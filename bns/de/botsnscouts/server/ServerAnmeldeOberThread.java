@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.server;
 
 import java.net.*;
 import java.io.*;
@@ -6,7 +6,8 @@ import java.io.*;
 /** Erlaubt die nebenlaeufige Anmeldung von Robotern und Ausgaben 
  *  Startet fuer jeden Anmeldeversuch einen ServerAnmeldeThread.
 */
-public class ServerAnmeldeOberThread extends Thread
+
+class ServerAnmeldeOberThread extends Thread
 {
     Server server;
     ServerSocket seso;

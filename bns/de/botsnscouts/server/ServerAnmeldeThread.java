@@ -1,10 +1,9 @@
-package de.spline.rr;
+package de.botsnscouts.server;
 
 import java.io.*; 
 import java.net.*; 
 /** 
  * Handhabt eine Connection nebenlaeufig.
- * original authors Holger Dreher, Alexander Rakovski, Mohammad Al-Saad 
  * modified for 2.0 by Dirk
  */ 
  

@@ -1,10 +1,10 @@
-package de.spline.rr;
+package de.botsnscouts.server;
 
 public class ServerRoboterThread extends Thread
 {
-    public Integer modus;
-    public int m;             // Modus während der Auswertung einer Antwort
-    public boolean fertig;
+    Integer modus;
+    int m;             // Modus während der Auswertung einer Antwort
+    boolean fertig;
     
     private Server server;
     private ServerAntwort ans;

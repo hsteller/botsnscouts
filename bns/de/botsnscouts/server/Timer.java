@@ -1,33 +1,33 @@
-package de.spline.rr;
+package de.botsnscouts.server;
 
 /** Schickt einem Thread nach definiertem Timeout einen notify(). 
  *  @author: Dirk
  */
 
-public class Timer extends Thread
+class Timer extends Thread
 {
     private int timeout;
     private Object toNotify;
     private boolean toVorbei;
     private boolean beenden=false;
         
-    public void setTimer(int to,Object tn)
+    void setTimer(int to,Object tn)
         {
             timeout=to;
             toNotify=tn;
         }
 
-    public synchronized boolean vorbei()
+    synchronized boolean vorbei()
         {
             return toVorbei;
         }
 
-    public void kill()
+    void kill()
         {
             beenden=true;
         }
         
-    public void run()
+    void run()
         {
             synchronized(this){
                 setName("TimerThread");

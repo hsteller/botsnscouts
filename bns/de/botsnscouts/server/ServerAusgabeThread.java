@@ -1,13 +1,13 @@
-package de.spline.rr;
+package de.botsnscouts.server;
 
-public class ServerAusgabeThread extends Thread
+class ServerAusgabeThread extends Thread
 {
     Server server;
     KommServerAusgabe komm;
     private boolean ende;
-    public Integer modus;
+    Integer modus;
     boolean fertig;
-    public float version;
+    float version;
     
     public ServerAusgabeThread(KommServerAusgabe ksa, Server s)
         {
