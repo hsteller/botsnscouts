@@ -111,7 +111,7 @@ public class RegisterView extends JButton {
 	}
 	if(locked()){
 	    //g.drawImage( lockedImage,(myX-50)/2,(myY-50)-1,this);
-	    g.drawImage( lockedImage,0,0,this);
+	    g.drawImage( lockedImage,4,3,this);
 	}
 	g.setFont(prioFont);
 	g.setColor(prioColor);
@@ -122,9 +122,13 @@ public class RegisterView extends JButton {
     public static void main (String args[]) {
 	Message.setLanguage("deutsch");
         JWindow f = new JWindow();
+        HumanCard card = new HumanCard( 1, "M1" );
+        card.setState( HumanCard.LOCKED );
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
 
-        RegisterView r = new RegisterView();
+        RegisterView r = new RegisterView(  );
+        r.setCard( card );
+        r.setLocked( true );
 
 	f.getContentPane().add(r);
 	f.pack();

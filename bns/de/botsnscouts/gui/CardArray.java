@@ -29,7 +29,7 @@ public class CardArray extends JPanel {
 		    System.err.println("Send.");
 		}
 	    });
-	     
+
     }
 
     public CardArray(ActionListener cards, ActionListener send) {
@@ -54,7 +54,7 @@ public class CardArray extends JPanel {
 	chooser.add(powerDownBox);
 
 	add(chooser);
-	
+
     }
 
     protected void resetAll() {
@@ -62,6 +62,7 @@ public class CardArray extends JPanel {
 	sendButton.setEnabled(false);
 	for (int i=0; i < cardsView.size(); i++) {
 	    ((CardView) cardsView.get(i)).reset();
+            ((CardView) cardsView.get(i)).setEnabled( false ); // XXX
 	}
     }
 
@@ -69,7 +70,7 @@ public class CardArray extends JPanel {
 	return powerDownBox.isSelected();
     }
 
-    public void addCard(HumanCard hc) {	
+    public void addCard(HumanCard hc) {
 	for (int i=0; i < cardsView.size(); i++) {
 	    if (((CardView) cardsView.get(i)).getCard() == null) {
 		((CardView) cardsView.get(i)).setCard(hc);
@@ -87,10 +88,11 @@ public class CardArray extends JPanel {
     }
 
 
-    public void setCards(ArrayList cards) {	
+    public void setCards(ArrayList cards) {
 	resetAll();
 	for (int i=0; i < cards.size(); i++) {
 	    ((CardView) cardsView.get(i)).setCard((HumanCard)cards.get(i));
+	    ((CardView) cardsView.get(i)).setEnabled( true );
 	}
     }
 
@@ -114,7 +116,7 @@ public class CardArray extends JPanel {
     public Dimension getMinimumSize() {
 	return new Dimension(xsize,ysize);
     }
-    
+
     public Dimension getPreferredSize() {
 	return new Dimension(xsize,ysize);
     }
@@ -134,7 +136,7 @@ public class CardArray extends JPanel {
     }
 
 
-    
+
 }
 
 

@@ -10,10 +10,13 @@ import java.net.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import org.apache.log4j.Category;
     /**
      * gui-container that has a card
      */
 public class CardView extends JButton {
+    static final Category CAT = Category.getInstance( CardView.class );
+
     private HumanCard h;
     private boolean wisenheimerPresent = false;
     private Font prioFont=new Font("SansSerif",Font.PLAIN,8);
@@ -103,7 +106,7 @@ public class CardView extends JButton {
 
     protected void setWisenheimer() {
 	wisenheimerPresent = true;
-	Global.debug(this,"lasse mich von einem Klugscheisser besetzten, ich habe die Karte: "+h);
+	CAT.debug("lasse mich von einem Klugscheisser besetzten, ich habe die Karte: "+h);
 	repaint();
     }
 
