@@ -35,17 +35,52 @@ public interface HumanViewInterface {
     public void showRegisterRepair();
 
     /**
-     * display the fresh cards that the server has sent
+     * update the position of the scout
      */
+    public void showUpdatedScout();
     //    public void showRegisterRepair();
 
     /**
-     * display the fresh cards that the server has sent
-     * Miriam: Auskommentiert, damit es uebersetzt. Dreimal die gleiche Signatur!
-  */
-    //public void showRegisterRepair();
-   
+     * activate the scout
+     */
+    public void activateScout();
 
+
+    /**
+     * remove the scout
+     */
+    public void removeScout();
+
+    /**
+     * update the position of the knowitalll
+     */
+    public void showUpdatedKlugScheisser();
+
+    /**
+     * activate the knowitall
+     */
+    public void activateKlugScheisser();
+
+
+    /**
+     * remove the knowitall
+     */
+    public void removeKlugScheisser();
+
+
+    /**
+     * show game over
+     * two types: a) winner + winner no.
+     *            b) dead
+     */
+    public void showGameOver(int typeOfGameOver, int winnerNumber);
+
+
+    /**
+     *  exit the programm
+     *  eihter by game over or by user request
+     */
+    public void shutup();
 }
 
 
