@@ -10,6 +10,14 @@ public class BoardRoboter extends Roboter {
 	super(name);
     }
 
+    public BoardRoboter(Roboter r) {
+	super(r);
+	BoardRoboter rob = (BoardRoboter )r;
+	xx = rob.xx;
+	yy = rob.yy;
+	aa = rob.aa;
+    }
+
     /**
      *Temporaere X-Postion des Roboters waehrend der Zugausfuerung.
      *wird nur intern von Spielfeld verwendet.

@@ -17,6 +17,13 @@ public class Roboter {
 	return new de.botsnscouts.board.BoardRoboter(name);
     }
 
+    /** Roboter-Fabrik kann auch klonen.
+	Sollte sie aber nicht. Wozu Roboter kopieren?
+    */
+    public static Roboter getCopy(Roboter r) {
+	return new de.botsnscouts.board.BoardRoboter(r);
+    }
+
     protected String name;
     /**
      * gibt die Ausrichtung des Roboters auf dem Spielfeld an
@@ -96,7 +103,7 @@ public class Roboter {
 	nextTurnPowerDown = false;
     }	 
 	
-    public Roboter(Roboter r ) {
+    protected Roboter(Roboter r ) {
 	super();
 	name = r.name;
 	ausrichtung = r.ausrichtung;
@@ -116,6 +123,11 @@ public class Roboter {
 	for (int i=0; i < karten.length; i++){
 	    karten[i] = r.karten[i];
 	}
+    }
+
+    /** liefert Zahl der zu erhaltenden Karten */
+    public int anzKarten() {
+	return ANZKARTEN - schaden;
     }
 
     public boolean isNaechsteRundeDeaktiviert(){
