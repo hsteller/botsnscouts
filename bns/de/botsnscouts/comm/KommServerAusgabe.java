@@ -2,11 +2,14 @@ package de.botsnscouts.comm;
 
 import de.botsnscouts.util.StatsList;
 import java.io.*;
+import org.apache.log4j.Category;
+
 // STAND : fertig 
-/**  
-Klasse fuer die Komunikation des Servers mit Ausgabekanälen
+/**  Communication from the server to the views.
 *@author Hendrik<BR> */
  public class KommServerAusgabe extends KommServer {
+
+    static final Category CAT = Category.getInstance( KommServerAusgabe.class );
 
  public KommServerAusgabe (BufferedReader in, PrintWriter out) {
  super (in, out);
@@ -24,6 +27,7 @@ Klasse fuer die Komunikation des Servers mit Ausgabekanälen
 	 raus = raus + roboternamen[i]+",";
        raus +=")";
        out.println(raus);
+       CAT.debug("Notify change send: "+raus);
        }
      catch (Exception not_existant) {
        throw new KommException ("Bei \"Aenderung\" trat eine Exception auf(Message: "+not_existant.getMessage()+")");
@@ -33,21 +37,31 @@ Klasse fuer die Komunikation des Servers mit Ausgabekanälen
 	 @param id Die Art der Nachricht bzw ihre id f&uuml;r die Message-Klasse */
      public void message (String id) {
 	 out.println("MSG("+id+")");
+	 if (CAT.isDebugEnabled())
+	     CAT.debug("Message send: "+id);
      }
      /**  Zum &uuml;bermitteln von Nachrichten/Ereignissen f&uuml; die Ausgabe
 	  @param id Die Art der Nachricht bzw ihre id f&uuml;r die Message-Klasse 
 	  @param name1 Ein zus&auml;tzliches Argument, f&uuml;r die Ausgabe von Nachrichten*/
      public void message (String id, String name1) {
 	 out.println("MSG("+id+","+name1+")");
+	 if (CAT.isDebugEnabled())
+	     CAT.debug("Message send: "+id+" "+name1);
      }
      public void message (String id, String name1, String name2) { 
 	 out.println("MSG("+id+","+name1+","+name2+")"); 
+	 if (CAT.isDebugEnabled())
+	     CAT.debug("Message send: "+id+" "+name1+" "+name2);
      }
      public void message (String id, String name1, String name2, String name3) { 
 	 out.println("MSG("+id+","+name1+","+name2+","+name3+")"); 
+	 if (CAT.isDebugEnabled())
+	     CAT.debug("Message send: "+id+" "+name1+" "+name2+" "+name3);
      }
      public void message (String id, String name1, String name2, String name3, String name4) { 
-	 out.println("MSG("+id+","+name1+","+name2+","+name3+","+name4+")"); 
+	 out.println("MSG("+id+","+name1+","+name2+","+name3+","+name4+")");
+	 if (CAT.isDebugEnabled())
+	     CAT.debug("Message send: "+id+" "+name1+" "+name2+" "+name3+" "+name4); 
      } 
      public void message (String id, String [] namen) {
 	 String send="MSG("+id;
@@ -60,6 +74,8 @@ Klasse fuer die Komunikation des Servers mit Ausgabekanälen
 	 send+=")";
 	 
 	 out.println(send);
+	 if (CAT.isDebugEnabled())
+	     CAT.debug("Message send: "+send);
      }
 
      /** Sends the stats to the output-channel

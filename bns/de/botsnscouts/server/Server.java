@@ -816,7 +816,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 		// Start der Phasenschleife
 		for (aktPhase=1; aktPhase!=0; aktPhase = (aktPhase+1)%6) {
-		    d("Auswertung Phase "+aktPhase);
+		    CAT.info("Evaluation phase "+aktPhase+", turn "+iRunde +" starts.");
 		    // Am Spiel beteiligte Roboter in Array kopieren (aus technischen Gruenden)
 		    Roboter[] robs;
 		    synchronized(aktRoboter) {
