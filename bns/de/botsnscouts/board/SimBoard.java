@@ -57,8 +57,7 @@ public class SimBoard extends Board implements Directions {
 
     protected Vector /* of LaserDef */ lasers;
 
-    /** the server to be notified of every change... This design
-     *  sucks royally, so: FIXME
+    /** TODO: the server to be notified of every change... This design sucks royally
      */
     protected Server server;
 
