@@ -235,7 +235,10 @@ public class KommClient {
 	   }
 	*/
 	if (!gotNTC) {// normal case; server did nothing unexpected
-	    try {
+	    if (in == null)
+              throw new KommFutschException("Connection to server failed!");
+
+            try {
 		rein = in.readLine();
 		if ((debug!=null)&&(log)) {
 		    debug.println("warte erhielt: "+rein);
@@ -646,7 +649,7 @@ public class KommClient {
 	    throw new KommException(Message.say("KommClient", "nohost"));
 	}
 	catch (java.io.IOException fehler) {
-	    throw new KommException ("IOException bei der Anmeldung");
+	    throw new KommException (Message.say("KommClient","IOException"));
 	}
 	// einlesen der Antwort beginnen
 	try {

@@ -471,7 +471,7 @@ public class Ausgabe extends BNSThread {
 
     /**
      * Zeigt einen Text im Splashscreen an
-     * (erzeugt den Splashscreen, falls n÷tig)
+     * (erzeugt den Splashscreen, falls noetig)
      */
     private void showSplash(String s) {
 	if(!nosplash) {
