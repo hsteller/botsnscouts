@@ -80,6 +80,11 @@ public class WaiterThread extends Thread{
     public void setMeldung(boolean m){
 	meldung=m;
     }
+    
+    public void reset(){
+	ksanz=0;
+	ks=new Thread[100];
+    }
 
     public void beende(){
 	beendemich=true;

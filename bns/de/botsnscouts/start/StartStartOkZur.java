@@ -48,6 +48,7 @@ public class StartStartOkZur extends JPanel implements  ActionListener, MouseLis
 	    parent.fassade.killServer(8077);
 	    Global.debug(this,"server gekilled!");
 	    //resete anzeige der angemeldeten roboter
+	    parent.resetWaiter();  
 	    parent.startStart.anmeldung.reset();
 	    parent.startStart.listen.closeSock();
 	    //schalte auf Spielfeld um

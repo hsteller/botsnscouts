@@ -73,6 +73,12 @@ public class Start extends JFrame implements WindowListener{
 	wth.addThread(k);
     }
 
+    public void resetWaiter(){
+	wth.beende();
+	wth.reset();
+	wth=new WaiterThread(this);
+    }
+    
     public void beenden(){
 	Global.debug(this,"beenden() wurde aufgerufen");
 	try{
@@ -80,7 +86,7 @@ public class Start extends JFrame implements WindowListener{
 		wth.start();
 	    }
 	}catch(IllegalThreadStateException e){
-	    System.err.println(Message.say("Start","e"));
+	    System.err.println(Message.say("Start","eSpielEnde"));
 	}
 //	dispose();
     }
