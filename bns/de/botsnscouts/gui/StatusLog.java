@@ -122,12 +122,10 @@ public class StatusLog  extends JPanel implements ActionListener{
                   this.setLocation((startx+ dim.width-500),
                              (starty+dim.height-150));
                 }
-                this.setVisible(true);
 		first = false;
 	    }
-	    else{
-		this.setVisible(true);
-	    }
+            this.setVisible(true);
+	    this.show();
 	}
 	public void finalize() throws Throwable{
 	    super.finalize();
