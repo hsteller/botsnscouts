@@ -1021,11 +1021,11 @@ public class SACanvas extends JComponent {
         // remove old highlight:
         repaintOrt( highlightPos );
 
-	System.out.println("highlighting 1 " + x + " " + y);
+        if( CAT.isDebugEnabled() )
+    	    CAT.debug("highlighting 1 " + x + " " + y);
 	highlightPos.x = x;
 	highlightPos.y = y;
 
-        CAT.debug( "going to highlight" );
         //this.paintHighlight((Graphics2D)this.getGraphics());
         if( !t.isRunning() )
             t.start();
