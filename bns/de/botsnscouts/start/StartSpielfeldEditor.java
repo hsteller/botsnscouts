@@ -187,8 +187,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 
 	spf.addKachelClickListener(this);
 
-	URL url = getClass().getResource(Message.say("Start","mBG"));
-	ImageIcon icon = new ImageIcon( url );
+	ImageIcon icon = ImageMan.getIcon(Message.say("Start","mBG"));
 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 	Graphics g = bgimg.getGraphics();
 	icon.paintIcon(this, g, 0,0);

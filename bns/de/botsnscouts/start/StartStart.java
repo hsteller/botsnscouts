@@ -66,8 +66,7 @@ public class StartStart extends JPanel implements  ActionListener, MouseListener
 	panel.add(ms, gc);
 	add(BorderLayout.EAST,panel);
 
-	URL url = getClass().getResource(Message.say("Start","mBG"));
-	ImageIcon icon = new ImageIcon( url );
+	ImageIcon icon = ImageMan.getIcon(Message.say("STart","mBG"));
 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 	Graphics g = bgimg.getGraphics();
 	icon.paintIcon(this, g, 0,0);
