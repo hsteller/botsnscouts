@@ -49,6 +49,17 @@ public class RegisterArray extends JPanel {
 	}
     
 
+
+    public boolean allOcupied() {
+	int ocupied=0;
+	for (int i=0; i < registerView.size(); i++) {
+	    if (((CardView) registerView.get(i)).getCard() != null) {
+		ocupied++;
+	    }
+	}
+	return (ocupied == 5);
+    }
+
     public Dimension getMinimumSize() {
 	return new Dimension(xsize,ysize);
     }

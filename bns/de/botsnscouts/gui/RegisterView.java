@@ -43,6 +43,10 @@ public class RegisterView extends JButton {
 	h = null;
     }
 
+    public boolean locked() {
+	return h.locked();
+    }
+
 
     public void setCard(HumanCard h) {
 	this.h = h;
