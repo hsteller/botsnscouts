@@ -452,7 +452,7 @@ public class AnimationCanvas extends Canvas implements Scalable, DrawingConstant
 	                      moveRobEast(internal, robocount);
 	                      internal.setPos(oldX + 1, oldY);
 	                  }
-	                  break;;
+	                  break;
 	              }
 	          case WEST:
 	              {
@@ -468,7 +468,7 @@ public class AnimationCanvas extends Canvas implements Scalable, DrawingConstant
 	                      moveRobSouth(internal, robocount);
 	                      internal.setPos(oldX, oldY - 1);
 	                  }
-	                  break;;
+	                  break;
 	              }
 	          default:
 	              {
