@@ -81,7 +81,7 @@ public Vector getLasers(){
      */
     public void ausgabenMsg(String id, String[] args){
 	if (server != null)
-	    server.ausgabenMsg(id,args);
+	    server.sendMsg(id,args);
     }
     private void ausgabenMsgString(String id, String arg){
 	if (server == null)

@@ -5,7 +5,9 @@ import de.botsnscouts.util.*;
 
 class ServerAusgabeThread extends Thread implements Waitable
 {
-    private Server server;
+    private InfoRequestAnswerer info;
+    private OKListener ok;
+    private ServerOutputThreadMaintainer outMaint;
     private KommServerAusgabe komm;
     private boolean ende;
     private int mode;
@@ -20,15 +22,17 @@ class ServerAusgabeThread extends Thread implements Waitable
 	version=v;
     }
 
-    public ServerAusgabeThread(KommServerAusgabe ksa, Server s)
+    public ServerAusgabeThread(KommServerAusgabe ksa, OKListener okL, InfoRequestAnswerer info, ServerOutputThreadMaintainer m)
         {
-            server=s;
+            ok=okL;
+	    this.info=info;
+	    outMaint=m;
             komm=ksa;
-            mode=s.KEINEFRAGEN; // sicher ist sicher
+            mode=Server.KEINEFRAGEN; // sicher ist sicher
         }
 
     private void notifyServer(){
-	server.notifyDone(this);
+	ok.notifyDone(this);
     }
 
     public void run()
@@ -40,10 +44,10 @@ class ServerAusgabeThread extends Thread implements Waitable
                   ans=komm.warte();
                   synchronized(this){
                       int m=mode;
-                      if (m==server.KEINEFRAGEN){ // dumm gelaufen...
+                      if (m==Server.KEINEFRAGEN){ // dumm gelaufen...
 			  if (ans.typ!=ans.ABMELDUNG){
 			      d("Keine Fragen erlaubt. Ausgabe entstoepseln."+this);
-			      server.ausgabeEntstoepseln(this,"RV");
+			      outMaint.deleteOutput(this,"RV");
 			      break outer;
 			  } else
 			      return;
@@ -56,33 +60,33 @@ class ServerAusgabeThread extends Thread implements Waitable
                               break;
 
                           case ServerAntwort.GIBSPIELFELDDIM:
-                              komm.sendSpielfeldDim(server.feld.getSizeX(),server.feld.getSizeY());
+                              komm.sendSpielfeldDim(info.getFieldSizeX(),info.getFieldSizeY());
                               break;
 
                           case ServerAntwort.GIBSPIELFELD:
-                              komm.sendSpielfeld(server.feld.getSpielfeldString());
+                              komm.sendSpielfeld(info.getFieldString());
                               break;
 
                           case ServerAntwort.GIBFAHNENPOS:
-                              komm.sendFahnenpos(server.feld.getFlaggen());
+                              komm.sendFahnenpos(info.getFlags());
                               break;
 
                           case ServerAntwort.GIBNAMEN:
-			      komm.sendNamen(server.gibNamen());
+			      komm.sendNamen(info.getNames());
                               break;
 
                           case ServerAntwort.GIBROBOTERPOS:
-			      Ort o=server.gibRobPos(ans.name);
+			      Ort o=info.getRobPos(ans.name);
 			      if (o!=null)
 				  komm.sendRobpos(o);
                               else{
-                                  server.ausgabeEntstoepseln(this,"RV");
+                                  outMaint.deleteOutput(this,"RV");
                                   ende=true;
                               }
                               break;
 
                           case ServerAntwort.GIBROBSTATUS:
-                              Roboter r = server.roboterStatus(ans.name);
+                              Roboter r = info.getRobStatus(ans.name);
                               if(r != null){
                                   komm.sendRobStatus(r);
                               }else{
@@ -91,27 +95,27 @@ class ServerAusgabeThread extends Thread implements Waitable
                               break;
 
                           case ServerAntwort.GIBSPIELSTAND:
-                              if(server.spiellaeuft()){
-                                  komm.spielstand(new Boolean(true),  server.auswertung());
+                              if(info.gameRunning()){
+                                  komm.spielstand(new Boolean(true), info.getStanding());
                               }else{
-                                  komm.spielstand(new Boolean(false), server.auswertung());
+                                  komm.spielstand(new Boolean(false), info.getStanding());
 				  notifyServer();
                               }
                               break;
 
                           case ServerAntwort.GIBAUSWERTUNGSSTATUS:
                               d("in GibAuswertungsStatus");
-                              komm.spielStatus(server.gibAuswertungsStatus());
+                              komm.spielStatus(info.getEvalStatus());
                               break;
 
 		          case ServerAntwort.GIBTIMEOUT:
-                              komm.sendTimeOut(server.zugto/1000);
+                              komm.sendTimeOut(outMaint.getOutputTimeout()/1000);
                               break;
 		          case ServerAntwort.GIBFARBEN:
-			      komm.sendFarben(server.angemeldet);
+			      komm.sendFarben(info.getNamesByColor());
 		              break;
 		          case ServerAntwort.STATS:
-			      komm.sendStats(server.stats);
+			      komm.sendStats(info.getStats());
 			      break;
 
 		          case ServerAntwort.ABMELDUNG:
@@ -121,7 +125,7 @@ class ServerAusgabeThread extends Thread implements Waitable
 
 		      default:
                               d("Erhielt einen Typ "+ans.typ+"; ich weiss nicht was ich damit soll und entstoepsle mich.");
-                              server.ausgabeEntstoepseln(this,"RV");
+                              outMaint.deleteOutput(this,"RV");
                               notifyServer();
                               break;
                       } // switch
@@ -130,7 +134,7 @@ class ServerAusgabeThread extends Thread implements Waitable
               catch (KommException e){
                   d("KommException ist aufgetreten. Beende mich.");
                   d("Message: "+e.getMessage());
-                  server.ausgabeEntstoepseln(this,"RV");
+                  outMaint.deleteOutput(this,"RV");
                   ende=true;
               }
           } //"Endlos"schleife

@@ -147,7 +147,7 @@ public class ServerAnmeldeThread extends Thread{
 		d("ok konnte nicht an Ausgabekanal gesendet werden");
 		return;
 	    }
-	    ServerAusgabeThread neu = new ServerAusgabeThread(ksa, server);
+	    ServerAusgabeThread neu = new ServerAusgabeThread(ksa, server, server, server);
 
 	    if (clienttype==AUSGABEV2)
 		neu.setVersion(2);
@@ -239,7 +239,7 @@ public class ServerAnmeldeThread extends Thread{
 			oberThread.anzSpieler=new Integer(oberThread.anzSpieler.intValue()+1);
 			d(""+oberThread.anzSpieler+". Roboter mit Name "+clientname+" erzeugt.");
 
-			ServerRoboterThread neu=new ServerRoboterThread(h,server,komm);
+			ServerRoboterThread neu=new ServerRoboterThread(h,server,server,server,komm);
 			server.addRoboterThread(neu);
 			d("ServerRoboterThread erzeugt und einsortiert.");
 			oberThread.addName(" "+clientname+" ");
