@@ -213,6 +213,7 @@ public class BoardView extends JLayeredPane {
     public synchronized void setScale(double scale) {
         // adapt this Component to the scaling factor
         //dScale = scale;
+        deleteScout();
         scaledFeldSize = (int) (scale * FELDSIZE);
        dScale = scaledFeldSize/((double)FELDSIZE);
         
@@ -225,7 +226,7 @@ public class BoardView extends JLayeredPane {
         // the preComputed-BoardImage is no longer valid      
         preBoard = null;
 
-       
+       //paintScout(this.getGraphics());
     }
 
     private void init(SimBoard sf_neu, Color[] robColors) {
@@ -455,23 +456,25 @@ public class BoardView extends JLayeredPane {
             int xpos64 = (internal.getX()-1) * feldSize;
             int ypos64 = (sf.getSizeY() -internal.getY())* feldSize;
             int clipLength=2*feldSize;
-                BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64, feldSize,clipLength);
-                Raster blank = tmpImage.getData();
-                Graphics2D myg = (Graphics2D) tmpImage.getGraphics();
-                myg.setComposite(ac);
-                    for (int yoffset = 0; yoffset <=feldSize; yoffset += MOVE_ROB_ANIMATION_OFFSET) {
-                         tmpImage.setData(blank);                                   
-                         myg.drawImage(imgRob, 0,yoffset, feldSize,feldSize, this); // paint the image                                                                                        
-                         g2.drawImage(tmpImage, xpos64, ypos64, feldSize, clipLength,this);
-                       try {
-                             Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
-                        } catch (InterruptedException ie) {
-                            CAT.warn("BoardView.paint: wait int moveRobNorth interrupted");
-                        }
-                       
+            if (preBoard==null)
+                preBoard=getBoardImage();
+            BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64, feldSize,clipLength);
+            Raster blank = tmpImage.getData();
+            Graphics2D myg = (Graphics2D) tmpImage.getGraphics();
+            myg.setComposite(ac);
+                for (int yoffset = 0; yoffset <=feldSize; yoffset += MOVE_ROB_ANIMATION_OFFSET) {
+                     tmpImage.setData(blank);                                   
+                     myg.drawImage(imgRob, 0,yoffset, feldSize,feldSize, this); // paint the image                                                                                        
+                     g2.drawImage(tmpImage, xpos64, ypos64, feldSize, clipLength,this);
+                   try {
+                         Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                    } catch (InterruptedException ie) {
+                        CAT.warn("BoardView.paint: wait int moveRobNorth interrupted");
                     }
-                    tmpImage.setData(blank);            
-        }
+                   
+                }
+                tmpImage.setData(blank);            
+    }
     }
 
 
@@ -489,6 +492,8 @@ public class BoardView extends JLayeredPane {
             int xpos64 =  (internal.getX()-1)* feldSize;
             int ypos64 =  (sf.getSizeY()-internal.getY()) *feldSize;
             int clipLength = 2*feldSize;  
+            if (preBoard==null)
+                preBoard=getBoardImage();
             BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64,clipLength,scaledFeldSize);
             Raster blank = tmpImage.getData();
             Graphics2D myg = (Graphics2D) tmpImage.getGraphics();    
@@ -522,7 +527,8 @@ public class BoardView extends JLayeredPane {
             int clipLength = 2*feldSize;     
             int xpos64 =  (internal.getX()-2) * feldSize;
             int ypos64 = (sf.getSizeY() - internal.getY())* feldSize;                         
-          
+            if (preBoard==null)
+                preBoard=getBoardImage();
             BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64,clipLength, feldSize);
             Raster blank = tmpImage.getData();
             Graphics2D myg = (Graphics2D) tmpImage.getGraphics();    
@@ -626,7 +632,7 @@ public class BoardView extends JLayeredPane {
         Location target = targetRob.getPos();
         int  laserFacing = sourceRob.getFacing();
         int laenge = calculateLaserLength(source, target, laserFacing);
-        laenge *= 64;
+        laenge *= scaledFeldSize;
 
         String name = sourceRob.getName();
 
@@ -642,12 +648,16 @@ public class BoardView extends JLayeredPane {
             SoundMan.playSound(BotVis.getBotLaserSoundByName(name));
             Graphics2D g2 = (Graphics2D) getGraphics();
             //g2.scale(dScale, dScale);
-            for (int i = 1; i <= FULL_LENGTH_INT; i++) {
-                int tmp_laenge = (int) ((((double) i) / FULL_LENGTH_DOUBLE) * laenge);
-                
+            int step = Math.max(1, (int) (((double)laenge)/FULL_LENGTH_DOUBLE)); // step must not be 0 
+                    																					// otherwise the while loop below won't exit
+            int tmp_laenge = step;
+            
+            //for (int i = 1; i <= FULL_LENGTH_INT; i++) {
+            //    int tmp_laenge = (int) ((((double) i) / FULL_LENGTH_DOUBLE) * laenge);
+            while (tmp_laenge<=laenge)  {  
                
                 paintActiveRobLaser(g2, source, laserFacing,tmp_laenge, robColor);
-
+                tmp_laenge+=step;
                 //     synchronized(this){
                 try {
                     wait(1);
@@ -724,7 +734,7 @@ public class BoardView extends JLayeredPane {
         switch (laserFacing) {
             case NORTH:
                 {
-                    lSourceX = tmp.x - (breite / 2 - 1);
+                    lSourceX = tmp.x - (breite / 2);
                     lSourceY = tmp.y - actualLength;
                     g2d.fillRect(lSourceX, lSourceY, breite, actualLength);
                     break;
@@ -732,13 +742,13 @@ public class BoardView extends JLayeredPane {
             case EAST:
                 {
                     lSourceX = tmp.x;
-                    lSourceY = tmp.y - (breite / 2 - 1);                    
+                    lSourceY = tmp.y - (breite / 2 );                    
                     g2d.fillRect(lSourceX, lSourceY, actualLength, breite);
                     break;
                 }
             case SOUTH:
                 {
-                    lSourceX = tmp.x - (breite / 2 - 1);
+                    lSourceX = tmp.x - (breite / 2 );
                     lSourceY = tmp.y;
                     g2d.fillRect(lSourceX, lSourceY, breite, actualLength);
                     break;
@@ -1255,9 +1265,9 @@ public class BoardView extends JLayeredPane {
     	if (sf.nw(xpos, ypos).isExisting()) {
             // is there a boardlaser to paint at this wall?
             if (sf.nw(xpos, ypos).getSouthDeviceType() == Wall.TYPE_LASER) {
-                g.drawImage(diverseCrop[15], actx, acty + 5, scaledFeldSize, scaledFeldSize, this);
+                g.drawImage(diverseCrop[15], actx, acty + fuenf, scaledFeldSize, scaledFeldSize, this);
             }
-            // is there a pisher?
+            // is there a pusher?
             if (sf.nw(xpos, ypos).getSouthDeviceType() == Wall.TYPE_PUSHER) {
                 g.drawImage(diverseCrop[7], actx - 1, acty + fuenf, scaledFeldSize, scaledFeldSize, this);
                 // ------------draw text (phases when active) on pusher --------------------
@@ -1294,11 +1304,11 @@ public class BoardView extends JLayeredPane {
             g.drawImage(diverseCrop[13], actx, acty + scaledFeldSize-sechs, scaledFeldSize, scaledFeldSize, this);
         }
 
-        // paint wall in the south, if any
+        // paint wall in the east, if any
 
         if (sf.ew(xpos, ypos).isExisting()) {
             if (sf.ew(xpos, ypos).getWestDeviceType() == Wall.TYPE_LASER) {
-                g.drawImage(diverseCrop[14], actx - sechs, acty, scaledFeldSize, scaledFeldSize, this);
+                g.drawImage(diverseCrop[14], actx - sechs+1, acty, scaledFeldSize, scaledFeldSize, this);
             }
             if (sf.ew(xpos, ypos).getWestDeviceType() == Wall.TYPE_PUSHER) {
                 g.drawImage(diverseCrop[6], actx - sechs, acty, scaledFeldSize, scaledFeldSize, this);
@@ -1441,8 +1451,13 @@ public class BoardView extends JLayeredPane {
             unhighlight();
         }
     });
+    
+    
+    
 
-
+   
+    
+    
     void highlight(int x, int y) {
         // remove old highlight:
         repaintOrt(highlightPos);
