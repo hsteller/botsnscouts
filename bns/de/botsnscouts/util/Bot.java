@@ -446,7 +446,19 @@ public class Bot {
     public void turnTo(int richtung){
 	setFacing(richtung);
     }
-
+    
+    public void turnClockwise(){
+       this.facing =((facing + 1) % 4);               
+    }
+    
+    public void turnCounterClockwise(){
+        int tmpFacing = this.facing -1;
+        if (tmpFacing == -1)
+            tmpFacing = 3;
+        this.facing = tmpFacing;
+     
+    }
+    
     public void setFacing(int neu) {
 	this.facing = neu;
     }
