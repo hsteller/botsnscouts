@@ -11,10 +11,10 @@ import de.botsnscouts.gui.*;
 
 public class Facade{
 
-    private KachelRaster kachelRaster, kachelRasterSave;
+    private TileRaster tileRaster, tileRasterSave;
     private Launcher launcher;
     private KommSpPr com;
-    private KachelFactory kachelFactory;
+    private TileFactory tileFactory;
     private int thumbGR;
 
     private static final String DIP="127.0.0.1";
@@ -30,9 +30,9 @@ public class Facade{
     }
     public Facade(int gr){
 	thumbGR=gr;
-	kachelFactory = new KachelFactory(thumbGR);
-	kachelFactory.start();
-	kachelRaster = new KachelRaster(kachelFactory);
+	tileFactory = new TileFactory(thumbGR);
+	tileFactory.start();
+	tileRaster = new TileRaster(tileFactory);
 	launcher = new Launcher();
 	com=new KommSpPr();
     }
@@ -41,120 +41,120 @@ public class Facade{
 	return thumbGR;
     }
 
-    //*KachelRaster*//
+   //*TileRaster*//
     //setzt Spielfeldgröße
     public void setSpielfeldDim(int x, int y){
-	kachelRaster.setSpielfeldDim(x,y);
+	tileRaster.setSpielfeldDim(x,y);
     }
 
     //gibt Spielfeldgröße zurück
     public Ort getSpielfeldDim(){
-	return kachelRaster.getSpielfeldDim();
+	return tileRaster.getSpielfeldDim();
     }
 
     // aktualisiert das Spielfeld
-    public void setKachel(int x, int y, String kachel) throws FlaggenVorhandenException{
+    public void setTile(int x, int y, String tile) throws FlaggenVorhandenException{
 	// to be written......
-	//Global.debug(this,"setKachel "+x+","+y+" "+kachel);
-	kachelRaster.setKachel(x,y,kachel);
+	//Global.debug(this,"setTile "+x+","+y+" "+tile);
+	tileRaster.setTile(x,y,tile);
     }
 
-    //dreht die Kachel um r*90° nach rechts
-    public void rotKachel(int x, int y){
-	kachelRaster.rotKachel(x,y);
+    //dreht die Tile um r*90° nach rechts
+    public void rotTile(int x, int y){
+	tileRaster.rotTile(x,y);
     }
 
-    //löscht die Kachel at (x,y)
-    public void delKachel(int x, int y){
+    //löscht die Tile at (x,y)
+    public void delTile(int x, int y){
 	// to be written......
-	kachelRaster.delKachel(x,y);
+	tileRaster.delTile(x,y);
     }
 
-    //prüft ob auf der Kachel at (x,y) Flaggen stehen
+    //prüft ob auf der Tile at (x,y) Flaggen stehen
     public boolean sindFlaggen(int x, int y){
-	return kachelRaster.sindFlaggen(x,y);
+	return tileRaster.sindFlaggen(x,y);
     }
 
     // prüft ob eine Flagge hinzugefügt werden kann
     public boolean checkFlaggePos(int x,int y){
-	return kachelRaster.checkFlaggePos(x,y);
+	return tileRaster.checkFlaggePos(x,y);
     }
 
     // prüft ob eine Flagge hinzugefügt werden kann
     public boolean checkFlaggeMovePos(int x,int y){
-	return kachelRaster.checkFlaggeMovePos(x,y);
+	return tileRaster.checkFlaggeMovePos(x,y);
     }
 
     // gibt ein String zurück falls die FlaggenPosition ungünstig ist
     //null sonst
     public String getFlaggeKomment(int x,int y){
-	return kachelRaster.getFlaggeKomment(x,y);
+	return tileRaster.getFlaggeKomment(x,y);
     }
 
     // fügt eine Flagge hinzu 
     public void addFlagge(int x,int y) throws FlaggenException{
-	kachelRaster.addFlagge(x,y);
+	tileRaster.addFlagge(x,y);
     }
 
     // löscht eine Flagge hinzu 
     public void delFlagge(int nr){
-	kachelRaster.delFlagge(nr);
+	tileRaster.delFlagge(nr);
     }
     
     //löscht Flagge mit koordinaten ax,ay
     public void delFlagge(int ax,int ay){
-	kachelRaster.delFlagge(ax,ay);
+	tileRaster.delFlagge(ax,ay);
     }
 
     //prüft, ob eine Flagge da ist
     public boolean istFlagge(int ax,int ay){
-	return kachelRaster.istFlagge(ax,ay);
+	return tileRaster.istFlagge(ax,ay);
     }
 
     // versetzt eine Flagge 
     public void moveFlagge(int nr, int x,int y) throws FlaggenException{
-	kachelRaster.moveFlagge(nr,x,y);
+	tileRaster.moveFlagge(nr,x,y);
     }
 
     // versetzt eine Flagge 
     public void moveFlagge(int ax,int ay, int x,int y) throws FlaggenException{
-	kachelRaster.moveFlagge(ax,ay,x,y);
+	tileRaster.moveFlagge(ax,ay,x,y);
     }
 
     //gibt die Flaggen zurück
     public Ort[] getFlaggen(){
-	return kachelRaster.getFlaggen();
+	return tileRaster.getFlaggen();
     }
 
-    //gibt Kacheln als 2-dim Array von Spielfeld zurück
-    public Tile[][] getKacheln(){
-	return kachelRaster.getKacheln();
+    //gibt Tilen als 2-dim Array von Spielfeld zurück
+    public Tile[][] getTiles(){
+	return tileRaster.getTiles();
     }
 
-    //gibt eine Kachel an der gegebenen Position
-    public Tile getKachelAt(int x, int y){
-	return kachelRaster.getKachelAt(x,y);
+    //gibt eine Tile an der gegebenen Position
+    public Tile getTileAt(int x, int y){
+	return tileRaster.getTileAt(x,y);
     }
 
-    //speichert den Zustand des KachelRasters
-    public void saveKachelRaster(){
-	kachelRasterSave=kachelRaster.getClone();
+    //speichert den Zustand des TileRasters
+    public void saveTileRaster(){
+	tileRasterSave=tileRaster.getClone();
     }
 
-    //stellt den gespeicherten Zustand des KachelRastors wieder her
-    public void restorKachelRaster(){
-	kachelRaster=kachelRasterSave;
+    //stellt den gespeicherten Zustand des TileRastors wieder her
+    public void restorTileRaster(){
+	tileRaster=tileRasterSave;
     }
 
     //prüft ob Spielfeld gültig ist (plausibilitätstests)
     public boolean checkSpielfeld() throws OneFlagException, NichtZusSpfException{
-	return kachelRaster.checkSpielfeld();
+	return tileRaster.checkSpielfeld();
     }
 
     //gibt das aktuelle Spielfeld als Properties zurück
     public Properties getSpfProp(){
 	Properties spfProp=new Properties();
-	Tile[][] kach=getKacheln();
+	Tile[][] kach=getTiles();
 	for (int i=0;i<kach.length;i++){
 	    for (int j=0;j<kach[0].length;j++){
 		if (kach[i][j]!=null){
@@ -178,29 +178,29 @@ public class Facade{
 	Ort dim=getSpielfeldDim();
 	for (int i=0;i<dim.x;i++){
 	    for (int j=0;j<dim.y;j++){
-		//lese kachelname ein
+		//lese tilename ein
 		String name=spfProp.getProperty("kach"+i+","+j);
-		delKachel(i,j);
+		delTile(i,j);
 		if(name!=null){
 		    //falls vorhanden
 		    try{
-			//setze Kachel
-			setKachel(i,j,name);
+			//setze Tile
+			setTile(i,j,name);
 		    }catch(FlaggenVorhandenException e){
 		    }
 		    try{
 			//lese Drehung aus
 			int dr=Integer.parseInt(spfProp.getProperty("dreh"+i+","+j));
-			//drehe Kachel
+			//drehe Tile
 			for (int d=0;d<dr;d++){
-			    rotKachel(i,j);
+			    rotTile(i,j);
 			}
 		    }catch(NumberFormatException e){
 		    }
 		}
 	    }
 	}
-	int flAnz=kachelRaster.getMaxFlag();
+	int flAnz=tileRaster.getMaxFlag();
 	int cntr=0;
 	int flx,fly;
 	//lösche evtl. vorhandene Flaggen
@@ -220,10 +220,10 @@ public class Facade{
 	}
     }
 
-    //*KachelFactory*//
-    //gibt KachelInfos zurück
-    public KachelInfo[] getKachelInfos(){
-	return kachelFactory.getKachelInfos();
+    //*TileFactory*//
+    //gibt TileInfos zurück
+    public TileInfo[] getTileInfos(){
+	return tileFactory.getTileInfos();
     }
 
     //*Launcher*//
@@ -283,7 +283,7 @@ public class Facade{
 
     public boolean startGame(String ip, int port, int pnum, int timeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
 	boolean ret;
-	ret=launcher.startGame(com, kachelRaster, ip, port, pnum, timeOut, lisPort);
+	ret=launcher.startGame(com, tileRaster, ip, port, pnum, timeOut, lisPort);
 
 	return ret;
     }

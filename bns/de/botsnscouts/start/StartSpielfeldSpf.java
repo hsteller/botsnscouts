@@ -12,7 +12,7 @@ import de.botsnscouts.board.*;
 
 public class StartSpielfeldSpf extends JPanel{
     Start parent;
-    StartKachelComp[][] kachP;
+    StartTileComp[][] kachP;
     Facade fassade;
 
     public StartSpielfeldSpf(Start par){
@@ -26,11 +26,11 @@ public class StartSpielfeldSpf extends JPanel{
 	setOpaque(false);
 	//setBorder(new EmptyBorder(50,50,50,50));
 
-	kachP=new StartKachelComp[spfDim.x][spfDim.y];
+	kachP=new StartTileComp[spfDim.x][spfDim.y];
 	//initialisiere Panels für jede Kachel
 	for (int j=spfDim.y-1;j>=0;j--){
 	    for (int i=0;i<spfDim.x;i++){
-		kachP[i][j]=new StartKachelComp(par.fassade,i,j);
+		kachP[i][j]=new StartTileComp(par.fassade,i,j);
 		add(kachP[i][j]);
 	    }
 	}
@@ -44,19 +44,19 @@ public class StartSpielfeldSpf extends JPanel{
 	}
     }
 
-    public void addKachelClickListener(KachelClickListener kachelClickL){
+    public void addTileClickListener(TileClickListener tileClickL){
 	for (int i=0;i<kachP.length;i++){
 	    for (int j=0;j<kachP[0].length;j++){
-		kachP[i][j].addKachelClickListener(kachelClickL);
+		kachP[i][j].addTileClickListener(tileClickL);
 	    }
 	}
 
     }
 
-    public void removeKachelClickListener(){
+    public void removeTileClickListener(){
 	for (int i=0;i<kachP.length;i++){
 	    for (int j=0;j<kachP[0].length;j++){
-		kachP[i][j].removeKachelClickListener();
+		kachP[i][j].removeTileClickListener();
 	    }
 	}
 

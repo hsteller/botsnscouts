@@ -2,11 +2,11 @@ package de.botsnscouts.start;
 
 import java.awt.*;
 
-public class KachelInfo{
+public class TileInfo{
     private Image image;
     private String name;
 
-    public KachelInfo(String nam, Image img){
+    public TileInfo(String nam, Image img){
 	name=nam;
 	image=img;
     }

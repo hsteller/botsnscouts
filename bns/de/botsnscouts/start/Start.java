@@ -152,7 +152,7 @@ public class Start extends JFrame implements WindowListener{
 	    startSpielfeldEditor.parent=null;
 	    startSpielfeldEditor.spf=null;
 	    startSpielfeldEditor.images=null;
-	    startSpielfeldEditor.kachelInfos=null;
+	    startSpielfeldEditor.tileInfos=null;
 	    startSpielfeldEditor.cursors=null;
 	}
 	

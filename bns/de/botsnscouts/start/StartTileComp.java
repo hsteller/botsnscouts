@@ -10,9 +10,9 @@ import java.net.*;
 import java.io.*;
 import de.botsnscouts.util.*;
 
-public class StartKachelComp extends JComponent implements  MouseListener, MouseMotionListener{
+public class StartTileComp extends JComponent implements  MouseListener, MouseMotionListener{
 
-    Image kachImage;
+    Image tileImage;
     int drehung;
     Facade fassade;
     int myX,myY;
@@ -21,11 +21,11 @@ public class StartKachelComp extends JComponent implements  MouseListener, Mouse
     int[] flagNum=new int[0];
     Ort[] flagPos=new Ort[0]; 
 
-    private boolean flaggenChanged, kachelChanged;
+    private boolean flagsChanged, tileChanged;
 
-    KachelClickListener kachelClickListener;
+    TileClickListener tileClickListener;
 
-    public StartKachelComp(Facade fas, int x, int y){
+    public StartTileComp(Facade fas, int x, int y){
 	setOpaque(false);
 	fassade=fas;
 	W=H=fassade.getThumbGR();
@@ -48,29 +48,29 @@ public class StartKachelComp extends JComponent implements  MouseListener, Mouse
     public void rasterChanged(){
 	//hole den neuen Image
 	//Global.debug(this, "rasterChanged "+myX+","+myY);
-	Tile tmpKachel=fassade.getKachelAt(myX, myY);
-	if (tmpKachel!=null){
-	    Image newKachelImage=tmpKachel.getImage();
-	    int newDrehung=tmpKachel.getRotation();
-	    kachelChanged=(kachImage!=newKachelImage||drehung!=newDrehung);
-	    kachImage=newKachelImage;
+	Tile tmpTile=fassade.getTileAt(myX, myY);
+	if (tmpTile!=null){
+	    Image newTileImage=tmpTile.getImage();
+	    int newDrehung=tmpTile.getRotation();
+	    tileChanged=(tileImage!=newTileImage||drehung!=newDrehung);
+	    tileImage=newTileImage;
 	    drehung=newDrehung;
 	}else{
-	    kachelChanged=(kachImage!=null);
-	    kachImage=null;
+	    tileChanged=(tileImage!=null);
+	    tileImage=null;
 	}
 	//hole die Flaggen
 	Ort[] flag = fassade.getFlaggen();
 	int counter=0;
-	flaggenChanged=false;
+	flagsChanged=false;
 	for (int i=0;i<flag.length;i++){
 	    if (flag[i]!=null&&(flag[i].x-1)/12==myX&&(flag[i].y-1)/12==myY){
-		flaggenChanged=(flaggenChanged||flagNum.length<=counter||flagNum[counter]!=i+1||flagPos[counter].x!=(flag[i].x-1)%12||flagPos[counter].y!=(flag[i].y-1)%12);
+		flagsChanged=(flagsChanged||flagNum.length<=counter||flagNum[counter]!=i+1||flagPos[counter].x!=(flag[i].x-1)%12||flagPos[counter].y!=(flag[i].y-1)%12);
 		counter++;
 	    }
 	}
-	flaggenChanged=(flaggenChanged||flagNum.length!=counter);
-	if (flaggenChanged){
+	flagsChanged=(flagsChanged||flagNum.length!=counter);
+	if (flagsChanged){
 	    flagNum=new int[counter];
 	    flagPos=new Ort[counter];
 	    if (counter!=0){
@@ -84,7 +84,7 @@ public class StartKachelComp extends JComponent implements  MouseListener, Mouse
 		}
 	    }
 	}
-	if (flaggenChanged||kachelChanged){
+	if (flagsChanged||tileChanged){
 	    repaint();
 	}
     }
@@ -97,13 +97,13 @@ public class StartKachelComp extends JComponent implements  MouseListener, Mouse
 	Graphics2D g2d = (Graphics2D) g;
 	g2d.setPaint( paint );
 
-	if (kachImage==null){//falls keine Kachel an dieser Stelle
+	if (tileImage==null){//falls keine Kachel an dieser Stelle
 	    g2d.setComposite( alphaTrans );
 	    g2d.fillRect(0,0, W, H);
 	    g2d.setComposite( alphaOpaque );
 	}else {//sonst male Kachelimage
 	    AffineTransform oldTransform=g2d.getTransform();
-	    g2d.drawImage(kachImage,AffineTransform.getRotateInstance(Math.toRadians(-90*drehung),kachImage.getWidth(null)/2,kachImage.getHeight(null)/2),null);
+	    g2d.drawImage(tileImage,AffineTransform.getRotateInstance(Math.toRadians(-90*drehung),tileImage.getWidth(null)/2,tileImage.getHeight(null)/2),null);
 	    g2d.setTransform(oldTransform);
 	    
 	    //male Flaggen
@@ -118,24 +118,24 @@ public class StartKachelComp extends JComponent implements  MouseListener, Mouse
 	}
     }
 
-    public void addKachelClickListener(KachelClickListener kachelClickL){
-	kachelClickListener=kachelClickL;
+    public void addTileClickListener(TileClickListener tileClickL){
+	tileClickListener=tileClickL;
     }
 
-    public void removeKachelClickListener(){
-	kachelClickListener=null;
+    public void removeTileClickListener(){
+	tileClickListener=null;
     }
 
     //MouseListener Methoden
     //Invoked when the mouse has been clicked on a component.
     public void mouseClicked(MouseEvent e){
-	if (kachelClickListener!=null){
+	if (tileClickListener!=null){
 	    //awt->flagge
 	    //x->x*12/W +1
 	    int xx=(e.getX()==W?12:(int)((double)e.getX()*12.0/(double)W)+1);
 	    //y->(H-y)*12/H +1
 	    int yy = (e.getY()==0?12:(int)((double)(H-e.getY())*12.0/(double)H)+1);
-	    kachelClickListener.kachelClick(myX,myY,xx,yy);
+	    tileClickListener.tileClick(myX,myY,xx,yy);
 	}
     }
     //Invoked when a mouse button has been pressed on a component.
@@ -146,20 +146,20 @@ public class StartKachelComp extends JComponent implements  MouseListener, Mouse
     public void mouseEntered(MouseEvent e){}
     //Invoked when the mouse exits a component.
     public void mouseExited(MouseEvent e){
-	if (kachelClickListener!=null){
-	    kachelClickListener.kachelMouseLeave();
+	if (tileClickListener!=null){
+	    tileClickListener.tileMouseLeave();
 	}
     }
 
     //MouseMotionListener Methoden
     public void mouseMoved(MouseEvent e){
-	if (kachelClickListener!=null){
+	if (tileClickListener!=null){
 	    //awt->flagge
 	    //x->x*12/W +1
 	    int xx=(e.getX()==W?12:(int)((double)e.getX()*12.0/(double)W)+1);
 	    //y->(H-y)*12/H +1
 	    int yy = (e.getY()==0?12:(int)((double)(H-e.getY())*12.0/(double)H)+1);
-	    kachelClickListener.kachelMouseMove(myX,myY,xx,yy);
+	    tileClickListener.tileMouseMove(myX,myY,xx,yy);
 	}
     }
     public void mouseDragged(MouseEvent e){    }

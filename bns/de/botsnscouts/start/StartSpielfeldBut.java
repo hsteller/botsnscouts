@@ -156,10 +156,10 @@ public class StartSpielfeldBut extends JPanel implements  ActionListener, Change
 	    if(parent.startSpielfeldEditor==null){
 		parent.startSpielfeldEditor=new StartSpielfeldEditor(parent,parent.startSpielfeld.spf);
 	    }else{
-		parent.startSpielfeldEditor.spf.addKachelClickListener(parent.startSpielfeldEditor);
+		parent.startSpielfeldEditor.spf.addTileClickListener(parent.startSpielfeldEditor);
 		parent.startSpielfeldEditor.fuerSpf.add(parent.startSpielfeldEditor.spf);
 	    }
-	    parent.fassade.saveKachelRaster();
+	    parent.fassade.saveTileRaster();
 	    parent.current=parent.startSpielfeldEditor;
 	    parent.setContentPane(parent.current);
 	    parent.show();

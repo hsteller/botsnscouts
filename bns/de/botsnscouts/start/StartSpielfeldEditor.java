@@ -11,15 +11,15 @@ import java.net.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.board.*;
 
-public class StartSpielfeldEditor extends JPanel implements  ActionListener, KachelClickListener,ListSelectionListener{
+public class StartSpielfeldEditor extends JPanel implements  ActionListener, TileClickListener,ListSelectionListener{
 
     public static final int MODE_FLAGGE_SETZEN=0;
     public static final int MODE_FLAGGE_ENTFERNEN=1;
     public static final int MODE_FLAGGE_VERSCHIEBEN=2;
 
-    public static final int MODE_KACHEL_SETZEN=3;
-    public static final int MODE_KACHEL_ENTFERNEN=4;
-    public static final int MODE_KACHEL_DREHEN=5;
+    public static final int MODE_TILE_SETZEN=3;
+    public static final int MODE_TILE_ENTFERNEN=4;
+    public static final int MODE_TILE_DREHEN=5;
 
     public static final int CURSOR_DEFAULT = 0,
 	CURSOR_FLAGGE_SETZBAR = 1,
@@ -37,11 +37,11 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
     JToggleButton modeFlaggeEntfernen;
     JToggleButton modeFlaggeVerschieben;
 
-    JToggleButton modeKachelSetzen;
-    JToggleButton modeKachelEntfernen;
-    JToggleButton modeKachelDrehen;
+    JToggleButton modeTileSetzen;
+    JToggleButton modeTileEntfernen;
+    JToggleButton modeTileDrehen;
 
-    ButtonGroup kachelnGroup;
+    ButtonGroup tilesGroup;
 
     JButton ok;
     JButton zurueck;
@@ -50,12 +50,12 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
     JPanel fuerSpf;
     JScrollPane fuerfuerSpf;
 
-    JScrollPane fuerKachelListe;
-    JList kachelListe;
+    JScrollPane fuerTileListe;
+    JList tileListe;
     JPanel okZur;
 
     int currentMode;
-    int currentKachel;
+    int currentTile;
 
     boolean kannFlaggeSetzen;
     boolean flaggeGewaehlt;
@@ -64,7 +64,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
     int   flaggeX,flaggeY;
 
     Image[] images;
-    KachelInfo[] kachelInfos;
+    TileInfo[] tileInfos;
     Cursor[] cursors;
 
     public StartSpielfeldEditor(Start par,StartSpielfeldSpf spf){
@@ -77,7 +77,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 
 	images=ImageMan.getImages(ImageMan.STARTKNOEPFE);
 
-	kachelInfos=parent.fassade.getKachelInfos();
+	tileInfos=parent.fassade.getTileInfos();
 
 	BorderLayout lay=new BorderLayout();
 
@@ -100,30 +100,30 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	modeFlaggeEntfernen.addActionListener(this);
 	modeFlaggeVerschieben.addActionListener(this);
 
-	modeKachelSetzen=new JToggleButton(new ImageIcon(images[5]));
-	modeKachelEntfernen=new JToggleButton(new ImageIcon(images[4]));
-	modeKachelDrehen=new JToggleButton(new ImageIcon(images[3]));
-	modeKachelSetzen.setOpaque(false);
-	modeKachelEntfernen.setOpaque(false);
-	modeKachelDrehen.setOpaque(false);
-	modeKachelSetzen.setToolTipText(Message.say("Start","mTTKachelSetzen"));
-	modeKachelEntfernen.setToolTipText(Message.say("Start","mTTKachelEntfernen"));
-	modeKachelDrehen.setToolTipText(Message.say("Start","mTTKachelDrehen"));
-	modeKachelSetzen.setActionCommand("kachSetzen");
-	modeKachelEntfernen.setActionCommand("kachEntfernen");
-	modeKachelDrehen.setActionCommand("kahcDrehen");
-	modeKachelSetzen.addActionListener(this);
-	modeKachelEntfernen.addActionListener(this);
-	modeKachelDrehen.addActionListener(this);
+	modeTileSetzen=new JToggleButton(new ImageIcon(images[5]));
+	modeTileEntfernen=new JToggleButton(new ImageIcon(images[4]));
+	modeTileDrehen=new JToggleButton(new ImageIcon(images[3]));
+	modeTileSetzen.setOpaque(false);
+	modeTileEntfernen.setOpaque(false);
+	modeTileDrehen.setOpaque(false);
+	modeTileSetzen.setToolTipText(Message.say("Start","mTTKachelSetzen"));
+	modeTileEntfernen.setToolTipText(Message.say("Start","mTTKachelEntfernen"));
+	modeTileDrehen.setToolTipText(Message.say("Start","mTTKachelDrehen"));
+	modeTileSetzen.setActionCommand("kachSetzen");
+	modeTileEntfernen.setActionCommand("kachEntfernen");
+	modeTileDrehen.setActionCommand("kahcDrehen");
+	modeTileSetzen.addActionListener(this);
+	modeTileEntfernen.addActionListener(this);
+	modeTileDrehen.addActionListener(this);
 
-	kachelnGroup=new ButtonGroup();
-	kachelnGroup.add(modeKachelSetzen);
-	kachelnGroup.add(modeKachelEntfernen);
-	kachelnGroup.add(modeKachelDrehen);
-	kachelnGroup.add(modeFlaggeSetzen);
-	kachelnGroup.add(modeFlaggeEntfernen);
-	kachelnGroup.add(modeFlaggeVerschieben);
-	kachelnGroup.setSelected(modeKachelSetzen.getModel(),true);
+	tilesGroup=new ButtonGroup();
+	tilesGroup.add(modeTileSetzen);
+	tilesGroup.add(modeTileEntfernen);
+	tilesGroup.add(modeTileDrehen);
+	tilesGroup.add(modeFlaggeSetzen);
+	tilesGroup.add(modeFlaggeEntfernen);
+	tilesGroup.add(modeFlaggeVerschieben);
+	tilesGroup.setSelected(modeTileSetzen.getModel(),true);
 
 	flaggenButtons=new JPanel();
 	flaggenButtons.setLayout(new FlowLayout());
@@ -132,20 +132,20 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	flaggenButtons.add(modeFlaggeEntfernen);
 	flaggenButtons.add(modeFlaggeVerschieben);
 	flaggenButtons.add(Box.createRigidArea(new Dimension(100,20)));
-	flaggenButtons.add(modeKachelSetzen);
-	flaggenButtons.add(modeKachelEntfernen);
-	flaggenButtons.add(modeKachelDrehen);
+	flaggenButtons.add(modeTileSetzen);
+	flaggenButtons.add(modeTileEntfernen);
+	flaggenButtons.add(modeTileDrehen);
 	add(BorderLayout.NORTH,flaggenButtons);
 
-	kachelListe=new JList(kachelInfos);
+	tileListe=new JList(tileInfos);
 
-	kachelListe.setCellRenderer(new ThumbsCellRenderer());
-	kachelListe.setOpaque(false);
-	fuerKachelListe=new JScrollPane();
-	fuerKachelListe.getViewport().setView(kachelListe);
+	tileListe.setCellRenderer(new ThumbsCellRenderer());
+	tileListe.setOpaque(false);
+	fuerTileListe=new JScrollPane();
+	fuerTileListe.getViewport().setView(tileListe);
 
-	add(BorderLayout.EAST,fuerKachelListe);
-	kachelListe.addListSelectionListener(this);
+	add(BorderLayout.EAST,fuerTileListe);
+	tileListe.addListSelectionListener(this);
 
 	ok=new TransparentButton(Message.say("Start","mOK"));
 	zurueck=new TransparentButton(Message.say("Start","mAbbr"));
@@ -174,7 +174,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 // 	vp.toViewCoordinates(new Point());
 	add(BorderLayout.CENTER,fuerfuerSpf);
 
-	spf.addKachelClickListener(this);
+	spf.addTileClickListener(this);
 
 // 	ImageIcon icon = ImageMan.getIcon(Message.say("Start","mBG"));
 // 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
@@ -192,7 +192,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 		if(parent.startSpielfeld==null){
 		    parent.startSpielfeld=new StartSpielfeld(parent);
 		}
-		spf.removeKachelClickListener();
+		spf.removeTileClickListener();
 		parent.startSpielfeld.pnl.add(spf);
 		parent.current=parent.startSpielfeld;
 		parent.setContentPane(parent.current);
@@ -209,8 +209,8 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	    if(parent.startSpielfeld==null){
 		parent.startSpielfeld=new StartSpielfeld(parent);
 	    }
-	    parent.fassade.restorKachelRaster();
-	    spf.removeKachelClickListener();
+	    parent.fassade.restorTileRaster();
+	    spf.removeTileClickListener();
 	    parent.startSpielfeld.pnl.add(spf);
 	    parent.current=parent.startSpielfeld;
 	    parent.setContentPane(parent.current);
@@ -230,11 +230,11 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	    currentMode=MODE_FLAGGE_VERSCHIEBEN;
 	    flaggeGewaehlt=false;
 	}else if(e.getActionCommand().equals("kachSetzen")){
-	    currentMode=MODE_KACHEL_SETZEN;
+	    currentMode=MODE_TILE_SETZEN;
 	}else if(e.getActionCommand().equals("kachEntfernen")){
-	    currentMode=MODE_KACHEL_ENTFERNEN;
+	    currentMode=MODE_TILE_ENTFERNEN;
 	}else if(e.getActionCommand().equals("kahcDrehen")){
-	    currentMode=MODE_KACHEL_DREHEN;
+	    currentMode=MODE_TILE_DREHEN;
 	}
     }
 
@@ -246,7 +246,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	paintChildren(g);
     }
 
-    public void kachelClick(int rx,int ry,int fx,int fy){
+    public void tileClick(int rx,int ry,int fx,int fy){
 	switch(currentMode){
 	case  MODE_FLAGGE_SETZEN:{
 	    try{
@@ -295,7 +295,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	    }
 	    break;
 	}
-	case  MODE_KACHEL_SETZEN:{
+	case  MODE_TILE_SETZEN:{
 	    if(parent.fassade.sindFlaggen(rx,ry)){
 		int ret=JOptionPane.showConfirmDialog(this,Message.say("Start","mKachelSetzen"),Message.say("Start","mKachelSetzenTitel"),JOptionPane.YES_NO_OPTION,JOptionPane.DEFAULT_OPTION,new ImageIcon(images[4]));
 		//fragen,ob kachel mit den flaggen gelöscht werden soll
@@ -304,31 +304,31 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 		}
 	    }
 	    try{
-		parent.fassade.delKachel(rx,ry);
-		parent.fassade.setKachel(rx,ry,kachelInfos[currentKachel].toString());
+		parent.fassade.delTile(rx,ry);
+		parent.fassade.setTile(rx,ry,tileInfos[currentTile].toString());
 	    }catch (FlaggenVorhandenException ex){
 		System.err.println("You cannot place here a field!");
 	    }
 	    spf.rasterChanged();
 	    break;
 	}
-	case  MODE_KACHEL_ENTFERNEN:{
+	case  MODE_TILE_ENTFERNEN:{
 	    if(parent.fassade.sindFlaggen(rx,ry)){
 		//fragen,ob kachel mit den flaggen gelöscht werden soll
 		int ret=JOptionPane.showConfirmDialog(this,Message.say("Start","mKachelLoeschen"),Message.say("Start","mKachelSetzenTitel"),JOptionPane.YES_NO_OPTION,JOptionPane.DEFAULT_OPTION,new ImageIcon(images[4]));
 		if(ret==JOptionPane.YES_OPTION){
-		    parent.fassade.delKachel(rx,ry);
+		    parent.fassade.delTile(rx,ry);
 		    spf.rasterChanged();
 		}
 	    }else{
-		parent.fassade.delKachel(rx,ry);
+		parent.fassade.delTile(rx,ry);
 		spf.rasterChanged();
 	    }
 
 	    break;
 	}
-	case  MODE_KACHEL_DREHEN:{
-	    parent.fassade.rotKachel(rx,ry);
+	case  MODE_TILE_DREHEN:{
+	    parent.fassade.rotTile(rx,ry);
 	    spf.rasterChanged();
 	    
 	    break;
@@ -336,7 +336,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	}
     }
 
-    public void kachelMouseMove(int rx,int ry,int fx,int fy){
+    public void tileMouseMove(int rx,int ry,int fx,int fy){
 	switch(currentMode){
 	case  MODE_FLAGGE_SETZEN:{
 	    kannFlaggeSetzen=parent.fassade.checkFlaggePos(rx*12+fx,ry*12+fy); 
@@ -379,30 +379,30 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	    }
 	    break;
 	}
-	case  MODE_KACHEL_SETZEN:{
+	case  MODE_TILE_SETZEN:{
 	    break;
 	}
-	case  MODE_KACHEL_ENTFERNEN:{
+	case  MODE_TILE_ENTFERNEN:{
 
 	    break;
 	}
-	case  MODE_KACHEL_DREHEN:{
+	case  MODE_TILE_DREHEN:{
 
 	    break;
 	}
 	}
     }
 
-    public void kachelMouseLeave(){
+    public void tileMouseLeave(){
 	//Global.debug(this,"Mouse left");
 	setCursor(cursors[CURSOR_DEFAULT]);
     }
 
     public void valueChanged(ListSelectionEvent e) {
-	//Global.debug(this,"selected kachel "+kachelListe.getSelectedIndex());
-	currentKachel=kachelListe.getSelectedIndex();
-	kachelnGroup.setSelected(modeKachelSetzen.getModel(),true);
-	currentMode=MODE_KACHEL_SETZEN;
+	//Global.debug(this,"selected tile "+tileListe.getSelectedIndex());
+	currentTile=tileListe.getSelectedIndex();
+	tilesGroup.setSelected(modeTileSetzen.getModel(),true);
+	currentMode=MODE_TILE_SETZEN;
 	setCursor(cursors[CURSOR_DEFAULT]);
 	flaggenButtons.repaint();
 	//repaint();
@@ -457,7 +457,7 @@ class ThumbsCellRenderer extends JPanel implements ListCellRenderer {
 	String name=value.toString().substring(0,value.toString().indexOf(".rra"));
 	setOpaque(false);
 	text.setText(name);
-	image.setIcon(new ImageIcon(((KachelInfo)value).getImage()));
+	image.setIcon(new ImageIcon(((TileInfo)value).getImage()));
 	if (isSelected) {
 	    text.setText(name.toUpperCase());
 	    image.setBorder( selectedBorder );

@@ -3,38 +3,38 @@ package de.botsnscouts.start;
 import de.botsnscouts.util.*;
 import de.botsnscouts.board.*;
 
-public class KachelRaster{
+public class TileRaster{
     private int KX=3, KY=3, FL=6 ;
-    private Tile kacheln[][]=new Tile[KX][KY];
+    private Tile tiles[][]=new Tile[KX][KY];
     private Ort[] flaggen = new Ort[FL];
     private int flaggenN=0;
-    private int[][] kachind = new int[KX][KY];
-    private KachelFactory kachFactory;
+    private int[][] tileind = new int[KX][KY];
+    private TileFactory tileFactory;
 
-    public KachelRaster(KachelFactory kachF){
-	kachFactory=kachF;
+    public TileRaster(TileFactory tileF){
+	tileFactory=tileF;
     }
 
     //setzt übergebene Tile an Stelle (x,y)
-    public void setKachel(int x, int y, String name) throws FlaggenVorhandenException{
+    public void setTile(int x, int y, String name) throws FlaggenVorhandenException{
 	if (sindFlaggen(x,y))
 	    throw new FlaggenVorhandenException();
-	kacheln[x][y]=kachFactory.getKachel(name,0);
+	tiles[x][y]=tileFactory.getTile(name,0);
     }
 
-    //dreht die Kachel um 90° nach links
-    public void rotKachel(int x, int y){
-	if (kacheln[x][y]==null) return;
-	//hole rotierte Kachel
-	kacheln[x][y]=kachFactory.getKachel(kacheln[x][y].getName(), (kacheln[x][y].getRotation()+1)%4);
+    //dreht die Tile um 90° nach links
+    public void rotTile(int x, int y){
+	if (tiles[x][y]==null) return;
+	//hole rotierte Tile
+	tiles[x][y]=tileFactory.getTile(tiles[x][y].getName(), (tiles[x][y].getRotation()+1)%4);
 	//rotiere Flaggen, falls vorhanden
 	int kx,ky,fx,fy;
 	for (int j=0;j<flaggenN;j++){
-	    kx=(flaggen[j].x-1)/12;//kachel x
-	    ky=(flaggen[j].y-1)/12;//kachel y
-	    if (kx==x&&ky==y){//die Flagge ist auf der zu drehenden Kachel
+	    kx=(flaggen[j].x-1)/12;//tile x
+	    ky=(flaggen[j].y-1)/12;//tile y
+	    if (kx==x&&ky==y){//die Flagge ist auf der zu drehenden Tile
 		fx=(flaggen[j].x-1)%12;//Flaggenposition
-		fy=(flaggen[j].y-1)%12;//im Kachel (-1)
+		fy=(flaggen[j].y-1)%12;//im Tile (-1)
 		//y->11-y + kachelX*12 +1 (x)
 		int nx=11-fy+kx*12+1;
 		//x->11-x + kachelY*12 +1 (y)
@@ -45,8 +45,8 @@ public class KachelRaster{
 	}
     }
     
-    //löscht die Kachel at (x,y)
-    public void delKachel(int x, int y){
+    //löscht die Tile at (x,y)
+    public void delTile(int x, int y){
 	//entferne Flaggen falls vorhanden
 	for (int i=flaggenN-1;i>=0;i--){
 	    if ((flaggen[i].x-1)/12==x&&(flaggen[i].y-1)/12==y){
@@ -54,11 +54,11 @@ public class KachelRaster{
 		delFlagge(i);
 	    }
 	}
-	//enferne Kachel
-	kacheln[x][y]=null;
+	//enferne Tile
+	tiles[x][y]=null;
     }
 
-    //prüft ob auf der Kachel at (x,y) Flaggen stehen
+    //prüft ob auf der Tile at (x,y) Flaggen stehen
     public boolean sindFlaggen(int x, int y){
 	for (int i=0;i<flaggenN;i++){
 	    if ((flaggen[i].x-1)/12==x&&(flaggen[i].y-1)/12==y){
@@ -77,7 +77,7 @@ public class KachelRaster{
 	flag[0]=new Ort((x-1)%12+1,(y-1)%12+1);
 	String komment="";
 	try{
-	    Spielfeld tmpSpf=new Spielfeld(12,12,kacheln[kx][ky].getComputedString(),flag);
+	    Spielfeld tmpSpf=new Spielfeld(12,12,tiles[kx][ky].getComputedString(),flag);
 	    komment=tmpSpf.getFlaggenProbleme();
 	}catch(FlaggenException e){
 	    System.err.println(e);
@@ -101,9 +101,9 @@ public class KachelRaster{
     public boolean checkFlaggeMovePos(int x,int y){
 	int kx=(x-1)/12;
 	int ky=(y-1)/12;
-	//fals keine Kachel drunter
+	//fals keine Tile drunter
 	//Global.debug(this, "kx: "+kx+" ky: "+ky+" x: "+x+" y: "+y);
-	if (kacheln[kx][ky]==null){
+	if (tiles[kx][ky]==null){
 	    return false;
 	}
 
@@ -111,11 +111,11 @@ public class KachelRaster{
 	if (istFlagge(x,y)){
 	    return false;
 	}
-	//prüfe Kachelelement
+	//prüfe Tileelement
 	Ort[] flag=new Ort[1];
 	flag[0]=new Ort((x-1)%12+1,(y-1)%12+1);
 
-	boolean testFl=kacheln[kx][ky].testFlagge(flag);
+	boolean testFl=tiles[kx][ky].testFlagge(flag);
 	//Global.debug(this, "testFlagge "+kx+","+ky+" "+testFl+" Flagge:"+flag[0].x+","+flag[0].y);
 	return testFl;
     }
@@ -183,14 +183,14 @@ public class KachelRaster{
 	return FL;
     }
 
-    //gibt Kacheln als 2-dim Array von Spielfeld zurück
-    public Tile[][] getKacheln(){
-	return kacheln;
+    //gibt Tiles als 2-dim Array von Spielfeld zurück
+    public Tile[][] getTiles(){
+	return tiles;
     }
 
-    //gibt eine Kachel an der gegebenen Position
-    public Tile getKachelAt(int x, int y){
-	return kacheln[x][y];
+    //gibt eine Tile an der gegebenen Position
+    public Tile getTileAt(int x, int y){
+	return tiles[x][y];
     }
 
     //setzt Spielfeldgröße
@@ -205,16 +205,16 @@ public class KachelRaster{
     }
 
     //gibt den "Clone" zurück
-    public KachelRaster getClone(){
-	KachelRaster tmpRaster = new KachelRaster(kachFactory);
+    public TileRaster getClone(){
+	TileRaster tmpRaster = new TileRaster(tileFactory);
 	tmpRaster.flaggenN=flaggenN;
 	for (int i=0;i<flaggenN;i++){
 	    tmpRaster.flaggen[i]=flaggen[i];
 	}
 	for (int i=0;i<KX;i++){
 	    for (int j=0;j<KY;j++){
-		tmpRaster.kacheln[i][j]=kacheln[i][j];
-		tmpRaster.kachind[i][j]=kachind[i][j];
+		tmpRaster.tiles[i][j]=tiles[i][j];
+		tmpRaster.tileind[i][j]=tileind[i][j];
 	    }
 	}
 
@@ -246,31 +246,31 @@ public class KachelRaster{
 	StringBuffer oben = new StringBuffer();
 	StringBuffer unten =new StringBuffer();
 	for (int i=0;i<KX;i++)
-	    for (int j=0;j<KY;kachind[i][j++]=0);
+	    for (int j=0;j<KY;tileind[i][j++]=0);
 	for(int j=bounds[1].y;j>=bounds[0].y;j--){
 	    for (int k=0;k<25;k++){
 		for (int i=bounds[0].x;i<=bounds[1].x;i++){
 		    if (k==0){
-			if (kacheln[i][j]==null)
+			if (tiles[i][j]==null)
 			    unten.append(GRUBENZWR);
-			else unten.append(liesZeile(kacheln[i][j].getComputedString(),i,j));
+			else unten.append(liesZeile(tiles[i][j].getComputedString(),i,j));
 		    }
 		    else if (k==24){
-			if (kacheln[i][j]==null)
+			if (tiles[i][j]==null)
 			    oben.append(GRUBENZWR);
-			else oben.append(liesZeile(kacheln[i][j].getComputedString(),i,j));
+			else oben.append(liesZeile(tiles[i][j].getComputedString(),i,j));
 		    }
 		    else{
 			if (k%2==0){
-			    if (kacheln[i][j]==null)
+			    if (tiles[i][j]==null)
 				out.append(GRUBENZWR);
 			    else
-				out.append(liesZeile(kacheln[i][j].getComputedString(),i,j));
+				out.append(liesZeile(tiles[i][j].getComputedString(),i,j));
 			}
 			else{
-			    if (kacheln[i][j]==null)
+			    if (tiles[i][j]==null)
 				rechts=GRUBENFLD;
-			    else rechts=new String(liesZeile(kacheln[i][j].getComputedString(),i,j));
+			    else rechts=new String(liesZeile(tiles[i][j].getComputedString(),i,j));
 			    if (links) mergez(out,rechts);
 			    else{
 				out.append(rechts);
@@ -350,16 +350,16 @@ public class KachelRaster{
 	return (zwr.toString()).trim();
     }
 
-    //liest eine Zeile aus Kachelstring
+    //liest eine Zeile aus Tilestring
     public String liesZeile(String fil,int i, int j){
 	StringBuffer str=new StringBuffer();
 	try{
-	    char x=fil.charAt(kachind[i][j]++);
+	    char x=fil.charAt(tileind[i][j]++);
 	    while(x=='\10'||x=='\13'||x=='\32'||x=='\t'||x=='\n'||x==' ')
-		x=fil.charAt(kachind[i][j]++);
+		x=fil.charAt(tileind[i][j]++);
 	    while (x!='\10'&&x!='\13'&&x!='\32'&&x!='\t'&&x!='\n'&&x!=' '){
 		str.append(x);
-		x=fil.charAt(kachind[i][j]++);
+		x=fil.charAt(tileind[i][j]++);
 	    }
 	}catch(Exception ex){
 	    System.err.println(ex);
@@ -374,7 +374,7 @@ public class KachelRaster{
 	bounds[1]=new Ort(0,0);
 	x0: for (int i=0;i<KX;i++){
 	    for (int j=0;j<KY;j++){
-		if (kacheln[i][j]!=null){
+		if (tiles[i][j]!=null){
 		    bounds[0].x=i;
 		    break x0;
 		}
@@ -382,7 +382,7 @@ public class KachelRaster{
 	}
 	y0: for (int j=0;j<KY;j++){
 	    for (int i=0;i<KX;i++){
-		if (kacheln[i][j]!=null){
+		if (tiles[i][j]!=null){
 		    bounds[0].y=j;
 		    break y0;
 		}
@@ -390,7 +390,7 @@ public class KachelRaster{
 	}
 	x1: for (int i=KX-1;i>=0;i--){
 	    for (int j=KY-1;j>=0;j--){
-		if (kacheln[i][j]!=null){
+		if (tiles[i][j]!=null){
 		    bounds[1].x=i;
 		    break x1;
 		}
@@ -398,7 +398,7 @@ public class KachelRaster{
 	}
 	y1: for (int j=KY-1;j>=0;j--){
 	    for (int i=KX-1;i>=0;i--){
-		if (kacheln[i][j]!=null){
+		if (tiles[i][j]!=null){
 		    bounds[1].y=j;
 		    break y1;
 		}
@@ -419,15 +419,15 @@ public class KachelRaster{
 	if (flaggenN<2)
 	    throw new OneFlagException();
 	//das Spielfeld ist nicht zusammenhängend
-	Ort fkachel=findFirstKachel();
+	Ort ftile=findFirstTile();
 	boolean[][] mark=new boolean[KX][KY];
 	for (int i=0;i<KX;i++)
 	    for (int j=0;j<KY;mark[i][j]=false,j++);
-	mark[fkachel.x][fkachel.y]=true;
-	markNachbarn(fkachel,mark);
+	mark[ftile.x][ftile.y]=true;
+	markNachbarn(ftile,mark);
 	for (int i=0;i<KX;i++){
 	    for (int j=0;j<KY;j++){
-		if (kacheln[i][j]!=null&&!mark[i][j]){
+		if (tiles[i][j]!=null&&!mark[i][j]){
 		    throw new NichtZusSpfException();
 		}
 	    }
@@ -435,38 +435,38 @@ public class KachelRaster{
 	return true;
     }
 
-    //findet die erste belegte Kachel
-    Ort findFirstKachel(){
+    //findet die erste belegte Tile
+    Ort findFirstTile(){
 	for (int i=0;i<KX;i++){
 	    for (int j=0;j<KY;j++){
-		if (kacheln[i][j]!=null)
+		if (tiles[i][j]!=null)
 		    return new Ort(i,j);
 	    }
 	}
 	return null;
     }
 
-    //markiert alle (mit der ersten) zusammenhängende Kacheln
-    void markNachbarn(Ort kach, boolean[][] mark){
+    //markiert alle (mit der ersten) zusammenhängende Tiles
+    void markNachbarn(Ort tile, boolean[][] mark){
 	//shau nach links
-	if (kach.x-1>=0&&kacheln[kach.x-1][kach.y]!=null&&!mark[kach.x-1][kach.y]){
-	    mark[kach.x-1][kach.y]=true;
-	    markNachbarn(new Ort(kach.x-1,kach.y),mark);
+	if (tile.x-1>=0&&tiles[tile.x-1][tile.y]!=null&&!mark[tile.x-1][tile.y]){
+	    mark[tile.x-1][tile.y]=true;
+	    markNachbarn(new Ort(tile.x-1,tile.y),mark);
 	}
 	//rechts
-	if (kach.x+1<KX&&kacheln[kach.x+1][kach.y]!=null&&!mark[kach.x+1][kach.y]){
-	    mark[kach.x+1][kach.y]=true;
-	    markNachbarn(new Ort(kach.x+1,kach.y),mark);
+	if (tile.x+1<KX&&tiles[tile.x+1][tile.y]!=null&&!mark[tile.x+1][tile.y]){
+	    mark[tile.x+1][tile.y]=true;
+	    markNachbarn(new Ort(tile.x+1,tile.y),mark);
 	}
 	//unten
-	if (kach.y-1>=0&&kacheln[kach.x][kach.y-1]!=null&&!mark[kach.x][kach.y-1]){
-	    mark[kach.x][kach.y-1]=true;
-	    markNachbarn(new Ort(kach.x,kach.y-1),mark);
+	if (tile.y-1>=0&&tiles[tile.x][tile.y-1]!=null&&!mark[tile.x][tile.y-1]){
+	    mark[tile.x][tile.y-1]=true;
+	    markNachbarn(new Ort(tile.x,tile.y-1),mark);
 	}
 	//oben
-	if (kach.y+1<KY&&kacheln[kach.x][kach.y+1]!=null&&!mark[kach.x][kach.y+1]){
-	    mark[kach.x][kach.y+1]=true;
-	    markNachbarn(new Ort(kach.x,kach.y+1),mark);
+	if (tile.y+1<KY&&tiles[tile.x][tile.y+1]!=null&&!mark[tile.x][tile.y+1]){
+	    mark[tile.x][tile.y+1]=true;
+	    markNachbarn(new Ort(tile.x,tile.y+1),mark);
 	}
     }
 
