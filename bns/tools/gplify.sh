@@ -1,18 +1,19 @@
 #!/usr/bin/zsh
-for i in *.java;do
+for i in **/*.java;do
+	echo -n GPLifying file $i...
 	rm -f tmp 2>/dev/null
 	cat > tmp <<EOF
-/*******************************************************************
+/*
+ *******************************************************************
  *        Bots 'n' Scouts - Multi-Player networked Java game       *
  *                                                                 *
- * Copyright (C) `date +%Y` scouties.                              *
- * Contact botsnscouts@spline.de                     		   *
+ * Copyright (C) `date +%Y` scouties.                                    *
+ * Contact botsnscouts-devel@sf.net                                *
  *******************************************************************
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
+ the Free Software Foundation, in version 2 of the License.
  
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,11 +21,15 @@ for i in *.java;do
  GNU General Public License for more details.
  
  You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
+ along with this program, in a file called COPYING in the top
+ directory of the Bots 'n' Scouts distribution; if not, write to 
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ Boston, MA  02111-1307  USA
+ 
+ *******************************************************************/
  
 EOF
 	cat >> tmp $i
 	mv -f tmp $i
+	echo done
 done
