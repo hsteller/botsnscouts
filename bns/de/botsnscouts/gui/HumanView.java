@@ -71,7 +71,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 		    int direct = Integer.parseInt(ae.getActionCommand());
 		    Global.debug(this,"I have choosen direction: "+direct);
 		    sendDirection(direct);
-                    dialogInSidebarActive = false;
+                    setDialogInSidebarActive(false);
 		}
 	    }
 					       );
@@ -79,7 +79,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 		public void actionPerformed(ActionEvent ae) {
 		    CAT.debug("The user clicked: "+ae.getActionCommand());
 		    sendAgainPowerDown(ae.getActionCommand().equals("powerdownagain"));
-                    dialogInSidebarActive = false;
+                    setDialogInSidebarActive(false);
 		}
 	    }
 							   );
@@ -119,7 +119,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	repairRegisters = new RepairRegisters(new ActionListener(){
 		public void actionPerformed(ActionEvent ae) {
 		    sendRepairRegisters();
-                    dialogInSidebarActive = false;
+                    setDialogInSidebarActive(false);
 		}
 	    });
 
@@ -171,7 +171,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
      * display a message that is shown only to this player
      */
     public synchronized void showMessageToPlayer(String s) {
-        if( dialogInSidebarActive ) { /* don't switch :-) */
+        if( isDialogInSidebarActive() ) { /* don't switch :-) */
             return;
         }
 	userInfo.setInfo(s);
@@ -203,23 +203,26 @@ public class HumanView extends JPanel implements HumanViewInterface {
     }
 
 
+    private boolean dialogInSidebarActive = false;
+
+
     /**
      * display the get direction request
      */
-    boolean dialogInSidebarActive = false;
     public synchronized void showGetDirection() {
 	panelSwitcher.show(switcherPanel,"getDirection");
 	this.requestFocus();
-        dialogInSidebarActive = true;
+        setDialogInSidebarActive(true);
     }
 
     /**
      * display the power down again request
 f     */
+
     public synchronized void showRePowerDown() {
 	panelSwitcher.show(switcherPanel,"againPowerDown");
 	this.requestFocus();
-        dialogInSidebarActive = true;
+        setDialogInSidebarActive(true);
     }
 
     /**
@@ -231,7 +234,7 @@ f     */
 	repairRegisters.setChoises(registers.getRegisterViewArray(), repairNumber);
 	panelSwitcher.show(switcherPanel,"repairRegisters");
 	this.requestFocus();
-        dialogInSidebarActive = true;
+        setDialogInSidebarActive(true);
     }
 
 
@@ -439,6 +442,14 @@ f     */
 
     public HumanPlayer getHumanPlayer() {
         return human;
+    }
+
+    private synchronized boolean isDialogInSidebarActive() {
+        return dialogInSidebarActive;
+    }
+
+    private synchronized void setDialogInSidebarActive(boolean dialogInSidebarActive) {
+        this.dialogInSidebarActive = dialogInSidebarActive;
     }
 }
 
