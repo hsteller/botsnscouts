@@ -340,6 +340,7 @@ public class GameFieldPanel extends JPanel {
     private void okClicked() {
         gameOptions.setAllowWisenheimer(allowWisenheimer.isSelected());
         gameOptions.setAllowScout(allowScout.isSelected());
+        gameOptions.setInvitor(nam.getText());
         try {
             parent.facade.updateGameOptions();
             /* Handig over a postServerStartTask is still a bit weird, but

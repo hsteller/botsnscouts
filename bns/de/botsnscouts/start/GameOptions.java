@@ -2,6 +2,7 @@ package de.botsnscouts.start;
 
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Conf;
+import de.botsnscouts.util.KrimsKrams;
 import nanoxml.XMLElement;
 import nanoxml.XMLParseException;
 
@@ -93,8 +94,9 @@ public class GameOptions {
      */
     private String comment;
 
-    /** A name for the game */
-    private String name;
+    /** A name for the game,
+     * TODO: delete this hack */
+    private String name = KrimsKrams.randomName();
 
     /** Game hosted by */
     private String invitor;
@@ -115,13 +117,17 @@ public class GameOptions {
      * @param x        "First coordinate of the board's dimension"
      * @param y        "Second coordinate of the board's dimension"
      */
-    public GameOptions(int noPlayers,
+    public GameOptions(String name,
+                       String invitor,
+                       int noPlayers,
                        int port,
                        int timeout,
                        String board,
                        Location[] flags,
                        int x,
                        int y) {
+        this.name = name;
+        this.invitor = invitor;
         this.maxPlayers = noPlayers;
         this.registrationPort = port;
         this.handInTimeout = timeout;
@@ -141,7 +147,9 @@ public class GameOptions {
      * @param x        "First coordinate of the board's dimension"
      * @param y        "Second coordinate of the board's dimension"
      */
-    public GameOptions(int noPlayers,
+    public GameOptions(String name,
+                       String invitor,
+                       int noPlayers,
                        int port,
                        int timeout,
                        String board,
@@ -150,7 +158,7 @@ public class GameOptions {
                        int y,
                        boolean allowScout,
                        boolean allowWisenheimer) {
-        this(noPlayers, port, timeout, board, flags, x, y);
+        this(name, invitor, noPlayers, port, timeout, board, flags, x, y);
         this.allowWisenheimer = allowWisenheimer;
         this.allowScout = allowScout;
     }
@@ -168,7 +176,9 @@ public class GameOptions {
      * @param name A name for the game
      * @param invitor the name of the human host who started the game
      */
-    public GameOptions(int noPlayers,
+    public GameOptions(String name,
+                       String invitor,
+                       int noPlayers,
                        int port,
                        int timeout,
                        String board,
@@ -177,10 +187,8 @@ public class GameOptions {
                        int y,
                        boolean allowScout,
                        boolean allowWisenheimer,
-                       String comment,
-                       String name,
-                       String invitor) {
-        this(noPlayers, port, timeout, board, flags, x, y, allowScout, allowWisenheimer);
+                       String comment) {
+        this(name, invitor, noPlayers, port, timeout, board, flags, x, y, allowScout, allowWisenheimer);
         this.comment = comment;
         this.name = name;
         this.invitor = invitor;
@@ -289,13 +297,16 @@ public class GameOptions {
     public XMLElement toXML() throws UnknownHostException {
         XMLElement xml = new XMLElement();
         xml.setName("game");
-        xml.setAttribute("name", name);
-        xml.setAttribute("invitor", invitor);
+        if (name != null)
+            xml.setAttribute("name", name);
+        if (invitor != null )
+            xml.setAttribute("invitor", invitor);
         xml.setAttribute("host", InetAddress.getLocalHost().getHostAddress());
         xml.setIntAttribute("port", registrationPort);
         xml.setAttribute("allowWisenheimer", allowWisenheimer?"true":"false");
         xml.setAttribute("allowScout", allowScout?"true":"false");
-        xml.setAttribute("comment", comment);
+        if (comment != null)
+            xml.setAttribute("comment", comment);
         XMLElement boardElement = new XMLElement();
         boardElement.setName("board");
         boardElement.setAttribute("field", board);
@@ -338,14 +349,14 @@ public class GameOptions {
                                                                    flag.getIntAttribute("y") );
             }
 
-            GameOptions gameOptions = new GameOptions( DPLAYERS, game.getIntAttribute("port"), DTO,
+            GameOptions gameOptions = new GameOptions( game.getStringAttribute("name"),
+                    game.getStringAttribute("invitor"),
+                    DPLAYERS, game.getIntAttribute("port"), DTO,
                     board.getStringAttribute("field"), flags,
                     board.getIntAttribute("x"), board.getIntAttribute("y"),
                     Boolean.valueOf(game.getStringAttribute("allowWisenheimer")).booleanValue(),
                     Boolean.valueOf(game.getStringAttribute("allowWisenheimer")).booleanValue(),
-                    game.getStringAttribute("comment"),
-                    game.getStringAttribute("name"), game.getStringAttribute("invitor")
-                    );
+                    game.getStringAttribute("comment"));
             if (!map.containsKey(gameOptions.name)) {
                 map.put( gameOptions.name, gameOptions);
             }  else {
@@ -359,6 +370,10 @@ public class GameOptions {
     private static void assertXMLTagName(XMLElement xml, String name) {
         if (!xml.getName().equals(name))
             throw new XMLParseException(xml.getName(),"Expected tag: "+name);
+    }
+
+    public void setInvitor(String name) {
+        invitor = name;
     }
 
 }
