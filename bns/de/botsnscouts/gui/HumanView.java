@@ -249,10 +249,10 @@ public class HumanView extends JPanel implements HumanViewInterface {
      */
     public void showGameOver(boolean dead, int winnerNumber) {
 	if (dead) {
-	    panelSwitcher.show(switcherPanel,"reacedEndDead");
+	    panelSwitcher.show(switcherPanel,"reachedEndDead");
 	}
 	else {
-	    panelSwitcher.show(switcherPanel,"reacedEndWinner");
+	    panelSwitcher.show(switcherPanel,"reachedEndWinner");
 	}
     }
 
