@@ -10,4 +10,4 @@ SMTP_HOST = 'localhost'
 #  This really should be fixed to support users across multiple
 #  domains.  Maybe a dictionary in here that maps from user to email
 #  address?
-EMAIL_DOMAIN = 'example.net'
+EMAIL_DOMAIN = 'sourceforge.net'
