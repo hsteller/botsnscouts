@@ -58,9 +58,9 @@ public class HumanView extends JPanel implements HumanViewInterface {
     public HumanView(HumanPlayer hp) {
 	human = hp;
 	setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-	switcherPanel = new JPanel();
-	JPanel regsAndCards = new JPanel();
-        wiseAndScout = new JPanel();
+	switcherPanel = new PaintPanel(OptionPane.getBackgroundPaint(this), true);
+	JPanel regsAndCards = new TJPanel();
+        wiseAndScout = new TJPanel();
 
 	switcherPanel.setLayout(panelSwitcher);
 
@@ -419,6 +419,10 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
     private void d(String s) {
 	Global.debug(this,s);
+    }
+
+    public HumanPlayer getHumanPlayer() {
+        return human;
     }
 }
 

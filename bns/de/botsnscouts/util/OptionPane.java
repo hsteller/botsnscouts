@@ -3,10 +3,32 @@ package de.botsnscouts.util;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.geom.*;
+import java.awt.image.BufferedImage;
 import java.awt.event.*;
 
 
 public class OptionPane extends JPanel {
+
+    static Paint backgroundPaint;
+    public static Paint getBackgroundPaint(Component c) {
+        if( backgroundPaint == null ) {
+            ImageIcon icon = ImageMan.getIcon( "garage2.jpg");
+            BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+            Graphics g = bgimg.getGraphics();
+            icon.paintIcon(c, g, 0,0);
+            g.dispose();
+            Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
+            backgroundPaint = new TexturePaint( bgimg, anchor );
+        }
+        return backgroundPaint;
+    }
+
+
+    public static Border niceBorder = BorderFactory.createCompoundBorder(
+            BorderFactory.createEtchedBorder( new Color(0, 255,0, 128), new Color(0,128,0,128) ),
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        );
 
     public static JButton getButton(String title) {
         return new TransparentButton(title, 12);

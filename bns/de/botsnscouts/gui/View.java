@@ -54,25 +54,20 @@ public class View extends JFrame {
     protected final boolean NURAUSGABE = true;
     protected final boolean MENSCHAUSGABE = false;
 
-
-
-    /*
-    public View() {
-	setTitle(Message.say("AusgabeFrame","gameName"));
-        sp = new JSplitPane();
-    }
-*/
     public View(AusgabeView av) {
-	setTitle(Message.say("AusgabeFrame","gameName"));
+	this.setTitle(Message.say("AusgabeFrame","gameName"));
 	ausgabeView=av;
 	initView();
-	getContentPane().add(av, BorderLayout.CENTER);
-        getContentPane().add(av.getNorthPanel(), BorderLayout.NORTH);
+        JComponent content = new ColoredComponent();
+        content.setLayout(new BorderLayout());
+	content.add(av, BorderLayout.CENTER);
+        content.add(av.getNorthPanel(), BorderLayout.NORTH);
+        this.setContentPane( content );
 	makeVisible();
     }
 
     public View(HumanView hv) {
-	setTitle(Message.say("AusgabeFrame","gameName"));
+	this.setTitle(Message.say("AusgabeFrame","gameName"));
 	humanView = hv;
 	initView();
         hv.setMinimumSize(new Dimension(0, 0));
@@ -80,8 +75,9 @@ public class View extends JFrame {
         sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         sp.setRightComponent(hv);
         sp.setOneTouchExpandable(true);
+        sp.setOpaque(false);
 
-	getContentPane().add(sp, BorderLayout.CENTER);
+	this.getContentPane().add(sp, BorderLayout.CENTER);
     }
 
 /*
@@ -92,23 +88,14 @@ public class View extends JFrame {
 
 */
 
-/*
-    public static void main (String args[]) {
-	Message.setLanguage("deutsch");
-	JFrame f = new View();
-	AusgabeView a = new AusgabeView();
-	f.getContentPane().add(a);
-	f.setVisible(true);
-   }
-*/
     synchronized private void initView() {
 	// Fenstergr”ÿe auf Vollbild setzen
 	Toolkit tk=Toolkit.getDefaultToolkit();
-	setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);
-	setLocation(4,4);
+	this.setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);
+	this.setLocation(4,4);
 
 	// Fentster-Schlieÿen behandeln
-	addWindowListener(new WindowAdapter() {
+	this.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e){
 		      if (ausgabeView!=null){
                           ausgabeView.quit(false); // will tell all the others to quit, using
@@ -122,9 +109,19 @@ public class View extends JFrame {
 		}});
 
 	// Layout erzeugen
-	getContentPane().setLayout(new BorderLayout());
+	this.getContentPane().setLayout(new BorderLayout());
         addMenuBar();
 
+    }
+
+    void traverseMenu( MenuElement menu ) {
+        Component c = menu.getComponent();
+        c.setBackground(Color.black);
+        c.setForeground(Color.lightGray);
+        MenuElement[] submenu = menu.getSubElements();
+        for (int i = 0; i < submenu.length; i++) {
+            traverseMenu( submenu[i] );
+        }
     }
 
     private void addMenuBar(){
@@ -132,6 +129,7 @@ public class View extends JFrame {
         CAT.debug("menus==null; getting menus..");
         if (ausgabeView!=null){
            menus = ausgabeView.getMenuBar();
+           traverseMenu( menus );
            this.setJMenuBar(menus);
            menus.setVisible(true);
         }
@@ -151,23 +149,23 @@ public class View extends JFrame {
         addMenuBar();
 
 
-	setVisible(true);
+	this.setVisible(true);
 
         JComponent board = ausgabeView.getBoardView();
         Point p = board.getLocationOnScreen();
 
-        logFloatPane = new LogFloatPane(board, getLayeredPane());
+        logFloatPane = new LogFloatPane(board, this.getLayeredPane());
         logFloatPane.setExpandedSize( new Dimension( 400, 300 ) );
         logFloatPane.setNormalSize( new Dimension( 400, 26 ) );
         logFloatPane.setExpanded( false );
-        getLayeredPane().add( logFloatPane, JLayeredPane.MODAL_LAYER );
+        this.getLayeredPane().add( logFloatPane, JLayeredPane.MODAL_LAYER );
 
-        final ChatLine cp = new ChatLine( ausgabeView );
+        final ChatLine cp = new ChatLine( ausgabeView, humanView.getHumanPlayer() );
         cp.setSize( cp.getPreferredSize() );
         cp.setLocation( p.x + 2, p.y + 2 );
         cp.setVisible( false );
 
-        addKeyListener(new KeyAdapter() {
+        this.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 if( e.getKeyChar() == KeyEvent.VK_ENTER ) {
                     if( humanView == null ) return;
@@ -180,9 +178,9 @@ public class View extends JFrame {
             public void keyPressed(KeyEvent e) {}
             public void keyReleased(KeyEvent e) {}
         });
-        getLayeredPane().add( cp, JLayeredPane.MODAL_LAYER );
+        this.getLayeredPane().add( cp, JLayeredPane.MODAL_LAYER );
 
-	validate();
+	this.validate();
     }
 
     public LogFloatPane logFloatPane;
@@ -192,7 +190,7 @@ public class View extends JFrame {
 	if (ausgabeView==null) {
           CAT.debug("ausgabeView is null");
           ausgabeView=av;
-          getContentPane().add(ausgabeView.getNorthPanel(), BorderLayout.NORTH);
+          this.getContentPane().add(ausgabeView.getNorthPanel(), BorderLayout.NORTH);
           this.addMenuBar();
         }
         if (humanView!=null){
@@ -215,18 +213,18 @@ public class View extends JFrame {
          // sp.setDividerLocation(0.75);
         }
         else{
-          getContentPane().add(av, BorderLayout.CENTER);
+          this.getContentPane().add(av, BorderLayout.CENTER);
         }
     }
 
     public void addChatPane(ChatPane cp){
         chatpane = cp;
-        getContentPane().add(cp, BorderLayout.SOUTH);
+        this.getContentPane().add(cp, BorderLayout.SOUTH);
 
     }
 
     public void removeChatPane() {
-        getContentPane().remove(chatpane);
+        this.getContentPane().remove(chatpane);
         chatpane = null;
     }
 
@@ -240,8 +238,8 @@ public class View extends JFrame {
         else {
           CAT.debug("There seems to be no human player, I'm propably a standalone Ausgabe(view)..");
         }
-        CAT.debug("Disposing the frame..");
-        setVisible(false);
+        CAT.debug("Disposing the this..");
+        this.setVisible(false);
         CAT.debug("View is now invisible");
 
     }

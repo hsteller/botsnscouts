@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
@@ -36,7 +36,7 @@ import javax.swing.border.*;
  * where the registers are displayed in a column
  * @author Lukasz Pekacki
  */
-public class RegisterArray extends JPanel {
+public class RegisterArray extends TJPanel {
 
     private ArrayList registerView = new ArrayList(5);
     private int xsize=70, ysize=550;
@@ -47,7 +47,7 @@ public class RegisterArray extends JPanel {
 		    System.err.println("Register klicked.");
 		}
 	    });
-	     
+
     }
 
     public RegisterArray(ActionListener register) {
@@ -95,10 +95,10 @@ public class RegisterArray extends JPanel {
 	    regs.add(((RegisterView) registerView.get(i)).getCard());
 	}
 	return regs;
-	
+
     }
 
-    public void addCard(HumanCard hc) {	
+    public void addCard(HumanCard hc) {
 	for (int i=0; i < registerView.size(); i++) {
 	    if (((RegisterView) registerView.get(i)).getCard() == null) {
 		((RegisterView) registerView.get(i)).setCard(hc);
@@ -122,7 +122,7 @@ public class RegisterArray extends JPanel {
     public Dimension getMinimumSize() {
 	return new Dimension(xsize,ysize);
     }
-    
+
     public Dimension getPreferredSize() {
 	return new Dimension(xsize,ysize);
     }
@@ -209,7 +209,7 @@ public class RegisterArray extends JPanel {
 	}
 	return s;
     }
-    
+
 }
 
 

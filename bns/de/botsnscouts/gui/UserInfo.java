@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
@@ -36,11 +36,11 @@ import java.util.*;
  * ask the user for the direction
  * @author Lukasz Pekacki
  */
-public class UserInfo extends JPanel {
-    
+public class UserInfo extends TJPanel {
+
     private ArrayList labels = new ArrayList(10);
     private static final int textWidth=25;
-    
+
 
     public UserInfo() {
 	BoxLayout b = new BoxLayout(this,BoxLayout.Y_AXIS);
@@ -70,7 +70,7 @@ public class UserInfo extends JPanel {
 		index++;
 	    }
 	    subString.append(token + " ");
-	    
+
 	}
 	( (JLabel) labels.get(index) ).setText(subString.toString());
 	index++;
@@ -80,16 +80,16 @@ public class UserInfo extends JPanel {
 	}
 
     }
-    
-    
+
+
 
 	public static void main (String args[]) {
 	    Message.setLanguage("deutsch");
 	    JWindow f = new JWindow();
 	    MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
-	    
+
 	    UserInfo ui = new UserInfo();
-	    
+
 	    f.getContentPane().add(ui);
 	    f.setLocation(100,100);
 	    f.setSize(200,400);
@@ -97,7 +97,7 @@ public class UserInfo extends JPanel {
 	    ui.setInfo("Das ist ein Test.");
 	    ui.setInfo("Und jetzt der Proof, ob es auch ersetzen geht.");
 	}
-    
+
     private void d(String s) {
 	System.err.println(s);
     }

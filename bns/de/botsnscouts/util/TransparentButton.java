@@ -42,7 +42,7 @@ public class TransparentButton extends JButton {
     static Border border = BorderFactory.createCompoundBorder( line, gap );
 
     public static class ButtonUI extends javax.swing.plaf.metal.MetalButtonUI {
-        static Color disabledColor = new Color(150, 150, 150);
+        static Color disabledColor = new Color(80, 80, 190);
 
         void fillRect( Graphics g, Color c, int left, int top, int width, int height ) {
             Graphics2D g2 = (Graphics2D) g;

@@ -37,7 +37,7 @@ import org.apache.log4j.*;
  * ask the user for the register reparation
  * @author Lukasz Pekacki
  */
-public class RepairRegisters extends JPanel implements ActionListener{
+public class RepairRegisters extends TJPanel implements ActionListener{
 
     private JButton done;
     private JLabel title;

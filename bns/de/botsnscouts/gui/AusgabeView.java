@@ -51,7 +51,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface, FocusLi
     private StatusLog statusLog;
     private JMenuBar menus = new JMenuBar();
 
-    private JPanel northPanel = new JPanel();
+    private JComponent northPanel = new PaintPanel( OptionPane.getBackgroundPaint(this) );
 
     // settings for Zoom-Menu
     protected static final int MIN_ZOOM = 40;
@@ -83,6 +83,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface, FocusLi
 //        statusLog = new StatusLog(aus.getView());
 
 	JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        robotsStatusContainer.setOpaque(false);
 //        Box robotsStatusContainer = new Box(BoxLayout.X_AXIS) {
 //            public void paint(Graphics g) {
 //                g.setColor(Color.black);
@@ -113,7 +114,6 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface, FocusLi
                             ausgabe.trackPos(robot.getArchivX(), robot.getArchivY(), true);
                         }
              });
-            //robotsStatusContainer.add( Box.createHorizontalStrut(20) );
 	    robotsStatusContainer.add(r);
 	    robotStatus.put(robots[i].getName(),r);
 
@@ -124,10 +124,12 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface, FocusLi
 
 	    RobotCard rc= new RobotCard(robots[i]);
 	    robotsCardContainer.add(rc);
+            robotsCardContainer.setOpaque( false );
 	    robotCardStatus.put(robots[i].getName(),rc);
 	}
 
         this.northPanel.setLayout(new BorderLayout());
+        northPanel.setOpaque( false );
         northPanel.add(robotsStatusContainer, BorderLayout.WEST);
 	//this.add(northPanel, BorderLayout.NORTH);
         // before splitpane: add(robotsStatusContainer,BorderLayout.NORTH);
@@ -142,6 +144,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface, FocusLi
 	gameBoardScrollPane.getHorizontalScrollBar().setUnitIncrement(64);
 	gameBoardScrollPane.getVerticalScrollBar().setUnitIncrement(64);
 	gameBoardScrollPane.setViewportView(gameBoardCanvas);
+        gameBoardScrollPane.setBorder( BorderFactory.createEmptyBorder(5,5,5,5) );
 	gameBoardCanvas.setScrollPane(gameBoardScrollPane);
 	add(gameBoardScrollPane,BorderLayout.CENTER);
 	gameBoardView = gameBoardScrollPane.getViewport();
@@ -154,7 +157,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface, FocusLi
         northPanel.add(p, BorderLayout.EAST);
     }
 
-    protected JPanel getNorthPanel(){
+    protected JComponent getNorthPanel(){
       return northPanel;
     }
     /*

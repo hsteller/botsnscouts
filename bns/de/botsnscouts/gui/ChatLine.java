@@ -8,6 +8,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import de.botsnscouts.util.OptionPane;
 import org.apache.log4j.Category;
 
 public class ChatLine extends ColoredComponent implements ActionListener, ComponentListener, KeyListener  {
@@ -15,9 +16,11 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
     AusgabeView ausgabeview;
     public JTextField text;
     Timer timer;
+    HumanPlayer humanPlayer;
 
-    ChatLine(AusgabeView ausgabeview) {
+    ChatLine(AusgabeView ausgabeview, HumanPlayer humanPlayer) {
         this.ausgabeview = ausgabeview;
+        this.humanPlayer = humanPlayer;
         setLayout( new BorderLayout() );
         add( new JLabel("Chat: "), BorderLayout.WEST );
         text = new JTextField(45);
@@ -27,13 +30,10 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
         text.addActionListener( this );
         text.addKeyListener( this );
 
-        JButton tb = de.botsnscouts.util.OptionPane.getTransparentButton("Send", 12);
+        JButton tb = OptionPane.getTransparentButton("Send", 12);
         add( tb, BorderLayout.EAST );
         tb.addActionListener( this );
-        setBorder( BorderFactory.createCompoundBorder(
-            BorderFactory.createEtchedBorder( new Color(0, 255,0, 128), new Color(0,128,0,128) ),
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
-        ));
+        setBorder( OptionPane.niceBorder );
         timer = new Timer( 5000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 setVisible( false );
@@ -51,10 +51,9 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
 
     public void actionPerformed(ActionEvent parm1) {
         String s = text.getText();
-        if( s == null || s.trim().length() == 0)
-            return;
+        if( s != null && s.trim().length() > 0)
+            humanPlayer.sendChat( text.getText() );
 
-        ausgabeview.showActionMessage( text.getText() );
         text.setText("");
         setVisible( false );
     }
@@ -75,7 +74,12 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
 
     public void keyTyped(KeyEvent parm1) {}
     public void keyPressed(KeyEvent parm1) {
-        timer.restart();
+        CAT.error( parm1 );
+        if( parm1.getKeyCode() == KeyEvent.VK_ESCAPE ) {
+            setVisible( false );
+        }
+        else
+            timer.restart();
     }
     public void keyReleased(KeyEvent parm1) {}
 

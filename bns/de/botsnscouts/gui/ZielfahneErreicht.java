@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
@@ -30,8 +30,8 @@ import java.awt.*;
 import javax.swing.*;
 
 
-public class ZielfahneErreicht extends JPanel{
-  
+public class ZielfahneErreicht extends TJPanel{
+
     private static final Color backColor = new Color(4,64,4);
     private static final Color foreColor2 = new Color(140,255,140);
 
@@ -41,21 +41,20 @@ public class ZielfahneErreicht extends JPanel{
 
 
     public ZielfahneErreicht(String inhalt, boolean tot) {
-	setBackground(backColor);
-	setLayout(new GridLayout((inhalt.length()+6),3)); 
-	for (int i = 0; i < 9; i++) add(new Label(""));
+	setLayout(new GridLayout((inhalt.length()+6),3));
+	for (int i = 0; i < 9; i++) add(new TJLabel(""));
 	for (int i = 0; i < inhalt.length(); i++) {
-	    Label l = new Label(inhalt.substring(i,i+1));
+	    TJLabel l = new TJLabel(inhalt.substring(i,i+1));
 	    l.setFont(new Font("Sans", Font.BOLD, 24));
 	    // ist der Robi tot, dann schreibe rot
 	    if (tot) l.setForeground(Color.red);
 	    else l.setForeground(foreColor2);
-	    add(new Label(""));
+	    add(new TJLabel(""));
 	    add(l);
-	    add(new Label(""));
+	    add(new TJLabel(""));
 	}
     }
-    
+
     public Dimension getPreferredSize() {
 	return new Dimension(180,550);
     }
@@ -68,4 +67,4 @@ public class ZielfahneErreicht extends JPanel{
 	f.add(zf);
 	f.setVisible(true);
     }
-}	
+}

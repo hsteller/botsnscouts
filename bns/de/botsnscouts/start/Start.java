@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.start;
 
 import java.awt.*;
@@ -83,13 +83,14 @@ public class Start extends JFrame implements WindowListener{
 	setSize(tk.getScreenSize());
 	setLocation(0,0);
 
-	ImageIcon icon = ImageMan.getIcon( "garage2.jpg");
-	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-	Graphics g = bgimg.getGraphics();
-	icon.paintIcon(this, g, 0,0);
-	g.dispose();
-	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
-	paint = new TexturePaint( bgimg, anchor );
+//	ImageIcon icon = ImageMan.getIcon( "garage2.jpg");
+//	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+//	Graphics g = bgimg.getGraphics();
+//	icon.paintIcon(this, g, 0,0);
+//	g.dispose();
+//	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
+//	paint = new TexturePaint( bgimg, anchor );
+        paint = OptionPane.getBackgroundPaint(this);
 
 	mainMenu=new MainMenu(this);
 	getContentPane().add(mainMenu, MAIN_MENU);
@@ -98,7 +99,7 @@ public class Start extends JFrame implements WindowListener{
 
 	busyPanel=new DoingStuffPanel(paint);
 	getContentPane().add(busyPanel, BUSY);
-	
+
 	addWindowListener(this);
 	show();
     }
@@ -110,7 +111,7 @@ public class Start extends JFrame implements WindowListener{
     protected void showBusy(String txt){
 	CAT.debug("setting busypanel. txt: "+txt);
 	busyPanel.setText(txt);
-	
+
 	switchCard(BUSY);
 
 	animatorThread=new Thread(busyAnimator);
@@ -147,7 +148,7 @@ public class Start extends JFrame implements WindowListener{
 	splash.noSplash();
         CAT.debug("window opened");
         CAT.debug("triggering tilefactory");
-	
+
 	// Needed so our window is actually drawn before triggering
 	// tile-loading
 	new Thread(new Runnable(){
@@ -270,10 +271,10 @@ public class Start extends JFrame implements WindowListener{
 			stopBusy();
 		    }catch(OneFlagException ex){
 			JOptionPane.showMessageDialog(Start.this,Message.say("Start","mZweiFlaggen"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
-			
+
 		    }catch(NichtZusSpfException exc){
 			JOptionPane.showMessageDialog(Start.this,Message.say("Start","mNichtZus"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
-			
+
 		    }
 		}}).start();
 

@@ -106,8 +106,15 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     static Color lineGreen =  new Color( 0, 80, 0 ) ;
     static Color background =  Color.black.brighter().brighter() ;
 
-    public void paint(Graphics _g) {
-        Graphics2D g = (Graphics2D) _g;
+    public void paintText(Graphics2D g) {
+        g.setFont( font );
+        g.setColor( Color.black );
+        g.drawString( robot.getName(), 15, 31 );
+        g.setColor( textColor );
+        g.drawString( robot.getName(), 14, 30 );
+    }
+
+    void paintGrid(Graphics2D g) {
         g.setColor( background );
 
         g.fillRect( 0,0, getWidth(), getHeight() );
@@ -116,40 +123,56 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
             g.drawLine(x, 0, x, getHeight() );
         for(int y=5; y< getHeight(); y+=5 )
             g.drawLine(0, y, getWidth(), y );
+    }
+
+    void paintRank(Graphics2D g) {
+        g.setFont( rankfont );
+        g.setColor( shadeGray );
+        g.drawString( ""+ ranking, getWidth()/2+2, getHeight() - 11 );
+        g.setColor( Color.yellow );
+        g.drawString( ""+ ranking, getWidth()/2, getHeight() - 13 );
+    }
+
+    void paintShade(Graphics2D g,  Color shadeColor) {
+        g.setPaint( shadeColor );
+        g.fillRect( 0,0,getWidth(), getHeight() );
+    }
+
+    void paintFrame(Graphics2D g) {
+        frame.paintIcon(this, g, -2, -2);
+    }
+
+    public void paint(Graphics _g) {
+        Graphics2D g = (Graphics2D) _g;
+        paintGrid( g );
 
         super.paint( g );
         if( ranking > 0 ) {
-//            g.setPaint( someGray );
-//            g.fillRect( getWidth()/2, 0,getWidth()/2, getHeight() );
-            g.setFont( rankfont );
-            g.setColor( shadeGray );
-            g.drawString( ""+ ranking, getWidth()/2+2, getHeight() - 11 );
-            g.setColor( Color.yellow );
-            g.drawString( ""+ ranking, getWidth()/2, getHeight() - 13 );
+            paintRank( g );
         }
 
-        g.setFont( font );
-        g.setColor( shadeGray );
-        g.drawString( robot.getName(), 15, 31 );
-        g.setColor( textColor );
-        g.drawString( robot.getName(), 14, 30 );
+        if( isDead() )
+            paintShade(g, darkShade);
 
+        paintText( g );
 
-        if( ranking == 0 && robot != null && !robot.istAktiviert()  ) {
-            g.setPaint( shadeGray );
-            g.fillRect( 0,0,getWidth(), getHeight() );
+        if( isDead() )
+            paintShade(g, darkShade);
+        else if( ranking == 0 && robot != null && !robot.istAktiviert() ) {
+            paintShade(g, shadeGray );
         }
-
-        frame.paintIcon(this, g, -2, -2);
+        paintFrame( g );
     }
     static Color someGray = new Color(100, 100, 100, 128 );
     static Color shadeGray = new Color(200, 200, 200, 128 );
+    static Color darkShade = new Color(50, 50, 50, 215 );
 
     static Font font = new Font("Serif", Font.ITALIC + Font.BOLD, 12 );
     static Font rankfont = new Font("Serif", Font.ITALIC + Font.BOLD, 64 );
-    static Color textColor = new Color( 0, 255, 0);
+    static Color textColor = new Color( 200, 200, 200);
     static ImageIcon frame = new ImageIcon( ImageMan.getImage(ImageMan.STATUS_FRAME) );
     private transient Vector robotInfoListeners;
+    private boolean dead;
 
     public Dimension getMinimumSize() {
         return new Dimension(90,70);
@@ -171,6 +194,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         damageBar1.setDamageValue(r.getSchaden());
         flagBar2.setReachedFlag(r.getNaechsteFlagge()-1);
         statusRobot1.setLifesLeft( r.getLeben() - 1);
+        setDead( r.getLeben() == 0 );
         repaint();
     }
 
@@ -258,5 +282,11 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         else {
             CAT.error("unkown source");
         }
+    }
+    public void setDead(boolean newDead) {
+        dead = newDead;
+    }
+    public boolean isDead() {
+        return dead;
     }
 }

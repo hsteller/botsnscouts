@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.start;
 
 import java.awt.*;
@@ -44,30 +44,28 @@ class PlayersPanel extends ColoredPanel{
     Vector names = new Vector();
     Hashtable map = new Hashtable();
 
-    public PlayersPanel(Start par){
+    public PlayersPanel(Start par, String title){
+        setLayout( new BorderLayout() );
 	parent=par;
 	roblist = new JList();
 	roblist.setOpaque( false );
 	roblist.setFixedCellWidth(250);
-	roblist.setSize(100, 100);
 	roblist.setOpaque( false );
-	roblist.setBorder( new EtchedBorder(4) );
-	roblist.setFont(new Font("Sans", Font.BOLD, 24));
+	roblist.setFont(new Font("Sans", Font.BOLD, 20));
 	roblist.setCellRenderer( new CellRenderer() );
+        roblist.setFixedCellHeight(64);
+        roblist.setBorder( BorderFactory.createEmptyBorder() );
 
-	JComponent p = new JPanel();
+	JComponent p = new JPanel( new BorderLayout() );
 	p.setOpaque( false );
 
 	JScrollPane sp = new JScrollPane
 	    ( roblist,
 	      JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 	      JScrollPane.HORIZONTAL_SCROLLBAR_NEVER );
-	sp.setSize( 200, 8*25+20 );
 	sp.setOpaque( false );
-	p.add(sp);
-	p.setBorder( new CompoundBorder( new EtchedBorder(8),
-					 new EmptyBorder(10, 10, 10, 10) ));
-	add(p);
+        sp.setBorder( OptionPane.niceBorder );
+	add(sp, BorderLayout.CENTER );
 	setOpaque(false);
     }
 

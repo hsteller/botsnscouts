@@ -468,12 +468,13 @@ public class HumanPlayer extends BNSThread {
     /** Returns the size of the main JFrame or null if the JFrame
      *  is null for any reason.
      *  #*/
-    protected Dimension getViewSize() {
-      if (view!=null)
-        return view.getSize();
-      else
-        return null;
-    }
+//    protected Dimension getViewSize() {
+//      if (view!=null)
+//        return view.getSize();
+//
+//      else
+//        return null;
+//    }
 
 
 

@@ -36,7 +36,7 @@ import javax.swing.border.*;
  * where the cards are displayed
  * @author Lukasz Pekacki
  */
-public class CardArray extends JPanel {
+public class CardArray extends TJPanel {
 
     private JButton sendButton = OptionPane.getTransparentButton(Message.say("SpielerMensch","senden"), 14);
     private ArrayList cardsView = new ArrayList(9);
@@ -58,12 +58,14 @@ public class CardArray extends JPanel {
     }
 
     public CardArray(ActionListener cards, ActionListener send) {
-	JPanel chooser = new JPanel();
+	JPanel chooser = new TJPanel( new GridLayout(2,1, 3, 3) );
+
 
 	setLayout(new GridLayout(5,2));
 
 	sendButton.setEnabled(false);
 	powerDownBox.setEnabled(true);
+        powerDownBox.setOpaque(false);
 	sendButton.addActionListener(send);
 	powerDownBox.setVerticalTextPosition(AbstractButton.BOTTOM);
 	powerDownBox.setHorizontalTextPosition(AbstractButton.CENTER);
@@ -74,7 +76,7 @@ public class CardArray extends JPanel {
 	    add(c);
 	}
 
-	chooser.setBorder(new EmptyBorder(25,0,0,0));
+	//chooser.setBorder(new EmptyBorder(25,0,0,0));
 	chooser.add(sendButton);
 	chooser.add(powerDownBox);
 

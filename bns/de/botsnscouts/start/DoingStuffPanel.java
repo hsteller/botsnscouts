@@ -3,12 +3,10 @@ package de.botsnscouts.start;
 import java.awt.*;
 import javax.swing.*;
 
-import de.botsnscouts.util.ImageMan;
-import de.botsnscouts.util.TJLabel;
-import de.botsnscouts.util.TJPanel;
+import de.botsnscouts.util.*;
 
 /** Shown when something is happening, yet we don't know
-    how long it'll take to complete 
+    how long it'll take to complete
     @author Dirk
 */
 
@@ -26,11 +24,19 @@ public class DoingStuffPanel extends JPanel{
 
 	setLayout(new BorderLayout());
 
+        JComponent comp = new de.botsnscouts.gui.ColoredComponent();
+        comp.setLayout( new BorderLayout() );
+        JPanel pl = new JPanel();
+        pl.setOpaque(false);
+        pl.add( comp );
 	txt=new TJLabel("Doing Stuff");
 	txt.setFont(font);
+        txt.setBorder( OptionPane.niceBorder );
+
+        comp.add( txt, BorderLayout.CENTER );
 	Box inner=Box.createHorizontalBox();
 	inner.add(Box.createHorizontalGlue());
-	inner.add(txt);
+	inner.add(pl);
 	inner.add(Box.createHorizontalGlue());
 
 	progressIndicator=new FourRobs();
@@ -64,7 +70,7 @@ public class DoingStuffPanel extends JPanel{
 	g2d.fillRect(0,0, d.width, d.height);
     }
 
-    private class FourRobs extends JComponent{
+    private class FourRobs extends de.botsnscouts.gui.ColoredComponent{
 	private Rob[] robs;
 	public FourRobs(){
 	    robs=new Rob[4];
@@ -87,6 +93,7 @@ public class DoingStuffPanel extends JPanel{
 	    for (int i=0;i<robs.length;i++)
 		robs[i].paint(g2);
 	    g2.setTransform(before);
+            g2.setColor( frameColor );
 	    g2.drawRect(0,0,d.width-1,d.height-1);
 	}
 	private Dimension d=new Dimension(60,60);
@@ -94,7 +101,7 @@ public class DoingStuffPanel extends JPanel{
 	public Dimension getMinimumSize(){return d;}
 	public Dimension getMaximumSize(){return d;}
     }
-
+    static Color frameColor = Color.green.darker();
     private class Rob{
 	private Image im;
 	private int x,y;
@@ -129,5 +136,5 @@ public class DoingStuffPanel extends JPanel{
 	f.setSize(500,500);
 	f.setVisible(true);
     }
-    
+
 }
