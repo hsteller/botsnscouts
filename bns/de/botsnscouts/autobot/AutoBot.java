@@ -87,7 +87,13 @@ public class AutoBot extends BNSThread {
       try {
 
         try {
-            myComm.anmelden(ip, port, realname);
+            CAT.debug("sending registration");
+            boolean ok = myComm.anmelden(ip, port, realname);
+            if (!ok) {
+                CAT.error("AutoBot '"+realname+"' failed to register :-(");
+                shutdown();
+                return;
+            }
         } catch (KommException e) {
             CAT.error("Could not connect", e);
             return;
@@ -95,8 +101,11 @@ public class AutoBot extends BNSThread {
 
         try {
             answer = myComm.warte();
-            if (answer.typ == answer.SPIELSTART) {
+            if (answer.typ == ClientAntwort.SPIELSTART) {
                 myComm.spielstart();
+            }
+            else {
+                CAT.warn("was expecting gamestart message but got: "+answer.getTyp());
             }
         } catch (KommException e) {
             CAT.error("Didn't get game start signal", e);
