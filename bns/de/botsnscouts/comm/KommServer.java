@@ -910,7 +910,8 @@ public class KommServer {
      * (Wird vom garbage collector aufgerufen.)
      * @author Miriam
      */
-    protected void finalize() throws IOException {
+    protected void finalize() throws Throwable {
+        super.finalize();
 	if (in != null) in.close();
 	if(out != null) out.close();
     }

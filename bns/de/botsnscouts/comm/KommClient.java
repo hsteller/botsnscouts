@@ -1207,9 +1207,10 @@ public class KommClient {
      * (Wird vom garbage collector aufgerufen.)
      * @author Miriam
      */
-    protected void finalize() throws IOException {
-	if (in != null) in.close();
-	if(out != null) out.close();
+    protected void finalize() throws Throwable {
+      super.finalize();
+	  if (in != null) in.close();
+	  if(out != null) out.close();
     }
 }
 
