@@ -14,7 +14,9 @@ public interface MessageID {
     public static final String PROG_DONE = "mProgReceived";
     public static final String LAST_PROG = "mLastProg";
     public static final String BOT_MOVE = AUSWERTUNG + "Move";
-
+    
+    public static final String BOT_TURN = AUSWERTUNG+"Turn";
+    public static final String BOT_UTURN = AUSWERTUNG+"UTurn";
 
     public static final String SOMEONE_QUIT = "mAbmeldung";
     public static final String BOT_REMOVED = "mHinr";
@@ -27,4 +29,8 @@ public interface MessageID {
     public static final String NO_SCOUT = "mNoScout";
     public static final String NO_WISENHEIMER = "mNoWisenheimer";
 
+    // TODO find a better place for those int constants
+    public static final int BOT_TURN_CLOCKWISE = 1;
+    public static final int BOT_TURN_COUNTER_CLOCKWISE=2;
+    
 }

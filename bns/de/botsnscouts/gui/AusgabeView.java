@@ -335,7 +335,14 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     protected void animateRobMove(Bot rob, int direction){
         gameBoardCanvas.animateRobMove(rob, direction);
     }
-
+    /** bord view is to animate robot movement*/
+    protected void animateRobTurn(Bot rob, int direction){
+        gameBoardCanvas.animateRobTurn(rob, direction);
+    }
+    /** bord view is to animate robot movement*/
+    protected void animateRobUTurn(Bot rob){
+        gameBoardCanvas.animateRobUTurn(rob);
+    }
 
     //protected int getDelay() {
     //  return speed;

@@ -26,6 +26,7 @@
 package de.botsnscouts.gui;
 
 import de.botsnscouts.board.*;
+import de.botsnscouts.comm.MessageID;
 import de.botsnscouts.util.*;
 import org.apache.log4j.Category;
 
@@ -169,17 +170,19 @@ public class BoardView extends JLayeredPane {
     
     
     /** Number of pixels a robot will be moved in a single animation step.
-     *  Has to be between 1 and FELDSIZE.
-     *  => Number of steps a one-field-move is drawn = FELDSIZE/MOVE_ROB_ANIMATION_OFFSET
+     *  Has to be between 1 and scaledFieldSize
+     *  => Number of steps a one-field-move is drawn = scaledFieldSize/MOVE_ROB_ANIMATION_OFFSET
      *
-     *   TODO: I guess that this must not be final and needs to be scaled so that it works
-     *    with different zoomlevels
      */
     private static final int MOVE_ROB_ANIMATION_OFFSET = 1;
     /** Amount of time (in ms) we wait after a single animation step
      *  of (pixel-)length MOVE_ROB_ANIMATION_OFFSET.
      */
     private static final int MOVE_ROB_ANIMATION_DELAY = 1;
+    
+    /** Number of steps a 90 degree turn is animated with*/ 
+    private static final int TURN_ROB_ANIMATION_STEPS = 45;
+    private static final int TURN_ROB_ANIMATION_DELAY = 1;
 
     private static final AlphaComposite AC_SRC = AlphaComposite.getInstance(AlphaComposite.SRC);
     private static final AlphaComposite AC_SRC_OVER = AlphaComposite.getInstance(AlphaComposite.SRC_OVER);
@@ -348,7 +351,7 @@ public class BoardView extends JLayeredPane {
     }
 
 
-    private HashMap internalPositionHash = new java.util.HashMap();
+    private HashMap internalBotHash = new java.util.HashMap();
     private static final Location pit = new Location(0, 0);
 
     protected void ersetzeRobos(Bot[] robos_neu) {
@@ -357,21 +360,23 @@ public class BoardView extends JLayeredPane {
             setRobColors(robos_neu);
             robos = robos_neu;
         }
-        // we dont want to overwrite the robots positions, because they
-        // have been updated in animateRobMove() before;
-        // animateRobMove() gets informed earlier, so overwriting the positions
-        // would reset the robot back to a position he has already left
+        // we dont want to overwrite the robots positions/facings, because they
+        // have been updated in animateRobMove()/animateRobTurn() before;
+        // animateRobMove()/animateRobTurn() gets informed earlier, so overwriting the positions/facings
+        // would reset a robot back to a position/facing he has already left
         else {
             if (Ausgabe.IS_ROB_MOVE_ANIMATION_ENABLED) {
-                for (int i = 0; i < robos.length; i++) // saving my internal robot positions
-                    internalPositionHash.put(robos[i].getName(), robos[i].getPos());
+                for (int i = 0; i < robos.length; i++) // saving my internal robot values
+                    internalBotHash.put(robos[i].getName(), robos[i]);
                 robos = robos_neu; // updating all robots
 
-// replacing robot positions - if it was not destroyed -
-                // with the positions we saved above
+                // replacing robot values - if it was not destroyed -
+                // with the values we saved above
                 for (int i = 0; i < robos.length; i++) {
                     Bot r = robos[i];
-                    Location tmp = (Location) internalPositionHash.get(r.getName());
+                    Bot tmpBot  = (Bot) internalBotHash.get(r.getName());
+                    Location tmp = tmpBot.getPos();
+                    //Location tmp = (Location) internalBotHash.get(r.getName());
 
                     if (!(r.getPos().equals(pit) || r.getDamage() >= 10 || tmp.equals(pit))) {
                         // ^^^^^^^^^^^^^
@@ -380,15 +385,15 @@ public class BoardView extends JLayeredPane {
                         // as we would ignore him if he
                         // is placed on the board again
                         if (CAT.isDebugEnabled()) {
-                            CAT.debug("ignoring server position of robot " + r.getName()
-                                    + " as my calculated position will be more accurate");
+                            CAT.debug("ignoring server values of robot " + r.getName()
+                                    + " as my calculated values will be more accurate");
                         }
-                        // use the internal kept position of our robot unless it is not
-                        // destroyed
+                        // use the internal kept values of our robot if it is not destroyed
                         r.setPos(tmp);
+                        r.setFacing(tmpBot.getFacing());
                     } else {
                         if (CAT.isDebugEnabled())
-                            CAT.debug("using server position of robot " + r.getName());
+                            CAT.debug("using server values of robot " + r.getName());
                     }
 
                 }
@@ -550,7 +555,94 @@ public class BoardView extends JLayeredPane {
         }
     }
     
+    
+    protected synchronized void animateRobUTurn(Bot rob) {
+        Bot internal = getBotByName(rob.getName());
+        turnRobot(internal, 180, TURN_ROB_ANIMATION_STEPS*2, true);
+        internal.turnClockwise();
+        internal.turnClockwise();
+    }
+    
+    private Bot getBotByName (String botName){
+        Bot internal=null;
+        for (int i = 0; i < robos.length; i++) {
+            if (robos[i].getName().equals(botName)) {
+                internal = robos[i];
+                break;
+            }
+        }
+        return internal;
+    }
+    
+    /** @param direction either BOT_TURN_CLOCKWISE or BOT_TURN_COUNTER_CLOCKWISE in MessageID*/
+    protected synchronized void animateRobTurn(Bot rob, int direction) {
 
+        Bot internal = getBotByName(rob.getName());
+       
+        int oldFacing = internal.getFacing();
+                
+        if (direction == MessageID.BOT_TURN_CLOCKWISE){
+            turnRobot(internal, 90,TURN_ROB_ANIMATION_STEPS, true);
+            internal.turnClockwise();
+        }
+        else {
+            turnRobot(internal, 90, TURN_ROB_ANIMATION_STEPS,false);
+            internal.turnCounterClockwise();
+        }
+       
+         
+    }
+    
+    private void turnRobot(Bot internal, int angle, int animationSteps, boolean clockWise) {
+        CAT.debug("turning bot");
+        AlphaComposite ac = AC_SRC_OVER;         
+        if (internal.isVirtual())
+            ac = AC_SRC_OVER_05;
+        Image cropRobImage = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
+        double rotateTheta;
+        if (clockWise)
+            rotateTheta= Math.toRadians(angle/animationSteps);
+        else 
+            rotateTheta = Math.toRadians(360-angle/animationSteps);  
+        CAT.debug("turning bot:; theta="+rotateTheta);
+        synchronized (this) {       
+            Graphics2D mainGraphics = (Graphics2D)getGraphics();  
+            int feldSize = scaledFeldSize;           
+            int xposScaled=  (internal.getX()-1) *feldSize;
+            int yposScaled = (sf.getSizeY() - internal.getY())*feldSize;                         
+            int clipLength = feldSize;    
+            int halfSize = feldSize/2;
+            if (preBoard == null)
+                preBoard = getBoardImage();
+            
+            // transforming the robot image into an image that we are allowed to call getGraphics() on so
+            // that we will be able to rotate it later
+            BufferedImage robImage=  preBoard.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
+            // saving a copy of the background:
+            Raster blank = robImage.getData();
+            Graphics2D botImageGraphics = (Graphics2D) robImage.getGraphics();
+            botImageGraphics.setComposite(ac);
+       
+            botImageGraphics.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
+           
+             for (int step = 0; step<TURN_ROB_ANIMATION_STEPS;step++) {
+
+                 	 robImage.setData(blank); // erasing the offscreen image with the boardbackground
+                     botImageGraphics.rotate(rotateTheta,halfSize, halfSize); // rotating the robot pic further   
+                     botImageGraphics.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);                  
+                     // paint the offscreen image on the screen:
+                     mainGraphics.drawImage(robImage, xposScaled, yposScaled, feldSize, clipLength,this);
+                
+                     try {
+                         Thread.currentThread().sleep(TURN_ROB_ANIMATION_DELAY);
+                    } catch (InterruptedException ie) {
+                        CAT.warn("BoardView.paint: wait in turnRobot  interrupted");
+                    }
+                   
+                }
+                robImage.setData(blank);
+        }
+    }
     protected synchronized void animateRobMove(Bot rob, int direction) {
         // important: according to the code on SpielfeldSim we do not get
         //            the updated robot position;

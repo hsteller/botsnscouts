@@ -941,7 +941,38 @@ public class Ausgabe extends BNSThread {
 
         }
     }
+    
+    private void comMsgHandleRobotTurn(ClientAntwort kommAntwort) {
 
+        String robname = kommAntwort.namen[1];
+        Bot r = (Bot) robots.get(robname);
+        String direction = kommAntwort.namen[2];
+        if (CAT.isDebugEnabled()) {
+            CAT.debug("Got robot turn message for robot \"" + robname + "\"");
+            CAT.debug("Direction: " + direction);
+        }
+        try {
+            int directionInt = Integer.parseInt(direction);
+            ausgabeView.animateRobTurn(r, directionInt);
+        } catch (NumberFormatException nfe) {
+            CAT.error("Failed to convert direction for robot \""
+                    + robname + "\"from String to int!");
+            CAT.error("String was: \"" + direction + "\"");
+
+        }
+    }
+
+    private void comMsgHandleRobotUTurn(ClientAntwort kommAntwort) {
+
+        String robname = kommAntwort.namen[1];
+        Bot r = (Bot) robots.get(robname);        
+        if (CAT.isDebugEnabled()) {
+            CAT.debug("Got robot U-Turn message for robot \"" + robname + "\"");
+        }
+        ausgabeView.animateRobUTurn(r);
+       
+    }
+    
     private String[] extractMessage(ClientAntwort kommAntwort) {
         int size = kommAntwort.namen.length - 1;
 
@@ -1063,6 +1094,22 @@ public class Ausgabe extends BNSThread {
                     }
                 });
 
+        sequencer.addActionMapping(MessageID.BOT_TURN,
+                        new AbstractMessageAction() {
+                            public void invoke(ClientAntwort msgData) {
+                                if (IS_ROB_MOVE_ANIMATION_ENABLED)
+                                    comMsgHandleRobotTurn(msgData);
+                            }
+                        });
+        sequencer.addActionMapping(MessageID.BOT_UTURN,
+                        new AbstractMessageAction() {
+                            public void invoke(ClientAntwort msgData) {
+                                if (IS_ROB_MOVE_ANIMATION_ENABLED)
+                                    comMsgHandleRobotUTurn(msgData);
+                            }
+                        });
+
+        
         sequencer.addActionMapping(DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {
