@@ -48,8 +48,9 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
     public void actionPerformed(ActionEvent parm1) {
         String s = text.getText();
         if( s != null && s.trim().length() > 0)
-            humanPlayer.sendChat( filter(s) );
-
+            humanPlayer.sendChat( /*filter(s)*/s );
+     // filter not necessary anymore, I hope (Hendrik)
+    // -> Messages will be (URL-)encoded in communication classes
         text.setText("");
         setVisible( false );
     }
@@ -76,6 +77,8 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
     }
     public void keyReleased(KeyEvent parm1) {}
 
+    // not necessary anymore, I hope (Hendrik)
+    // -> Messages will be (URL-)encoded in communication classes
     private String filter(String in){
         StringBuffer out=new StringBuffer();
         StringTokenizer st=new StringTokenizer(in, "$,");

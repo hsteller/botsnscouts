@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.server;
 
 import java.net.*;
@@ -44,7 +44,7 @@ import de.botsnscouts.comm.*;
 class RegistrationManager implements Runnable
 {
     static final Category CAT = Category.getInstance( RegistrationManager.class );
-    static final String REGISTER_PATTERN = "(RGS|RGA|RS2|RA2)\\(([:alpha:]+)(,([1-8]))?\\)";
+    static final String REGISTER_PATTERN = "(RGS|RGA|RS2|RA2)\\((([:alnum:]|\\+|\\%|\\_|\\-|\\.|\\*)+)(,([1-8]))?\\)";
 
     Server server;
     ServerSocket seso;
@@ -137,10 +137,14 @@ class RegistrationManager implements Runnable
               throw new RegistrationException("Register string not in the right format");
 
             String type = registerRE.getParen(1);
-            clientName = registerRE.getParen(2);
-            if( registerRE.getParenCount() >= 4 ) {
-              farbe = Integer.parseInt( registerRE.getParen(4) );
+            clientName = URLDecoder.decode(registerRE.getParen(2));
+
+            if( registerRE.getParenCount() >= 5 ) {
+              //for (int i=0; i<=5;i++)
+              //  System.out.println(i+"="+registerRE.getParen(i));
+              farbe = Integer.parseInt( registerRE.getParen(5) );
             }
+
 
             if( type.equals("RGS") )
                 registerPlayer(clientName, farbe, in, out, 1.0f );

@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.net.URLEncoder;
+
 import org.apache.log4j.Category;
 
 public class Stats implements Comparable{
@@ -131,7 +133,7 @@ public class Stats implements Comparable{
 
 
     public String toSendString () {
-	return (this.name+","+this.hits+","+this.kills+","+this.damageByBoard+","
+	return (URLEncoder.encode(this.name)+","+this.hits+","+this.kills+","+this.damageByBoard+","
                +this.damageByRobots+","+this.askedWisenheimer);
     }
 
