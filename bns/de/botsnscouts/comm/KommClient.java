@@ -866,7 +866,7 @@ public class KommClient {
 
 	}
 	catch (Exception sonstige) {
-	    throw new KommException ("Exception bei getSpielfeld; Message: "+sonstige.getMessage());
+	    throw new KommException ("Exception bei getBoard; Message: "+sonstige.getMessage());
 	}
 	return back;
     }

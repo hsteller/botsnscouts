@@ -72,6 +72,8 @@ public class GameFieldPanel extends JPanel {
     JCheckBox allowWisenheimer;
     JCheckBox allowScout;
 
+    private GameOptions gameOptions;
+
     /** Announce the game at a meta server? */
     private AnnounceGame announceGame = new AnnounceGame();
 
@@ -104,6 +106,8 @@ public class GameFieldPanel extends JPanel {
         add(BorderLayout.CENTER, scrl);
         add(BorderLayout.EAST, editPanel);
         spf.rasterChanged();
+
+        gameOptions = parent.fassade.getGameOptions();
     }
 
     public void paint(Graphics g) {
@@ -227,26 +231,26 @@ public class GameFieldPanel extends JPanel {
         final JCheckBox announce = new TJCheckBox(Message.say("Start", "mAnnounceMetaServer"),
                 announceGame.willBeAnnounced());
         announce.addActionListener(
-            new ActionListener() {
+                new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         metaServer.setEnabled(announce.isSelected());
                         metaServer.setEditable(announce.isSelected());
                         announceGame.setAnnounce(announce.isSelected());
                     }
-            }
+                }
         );
         metaServer.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        announceGame.parse(((JTextField )e.getSource()).getText());
-                    } catch (InvalidInputException ex) {
-                        CAT.debug(ex.getMessage());
-                        //TODO: beep
-                        metaServer.setText(announceGame.getServerString());
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            announceGame.parse(((JTextField) e.getSource()).getText());
+                        } catch (InvalidInputException ex) {
+                            CAT.debug(ex.getMessage());
+                            //TODO: beep
+                            metaServer.setText(announceGame.getServerString());
+                        }
                     }
                 }
-            }
         );
 
         spielfelder.setFont(font);
@@ -278,15 +282,14 @@ public class GameFieldPanel extends JPanel {
         inner.add(nam, gc);
         inner.add(new TJLabel(Message.say("Start", "mFarbe")), gc);
         inner.add(farben, gc);
-	
-	//not fully implemented yet -- commented out, do not remove.
-	if (false) {
-            inner.add(allowWisenheimer, gc);
-	        inner.add(allowScout, gc);
-            inner.add(announce, gc);
-            inner.add(metaServer, gc);
-        }
-	gc.fill = GridBagConstraints.HORIZONTAL;
+
+        /*    not yet functional
+        inner.add(allowWisenheimer, gc);
+        inner.add(allowScout, gc);
+        inner.add(announce, gc);
+        inner.add(metaServer, gc);    */
+
+        gc.fill = GridBagConstraints.HORIZONTAL;
 
         panel.add(inner);
         //Add new game options below this one.
@@ -333,32 +336,41 @@ public class GameFieldPanel extends JPanel {
     }
 
     private void okClicked() {
-        parent.fassade.setAllowWisenheimer(allowWisenheimer.isSelected());
-        parent.fassade.setAllowScout(allowScout.isSelected());
-        /* Handig over a postServerStartTask is still a bit weird, but
-           it is much more sane and faster than before...
-         */
-        parent.showNewStartPanel(
-            new Task() {
-            public void doIt() {
+        gameOptions.setAllowWisenheimer(allowWisenheimer.isSelected());
+        gameOptions.setAllowScout(allowScout.isSelected());
+        try {
+            parent.fassade.updateGameOptions();
+            /* Handig over a postServerStartTask is still a bit weird, but
+               it is much more sane and faster than before...
+             */
+            parent.showNewStartPanel(
+                    new Task() {
+                        public void doIt() {
 
-                if (mitspielen.getSelectedObjects() != null) {
-                    Thread smth = parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(), farben.getSelectedIndex());
-                    parent.addKS(smth);
-                    Global.debug(this, "menschlichen spieler gestartet");
-                } else {//starte einen AusgabeFrame
-                    parent.addKS(parent.fassade.einemSpielZuschauenNoSplash());
-                }
-                // Announce game, if we shall do this.
-                try {
-                    announceGame.announceGame(null); //TODO: We need the game options here
-                } catch (UnableToAnnounceGameException e) {
-                    e.printStackTrace(); //TODO: give info
-                } catch (YouAreNotReachable youAreNotReachable) {
-                    youAreNotReachable.printStackTrace(); //TODO: give info
-                }
-            }
-        });
+                            if (mitspielen.getSelectedObjects() != null) {
+                                Thread smth = parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(), farben.getSelectedIndex());
+                                parent.addKS(smth);
+                                Global.debug(this, "menschlichen spieler gestartet");
+                            } else {//starte einen AusgabeFrame
+                                parent.addKS(parent.fassade.einemSpielZuschauenNoSplash());
+                            }
+                            // Announce game, if we shall do this.
+                            try {
+                                announceGame.announceGame(gameOptions);
+                            } catch (UnableToAnnounceGameException e) {
+                                e.printStackTrace(); //TODO: give info
+                            } catch (YouAreNotReachable youAreNotReachable) {
+                                youAreNotReachable.printStackTrace(); //TODO: give info
+                            }
+                        }
+                    });
+        } catch (OneFlagException ex) {
+            JOptionPane.showMessageDialog(this, Message.say("Start", "mZweiFlaggen"), Message.say("Start", "mError"), JOptionPane.ERROR_MESSAGE);
+
+        } catch (NonContiguousMapException exc) {
+            JOptionPane.showMessageDialog(this, Message.say("Start", "mNichtZus"), Message.say("Start", "mError"), JOptionPane.ERROR_MESSAGE);
+
+        }
     }//okclicked
 
     void unrollOverButs() {

@@ -42,23 +42,7 @@ public class Facade {
     //private KommSpPr com;
     private TileFactory tileFactory;
 
-    private static final String DIP;//="127.0.0.1";
-    private static final int DPORT;//=8077;
-    private static final int DPLAYERS;//=8;
-    private static final int DTO;//=200;
-
-    static {
-        String stmp;
-        int tmp;
-        stmp = Conf.getProperty("server.IP");
-        DIP = (stmp == null ? "127.0.0.1" : stmp);
-        tmp = Conf.getIntProperty("server.port");
-        DPORT = (tmp == -1 ? 8077 : tmp);
-        tmp = Conf.getIntProperty("players");
-        DPLAYERS = (tmp == -1 ? 8 : tmp);
-        tmp = Conf.getIntProperty("timeout");
-        DTO = (tmp == -1 ? 200 : tmp);
-    }
+    private GameOptions gameOptions;
 
 ////////////////////////////////////////
     public Facade() {
@@ -275,12 +259,12 @@ public class Facade {
 
     // startet ein AusgabeKanal mit default parameter
     public Thread einemSpielZuschauen() {
-        return launcher.einemSpielZuschauen(DIP, DPORT, false);
+        return launcher.einemSpielZuschauen(GameOptions.DIP, GameOptions.DPORT, false);
     }
 
     // startet ein AusgabeKanal mit default parameter und keinem Splashscreen
     public Thread einemSpielZuschauenNoSplash() {
-        return launcher.einemSpielZuschauen(DIP, DPORT, true);
+        return launcher.einemSpielZuschauen(GameOptions.DIP, GameOptions.DPORT, true);
     }
 
     // startet einen SpielerMensch
@@ -290,17 +274,17 @@ public class Facade {
 
     // startet einen SpielerMensch with default port num
     public Thread amSpielTeilnehmen(String ip, String name, int farbe) {
-        return launcher.amSpielTeilnehmen(ip, DPORT, name, farbe, false);
+        return launcher.amSpielTeilnehmen(ip, GameOptions.DPORT, name, farbe, false);
     }
 
     // startet einen SpielerMensch mit default parameter
     public Thread amSpielTeilnehmen(String name, int farbe) {
-        return launcher.amSpielTeilnehmen(DIP, DPORT, name, farbe, false);
+        return launcher.amSpielTeilnehmen(GameOptions.DIP, GameOptions.DPORT, name, farbe, false);
     }
 
     // startet einen SpielerMensch mit default parameter und ohne Splash Screen
     public Thread amSpielTeilnehmenNoSplash(String name, int farbe) {
-        return launcher.amSpielTeilnehmen(DIP, DPORT, name, farbe, true);
+        return launcher.amSpielTeilnehmen(GameOptions.DIP, GameOptions.DPORT, name, farbe, true);
     }
 
     // startet Künstliche Spieler local
@@ -310,12 +294,12 @@ public class Facade {
 
     // startet Künstliche Spieler local mit default parametern
     public Thread kuenstlicheSpielerStarten(int iq, boolean beltAware) {
-        return launcher.startAutoBot(DIP, DPORT, iq, beltAware);
+        return launcher.startAutoBot(GameOptions.DIP, GameOptions.DPORT, iq, beltAware);
     }
 
     // startet Künstliche Spieler local mit default parametern
     public Thread kuenstlicheSpielerStarten(int iq, boolean beltAware, String botName) {
-        return launcher.startAutoBot(DIP, DPORT, iq, beltAware, botName);
+        return launcher.startAutoBot(GameOptions.DIP, GameOptions.DPORT, iq, beltAware, botName);
     }
 
     // launch the game
@@ -324,13 +308,13 @@ public class Facade {
     }
 
     public void startGame(StSpListener listener) throws OneFlagException, NonContiguousMapException {
-        launcher.startGame(tileRaster, DPLAYERS, DTO, DPORT, listener);
+        launcher.startGame(gameOptions, listener );
     }
 
     //startet das Spiel tatsächlich
     public void spielGehtLos() {
         tileFactory.forgetTiles();
-        launcher.spielGehtLos(DIP, DPORT);
+        launcher.spielGehtLos(GameOptions.DIP, GameOptions.DPORT);
     }
 
 
@@ -343,11 +327,23 @@ public class Facade {
         tileFactory.prepareTiles();
     }
 
-    void setAllowWisenheimer(boolean selected) {
-        launcher.setAllowWisenheimer(selected);
+    de.botsnscouts.start.GameOptions getGameOptions() {
+        if (gameOptions == null) {
+            gameOptions = new GameOptions();
+        }
+        return gameOptions;
     }
 
-    void setAllowScout(boolean selected) {
-        launcher.setAllowScout(selected);
+    /**
+     * After everything is chosen, update the game options,
+     * i.e. set field and flags.
+     */
+    public void updateGameOptions() throws OneFlagException, NonContiguousMapException  {
+
+        Location dim = tileRaster.getSpielfeldSize();
+        gameOptions.setX(dim.x);
+        gameOptions.setY(dim.y);
+        gameOptions.setBoard(tileRaster.getBoard());
+        gameOptions.setFlags(tileRaster.getRFlaggen());
     }
 }

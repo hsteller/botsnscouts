@@ -1,6 +1,7 @@
-package de.botsnscouts.server;
+package de.botsnscouts.start;
 
 import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Conf;
 
 /*
  *******************************************************************
@@ -20,14 +21,33 @@ import de.botsnscouts.util.Location;
  */
 public class GameOptions {
 
+    static final String DIP;//="127.0.0.1";
+    static final int DPORT;//=8077;
+    static final int DPLAYERS;//=8;
+    static final int DTO;//=200;
+
+    static {
+        String stmp;
+        int tmp;
+        stmp = Conf.getProperty("server.IP");
+        DIP = (stmp == null ? "127.0.0.1" : stmp);
+        tmp = Conf.getIntProperty("server.port");
+        DPORT = (tmp == -1 ? 8077 : tmp);
+        tmp = Conf.getIntProperty("players");
+        DPLAYERS = (tmp == -1 ? 8 : tmp);
+        tmp = Conf.getIntProperty("timeout");
+        DTO = (tmp == -1 ? 200 : tmp);
+    }
+
     /** Max number of players for this game */
-    private int maxPlayers;
+    private int maxPlayers = DPLAYERS;
 
     /** TCP/IP port for registration */
-    private int registrationPort;
+    private int registrationPort = DPORT;
 
     /** Tiwmeout in ms for handing in cards. */
-    private int handInTimeout;
+    private int handInTimeout = 1000*DTO;
+
     /** The board for the game.
      * Represented as a string in the fucking old board format.
      */
@@ -61,6 +81,14 @@ public class GameOptions {
      */
     private String comment;
 
+
+
+    /**
+     * Set the relevant information later.
+     */
+    GameOptions() {
+    }
+
     /**
      *
      * @param noPlayers  Max number of players for this game
@@ -71,13 +99,13 @@ public class GameOptions {
      * @param x        "First coordinate of the board's dimension"
      * @param y        "Second coordinate of the board's dimension"
      */
-    public GameOptions( int noPlayers,
-                        int port,
-                        int timeout,
-                        String board,
-                        Location[] flags,
-                        int x,
-                        int y) {
+    public GameOptions(int noPlayers,
+                       int port,
+                       int timeout,
+                       String board,
+                       Location[] flags,
+                       int x,
+                       int y) {
         this.maxPlayers = noPlayers;
         this.registrationPort = port;
         this.handInTimeout = timeout;
@@ -86,6 +114,7 @@ public class GameOptions {
         this.x = x;
         this.y = y;
     }
+
     /**
      *
      * @param noPlayers  Max number of players for this game
@@ -96,21 +125,21 @@ public class GameOptions {
      * @param x        "First coordinate of the board's dimension"
      * @param y        "Second coordinate of the board's dimension"
      */
-    public GameOptions( int noPlayers,
-                        int port,
-                        int timeout,
-                        String board,
-                        Location[] flags,
-                        int x,
-                        int y,
-                        boolean allowScout,
-                        boolean allowWisenheimer ) {
+    public GameOptions(int noPlayers,
+                       int port,
+                       int timeout,
+                       String board,
+                       Location[] flags,
+                       int x,
+                       int y,
+                       boolean allowScout,
+                       boolean allowWisenheimer) {
         this(noPlayers, port, timeout, board, flags, x, y);
         this.allowWisenheimer = allowWisenheimer;
         this.allowScout = allowScout;
     }
 
-     /**
+    /**
      *
      * @param noPlayers  Max number of players for this game
      * @param port TCP/IP port for registration
@@ -120,19 +149,19 @@ public class GameOptions {
      * @param x        "First coordinate of the board's dimension"
      * @param y        "Second coordinate of the board's dimension"
      */
-    public GameOptions( int noPlayers,
-                        int port,
-                        int timeout,
-                        String board,
-                        Location[] flags,
-                        int x,
-                        int y,
-                        boolean allowScout,
-                        boolean allowWisenheimer,
-                        String comment) {
+    public GameOptions(int noPlayers,
+                       int port,
+                       int timeout,
+                       String board,
+                       Location[] flags,
+                       int x,
+                       int y,
+                       boolean allowScout,
+                       boolean allowWisenheimer,
+                       String comment) {
         this(noPlayers, port, timeout, board, flags, x, y, allowScout, allowWisenheimer);
         this.comment = comment;
-     }
+    }
 
     /**
      *
@@ -190,8 +219,48 @@ public class GameOptions {
         return comment;
     }
 
+    void setMaxPlayers(int maxPlayers) {
+        this.maxPlayers = maxPlayers;
+    }
+
+    void setRegistrationPort(int registrationPort) {
+        this.registrationPort = registrationPort;
+    }
+
+    void setHandInTimeout(int handInTimeout) {
+        this.handInTimeout = handInTimeout;
+    }
+
+    void setBoard(String board) {
+        this.board = board;
+    }
+
+    void setFlags(Location[] flags) {
+        this.flags = flags;
+    }
+
+    void setX(int x) {
+        this.x = x;
+    }
+
+    void setY(int y) {
+        this.y = y;
+    }
+
+    void setAllowWisenheimer(boolean allowWisenheimer) {
+        this.allowWisenheimer = allowWisenheimer;
+    }
+
+    void setAllowScout(boolean allowScout) {
+        this.allowScout = allowScout;
+    }
+
+    void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public String toString() {
-        return "numberPlayers="+maxPlayers+", registrationPort"+registrationPort+"...";
+        return "numberPlayers=" + maxPlayers + ", registrationPort" + registrationPort + "...";
     }
 
 }

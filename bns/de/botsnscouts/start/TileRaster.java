@@ -256,13 +256,15 @@ public class TileRaster{
 	return flags;
     }
 
-    //gibt das Board als ein String zurück
-    public String getSpielfeld() throws OneFlagException, NonContiguousMapException{
+    /**
+     * Hand out string representation of a board.
+     */
+    public String getBoard() throws OneFlagException, NonContiguousMapException{
 	checkSpielfeld();//teste
 	Location[] bounds= findBounds();
 	String GRUBENZWR="____________";
 	String GRUBENFLD="_G_G_G_G_G_G_G_G_G_G_G_G_";
-	StringBuffer out=new StringBuffer();//hier wird das Board aufgebaut
+	StringBuffer out=new StringBuffer();
 	String rechts=new String();
 	boolean links =false;
 	StringBuffer oben = new StringBuffer();

@@ -29,7 +29,6 @@ import de.botsnscouts.gui.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.autobot.*;
 import de.botsnscouts.server.Server;
-import de.botsnscouts.server.GameOptions;
 import org.apache.log4j.Category;
 
 // launches human player, output ...
@@ -39,8 +38,6 @@ public class Launcher {
     static final Category CAT = Category.getInstance(Launcher.class);
 
     private Server server;
-    private boolean allowWisenheimer = true;
-    private boolean allowScout = true;
 
     // launches output
     public Thread einemSpielZuschauen(String ip, int port, boolean noSplash) {
@@ -86,17 +83,11 @@ public class Launcher {
         return ks;
     }
 
-     public void startGame(TileRaster tileRaster, int pnum, int timeOut, int lisPort, StSpListener listener) throws OneFlagException, NonContiguousMapException {
-        Location dim = tileRaster.getSpielfeldSize();
-        String field = tileRaster.getSpielfeld();
-//        int retFromNewGame = com.newGame(ip, port, pnum, 0, timeOut, field, flags[0], flags[1], dim.x, dim.y, lisPort);
-//        return (retFromNewGame != 1);
-        server = new Server(new GameOptions(pnum, lisPort, 1000*timeOut, field,
-                    tileRaster.getRFlaggen(), dim.x, dim.y,
-                    allowScout, allowWisenheimer),
-                    listener);
-         server.start();
-    }
+    public void startGame(de.botsnscouts.start.GameOptions options, StSpListener listener) throws OneFlagException, NonContiguousMapException {
+       server = new Server(options, listener);
+       server.start();
+   }
+
 
     public void spielGehtLos(String ip, int port) {
         server.startGame();
@@ -105,14 +96,6 @@ public class Launcher {
     public void stopServer() {
         // Not nice, but this is the way it was done before...
         server.interrupt();
-    }
-
-    public void setAllowWisenheimer(boolean selected) {
-        allowWisenheimer = selected;
-    }
-
-    public void setAllowScout(boolean selected) {
-        allowScout = selected;
     }
 
 }

@@ -2,7 +2,6 @@ package de.botsnscouts.start;
 
 import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.InvalidInputException;
-import de.botsnscouts.server.GameOptions;
 import org.apache.log4j.Category;
 
 /**  Announce the new game at a meta server.
@@ -36,7 +35,7 @@ class AnnounceGame {
      *         not be possible for clients to connect to our game server, e.g. because
      *         we are behind a firewall.
      */
-    void announceGame(GameOptions gameOptions)
+    void announceGame(de.botsnscouts.start.GameOptions gameOptions)
             throws UnableToAnnounceGameException, YouAreNotReachable {
         if (doAnnounce) {
             CAT.info("Going to announce game at meta server "+getServerString());
