@@ -145,7 +145,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      */
     public void showWinnerState (String[] gameState) {
 	int i=0;
-	while (!gameState[i].equals("null")) {
+	while (i<gameState.length&&!gameState[i].equals("null")) {
 	    d("getting ranking of "+gameState[i]+" zu holen");
 	    ((RobotStatus) robotStatus.get(gameState[i])).setWinnerNumber((i+1));
 	    
