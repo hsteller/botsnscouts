@@ -578,7 +578,9 @@ public class Ausgabe extends BNSThread {
      * Zentriert die angegebenen Flagge
      */
     public void scrollFlag (int nr) {
-	trackPos(flags[(nr-1)].getX(),flags[(nr-1)].getY());
+	if (nr > 0 && nr <= flags.length) {
+	    trackPos(flags[(nr-1)].getX(),flags[(nr-1)].getY());
+	} 
     }
 
     public void trackPos (int x, int y) {
