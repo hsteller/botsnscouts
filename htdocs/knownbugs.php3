@@ -40,7 +40,7 @@ Well, in between the state of translation has improved. When you find a lot of G
 But if you manage: Please use the 
 <A HREF="http://sourceforge.net/cvs/?group_id=3883">CVS version</A>
 for reading and hacking, and send us patches.<P>
-You want to use this project as an example in a university course? Uhhm, see above and read the source... <P>
-There is still hope, we continue to refactor and translate and optimze sometimes we might even add new features...
+You want to use this project as an example in a university course? Uhhm, see above and read the source...<BR>
+There is still hope, we continue to refactor and translate and optimze. Sometimes we might even add new features...
 </div>
 <?php include('bnsfooter.pht');?>
