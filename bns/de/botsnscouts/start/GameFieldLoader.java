@@ -46,11 +46,6 @@ class GameFieldLoader{
     private static HashSet distSpf = new HashSet(); // The spfs from the distribution
 
     public String[] getSpielfelder(){
-
-
-
-
-
 	String[] part1;
 
         File kd=new File("tiles");
@@ -61,8 +56,8 @@ class GameFieldLoader{
           }
         }
         else {
-          CAT.debug("could not find tiles directory for custom tiles");
-          part1 = new  String [0];
+          CAT.warn("could not find tiles directory for personal tiles");
+          part1 = new String [0];
         }
 
 	// Load those from the distribution
