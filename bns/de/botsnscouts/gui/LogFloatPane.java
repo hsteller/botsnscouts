@@ -13,6 +13,23 @@ public class LogFloatPane extends ColoredComponent implements ComponentListener 
     Component master;
     Container container;
 
+//    class MiniButton extends JButton {
+//        Dimension size = new Dimension(10,10);
+//        Color c = Color.blue;
+//        MiniButton() {
+//            setBorderPainted( false );
+//            setOpaque( false );
+//        }
+//        public Dimension getPreferredSize() { return size; };
+//        public Dimension getMinimumSize() { return size; };
+//        public Dimension getMaximumSize() { return size; };
+//        public void paintComponent(Graphics g) {
+//            g.setColor(c);
+//            g.fillRect( 0,0,getWidth(), getHeight());
+//        }
+//    }
+//
+//    JButton mini = new MiniButton();
     public LogFloatPane(Component master, Container container) {
         this.master = master;
         this.container = container;
@@ -20,25 +37,47 @@ public class LogFloatPane extends ColoredComponent implements ComponentListener 
         enableEvents( AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
         setBorder( BorderFactory.createEtchedBorder( new Color(0, 255,0, 128), new Color(0,128,0,128) ) );
         setOpaque( false );
+//        setLayout( null );
+//        add( mini );
+//        mini.setSize( mini.getPreferredSize() );
+//        mini.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                switchSize();
+//            }
+//        });
         enableEvents(AWTEvent.MOUSE_EVENT_MASK);
     }
 
     Font font = new Font("Sans", Font.BOLD, 12 );
-    public void paint(Graphics g) {
-        super.paint(g);
+    public void paintComponent(Graphics g) {
+        Insets in = getInsets();
         g.setFont( font );
         g.setColor( Color.green );
         synchronized(msgs) {
             Iterator i = msgs.listIterator();
-            int y = getHeight() - 2;
+            int y = getHeight() - in.top - in.bottom;
             while( i.hasNext() && y > 0) {
                 String m = (String)i.next();
-                g.drawString( m, 2, y );
+                g.drawString( m, in.left + 2, y );
                 y -= 13;
             }
         }
         g.setColor(Color.black);
-        g.fillRect( getWidth()-10, 0, 10, 10 );
+        g.fillRect( getWidth()-in.right - 10, in.top, 10, 10 );
+        g.setColor(Color.green);
+        if( !expanded ) {
+            g.drawLine( getWidth()-in.right - 10, in.top + 9,
+                        getWidth()-in.right - 6, in.top );
+            g.drawLine( getWidth()-in.right - 2 , in.top + 9,
+                        getWidth()-in.right - 6, in.top );
+        } else {
+            g.drawLine( getWidth()-in.right - 10, in.top ,
+                        getWidth()-in.right - 6, in.top + 9);
+            g.drawLine( getWidth()-in.right - 2 , in.top,
+                        getWidth()-in.right - 6, in.top + 9);
+        }
+        super.paintBorder(g);
+
     }
     LinkedList msgs = new LinkedList();
     boolean expanded = false;
@@ -59,15 +98,19 @@ public class LogFloatPane extends ColoredComponent implements ComponentListener 
         CAT.error( "container null? " + (container == null) );
         SwingUtilities.convertPointFromScreen(p, container);
 
-        r.height = expanded ? expandedSize.height : normalSize.height;
-        r.width = expanded ? expandedSize.width : normalSize.width;
+        r.height = expanded ? expandedSize.height : normalSize.height + 2;
+        //r.width = expanded ? expandedSize.width : normalSize.width;
+        r.width = (int)(master.getWidth() * 0.8);
         r.x = p.x;
         r.y = p.y + master.getHeight() - r.height - 5;
         return r;
     }
 
     private void setSize() {
-        setBounds( recalcBounds() );
+        Rectangle r = recalcBounds();
+        setBounds( r );
+        Insets in = getInsets();
+//        mini.setLocation( in.left, in.top );
     }
 
     void switchSize() {
@@ -121,6 +164,4 @@ public class LogFloatPane extends ColoredComponent implements ComponentListener 
     }
     public void componentHidden(ComponentEvent parm1) {
     }
-
-
 }

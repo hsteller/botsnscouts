@@ -126,11 +126,13 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     }
 
     void paintRank(Graphics2D g) {
+        String r = "" + ranking;
         g.setFont( rankfont );
+        int width = g.getFontMetrics().stringWidth(r);
         g.setColor( shadeGray );
-        g.drawString( ""+ ranking, getWidth()/2+2, getHeight() - 11 );
+        g.drawString( r, getWidth()-width, getHeight() - 11 );
         g.setColor( Color.yellow );
-        g.drawString( ""+ ranking, getWidth()/2, getHeight() - 13 );
+        g.drawString( r, getWidth()-width-2, getHeight() - 13 );
     }
 
     void paintShade(Graphics2D g,  Color shadeColor) {
@@ -213,7 +215,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
             Roboter robot = Roboter.getNewInstance("TestRob " + i);
             robot.setAktiviert( i % 2 == 0 );
             final RobotInfo db = new RobotInfo( robot, 7, i);
-            db.setWinnerNumber(i+3);
+            db.setWinnerNumber(i);
             db.setBorder( BorderFactory.createLineBorder(Color.black) );
             db.setSize( db.getPreferredSize() );
             JPanel p = new JPanel();

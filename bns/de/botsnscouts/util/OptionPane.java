@@ -25,8 +25,9 @@ public class OptionPane extends JPanel {
     }
 
 
+    public static Border etchedBorder = BorderFactory.createEtchedBorder( new Color(0, 255,0, 128), new Color(0,128,0,128) );
     public static Border niceBorder = BorderFactory.createCompoundBorder(
-            BorderFactory.createEtchedBorder( new Color(0, 255,0, 128), new Color(0,128,0,128) ),
+            etchedBorder,
             BorderFactory.createEmptyBorder(20, 20, 20, 20)
         );
 

@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.start;
 
 import java.awt.*;
@@ -33,12 +33,13 @@ import java.awt.geom.*;
 import javax.swing.border.*;
 import java.net.*;
 import de.botsnscouts.util.*;
+import de.botsnscouts.gui.ColoredComponent;
 
-public class ParticipatePanel extends JPanel implements  ActionListener{
-    
-    JLabel server;    
-    JLabel name;    
-    JLabel farbe;    
+public class ParticipatePanel extends ColoredComponent implements  ActionListener{
+
+    JLabel server;
+    JLabel name;
+    JLabel farbe;
 
     JTextField serv;
     JTextField nam;
@@ -57,7 +58,7 @@ public class ParticipatePanel extends JPanel implements  ActionListener{
 	parent=par;
 	parent.setTitle(Message.say("Start","mTeilnehmen"));
 	paint=parent.paint;
-	
+
 	String[] farben={Message.say("Start","mFarbeEgal"),Message.say("Start","mFarbeGruen"),Message.say("Start","mFarbeGelb"),Message.say("Start","mFarbeRot"),Message.say("Start","mFarbeBlau"),Message.say("Start","mFarbeMagenta"),Message.say("Start","mFarbeOrange"),Message.say("Start","mFarbeGrau"),Message.say("Start","mFarbeDunkelMagenta")};
 	font=new Font("Sans", Font.BOLD, 24);
 
@@ -67,8 +68,11 @@ public class ParticipatePanel extends JPanel implements  ActionListener{
 	lay.setVgap(80);
 
 	setLayout(lay);
-	setBorder(new EmptyBorder(50,50,50,50));
-	
+	setBorder(BorderFactory.createCompoundBorder(
+            new EmptyBorder(150,150,150,150),
+            OptionPane.niceBorder
+        ));
+
 	server=new JLabel(Message.say("Start","mServer"));
 	name=new JLabel(Message.say("Start","mName"));
 	farbe=new JLabel(Message.say("Start","mFarbe"));
@@ -87,7 +91,7 @@ public class ParticipatePanel extends JPanel implements  ActionListener{
 
 	serv.setOpaque(false);
 	nam.setOpaque(false);
-	
+
 	server.setForeground(Color.lightGray);
 	name.setForeground(Color.lightGray);
 	farbe.setForeground(Color.lightGray);
@@ -102,8 +106,11 @@ public class ParticipatePanel extends JPanel implements  ActionListener{
         add(serv);
         add(name);
         add(nam);
-        add(farbe);
-        add(farb);
+
+        add( farbe );
+        JPanel jp = new TJPanel();
+        jp.add(farb);
+        add(jp);
         add(go);
         add(zurueck);
     }
