@@ -29,7 +29,7 @@ import java.awt.*;
 import java.util.Hashtable;
 
 import de.botsnscouts.gui.SACanvas;
-import de.botsnscouts.gui.RobotStatus;
+import de.botsnscouts.gui.OldRobotStatusImpl;
 
 /**
  * Holds the mapping of the color and the image of a robot
@@ -55,7 +55,7 @@ public class BotVis {
   }
 
   public static Image getBotIconByName(String name) {
-    return RobotStatus.getRobotImages()[getBotVisByName(name)];
+    return OldRobotStatusImpl.getRobotImages()[getBotVisByName(name)];
   }
 
 /*

@@ -82,27 +82,44 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	gameBoardCanvas=sa;
         statusLog = new StatusLog(aus.getView());
 
-	JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+//	JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        Box robotsStatusContainer = new Box(BoxLayout.X_AXIS) {
+            public void paint(Graphics g) {
+                g.setColor(Color.black);
+                g.fillRect(0,0,getWidth(), getHeight());
+                super.paint(g);
+            }
+        };
+        JPanel p = new JPanel( new BorderLayout() );
+        p.add( robotsStatusContainer, BorderLayout.CENTER );
+        add( p );
+        p.setBackground(Color.black);
+        p.setBorder(BorderFactory.createMatteBorder(10, 10, 20, 20, Color.black));
+        robotsStatusContainer.setBackground( Color.black );
 	JPanel robotsCardContainer = new JPanel(new GridLayout(8,1));
-
+        int flagCount = sa.sf.getFlaggen().length;
 
         setLayout(new BorderLayout());
 
 	// create status panel
 	for (int i=0; i< robots.length; i++) {
-	    RobotStatus r = new RobotStatus(robots[i],
-                new MouseAdapter(){
-                        public void mouseClicked(MouseEvent me) {
-                            CAT.debug("tracking rob: " + ((JLabel)me.getSource()).getName() );
-                            ausgabe.trackRob(((JLabel)me.getSource()).getName());
+            final String robotName = robots[i].getName();
+	    RobotInfo r = new RobotInfo(robots[i], flagCount );
+            r.addRobotInfoListener( new RobotInfoListener() {
+                        public void robotClicked(RobotInfoEvent rie) {
+                            CAT.debug("tracking rob: " + robotName );
+                            ausgabe.trackRob(robotName);
                         }
-                    },
-                new MouseAdapter(){
-                        public void mouseClicked(MouseEvent me) {
-                            ausgabe.scrollFlag(Integer.parseInt(((JLabel)me.getSource()).getText()));
+                        public void flagClicked(RobotInfoEvent rie) {
+                            RobotInfo ri = (RobotInfo)rie.getSource();
+                            ausgabe.scrollFlag(ri.getRobot().getNaechsteFlagge());
                         }
-                    }
-                );
+                        public void diskClicked(RobotInfoEvent rie) {
+                            Roboter robot = ((RobotInfo)rie.getSource()).getRobot();
+                            ausgabe.trackPos(robot.getArchivX(), robot.getArchivY(), true);
+                        }
+             });
+            robotsStatusContainer.add( Box.createHorizontalStrut(20) );
 	    robotsStatusContainer.add(r);
 	    robotStatus.put(robots[i].getName(),r);
 
@@ -289,11 +306,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         CAT.debug("AusgabeView starts procedure to quit the client..");
 	JLabel[] msg = new JLabel[2];
 	msg[0] = new JLabel(Message.say("AusgabeView", "reallyQuit1"));
-	msg[1] = new JLabel(Message.say("AusgabeView","reallyQuit2")); 
+	msg[1] = new JLabel(Message.say("AusgabeView","reallyQuit2"));
 	if (JOptionPane.showConfirmDialog(this, msg,
 	Message.say("AusgabeView","reallyQuitTitle"),
-	JOptionPane.OK_CANCEL_OPTION, 
-	JOptionPane.QUESTION_MESSAGE) 
+	JOptionPane.OK_CANCEL_OPTION,
+	JOptionPane.QUESTION_MESSAGE)
 	                        == JOptionPane.OK_OPTION){
 	 // null means CANCEL
         ausgabe.quit(keepWatching);
@@ -526,7 +543,10 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
          Enumeration e = robotStatus.elements();
          while (e.hasMoreElements()){
             RobotStatus rs = (RobotStatus) e.nextElement();
-            JMenuItem rob = new JMenuItem(rs.robot.getName(),new ImageIcon(rs.robotImages[rs.robot.getBotVis()]));
+            Roboter robot = rs.getRobot();
+            CAT.debug( "Robot is: " + robot );
+            CAT.debug( "imgs is: " + OldRobotStatusImpl.robotImages );
+            JMenuItem rob = new JMenuItem(robot.getName(),new ImageIcon(OldRobotStatusImpl.robotImages[robot.getBotVis()]));
             rob.addActionListener(new ShowRobListener(rs));
             this.add(rob);
           }
@@ -544,15 +564,16 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         }
 
         public void actionPerformed(ActionEvent e){
+          Roboter robot = rob.getRobot();
           if (CAT.isDebugEnabled())
-            CAT.debug("Showing robot \""+rob.robot.getName()+"\" at x:"+rob.robot.getX()+" y:"+rob.robot.getY());
-          int x = rob.robot.getX();
-          int y = rob.robot.getY();
+            CAT.debug("Showing robot \""+robot.getName()+"\" at x:"+robot.getX()+" y:"+robot.getY());
+          int x = robot.getX();
+          int y = robot.getY();
           if (x<1 && y<1){ // robot destroyed, not on board
 
-              String s = Message.say("AusgabeView", "robotNotOnBoard", rob.robot.getName());
+              String s = Message.say("AusgabeView", "robotNotOnBoard", robot.getName());
               JOptionPane.showMessageDialog(null,s, "Ooops!",JOptionPane.INFORMATION_MESSAGE,
-                                             new ImageIcon(rob.robotImages[rob.robot.getBotVis()]));
+                                             new ImageIcon(OldRobotStatusImpl.robotImages[robot.getBotVis()]));
               CAT.debug("Showing popup instead of robot, because robot is not on board..");
           }
           else {
