@@ -8,8 +8,7 @@ import de.botsnscouts.start.*;
 import de.botsnscouts.util.*;
 
 public class Server extends Thread 
-    implements ServerRobotThreadMaintainer, ServerOutputThreadMaintainer, ThreadMaintainer,
-    OKListener, InfoRequestAnswerer{
+    implements ServerRobotThreadMaintainer, ServerOutputThreadMaintainer, ThreadMaintainer, OKListener, InfoRequestAnswerer{
 
     // Vektoren
     private Vector aThreads		= new Vector();	// ServerAusgabeThread
