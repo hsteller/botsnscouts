@@ -207,7 +207,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
     /**
      * display the power down again request
-     */
+f     */
     public void showRePowerDown() {
 	panelSwitcher.show(switcherPanel,"againPowerDown");
 	this.requestFocus();

@@ -187,6 +187,12 @@ public class View extends JFrame {
 
     public LogFloatPane logFloatPane;
 
+    protected void showGameStatusMessage(String s) {
+        if(humanView != null) {
+            humanView.showMessageToPlayer(s);
+        }
+    }
+
     public void addAusgabeView(AusgabeView av) {
         CAT.debug("addAusgabeView called");
 	if (ausgabeView==null) {

@@ -267,7 +267,7 @@ public class Ausgabe extends BNSThread {
 		    Status[] stArray = kommClient.getSpielstatus();
 		    if (stArray != null) {
 			if (stArray[0].aktPhase != lastPhase) {
-			    showActionMessage(Message.say("AusgabeFrame","phase")+stArray[0].aktPhase);
+			    view.showGameStatusMessage(Message.say("AusgabeFrame","phase")+ " " + stArray[0].aktPhase);
 			    lastPhase = stArray[0].aktPhase;
 			}
 		    }

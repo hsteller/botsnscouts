@@ -185,6 +185,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         }
     }
 
+    public void showGameStatusMessage(String s){
+    }
 
     /**
      * Schreibt in die Statuszeile einen Text
