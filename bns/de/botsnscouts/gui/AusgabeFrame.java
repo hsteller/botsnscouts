@@ -25,7 +25,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
     // -----------  Konstanten -----------
     protected final Dimension screendim = Toolkit.getDefaultToolkit().getScreenSize();
     protected final int LANGSAM = 2000;
-    protected final int MITTEL = 500;
+    protected final int MITTEL = 200;
     protected final int UNGEBREMST = 0;
     protected final boolean NURAUSGABE = true;
     protected final boolean MENSCHAUSGABE = false;
@@ -228,9 +228,6 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	getContentPane().add(stBP,BorderLayout.SOUTH);
 	// KommClientAusgabe erzeugen
 	kCA = new KommClientAusgabe();
-
-	
-
     }
 
 
@@ -921,7 +918,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 
     public void run() {
 
-
+	Global.debug(this,"Meine runmethode ist aufgerufen");
 
 	// ------- Anmeldung am Server -------
 
