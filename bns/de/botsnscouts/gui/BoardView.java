@@ -55,9 +55,9 @@ import com.keypoint.PngEncoder;
 /**
  * Board-Ausgabe-Canvas ist das Objekt, das der Ausgabe und dem menschlichen Spieler das Board grafisch darstellt und verwaltet
  * @author some time ago Daniel Holtz
- * @version improvement of 1.0
-
- * changes: enno v1.23
+ * @version $id $
+ * 
+ *  changes: enno v1.23
  * 1. beim painten wird nur noch der teil ins sichtbare kopiert, der auch
  *   in gepaintet werden muss (hat aber nicht viel gebracht)
  * 2. Felder, die nicht wirklich neu gezeichnet werden m\uFFFDssen, werden nicht
@@ -73,9 +73,21 @@ import com.keypoint.PngEncoder;
  *    damit viel schneller, ebenso die Board-Vorschau
  */
 
-public class BoardView extends JLayeredPane {
+public class BoardView extends JComponent{
     static Category CAT = Category.getInstance(BoardView.class);
 
+    private final Object rescaleLock = new Object(); 
+    
+    /**
+     *  Switch for the method that animations use to clear the area where they animate the bots:
+     * if true, we will not only have an offScreenImage for doublebuffering but _also_ another 
+     * BufferedImage ("staticBackground") of the board that will contain the background without 
+     * any dynamic components (bots, scout,highlight) drawn on it.
+     * If false, this second BufferedImage will be null and another was to paint the background will be used. 
+     */
+    private final boolean useStaticBg = false;
+    
+    
     // inner classes
     public static interface ClickListener {
         void feldClicked(int x, int y, int modifiers);
@@ -197,23 +209,32 @@ public class BoardView extends JLayeredPane {
         return dScale;
     }
 
-    public synchronized void setScale(double scale) {
+    /*must not be called before images are loaded*/
+    public void setScale(double scale) {
         // adapt this Component to the scaling factor
         //dScale = scale;
       //  Bot preCopy = previewRob;
       //  previewRob = null;
-        deleteScout();
-        scaledFeldSize = (int) (scale * FELDSIZE);
-       dScale = scaledFeldSize/((double)FELDSIZE);
-        
-        widthInPixel = (int) (sf.getSizeX() * scaledFeldSize);
-        heightInPixel = (int) (sf.getSizeY() * scaledFeldSize);
+        synchronized (rescaleLock) {
+	        deleteScout();
+	        scaledFeldSize = (int) (scale * FELDSIZE);
+	        dScale = scaledFeldSize/((double)FELDSIZE);
+	        
+	        widthInPixel = (int) (sf.getSizeX() * scaledFeldSize);
+	        heightInPixel = (int) (sf.getSizeY() * scaledFeldSize);
+	       
+	        CAT.debug("dim : " + widthInPixel + " " + heightInPixel);
+	        setSize(widthInPixel, heightInPixel);
+	
+	        // the preComputed-BoardImage is no longer valid      
        
-        CAT.debug("dim : " + widthInPixel + " " + heightInPixel);
-        setSize(widthInPixel, heightInPixel);
-
-        // the preComputed-BoardImage is no longer valid      
-        preBoard = null;
+            offScreenImage = createBoardImage();
+            if (useStaticBg) {
+                staticBackground = createBoardImage(); // TODO possible to use java-scaling instead? 
+            }
+        }
+      
+       
       //  previewRob = preCopy;
        // paintScout(this.getGraphics());
     }
@@ -223,18 +244,19 @@ public class BoardView extends JLayeredPane {
         gotColors = false;
         sf = sf_neu;
 
-        setDoubleBuffered(true);
-        setScale(dScale); // does setSize()
-
+        //setDoubleBuffered(true);
         ImageMan.finishLoading();
-
+        
+        
         ebeltCrop = ImageMan.getImages(ImageMan.EBELTS);
         cbeltCrop = ImageMan.getImages(ImageMan.CBELTS);
         diverseCrop = ImageMan.getImages(ImageMan.DIVERSE);
         robosCrop = ImageMan.getImages(ImageMan.ROBOS);
         scoutCrop = ImageMan.getImages(ImageMan.SCOUT);
-
+        
         initFloorHashMap();
+        setScale(dScale); // does setSize(); must not be called before images are loaded
+        
         
       
     }
@@ -381,13 +403,15 @@ public class BoardView extends JLayeredPane {
                         // use the internal kept values of our robot if it is not destroyed
                         r.setPos(tmp);
                         r.setFacing(tmpBot.getFacing());
-                    } else {
+                    } 
+                    else {
                         if (CAT.isDebugEnabled())
                             CAT.debug("using server values of robot " + r.getName());
+                       
                     }
-
-                }
-                repaint();                
+                    repaint();
+                }                
+                            
             } else { // no animation
                 robos = robos_neu;
                 repaint();
@@ -403,7 +427,7 @@ public class BoardView extends JLayeredPane {
      * ersetzeRobos(Bot[]) doesn't work if animations are enabled (if animations are enabled
      * we have to use an internal version of the bots and ignore the server values for position and
      * facing because we have the bots moved before we get the notification that something has changed
-     * (and might get other notification in between that still contain the old values=>bots would be animated and
+     * (and might get other notifications in between that still contain the old values=>bots would be animated and
      * then placed back to their position before the animation).
      * 
      * DON'T USE THIS METHOD TO TURN ROBOTS, use animateRobTurn etc. instead
@@ -447,10 +471,7 @@ public class BoardView extends JLayeredPane {
         
         g2d.setComposite(old);
     }
-
-
-    /////////////////////////////////////////////////////////////////////
-
+    
     private void moveRobNorth(Bot internal, int robocount, Graphics2D g2) {    
         CAT.debug("moving bot one square to the north");
         AlphaComposite ac = AC_SRC_OVER;         
@@ -458,44 +479,80 @@ public class BoardView extends JLayeredPane {
             ac = AC_SRC_OVER_05;
         Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
         Location botStartPos = internal.getPos();
-        Location botEndPos = new Location(botStartPos.getX(), botStartPos.getY()+1);
+        Location botEndPos = new Location (botStartPos.getX(), botStartPos.getY()+1);
         
-        synchronized (this) {           
-         //  g2.scale(dScale, dScale);
+        synchronized (rescaleLock) {                    
             int feldSize = scaledFeldSize;//  FELDSIZE;//(int)(FELDSIZE*dScale);
             int xposScaled=  (internal.getX()-1) *feldSize;
             int yposScaled = (sf.getSizeY() - internal.getY()-1)*feldSize;                         
             int clipLength = 2*feldSize;    
-                    
-            if (preBoard == null)
-                preBoard = getBoardImage();
-            BufferedImage tmpImage = preBoard.getSubimage(xposScaled, yposScaled, feldSize,clipLength);
-            Graphics2D myg = (Graphics2D) tmpImage.getGraphics();
-            Raster blank = tmpImage.getData();            
-            paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, scaledFeldSize);
+            
+            
+            
+            BufferedImage offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength);
+            Graphics2D myg = (Graphics2D) offScreenClipImage.getGraphics();
+           // Raster blankBg;
+            BufferedImage blankBgImage;
+            if (useStaticBg){
+                blankBgImage = staticBackground.getSubimage(xposScaled, yposScaled, feldSize,clipLength);
+            }
+            else {            
+             //   blankBg = offscreeClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
+                blankBgImage = new BufferedImage(feldSize, clipLength, offScreenClipImage.getType());
+                blankBgImage.getGraphics().drawImage(offScreenClipImage,0,0,feldSize,clipLength,this);
+            }
+                                    
+            paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, feldSize);
             paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,0);
-            Raster blankWithBots = tmpImage.getData();
+           
             myg.setComposite(ac);
+            
+           
             int animationOffsetMoveRob =currentAnimationConfig.getAnimationOffsetMoveRob();           
             int animationDelayMoveRob = currentAnimationConfig.getAnimationDelayMoveRob();
+            Rectangle oldClipBounds = g2.getClipBounds();
+            g2.setClip(xposScaled,yposScaled,feldSize, clipLength);
+            Composite oldComp  = g2.getComposite();
+            g2.setComposite(ac);
             for (int yoffset = 0; yoffset >= -feldSize; yoffset -= animationOffsetMoveRob) {
-                     tmpImage.setData(blankWithBots);                                                        
-                     myg.drawImage(imgRob, 0,feldSize+yoffset, feldSize, feldSize, this); // paint the image                                                                                        
-                    // myg.scale(dScale, dScale);
-                     g2.drawImage(tmpImage, xposScaled, yposScaled, feldSize, clipLength,this);
-                  
-                        waitSomeTime(animationDelayMoveRob,this);
-                  
+                if (useStaticBg) {
+                	    myg.drawImage(blankBgImage, 0,0, feldSize, clipLength, this); // paint the image
+               	}
+               	else {
+               	    myg.drawImage(blankBgImage, 0,0, feldSize, clipLength, this);
+               	    //offScreenClipImage.setData(blankBg);
+                }
+                paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, feldSize);
+                paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,0);                     
+                myg.drawImage(imgRob, 0,feldSize+yoffset, feldSize, feldSize, this); // paint the image                                                                                                           
+                g2.drawImage(offScreenClipImage, xposScaled, yposScaled, feldSize, clipLength,this);
+                
+                waitSomeTime(animationDelayMoveRob,this);                 
                    
                 }
-                tmpImage.setData(blank);   
-                //paintRobos(this.getGraphics());
+           
+            
+            if (useStaticBg){
+        	  myg.drawImage(blankBgImage, 0,0, feldSize, clipLength, this); // paint the image
+            }
+            else {
+                Graphics2D tmpg = (Graphics2D)offScreenImage.getGraphics();             	   
+          	   Composite tmpComp = tmpg.getComposite();             	   
+          	   tmpg.setComposite(AC_SRC_OVER);
+          	   tmpg.drawImage(blankBgImage,xposScaled,yposScaled,feldSize,clipLength,this);
+          	   tmpg.setComposite(tmpComp); 
+                //myg.drawImage(blankBgImage, 0,0, feldSize, clipLength, this); // paint the image
+                //offscreeClipImage.setData(blankBg);
+            }
+            
+            g2.setClip(oldClipBounds);
+            g2.setComposite(oldComp);
         }
     }
     
   
    
-  
+   
     private void moveRobSouth(Bot internal, int robocount,Graphics2D g2) {
         CAT.debug("moving bot one square to the south");
         AlphaComposite ac = AC_SRC_OVER;         
@@ -503,33 +560,69 @@ public class BoardView extends JLayeredPane {
             ac = AC_SRC_OVER_05;
         Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
         Location botStartPos = internal.getPos();
-        Location botEndPos = new Location (botStartPos.getX(), botStartPos.getY()+1);
-        synchronized (this) {
+        Location botEndPos = new Location (botStartPos.getX(), botStartPos.getY()-1);
+        
+        synchronized (rescaleLock) {
             int feldSize = scaledFeldSize;//(int)(FELDSIZE*dScale);
-         //  g2.scale(dScale, dScale);
             int xpos64 = (internal.getX()-1) * feldSize;
             int ypos64 = (sf.getSizeY() -internal.getY())* feldSize;
             int clipLength=2*feldSize;
-            if (preBoard==null)
-                preBoard=getBoardImage();
-            BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64, feldSize,clipLength);
-            Raster blank = tmpImage.getData();
-            Graphics2D myg = (Graphics2D) tmpImage.getGraphics();
-            paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, 0);
-            paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,scaledFeldSize);
-            Raster blankWithBots = tmpImage.getData();
-            int animationOffsetMoveRob =currentAnimationConfig.getAnimationOffsetMoveRob();
+            
+         
+            BufferedImage offScreenClipImage  = offScreenImage.getSubimage(xpos64, ypos64, feldSize,clipLength);                                  
+            Graphics2D myg = (Graphics2D) offScreenClipImage.getGraphics();
+            BufferedImage blankBgImage;
+            Raster blankBg;
+            if (useStaticBg){
+                blankBgImage  = staticBackground.getSubimage(xpos64, ypos64, feldSize,clipLength);
+            }
+            else  {
+              //  blankBg = offScreenClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
+                blankBgImage = new BufferedImage(feldSize, clipLength, offScreenClipImage.getType());
+                blankBgImage.getGraphics().drawImage(offScreenClipImage,0,0,feldSize,clipLength,this);
+            }
+           paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, 0);
+           paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,feldSize);
+            
+            int animationOffsetMoveRob = currentAnimationConfig.getAnimationOffsetMoveRob();
             int animationDelayMoveRob = currentAnimationConfig.getAnimationDelayMoveRob();
-            myg.setComposite(ac);
-                for (int yoffset = 0; yoffset <=feldSize; yoffset += animationOffsetMoveRob) {
-                     tmpImage.setData(blankWithBots);                                   
-                     myg.drawImage(imgRob, 0,yoffset, feldSize,feldSize, this); // paint the image                                                                                        
-                     g2.drawImage(tmpImage, xpos64, ypos64, feldSize, clipLength,this);
-                     waitSomeTime(animationDelayMoveRob, this);
-                   
+            myg.setComposite(ac);    
+            Rectangle oldClipBounds = g2.getClipBounds();
+            g2.setClip(xpos64,ypos64,feldSize, clipLength);    
+            Composite oldComp = g2.getComposite();
+            g2.setComposite(oldComp);
+            for (int yoffset = 0; yoffset <=feldSize; yoffset += animationOffsetMoveRob) {
+                if (useStaticBg) {
+                    myg.drawImage(blankBgImage,0,0,feldSize,clipLength,this);
                 }
-                tmpImage.setData(blank);            
-    }
+                else {
+                    //offScreenClipImage.setData(blankBg);
+                    myg.drawImage(blankBgImage,0,0,feldSize,clipLength,this);
+                }
+                paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, 0);
+                paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,feldSize);
+                myg.drawImage(imgRob, 0,yoffset, feldSize,feldSize, this); // paint the image                                                                                        
+                g2.drawImage(offScreenClipImage, xpos64, ypos64, feldSize, clipLength,this);
+                waitSomeTime(animationDelayMoveRob, this);
+                   
+             }
+            if (useStaticBg){
+                myg.drawImage(blankBgImage,0,0,feldSize,clipLength,this);
+            }
+            else {
+               // offScreenClipImage.setData(blankBg);
+               // myg.drawImage(blankBgImage,0,0,feldSize,clipLength,this);
+                Graphics2D tmpg = (Graphics2D)offScreenImage.getGraphics();             	   
+           	   Composite tmpComp = tmpg.getComposite();             	   
+           	   tmpg.setComposite(AC_SRC_OVER);
+           	   tmpg.drawImage(blankBgImage,xpos64,ypos64,feldSize,clipLength,this);
+           	   tmpg.setComposite(tmpComp); 
+            }
+             g2.setClip(oldClipBounds);
+             g2.setComposite(oldComp);
+            
+          
+        }
     }
 
 
@@ -541,32 +634,68 @@ public class BoardView extends JLayeredPane {
         Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
          Location botStartPos =  internal.getPos();
          Location botEndPos = new Location(botStartPos.getX()+1, botStartPos.getY());
-        synchronized (this) {        
+        synchronized (rescaleLock) {        
            
          //   g2.scale(dScale, dScale);
             int feldSize = scaledFeldSize;//(int)(FELDSIZE*dScale);
             int xpos64 =  (internal.getX()-1)* feldSize;
             int ypos64 =  (sf.getSizeY()-internal.getY()) *feldSize;
             int clipLength = 2*feldSize;  
-            if (preBoard==null)
-                preBoard=getBoardImage();
-            BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64,clipLength,scaledFeldSize);
-            Raster blank = tmpImage.getData();
-            Graphics2D myg = (Graphics2D) tmpImage.getGraphics();    
+           
+            
+           
+            BufferedImage offScreenClipImage = offScreenImage.getSubimage(xpos64, ypos64,clipLength,feldSize); 
+            Graphics2D myg = (Graphics2D) offScreenClipImage.getGraphics();    
+            Raster blankBg;
+            BufferedImage blankBgImage;
+            if (useStaticBg){
+                 blankBgImage = staticBackground.getSubimage(xpos64, ypos64,clipLength,feldSize);
+            }
+            else {
+                // blankBg = offScreenClipImage.getData(new Rectangle(0,0,clipLength, feldSize));
+                blankBgImage = new BufferedImage( clipLength, feldSize, offScreenClipImage.getType());
+                blankBgImage.setData(offScreenClipImage.getData(new Rectangle(0,0,clipLength, feldSize)));
+                blankBgImage.getGraphics().drawImage(offScreenClipImage,0,0,clipLength,feldSize,this);
+            }
             paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, 0);
-            paintBotsOnPositionButNotMe(botEndPos, internal,myg,scaledFeldSize,0);
-            Raster blankWithBots = tmpImage.getData();
+            paintBotsOnPositionButNotMe(botEndPos, internal,myg,feldSize,0);
+           
             myg.setComposite(ac);
             int animationOffsetMoveRob =currentAnimationConfig.getAnimationOffsetMoveRob();
             int animationDelayMoveRob = currentAnimationConfig.getAnimationDelayMoveRob();
+             Rectangle oldClipBounds = g2.getClipBounds();
+             g2.setClip(xpos64,ypos64,clipLength,feldSize);
+             Composite oldComp = g2.getComposite();
             for (int xoffset = 0; xoffset <= feldSize; xoffset += animationOffsetMoveRob) {
-                tmpImage.setData(blankWithBots);                                   
+                if (useStaticBg) {
+                    myg.drawImage(blankBgImage, 0,0, clipLength, feldSize, this); // paint the image
+                }
+                else {
+                    //offScreenClipImage.setData(blankBg);
+                    myg.drawImage(blankBgImage, 0,0, clipLength, feldSize, this);
+                }
+                paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, 0);
+                paintBotsOnPositionButNotMe(botEndPos, internal,myg,feldSize,0);
+                                                   
                  myg.drawImage(imgRob, xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
-                 g2.drawImage(tmpImage, xpos64, ypos64, clipLength, feldSize,this);
+                 g2.drawImage(offScreenClipImage, xpos64, ypos64, clipLength, feldSize,this);
                  waitSomeTime(animationDelayMoveRob, this);
                
             }
-            tmpImage.setData(blank);            
+            if (useStaticBg){
+                myg.drawImage(blankBgImage, 0,0, clipLength, feldSize, this); // paint the image
+            }
+            else {
+                Graphics2D tmpg = (Graphics2D)offScreenImage.getGraphics();             	   
+          	   Composite tmpComp = tmpg.getComposite();             	   
+          	   tmpg.setComposite(AC_SRC_OVER);
+          	   tmpg.drawImage(blankBgImage,xpos64,ypos64,clipLength,feldSize,this);
+          	   tmpg.setComposite(tmpComp); 
+               // myg.drawImage(blankBgImage, 0,0, clipLength, feldSize, this); // paint the image
+                //offScreenClipImage.setData(blankBg);
+            }
+            g2.setClip(oldClipBounds);
+            g2.setComposite(oldComp);
     }
 
     }
@@ -579,36 +708,82 @@ public class BoardView extends JLayeredPane {
         Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
        Location botStartPos = internal.getPos();
        Location botEndPos = new Location(botStartPos.getX()-1, botStartPos.getY());
-        synchronized (this) {           
-      //      g2.scale(dScale, dScale);
+        synchronized (rescaleLock) {           
+      
             int feldSize = scaledFeldSize;//(int)( FELDSIZE*dScale);
             int clipLength = 2*feldSize;     
             int xpos64 =  (internal.getX()-2) * feldSize;
             int ypos64 = (sf.getSizeY() - internal.getY())* feldSize;                         
-            if (preBoard==null)
-                preBoard=getBoardImage();
-            BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64,clipLength, feldSize);
-            Raster blank = tmpImage.getData();
-            Graphics2D myg = (Graphics2D) tmpImage.getGraphics();    
-            paintBotsOnPositionButNotMe(botStartPos, internal, myg,scaledFeldSize, 0);
-            paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,0);
-            Raster blankWithBots = tmpImage.getData();
+            
+            
+            
+            BufferedImage offScreenClipImage   = offScreenImage.getSubimage(xpos64, ypos64,clipLength, feldSize);                        
+            Graphics2D offScreenClipGraphics = (Graphics2D) offScreenClipImage.getGraphics();    
+            
+            BufferedImage blankBgImage;
+            Raster blankBg;
+            if (useStaticBg){
+                blankBgImage = staticBackground.getSubimage(xpos64, ypos64,clipLength, feldSize);
+            }
+            else {
+                //blankBg = offScreenClipImage.getData(new Rectangle(0,0,clipLength,feldSize));
+                blankBgImage = new BufferedImage( clipLength, feldSize, offScreenClipImage.getType());
+                blankBgImage.getGraphics().drawImage(offScreenClipImage,0,0,clipLength,feldSize,this);
+            }
+           
+            
+            
+            paintBotsOnPositionButNotMe(botStartPos, internal, offScreenClipGraphics,feldSize, 0);
+            paintBotsOnPositionButNotMe(botEndPos, internal,offScreenClipGraphics,0,0);
+       
             int animationOffsetMoveRob =currentAnimationConfig.getAnimationOffsetMoveRob();
-            int animationDelayMoveRob = currentAnimationConfig.getAnimationDelayMoveRob();
-            myg.setComposite(ac);
-                for (int xoffset = 0; xoffset >= -feldSize; xoffset -= animationOffsetMoveRob) {
-                    tmpImage.setData(blankWithBots);                                   
-                     myg.drawImage(imgRob, feldSize+xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
-                     g2.drawImage(tmpImage, xpos64, ypos64, clipLength, feldSize,this);
-                     waitSomeTime(animationDelayMoveRob, this);
+            int animationDelayMoveRob = currentAnimationConfig.getAnimationDelayMoveRob();           
+            offScreenClipGraphics.setComposite(ac);
+            Rectangle oldClipBounds = g2.getClipBounds();
+            g2.setClip(xpos64,ypos64,clipLength,feldSize);
+            Composite oldComp = g2.getComposite();
+            g2.setComposite(ac);
+            for (int xoffset = 0; xoffset >= -feldSize; xoffset -= animationOffsetMoveRob) {                                                
+                if (useStaticBg) {    
+                    offScreenClipGraphics.drawImage(blankBgImage,0,0,clipLength,feldSize,this); 
+                }
+                else {
+                    //offScreenClipImage.setData(blankBg);
+                    offScreenClipGraphics.drawImage(blankBgImage,0,0,clipLength,feldSize,this);
+                }
+                	paintBotsOnPositionButNotMe(botStartPos, internal, offScreenClipGraphics,feldSize, 0);
+                    paintBotsOnPositionButNotMe(botEndPos, internal,offScreenClipGraphics,0,0);
+                    offScreenClipGraphics.drawImage(imgRob, feldSize+xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
+                    g2.drawImage(offScreenClipImage, xpos64, ypos64, clipLength, feldSize,this);
+                    waitSomeTime(animationDelayMoveRob, this);
                    
                 }
-                tmpImage.setData(blank);            
+            
+            	
+               if (useStaticBg) {            	
+                   offScreenClipGraphics.drawImage(blankBgImage,0,0,clipLength,feldSize,this);
+               }
+               else {
+                   //offScreenClipImage.setData(blankBg);
+                   //offScreenClipGraphics.drawImage(blankBgImage,0,0,clipLength,feldSize,this);
+                   Graphics2D tmpg = (Graphics2D)offScreenImage.getGraphics();             	   
+              	   Composite tmpComp = tmpg.getComposite();             	   
+              	   tmpg.setComposite(AC_SRC_OVER);
+              	   tmpg.drawImage(blankBgImage,xpos64,ypos64,clipLength,feldSize,this);
+              	   tmpg.setComposite(tmpComp);  
+               }
+                g2.setClip(oldClipBounds);
+                g2.setComposite(oldComp);
         }
     }
     
     
-    protected synchronized void animateRobUTurn(Bot rob) {
+    
+    
+    
+    
+    
+    protected /*synchronized*/ void animateRobUTurn(Bot rob) {
         if (!AnimationConfig.areMovementAnimationsEnabled()){
             return;
         }
@@ -633,7 +808,7 @@ public class BoardView extends JLayeredPane {
     }
     
     /** @param direction either BOT_TURN_CLOCKWISE or BOT_TURN_COUNTER_CLOCKWISE in MessageID*/
-    protected synchronized void animateRobTurn(Bot rob, int direction) {
+    protected /* synchronized*/ void animateRobTurn(Bot rob, int direction) {
         if (!AnimationConfig.areMovementAnimationsEnabled()){            
             return;
         }
@@ -660,8 +835,8 @@ public class BoardView extends JLayeredPane {
          
     }
     
-    private void turnRobot(Bot internal, int angle, int animationSteps, boolean clockWise) {
-        CAT.debug("turning bot");
+    
+    private void turnRobot(Bot internal, int angle, int animationSteps, boolean clockWise) {       
         AlphaComposite ac = AC_SRC_OVER;         
         if (internal.isVirtual())
             ac = AC_SRC_OVER_05;
@@ -671,8 +846,8 @@ public class BoardView extends JLayeredPane {
             rotateTheta= Math.toRadians(angle/animationSteps);
         else 
             rotateTheta = Math.toRadians(360-angle/animationSteps);  
-        CAT.debug("turning bot:; theta="+rotateTheta);
-        synchronized (this) {       
+        //CAT.debug("turning bot; theta="+rotateTheta);
+        synchronized (rescaleLock) {       
             Graphics2D mainGraphics = (Graphics2D)getGraphics();  
             Composite oldComposite = mainGraphics.getComposite();
             int feldSize = scaledFeldSize;           
@@ -680,32 +855,66 @@ public class BoardView extends JLayeredPane {
             int yposScaled = (sf.getSizeY() - internal.getY())*feldSize;                         
             int clipLength = feldSize;    
             int halfSize = feldSize/2;
-            if (preBoard == null)
-                preBoard = getBoardImage();
-            
-            BufferedImage backgroundImage=  preBoard.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
-            Graphics2D backgroundWithBots = (Graphics2D) backgroundImage.getGraphics();     
-            backgroundWithBots.setComposite(ac);       
-            // saving a copy of the background:
-            Raster blank = backgroundImage.getData();                                          
-            paintBotsOnPositionButNotMe(internal.getPos(), internal,backgroundWithBots,0,0);
-            Raster blankWithBots = backgroundImage.getData();
-                       
-            // painting the animated bot           
-            backgroundWithBots.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
+           
+            BufferedImage offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
+            Graphics2D offScreenClip = (Graphics2D) offScreenClipImage.getGraphics();     
+            offScreenClip.setComposite(ac);       
             mainGraphics.setComposite(ac);
+            BufferedImage blankImage;
+            
+            Raster blank;
+            if (useStaticBg){
+                blank = staticBackground.getData(new Rectangle(xposScaled,yposScaled,feldSize,clipLength));
+                blankImage = staticBackground.getSubimage(xposScaled,yposScaled,feldSize,clipLength);
+                //offScreenClipImage.setData(blank);
+                offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);
+                mainGraphics.drawImage(blankImage, xposScaled, yposScaled, feldSize, clipLength,this);
+            }
+            else {
+                // there shouldn't be any active content on the offScreen image if useStaticBg==false
+               // blank = offScreenClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
+                blankImage = new BufferedImage(feldSize, clipLength, BufferedImage.TYPE_INT_ARGB);
+                blankImage.getGraphics().drawImage(offScreenClipImage,0,0,feldSize,clipLength,this);
+               
+            }    
+                
+                                                  
+           // paintBotsOnPositionButNotMe(internal.getPos(), internal,offScreenClip,0,0);
+           Raster blankWithBots = offScreenClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
+            //offScreenClipImage.setData(blank);
+            
+            // painting the animated bot           
+            //offScreenClip.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
+            
             int animationStepsTurnRob =animationSteps;//currentAnimationConfig.getAnimationStepsTurnRob();
             int animationDelayTurnRob = currentAnimationConfig.getAnimationDelayTurnRob();
              for (int step = 0; step<animationStepsTurnRob;step++) {
-                 	 backgroundImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
-                     backgroundWithBots.rotate(rotateTheta,halfSize, halfSize); // rotating the robot pic further   
-                     backgroundWithBots.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);                  
+                 	 
+               
+               //  offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);	 
+               //  paintBotsOnPositionButNotMe(internal.getPos(), internal,offScreenClip,0,0);
+                 	offScreenClipImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
+                     offScreenClip.rotate(rotateTheta,halfSize, halfSize); // rotating the robot pic further   
+                     offScreenClip.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);                  
                      // paint the offscreen image on the screen:
-                     mainGraphics.drawImage(backgroundImage, xposScaled, yposScaled, feldSize, clipLength,this);                
+                     mainGraphics.drawImage(offScreenClipImage, xposScaled, yposScaled, feldSize, clipLength,this);                
                      waitSomeTime(animationDelayTurnRob, this);                   
-                }
-                backgroundImage.setData(blank);
-                mainGraphics.setComposite(oldComposite);
+             }
+             	if (useStaticBg) {
+             	   //offScreenClipImage.setData(blank);
+             	   offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);
+             	}
+             	else {
+             	    // doesn't work: offScreenClipImage.setData(blank);
+             	    // also doesn't work: offScreenClip.XYZ() 
+             	   Graphics2D tmpg = (Graphics2D)offScreenImage.getGraphics();             	   
+              	   Composite tmpComp = tmpg.getComposite();             	   
+              	   tmpg.setComposite(AC_SRC_OVER);
+              	   tmpg.drawImage(blankImage,xposScaled,yposScaled,feldSize,clipLength,this);
+              	   tmpg.setComposite(tmpComp); 
+                   mainGraphics.setComposite(oldComposite);   
+             	}
+             	
         }
     }
     
@@ -751,18 +960,17 @@ public class BoardView extends JLayeredPane {
             int yposScaled = (sf.getSizeY() - internal.getY())*feldSize;                         
             int clipLength = feldSize;    
             int halfSize = feldSize/2;
-            if (preBoard == null)
-                preBoard = getBoardImage();
+           
             
-            BufferedImage backgroundImage=  preBoard.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
+            BufferedImage backgroundImage=  offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
             Graphics2D background = (Graphics2D) backgroundImage.getGraphics();     
             background.setComposite(ac);       
             // saving a copy of the background:
-            Raster blank = backgroundImage.getData();                                          
-          
+            Raster blank = backgroundImage.getData(new Rectangle(0,0,feldSize,clipLength));           
+            mainGraphics.drawImage(backgroundImage,xposScaled,yposScaled,feldSize,feldSize,this);
                        
             // painting the animated bot           
-            background.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
+           // background.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
             mainGraphics.setComposite(ac);
             double doffset=0;
              for (int step = 0; step<numberOfShrinks;step++) {
@@ -787,7 +995,7 @@ public class BoardView extends JLayeredPane {
     
     
     
-    protected synchronized void animateRobMove(Bot rob, int direction) {
+    protected /*synchronized*/ void animateRobMove(Bot rob, int direction) {
         // important: according to the code on SpielfeldSim we do not get
         //            the updated robot position;
         //            the updated position will be the endposition of the total move,
@@ -1435,7 +1643,7 @@ public class BoardView extends JLayeredPane {
         //else
         ac = AC_SRC_OVER_05;
         dbg.setComposite(ac);
-
+        
         LaserDef actuallaser;
         for (Enumeration e = sf.getLasers().elements(); e.hasMoreElements();) {
             actuallaser = ((LaserDef) e.nextElement());
@@ -1670,7 +1878,7 @@ public class BoardView extends JLayeredPane {
      */
 
     void repaintOrt(Location ort) {
-        ort2Rect(ort, rc);
+        ort2Rect(ort, rc);        
         repaint(1, rc.x, rc.y, rc.width, rc.height);
     }
 
@@ -1803,6 +2011,7 @@ public class BoardView extends JLayeredPane {
     }
 
     private void paintRobos(Graphics g, Bot dontPaintMe) {
+        CAT.debug("...painting Robots..");
         Graphics2D g2d = (Graphics2D) g;
         int numOfBots = robos!=null?robos.length:0;
         if (dontPaintMe == null) {
@@ -1870,19 +2079,21 @@ public class BoardView extends JLayeredPane {
 // 	g_off.setClip(0,0,x,y);
 // 	g_off.scale( dScale, dScale );
 //     }
-    Graphics2D g_off;
+    //private Graphics2D g_off;
 
 
-    BufferedImage preBoard = null;
-
-    private BufferedImage getBoardImage() {
+    private BufferedImage offScreenImage;
+    private BufferedImage staticBackground;
+    
+    private BufferedImage createBoardImage() {
+        CAT.debug("createBoardImage called!");
         //preBoard = new BufferedImage(x,y, BufferedImage.TYPE_BYTE_INDEXED);
-        BufferedImage bi = new BufferedImage(widthInPixel, heightInPixel, BufferedImage.TYPE_INT_RGB);
-        g_off = (Graphics2D) bi.getGraphics();
+        BufferedImage bi = new BufferedImage(widthInPixel, heightInPixel, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g_off = (Graphics2D) bi.getGraphics();
         g_off.setClip(0, 0, widthInPixel, heightInPixel);
        // g_off.scale(dScale, dScale);
         paintUnbuffered(g_off);
-        g_off.dispose();
+       // g_off.dispose();
         return bi;
     }
 
@@ -1899,7 +2110,7 @@ public class BoardView extends JLayeredPane {
         if (size > 0) {
             image = getThumb(size);
         } else {
-            image = getBoardImage();
+            image = createBoardImage();
         }
         fop.write((new PngEncoder(image)).pngEncode());
         fop.flush();
@@ -1917,22 +2128,43 @@ public class BoardView extends JLayeredPane {
 
 
     public void paintComponent(Graphics g) {
-
-        // Blit the board (it's already scaled)
-        if (preBoard == null) {
-            preBoard = getBoardImage();
+        Rectangle oldClip = g.getClipBounds();
+        //Rectangle rect = this.getVisibleRect();
+        //System.out.println("OLD="+oldClip+"\tNEW="+rect);
+        //g.setClip(rect);
+        if (useStaticBg) { // 100% doublebuffered
+            Graphics2D offG = (Graphics2D) offScreenImage.getGraphics();
+           offG.setClip(oldClip);
+            offG.drawImage(staticBackground,0,0,widthInPixel,heightInPixel,this);
+           // draw the active elements (robos)
+            paintHighlight(offG);
+            paintScout(offG);
+          
+           paintRobos(offG);
+          
         }
-        g.drawImage(preBoard, 0, 0, this);
-
-        // draw the active elements (robos)
-        Graphics2D dbg = (Graphics2D) g;
-        paintHighlight(dbg);
-
-       // dbg.scale(dScale, dScale);
+      //  
+        // Blit the board (it's already scaled)
+      
+        
+       //  synchronized (rescaleLock) {
+        
        
-        paintScout(dbg);
-        paintRobos(dbg);
-        dbg.setComposite(AC_SRC);
+        g.drawImage(offScreenImage, 0, 0, this);
+        
+        //}
+        // draw the active elements (robos)
+        if(!useStaticBg) { // the active elements must not be painted on the offscreen image in this case;
+                                 // reason: we need it as a source for "clean" background during animations
+            			         // (animations will still be doublebuffered, but we will clean the offscreenimage
+                                //   when the animation is finished)
+            Graphics2D dbg = (Graphics2D) g;
+            paintHighlight(dbg);
+            paintScout(dbg);
+            paintRobos(dbg);
+            dbg.setComposite(AC_SRC);
+        }
+        //g.setClip(oldClip);
     }
 
     protected void paintUnbuffered(Graphics dbg) {
@@ -1945,7 +2177,16 @@ public class BoardView extends JLayeredPane {
 
     protected void finalize() throws Throwable {
         super.finalize();
-        g_off.dispose();
+        synchronized (this) {
+	        if (offScreenImage != null) {
+	            Graphics g = offScreenImage.getGraphics();
+	            g.dispose();
+	        }
+	        if (useStaticBg && staticBackground != null) {
+	            Graphics g = staticBackground.getGraphics();
+	            g.dispose();
+	        }
+        }
     }
 
     public void update(Graphics g) {
@@ -1965,7 +2206,7 @@ public class BoardView extends JLayeredPane {
         paintUnbuffered(g2);
         g2.dispose();
 
-        return bi;
+        return bi; 
     }
 
     private synchronized void ersetzeSpielfeld(SimBoard sfs) {
@@ -1983,7 +2224,7 @@ public class BoardView extends JLayeredPane {
     private static BoardView sac = null;
 
     public static Image createThumb(SimBoard sim, int size) {
-        if (sac == null) {
+        if (sac == null) {            
             sac = new BoardView(sim);
         } else {
             sac.ersetzeSpielfeld(sim);
