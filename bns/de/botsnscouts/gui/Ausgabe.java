@@ -40,22 +40,25 @@ public class Ausgabe extends Thread {
     private int port;
     private boolean spielEnde = false;
     private boolean nosplash = false;
+    /** the last phase of the current turn */
+    private int lastPhase=1;
 
     public Ausgabe() {
 	this("localhost",8077,false);
     }
 
+    public Ausgabe(String host, int port, Object o, boolean nosplash) {
+	this (host,port,nosplash);
+    }
+
 
     public Ausgabe(String host, int port, boolean nosplash) {
 	this.nosplash=nosplash;
-	// Splash-Screen anzeigen
-	showSplash(Message.say("AusgabeFrame","msplashWarte"));
-
 	this.host = host;
 	this.port = port;
 	name = KrimsKrams.randomName();
 
-	// Kommunikationsobjekt erzeugen
+	showSplash(Message.say("AusgabeFrame","msplashWarte"));
 	kommClient = new KommClientAusgabe();
     }
 
@@ -102,9 +105,28 @@ public class Ausgabe extends Thread {
 		    flags = kommClient.getFahnenPos();
 		    Color[] robotsDefaultColor = SACanvas.robocolor;
 		    Color[] robotsNewColor = new Color[8];
-		    
+
+		    // !!HACK!!
+		    int[] colorMap = new int[8];
+
+		    int j=0;
+		    for (int i=0;i<8;i++) {
+			if(!playerColors[i].equals("0")) {
+			    robotsNewColor[j]=robotsDefaultColor[i];
+			    colorMap[j]=i;
+			    j++;
+			}
+		    }
+
+		    // !! END OF HACK !!
+
 		    for (int i=0; i < playerNames.length; i++) {
-			robots.put(playerNames[i], Roboter.getNewInstance(playerNames[i]));
+			d("Hole Roboterstatus von: "+playerNames[i]);
+			Roboter tempRob = kommClient.getRobStatus(playerNames[i]);
+			// !! refecting HACK above !!!
+			tempRob.setBotVis(colorMap[(i+playerNames.length+1)%playerNames.length]);
+			// !! end refecting HACK above !!!
+			robots.put(playerNames[i], tempRob);
 		    }
 
 
@@ -113,16 +135,8 @@ public class Ausgabe extends Thread {
 							kommClient.getSpielfeld(),
 							flags);
 		    
-		    int j=0;
-		    for (int i=0;i<8;i++) {
-			if(!playerColors[i].equals("0")) {
-			    robotsNewColor[j]=robotsDefaultColor[i];
-			    j++;
-			}
-		    }
 
-		    ausgabeView = new AusgabeView(new SACanvas(sim,robotsNewColor));
-		    ausgabeView.showUpdatedRobots(getRoboterArrray());
+		    ausgabeView = new AusgabeView(new SACanvas(sim,robotsNewColor),getRoboterArray());
 		    view=new View(ausgabeView);
 		    removeSplash();
 
@@ -154,7 +168,7 @@ public class Ausgabe extends Thread {
 		    tmpstr[i]=kommAntwort.namen[i+1];
 
 		if (!(kommAntwort.namen[0].substring(0,5).equals("mAusw")))
-		    setStatus(Message.say("MSG",kommAntwort.namen[0],tmpstr));
+		    showActionMessage(Message.say("MSG",kommAntwort.namen[0],tmpstr));
 
 		if (kommAntwort.namen[0].equals("mRobLaser")){
 		    Roboter r1=null;
@@ -224,42 +238,28 @@ public class Ausgabe extends Thread {
 		    for (int i=0; i < playerNames.length; i++) {
 			robots.put(playerNames[i],kommClient.getRobStatus(playerNames[i]));
 		    }
-		    /* TODO: set Roboter status
-		       statusLine.setRobStatus(spNamen[i],kommClient.getRobStatus(spNamen[i]));
-		    */
 		
-		    ausgabeView.showUpdatedRobots(getRoboterArrray());
+		    ausgabeView.showUpdatedRobots(getRoboterArray());
 
-		// --------- Neue Roboter-Position an Spielfeld senden ---------
-		try {
-		    Thread.sleep(1000);
-		} // Verzögerung der Ausgabegeschwindigkeit
-		catch (Exception e) {
-		    System.err.println(e.getMessage());
-		} 
-		
-		// --------- get other information from the server
-		/*
-		  Global.debug("Ausgabe: Hole Spielstatus...");
-		  try {
-		  Status[] stArray = kommClient.getSpielstatus();
-		  if (stArray != null) {
-		  statusLine.weitereStati(stArray);
-		    // Phase ausgeben
-		    if (stArray[0].aktPhase != lastPhase) {
-		    setStatus(Message.say("AusgabeFrame","phase")+stArray[0].aktPhase);
-		    lastPhase = stArray[0].aktPhase;
-		    }
-		    }
-		*/
-
-		// --------- has somebody already reached the final flag?
-		String[] spStand = kommClient.getSpielstand();
-		if (spStand != null) {
-		    Global.debug(this,spStand.length+" players have already won");
-		    // TODO show winner
-		
-		}
+		    // --------- Neue Roboter-Position an Spielfeld senden ---------
+		    try {
+			Thread.sleep(1000);
+		    } // Verzögerung der Ausgabegeschwindigkeit
+		    catch (Exception e) {
+			System.err.println(e.getMessage());
+		    } 
+		    
+		    // --------- get other information from the server
+		    Status[] stArray = kommClient.getSpielstatus();
+		    if (stArray != null) {
+			if (stArray[0].aktPhase != lastPhase) {
+			    showActionMessage(Message.say("AusgabeFrame","phase")+stArray[0].aktPhase);
+			    lastPhase = stArray[0].aktPhase;
+			}
+		    }  
+		    // --------- has somebody already reached the final flag?
+		    String[] winnerStateList = kommClient.getSpielstand();
+		    ausgabeView.showWinnerState(winnerStateList);
 		}
 		catch (KommFutschException ke) {
 		    System.err.println("ke2: "+ke.getMessage());
@@ -302,7 +302,7 @@ public class Ausgabe extends Thread {
 	    
 	}
 	Global.debug(this,"I reached the end of my run() method");
-	setStatus(Message.say("AusgabeFrame","spielende"));
+	showActionMessage(Message.say("AusgabeFrame","spielende"));
 	return;
     }
 
@@ -332,15 +332,15 @@ public class Ausgabe extends Thread {
 	
     }
 
-    private Roboter[] getRoboterArrray(){
-		    Roboter[] robs = new Roboter[robots.size()];
-		    int i=0;
-		    Iterator iter = robots.values().iterator();
-		    while (iter.hasNext()) {
-			robs[i] = (Roboter) iter.next();
-			i++;
-		    }
-		    return robs;
+    private Roboter[] getRoboterArray(){
+	Roboter[] robs = new Roboter[robots.size()];
+	int i=0;
+	Iterator iter = robots.values().iterator();
+	while (iter.hasNext()) {
+	    robs[i] = (Roboter) iter.next();
+	    i++;
+	}
+	return robs;
     }
 
 
@@ -348,7 +348,7 @@ public class Ausgabe extends Thread {
 	boolean anmeldungErfolg = false;
 	int versuche = 0;
 	
-	setStatus(Message.say("AusgabeFrame","Anmeldung"));
+	showActionMessage(Message.say("AusgabeFrame","Anmeldung"));
 	while ((!anmeldungErfolg)&&(versuche < 3)) { 
 	    try{
 		anmeldungErfolg = kommClient.anmelden2(host,port,name); 
@@ -360,7 +360,7 @@ public class Ausgabe extends Thread {
 		try {Thread.sleep(3000);} catch (Exception e) {System.err.println(e.getMessage());}
 	    }
 	}
-	    return anmeldungErfolg;
+	return anmeldungErfolg;
 	
     }
 
@@ -368,9 +368,9 @@ public class Ausgabe extends Thread {
     /**
      * Fordert die View auf, eine ActionMessage anzuzeigen
      */
-    protected void setStatus(String s){
+    protected void showActionMessage(String s){
 	if (ausgabeView !=null) {
-	ausgabeView.showActionMessage(s);
+	    ausgabeView.showActionMessage(s);
 	}
     }
 
@@ -387,13 +387,16 @@ public class Ausgabe extends Thread {
      * Zentriert die angegebenen Flagge
      */
     public void scrollFlag (int nr) {
-	  trackPos(flags[(nr-1)].getX(),flags[(nr-1)].getY());
+	trackPos(flags[(nr-1)].getX(),flags[(nr-1)].getY());
     }
 
     public void trackPos (int x, int y) {
 	ausgabeView.showPos(x,y);
     }
 
+    private void d(String s){
+	Global.debug(this, s);
+    }
 
 
 

@@ -20,6 +20,11 @@ public interface AusgabeViewInterface {
     public void showPos (int x, int y);
 
     /**
+     *  shows the winner state of the game
+     */
+    public void showWinnerState (String[] gameState);
+
+    /**
      *  shows the winner list at game over
      */
     public void showWinnerlist (String[] winners);
@@ -34,6 +39,15 @@ public interface AusgabeViewInterface {
      * Statusleiste der spielenden Roboter
      */
     public void showRobStatus(Roboter r);
+
+
+    /**
+     * shows the changed, new status of the robots
+     */
+    public void showUpdatedRobots(Roboter[] r);
+
+
+
 
 }
 

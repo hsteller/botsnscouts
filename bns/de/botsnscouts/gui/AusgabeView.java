@@ -5,7 +5,7 @@ import java.awt.*;
 import java.io.*;
 import java.awt.event.*;
 import java.awt.image.*;
-
+import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -15,11 +15,14 @@ import javax.swing.border.*;
  */
 
 public class AusgabeView extends JPanel implements AusgabeViewInterface {
-    // --- Objekte
-    JScrollPane spielFeldScrollFenster;
-    JViewport spielFeldView;
-    SACanvas  spielFeld;
-    Ausgabe   ausgabe;
+    // --- objects
+    private JScrollPane spielFeldScrollFenster;
+    private JViewport spielFeldView;
+    private SACanvas  spielFeld;
+    private Ausgabe   ausgabe;
+    private Hashtable robotStatus = new Hashtable(8);
+    private StatusLog statusLog = new StatusLog();
+
 
     /** @args SpielerMensch spielerref ist Referenz auf umgebenden 
      *  MenschlichenSpieler, falls Ausgabe zu einem Spieler gehoert,
@@ -28,35 +31,34 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     public AusgabeView() {
     }
 
-    public AusgabeView(SACanvas sa) {
+    public AusgabeView(SACanvas sa, Roboter[] robots) {
 	spielFeld=sa;
+	JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-	// Layout erzeugen
 	setLayout(new BorderLayout());
 
-	// create scroll window
+	// create status panel
+	for (int i=0; i< robots.length; i++) {
+	    RobotStatus r = new RobotStatus(robots[i]);
+	    robotsStatusContainer.add(r);
+	    robotStatus.put(robots[i].getName(),r);
+	}
+	add(robotsStatusContainer,BorderLayout.NORTH);
+	
+
+	// create status log
+	add(statusLog,BorderLayout.SOUTH);
+
+	// create scroll panel
 	spielFeldScrollFenster = new JScrollPane();
 	spielFeldScrollFenster.getHorizontalScrollBar().setUnitIncrement(64);
 	spielFeldScrollFenster.getVerticalScrollBar().setUnitIncrement(64);
 	spielFeldScrollFenster.setViewportView(spielFeld);
 	spielFeld.setScrollPane(spielFeldScrollFenster);
-	//	spielFeldScrollFenster.validate();
 	add(spielFeldScrollFenster,BorderLayout.CENTER);
-	//	validate();
 	spielFeldView = spielFeldScrollFenster.getViewport();
 
     }
-    /*
-
-    public Dimension getPreferredSize() {
-	return new Dimension(800,600);
-    }
-
-    public Dimension getMinimumSize() {
-	return new Dimension(800,600);
-    }
-
-    */
 
     public void shutup() {
 	System.exit(0);
@@ -65,9 +67,10 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 
     /**
-     * Schreibt in die Statuszeile einen Text
+     * show the sinlge line action message that came from the server
      */
     public void showActionMessage(String s){
+	statusLog.addMessage(s);
     }
 
 
@@ -83,6 +86,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      */
     public void showUpdatedRobots(Roboter[] r){
 	spielFeld.ersetzeRobos(r);
+	for (int i = 0; i < r.length; i++) {
+	    ((RobotStatus) robotStatus.get(r[i].getName())).updateRobot(r[i]);
+	}
     }
 
 
@@ -134,11 +140,32 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	spielFeld.doBordLaser(laserPos, facing, stregth, r1Pos,spielFeldView);
     }
 
+    /**
+     *  shows the winner state of the game in the mids of the game
+     */
+    public void showWinnerState (String[] gameState) {
+	int i=0;
+	while (!gameState[i].equals("null")) {
+	    d("getting ranking of "+gameState[i]+" zu holen");
+	    ((RobotStatus) robotStatus.get(gameState[i])).setWinnerNumber((i+1));
+	    
+	    i++;
+	}
+    }
+
 
     /**
      *  shows the winner list at game over
      */
     public void showWinnerlist (String[] winners) {
+	spielFeld.setVisible(false);
+	add(new Abspann(winners),BorderLayout.CENTER);
+	validate();
+    }
+
+
+    private void d(String s){
+	Global.debug(this, s);
     }
 
 
