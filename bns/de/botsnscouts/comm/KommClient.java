@@ -724,7 +724,7 @@ public class KommClient {
         DOES NOT ENCODE THE CLIENT NAME;
         ENCODING MUST HAPPEN IN THE DERIVED CLASSES ("anmelden*"-methods)
 	@param ipnr IP of the server
-	@param portnt Ip-port of the server
+	@param portnr Ip-port of the server
 	@param clientName The name of the client
 	@param kuerzel Indicates, whether the client is a robot or an output channel
 	@exception  KommException Thrown, if parsing failed
@@ -1371,9 +1371,7 @@ public class KommClient {
 	}
 	return back;
     }
-    /** Finalizer, der die Streams zu macht.
-     * (Wird vom garbage collector aufgerufen.)
-     * @author Miriam
+    /** Finalizer closes the streams.
      */
     protected void finalize() throws Throwable {
       super.finalize();
