@@ -189,19 +189,27 @@ public class View extends JFrame {
         // of mixing keyCode/KeyChar seems to work for the beginning !!
         this.addKeyListener(new AbstractHotKeyListener() {
               public void doStuff(KeyEvent e, int hotkeyCode){
-                CAT.debug("KEYEVENT:");
-                CAT.debug("code="+e.getKeyCode()+"\tchar="+e.getKeyChar()
+                if (CAT.isDebugEnabled()) {
+                  CAT.debug("KEYEVENT:");
+                  CAT.debug("code="+e.getKeyCode()+"\tchar="+e.getKeyChar()
                           +"\t="+e.getKeyText(e.getKeyCode()));
-
-
-
-                CAT.debug("chatline showing?"+chatLine.isShowing());
-
-                if (chatLine.text.hasFocus() && chatLine.isShowing()) {
-                  CAT.debug("chatline has focus, ignoring event");
+                  CAT.debug("chatline showing?"+chatLine.isShowing());
                 }
-                else
+               // <hack alert>
+                if (chatLine.isShowing()) {
+                  if (chatLine.text.hasFocus())
+                    CAT.debug("chatline has focus, ignoring key event");
+                  else {
+                    CAT.debug("forcing focus to chatline!"); //s.o. typing and chatline lost focus!
+                    chatLine.text.requestFocus();
+                  }
+                }
+                else {
+                  if (chatLine.hasFocus())
+                    ausgabeView.requestFocus();
                   keyMan.invoke(hotkeyCode);
+                }
+                //</hack alert>
               }
 
           });
