@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
 import java.io.*;
+import de.botsnscouts.util.*;
 
 /**
 * KommSpPr zusammen mit KommStSrv sorgt für die Netzwerkkommunikation

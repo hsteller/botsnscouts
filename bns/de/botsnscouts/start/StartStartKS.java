@@ -7,6 +7,7 @@ import java.awt.image.*;
 import java.awt.geom.*;
 import javax.swing.border.*;
 import java.net.*;
+import de.botsnscouts.util.*;
 
 public class StartStartKS extends JPanel implements  ActionListener, MouseListener{
 

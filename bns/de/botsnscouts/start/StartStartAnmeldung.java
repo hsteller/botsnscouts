@@ -8,6 +8,8 @@ import java.awt.geom.*;
 import javax.swing.border.*;
 import java.net.*;
 import java.util.*;
+import de.botsnscouts.util.*;
+import de.botsnscouts.gui.*;
 
 public class StartStartAnmeldung extends JPanel implements  ActionListener, MouseListener{
     JList roblist;

@@ -1,6 +1,7 @@
 package de.botsnscouts.start;
 
 import de.botsnscouts.util.*;
+import de.botsnscouts.board.*;
 
 public class KachelRaster{
     private int KX=3, KY=3, FL=6 ;
