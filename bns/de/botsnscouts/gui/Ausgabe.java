@@ -118,10 +118,12 @@ public class Ausgabe extends BNSThread {
                     Roboter r1,r2;
                     r1=r2=null; //temp. variables
 
-                    try {
+		    //                    try {
                         // gettin information about involved robots
-                        r1 = kommClient.getRobStatus(kommAntwort.namen[1]);// firing robot
-                        r2 = kommClient.getRobStatus(kommAntwort.namen[2]);// robot hit
+                        //r1 = kommClient.getRobStatus(kommAntwort.namen[1]);// firing robot
+                        //r2 = kommClient.getRobStatus(kommAntwort.namen[2]);// robot hit
+			r1 =(Roboter )robots.get(kommAntwort.namen[1]);
+			r2 =(Roboter )robots.get(kommAntwort.namen[2]);
 
                         // updating statistics
                         Stats actualStats=stats.getStats(r1.getName());
@@ -130,11 +132,11 @@ public class Ausgabe extends BNSThread {
 			    actualStats.incKills();
 			actualStats=stats.getStats(r2.getName());
 			actualStats.incDamageByRobots();
-		    }
-		    catch (KommException k) {
-                        CAT.error("Error getting information for laser animation and stats");
-			CAT.error(k);
-		    }
+			//    }
+		//		    catch (KommException k) {
+		//                        CAT.error("Error getting information for laser animation and stats");
+		//			CAT.error(k);
+		//		    }
                     // paint animation and play sounds
 		    ausgabeView.showRobLaser(r1, r2);
 		}
