@@ -73,6 +73,7 @@ public class StartSpielfeldOkZur extends JPanel implements  ActionListener{
 	    if(parent.startSpielfeld.buttons.mitspielen.getSelectedObjects()!=null){//starte einen SpielerMensch
 		Thread smth=parent.fassade.amSpielTeilnehmenNoSplash(parent.startSpielfeld.buttons.nam.getText(),parent.startSpielfeld.buttons.farben.getSelectedIndex()); 
 		parent.addKS(smth);
+		Global.debug(this,"menschlichen spieler gestartet");
 	    }else{//starte einen AusgabeFrame
 		parent.addKS( parent.fassade.einemSpielZuschauenNoSplash());
 	    }

@@ -12,10 +12,10 @@ import de.botsnscouts.util.*;
 public class StartZuschauen extends JPanel implements  ActionListener, MouseListener{
 
     JLabel server;    
-    JLabel port;    
+    //JLabel port;    
 
     JTextField serv;
-    JTextField prt;
+    //JTextField prt;
 
     TransparentButton go;
     TransparentButton zurueck;
@@ -35,29 +35,29 @@ public class StartZuschauen extends JPanel implements  ActionListener, MouseList
 	font=new Font("Sans", Font.BOLD, 24);
 
 	GridLayout lay;
-	lay=new GridLayout(3,2);
+	lay=new GridLayout(2,2);
 	lay.setHgap(170);
-	lay.setVgap(30);
+	lay.setVgap(200);
 
 	setLayout(lay);
-	setBorder(new EmptyBorder(50,50,50,50));
+	setBorder(new EmptyBorder(200,100,200,100));
 	
 	server=new JLabel(Message.say("Start","mServer"));
-	port=new JLabel(Message.say("Start","mPort"));
+	//port=new JLabel(Message.say("Start","mPort"));
         serv=new JTextField(Message.say("Start","mServerInh"));
-        prt=new JTextField(Message.say("Start","mPortInh"));
+        //prt=new JTextField(Message.say("Start","mPortInh"));
         go=new TransparentButton(Message.say("Start","mGoButton"));
         zurueck=new TransparentButton(Message.say("Start","mZurueckButton"));
 
 	server.setFont(font);
-	port.setFont(font);
+	//port.setFont(font);
         serv.setFont(font);
-        prt.setFont(font);
+        //prt.setFont(font);
         serv.setOpaque(false);
-        prt.setOpaque(false);
+        //prt.setOpaque(false);
 
 	server.setForeground(Color.lightGray);
-	port.setForeground(Color.lightGray);
+	//port.setForeground(Color.lightGray);
 
         go.addActionListener(this);
         zurueck.addActionListener(this);
@@ -67,8 +67,8 @@ public class StartZuschauen extends JPanel implements  ActionListener, MouseList
 
 	add(server);
         add(serv);
-	add(port);
-        add(prt);
+	//add(port);
+        //add(prt);
         add(go);
         add(zurueck);
 
@@ -87,23 +87,14 @@ public class StartZuschauen extends JPanel implements  ActionListener, MouseList
     public void actionPerformed(ActionEvent e){
 	if(e.getActionCommand().equals("go")){
 //	    System.out.println(farb.getSelectedIndex());
-	    int portnr=0;
-	    try{
+	    int portnr=8077;
+	    /*try{
 		portnr=Integer.parseInt(prt.getText());
 	    }catch (Exception x){
 		System.err.println("Must be a number!");
 		return;
-	    }
+		}*/
 	    Thread ausgabe=parent.fassade.einemSpielZuschauen(serv.getText(),portnr);
-// 	    if(ausgabe!=null){
-// 		parent.hide();
-// 		try{
-// 		    ausgabe.join();
-// 		}catch(InterruptedException ex){
-// 		    System.err.println("Interrupted while waiting for SpielerMensch");
-// 		}
-// 		parent.show();
-// 	    }
 	    parent.addKS(ausgabe);
 	    parent.hide();
 	    parent.dispose();

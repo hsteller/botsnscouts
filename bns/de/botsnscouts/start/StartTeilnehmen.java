@@ -10,14 +10,14 @@ import java.net.*;
 import de.botsnscouts.util.*;
 
 public class StartTeilnehmen extends JPanel implements  ActionListener, MouseListener{
-
+    
     JLabel server;    
-    JLabel port;    
+    //JLabel port;    
     JLabel name;    
     JLabel farbe;    
 
     JTextField serv;
-    JTextField prt;
+    //JTextField prt;
     JTextField nam;
     JComboBox farb;
 
@@ -39,35 +39,35 @@ public class StartTeilnehmen extends JPanel implements  ActionListener, MouseLis
 	font=new Font("Sans", Font.BOLD, 24);
 
 	GridLayout lay;
-	lay=new GridLayout(5,2);
+	lay=new GridLayout(4,2);
 	lay.setHgap(170);
-	lay.setVgap(30);
+	lay.setVgap(80);
 
 	setLayout(lay);
 	setBorder(new EmptyBorder(50,50,50,50));
 	
 	server=new JLabel(Message.say("Start","mServer"));
-	port=new JLabel(Message.say("Start","mPort"));
+	//port=new JLabel(Message.say("Start","mPort"));
 	name=new JLabel(Message.say("Start","mName"));
 	farbe=new JLabel(Message.say("Start","mFarbe"));
         serv=new JTextField(Message.say("Start","mServerInh"),JTextField.CENTER);
-        prt=new JTextField(Message.say("Start","mPortInh"),JTextField.CENTER);
+        //prt=new JTextField(Message.say("Start","mPortInh"),JTextField.CENTER);
         nam=new JTextField(KrimsKrams.randomName(),JTextField.CENTER);
 	farb=new RoboBox( true ); //new JComboBox(farben);
         go=new TransparentButton(Message.say("Start","mGoButton"));
         zurueck=new TransparentButton(Message.say("Start","mZurueckButton"));
 
 	server.setFont(font);
-	port.setFont(font);
+	//port.setFont(font);
 	name.setFont(font);
 	farbe.setFont(font);
         serv.setFont(font);
-        prt.setFont(font);
+        //prt.setFont(font);
 	nam.setFont(font);
 	farb.setFont(font);
 
 	serv.setOpaque(false);
-        prt.setOpaque(false);
+        //prt.setOpaque(false);
 	nam.setOpaque(false);
 	
 	/*
@@ -77,7 +77,7 @@ public class StartTeilnehmen extends JPanel implements  ActionListener, MouseLis
 	*/
 
 	server.setForeground(Color.lightGray);
-	port.setForeground(Color.lightGray);
+	//port.setForeground(Color.lightGray);
 	name.setForeground(Color.lightGray);
 	farbe.setForeground(Color.lightGray);
 
@@ -89,8 +89,8 @@ public class StartTeilnehmen extends JPanel implements  ActionListener, MouseLis
 
 	add(server);
         add(serv);
-	add(port);
-        add(prt);
+	//add(port);
+        //add(prt);
         add(name);
         add(nam);
         add(farbe);
@@ -113,13 +113,13 @@ public class StartTeilnehmen extends JPanel implements  ActionListener, MouseLis
     public void actionPerformed(ActionEvent e){
 	if(e.getActionCommand().equals("go")){
 //	    System.out.println(farb.getSelectedIndex());
-	    int portnr;
-	    try{
+	    int portnr=8077;
+	    /*try{
 		portnr=Integer.parseInt(prt.getText());
 	    }catch (Exception x){
 		System.err.println("Must be a number!");
 		return;
-	    }
+		}*/
 
 	    Thread smth=parent.fassade.amSpielTeilnehmen(serv.getText(),portnr,nam.getText(),farb.getSelectedIndex());
 	    Global.debug(this,"SpielerMensch gestartet");
