@@ -1,0 +1,21 @@
+#Tue Mar 14 15:28:46 GMT+01:00 2000
+flag2y=7
+flag2x=18
+flag5y=8
+flag5x=1
+kach1,1=rotateleft.rra
+kach1,0=labyrinth.rra
+dreh0,1=0
+dreh0,0=0
+flag1y=2
+flag1x=13
+flag4y=21
+flag4x=7
+flag0y=4
+flag0x=1
+kach0,1=dima.rra
+kach0,0=dan.rra
+flag3y=18
+flag3x=22
+dreh1,1=0
+dreh1,0=0
