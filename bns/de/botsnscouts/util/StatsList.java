@@ -1,13 +1,23 @@
 package de.botsnscouts.util;
+import java.util.Vector;
 /**@author Hendrik
    Container class for Stats objects.
  */
 public class StatsList {
     private Stats[] robots;
   
-    /** Creates a new list with length 0 */ 
+    /** Creates a new list with length 0*/
     public StatsList () {
 	robots = new Stats[0];
+    }
+    /** Creates a new StatsList containing the Stats-objects 
+	in stats.
+	@param stats A vector containing Stats-objects.
+    */
+    public StatsList(Vector stats) {
+	this.robots = new Stats [stats.size()];
+	for (int i=0;i<stats.size();i++) 
+	    robots [i] = (Stats) stats.elementAt(i);
     }
 
     /** Creates a new StatsList.
@@ -30,6 +40,7 @@ public class StatsList {
 		robots [i]=neu;
 		break;
 	    }
+	
     }
     
     /**

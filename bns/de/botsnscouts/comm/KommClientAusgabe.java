@@ -1,5 +1,11 @@
 package de.botsnscouts.comm;
+
+import de.botsnscouts.util.Stats;
+import de.botsnscouts.util.StatsList;
 import java.io.*;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
 /** Diese Klasse enthaelt die Methoden, Objekte usw., die nicht in KommClient enthalten sind und vom Spieler nicht benoetigt werden
 *@author Hendrik<BR>*/
 public class  KommClientAusgabe extends KommClient {
@@ -21,13 +27,46 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
 
   /** Zur Bestaetigung fuer den Server, dass die Ausgaben beendet wurden und der Server weitermachen darf*/ 
   public void aenderungFertig() {
-    //out.println ("ok");
-    try {
-      this.senden("ok");
-    }
-    catch (KommFutschException k) {
-      System.err.println ("Exception bei KCA.aenderungfertig(von"+cn+"\nMessage: "+k.getMessage());
-    }
+      try {
+	  this.senden("ok");
+      }
+      catch (KommFutschException k) {
+	  System.err.println ("Exception bei KCA.aenderungfertig(von"+cn+"\nMessage: "+k.getMessage());
+	  k.printStackTrace();
+      }
   }
-   
+
+    /** This methods asks for the actual game stats (laserhits).
+	@exception ..if an error occurs
+	@return A sorted list of Stats-objects.
+    */
+    
+    public StatsList getStats() throws KommException {
+	// format: GST(name,int,int,int,int,name,..,name,int,int,int,int)
+	senden("GST");
+	String rein = einlesen();
+	Vector stats = new Vector();
+	StringTokenizer st = new StringTokenizer (rein.substring(0,rein.length()-1),",");
+	String notNeeded=st.nextToken();
+	notNeeded=null;
+	while (st.hasMoreElements()) {
+	    Stats s = new Stats (st.nextToken());
+	    try {
+		s.setHits(Integer.parseInt(st.nextToken()));
+		s.setKills(Integer.parseInt(st.nextToken()));
+		s.setDamageByBoard(Integer.parseInt(st.nextToken()));
+		s.setDamageByRobots(Integer.parseInt(st.nextToken()));
+		stats.addElement(s);
+	    }
+	    catch (NumberFormatException nfe) {
+		nfe.printStackTrace();
+	    }
+	}
+	return new StatsList(stats);
+    }
+	
+
 }
+    
+   
+
