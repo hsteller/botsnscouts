@@ -207,6 +207,8 @@ mRoboTrack RoboTrack
 mSlow slow
 mSpeed speed
 mflagMenu Flags
+mSound Sound
+mSoundOn on
 msplashEnde Quitting.
 msplashFehlerAnmeldung Connection failed - retrying...
 msplashWarte Initializing game. Please wait...
@@ -219,6 +221,7 @@ spielende Game over.
 statusVon Status for
 trackAus none
 virtuell virtual
+
 [SACanvas]
 [HalloCanvas]
 [Abspann]

@@ -219,6 +219,8 @@ eKeineSpieler Es gibt noch keine angemeldete Spieler!
 [AusgabeFrame]
 mHelpMenuName Hilfe
 mAbout Über
+mSound Sound
+mSoundOn an
 msplashEnde Das Programm wird beendet.
 msplashFehlerAnmeldung Die Anmeldung ist fehlgeschlagen - versuche erneut...
 msplashWarte Das Spiel wird initialisiert. Bitte warten...
@@ -257,6 +259,7 @@ phase Phase
 trackAus ausschalten
 spielende Das Spiel ist beendet.
 eAnmeldung Eine Anmeldung beim Server war leider nicht möglich.
+
 
 [SACanvas]
 [HalloCanvas]

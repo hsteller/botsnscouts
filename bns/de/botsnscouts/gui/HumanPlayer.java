@@ -6,6 +6,9 @@ import  de.botsnscouts.comm.*;
 import  de.botsnscouts.autobot.*;
 import  de.botsnscouts.board.*;
 import  de.botsnscouts.server.KartenStapel;
+
+import org.apache.log4j.Category;
+
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -17,6 +20,8 @@ import javax.swing.plaf.metal.*;
  * @author Lukasz Pekacki
  */
 public class HumanPlayer extends Thread {
+    static Category CAT = Category.getInstance(SACanvas.class);
+
     protected final int LANGSAM = 2000;
     protected final int MITTEL = 200;
     protected final int UNGEBREMST = 0;
@@ -45,9 +50,11 @@ public class HumanPlayer extends Thread {
     private boolean gameOver = false, nosplash = false;
     private Wisenheimer wisenheimer;
 
+    private boolean soundOn=false;
+
     public HumanPlayer (String host, int port, String name) {
 	this(host,port,name,-1);
-    }
+   }
 
     public HumanPlayer(){
 	this ("localhost",8077,KrimsKrams.randomName());
@@ -449,6 +456,19 @@ public class HumanPlayer extends Thread {
 
 	JMenu optionenMenu = new JMenu((Message.say("AusgabeFrame","mOptions")));
 	JMenu optSpeed = new JMenu((Message.say("AusgabeFrame","mSpeed")));
+
+	JMenu soundMenu = new JMenu ((Message.say("AusgabeFrame","mSound")));
+	JCheckBoxMenuItem soundBox = new JCheckBoxMenuItem(Message.say("AusgabeFrame","mSoundOn"), soundOn);
+	soundBox.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e){
+		    soundOn = !soundOn;
+		    //soundBox.setSelected(soundOn);
+		    ausgabe.getAusgabeView().getSpielfeld().setSoundActive(soundOn);
+		    CAT.debug("Setting sound to "+soundOn);
+		}
+	    });
+	soundMenu.add(soundBox);
+	optionenMenu.add(soundMenu);
 	SpeedMenuListener speedListener= new SpeedMenuListener();
 
 	ButtonGroup speedGroup = new ButtonGroup();

@@ -285,6 +285,7 @@ public class SACanvas extends JComponent {
     }
     
     public void setSoundActive(boolean on) {
+	CAT.debug("sound was set to "+on);
 	soundActive = on;
     }
 
