@@ -20,6 +20,8 @@ public class Facade{
 
     private static final String DIP="127.0.0.1";
     private static final int DPORT=8077;
+    private static final int DPLAYERS=8;
+    private static final int DTO=200;
 
 ////////////////////////////////////////
     // instanziiert alle benötigten Klassen
@@ -43,11 +45,11 @@ public class Facade{
     //*SpielStarter*//
     // Startet einfach das Spiel
     public boolean startSpiel() throws OneFlagException, NichtZusSpfException{
-	return startSpiel(DIP, 8077, 8, 200, 8889);
+	return startSpiel(DIP, DPORT, DPLAYERS, DTO, 8889);
     }
 
-    public boolean startSpiel(String ip, int port, int zugTimeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
-	return startSpiel(ip, port, 8, zugTimeOut);
+    public boolean startSpiel(String ip, int port, int timeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
+	return startSpiel(ip, port, DPLAYERS, timeOut);
     }
 
     public boolean startSpiel(String ip, int port, int anzahl, int zugTimeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
@@ -146,12 +148,12 @@ public class Facade{
     }
 
     //gibt Kacheln als 2-dim Array von Spielfeld zurück
-    public Kachel[][] getKacheln(){
+    public Tile[][] getKacheln(){
 	return kachelRaster.getKacheln();
     }
 
     //gibt eine Kachel an der gegebenen Position
-    public Kachel getKachelAt(int x, int y){
+    public Tile getKachelAt(int x, int y){
 	return kachelRaster.getKachelAt(x,y);
     }
 
@@ -253,12 +255,12 @@ public class Facade{
  
     // startet ein AusgabeKanal mit default parameter
     public Thread einemSpielZuschauen(){
-	return launcher.einemSpielZuschauen(DIP, 8077,false);
+	return launcher.einemSpielZuschauen(DIP, DPORT,false);
     }
  
     // startet ein AusgabeKanal mit default parameter und keinem Splashscreen
     public Thread einemSpielZuschauenNoSplash(){
-	return launcher.einemSpielZuschauen(DIP, 8077,true);
+	return launcher.einemSpielZuschauen(DIP, DPORT,true);
     }
  
     // startet einen SpielerMensch
@@ -268,12 +270,12 @@ public class Facade{
 
     // startet einen SpielerMensch mit default parameter
     public Thread amSpielTeilnehmen(String name, int farbe){
-	return launcher.amSpielTeilnehmen(DIP, 8077, name, farbe,false);
+	return launcher.amSpielTeilnehmen(DIP, DPORT, name, farbe,false);
     }
 
     // startet einen SpielerMensch mit default parameter und ohne Splash Screen
     public Thread amSpielTeilnehmenNoSplash(String name, int farbe){
-	return launcher.amSpielTeilnehmen(DIP, 8077, name, farbe,true);
+	return launcher.amSpielTeilnehmen(DIP, DPORT, name, farbe,true);
     }
 
     // startet Künstliche Spieler
@@ -288,12 +290,12 @@ public class Facade{
 
     // startet Künstliche Spieler local mit default parametern
     public Thread  kuenstlicheSpielerStarten(int iq){
-	return launcher.kuenstlicheSpielerStarten(DIP, 8077, true, iq, com);
+	return launcher.kuenstlicheSpielerStarten(DIP, DPORT, true, iq, com);
     }
 
     //startet das Spiel tatsächlich
     public boolean spielGehtLos(){
-	return spielStarter.spielGehtLos(com,DIP,8077);
+	return spielStarter.spielGehtLos(com,DIP,DPORT);
     }
 
     public void killStartServer(){
