@@ -80,7 +80,7 @@ public class RepairRegisters extends JPanel implements ActionListener{
     }
 
     
-    private void setChoises(ArrayList registers, int repairPoints) {	
+    public void setChoises(ArrayList registers, int repairPoints) {	
 	this.repairPoints=repairPoints;
 	this.registers=registers;
 	zuVerteilen = repairPoints;
@@ -89,19 +89,19 @@ public class RepairRegisters extends JPanel implements ActionListener{
 
 	titel.setText(Message.say("SpielerMensch","mregwahl",repairPoints));
 
-	if(((HumanCard) registers.get(0)).getState() == HumanCard.LOCKED) {
+	if(((CardView) registers.get(0)).getCard().getState() == HumanCard.LOCKED) {
 	    cb1.setEnabled(true);
 	}
-	if(((HumanCard) registers.get(1)).getState() == HumanCard.LOCKED){
+	if(((CardView) registers.get(1)).getCard().getState() == HumanCard.LOCKED){
 	    cb2.setEnabled(true);
 	}
-	if(((HumanCard) registers.get(2)).getState() == HumanCard.LOCKED){
+	if(((CardView) registers.get(2)).getCard().getState() == HumanCard.LOCKED){
 	    cb3.setEnabled(true);
 	}
-	if(((HumanCard) registers.get(3)).getState() == HumanCard.LOCKED){
+	if(((CardView) registers.get(3)).getCard().getState() == HumanCard.LOCKED){
 	    cb4.setEnabled(true);
 	}
-	if(((HumanCard) registers.get(4)).getState() == HumanCard.LOCKED){
+	if(((CardView) registers.get(4)).getCard().getState() == HumanCard.LOCKED){
 	    cb5.setEnabled(true);
 	}
     }
