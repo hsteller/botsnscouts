@@ -54,7 +54,7 @@ class SpfFilter implements FilenameFilter{
     public boolean accept(File dir, String name){
 	try{
 	    // endsWith(".spf") ???
-	    return name.endsWith(".spf");
+	    return name.toLowerCase().endsWith(".spf");
 	} catch(Throwable t){return false;}
     }
 }
