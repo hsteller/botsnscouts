@@ -438,6 +438,10 @@ public class Ausgabe extends Thread {
 	trackPos(r.getX(), r.getY());
     }
 
+    public void setTracking( String name ) {
+      /** @todo: track the given robot permanently */
+    }
+
 
     /**
      * Zentriert die angegebenen Flagge
@@ -458,7 +462,9 @@ public class Ausgabe extends Thread {
 	Global.debug(this, s);
     }
 
-
+    public void abmelden() {
+      kommClient.abmelden( name );
+    }
 
 }
 

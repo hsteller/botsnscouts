@@ -201,6 +201,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	help.add(about);
 	hauptMenu.add(help);
 
+
 	setJMenuBar(hauptMenu);
 
 	// Layout erzeugen

@@ -25,7 +25,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private StatusLog statusLog = new StatusLog();
 
 
-    /** @args SpielerMensch spielerref ist Referenz auf umgebenden 
+    /** @args SpielerMensch spielerref ist Referenz auf umgebenden
      *  MenschlichenSpieler, falls Ausgabe zu einem Spieler gehoert,
      *  null sonst.
      */
@@ -42,12 +42,12 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 	// create status panel
 	for (int i=0; i< robots.length; i++) {
-	    RobotStatus r = new RobotStatus(robots[i], 
+	    RobotStatus r = new RobotStatus(robots[i],
 					    new MouseAdapter(){
 						    public void mouseClicked(MouseEvent me) {
 							ausgabe.trackRob(((JLabel)me.getSource()).getName());
 						    }
-						}, 
+						},
 					    new MouseAdapter(){
 						    public void mouseClicked(MouseEvent me) {
 							ausgabe.scrollFlag(Integer.parseInt(((JLabel)me.getSource()).getText()));
@@ -82,7 +82,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     public void shutup() {
 	System.exit(0);
     }
-   
+
 
 
     /**
@@ -117,11 +117,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 	int x = robix*64;
 	int y = spielFeld.getHeight()-(robiy*64);
-		
+
 	Dimension sz = spielFeldView.getExtentSize();
 	int w2 = sz.width/2;
 	int h2 = sz.height/2;
-	
+
 
 	// make sure we dont want to scoll 'out' to
 	// the left and top
@@ -130,19 +130,19 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 	// soll ich überhaupt scrollen?
 	// in X-Richtung
-	if ((x < ( (spielFeldView.getViewPosition().x)+10 ) ) || 
+	if ((x < ( (spielFeldView.getViewPosition().x)+10 ) ) ||
 	    x > ( (spielFeldView.getViewPosition().x+sz.width)-10 )) {
 	    x1 = Math.min( x1, (spielFeld.getWidth() - sz.width) );
 	}
 	else x1 = spielFeldView.getViewPosition().x;
 
 	// in Y-Richtung
-	if ((y < ( spielFeldView.getViewPosition().y +10) ) || 
+	if ((y < ( spielFeldView.getViewPosition().y +10) ) ||
 	    y > ( (spielFeldView.getViewPosition().y+sz.height)-10 )) {
 	    y1 = Math.min( y1, (spielFeld.getHeight() - sz.height) );
 	}
 	else y1 = spielFeldView.getViewPosition().y;
-	
+
 	spielFeldView.setViewPosition(new Point(x1, y1));
     }
 
@@ -169,7 +169,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	while (i<gameState.length&&!gameState[i].equals("null")) {
 	    d("getting ranking of "+gameState[i]+" zu holen");
 	    ((RobotStatus) robotStatus.get(gameState[i])).setWinnerNumber((i+1));
-	    
+
 	    i++;
 	}
     }
@@ -189,6 +189,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     }
 
 
+    public SACanvas getSpielfeld() {
+      return spielFeld;
+    }
 
     private void d(String s){
 	Global.debug(this, s);
