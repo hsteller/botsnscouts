@@ -46,6 +46,7 @@ public class ImageMan {
 	"images/lock.png"
     };
 
+    public static Image[] PNGImages = new Image[PngImages.length];
     public static ImageIcon[] PNGImageIcons = new ImageIcon[PngImages.length];
 	
     
@@ -94,7 +95,7 @@ public class ImageMan {
 	for (int i=0; i < PngImages.length; i++) {
 	        try {
 		    PngImage png = new PngImage(c.getResource(PngImages[i]));
-		    PNGImageIcons[i] = new ImageIcon(tk.createImage(png));
+		    PNGImages[i] = tk.createImage(png);
 		} catch (IOException e) {
 		    e.printStackTrace();
 		}                                                                
@@ -148,9 +149,18 @@ public class ImageMan {
 	return imgSets[id];
     }
 
+    public static Image getPNGImage(int id) {
+	if( !imagesLoading ) 
+	    loadImages();
+	return PNGImages[id];
+    }
+
     public static ImageIcon getPNGImageIcon(int id) {
 	if( !imagesLoading ) 
 	    loadImages();
+	if(PNGImageIcons[id]==null){
+	    PNGImageIcons[id]=new ImageIcon(PNGImages[id]);
+	}
 	return PNGImageIcons[id];
     }
 

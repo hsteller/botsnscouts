@@ -17,6 +17,7 @@ public class RegisterView extends JButton {
     ImageIcon registerFree = ImageMan.CardRLEER;
     ImageIcon cardImage;
     HumanCard h;
+    int myX=0,myY=0;
 
     public RegisterView() {
 	this(new ActionListener() {
@@ -84,6 +85,7 @@ public class RegisterView extends JButton {
 	setIcon(cardImage);
 	h.setState(HumanCard.FILLED);
 	setEnabled(true);
+
     }
 
     public HumanCard getCard() {
@@ -92,8 +94,15 @@ public class RegisterView extends JButton {
 
     public void paintComponent(Graphics g){
 	super.paintComponent(g);
-	if(locked()) g.drawString("Locked",55,55);
-//	g.drawImage();
+	if(myX==0||myY==0){
+	    Dimension d=getSize();
+	    myX=d.width;
+	    myY=d.height;
+	    Global.debug(this,"(myX,myY)=("+myX+","+myY+")");
+	}
+	if(locked()){
+	    g.drawImage(ImageMan.getPNGImage(ImageMan.REGLOCK),(myX-50)/2,(myY-50)/2,this);
+	}
     }
 
     public static void main (String args[]) {
