@@ -108,7 +108,7 @@ public class Start extends JFrame implements WindowListener{
 	}catch(IllegalThreadStateException e){
 	    System.err.println(Message.say("Start","eSpielEnde"));
 	}
-	nullen();
+	//nullen();
 //	dispose();
     }
 
