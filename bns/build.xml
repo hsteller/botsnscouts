@@ -96,6 +96,16 @@
      </java>
   </target>
 
+  <target name="metaserver" depends="compile">
+       <java classname="de.botsnscouts.meta.Server" fork="true">
+          <classpath>
+         <fileset dir="${jars}" includes="*.jar" />
+         <pathelement path="${build}" />
+      </classpath>
+       </java>
+  </target>
+
+
   <target name="editor" depends="compile">
      <java classname="de.botsnscouts.editor.BoardEditor" fork="true">
         <classpath>
