@@ -65,8 +65,7 @@ public class StartKachelComp extends JComponent implements  MouseListener, Mouse
 	flaggenChanged=false;
 	for (int i=0;i<flag.length;i++){
 	    if (flag[i]!=null&&(flag[i].x-1)/12==myX&&(flag[i].y-1)/12==myY){
-		flaggenChanged=flagNum.length<=counter;
-		flaggenChanged=(flaggenChanged||flagNum[counter]!=i+1||flagPos[counter].x!=(flag[i].x-1)%12||flagPos[counter].y!=(flag[i].y-1)%12);
+		flaggenChanged=(flaggenChanged||flagNum.length<=counter||flagNum[counter]!=i+1||flagPos[counter].x!=(flag[i].x-1)%12||flagPos[counter].y!=(flag[i].y-1)%12);
 		counter++;
 	    }
 	}
