@@ -85,7 +85,7 @@ public class TileComponent extends JComponent implements  MouseListener, MouseMo
 	    tileImage=null;
 	}
 	//hole die Flaggen
-	Location[] flag = fassade.getFlaggen();
+	Location[] flag = fassade.getFlagPositions();
 	int counter=0;
 	flagsChanged=false;
 	for (int i=0;i<flag.length;i++){

@@ -105,7 +105,7 @@ public class WaiterThread extends BNSThread{
 	waitServer=true;
     }
 
-    public void beende(){
+    public void quitYourself(){
 	beendemich=true;
     }
 

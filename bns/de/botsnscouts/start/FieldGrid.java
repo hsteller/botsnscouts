@@ -36,7 +36,7 @@ class FieldGrid extends JPanel {
 
     FieldGrid(Start par) {
         parent = par;
-        Location spfDim = parent.fassade.getSpielfeldDim();
+        Location spfDim = parent.facade.getBoardDim();
         GridLayout lay = new GridLayout(spfDim.y, spfDim.x);
         lay.setHgap(0);
         lay.setVgap(0);
@@ -46,7 +46,7 @@ class FieldGrid extends JPanel {
         tileP = new TileComponent[spfDim.x][spfDim.y];
         for (int j = spfDim.y - 1; j >= 0; j--) {
             for (int i = 0; i < spfDim.x; i++) {
-                tileP[i][j] = new TileComponent(par.fassade, i, j);
+                tileP[i][j] = new TileComponent(par.facade, i, j);
                 add(tileP[i][j]);
             }
         }

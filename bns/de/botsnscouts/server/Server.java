@@ -52,7 +52,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     private RegistrationManager registrationManager;
     private MessageThread messageThread;
 
-    private StSpListener gameStartListener;
+    private ServerObserver gameStartListener;
 
     protected SimBoard feld;
 
@@ -89,7 +89,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
      *
      */
     public Server(GameOptions options,
-                  StSpListener listener)
+                  ServerObserver listener)
     {
         gameStartListener = listener;
         this.options = options;
@@ -229,7 +229,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
     public void updateNewBot(String name, int color) {
         if (gameStartListener != null) {
-            gameStartListener.updateNewBot(name, color);
+            gameStartListener.fireNewBot(name, color);
         }
     }
 
@@ -635,7 +635,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             }
             //Spiel starts!
             if (gameStartListener != null){
-                gameStartListener.updateStartGame();
+                gameStartListener.fireGameStarted();
             }
             return true;
         } finally {
@@ -1184,7 +1184,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             messageThread.interrupt();
 
             if (gameStartListener != null) {
-                gameStartListener.updateGameFinished();
+                gameStartListener.fireGameFinished();
             }
         } catch (Throwable t) {
             CAT.fatal("Exception:", t);

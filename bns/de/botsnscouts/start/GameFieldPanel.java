@@ -106,7 +106,7 @@ public class GameFieldPanel extends JPanel {
         add(BorderLayout.EAST, editPanel);
         boardGrid.rasterChanged();
 
-        gameOptions = parent.fassade.getGameOptions();
+        gameOptions = parent.facade.getGameOptions();
     }
 
     public void paint(Graphics g) {
@@ -182,7 +182,7 @@ public class GameFieldPanel extends JPanel {
         save.setEnabled(true);
         save.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Properties spfProp = parent.fassade.getSpfProp();
+                Properties spfProp = parent.facade.getBoardAsProperties();
                 makeChooser();
                 chooser.rescanCurrentDirectory();
                 int returnVal = chooser.showSaveDialog(parent);
@@ -303,13 +303,13 @@ public class GameFieldPanel extends JPanel {
             spfProp = loader.getProperties(defSpf);
             spielfelder.setSelectedItem(defSpf);
         }
-        parent.fassade.loadSpfProp(spfProp);
+        parent.facade.loadBoardFromProperties(spfProp);
         spielfelder.addItemListener(new ItemListener() {
             //Invoked when an item has been selected or deselected.
             public void itemStateChanged(ItemEvent e) {
                 String spfConf = (String) spielfelder.getSelectedItem();
                 Properties prop = loader.getProperties(spfConf);
-                parent.fassade.loadSpfProp(prop);
+                parent.facade.loadBoardFromProperties(prop);
                 boardGrid.rasterChanged();
             }
         });
@@ -341,7 +341,7 @@ public class GameFieldPanel extends JPanel {
         gameOptions.setAllowWisenheimer(allowWisenheimer.isSelected());
         gameOptions.setAllowScout(allowScout.isSelected());
         try {
-            parent.fassade.updateGameOptions();
+            parent.facade.updateGameOptions();
             /* Handig over a postServerStartTask is still a bit weird, but
                it is much more sane and faster than before...
              */
@@ -349,11 +349,11 @@ public class GameFieldPanel extends JPanel {
                 public void doIt() {
 
                     if (participate.getSelectedObjects() != null) {
-                        Thread smth = parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(), colors.getSelectedIndex());
+                        Thread smth = parent.facade.participateInAGameNoSplash(nam.getText(), colors.getSelectedIndex());
                         parent.addKS(smth);
                         Global.debug(this, "menschlichen spieler gestartet");
                     } else {//starte einen AusgabeFrame
-                        parent.addKS(parent.fassade.einemSpielZuschauenNoSplash());
+                        parent.addKS(parent.facade.watchAGameNoSplash());
                     }
                     // Announce game, if we shall do this.
                     try {

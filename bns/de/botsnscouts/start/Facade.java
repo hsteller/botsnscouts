@@ -25,11 +25,11 @@
 
 package de.botsnscouts.start;
 
-import java.awt.*;
-import java.util.*;
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.util.Location;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.board.*;
+import java.awt.*;
+import java.util.Properties;
 
 // Diese Klasse dient der Entkopplung der GUI-Schicht (StartSpieler)
 // von der Fachkonzeptschicht(...) und der Datenhaltungsschicht (...)
@@ -39,12 +39,10 @@ public class Facade {
     private int thumbnailsize;
     private TileRaster tileRaster, tileRasterSave;
     private Launcher launcher;
-    //private KommSpPr com;
     private TileFactory tileFactory;
 
     private GameOptions gameOptions;
 
-////////////////////////////////////////
     public Facade() {
         this(180);
     }
@@ -52,197 +50,166 @@ public class Facade {
     public Facade(int thumbnailsize) {
         this.thumbnailsize = thumbnailsize;
         tileFactory = new TileFactory(thumbnailsize);
-        //tileFactory.start();
         tileRaster = new TileRaster(tileFactory);
         launcher = new Launcher();
-        //com = new KommSpPr();
     }
 
     public int getThumbnailSize() {
         return thumbnailsize;
     }
 
-    //*TileRaster*//
-    //setzt Spielfeldgröße
-    public void setSpielfeldDim(int x, int y) {
-        tileRaster.setSpielfeldDim(x, y);
+    public void setBoardDim(int x, int y) {
+        tileRaster.setBoardDim(x, y);
     }
 
-    //gibt Spielfeldgröße zurück
-    public Location getSpielfeldDim() {
-        return tileRaster.getSpielfeldDim();
+    public Location getBoardDim() {
+        return tileRaster.getBoardDim();
     }
 
-    // aktualisiert das Board
     public void setTile(int x, int y, int rot, String tile) throws FlagPresentException {
-        // to be written......
-        //Global.debug(this,"setTile "+x+","+y+" "+tile);
         tileRaster.setTile(x, y, rot, tile);
     }
 
-    //dreht die Tile um r*90° nach rechts
+    /**
+     * Rotates the tile 90° left
+     */
     public void rotTile(int x, int y) {
         tileRaster.rotTile(x, y);
     }
 
-    //löscht die Tile at (x,y)
     public void delTile(int x, int y) {
-        // to be written......
         tileRaster.delTile(x, y);
     }
 
-    //prüft ob auf der Tile at (x,y) Flaggen stehen
-    public boolean sindFlaggen(int x, int y) {
-        return tileRaster.sindFlaggen(x, y);
+    public boolean flagsOnTile(int x, int y) {
+        return tileRaster.flagsOnTile(x, y);
     }
 
-    // prüft ob eine Flagge hinzugefügt werden kann
-    public boolean checkFlaggePos(int x, int y) {
-        return tileRaster.checkFlaggePos(x, y);
+    public boolean legalFlagPosition(int x, int y) {
+        return tileRaster.legalFlagPosition(x, y);
     }
 
-    // prüft ob eine Flagge hinzugefügt werden kann
-    public boolean checkFlaggeMovePos(int x, int y) {
-        return tileRaster.checkFlaggeMovePos(x, y);
+    public boolean legalFlagPosAfterMove(int x, int y) {
+        return tileRaster.legalFlagPosAfterMove(x, y);
     }
 
-    // gibt ein String zurück falls die FlaggenPosition ungünstig ist
-    //null sonst
-    public String getFlaggeKomment(int x, int y) {
-        return tileRaster.getFlaggeKomment(x, y);
+    /**
+     * @return the reason the flag may not be placed, or null if it may be.
+     */
+    public String reasonFlagIllegal(int x, int y) {
+        return tileRaster.reasonFlagIllegal(x, y);
     }
 
-    // fügt eine Flagge hinzu
-    public void addFlagge(int x, int y) throws FlagException {
-        tileRaster.addFlagge(x, y);
+    public void addFlag(int x, int y) throws FlagException {
+        tileRaster.addFlag(x, y);
     }
 
-    // löscht eine Flagge hinzu
-    public void delFlagge(int nr) {
-        tileRaster.delFlagge(nr);
+    public void delFlag(int nr) {
+        tileRaster.delFlag(nr);
     }
 
-    //löscht Flagge mit koordinaten ax,ay
-    public void delFlagge(int ax, int ay) {
-        tileRaster.delFlagge(ax, ay);
+    public void delFlag(int ax, int ay) {
+        tileRaster.delFlag(ax, ay);
     }
 
-    //prüft, ob eine Flagge da ist
-    public boolean istFlagge(int ax, int ay) {
-        return tileRaster.istFlagge(ax, ay);
+    public boolean flagExists(int ax, int ay) {
+        return tileRaster.flagExists(ax, ay);
     }
 
-    // versetzt eine Flagge
-    public void moveFlagge(int nr, int x, int y) throws FlagException {
-        tileRaster.moveFlagge(nr, x, y);
+    public void moveFlag(int nr, int x, int y) throws FlagException {
+        tileRaster.moveFlag(nr, x, y);
     }
 
-    // versetzt eine Flagge
-    public void moveFlagge(int ax, int ay, int x, int y) throws FlagException {
-        tileRaster.moveFlagge(ax, ay, x, y);
+    public void moveFlag(int ax, int ay, int x, int y) throws FlagException {
+        tileRaster.moveFlag(ax, ay, x, y);
     }
 
-    //gibt die Flaggen zurück
-    public Location[] getFlaggen() {
-        return tileRaster.getFlaggen();
+    public Location[] getFlagPositions() {
+        return tileRaster.getFlagPositions();
     }
 
-    //gibt Tilen als 2-dim Array von Board zurück
     public Tile[][] getTiles() {
         return tileRaster.getTiles();
     }
 
-    //gibt eine Tile an der gegebenen Position
     public Tile getTileAt(int x, int y) {
         return tileRaster.getTileAt(x, y);
     }
 
-    //speichert den Zustand des TileRasters
     public void saveTileRaster() {
         tileRasterSave = tileRaster.getClone();
     }
 
-    //stellt den gespeicherten Zustand des TileRastors wieder her
-    public void restorTileRaster() {
+    public void restoreTileRaster() {
         tileRaster = tileRasterSave;
     }
 
-    //prüft ob Board gültig ist (plausibilitätstests)
-    public boolean checkSpielfeld() throws OneFlagException, NonContiguousMapException {
-        return tileRaster.checkSpielfeld();
+    public boolean isBoardValid() throws OneFlagException, NonContiguousMapException {
+        return tileRaster.isBoardValid();
     }
 
-    //gibt das aktuelle Board als Properties zurück
-    public Properties getSpfProp() {
-        Properties spfProp = new Properties();
-        Tile[][] kach = getTiles();
-        for (int i = 0; i < kach.length; i++) {
-            for (int j = 0; j < kach[0].length; j++) {
-                if (kach[i][j] != null) {
-                    spfProp.setProperty("kach" + i + "," + j, kach[i][j].getName());
-                    spfProp.setProperty("dreh" + i + "," + j, "" + kach[i][j].getRotation());
+    /**
+     * @return the current board as a Properties-object.
+     */
+    public Properties getBoardAsProperties() {
+        Properties ret = new Properties();
+        Tile[][] tiles = getTiles();
+        for (int i = 0; i < tiles.length; i++) {
+            for (int j = 0; j < tiles[0].length; j++) {
+                if (tiles[i][j] != null) {
+                    ret.setProperty("kach" + i + "," + j, tiles[i][j].getName());
+                    ret.setProperty("dreh" + i + "," + j, "" + tiles[i][j].getRotation());
                 }
             }
         }
-        Location[] flag = getFlaggen();
+        Location[] flag = getFlagPositions();
         for (int i = 0; i < flag.length; i++) {
             if (flag[i] != null) {
-                spfProp.setProperty("flag" + i + "x", "" + flag[i].x);
-                spfProp.setProperty("flag" + i + "y", "" + flag[i].y);
+                ret.setProperty("flag" + i + "x", "" + flag[i].x);
+                ret.setProperty("flag" + i + "y", "" + flag[i].y);
             }
         }
-        return spfProp;
+        return ret;
     }
 
-    //lädt das durch Properties beschriebene Board
-    public void loadSpfProp(Properties spfProp) {
-        Location dim = getSpielfeldDim();
+
+    /**
+     * Load a board.
+     * @param spfProp a Properties-object generated by getBoardAsProperties, above.
+     */
+    public void loadBoardFromProperties(Properties spfProp) {
+        Location dim = getBoardDim();
         for (int i = 0; i < dim.x; i++) {
             for (int j = 0; j < dim.y; j++) {
-                //lese tilename ein
+                //read name of tile
                 String name = spfProp.getProperty("kach" + i + "," + j);
                 delTile(i, j);
                 if (name != null) {
-                    //falls vorhanden
                     int rot = Integer.parseInt(spfProp.getProperty("dreh" + i + "," + j));
                     try {
-                        //setze Tile
                         setTile(i, j, rot, name);
                     } catch (FlagPresentException e) {
                     }
-                    /*   try{
-                    //lese Drehung aus
-                    int dr=Integer.parseInt(spfProp.getProperty("dreh"+i+","+j));
-                    //drehe Tile
-                    for (int d=0;d<dr;d++){
-                        rotTile(i,j);
-                    }
-                    }catch(NumberFormatException e){
-                    }*/
                 }
             }
         }
         int flAnz = tileRaster.getMaxFlag();
         int flx,fly;
-        //lösche evtl. vorhandene Flaggen
         for (int i = 0; i < flAnz; i++) {
-            delFlagge(i);
+            delFlag(i);
         }
-        //füge die Flaggen hinzu
         for (int i = 0; i < flAnz; i++) {
             try {
                 if (spfProp.getProperty("flag" + i + "x") != null) {
                     flx = Integer.parseInt(spfProp.getProperty("flag" + i + "x"));
                     fly = Integer.parseInt(spfProp.getProperty("flag" + i + "y"));
-                    addFlagge(flx, fly);
+                    addFlag(flx, fly);
                 }
             } catch (Exception e) {
             }
         }
     }
 
-    //*TileFactory*//
-    //gibt TileInfos zurück
     public TileInfo[] getTileInfos() {
         return tileFactory.getTileInfos();
     }
@@ -251,83 +218,74 @@ public class Facade {
         return tileFactory.getImage(name);
     }
 
-    //*Launcher*//
-    // startet ein AusgabeKanal
-    public Thread einemSpielZuschauen(String ip, int port) {
-        return launcher.einemSpielZuschauen(ip, port, false);
+    /**
+     * Start a stand-alone Ausgabe.
+     */
+    public Thread watchAGame(String ip, int port) {
+        return launcher.watchAGame(ip, port, false);
     }
 
-    // startet ein AusgabeKanal mit default parameter
-    public Thread einemSpielZuschauen() {
-        return launcher.einemSpielZuschauen(GameOptions.DIP, GameOptions.DPORT, false);
+    public Thread watchAGame() {
+        return launcher.watchAGame(GameOptions.DIP, GameOptions.DPORT, false);
     }
 
-    // startet ein AusgabeKanal mit default parameter und keinem Splashscreen
-    public Thread einemSpielZuschauenNoSplash() {
-        return launcher.einemSpielZuschauen(GameOptions.DIP, GameOptions.DPORT, true);
+    public Thread watchAGameNoSplash() {
+        return launcher.watchAGame(GameOptions.DIP, GameOptions.DPORT, true);
     }
 
-    // startet einen SpielerMensch
-    public Thread amSpielTeilnehmen(String ip, int port, String name, int farbe) {
-        return launcher.amSpielTeilnehmen(ip, port, name, farbe, false);
+    /**
+     * Start a human player
+     */
+    public Thread participateInAGame(String ip, int port, String name, int color) {
+        return launcher.participateInAGame(ip, port, name, color, false);
     }
 
-    // startet einen SpielerMensch with default port num
-    public Thread amSpielTeilnehmen(String ip, String name, int farbe) {
-        return launcher.amSpielTeilnehmen(ip, GameOptions.DPORT, name, farbe, false);
+    public Thread participateInAGame(String ip, String name, int color) {
+        return launcher.participateInAGame(ip, GameOptions.DPORT, name, color, false);
     }
 
-    // startet einen SpielerMensch mit default parameter
-    public Thread amSpielTeilnehmen(String name, int farbe) {
-        return launcher.amSpielTeilnehmen(GameOptions.DIP, GameOptions.DPORT, name, farbe, false);
+    public Thread participateInAGame(String name, int color) {
+        return launcher.participateInAGame(GameOptions.DIP, GameOptions.DPORT, name, color, false);
     }
 
-    // startet einen SpielerMensch mit default parameter und ohne Splash Screen
-    public Thread amSpielTeilnehmenNoSplash(String name, int farbe) {
-        return launcher.amSpielTeilnehmen(GameOptions.DIP, GameOptions.DPORT, name, farbe, true);
+    public Thread participateInAGameNoSplash(String name, int color) {
+        return launcher.participateInAGame(GameOptions.DIP, GameOptions.DPORT, name, color, true);
     }
 
-    // startet Künstliche Spieler local
-    public Thread kuenstlicheSpielerStarten(String ip, int port, int iq) {
+    public Thread startAutoBot(String ip, int port, int iq) {
         return launcher.startAutoBot(ip, port, iq);
     }
 
-    // startet Künstliche Spieler local mit default parametern
-    public Thread kuenstlicheSpielerStarten(int iq, boolean beltAware) {
+    public Thread startAutoBot(int iq, boolean beltAware) {
         return launcher.startAutoBot(GameOptions.DIP, GameOptions.DPORT, iq, beltAware);
     }
 
-    // startet Künstliche Spieler local mit default parametern
-    public Thread kuenstlicheSpielerStarten(int iq, boolean beltAware, String botName) {
+    public Thread startAutoBot(int iq, boolean beltAware, String botName) {
         return launcher.startAutoBot(GameOptions.DIP, GameOptions.DPORT, iq, beltAware, botName);
     }
 
-    // launch the game
     public void startGame() throws OneFlagException, NonContiguousMapException {
         startGame(null);
     }
 
-    public void startGame(StSpListener listener) throws OneFlagException, NonContiguousMapException {
+    public void startGame(ServerObserver listener) throws OneFlagException, NonContiguousMapException {
         launcher.startGame(gameOptions, listener );
     }
 
-    //startet das Spiel tatsächlich
     public void gameStarts() {
         tileFactory.forgetTiles();
         launcher.gameStarts(GameOptions.DIP, GameOptions.DPORT);
     }
 
-
     public void killServer() {
         launcher.stopServer();
-        //com.cancelGame(DIP, DPORT);
     }
 
     public void prepareTiles() {
         tileFactory.prepareTiles();
     }
 
-    de.botsnscouts.start.GameOptions getGameOptions() {
+    GameOptions getGameOptions() {
         if (gameOptions == null) {
             gameOptions = new GameOptions();
         }
@@ -339,7 +297,6 @@ public class Facade {
      * i.e. set field and flags.
      */
     public void updateGameOptions() throws OneFlagException, NonContiguousMapException  {
-
         Location dim = tileRaster.getSpielfeldSize();
         gameOptions.setX(dim.x);
         gameOptions.setY(dim.y);

@@ -42,7 +42,7 @@ public class TileRaster{
 
     //setzt übergebene Tile an Stelle (x,y)
     public void setTile(int x, int y, int rot, String name) throws FlagPresentException{
-	if (sindFlaggen(x,y))
+	if (flagsOnTile(x,y))
 	    throw new FlagPresentException();
 	tiles[x][y]=tileFactory.getTile(name,rot);
     }
@@ -75,7 +75,7 @@ public class TileRaster{
 	//entferne Flaggen falls vorhanden
 	for (int i=flaggenN-1;i>=0;i--){
 	    if ((flaggen[i].x-1)/12==x&&(flaggen[i].y-1)/12==y){
-		delFlagge(i);
+		delFlag(i);
 	    }
 	}
 	//enferne Tile
@@ -83,7 +83,7 @@ public class TileRaster{
     }
 
     //prüft ob auf der Tile at (x,y) Flaggen stehen
-    public boolean sindFlaggen(int x, int y){
+    public boolean flagsOnTile(int x, int y){
 	for (int i=0;i<flaggenN;i++){
 	    if ((flaggen[i].x-1)/12==x&&(flaggen[i].y-1)/12==y){
 		return true;
@@ -94,7 +94,7 @@ public class TileRaster{
 
     // gibt ein String zurück falls die FlaggenPosition ungünstig ist
     // "" sonst
-    public String getFlaggeKomment(int x,int y){
+    public String reasonFlagIllegal(int x,int y){
 	int kx=(x-1)/12;
 	int ky=(y-1)/12;
 	Location[] flag= new Location[1];
@@ -113,16 +113,16 @@ public class TileRaster{
     }
 
     // prüft ob eine Flagge hinzugefügt werden kann
-    public boolean checkFlaggePos(int x,int y){
+    public boolean legalFlagPosition(int x,int y){
 	//falls schon alle Flaggen da sind
 	if (flaggenN==FL){
 	    return false;
 	}
-	return checkFlaggeMovePos(x,y);
+	return legalFlagPosAfterMove(x,y);
     }
 
     // prüft ob eine Flagge hinzugefügt werden kann
-    public boolean checkFlaggeMovePos(int x,int y){
+    public boolean legalFlagPosAfterMove(int x,int y){
 	int kx=(x-1)/12;
 	int ky=(y-1)/12;
 	//fals keine Tile drunter
@@ -131,7 +131,7 @@ public class TileRaster{
 	}
 
 	//prüfe ob an der Stelle schon eine Flagge Steht
-	if (istFlagge(x,y)){
+	if (flagExists(x,y)){
 	    return false;
 	}
 	//prüfe Tileelement
@@ -143,14 +143,14 @@ public class TileRaster{
     }
 
     // fügt eine Flagge hinzu 
-    public void addFlagge(int x,int y) throws FlagException{
-	if (!checkFlaggePos(x,y))
+    public void addFlag(int x,int y) throws FlagException{
+	if (!legalFlagPosition(x,y))
 	    throw new FlagException();
 	flaggen[flaggenN++]=new Location(x,y);
     }
 
     // löscht eine Flagge
-    public void delFlagge(int nr){
+    public void delFlag(int nr){
 	if (nr>=flaggenN) return;
 	for (int i=nr+1;i<flaggenN;i++){
 	    flaggen[i-1]=flaggen[i];
@@ -159,17 +159,17 @@ public class TileRaster{
     }
 
     // löscht eine Flagge an der Position
-    public void delFlagge(int ax,int ay){
+    public void delFlag(int ax,int ay){
 	for (int i=0;i<flaggenN;i++){
 	    if (flaggen[i].x==ax&&flaggen[i].y==ay){
-		delFlagge(i);
+		delFlag(i);
 		return;
 	    }
 	}
     }
 
     // prüft ob eine Flagge an der Position vorhanden ist
-    public boolean istFlagge(int ax,int ay){
+    public boolean flagExists(int ax,int ay){
 	for (int i=0;i<flaggenN;i++){
 	    if (flaggen[i].x==ax&&flaggen[i].y==ay){
 		return true;
@@ -179,24 +179,24 @@ public class TileRaster{
     }
 
     // versetzt eine Flagge 
-    public void moveFlagge(int nr, int x,int y) throws FlagException{
-	if (!checkFlaggeMovePos(x,y))
+    public void moveFlag(int nr, int x,int y) throws FlagException{
+	if (!legalFlagPosAfterMove(x,y))
 	    throw new FlagException();
 	flaggen[nr]=new Location(x,y);
     }
 
     // versetzt eine Flagge an der Position
-    public void moveFlagge(int ax,int ay, int x,int y) throws FlagException{
+    public void moveFlag(int ax,int ay, int x,int y) throws FlagException{
 	for (int i=0;i<flaggenN;i++){
 	    if (flaggen[i].x==ax&&flaggen[i].y==ay){
-		moveFlagge(i,x,y);
+		moveFlag(i,x,y);
 		return;
 	    }
 	}
     }
 
     //gibt die Flaggen zurück
-    public Location[] getFlaggen(){
+    public Location[] getFlagPositions(){
 	return flaggen;
     }
 
@@ -216,13 +216,13 @@ public class TileRaster{
     }
 
     //setzt Spielfeldgröße
-    public void setSpielfeldDim(int x, int y){
+    public void setBoardDim(int x, int y){
 	KX=x;
 	KY=y;
     }
 
     //gibt Spielfeldgröße zurück
-    public Location getSpielfeldDim(){
+    public Location getBoardDim(){
 	return new Location(KX,KY);
     }
 
@@ -260,7 +260,7 @@ public class TileRaster{
      * Hand out string representation of a board.
      */
     public String getBoard() throws OneFlagException, NonContiguousMapException{
-	checkSpielfeld();//teste
+	isBoardValid();//teste
 	Location[] bounds= findBounds();
 	String GRUBENZWR="____________";
 	String GRUBENFLD="_G_G_G_G_G_G_G_G_G_G_G_G_";
@@ -438,7 +438,7 @@ public class TileRaster{
     }
     
     //prüft ob Board gültig ist (plausibilitätstests)
-    public boolean checkSpielfeld() throws OneFlagException, NonContiguousMapException{
+    public boolean isBoardValid() throws OneFlagException, NonContiguousMapException{
 	//zu wenig Flaggen
 	if (flaggenN<2)
 	    throw new OneFlagException();

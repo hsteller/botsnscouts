@@ -107,7 +107,7 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
 
         images = ImageMan.getImages(ImageMan.STARTKNOEPFE);
 
-        tileInfos = parent.fassade.getTileInfos();
+        tileInfos = parent.facade.getTileInfos();
 
         BorderLayout lay = new BorderLayout();
 
@@ -209,7 +209,7 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("ok")) {
             try {
-                parent.fassade.checkSpielfeld();
+                parent.facade.isBoardValid();
                 parent.showGameFieldPanel();
                 spf.removeTileClickListener();
                 parent.gameFieldPanel.pnl.add(spf);
@@ -225,7 +225,7 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
             if (parent.gameFieldPanel == null) {
                 parent.gameFieldPanel = new GameFieldPanel(parent);
             }
-            parent.fassade.restorTileRaster();
+            parent.facade.restoreTileRaster();
             spf.removeTileClickListener();
             parent.gameFieldPanel.pnl.add(spf);
             parent.showGameFieldPanel();
@@ -269,7 +269,7 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
                                     return;
                                 }
                             }
-                            parent.fassade.addFlagge(rx * 12 + fx, ry * 12 + fy);
+                            parent.facade.addFlag(rx * 12 + fx, ry * 12 + fy);
                             spf.rasterChanged();
                         } else {
                             //System.err.println("You cannot place a flag here!");
@@ -282,7 +282,7 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
                 }
             case MODE_FLAGGE_ENTFERNEN:
                 {
-                    parent.fassade.delFlagge(rx * 12 + fx, ry * 12 + fy);
+                    parent.facade.delFlag(rx * 12 + fx, ry * 12 + fy);
                     spf.rasterChanged();
                     break;
                 }
@@ -300,7 +300,7 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
                             }
                         }
                         try {
-                            parent.fassade.moveFlagge(flaggeX, flaggeY, rx * 12 + fx, ry * 12 + fy);
+                            parent.facade.moveFlag(flaggeX, flaggeY, rx * 12 + fx, ry * 12 + fy);
                         } catch (FlagException ex) {
                             System.err.println("You cannot place a flag here!");
                         }
@@ -311,7 +311,7 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
                 }
             case MODE_TILE_SETZEN:
                 {
-                    if (parent.fassade.sindFlaggen(rx, ry)) {
+                    if (parent.facade.flagsOnTile(rx, ry)) {
                         int ret = JOptionPane.showConfirmDialog(this, Message.say("Start", "mKachelSetzen"), Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION, JOptionPane.DEFAULT_OPTION, new ImageIcon(images[4]));
                         //fragen,ob kachel mit den flaggen gelöscht werden soll
                         if (ret != JOptionPane.YES_OPTION) {
@@ -319,8 +319,8 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
                         }
                     }
                     try {
-                        parent.fassade.delTile(rx, ry);
-                        parent.fassade.setTile(rx, ry, 0, tileInfos[currentTile].toString());
+                        parent.facade.delTile(rx, ry);
+                        parent.facade.setTile(rx, ry, 0, tileInfos[currentTile].toString());
                     } catch (FlagPresentException ex) {
                         System.err.println("You cannot place here a field!");
                     }
@@ -329,15 +329,15 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
                 }
             case MODE_TILE_ENTFERNEN:
                 {
-                    if (parent.fassade.sindFlaggen(rx, ry)) {
+                    if (parent.facade.flagsOnTile(rx, ry)) {
                         //fragen,ob kachel mit den flaggen gelöscht werden soll
                         int ret = JOptionPane.showConfirmDialog(this, Message.say("Start", "mKachelLoeschen"), Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION, JOptionPane.DEFAULT_OPTION, new ImageIcon(images[4]));
                         if (ret == JOptionPane.YES_OPTION) {
-                            parent.fassade.delTile(rx, ry);
+                            parent.facade.delTile(rx, ry);
                             spf.rasterChanged();
                         }
                     } else {
-                        parent.fassade.delTile(rx, ry);
+                        parent.facade.delTile(rx, ry);
                         spf.rasterChanged();
                     }
 
@@ -345,7 +345,7 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
                 }
             case MODE_TILE_DREHEN:
                 {
-                    parent.fassade.rotTile(rx, ry);
+                    parent.facade.rotTile(rx, ry);
                     spf.rasterChanged();
 
                     break;
@@ -357,9 +357,9 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
         switch (currentMode) {
             case MODE_FLAGGE_SETZEN:
                 {
-                    kannFlaggeSetzen = parent.fassade.checkFlaggePos(rx * 12 + fx, ry * 12 + fy);
+                    kannFlaggeSetzen = parent.facade.legalFlagPosition(rx * 12 + fx, ry * 12 + fy);
                     if (kannFlaggeSetzen) {
-                        istFlaggeGut = parent.fassade.getFlaggeKomment(rx * 12 + fx, ry * 12 + fy);
+                        istFlaggeGut = parent.facade.reasonFlagIllegal(rx * 12 + fx, ry * 12 + fy);
                         if (istFlaggeGut.equals("")) {
                             setCursor(cursors[CURSOR_FLAGGE_SETZBAR]);
                         } else {
@@ -378,16 +378,16 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
             case MODE_FLAGGE_VERSCHIEBEN:
                 {
                     if (!flaggeGewaehlt) {
-                        istFlagge = parent.fassade.istFlagge(rx * 12 + fx, ry * 12 + fy);
+                        istFlagge = parent.facade.flagExists(rx * 12 + fx, ry * 12 + fy);
                         if (istFlagge) {
                             setCursor(cursors[CURSOR_FLAGGE_VERSCHIEBEN]);
                         } else {
                             setCursor(cursors[CURSOR_DEFAULT]);
                         }
                     } else {
-                        kannFlaggeSetzen = parent.fassade.checkFlaggeMovePos(rx * 12 + fx, ry * 12 + fy);
+                        kannFlaggeSetzen = parent.facade.legalFlagPosAfterMove(rx * 12 + fx, ry * 12 + fy);
                         if (kannFlaggeSetzen) {
-                            istFlaggeGut = parent.fassade.getFlaggeKomment(rx * 12 + fx, ry * 12 + fy);
+                            istFlaggeGut = parent.facade.reasonFlagIllegal(rx * 12 + fx, ry * 12 + fy);
                             if (istFlaggeGut.equals("")) {
                                 setCursor(cursors[CURSOR_FLAGGE_SETZBAR]);
                             } else {

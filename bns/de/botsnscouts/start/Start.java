@@ -44,7 +44,7 @@ public class Start extends JFrame implements WindowListener {
 
     private static final Category CAT = Category.getInstance(Start.class);
 
-    Facade fassade;
+    Facade facade;
 
     protected Paint paint;
     private MainMenu mainMenu;                // Start screen
@@ -76,9 +76,9 @@ public class Start extends JFrame implements WindowListener {
         wth = new WaiterThread(this);
         Dimension ssize = BotsNScouts.getScreenSize();
         if (ssize.height < 600) {
-            fassade = new Facade(150);
+            facade = new Facade(150);
         } else {
-            fassade = new Facade();
+            facade = new Facade();
         }
         setSize(ssize);
         setLocation(0, 0);
@@ -152,7 +152,7 @@ public class Start extends JFrame implements WindowListener {
                     Thread.sleep(1000);
                 } catch (InterruptedException ie) {
                 }
-                fassade.prepareTiles();
+                facade.prepareTiles();
             }
         }).start();
     }
@@ -187,7 +187,7 @@ public class Start extends JFrame implements WindowListener {
     }
 
     public void resetWaiter() {
-        wth.beende();
+        wth.quitYourself();
         wth.reset();
         wth = new WaiterThread(this);
     }
@@ -260,7 +260,7 @@ public class Start extends JFrame implements WindowListener {
                     fieldEditor.spf.addTileClickListener(fieldEditor);
                     fieldEditor.fuerSpf.add(fieldEditor.spf);
                 }
-                fassade.saveTileRaster();
+                facade.saveTileRaster();
                 switchCard(FIELD_EDITOR);
                 stopBusy();
             }
@@ -276,7 +276,7 @@ public class Start extends JFrame implements WindowListener {
                         startPanel = new StartPanel(Start.this);
                         getContentPane().add(startPanel, START);
                     }
-                    fassade.startGame(startPanel.getListener());//starte Spiel
+                    facade.startGame(startPanel.getListener());//starte Spiel
                     addServer();
                     postServerStartTask.doIt();
 
@@ -346,22 +346,22 @@ public class Start extends JFrame implements WindowListener {
                 Facade fassade = new Facade();
                 Properties prop = loader.getProperties(spielfeld);
                 CAT.debug("Properties " + prop);
-                fassade.loadSpfProp(prop);
+                fassade.loadBoardFromProperties(prop);
                 CAT.debug("Spielfed loaded");
                 fassade.startGame();
                 CAT.debug("Server gestartet");
                 if (argv[2].equals("yes")) {
-                    fassade.amSpielTeilnehmen(KrimsKrams.randomName(), 0);
+                    fassade.participateInAGame(KrimsKrams.randomName(), 0);
                     CAT.debug("Menschlichen Spieler gestartet");
                 } else {
-                    fassade.einemSpielZuschauen();
+                    fassade.watchAGame();
                     CAT.debug("Ausgabe gestartet");
                 }
                 int anzKS = 0;
                 try {
                     anzKS = Integer.parseInt(argv[3]);
                     for (int i = 0; i < anzKS; i++) {
-                        fassade.kuenstlicheSpielerStarten(40, true);
+                        fassade.startAutoBot(40, true);
                         CAT.debug("Künstlichen Spieler gestartet");
                     }
                 } catch (NumberFormatException e) {

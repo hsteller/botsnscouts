@@ -66,7 +66,7 @@ class PlayersPanel extends ColoredPanel {
         setOpaque(false);
     }
 
-    public void neurob(String name, int farbe) {
+    public void newBotEntered(String name, int farbe) {
         map.put(name, new Integer(farbe));
         Global.debug(this, "neuer roboter:" + name + BoardView.ROBOCOLOR[farbe]);
         names.addElement(name);
@@ -74,7 +74,7 @@ class PlayersPanel extends ColoredPanel {
         parent.show();
     }
 
-    public void spGL() {
+    public void gameStarted() {
         Global.debug(this, "Spiel geht los");
         parent.beenden();
     }

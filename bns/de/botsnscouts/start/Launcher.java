@@ -40,7 +40,7 @@ public class Launcher {
     private Server server;
 
     // launches output
-    public Thread einemSpielZuschauen(String ip, int port, boolean noSplash) {
+    public Thread watchAGame(String ip, int port, boolean noSplash) {
         Thread ret;
         try {
             ret = new BNSThread(new Ausgabe(ip, port, noSplash));
@@ -52,7 +52,7 @@ public class Launcher {
     }
 
     // launches human player
-    public Thread amSpielTeilnehmen(String ip, int port, String name, int farbe, boolean noSplash) {
+    public Thread participateInAGame(String ip, int port, String name, int farbe, boolean noSplash) {
         Thread ret;
         try {
             if (CAT.isDebugEnabled()) CAT.debug("Trying to start human player...");
@@ -83,7 +83,7 @@ public class Launcher {
         return ks;
     }
 
-    public void startGame(GameOptions options, StSpListener listener) throws OneFlagException, NonContiguousMapException {
+    public void startGame(GameOptions options, ServerObserver listener) throws OneFlagException, NonContiguousMapException {
        server = new Server(options, listener);
        server.start();
    }

@@ -55,7 +55,7 @@ public class StartPanel extends JPanel {
     private JComponent autobotComponent;
     private JComponent localComponent;
 
-    private StSpListener listener;
+    private ServerObserver listener;
 
     private JSlider intel;
     private JTextField name;
@@ -77,7 +77,7 @@ public class StartPanel extends JPanel {
         okComponent = getOkComponent();
         autobotComponent = getABComponent();
         localComponent = getLocalComponent();
-        listener = new StSpListener(playersComponent);
+        listener = new ServerObserver(playersComponent);
         listener.start();
 
         angem.setFont(font);
@@ -102,7 +102,7 @@ public class StartPanel extends JPanel {
         add(BorderLayout.EAST, panel);
     }
 
-    StSpListener getListener() {
+    ServerObserver getListener() {
         return listener;
     }
 
@@ -166,7 +166,7 @@ public class StartPanel extends JPanel {
                 new Thread() {
                     public void run() {
                         CAT.debug("Button pressed. Going to register " + name.getText());
-                        Thread player = parent.fassade.amSpielTeilnehmenNoSplash(name.getText(), color.getSelectedIndex());
+                        Thread player = parent.facade.participateInAGameNoSplash(name.getText(), color.getSelectedIndex());
                         parent.addKS(player);
                         //Generate a new name for the (potential) next local player
                         name.setText(KrimsKrams.randomName());
@@ -293,7 +293,7 @@ public class StartPanel extends JPanel {
                 String name = botNameField.getText();
                 if (name == null || name.length() == 0)
                     name = KrimsKrams.randomName();
-                parent.addKS(parent.fassade.kuenstlicheSpielerStarten(intel.getValue(),
+                parent.addKS(parent.facade.startAutoBot(intel.getValue(),
                         beltAware.getModel().isSelected(), name));
 
                 botNameField.setText(KrimsKrams.randomName());
@@ -331,7 +331,7 @@ public class StartPanel extends JPanel {
                 CAT.debug("Start-button pressed.");
                 if (playersComponent.names.size() != 8) {
                     CAT.debug("Going to kick the server to get really going...");
-                    parent.fassade.gameStarts();
+                    parent.facade.gameStarts();
                     parent.hide();
                     //parent.beenden(); // will be done in playerspanel
                 }
@@ -339,7 +339,7 @@ public class StartPanel extends JPanel {
         });
         backBut.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                parent.fassade.killServer();
+                parent.facade.killServer();
                 parent.resetWaiter();
                 listener.closeSock();
                 parent.showGameFieldPanel();

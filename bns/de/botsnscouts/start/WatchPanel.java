@@ -113,7 +113,7 @@ public class WatchPanel extends JPanel implements ActionListener, MouseListener 
             System.err.println("Must be a number!");
             return;
             }*/
-            Thread ausgabe = parent.fassade.einemSpielZuschauen(serv.getText(), portnr);
+            Thread ausgabe = parent.facade.watchAGame(serv.getText(), portnr);
             parent.addKS(ausgabe);
             parent.hide();
             parent.dispose();
