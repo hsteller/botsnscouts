@@ -1011,9 +1011,12 @@ private void roboterThreadStart(){
 
 	    // Karten an die Roboter verteilen die nicht zerstoert oder deaktiviert sind
 	    // warten auf die Karten der Roboter (Timeout)
+	    Karte[] cards = new Karte[gesperrteKarten.size()];
+	    for (int i=0; i<gesperrteKarten.size(); i++) 
+		cards[i] = (Karte )gesperrteKarten.get(i);
 
-	    KartenStapel stapel = new KartenStapel(gesperrteKarten);
-	    
+	    KartenStapel stapel = new KartenStapel(cards);
+	    d("Neuer Stapel: "+stapel);
 	    rThreadsAufDieIchWarte = new Vector();
 	    for(Iterator e=aktRoboter.iterator();e.hasNext();) {
 		ServerRoboterThread tmp = ((ServerRoboterThread )e.next());

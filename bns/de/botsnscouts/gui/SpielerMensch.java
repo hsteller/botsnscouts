@@ -5,6 +5,8 @@ import  de.botsnscouts.util.*;
 import  de.botsnscouts.comm.*;
 import  de.botsnscouts.autobot.*;
 import  de.botsnscouts.board.*;
+import de.botsnscouts.server.KartenStapel; 
+
 import java.awt.*;
 import java.io.*;
 import java.net.*;
@@ -265,7 +267,7 @@ public class SpielerMensch extends Thread {
 
 	    // ------- belegte Register in den Robbi einsetzen
 	    for (int m = 0; m < moeglichePhasen; m++) {
-		Karte ka = new Karte(uI.register[m].kartePrio,uI.register[m].karteName);
+		Karte ka = KartenStapel.get(uI.register[m].kartePrio,uI.register[m].karteName);
 		doPhaseRob[0].setZug(m, ka);
 	    }
 	    doPhaseRob[0].zeige_Roboter();
@@ -321,7 +323,7 @@ public class SpielerMensch extends Thread {
 	// gelegte Karten in das enstprechende gesperrte Register des Robis packen
 	for (int l = 0; l<5;l++) {
 	    if (!uI.register[l].istFrei()) {
-		r.sperreRegister(l,  new Karte(uI.register[l].kartePrio,uI.register[l].karteName));
+		r.sperreRegister(l,  KartenStapel.get(uI.register[l].kartePrio,uI.register[l].karteName));       
 	    }
 	}
 	// gesperrte Register in r.zug schreiben
@@ -534,7 +536,7 @@ public class SpielerMensch extends Thread {
     /**
      * Klugscheisser-Karte, die auf ein KartenCanvas verweist
      */
-    private class KlugKarte extends Karte{
+    private class KlugKarte extends de.botsnscouts.server.KarteImpl{
 	KarteCanvas k;
 	public KlugKarte(KarteCanvas kin){
 	    super(kin.prio,kin.ktyp);
@@ -566,7 +568,9 @@ public class SpielerMensch extends Thread {
 	    g.drawImage(img,0,0,this);
 	    g.setFont(new Font("SansSerif",Font.PLAIN,8));
 	    g.setColor(Color.darkGray);
-	    if ((status == FREI) && (prio>0)) g.drawString(""+prio,23,19);
+	    //Miriam: priority is multiplies by ten because the cards
+	    // look better then.
+	    if ((status == FREI) && (prio>0)) g.drawString(""+10*prio,23,19);
 	    if (klugScheisser) g.drawImage(Images.KSCHEISSER,25,42,this);
 	}
 
@@ -611,7 +615,7 @@ public class SpielerMensch extends Thread {
 	 */
 	public void neueKarte(Karte k, int austeilNummer)
 	{
-	    prio = (10*k.getprio());
+	    prio = (k.getprio());
 	    bornprio = prio;
 	    austeilNum = (austeilNummer+1);
 	    ktyp = k.getaktion();
@@ -657,7 +661,7 @@ public class SpielerMensch extends Thread {
 	    if (kartePrio > 0) {
 		g.setFont(new Font("SansSerif",0,8));
 		g.setColor(Color.darkGray);
-		g.drawString(""+kartePrio,23,19);}
+		g.drawString(""+kartePrio*10,23,19);}
 	    if (status == GESPERRT) {
 		g.setFont(new Font("SansSerif",Font.BOLD,10));
 		g.setColor(Color.red);

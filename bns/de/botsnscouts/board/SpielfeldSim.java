@@ -920,18 +920,16 @@ public Vector getLasers(){
       if (robbi.getSchaden()>=5) {
 	for (int i=4;i>=0;i--){
 	  if (robbi.getGesperrteRegister()[i]==null) {
-	    if (robbi.getZug()[i] == null)
-		robbi.sperreRegister(i, null);
-	    else{
-	        robbi.sperreRegister(i, new Karte(robbi.getZug(i).getprio(),robbi.getZug(i).getaktion()));
-		d("Sperre Register "+i);
-	    }
-	    return;
+	      if (robbi.getZug()[i] != null){
+		  robbi.sperreReg(i);
+		  d("Sperre Register "+i);
+	      }
+	      return;
 	  }
 	} // for
       } // if
     } // registerSperren ende
-
+    
     protected void d(String s){
 	if (debugmeldungen){
 		Global.debug(this,s);

@@ -37,13 +37,14 @@ public interface HumanViewInterface {
     /**
      * display the fresh cards that the server has sent
      */
-    public void showRegisterRepair();
+    //    public void showRegisterRepair();
 
     /**
      * display the fresh cards that the server has sent
-     */
-    public void showRegisterRepair();
-
+     * Miriam: Auskommentiert, damit es uebersetzt. Dreimal die gleiche Signatur!
+  */
+    //public void showRegisterRepair();
+   
 
 }
 

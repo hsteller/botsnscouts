@@ -56,21 +56,7 @@ public class ServerRoboterThread extends Thread
                                 rob.setNaechsteRundeDeaktiviert(ans.ok); // PowerDown?
                                 
                                 d("Setze Programmierung um.");
-                                // Zug loeschen
-                                for (int i=0;i<5;i++)
-                                    rob.setZug(i,null);
-                                
-                                // gesperrte Register kopieren
-                                for (int i=0;i<5;i++)
-                                    if (rob.getGesperrteRegister(i)!=null)
-                                        rob.setZug(i,rob.getGesperrteRegister(i));
-
-                                // Programmierung umsetzen
-                                int ansidx=0;
-                                for (int i=0;i<5;i++)
-                                    if (rob.getZug(i)==null)
-                                        rob.setZug(i,rob.getKarten()[ans.register[ansidx++]-1]);
-                                
+				rob.program(ans.register);
                                 d("Programmierung umgesetzt. Roboter:");
                                 rob.zeige_Roboter();
                                 
@@ -120,7 +106,7 @@ public class ServerRoboterThread extends Thread
                                 }
                                 
                                 for (int i=0;i<ans.register.length;i++)
-                                    rob.sperreRegister(ans.register[i]-1, null);
+				    rob.entsperreReg(ans.register[i]-1);
                                 
 				notifyServer();
 

@@ -3,175 +3,96 @@ package de.botsnscouts.server;
 import java.util.Random;
 import java.util.*;
 import de.botsnscouts.util.Karte;
+import de.botsnscouts.util.Global;
 
+/** Card deck
+ *  gibKarte() returns a random card from the deck
+ *  @author Miriam
+ */
 
-/**
- * KartenStapel enthält die Karten die im Spiel benutzt werden.
- * Die Art der Karten ist festgelegt (kann nicht ohne Neukompilieren geändert werden).
- * Beim Initialisieren wird ein gemischter Stapel erzeugt. Von ihm kann man Karten mit
- * der Hilfe der Metode gibKarte() ziehen.
- * @version 1.0 (uralt)
- * TODO: Neu programmieren oder durchlesen und verstehen!!!! (Miriam)
-*/
-public class KartenStapel
-{
-    //die Menge der ganzen Karten
-    private static Karte[] KartenMenge = {
-	new Karte(49,"M1"),
-	new Karte(50,"M1"),
-	new Karte(51,"M1"),
-	new Karte(52,"M1"),
-	new Karte(53,"M1"),
-	new Karte(54,"M1"),
-	new Karte(55,"M1"),
-	new Karte(56,"M1"),
-	new Karte(57,"M1"),
-	new Karte(58,"M1"),
-	new Karte(59,"M1"),
-	new Karte(60,"M1"),
-	new Karte(61,"M1"),
-	new Karte(62,"M1"),
-	new Karte(63,"M1"),
-	new Karte(64,"M1"),
-	new Karte(65,"M1"),
-	new Karte(66,"M1"),
+public class KartenStapel {
 
-	new Karte(67,"M2"),
-	new Karte(68,"M2"),
-	new Karte(69,"M2"),
-	new Karte(70,"M2"),
-	new Karte(71,"M2"),
-	new Karte(72,"M2"),
-	new Karte(73,"M2"),
-	new Karte(74,"M2"),
-	new Karte(75,"M2"),
-	new Karte(76,"M2"),
-	new Karte(77,"M2"),
-	new Karte(78,"M2"),
+    /** Different kinds of cards */
+    public static final String[] types = {"UT","RR","RL","BU","M1","M2","M3"};
+    /** Number of each type of cards */
+    public static final int[] nr = {6,18,18,6,17,13,6};
+    
+    /** Array of all valid cards 
+     *  Invariant: The cards are kept sorted by priority.
+     */
+    private static KarteImpl[] allCards = null;
 
-	new Karte(79,"M3"),
-	new Karte(80,"M3"),
-	new Karte(81,"M3"),
-	new Karte(82,"M3"),
-	new Karte(83,"M3"),
-	new Karte(84,"M3"),
+    //    private static KarteImpl[] ktypes;
 
-	new Karte(43,"BU"),
-	new Karte(44,"BU"),
-	new Karte(45,"BU"),
-	new Karte(46,"BU"),
-	new Karte(47,"BU"),
-	new Karte(48,"BU"),
+    /** The real card deck */
+    private Vector deck = new Vector();
 
-	new Karte(7,"RL"),
-	new Karte(9,"RL"),
-	new Karte(11,"RL"),
-	new Karte(13,"RL"),
-	new Karte(15,"RL"),
-	new Karte(17,"RL"),
-	new Karte(19,"RL"),
-	new Karte(21,"RL"),
-	new Karte(23,"RL"),
-	new Karte(25,"RL"),
-	new Karte(27,"RL"),
-	new Karte(29,"RL"),
-	new Karte(31,"RL"),
-	new Karte(33,"RL"),
-	new Karte(35,"RL"),
-	new Karte(37,"RL"),
-	new Karte(39,"RL"),
-	new Karte(41,"RL"),
+    private java.util.Random random = new Random(); 
 
-	new Karte(8,"RR"),
-	new Karte(10,"RR"),
-	new Karte(12,"RR"),
-	new Karte(14,"RR"),
-	new Karte(16,"RR"),
-	new Karte(18,"RR"),
-	new Karte(20,"RR"),
-	new Karte(22,"RR"),
-	new Karte(24,"RR"),
-	new Karte(26,"RR"),
-	new Karte(28,"RR"),
-	new Karte(30,"RR"),
-	new Karte(32,"RR"),
-	new Karte(34,"RR"),
-	new Karte(36,"RR"),
-	new Karte(38,"RR"),
-	new Karte(40,"RR"),
-	new Karte(42,"RR"),
+    /** creates a new card deck respecting which card are stuck in
+     *  locked registers.
+     *  @param Vector locked - the cards that are not present in the 
+     *  new desk.
+     */
 
-	new Karte(1,"UT"),
-	new Karte(2,"UT"),
-	new Karte(3,"UT"),
-	new Karte(4,"UT"),
-	new Karte(5,"UT"),
-	new Karte(6,"UT")
-	    };
+    protected KartenStapel (Karte[] locked) {
 
-    // ein einziges Attribut
-    private Karte[] stapel;
-    private int schonVerteilteKarten;
-  
-	/**
-	 * Dem Konstruktor werden die gesperten karten uebergeben.
-	 * Die gesperten Karten werden im Stapel nicht mitgemischt	
-	    * @param gespert Ein Array mit den gesperten Karten
-	    */
+	// Initialize allCards - only needed one time
+	createAllCardsIfNeeded();
+	// -----------------------------------------
 
-    public KartenStapel(Vector gespert)
-    { 
-	schonVerteilteKarten=0;
-	int AnzahlderFreienKarten = 84-gespert.size();
-	stapel=new Karte[AnzahlderFreienKarten];
-	int zInStapel=0;
-	// stapel wird mit den noch nicht gesperten Karten gefühlt
-	for(int z=0;z<84;z++)
-	    {
-		if (!istKarteInArray(gespert,KartenMenge[z]))
-		    {
-			stapel[zInStapel] = KartenMenge[z];
-			zInStapel++;	
-		    }
+	java.util.Arrays.sort(locked);
+	int cLocked = 0;
+	for (int i=0; i < allCards.length; i++){
+	    if (cLocked < locked.length && locked[cLocked].equals(allCards[i])){
+		cLocked++;
+		continue;
 	    }
-
-	mische();
+	    deck.add(allCards[i]);
+	}
     }
 
 
-    /**
-	    * Erzeugt neuen Stapel mit 84 Karten. 
-	    */
-    public KartenStapel()
-    { 
-	schonVerteilteKarten=0;
-	int AnzahlderFreienKarten = 84;
-	stapel=new Karte[AnzahlderFreienKarten];
-	for(int z=0;z<84;z++)
-	    {
-		stapel[z]=new Karte(0,"");
-		stapel[z]= KartenMenge[z];
-	    }
-	mische();
+
+    /** creates new card deck */
+    protected KartenStapel() { 
+	this(new Karte[0]);
     }
 
-    /**
-	* Die Metode gibt eine Karte zurück, wenn der Stapel nicht leer ist, sonst - null.
-	* @return eine Karte aus dem Stapel
-	*/ 
-    public Karte gibKarte()
-    {
-		
-	if (schonVerteilteKarten==stapel.length)		
-	    return null;
-	else
-	    {
-		schonVerteilteKarten++;
-		return	stapel[schonVerteilteKarten-1];
+
+    private static void createAllCardsIfNeeded() {
+	if (allCards==null){
+	    int size = 0;
+	    for (int i=0; i<nr.length; i++) {
+		size += nr[i];
 	    }
+	    Global.debug("Es gibt "+size+" Karten im Spiel.");
+	    allCards = new KarteImpl[size];
+	    int i=0; 
+	    int max = 0;
+	    for (int n=0; n<nr.length; n++){ 
+		max += nr[n]; 
+		for(; i<max; i++){ 
+		    
+		    allCards[i] = new KarteImpl(i+1, types[n]);
+		    Global.debug(allCards[i].toString()+" erzeugt.");
+		}
+	    }
+	    //debug - wieder raus
+
+	}
     }
 
-    /** Ist noch schoener zu machen: 
+    /** returns a card from the card deck
+     * Pre: card deck is not empty.
+     */
+    protected Karte gibKarte() {
+	int index = random.nextInt(deck.size());
+	Karte k = (Karte )deck.remove(index);
+	return k;
+    }
+    
+    /** returns an array of n cards from the deck.
      * PRE: Es werden nicht zu viele Karten vom Server verteilt.
      *
      */
@@ -183,36 +104,38 @@ public class KartenStapel
 	return k;
     }
 
-    private void mische()
-    {
-	Random rand=new Random();
-	int stapL=stapel.length;
-	int schonGemischt=0;
-	Karte k=new Karte(0,"");
-	while(schonGemischt<(stapL-1))
-	    {
-		int r=rand.nextInt()%(stapL-1-schonGemischt);
-		if(r<0) r=(-r);
-		k=stapel[stapL-1-schonGemischt];
-		stapel[stapL-1-schonGemischt]=stapel[r];
-		stapel[r]=k;
-		schonGemischt++;
-	    }
+    /* returns the Card with a given priority.
+     * We ignore the string... (depricated)
+     */
+
+    public static Karte get(int prio, String action){
+	createAllCardsIfNeeded();
+	return allCards[prio-1];
     }
-	
-    // TRUE <=> k ist in Arr vorhanden
-    private boolean istKarteInArray(Vector v, Karte k)
-    {
-	if (v==null) return false;
-	int vl=v.size();
-	for(int i=0;i<vl;i++){
-	    Karte von_v=(Karte)v.elementAt(i);
-	    if ((von_v.getprio()==k.getprio())&&(von_v.getaktion()==k.getaktion()))
-		{
-		    return true;
-		}
+
+
+    /** returns one card as a reference for a kind of cards 
+     *  null if String is invalid.
+     */
+    public static Karte getRefCard(String kind){
+	createAllCardsIfNeeded();
+	int pos = 0;
+	for (int i=0; i < types.length; i++) {
+	    if (!types[i].equals(kind))
+		pos += nr[i];
+	    else
+		return allCards[pos];
 	}
-	return false;
+	return null; // String wasn't valid.
+    }
+
+    public String toString(){
+	StringBuffer s = new StringBuffer("(");
+	for (Iterator i=deck.iterator(); i.hasNext();){
+	    s.append(((KarteImpl )i.next()).toString()+" ");
+	}
+	s.append(")");
+	return new String(s);
     }
 
 }	 

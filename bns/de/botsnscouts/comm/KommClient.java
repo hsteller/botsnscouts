@@ -1,8 +1,13 @@
 package de.botsnscouts.comm;
+
 import de.botsnscouts.util.*;
+import de.botsnscouts.server.KartenStapel;
+
 import java.io.*;
 import java.util.*;
 import java.net.*;
+
+
 /** The parent class for all clientside communication.
     Very 'advanced' parsing of Strings.
  *@author Hendrik  
@@ -317,7 +322,7 @@ public class KommClient {
 					String pri=work.substring(komma+1);
 					try {
 					    int prio=Integer.parseInt(pri);
-					    karten1 [count]= new Karte (prio, art);
+					    karten1 [count]= KartenStapel.get(prio, art);
 					}
 					catch (NumberFormatException nme) {
 					    error=true;
@@ -1099,7 +1104,7 @@ public class KommClient {
 			throw new KommException ("NumberFormatException bei KC.getStatusRegs; Message: "+nfe.getMessage());
 		    }
 	  
-		    back.register[i]= new Karte (p, akt);
+		    back.register[i]= KartenStapel.get(p, akt);
 		    i++;
 		    in = in.substring(klazu+1);
 		    // System.out.println ("Beende While-Loop mit: "+in);
@@ -1150,7 +1155,7 @@ public class KommClient {
 		catch (NumberFormatException nf2) {
 		    throw new KommException ("getRegister: NumberFormatException bei Parsen der Kartenprioritaet: Message: "+nf2.getMessage());
 		}			 
-		back [register-1]=new Karte(prioritaet,kartenaktion); // Karte eingeteilt
+		back [register-1]=KartenStapel.get(prioritaet,kartenaktion); // Karte eingeteilt
 		//jetzt String aktualisieren:
 
 		active=active.substring(klzu+3); // "1,PK(M1,123))(" abschneiden    KLZU+1

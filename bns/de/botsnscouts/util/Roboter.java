@@ -63,8 +63,9 @@ public class Roboter {
     protected Karte[] zug = new Karte[ANZREG];
     /**
      * enthält die Karten der gesperrten Register 
+     * Invariant: gesperrteRegister[i] -> zug[i] ist gesperrt.
      */
-    protected Karte[] gesperrteRegister = new Karte[ANZREG];	// null wenn nichts gesoert ist
+    protected boolean[] gesperrteRegister = new boolean[ANZREG];	
 
     /** Zugeteilte Karten */
     protected Karte[] karten = new Karte[ANZKARTEN];
@@ -243,13 +244,28 @@ public class Roboter {
 	return (schaden==10) && pos.equals(grube);
     }
 
-
+    /** returns the card locked at register i. null it isn't locked.
+     */
     public Karte getGesperrteRegister(int i){
-	return gesperrteRegister[i];
+	if (gesperrteRegister[i])
+	    return zug[i];
+	else
+	    return null;
     }
 
+    /** returns an array which hold a card at position i if register i is
+	locked, null otherwise
+	This method is to be eliminated!
+    */
     public Karte[] getGesperrteRegister() {
-	return gesperrteRegister;
+	Karte[] regs = new Karte[ANZREG];
+	for (int i=0; i < ANZREG; i++){
+	    if (gesperrteRegister[i])
+		regs[i]=zug[i];
+	    else
+		regs[i]=null;
+	}
+	return regs;
     }
 
     public Karte getZug(int i){
@@ -301,16 +317,16 @@ public class Roboter {
      */
     public int gesperrteRegs() {
 	int c=0;
-	for (int i=0; i<5; i++)
-	    if (gesperrteRegister[i]!=null)
+	for (int i=0; i<ANZREG; i++)
+	    if (gesperrteRegister[i])
 		c++;
 	return c;
     }
 	
     /** entsperrt alle Register */
     public void entsperreAlleRegs() {
-	for (int i=0; i<5; i++)
-	    gesperrteRegister[i] = null;
+	for (int i=0; i<ANZREG; i++)
+	    gesperrteRegister[i] = false;
     }
 
     /** Aktuelle Position wird archiviert. */
@@ -427,23 +443,40 @@ public class Roboter {
 	pos.set(archivX, archivY);
     }
 
-    /** Register n wird gesperrt, es liegt gerade Karte karte 
-	(Rückwartskompatibilität, eigentlich sollte sperreReg(int i)
-	aufgerufen werden.
+    /** Register n wird gesperrt und mit Karte k belegt. 
+     *  @deprecated Eigentlich hat man die entsprechende Karte ja bereits im letzten Zug drin!!!
      */
-    public void sperreRegister(int n, Karte karte) {
-	gesperrteRegister[n] = karte;
+    public void sperreRegister(int i, Karte k){
+	zug[i] = k;
+	gesperrteRegister[i] = true;
     }
+
+
+    /** Register n wird gesperrt, 
+     */
 
     public void sperreReg(int n){
-	gesperrteRegister[n] = zug[n];
+	gesperrteRegister[n] = true;
+    }
+
+
+    public void entsperreReg(int n){
+	gesperrteRegister[n] = false;
     }
     
-    
+    /* to be eliminated: */
 
     public void sperreRegister(Karte[] karten) {
-	gesperrteRegister = karten;
+	for (int i = 0; i < ANZREG; i++){
+	    if (karten[i]==null)
+		gesperrteRegister[i] = false;
+	    else {
+		gesperrteRegister[i] = true;
+		zug[i] = karten[i];
+	    }
+	}
     }
+
 
     public void setZug(int i, Karte karte) {
 	zug[i] = karte;
@@ -451,7 +484,7 @@ public class Roboter {
 
 
     /** Neue Karten werden vom Server zugeteilt.
-     *  Pre: Das Array kommt frisch vom Kartenstapel und ist nur fuer mich da!
+     *  
      *  Der Roboter bekommt nur so viele Karten, wie er bekommen soll.
      *  Wird mit null aufgefuellt.
      */
@@ -463,6 +496,25 @@ public class Roboter {
 	for (; i < ANZKARTEN; i++){
 	    this.karten[i] = null;
 	}
+    }
+
+    /** Programm the register.
+     *  This means: set "zug" according to the cards I have in "Karten"
+     * and the locked registers.
+     * @param Array which tells how to programm: Includes the index in "karten"
+     * of the card to be put in the register. The array is one shorter for
+     * each lockes register.
+     * Pre: register includes only values from 1 to deales cards+1.
+
+     */
+    public void program (int[] register){
+	int j=0;
+	for (int i=0; i < ANZREG; i++){
+	    if (!gesperrteRegister[i]){
+		zug[i] = karten[register[j++]-1];
+	    }
+	}
+
     }
 
     public String toString()
@@ -480,8 +532,8 @@ public class Roboter {
 				
             s+="\ngesperrteRegister: ";
             for(int i=0;i<5;i++)
-                if (gesperrteRegister[i]!=null)
-                    s+="["+gesperrteRegister[i].getprio()+"|"+gesperrteRegister[i].getaktion()+"] ";
+                if (gesperrteRegister[i])
+                    s+="["+zug[i].getprio()+"|"+zug[i].getaktion()+"] ";
                 else
                     s+="#";
 						

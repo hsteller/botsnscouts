@@ -9,6 +9,7 @@ package de.botsnscouts.autobot;
 import de.botsnscouts.board.SpielfeldKS;
 import de.botsnscouts.util.*;
 import de.botsnscouts.board.BoardRoboter;
+import de.botsnscouts.server.KartenStapel;
 
 public class Permu {
 
@@ -17,11 +18,11 @@ public class Permu {
     private int bestScore;
     private int malus;
 
-    private static final Karte[] zuege = { new Karte(110,"RL"), 
-                                           new Karte(110,"M1"),
-                                           new Karte(110,"M2"),
-                                           new Karte(110,"M3"),
-                                           new Karte(110,"BU") };
+    private static final Karte[] zuege = { KartenStapel.getRefCard("RL"), 
+                                           KartenStapel.getRefCard("M1"),
+                                           KartenStapel.getRefCard("M2"),
+                                           KartenStapel.getRefCard("M3"),
+                                           KartenStapel.getRefCard("BU")};
     private static final int[] zuegemali = { 25, 15, 15, 15, 10 };
     private static final int zuegemalisumme = 80;
 
