@@ -85,23 +85,6 @@ public class SACanvas extends JComponent {
     private java.util.Hashtable nameToColorHash;
     private boolean gotColors;
 
-
-
-    /** sounds for robotlasers*/
-    private static AudioClip [] laserSounds;
-
-    /** YOU MUST NOT USE THIS VARIABLE DIRECTLY.
-	use isSoundActive() instead.
-        Used to check whether sounds should be played or not*/
-    private boolean soundActive;
-
-    /** Do we have sounds to play?*/
-    private boolean soundsLoaded=false;
-
-    /** Stores the position (in laserSounds) of the last played lasersound.*/
-    private int laserWavCount;
-
-
     /** where are the sounds, if we are not using getResource() to find out */
     //  private static final String SOUND_DIR="de/botsnscouts/sounds";
     /** used to select the file(types) we want*/
@@ -192,91 +175,10 @@ public class SACanvas extends JComponent {
 
 
 
-    private void loadSounds() {
-	if (soundsLoaded)
-	    return;
-	Thread t = new Thread () {
-		public void run() {
-		    CAT.debug("Initializing sounds..");
 
-		    // if not in a jar..
-		    /*
-		    File f = new File (SOUND_DIR);
-		    CAT.error("SOUND_DIR="+f.getAbsolutePath());
 
-		    if (f!=null && f.exists() && f.isDirectory()){
-			String [] list = f.list(soundFilter);
-			if (list == null) {
-			    CAT.debug("Got no sounds!");
-			    return;
-			}
-			CAT.debug("Got "+list.length+" sounds");
 
-			URL u = null;
-			AudioClip a = null;
-			Vector v = new Vector();
-			String s = null;
-			for (int i=0;i<list.length;i++){
-			    s = list [i];
-			    CAT.debug("Trying to load sound: "+s);
-			    u = BotsNScouts.class.getResource("sounds/"+s);
-			    CAT.debug("sound-url: "+(u==null?"null":u.toString()));
-			    if (u==null)
-				a = Applet.newAudioClip(u);
-			    if (a!=null)
-				v.add(a);
-			}
 
-			int l = v.size();
-			laserSounds = new AudioClip [l];
-			for (int i=0;i<l;i++)
-			    laserSounds[i] = (AudioClip) v.elementAt(i);
-			soundsLoaded=true;
-			CAT.debug("Sounds loaded!");
-		    }
-		    else {
-			CAT.error("Error!: Unable to load sounds from "+SOUND_DIR);
-		    }
-		    */
-		    // fuer Jars
-		    laserSounds = new AudioClip[2];
-                    CAT.debug("loading sounds/laserhit.wav..");
-		    laserSounds [0] = Applet.newAudioClip(BotsNScouts.class.getResource("sounds/laserhit.wav"));
-                    if (CAT.isDebugEnabled()){
-                      CAT.debug("..done");
-                      CAT.debug("loading sounds/laser2.wav..");
-                    }
-		    laserSounds [1] = Applet.newAudioClip(BotsNScouts.class.getResource("sounds/laser2.wav"));
-		    CAT.debug("..done");
-
-                    boolean error = false;
-		    if (laserSounds [0] == null) {
-			CAT.warn("laserhit.wav not located :-(");
-			error=true;
-		    }
-		    if (laserSounds [1] == null){
-			CAT.warn("laser2.wav not located :-(");
-			error = true;
-		    }
-		    if (error)
-			CAT.error("Failed to load sounds; sounds deactivated");
-		    else{
-			CAT.debug("Sounds loaded!");
-			soundsLoaded=true;
-		    }
-		}
-	    };
-	t.start();
-    }
-
-    public boolean isSoundActive() {
-	return soundsLoaded && soundActive;
-    }
-
-    public void setSoundActive(boolean on) {
-	CAT.debug("sound was set to "+on);
-	soundActive = on;
-    }
 
     private void init(SpielfeldSim sf_neu, Color [] robColors) {
 	//robocolor2=robColors;
@@ -287,7 +189,6 @@ public class SACanvas extends JComponent {
 	sf=sf_neu;
 	//x=(sf.boden.length-2)*64;
 	//y=(sf.boden[0].length-2)*64;
-	loadSounds();
 	setDoubleBuffered( true );
 	setScale( dScale ); // does setSize()
 	//setSize(x,y);
@@ -430,17 +331,17 @@ public class SACanvas extends JComponent {
 	laenge*=64;
 
 	Color c = getRobColor(sourceRob.getName());
-	if (isSoundActive()) {
-	    laserSounds[laserWavCount%(laserSounds.length)].play();
-	    synchronized(this){
-		try {
-		    wait (50);
-		}
-		catch (InterruptedException ie){
-		    System.err.println ("SACanvas.paint: wait interrupted");
-		}
-	    }
-	}
+
+        SoundMan.playNextLaserSound();
+        synchronized(this){
+	  try {
+	    wait (50);
+          }
+	  catch (InterruptedException ie){
+	    System.err.println ("SACanvas.paint: wait interrupted");
+	  }
+        }
+
 
 	for(int i=1; i<=FULL_LENGTH_INT; i++) {
 	    int tmp_laenge=(int) ((((double)i)/FULL_LENGTH_DOUBLE)*laenge);
@@ -458,7 +359,7 @@ public class SACanvas extends JComponent {
 	     }
 	}
 	// drawRobLaser=false;
-	if (isSoundActive()) {
+	if (SoundMan.isSoundActive()) {
 	    synchronized(this){
 		try {
 		    wait (200);
@@ -467,7 +368,6 @@ public class SACanvas extends JComponent {
 		    System.err.println ("SACanvas.paint: wait interrupted");
 		}
 	    }
-	    ++laserWavCount;
 	}
 	repaint();
 
