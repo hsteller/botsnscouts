@@ -162,6 +162,9 @@ public class BoardView extends JComponent {
     ClickListener myClickListener;
 
 
+    private int delay=AusgabeView.MEDIUM;
+    
+    
     /** Number of pixels a robot will be moved in a single animation step.
      *  Has to be between 1 and FELDSIZE.
      *  => Number of steps a one-field-move is drawn = FELDSIZE/MOVE_ROB_ANIMATION_OFFSET
@@ -677,15 +680,15 @@ public class BoardView extends JComponent {
         String name = sourceRob.getName();
 
         Color c = getRobColor(name);
-        SoundMan.playSound(BotVis.getBotLaserSoundByName(name));
+        
         synchronized (this) {
             try {
-                wait(50);
+                wait(delay);  
             } catch (InterruptedException ie) {
                 CAT.error("BoardView.paint: wait interrupted");
             }
-
-
+            		
+            SoundMan.playSound(BotVis.getBotLaserSoundByName(name));
             for (int i = 1; i <= FULL_LENGTH_INT; i++) {
                 int tmp_laenge = (int) ((((double) i) / FULL_LENGTH_DOUBLE) * laenge);
                 Graphics2D g2 = (Graphics2D) getGraphics();
@@ -1567,6 +1570,9 @@ public class BoardView extends JComponent {
                 AlphaComposite ac = AC_SRC_OVER_05;
                 g2d.setComposite(ac);
             }
+            else {
+            	g2d.setComposite(AC_SRC_OVER);
+            }
             g2d.drawImage(imgRob, xpos64, ypos64, 64, 64, this);
             if (virtuell) {
                 g2d.setComposite(AC_SRC);
@@ -1752,6 +1758,14 @@ public class BoardView extends JComponent {
         initFloorHashMap();
     }
 
+    
+    public void setDelay(int millisecs){
+    	delay = millisecs;
+    }
+    
+    public int getDelay() {
+    	return delay;
+    }
 
     // Little helper for getting thumbnails of the board
     private static BoardView sac = null;

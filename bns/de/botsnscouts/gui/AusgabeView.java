@@ -78,9 +78,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private boolean soundOn = false;
 
     // speed-menu
-    protected final int SLOW = 1000;
-    protected final int MEDIUM = 500;
-    protected final int FAST = 100;
+    protected static final int SLOW = 1000;
+    protected static final int MEDIUM = 500;
+    protected static final int FAST = 100;
 
     protected int speed=MEDIUM;
 
@@ -586,18 +586,24 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       }
 
       public void actionPerformed(ActionEvent e) {
-	    if (e.getSource() == lSpeed) {
-		speed=SLOW;
-		showActionMessage(Message.say("AusgabeFrame","gAufLang"));
+	    String message = null;
+      	if (e.getSource() == lSpeed) {
+			speed=SLOW;
+			message = "gAufLang";	
 	    }
-	    else if (e.getSource() == mSpeed) {
-		speed=MEDIUM;
-                showActionMessage(Message.say("AusgabeFrame","gAufMitt"));
-            }
-	    else {
-		speed=FAST;
-	        showActionMessage(Message.say("AusgabeFrame","gAufUn"));
-	    }
+      	else if (e.getSource() == hSpeed){
+    		speed=FAST;
+    		message = "gAufUn";    	
+    	}
+	    else  {
+			speed=MEDIUM;
+			message = "gAufMitt";              
+        }
+      	
+      	if (gameBoardCanvas != null) {
+      		gameBoardCanvas.setDelay(speed);
+      	}      		      	
+      	showActionMessage(Message.say("AusgabeFrame",message));
 	}
 
 
