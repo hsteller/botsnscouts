@@ -308,31 +308,35 @@ public class GameFieldPanel extends JPanel{
     }
 
     private void okClicked(){
-	try{
-	    if(parent.startPanel==null){
-		parent.startPanel=new StartPanel(parent);
-	    }
-	    parent.fassade.startGame();//starte Spiel
-	    parent.addServer();
-	    if( mitspielen.getSelectedObjects()!=null){
-		//starte einen SpielerMensch
-		Thread smth=parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(),farben.getSelectedIndex());
-		parent.addKS(smth);
-		Global.debug(this,"menschlichen spieler gestartet");
-	    }else{//starte einen AusgabeFrame
-		parent.addKS( parent.fassade.einemSpielZuschauenNoSplash());
-	    }
-	    parent.current=parent.startPanel;
-	    parent.setContentPane(parent.current);
-	    parent.show();
-	}catch(OneFlagException ex){
-	    JOptionPane.showMessageDialog(this,Message.say("Start","mZweiFlaggen"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
-
-	}catch(NichtZusSpfException exc){
-	    JOptionPane.showMessageDialog(this,Message.say("Start","mNichtZus"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
-
-	}
-
+	new Thread(new Runnable(){
+		public void run(){
+		    parent.showBusy(Message.say("Start","mStartingServer"));
+		    
+		    try{
+			if(parent.startPanel==null){
+			    parent.startPanel=new StartPanel(parent);
+			}
+			parent.fassade.startGame();//starte Spiel
+			parent.addServer();
+			if( mitspielen.getSelectedObjects()!=null){
+			    Thread smth=parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(),farben.getSelectedIndex());
+			    parent.addKS(smth);
+			    Global.debug(this,"menschlichen spieler gestartet");
+			}else{//starte einen AusgabeFrame
+			    parent.addKS( parent.fassade.einemSpielZuschauenNoSplash());
+			}
+			parent.current=parent.startPanel;
+			parent.setContentPane(parent.current);
+			parent.show();
+			parent.stopBusy();
+		    }catch(OneFlagException ex){
+			JOptionPane.showMessageDialog(GameFieldPanel.this,Message.say("Start","mZweiFlaggen"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
+			
+		    }catch(NichtZusSpfException exc){
+			JOptionPane.showMessageDialog(GameFieldPanel.this,Message.say("Start","mNichtZus"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
+			
+		    }
+		}}).start();
     }//okclicked
 
     void unrollOverButs(){
