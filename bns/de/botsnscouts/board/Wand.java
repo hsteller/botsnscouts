@@ -6,7 +6,7 @@ public class Wand{
     //  1:rechts oder unten
     public int[] spez;      //   Laserstärke / Pusherphasen
 
-    Wand()
+    public Wand()
     {
 	wandEl=new int[2];
 	wandEl[0]=Spielfeld.WKEINS;
