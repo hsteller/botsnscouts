@@ -79,13 +79,25 @@ public class Ausgabe extends BNSThread {
     // -> see last case in the run()-method and abmelden()
     private boolean quitByMyself = false;
 
-    // no comment here ;)
-    //LaserHack laserHack = new LaserHack();
+
+    /** A dummy that is used to map various message types to one single AbstractMessageAction
+     *  that does nothing else than displaying the message in the transparent chatpane
+     */
+    private static final String DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY = "just show this message in chatpane";
+
+    /** We will receive "notify changes" (NTC) and more detailed information messages
+     *  about what is happening in a f***ed up order.
+     *  To avoid display errors (i.e. removing a killed robot before it was shot),
+     *  we will stuff all messages into this sequencer that will know (because of
+     *  sequence numbers)  when it is time to act.
+     */
+    private MessageSequencer sequencer = new MessageSequencer();
+
 
     /** Turns animation of robot movement on or off;
      *  visibility is proteced (not private), because BoardView needs to know about that, too.
      */
-    protected static boolean enableRobMoveAnimation = false;
+    protected static boolean enableRobMoveAnimation =false;
 
     public Ausgabe() {
 	this("localhost",8077,false);
@@ -110,6 +122,7 @@ public class Ausgabe extends BNSThread {
 	showSplash(Message.say("AusgabeFrame","msplashWarte"));
 	kommClient = new KommClientAusgabe();
         initSpecialMessagesSet();
+        initMessageToActionMapping();
 
     }
 
@@ -569,7 +582,7 @@ public class Ausgabe extends BNSThread {
 
 
   private void comHandleNotifyChange (ClientAntwort kommAntwort) throws KommException {
-          boolean updateDisplayMakesSense = false;
+
        // getting the names of the players that have some changed values
           String[] playerNames = kommAntwort.namen;
           Bot [] tmp = new Bot[playerNames.length];
@@ -577,54 +590,15 @@ public class Ausgabe extends BNSThread {
               Bot newBotValues = getBotDataFromServer(playerNames[i]);
               tmp [i] = newBotValues;
           }
-          processNTC(tmp, kommAntwort.messageSequenceNumber);
-              /*if (hasCrossedAcheron(newBotValues)
-                  || laserHack.isDeathUnhandled(newBotValues)) { // check whether this notify change
-                                                                 // indicates that a robot was destroyed
 
-                  if (laserHack.receivedDeathReasonMessage(newBotValues)) { // we already got a message
-                                                             // about the death reason of this
-                                                             // bot and we might have shown a
-                                                             // possible animation; so we can
-                                                             // remove the bot from the
-                                                             // display now
-                     robots.put(playerNames[i],newBotValues);
-                     // and finally: don't forget to reset the information for
-                     // the next destruction of the bot
-                     laserHack.resetDeathState(newBotValues);
-                  }
-                  else { // We know that "newBotValues" was destroyed, but we did not
-                         // yet get a message for a possible animation of the destruction.
-                         // So we will not update the bot, but save this information so
-                         // that the message handling methods know that they have to
-                         // update the display if they get a message that indicates
-                         // the destruction of this robot
-                    laserHack.setDeathNotificationArrived(newBotValues);
-                    if (CAT.isDebugEnabled()) {
-                      CAT.debug("LASER HACK ACTIVE:");
-                      CAT.debug("\tGot notify change for a destroyed robot, "
-                                +"but no message about it");
-                      CAT.debug("=> I will skip updating this robot until a message"
-                               +" about the reason for the destruction arrives");
-                    }
-                  }
 
-              }
-              else { // reason for notify change was not the destruction of the bot,
-                     // so we can safely update it
-                robots.put(playerNames[i],newBotValues);//updating the my internal robots
 
-                // something that we are allowed to show happend:
-                updateDisplayMakesSense = true;
-              }
-        }
-
-        // if we got an information that we are allowed to display we will
-        // do so; otherwise we don't have to waste time upating no changes
-        if (updateDisplayMakesSense)
-          updateBoardView();
-
-        */
+          // Using the Bot[] container (only added to ClientAntwort for this
+          //    special purpose) to store the new robot values so that our
+          //    HandlerAction can use them:
+          kommAntwort.updatedBotsForNTC = tmp;
+          // now we have done enough so that is should work..
+          sequencer.invoke(MessageID.NTC, kommAntwort);
 
         // --------- get other information from the server
         Status[] stArray = kommClient.getSpielstatus();
@@ -691,169 +665,31 @@ public class Ausgabe extends BNSThread {
 
   //</SEQUENCCER-FIx>
 
-  /** @todo ?caching of message-Actions?
-   *
-   */
-  private void comHandleMessages(final ClientAntwort kommAntwort){
-      CAT.debug("Server send me: "+kommAntwort.namen[0]);
-      int size = kommAntwort.namen.length;
-
-      // getting parts of the message
-      String[] tmpstr=new String[size-1];
-      for (int i=0;i<tmpstr.length;i++)
-          tmpstr[i]=kommAntwort.namen[i+1];
-      // check the kind of message
+  private void comHandleMessages(ClientAntwort kommAntwort){
       String msgId = kommAntwort.namen[0];
+
+      if (CAT.isDebugEnabled())
+         CAT.debug("Server sent me: "+msgId);
 
       // check whether we have to display an information message in the transparent
       // chat- and actionlog on the bottomline of the board:
       // don't show if message is a "mAusw*"-message or it
       // is a SIGNAL_ACTION_[START|STOP]-message
-
-
-      final String displayString;
-      if (msgId.equals(MessageID.SIGNAL_ACTION_STOP) // to avoid resource-not-found warning
-         ||msgId.equals(MessageID.SIGNAL_ACTION_START)){
-        displayString = "";
-      }
-      else
-       displayString = Message.say("MSG",msgId,tmpstr);
-
-
       if (isActionToBeDisplayedInInfopanelOnly(msgId)) {
-        //  if (CAT.isDebugEnabled())
-         //    CAT.debug("kommAntowrtnamen[0] ist: "+msgId+ "tmpstr ist: "+tmpstr[0]);
-          // display the message in the statusbar
+          // this is a little dirty; we will override the message id so that will
+          // be mapped to an action that does nothing else than displaying this
+          // (status) message in the transparent chatpane on the bottom of the
+          // display
+          sequencer.invoke(DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY, kommAntwort);
+      }
+      else {
+        sequencer.invoke(kommAntwort);
+      }
 
-          sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                  showActionMessage(displayString);
-              }
-          });
-     }
-     else if (msgId.equals(MessageID.SIGNAL_ACTION_START)) {
-       sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                  comMsgHandleActionStart(kommAntwort);
-              }
-        });
-     }
-     else if (msgId.equals(MessageID.SIGNAL_ACTION_STOP)) {
-        sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                 comMsgHandleActionStop(kommAntwort);
-              }
-        });
-     }
-     else if(msgId.startsWith(MessageID.PROG_DONE)) {
-        sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                  showActionMessage(displayString);
-                  comMsgHandleProgrammingDone(kommAntwort);
-              }
-         });
-
-     }
-     else if (msgId.equals(MessageID.SOMEONE_QUIT) || (msgId.startsWith(MessageID.BOT_REMOVED))){
-         sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                  showActionMessage(displayString);
-                  comMsgHandleRobotRemoved(kommAntwort);
-              }
-        });
-
-     }
-     else if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_LASER)){ // robots shooting
-      sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                  showActionMessage(displayString);
-                  comMsgHandleRobotLaser(kommAntwort);
-              }
-        });
-
-     }
-     else if (msgId.equals(de.botsnscouts.comm.MessageID.CHAT)){
-        sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                 showActionMessage(displayString);
-                 comMsgHandleChat(kommAntwort);
-              }
-        });
-
-     }
-     else if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_IN_PIT)) {// robot fell into a pit
-         sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                showActionMessage(displayString);
-                comMsgHandleRobotFellIntoPit(kommAntwort);
-              }
-        });
-
-     }
-     else if (msgId.equals(de.botsnscouts.comm.MessageID.FLAG_REACHED)) {
-      sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                showActionMessage(displayString);
-                comMsgHandleRobotReachedFlag(kommAntwort);
-              }
-        });
-
-     }
-     else if (msgId.equals(de.botsnscouts.comm.MessageID.LAST_PROG)) {
-       sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                showActionMessage(displayString);
-                comMsgHandleLastProgrammerFinished(kommAntwort);
-              }
-        });
-
-     }
-     else if (msgId.equals(de.botsnscouts.comm.MessageID.BORD_LASER_SHOT)){ // boardlaser shooting
-        sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                showActionMessage(displayString);
-                comMsgHandleBoardLaser(kommAntwort);
-              }
-        });
-
-     }
-     else if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_CRUSHED)){
-         sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                showActionMessage(displayString);
-                comMsgHandleRobotCrushed(kommAntwort);
-              }
-        });
-
-     }
-     else if (msgId.equals(de.botsnscouts.comm.MessageID.WISE_USED)){
-        sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                showActionMessage(displayString);
-                comMsgHandleSomeoneAskedWisenheimer(kommAntwort);
-              }
-        });
-
-     }
-     else if (msgId.equals(MessageID.BOT_MOVE)) {
-      sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-                if (enableRobMoveAnimation)
-                  comMsgHandleRobotMove(kommAntwort);
-              }
-        });
-
-     }
-     else { // all the stuff that starts with "mAusw" (==MessageId.AUSWERTUNG)
-       sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
-              public void invoke(){
-               CAT.debug("got a message without specifc action; nothing to invoke");
-              }
-        });
-     }
-
-    acknowledgeMessage();
+      acknowledgeMessage();
   }
+
+
   /** send response to the server that we got the message
    and did all the stuff we wanted to do, so the server can
    send the next message
@@ -1088,49 +924,13 @@ public class Ausgabe extends BNSThread {
   }
 
 
-  //private Object lock = new Object();
-  //private int delay = 300;
-  //private boolean updating = false;
-  //private Vector history = new Vector();
-  //private boolean inAction = false;
 
   private void comMsgHandleActionStart(ClientAntwort ca) {
-
         CAT.debug("got an action start");
-
-  /*  synchronized (lock) {
-      inAction=true;
-      //lock.notifyAll();
-    }
-    */
   }
 
   private void comMsgHandleActionStop(ClientAntwort ca) {
         CAT.debug("got an action stop");
-
-  /*  CAT.debug("action stop");
-    updating = true;
-     synchronized (lock) {
-
-      int l = history.size();
-      CAT.debug("history size: "+l);
-       for (int i=0;i<l;i++){
-        CAT.debug("doing history: "+i);
-         Bot[] tmp = (Bot []) history.elementAt(0);
-         for (int j=0;j<tmp.length;j++){
-          robots.put(tmp[j].getName(), tmp[j]);
-         }
-         history.removeElementAt(0);
-         updateBoardView();
-         synchronized (this) {
-            try {sleep(300);}catch(InterruptedException ie){CAT.error(ie.getMessage(), ie);}
-          }
-       }
-       updating = false;
-       inAction = false;
-       lock.notifyAll();
-     }
-     */
   }
 
     private void comMsgHandleRobotMove(ClientAntwort kommAntwort) {
@@ -1154,146 +954,146 @@ public class Ausgabe extends BNSThread {
       }
   }
 
- // private int lastMsgProcessed = -1;
- // private int nextMsg=0;
+ private String [] extractMessage(ClientAntwort kommAntwort) {
+      int size = kommAntwort.namen.length-1;
 
-  private Sequenzer sequenzer = new Sequenzer();
-  private void processNTC(final Bot [] updates, int msgNum){
-    CAT.debug("process NTC id="+msgNum);
-    sequenzer.addAndDoAction(new UpdateActionAdapter(msgNum){
-      public void invoke(){
-         CAT.debug("NTC invoked!");
-         for (int j=0;j<updates.length;j++)
-              robots.put(updates[j].getName(), updates[j]);
-         updateBoardView();
-
-      }
-    });
-    /**
-   synchronized (lock) {
-      if (inAction) {
-        CAT.debug("in action");
-        while (updating)
-          try {wait();}catch(InterruptedException ie){CAT.error(ie.getMessage(),ie);}
-        history.add(updates);
-      }
-      else {
-         CAT.debug("not in action");
-         if (msgNum>-1 && msgNum == nextMsg) {
-           for (int j=0;j<updates.length;j++){
-              robots.put(updates[j].getName(), updates[j]);
-           }
-           updateBoardView();
-           nextMsg++;
-         }
-         else
-           history.add(updates);
-
-      }
-    }
-  */
+      // getting parts of the message
+      String[] tmpstr=new String[size];
+      for (int i=0;i<size;i++)
+          tmpstr[i]=kommAntwort.namen[i+1];
+      return tmpstr;
   }
 
-  class Sequenzer {
-    private int nextMsg;
-    private TreeSet messages = new TreeSet();
 
-    public Sequenzer() {
-      nextMsg=1;
-    }
+    private void initMessageToActionMapping(){
 
-    public synchronized void addAndDoAction(UpdateActionAdapter action){
-      int num = action.seqNum;
+       sequencer.addActionMapping(MessageID.SIGNAL_ACTION_START,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                            comMsgHandleActionStart(msgData);
+                                  }
+       });
+       sequencer.addActionMapping(MessageID.SIGNAL_ACTION_STOP,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                            comMsgHandleActionStop(msgData);
+                                  }
+       });
+       sequencer.addActionMapping(MessageID.PROG_DONE,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                            comMsgHandleProgrammingDone(msgData);
+                                  }
+       });
 
-      if (num<0){
-        CAT.debug("invoking action without a sequence number");
-        action.invoke();
-        return;
-      }
-      else if (num<nextMsg) {
-        // this case might look quite senseless as it can't happen as far as I can
-        // see - but one time one of the actions appeared again in messages and
-        // so all execution stopped because messages.firsts() hat sequence number
-        // that was smaller than numSeq;
-        CAT.error("got an action that should have been executed already: #"+num);
-        CAT.error("invoking it again, but don't add it to the queue!");
-        action.invoke();
-      }
-      else {
-        CAT.debug("adding action #"+num+" to queue");
-        messages.add(action);
-      }
-      if (CAT.isDebugEnabled()) {
-        CAT.debug("queue before invokeAsLongAsPossible:");
-        dump();
-        invokeAsLongAsPossible();
-        CAT.debug("invoked as long as possible; actions left: "+messages.size());
-        CAT.debug("queue after invokeAsLongAsPossible:");
-        dump();
-      }
-      else {
-        invokeAsLongAsPossible();
-      }
-    }
+       AbstractMessageAction tmp = new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                            comMsgHandleRobotRemoved(msgData);
+                                      }
+                                 };
+       //sequencer.addActionMapping(MessageID., tmp);
 
-    private synchronized void invokeAsLongAsPossible(){
-      if (messages.isEmpty())
-        return;
-      UpdateActionAdapter smallest = (UpdateActionAdapter) messages.first();
-      int actualId = smallest.seqNum;
-      while (actualId == nextMsg) {
-        CAT.debug("INVOKING MESSAGEACTION #"+actualId);
-        smallest.invoke();
-        ++nextMsg;
-        messages.remove(smallest);
-        if (!messages.isEmpty()){
-          smallest= (UpdateActionAdapter)messages.first();
-          actualId=smallest.seqNum;
-        }
-        CAT.debug("actual="+actualId+"\tnext="+nextMsg);
-        // else nextMsg!=actualId -> exiting loop
-      }
+       sequencer.addActionMapping(MessageID.BOT_REMOVED, tmp);
+
+       sequencer.addActionMapping(MessageID.CHAT,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                           String displayString = Message.say("MSG", MessageID.CHAT,
+                                                                 extractMessage(msgData));
+                                           showActionMessage(displayString);
+                                           comMsgHandleChat(msgData);
+                                  }
+       });
+
+       sequencer.addActionMapping(MessageID.BOT_LASER,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                          comMsgHandleRobotLaser (msgData);
+                                  }
+       });
+
+       sequencer.addActionMapping(MessageID.BOT_IN_PIT,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                          String displayString = Message.say("MSG", MessageID.BOT_IN_PIT,
+                                                                             extractMessage(msgData));
+                                          showActionMessage(displayString);
+                                          comMsgHandleRobotFellIntoPit (msgData);
+                                  }
+       });
+
+       sequencer.addActionMapping(MessageID.FLAG_REACHED,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                         String displayString = Message.say("MSG", MessageID.FLAG_REACHED,
+                                                                              extractMessage(msgData));
+                                          showActionMessage(displayString);
+                                          comMsgHandleRobotReachedFlag (msgData);
+                                  }
+       });
+
+      sequencer.addActionMapping(MessageID.LAST_PROG,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                          String displayString = Message.say("MSG",MessageID.LAST_PROG,
+                                                                              extractMessage(msgData));
+                                          showActionMessage(displayString);
+                                          comMsgHandleLastProgrammerFinished(msgData);
+                                  }
+       });
+
+       sequencer.addActionMapping(MessageID.BORD_LASER_SHOT,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                           String displayString = Message.say("MSG", MessageID.BORD_LASER_SHOT,
+                                                                             extractMessage(msgData));
+                                          showActionMessage(displayString);
+                                          comMsgHandleBoardLaser(msgData);
+                                  }
+       });
+
+      sequencer.addActionMapping(MessageID.WISE_USED,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                         String displayString = Message.say("MSG",MessageID.WISE_USED,
+                                                                              extractMessage(msgData));
+                                          showActionMessage(displayString);
+                                          comMsgHandleSomeoneAskedWisenheimer(msgData);
+                                  }
+       });
+
+       sequencer.addActionMapping(MessageID.BOT_MOVE,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                         if (enableRobMoveAnimation)
+                                            comMsgHandleRobotMove(msgData);
+                                  }
+       });
+
+       sequencer.addActionMapping(DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                         String displayString = Message.say("MSG", msgData.namen[0],
+                                                                            extractMessage(msgData));
+                                         showActionMessage(displayString);
+                                  }
+       });
+
+       sequencer.addActionMapping(MessageID.NTC,
+                                  new AbstractMessageAction(){
+                                      public void invoke(ClientAntwort msgData){
+                                        Bot [] updatedBots = msgData.updatedBotsForNTC;
+                                        int l = updatedBots.length;
+                                        for (int i=0;i<l;i++){
+                                           Bot $_ = updatedBots[i];
+                                           robots.put($_.getName(), $_);
+                                        }
+                                        updateBoardView();
+                                  }
+       });
 
 
-    }
-
-    private synchronized void dump() {
-      CAT.debug("nextMesg="+nextMsg);
-      CAT.debug("ids: ");
-      StringBuffer sb= new StringBuffer();
-      Iterator it = messages.iterator();
-      while (it.hasNext())
-        sb.append(((UpdateActionAdapter) it.next()).seqNum).append(", ");
-      CAT.debug(sb.toString());
-    }
-
-  }
-
-  class UpdateActionAdapter implements Comparable {
-    int seqNum;
-
-    public UpdateActionAdapter(int sequenzNumber){
-      seqNum = sequenzNumber;
-    }
-
-    public void invoke(){
-
-    }
-
-    public int compareTo(Object o){
-      UpdateActionAdapter t = (UpdateActionAdapter) o;
-      int tnum = t.seqNum;
-      if (seqNum==t.seqNum) // not needed for sorting as seqnums will be unique;
-                            // but this method is used for general comparision, i.e.
-                            // without this case Sequenzer's messages.remove(Object) won't work
-        return 0;
-      else if (seqNum<t.seqNum)
-        return -1;
-      else
-        return 1;
-    }
-
-  }
+     }
 
 }
 

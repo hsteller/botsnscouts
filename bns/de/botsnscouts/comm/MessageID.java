@@ -22,6 +22,6 @@ public interface MessageID {
   public static final String SIGNAL_ACTION_START = "mSignalStart";
   public static final String SIGNAL_ACTION_STOP  = "mSignalStop";
 
-
+  public static final String NTC = "NOTIFY_CHANGE";
 
 }

@@ -25,7 +25,7 @@
 
 package de.botsnscouts.comm;
 import de.botsnscouts.util.*;
-public class ClientAntwort {
+public class ClientAntwort implements Comparable{
     /** Ermoeglicht die Abfrage der Kommunikationsart mittels der Konstanten dieser Klasse
      *@author Hendrik<BR>*/
     public int typ;
@@ -43,8 +43,8 @@ public class ClientAntwort {
     // public Feld feld;
 
 
-    /** wohl doch nicht benoetigt*/
-    public Bot roboter;
+
+
     /** Container; enthaelt die ausgeteilten Karten bei MACHEZUG*/
     public Card [] karten;
     /** Container; wird gesetzt, falls ein bool geschickt wird*/
@@ -61,6 +61,26 @@ public class ClientAntwort {
      *  is shown (triggered by an information message)
      */
     public int messageSequenceNumber=-1;
+
+
+    /** Used by the MessageSequencer */
+    public String specialMessageId;
+
+    public Bot [] updatedBotsForNTC;
+
+    /** Used by the Sequencer to sort received messages by their number*/
+    public int compareTo(Object o){
+      ClientAntwort ca = (ClientAntwort) o;
+      int num = ca.messageSequenceNumber;
+      if (messageSequenceNumber==num)
+        return 0;
+      else if (messageSequenceNumber<num)
+        return -1;
+      else
+        return 1;
+    }
+
+
 
     public final static int SPIELFELDDIM=1;
     public final static int FAHNENPOS=2;
