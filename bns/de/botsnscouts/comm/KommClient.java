@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.comm;
 
 import de.botsnscouts.util.*;
@@ -642,9 +642,8 @@ public class KommClient {
 	    this.senden(raus);
 	}
 	catch(UnknownHostException e){
-	    System.err.println("Anmeldung: Der angegebene Server wurde nicht gefunden");
-	    // evtl. stattdessen eine Exception
-	    return false;
+
+	    throw new KommException(Message.say("KommClient", "nohost"));
 	}
 	catch (java.io.IOException fehler) {
 	    throw new KommException ("IOException bei der Anmeldung");
