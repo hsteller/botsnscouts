@@ -72,6 +72,7 @@ public class MainMenu extends JPanel implements  ActionListener{
 	partBut=OptionPane.getTransparentButton(Message.say("Start","mTeilnehmen"));
 	watchBut=OptionPane.getTransparentButton(Message.say("Start","mZuschauen"));
 	editBut=OptionPane.getTransparentButton(Message.say("Start","mEdit"));
+	endBut=new TransparentButton(Message.say("Start","mBeenden"));
 
 	gameBut.addActionListener(this);
 	partBut.addActionListener(this);
