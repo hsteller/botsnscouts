@@ -49,8 +49,8 @@ public class GamePreview extends JPanel implements ActionListener {
             public void valueChanged(ListSelectionEvent event) {
                 setContent( (GameOptions )gameMap.get( gameList.getSelectedValue()) );
             }
-
         });
+
     }
 
     /** call this to stop the current preview */

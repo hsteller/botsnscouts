@@ -12,7 +12,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 import java.awt.*;
+import java.util.Vector;
 
 /*
   *******************************************************************
@@ -53,6 +56,7 @@ public class JoinGamePanel extends ColoredComponent {
     private Start parent;
 
     private GamePreview gamePreview = new GamePreview( announcedGamesList, hostName );
+    private Vector favServers;
 
     public JoinGamePanel(Start par) {
 
@@ -125,7 +129,9 @@ public class JoinGamePanel extends ColoredComponent {
         JComponent box = Box.createVerticalBox();
         box.add(new TJLabel("Favorite Servers"));
 
-        favServerList = new JList( Conf.getFavoriteGameServers() );
+        favServers =  Conf.getMultiplePropertyVector("start.favServers");
+
+        favServerList = new JList(favServers);
         favServerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         favServerList.addListSelectionListener( new ListSelectionListener(){
             public void valueChanged(ListSelectionEvent event) {
@@ -134,6 +140,24 @@ public class JoinGamePanel extends ColoredComponent {
 
         });
         box.add(favServerList);
+
+        hostName.addFocusListener( new FocusListener() {
+            public void focusGained(FocusEvent event) {
+                //Do not care.
+            }
+
+            public void focusLost(FocusEvent event) {
+                //Check if we already know the server.
+                String entry = hostName.getText();
+                if (!favServers.contains(entry)) {
+                    favServers.add(entry);
+                    Conf.setMultipleProperty("start.favServers", favServers);
+                    Conf.saveProperties();
+                }
+            }
+
+        }
+        );
 
         queryMetaButton.addActionListener(gamePreview);
 

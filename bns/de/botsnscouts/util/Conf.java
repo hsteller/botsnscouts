@@ -70,9 +70,9 @@ public class Conf {
             Properties p = new Properties(properties);
             p.load(new FileInputStream(bnsHome + System.getProperty("file.separator") + CONFNAME));
             properties = p;
-            CAT.debug("user-defined bns.config loaded.");
+            CAT.info("user-defined bns.config loaded.");
         } catch (IOException e) {
-            CAT.debug("no user-defined bns.config found.");
+            CAT.info("no user-defined bns.config found.");
         }
         // c) System-wide properties override that -- see getProperty
     }
@@ -122,12 +122,33 @@ public class Conf {
         return back;
     }
 
+    public static Vector getMultiplePropertyVector(String key) {
+        String data = System.getProperty(key);
+        if (data == null)
+            data = properties.getProperty(key);
+        Vector back = new Vector();
+        if (data != null) {
+            if (data.indexOf(MULTIPLE_PROP_SEPARATOR) > -1) {
+                StringTokenizer st = new StringTokenizer(data, "" + MULTIPLE_PROP_SEPARATOR);
+                int length = st.countTokens();
+                for (int i = 0; i < length; i++) {
+                    back.addElement(URLDecoder.decode(st.nextToken()));
+                }
+            } else {
+                back.add(URLDecoder.decode(data));
+            }
+        }
+        return back;
+    }
+
+
     public static int getIntProperty(String key) {
         String data = getProperty(key);
         int ret = -1;
         try {
             ret = Integer.parseInt(data);
         } catch (Exception e) {
+            CAT.warn(e.getMessage());
         }
         return ret;
     }
@@ -136,7 +157,7 @@ public class Conf {
         properties.setProperty(key, URLEncoder.encode(data));
     }
 
-    public static void setMultipleProperty(String key, String[] values) {
+   public static void setMultipleProperty(String key, String[] values) {
         if (values == null || values.length < 1) {
             properties.setProperty(key, "");
             return;
@@ -149,6 +170,20 @@ public class Conf {
         properties.setProperty(key, sb.toString());
     }
 
+    public static void setMultipleProperty(String key, Vector values) {
+        if (values == null || values.size() < 1) {
+            properties.setProperty(key, "");
+            return;
+        }
+        StringBuffer sb = new StringBuffer();
+        sb.append(URLEncoder.encode(values.elementAt(0).toString()));
+        for (int i = 1; i < values.size(); i++) {
+            sb.append(MULTIPLE_PROP_SEPARATOR).append(values.elementAt(i));
+        }
+        properties.setProperty(key, sb.toString());
+    }
+
+
     public static void saveProperties() {
         try {
             File file = new File(bnsHome + System.getProperty("file.separator") + CONFNAME);
@@ -159,29 +194,19 @@ public class Conf {
         }
     }
 
-    //TODO
     public static String getDefaultMetaServer() {
-        //return "www.botsnscouts.de";
-        return "localhost";
+        String meta = Conf.getProperty("meta.server");
+        if (meta == null || meta.equals(""))
+            meta = "www.botsnscouts.de";
+        return meta;
     }
 
     public static int getDefaultMetaServerPort() {
-        return 8725;
-    }
-
-    public static Vector getFavoriteGameServers() {
-        //TODO
-        Vector v = new Vector();
-        //v.add("fuldigor.hause");
-        //v.add("codi.hause");
-        return v;
-    }
-
-    public static Vector getMetaServers() {
-        //TODO
-        Vector v = new Vector();
-        v.add(getDefaultMetaServer());
-        return v;
+        String portString = Conf.getProperty("meta.port");
+        if (portString!=null && !portString.equals(""))
+            return Integer.parseInt(portString);
+        else
+            return 8725;
     }
 
 }
