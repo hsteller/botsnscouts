@@ -1,4 +1,5 @@
 package de.botsnscouts.start;
+import de.botsnscouts.util.*;
 
 
 public class WaiterThread extends Thread{

@@ -2,7 +2,15 @@ package de.botsnscouts.start;
 
 import java.awt.*;
 import java.util.*;
-
+import de.botsnscouts.util.*;
+import de.botsnscouts.board.*;
+import de.botsnscouts.comm.*;
+import de.botsnscouts.gui.*;
+/*import de.botsnscouts..*;
+import de.botsnscouts..*;
+import de.botsnscouts..*;
+import de.botsnscouts..*;
+*/
 // Diese Klasse dient der Entkopplung der GUI-Schicht (StartSpieler) 
 // von der Fachkonzeptschicht(...) und der Datenhaltungsschicht (...)
 

@@ -5,6 +5,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.plaf.metal.*;
 import java.util.*;
+import de.botsnscouts.util.*;
+
 
 public class Start extends JFrame implements WindowListener{
 
