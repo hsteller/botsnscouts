@@ -33,6 +33,7 @@ import java.util.*;
 import java.net.*;
 
 
+
 /** The parent class for all clientside communication.
     Very 'advanced' parsing of Strings.
  *@author Hendrik
@@ -60,8 +61,17 @@ public class KommClient {
     */
     protected String strNTC;
     /** The name of the client that owns this KommClient object.
-	For debugging purposes.
+        For debugging purposes.
     */
+
+    /**
+     * Used for communication with the server.
+     *  The (URL-)encoded name of the client; will be used in methods instead of names
+     *  that are given as parameters.
+     *
+     */
+    protected String encodedName = "";
+
     protected String cn;
     /** For debugging purposes: if set to true,
 	a logfile "<clientname>'s.Kommlog" will be created,
@@ -332,7 +342,7 @@ public class KommClient {
 			back.namen= new String [sto.countTokens()];
 			int i=0;
 			while (sto.hasMoreTokens()){
-			    back.namen[i]=sto.nextToken();
+			    back.namen[i]= URLDecoder.decode(sto.nextToken());
 			    i++;
 			}
 			break;
@@ -455,6 +465,7 @@ public class KommClient {
 			    try {
 				back.typ=back.AENDERUNG;
 				int klauf=com.indexOf('(');
+                                // getNamen2 does the URL-decoding of the names for us..
 				back.namen  = getNamen2(com.substring(klauf));
 			    }
 			    catch (Exception e) {
@@ -488,7 +499,8 @@ public class KommClient {
 				int komma1=com.indexOf(',');
 				com=com.substring(komma1+1);
 				com="("+com; // now the String has GSN-formatting
-				back.namen=this.getNamen2(com);
+				// getNamen2 does the URL-decoding of the names for us..
+                                back.namen=this.getNamen2(com);
 			    }
 			}
 			catch (Exception e) {
@@ -520,6 +532,7 @@ public class KommClient {
 				int zaehler=0;
 				while (bloed!=-1){
 				    String erster = splitFirstRob(com);
+                                    // getStatusRegs does URL-decoding of the names for us..
 				    stats [zaehler] = getStatusRegs(erster);
 				    int bloed2 = klazu2(com);
 				    if (bloed2!=-1) {
@@ -617,23 +630,35 @@ public class KommClient {
 
     }
     /** This method is used to tell the server that the client wants to quit
-	@param name The name of the client
+	@param name The name of the client UPDATE: WILL BE IGNORED
+
     */
     public void abmelden (String name) {
-	String back="RLE("+name+")";
+
+	String back="RLE("+encodedName+")";
 
 	if(out!=null) out.println (back);
     }
+
+
+
     /** This method registers a client.
 	Never used directly. Use child's method instead.
+        DOES NOT ENCODE THE CLIENT NAME;
+        ENCODING MUST HAPPEN IN THE DERIVED CLASSES ("anmelden*"-methods)
 	@param ipnr IP of the server
 	@param portnt Ip-port of the server
 	@param clientName The name of the client
 	@param kuerzel Indicates, whether the client is a robot or an output channel
 	@exception  KommException Thrown, if parsing failed
     */
-    protected boolean anmelden (String ipnr, int portnr, String clientName, String kuerzel)throws KommException{
-	cn = clientName;
+    protected boolean anmelden (String ipnr, int portnr,String clientName, String kuerzel)throws KommException{
+
+        StringTokenizer st = new StringTokenizer(clientName, ",");
+
+        encodedName = st.nextToken();//clientName; // now encoded in derived classes, only to lazy
+                                  // to remove the variable again
+        cn = encodedName;
 	try{
 	    Socket socAnmeldung=new Socket(ipnr, portnr);
 	    in = new BufferedReader(new InputStreamReader(socAnmeldung.getInputStream()));
@@ -730,14 +755,15 @@ public class KommClient {
 	@return The robot's coordinates
 	@exception KommException ..if an error occurs
     */
-    public Ort getRobPos (String name) throws KommException {
+/*   public Ort getRobPos (String name) throws KommException {
 	return this.fetchOrt(name, true);
     }
-
+*/
     /** This method asks the server for the size of the board.
 	@return An Ort containing the bords Dimensions.
 	@exception KommException ..if an error occurs
     */
+
     public Ort getSpielfeldDim () throws KommException{
 	return this.fetchOrt("wirdIgnoriert", false);
     }
@@ -802,13 +828,16 @@ public class KommClient {
 	    rein = rein.substring (1); // remove '('
 	    for (int i=0;i<zaehler;i++) {
 		int kommapos = rein.indexOf(',');
-		raus [i] = rein.substring(0,kommapos);
+		raus [i] = URLDecoder.decode(rein.substring(0,kommapos));
 		rein = rein.substring(kommapos+1); // remove read names and ','
 	    }
-	}
+
+
+        }
 	catch (Exception e) {
-	    throw new KommException ("Exception bei getNamen;Message: "+e.getMessage());
+	    throw new KommException ("Exception at getNamen2;Message: "+e.getMessage());
 	}
+
 	return raus;
     }
 
@@ -833,9 +862,9 @@ public class KommClient {
        @exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.
     */
     public Roboter getRobStatus (String name) throws KommException {
-	String com ="";
+        String com ="";
 	Roboter robot=Roboter.getNewInstance(name);
-        String raus ="GRS("+name+")";
+        String raus ="GRS("+URLEncoder.encode(name)+")";
 	this.senden(raus);
 	//Server sends "RS(Richtung(N,O..), Ort(1,1), LFlag, LArchF, Schaden, VLeben, GespRegister, Aktiv, Virtuell, RSreserveiert)"
 	/*try{
@@ -983,7 +1012,8 @@ public class KommClient {
 	      else
 	      return xyz.namen;
 	    */
-	    return xyz.namen;
+	     return xyz.namen;
+
 	}
 	else if (xyz.typ==0) {
 	    throw new KommException ("getSpielstand: keine gueltige Antwort");
@@ -1057,16 +1087,21 @@ public class KommClient {
 	this.spielstart();
     }
 
-    // Jetzt kommen HILFSMETHODEN:
+    // HELPER METHODS
 
     // bearbeitet Anfragen nach einem Ort
+
+    /**Gets either the position of the robot (if RobPos==true)
+     * or the dimensionj of the board (if RobPos== false)
+     *
+     * @param name WILL BE IGNORED */
     private  Ort fetchOrt (String name, boolean RobPos) throws KommException{
 	Ort back= new Ort (-1,-1); // Initialisierung
 	String method="noch fetchOrt";;
 	try {
 	    if (RobPos) { // getRobPos ?!
 		method="getRobPos";
-		this.senden ("SRO("+name+")");
+		this.senden ("SRO("+encodedName+")");
 
 	    }
 	    else { // nicht RobPos => nordostecke gefragt
@@ -1089,9 +1124,9 @@ public class KommClient {
 	catch (NumberFormatException nfe) {
 	    throw new KommException(method+": NumberFormatException: Parsen der koordinaten-substrings schlug fehl");
 	}
-	/*    catch (IOException ioe) {
-	      throw new KommException (method+" warf eine IOException; Message: "+ioe.getMessage());
-	      }*/
+	//catch (IOException ioe) {
+	//      throw new KommException (method+" warf eine IOException; Message: "+ioe.getMessage());
+	//      }
 	catch (Exception sonstige) {
 	    throw new KommException (method+" warf eine Exception; Message: "+sonstige.getMessage());
 	}
@@ -1099,6 +1134,7 @@ public class KommClient {
     }
 
     /**Diese Methode parst den Programmkartenteil bei getRobStatus
+     * (URL-)decodes the names
      */
     public static Status getStatusRegs(String in)throws KommException {
 	Status back=new Status();
@@ -1106,7 +1142,7 @@ public class KommClient {
 	// in soll in etwa so aussehen: (name,PK(M1,123)PK(M2,456))
 	// oder Spezialfall: (name,)
 	int kommaName=in.indexOf(',');
-	back.robName=new String (in.substring(1,kommaName));
+	back.robName= URLDecoder.decode(new String (in.substring(1,kommaName)));
 	in = in.substring(kommaName+1); // nur noch die Karten und die Klammerzu
 	String in2 = new String (in);
 	int kpos = in2.indexOf(',');

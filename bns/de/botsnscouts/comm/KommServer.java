@@ -9,24 +9,25 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.comm;
 
 import de.botsnscouts.util.*;
 import java.io.*;
+import java.net.*;
 /* STAND 20.7.99 2:55 ; sendFeldinhalt fehlt noch;
    getestet: - warte
               sendRobStatus
@@ -148,7 +149,7 @@ public class KommServer {
 	     break;
 	  }
 	  back.typ=back.GIBROBOTERPOS;
-	  back.name=input.substring (klammeraufpos+1,klammerzupos);
+	  back.name=URLDecoder.decode(input.substring (klammeraufpos+1,klammerzupos));
 	 // System.out.println ("SRO-test");
 
 	}
@@ -216,7 +217,7 @@ public class KommServer {
 	      break;
 	    }
 	    back.typ=back.GIBROBSTATUS;
-	    back.name=input.substring (klammeraufpos+1,klammerzupos);
+	    back.name=URLDecoder.decode(input.substring (klammeraufpos+1,klammerzupos));
 	  }
 	  else {
 	    error=true;
@@ -331,7 +332,7 @@ public class KommServer {
 
 
 		/* Auslesen des Namens; aufgrund der persoenlichen Komm-Objekte unseres Servers eigentlich ueberfluessig */
-		back.name=new String(input.substring(klammerauf1+1,komma1));
+		back.name=URLDecoder.decode(new String(input.substring(klammerauf1+1,komma1)));
 		// Auslesen des Power-Down-Booleans
 		String deaktiviert=new String (input.substring(kommaletzt+1,klammerzu2));
 		try {
@@ -409,7 +410,7 @@ public class KommServer {
 
 
 		/* Auslesen des Namens; aufgrund der persoenlichen Komm-Objekte unseres Servers eigentlich ueberfluessig */
-		back.name=new String(input.substring(klammerauf+1,komma1));
+		back.name=URLDecoder.decode(new String(input.substring(klammerauf+1,komma1)));
 		back.typ=back.REPARATUR;
 	      }
 	      catch (StringIndexOutOfBoundsException xe) {
@@ -439,7 +440,7 @@ public class KommServer {
 	    if ((komma1!=-1)&&(klammerauf!=-1)&&(klammerzu!=-1)){
 	      try {
 		String richtstr=input.substring(komma1+1,klammerzu);
-		back.name=input.substring(klammerauf+1,komma1);
+		back.name=URLDecoder.decode(input.substring(klammerauf+1,komma1));
 		back.typ=back.AUSRICHTUNG;
 		/* Es koennte eine Exception kommen, falls nach 'trim' keine
 		   Zeichen mehr in 'richtstr' sind
@@ -482,7 +483,7 @@ public class KommServer {
 	    int klammerzu=input.lastIndexOf(')');
 	    int komma1=input.indexOf(',');
 	    if ((komma1!=-1)&&(klammerauf!=-1)&&(klammerzu!=-1)){
-	      back.name = input.substring (klammerauf+1,komma1);
+	      back.name = URLDecoder.decode(input.substring (klammerauf+1,komma1));
 	      back.typ=back.REAKTIVIERUNG;
 	      try {
 	      char stayPDown=Character.toUpperCase(input.substring(komma1+1,klammerzu).trim().charAt(0));
@@ -557,7 +558,7 @@ public class KommServer {
 	      back.msg= new String [sto.countTokens()];
 	      int i=0;
 	      while (sto.hasMoreTokens()){
-		  back.msg[i]=sto.nextToken();
+		  back.msg[i]=URLDecoder.decode(sto.nextToken());
 		  i++;
 	      }
 	      break;
@@ -684,7 +685,7 @@ public class KommServer {
     try {
       String raus="(";
       for (int i=0;i<namen.length;i++)
-	raus+=namen[i]+",";
+	raus+=URLEncoder.encode(namen[i])+",";
       raus+=")";
       // System.err.println("SERVER: sende Namen: "+raus);
       out.println (raus);
@@ -706,7 +707,7 @@ public class KommServer {
 		if (namen[i]==null)
 		    raus+="0,";
 		else
-		    raus+=namen[i]+",";
+		    raus+=URLEncoder.encode(namen[i])+",";
 	    }
 	    raus+=")";
 	    // System.err.println("SERVER: sende Namen: "+raus);
@@ -839,11 +840,15 @@ public class KommServer {
       else {
 	raus = "SS(END,";
       }
-      for (int i=0;i<endplazierung.length;i++)
-	  raus+=endplazierung[i]+",";
-      raus +=")";
-
-      out.println (raus);
+      if (endplazierung != null)
+          for (int i=0;i<endplazierung.length;i++)
+            if (raus!=null)
+		raus+=URLEncoder.encode(endplazierung[i])+",";
+	    else
+		raus+=endplazierung[i]+",";      
+          
+          raus +=")";       
+          out.println (raus);
     }
     catch (Exception gibtsnicht) {
       throw new KommException ("Exception bei spielstand-Uebermittlung");
@@ -885,7 +890,7 @@ public class KommServer {
       //  System.err.println ("raus"+raus);
 
       for (int i=0;i<robbis.length;i++){
-	raus+="("+robbis[i].robName+",";
+	raus+="("+URLEncoder.encode(robbis[i].robName)+",";
 	//  System.err.println ("raus aeussere For: "+raus);
 	if (robbis[i].register!=null) {
 	  for (int j=0;j<(robbis[i].register.length);j++) {

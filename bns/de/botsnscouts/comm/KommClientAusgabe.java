@@ -28,6 +28,7 @@ package de.botsnscouts.comm;
 import de.botsnscouts.util.Stats;
 import de.botsnscouts.util.StatsList;
 import java.io.*;
+import java.net.URLDecoder;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -41,11 +42,15 @@ public class  KommClientAusgabe extends KommClient {
 Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception geworfen.
 @exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.*/
   public boolean anmelden  (String ipnr, int portnr, String name) throws KommException{
-  return super.anmelden (ipnr, portnr, name, "RGA");
+
+  return super.anmelden (ipnr, portnr, java.net.URLEncoder.encode(name), "RGA");
   }
 
+  // here: name encoding not really needed, because we use our generated random
+  // names that do not contain 'evil' characters..
+ // ..but who knows who will use these methods 100years later
  public boolean anmelden2  (String ipnr, int portnr, String name) throws KommException{
-  return super.anmelden (ipnr, portnr, name, "RA2");
+  return super.anmelden (ipnr, portnr, java.net.URLEncoder.encode(name), "RA2");
   }
 
 
@@ -81,7 +86,7 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
 	    Vector stats = new Vector();
 	    StringTokenizer st = new StringTokenizer (rein.substring(4,rein.length()-1),",");
 	    while (st.hasMoreElements()) {
-		Stats s = new Stats (st.nextToken());
+		Stats s = new Stats (URLDecoder.decode(st.nextToken()));
 	    try {
 		s.setHits(Integer.parseInt(st.nextToken()));
 		s.setKills(Integer.parseInt(st.nextToken()));
