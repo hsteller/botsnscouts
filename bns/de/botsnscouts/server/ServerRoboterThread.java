@@ -72,7 +72,7 @@ public class ServerRoboterThread extends Thread implements Waitable
                                     d("RV: habe Ausrichtung im Modus"+m+"erhalten; und tschuess");
                                     robMaint.deleteRob(this,"RV");
                                     ende=true;
-                                    //return;
+				    break;
                                 }
                                 rob.setAusrichtung(ans.wohin);
                                 if (m==Server.ZERSTOERT_SYNC || m==Server.ZERSTOERT_ASYNC){
@@ -92,7 +92,7 @@ public class ServerRoboterThread extends Thread implements Waitable
                                     d("RV: habe Reaktivierung im Modus "+m+" erhalten; und tschuess");
                                     robMaint.deleteRob(this,"RV");
                                     ende=true;
-                                    return;
+                                    break;
                                 }
                                 
                                 rob.setAktiviert(ans.ok);
@@ -105,7 +105,7 @@ public class ServerRoboterThread extends Thread implements Waitable
                                     d("RV: habe Reperatur im Modus "+m+" erhalten; und tschuess");
                                     robMaint.deleteRob(this,"RV");
                                     ende=true;
-                                    return;
+				    break;
                                 }
                                 
                                 for (int i=0;i<ans.register.length;i++)
@@ -118,10 +118,8 @@ public class ServerRoboterThread extends Thread implements Waitable
                             case ServerAntwort.ABMELDUNG:
 				d("Abmeldung. Modus: "+m);
                                 ende=true;
-				if ((m==Server.PROGRAMMIERUNG)||(m==Server.INITAUSR)||(m==Server.ZERSTOERT_SYNC)||(m==Server.POWERUP)||(m==Server.ENTSPERREN)||(m==Server.SPIELSTART)||(m==Server.SPIELENDE))
-				    notifyServer();
-				
-                                return;
+				robMaint.deleteRob(this,"LL");
+                                break;
                             
                             case ServerAntwort.AENDERUNGFERTIG:
                                 if ((m!=Server.SPIELSTART)&&(m!=Server.SPIELENDE)){

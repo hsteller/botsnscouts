@@ -88,6 +88,8 @@ public class Server extends Thread implements ModusConstants, ServerOutputThread
 
 	t.interrupt();     // Beende den Thread bei nächster Gelegenheit
 
+	rThreads.remove(t);
+
 	String[] tmpstr=new String[1];
 	tmpstr[0]=t.rob.getName();
 	if (grund.equals("LL"))
