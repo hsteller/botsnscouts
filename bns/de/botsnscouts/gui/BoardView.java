@@ -781,9 +781,6 @@ public class BoardView extends JComponent {
     private void paintCrusher(Graphics g2, Floor floor,
 		      int actx, int acty)
     {
-         // dont know what I'm doing (graphics stuff, not coding!), but we
-        // have to set this somewhere otherwise transparent stuff (gifs) will
-        // not be displayed in a correct manner (only a problem since jdk1.4)
         Graphics2D g = (Graphics2D) g2;
         g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 	g.drawImage(diverseCrop[10],actx,acty,64,64,this);
@@ -799,9 +796,7 @@ public class BoardView extends JComponent {
 
     /** paints the (back-)ground of the board*/
     private void paintSpielfeldBoden( Graphics g2 ) {
-             // dont know what I'm doing (graphics stuff, not coding!), but we
-        // have to set this somewhere otherwise transparent stuff (gifs) will
-        // not be displayed in a correct manner (only a problem since jdk1.4)
+
         Graphics2D g = (Graphics2D) g2;
         g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 	// Grenzen des zu zeichnenden Bereichs berechnen:
@@ -884,9 +879,6 @@ public class BoardView extends JComponent {
 
     private void paintWaende( Graphics g2) {
 
-        // dont know what I'm doing (graphics stuff, not coding!), but we
-        // have to set this somewhere otherwise transparent stuff (gifs) will
-        // not be displayed in a correct manner (only a problem since jdk1.4)
         Graphics2D g = (Graphics2D) g2;
         g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 
@@ -995,9 +987,7 @@ public class BoardView extends JComponent {
     }
 
     private void paintFlaggen( Graphics g2 ) {
-        // dont know what I'm doing (graphics stuff, not coding!), but we
-        // have to set this somewhere otherwise transparent stuff (gifs) will
-        // not be displayed in a correct manner (only a problem since jdk1.4)
+
         Graphics2D g = (Graphics2D) g2;
         g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 
