@@ -246,11 +246,11 @@ public class Bot {
     }
 
     public int getX(){
-	return pos.x;
+	return pos.getX();
     }
 
     public int getY() {
-	return pos.y;
+	return pos.getY();
     }
 
     public Location getPos() {
@@ -358,7 +358,7 @@ public class Bot {
 
     /** Remember the curent poition as archive position */
     public void touchArchive(){
-	setArchive(pos.x, pos.y);
+	setArchive(pos.getX(), pos.getY());
     }
 
     public void setArchive(int x, int y) {
@@ -367,8 +367,8 @@ public class Bot {
     }
 
     public void setArchive(Location o) {
-	archiveX = o.x;
-	archiveY = o.y;
+	archiveX = o.getX();
+	archiveY = o.getY();
     }
 
     /**
@@ -395,8 +395,7 @@ public class Bot {
     }
 
     public void setPos(int x, int y){
-	this.pos.x = x;
-	this.pos.y = y;
+        this.pos.set(x, y);
     }
 
     public void setPos(Location o) {
@@ -440,8 +439,7 @@ public class Bot {
     }
 
     public void setInvalidPos() {
-	this.pos.x = 0;
-	this.pos.y = 0;
+	this.pos.set(0,0);
     }
 
     /** Turns bot to given direction. */
