@@ -10,7 +10,7 @@ package de.botsnscouts.board;
 import java.io.*;
 import java.lang.*;
 
-import de.botsnscouts.util.Roboter;
+import de.botsnscouts.util.*;
 
 public class SpielfeldKS extends SpielfeldSim  {
     private int[][][] entftab;
