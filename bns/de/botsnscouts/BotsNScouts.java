@@ -40,8 +40,10 @@ public class BotsNScouts {
 
             PropertyConfigurator.configure(BotsNScouts.class.getResource("conf/log4j.conf"));
             CAT.debug("Starting app");
-            CAT.debug("User.dir: " + System.getProperty("user.dir"));
-            de.botsnscouts.start.Start.main(args, splash);
+            CAT.info("User.dir: " + System.getProperty("user.dir"));
+	    CAT.info("Java version: "+System.getProperty("java.vendor")+" "+
+			System.getProperty("java.version"));
+	    de.botsnscouts.start.Start.main(args, splash);
         } catch (Throwable t) {
             CAT.fatal("Exception:", t);
             throw t;
