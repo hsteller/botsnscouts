@@ -120,8 +120,11 @@ public class SpielerMensch extends Thread {
 	zErreichtTot = new ZielfahneErreicht(Message.say("SpielerMensch","mkilled"),true);
 	zErreichtGewinner= new ZielfahneErreicht(Message.say("SpielerMensch","mflagreached"),false);
 	zuRepPanel = new  ZuReparieren();
+	KartenMisch karteWarte = new KartenMisch();
+
 	userInterfaceContainer.add(new JPanel(),"leer");
 	userInterfaceContainer.add(gR,"richtung");
+	userInterfaceContainer.add(karteWarte,"warten");
 	userInterfaceContainer.add(zErreichtTot,"zieltot");
 	userInterfaceContainer.add(zErreichtGewinner,"zielgewinner");
 	userInterfaceContainer.add(uI,"karten");
@@ -169,6 +172,8 @@ public class SpielerMensch extends Thread {
 
     private void sendeWunschRichtung(int r) {
 		kCS.respZerstoert(name,r); 
+		uICardLayout.show(userInterfaceContainer,"warten");
+
     }
 
 
@@ -799,7 +804,7 @@ public class SpielerMensch extends Thread {
     protected class IstPowerDownPanel extends JPanel {
 	public IstPowerDownPanel(){
 	    setBorder(new EmptyBorder(0,40,0,0));
-	    add(Box.createVerticalStrut(300));
+	    add(Box.createVerticalStrut(30));
 	    BoxLayout b = new BoxLayout(this,BoxLayout.Y_AXIS);
 	    setLayout(b);
 	    //	    ImageIcon im = new ImageIcon("./de/spline/rr/images/zzz.gif");
@@ -823,7 +828,7 @@ public class SpielerMensch extends Thread {
 
 	public WiederPowerDown(){
 	    setBorder(new EmptyBorder(0,10,0,0));
-	    add(Box.createVerticalStrut(40));
+	    add(Box.createVerticalStrut(30));
 	    BoxLayout b = new BoxLayout(this,BoxLayout.Y_AXIS);
 	    setLayout(b);
 	    JLabel titel = new JLabel(Message.say("SpielerMensch","roboreaktwtitle"));
@@ -1377,4 +1382,21 @@ public class SpielerMensch extends Thread {
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
 	(new SpielerMensch(host,port,name,farbe)).start();
     }
+
+    
+    public class KartenMisch extends JPanel {
+	   public KartenMisch(){
+	       setBorder(new EmptyBorder(0,40,0,0));
+	       add(Box.createVerticalStrut(30));
+	       BoxLayout b = new BoxLayout(this,BoxLayout.Y_AXIS);
+		    setLayout(b);
+		    add(new JLabel(Message.say("SpielerMensch","mkartenMisch")));
+		    add(Box.createVerticalStrut(10));
+		    add(new JLabel(Message.say("SpielerMensch","mbitteWarten")));
+	   }
+    }
+    
+    
+    
+
 }
