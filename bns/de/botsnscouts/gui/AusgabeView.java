@@ -273,13 +273,21 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       JMenu trackMenu = new JMenu(Message.say("AusgabeView", "trackMenu"));
       if (gameBoardCanvas!=null)
         trackMenu.add(new ShowFlagMenu(gameBoardCanvas.getFlags()));
-
-
       trackMenu.add(new ShowRobMenu());
+
+      JMenuItem stats = new JMenuItem(Message.say("AusgabeView", "stats"));
+      stats.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e){
+          ausgabe.showStats();
+        }
+      });
 
       JMenu optionsMenu = new JMenu (Message.say("AusgabeFrame","mOptions"));
       optionsMenu.add(new SpeedMenu());
       optionsMenu.add(new SoundMenu());
+      optionsMenu.add(stats);
+
+
 
       menus.add(new FileMenu());
       menus.add(new ZoomMenu());
@@ -504,6 +512,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
           }
         }
     }
+
 
 
 

@@ -20,15 +20,21 @@ import org.apache.log4j.Category;
 public class Ausgabe extends Thread {
     static Category CAT = Category.getInstance(Ausgabe.class);
 
-   // private HumanPlayer human;
+    // for communication with server
     private KommClientAusgabe kommClient;
     private ClientAntwort kommAntwort = new ClientAntwort();
+
+    // for displaying the stuff
     private AusgabeView ausgabeView;
     private Splash splashScreen;
-    private Hashtable robots = new Hashtable(8);
     private View view;
 
-    // ---------- class variables ------------
+    // managing values of the robots
+    private Hashtable robots = new Hashtable(8);
+
+    // keeping statistic information;  "who-kills-who"-dictionary ;-)
+    private StatsList stats;
+    private JFrame statsWindow;
 
     // game constants
     private Dimension boardDimension;
@@ -39,6 +45,7 @@ public class Ausgabe extends Thread {
     private boolean spielEnde = false;
     private boolean nosplash = false;
     private boolean registered = false;
+
     /** the last phase of the current turn */
     private int lastPhase=1;
 
@@ -89,44 +96,56 @@ public class Ausgabe extends Thread {
 	    // what did the server send?
 	    switch (kommAntwort.typ) {
 	    case (ClientAntwort.MESSAGE):{
-		Global.debug(this,"Server send me: some messsage.");
-		String[] tmpstr=new String[kommAntwort.namen.length-1];
+		CAT.debug("Server send me: some messsage.");
 
+                // getting parts of the message
+                String[] tmpstr=new String[kommAntwort.namen.length-1];
 		for (int i=0;i<tmpstr.length;i++)
 		    tmpstr[i]=kommAntwort.namen[i+1];
 
+                // check the kind of message
                 String msgId = kommAntwort.namen[0];
 		if (!(msgId.substring(0,5).equals("mAusw"))) {
                     if (CAT.isDebugEnabled())
 		      CAT.debug("kommAntowrtnamen[0] ist: "+msgId+ "tmpstr ist: "+tmpstr[0]);
-		    showActionMessage(Message.say("MSG",msgId,tmpstr));
+		    // display the message in the statusbar
+                    showActionMessage(Message.say("MSG",msgId,tmpstr));
 		}
 
 		if (msgId.equals("mRobLaser")){ // robots shooting
-		    Roboter r1=null;
-		    Roboter r2=null;
-		    try {
-			r1=kommClient.getRobStatus(kommAntwort.namen[1]);// firing robot
+                    Roboter r1,r2;
+                    r1=r2=null; //temp. variables
+
+                    try {
+                        // gettin information about involved robots
+                        r1 = kommClient.getRobStatus(kommAntwort.namen[1]);// firing robot
+                        r2 = kommClient.getRobStatus(kommAntwort.namen[2]);// robot hit
+
+                        // updating statistics
+                        Stats actualStats=stats.getStats(r1.getName());
+			actualStats.incHits();
+			if (r2.getSchaden()>=10) // was the robot r2(hit) killed ny r1?
+			    actualStats.incKills();
+			actualStats=stats.getStats(r2.getName());
+			actualStats.incDamageByRobots();
 		    }
 		    catch (KommException k) {
-			k.printStackTrace();
+                        CAT.error("Error getting information for laser animation and stats");
+			CAT.error(k);
 		    }
-		    try {
-			r2=kommClient.getRobStatus(kommAntwort.namen[2]);// robot hit
-		    }
-		    catch (KommException k) {
-			k.printStackTrace();
-		    }
+                    // paint animation and play sounds
 		    ausgabeView.showRobLaser(r1, r2);
 		}
+
                 else if (msgId.equals("mGrubenopfer")) {// robot fell into a pit
+                    // play the sound for "robot fell into pit"
                     SoundMan.playPitFallSound();
                 }
 
-		else if (msgId.equals("mBoardLaser")){ //boardlaser shooting
+		else if (msgId.equals("mBoardLaser")){ // boardlaser shooting
 		    Roboter r1=null;
 		    Ort r1Pos = null;
-		    // get damaged Roboter
+		    // get damaged robot
 		    try {
 			r1=kommClient.getRobStatus(kommAntwort.namen[1]);
 			r1Pos= new Ort (r1.getX(), r1.getY());
@@ -134,7 +153,15 @@ public class Ausgabe extends Thread {
 		    catch (KommException k) {
 			k.printStackTrace();
 		    }
-		    // get the Laser-Position
+
+
+                    // updating statistics for the robot hit
+                    Stats actualStats=stats.getStats(r1.getName());
+                    actualStats.incDamageByBoard();
+
+
+		    // get the origin of the laser (position and other stuff
+                    // needed for animation)
 		    Ort laserPos = new Ort(0,0);
 		    int facing=-1;
 		    int strength=-1;
@@ -149,8 +176,11 @@ public class Ausgabe extends Thread {
 			CAT.error(nfe);
                         nfe.printStackTrace();
 		    }
-		    if ((laserPos!=null)&&(facing>=0)&&(r1Pos!=null)&&(strength>=0))
+
+                    // if enough information,  show laser animation
+		    if ((laserPos!=null)&&(facing>=0)&&(r1Pos!=null)&&(strength>=0)){
 			ausgabeView.showBoardLaser(laserPos, facing, strength, r1Pos);
+                    }
 		    else {
                         if (CAT.isDebugEnabled()){
 			  CAT.error("Ausgabe: unable to calculate Laseranimation: ");
@@ -163,6 +193,9 @@ public class Ausgabe extends Thread {
 		}
 
 		try{
+                    // send response to the server that we got the message
+                    // and did all the stuff we wanted to do, so the server can
+                    // send the next message
 		    kommClient.acknowledgeMsg();
 		} catch (KommFutschException ke) {
 		    CAT.error("ke2: "+ke.getMessage());
@@ -178,7 +211,7 @@ public class Ausgabe extends Thread {
 		break;
 	    }
 
-	    case (ClientAntwort.AENDERUNG): {
+	    case (ClientAntwort.AENDERUNG): {// notify change; something happened
 		Global.debug(this,"Server send me: change occured.");
 
 		// ------- get changes  -----------
@@ -330,6 +363,23 @@ public class Ausgabe extends Thread {
 		else {
                     view.addAusgabeView(ausgabeView);
 		    view.makeVisible();
+                }
+
+                // fetching initial stats
+                try {
+                  CAT.debug("fetching stats..");
+                  stats = kommClient.getStats();
+                  if (CAT.isDebugEnabled()){
+                    CAT.debug("..done");
+                    CAT.debug("stats ist: ");
+                    CAT.debug(stats.toString());
+                  }
+                }
+                catch (KommException ke) {
+                  CAT.error(ke);
+                  CAT.error("KommException occured!");
+                  CAT.error("Failed to initialize Statistics-Menu!!!");
+                  CAT.error("!!YOU BETTER DO NOT CLICK ON THE STATISTICS MENU !!!");
                 }
 
 		removeSplash();
@@ -509,23 +559,27 @@ public class Ausgabe extends Thread {
 */
 
 
+  protected void showStats() {
+    if (statsWindow==null) {
+      statsWindow = new JFrame(Message.say("AusgabeView", "stats"));
+      statsWindow.getContentPane().add(new StatisticPanel(stats));
+      statsWindow.addWindowListener(new WindowAdapter() {
+		public void windowClosing(WindowEvent e){
+                  statsWindow.setVisible(false);
+                }
+          });
 
 
-
-
-
-/*
-     private void initMenus(JFrame frame, JMenu trackMenu) {
-
-
-	JMenu scrollFlag = new JMenu (Message.say("AusgabeFrame","mflagMenu"));
-	optionenMenu.add(scrollFlag);
-
-	//JMenu optTrack = new JMenu((Message.say("AusgabeFrame","mRoboTrack")));
-	optionenMenu.add(trackMenu);
-
+      statsWindow.pack();
     }
-*/
+
+    statsWindow.setVisible(true);
+    statsWindow.show();
+  }
+
+
+
+
 }
 
 
