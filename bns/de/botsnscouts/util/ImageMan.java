@@ -135,7 +135,7 @@ public class ImageMan {
         }catch(InterruptedException ie) { System.err.println( ie ); }
     }
 
-    public ImageIcon getIcon(String s) {
+    public static ImageIcon getIcon(String s) {
 	URL url = BotsNScouts.class.getResource( "images/" + s );
 	return new ImageIcon( url );
     }
