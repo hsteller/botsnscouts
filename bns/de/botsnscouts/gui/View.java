@@ -25,6 +25,7 @@
 
 package de.botsnscouts.gui;
 
+import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.gui.hotkey.*;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.ColoredComponent;
@@ -199,8 +200,8 @@ public class View extends JFrame {
 
 	// set window size to fullscreen 
 	
-    Toolkit tk=Toolkit.getDefaultToolkit();   
-	this.setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);	
+    Dimension ssize = BotsNScouts.getScreenSize(); 
+	this.setSize(ssize.width-8,ssize.height-8);	
 	this.setLocation(4,4);
 
 	// handle window closing 
@@ -300,9 +301,9 @@ public class View extends JFrame {
           this.addMenuBar();
         }
         if (humanView!=null){	      
-	          Toolkit tk = Toolkit.getDefaultToolkit();
-	          int w = tk.getScreenSize().width-8;
-	          int h = tk.getScreenSize().height-8;
+	         Dimension ssize = BotsNScouts.getScreenSize();
+	          int w = ssize.width-8;
+	          int h = ssize.height-8;
 	          int leftPanelWidth=Math.max(w-250, 400);
 	          int leftPanelHeight=Math.max(h-250, 350);
 	          if (CAT.isDebugEnabled()){

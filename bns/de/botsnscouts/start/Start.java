@@ -25,6 +25,7 @@
 
 package de.botsnscouts.start;
 
+import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.gui.Splash;
 import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.OptionPane;
@@ -73,13 +74,13 @@ public class Start extends JFrame implements WindowListener {
         getContentPane().setLayout(layout);
 
         wth = new WaiterThread(this);
-        Toolkit tk = Toolkit.getDefaultToolkit();
-        if (tk.getScreenSize().height < 600) {
+        Dimension ssize = BotsNScouts.getScreenSize();
+        if (ssize.height < 600) {
             fassade = new Facade(150);
         } else {
             fassade = new Facade();
         }
-        setSize(tk.getScreenSize());
+        setSize(ssize);
         setLocation(0, 0);
 
         paint = OptionPane.getBackgroundPaint(this);

@@ -25,6 +25,7 @@
 
 package de.botsnscouts.gui;
 
+import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.util.*;
 
 import java.awt.*;
@@ -54,7 +55,7 @@ public class Splash{
 	dummy=new Frame();
 	splash = new Window(dummy);
 
-	Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+	Dimension screen = BotsNScouts.getScreenSize();
 	int x = (screen.width-WIDTH)/2;
 	int y = (screen.height-HEIGHT)/3;
 	splash.setBounds(x,y,WIDTH,HEIGHT);

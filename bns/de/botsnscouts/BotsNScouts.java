@@ -25,7 +25,13 @@
 
 package de.botsnscouts;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 import org.apache.log4j.*;
+
+
+
 import de.botsnscouts.gui.Splash;
 
 public class BotsNScouts {
@@ -50,4 +56,33 @@ public class BotsNScouts {
         }
 
     }
+    
+    public static Dimension getScreenSize(){
+        String s = System.getProperty("geometry");
+        if (s != null){ 
+            try {
+	            s = s.toLowerCase();
+	            int x = s.indexOf('x');
+	            int x2 = x+1;
+	            if (x>0 && x2 < s.length()) {
+	                String widthS = s.substring(0,x).trim();
+	                int pos2 = x+1;
+	                String heightS =  s.substring(x2).trim();
+	                int width = Integer.parseInt(widthS);
+	                int height = Integer.parseInt(heightS);
+	                return new Dimension(width, height);
+	            }
+            }
+            catch (Exception e){
+                CAT.error(e.getMessage(), e);
+            }
+            
+         }
+       
+        java.awt.Toolkit tk = Toolkit.getDefaultToolkit();
+        return tk.getScreenSize();
+    
+    
+    }
+    
 }

@@ -85,8 +85,8 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 
         setTitle(Message.say("BoardEditor", "mTitel"));
 
-        Toolkit tk = Toolkit.getDefaultToolkit();
-        Dimension dim = tk.getScreenSize();
+       
+        Dimension dim = BotsNScouts.getScreenSize();
 
         sp = new JScrollPane();
         sp.getViewport().setView(boardView);

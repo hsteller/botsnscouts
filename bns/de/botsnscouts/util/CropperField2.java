@@ -27,8 +27,7 @@ package de.botsnscouts.util;
 
 import java.awt.image.*;
 import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.Toolkit;
+
 import java.awt.*;
 
 
@@ -43,18 +42,18 @@ public class CropperField2 {
 	cropper = new Image[cols][rows];
 //	this.comp = comp;
         this.img = img;
-	this.grid = grid;
+        this.grid = grid;
     }
 
     public Image cropImage(int col, int row) {
-	if( cropper[col][row] != null )
-            return cropper[col][row];
-
-        BufferedImage bi = new BufferedImage( grid, grid, BufferedImage.TYPE_4BYTE_ABGR );
-        Graphics g = bi.createGraphics();
-        g.drawImage( img, 0, 0, grid, grid, col*grid, row*grid, (col+1)*grid, (row+1)*grid, null );
-        g.dispose();
-        return bi;
+			if( cropper[col][row] != null )
+	            return cropper[col][row];
+	
+	        BufferedImage bi = new BufferedImage( grid, grid, BufferedImage.TYPE_4BYTE_ABGR );
+	        Graphics g = bi.createGraphics();
+	        g.drawImage( img, 0, 0, grid, grid, col*grid, row*grid, (col+1)*grid, (row+1)*grid, null );
+	        g.dispose();
+	        return bi;
 
     }
 

@@ -25,6 +25,7 @@
  
 package de.botsnscouts.gui;
 
+import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.util.*;
 import java.awt.event.*;
 import java.awt.*;
@@ -35,8 +36,8 @@ import javax.swing.border.*;
 public class AboutFenster extends JFrame{
   
     public AboutFenster() {
-	Toolkit tk=Toolkit.getDefaultToolkit();
-	Dimension d = tk.getScreenSize();
+	
+	Dimension d = BotsNScouts.getScreenSize();
 	setLocation((d.width/2)-200,((d.height/2)-200));
 	setSize(400,500);
 	setTitle(Message.say("AboutFenster","mtitel"));
