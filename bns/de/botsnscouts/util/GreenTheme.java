@@ -5,7 +5,7 @@ import java.awt.*;
 import javax.swing.plaf.*;
 import javax.swing.plaf.metal.*;
 
-class GreenTheme extends DefaultMetalTheme {
+public class GreenTheme extends DefaultMetalTheme {
 	public String getName() {
 		return "botsnscouts"; 
 	}
