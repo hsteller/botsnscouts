@@ -291,7 +291,7 @@ public class Ausgabe extends Thread {
 						    flags);
 		    
 
-		ausgabeView = new AusgabeView(new SACanvas(sim,robotsNewColor),getRoboterArray());
+		ausgabeView = new AusgabeView(new SACanvas(sim,robotsNewColor),getRoboterArray(),this);
 
 		if (view == null) {
 		    view=new View(ausgabeView);

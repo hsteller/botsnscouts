@@ -29,10 +29,10 @@ public class RobotStatus extends JPanel {
     Roboter robot;
 
     public RobotStatus () {
-	this(Roboter.getNewInstance("TestRob"));
+	this(Roboter.getNewInstance("TestRob"),null);
     }
 
-    public RobotStatus (Roboter r) {
+    public RobotStatus (Roboter r, MouseListener botCenter) {
 	robot = r;
 	name = new JLabel(r.getName());
 	flag = new JLabel(""+r.getNaechsteFlagge(),new ImageIcon(flagge),JLabel.LEFT);
@@ -47,27 +47,29 @@ public class RobotStatus extends JPanel {
 	setLayout(new BorderLayout());
 	setBorder( new EtchedBorder(4));
 
-	name.setFont(nameFont);
-	add(name,BorderLayout.NORTH);
-
 	roboInfo.setLayout(new GridLayout(2,2,1,1));
 
-	flag.setVerticalTextPosition(SwingConstants.BOTTOM);
+	name.setFont(nameFont);
 	flag.setFont(labelFont);
-	roboInfo.add(flag);
-
-	lifes.setVerticalTextPosition(SwingConstants.BOTTOM);
 	lifes.setFont(labelFont);
-	roboInfo.add(lifes);
-
-	damage.setVerticalTextPosition(SwingConstants.BOTTOM);
 	damage.setFont(labelFont);
-	roboInfo.add(damage);
-
-	track.setVerticalTextPosition(SwingConstants.BOTTOM);
 	track.setFont(labelFont);
+
+	flag.setVerticalTextPosition(SwingConstants.BOTTOM);
+	lifes.setVerticalTextPosition(SwingConstants.BOTTOM);
+	damage.setVerticalTextPosition(SwingConstants.BOTTOM);
+	track.setVerticalTextPosition(SwingConstants.BOTTOM);
+
+	track.setName(r.getName());
+
+	track.addMouseListener(botCenter);
+
+	roboInfo.add(flag);
+	roboInfo.add(lifes);
+	roboInfo.add(damage);
 	roboInfo.add(track);
 
+	add(name,BorderLayout.NORTH);
 	add(roboInfo,BorderLayout.CENTER);
     }
 

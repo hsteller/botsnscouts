@@ -31,7 +31,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     public AusgabeView() {
     }
 
-    public AusgabeView(SACanvas sa, Roboter[] robots) {
+    public AusgabeView(SACanvas sa, Roboter[] robots, Ausgabe aus) {
+	ausgabe = aus;
 	spielFeld=sa;
 	JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
@@ -39,7 +40,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 	// create status panel
 	for (int i=0; i< robots.length; i++) {
-	    RobotStatus r = new RobotStatus(robots[i]);
+	    RobotStatus r = new RobotStatus(robots[i], new MouseAdapter(){
+		    public void mouseClicked(MouseEvent me) {
+			ausgabe.trackRob(((JLabel)me.getSource()).getName());
+		    }
+		});
 	    robotsStatusContainer.add(r);
 	    robotStatus.put(robots[i].getName(),r);
 	}
