@@ -242,12 +242,32 @@ public class StartPanel extends JPanel{
         gc.anchor = GridBagConstraints.WEST;
         panel.add(beltAware, gc);
 
+        final JTextField botNameField = new JTextField(KrimsKrams.randomName());
+        botNameField.setColumns(10);
+        JPanel botnamePanel = new JPanel();
+        botnamePanel.setOpaque(false);
+        botnamePanel.add(new JLabel(Message.say("Start", "mKSName")));
+        botnamePanel.add(botNameField);
+        gc.gridx = 2;
+        gc.gridwidth = 1;
+	gc.anchor = GridBagConstraints.EAST;
+        gc.fill =  GridBagConstraints.CENTER;
+	gc.insets = noInsets;
+        panel.add(botnamePanel, gc);
+
         JButton startAB=new TransparentButton(Message.say("Start","mKSStarten"));
 	startAB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
                     CAT.debug("intel ist jetzt "+intel.getValue());
-		    parent.addKS(parent.fassade.kuenstlicheSpielerStarten(intel.getValue(),beltAware.getModel().isSelected()));
-		}});
+                    String name = botNameField.getText();
+                    if (name == null || name.length()==0)
+                      name = KrimsKrams.randomName();
+		    parent.addKS(parent.fassade.kuenstlicheSpielerStarten(intel.getValue(),
+                                                                          beltAware.getModel().isSelected(),
+                                                                          name));
+
+		    botNameField.setText(KrimsKrams.randomName());
+                }});
 
 	gc.gridx = 4;
 	gc.gridwidth = 1;
@@ -305,5 +325,7 @@ public class StartPanel extends JPanel{
     public void setThreadToWait(Thread th){
 	thread=th;
     }
+
+
 
 }

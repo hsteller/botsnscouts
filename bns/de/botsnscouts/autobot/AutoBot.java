@@ -45,18 +45,18 @@ public class AutoBot extends BNSThread {
     }
 
     public AutoBot(String ip, int port, int malus) {
-        this(ip, port, malus, false);
+        this(ip, port, malus, false, KrimsKrams.randomName());
     }
     /**
      * This constructor also gets a playing strength: the higher malus
      * is, the worse the 'bot will be. 0 is best, therefore.
      */
-    public AutoBot(String i, int p, int malus, boolean beltAware) {
+    public AutoBot(String i, int p, int malus, boolean beltAware, String name) {
         ip = i;
         port = p;
         this.malus = malus;
         this.beltAware=beltAware;
-        realname = KrimsKrams.randomName();
+        realname = name;
         super.setName("AutoBot:" + realname);
     }
 
