@@ -29,7 +29,7 @@ import java.applet.Applet;
 import java.applet.AudioClip;
 import de.botsnscouts.BotsNScouts;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.*;
 
 /** SoundMan configures, loads and plays the sounds
  *  To add a new sound, simply add a constant and add the filename
@@ -48,6 +48,16 @@ public class SoundMan {
     /** Another Sound of robot laser */
     public static final int LASER2 = 2;
 
+    public static final int LASER_GREEN = 6;
+    public static final int LASER_YELLOW = 7;
+    public static final int LASER_RED = 8;
+    public static final int LASER_BLUE= 9;
+    public static final int LASER_ROSA = 10;
+    public static final int LASER_ORANGE = 11;
+    public static final int LASER_GRAY = 12;
+    public static final int LASER_VIOLET = 13;
+
+
     /** Sound of robot reaching a flag. */
     public static final int FLAG_REACHED = 3;
 
@@ -57,20 +67,33 @@ public class SoundMan {
     /** Sound of a robot pushing another one. */
     public static final int PUSHING = 5;
 
+   public static final int BOO = 14;
+
     /** How to locate the sounds relative to de.botsnscouts.BotsNScouts
      *  Mind the ordering.
      */
     private static final String[] filenames = {
 	"sounds/pit.wav",
-	"sounds/laserhit.wav",
+	"sounds/laser1.wav",
 	"sounds/laser2.wav",
 	"sounds/flag_reached.wav",
 	"sounds/boardlaser.wav",
-	"sounds/push.wav"
+	"sounds/push.wav",
+        "sounds/laser_green.wav",
+        "sounds/laser_yellow.wav",
+        "sounds/laser_red.wav",
+        "sounds/laser_blue.wav",
+        "sounds/laser_rosa.wav",
+        "sounds/laser_orange.wav",
+        "sounds/laser_gray.wav",
+        "sounds/laser_violet.wav",
+        "sounds/boo.wav"
     };
 
     /** These sounds are robot laser sounds */
-    private static final int[] laserSounds = {LASER1, LASER2};
+  //  private static final int[] laserSounds = {LASER1, LASER2, LASER3, LASER4,
+  //                                            LASER5,LASER6,LASER7,LASER8,LASER9,
+  //                                           LASER10};
 
     private static final AudioClip[] sounds = new AudioClip[filenames.length];
 
@@ -80,6 +103,7 @@ public class SoundMan {
     private static boolean soundsEnabled;
 
   static {
+    CAT.setPriority(Priority.DEBUG);
     String tmp=Conf.getProperty("sound.active");
     if (tmp==null)
 	soundsEnabled=false;
@@ -92,25 +116,32 @@ public class SoundMan {
 
   }
 
+
+
     public static synchronized void playSound(int sound){
 	try {
+
 	    if (soundsLoaded && soundsEnabled){
+                System.out.println("spiele..");
 		sounds[sound].play();
 	    }
+            System.out.println("gespielt?");
 	}catch (ArrayIndexOutOfBoundsException ex){
 	    CAT.error("Invalid sound constant chosen.");
 	}
     }
-
+/*
   public static synchronized void playNextLaserSound(){
       try {
+        System.out.println("loaded?"+soundsLoaded);
+      System.out.println("enabled?"+soundsEnabled);
 	  playSound(laserSounds[actualLaserSound]);
 	  actualLaserSound = ++actualLaserSound%laserSounds.length;
       } catch(ArrayIndexOutOfBoundsException ex){
 	  CAT.error("Invalid laser sound constant chosen.");
       }
   }
-
+*/
   public static synchronized void playPitFallSound() {
       playSound(PIT);
   }
@@ -139,15 +170,22 @@ public class SoundMan {
 
 
   public static synchronized void loadSounds() {
-      if (soundsLoaded || (!soundsEnabled))
-	    return;
+      System.out.println("loaded?"+soundsLoaded);
+      System.out.println("enabled?"+soundsEnabled);
+
+      if (soundsLoaded || (!soundsEnabled)){
+
+          return;
+      }
 	Thread t = new BNSThread () {
 		public void run() {
+                  System.out.println("*************************************");
                   try {
 
 		    SoundMan.CAT.debug("Initializing sounds..");
 
 		    for (int i=0; i<sounds.length; i++){
+                        System.out.println("Lade "+filenames[i]);
 			sounds[i] = loadSound(filenames[i]);
 			if (sounds[i] == null)
 			    throw new Exception("Sound "+filenames[i]+" was not loaded");

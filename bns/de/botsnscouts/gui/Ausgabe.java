@@ -210,6 +210,7 @@ public class Ausgabe extends BNSThread {
 		    }
 		}
                 else if (msgId.equals("mKlugSchKlick")){
+                    SoundMan.playSound(SoundMan.BOO);
                     Roboter r1= (Roboter )robots.get(kommAntwort.namen[1]);
                     Stats actualStats=stats.getStats(r1.getName());
                     actualStats.incAskWisenheimer();

@@ -136,14 +136,14 @@ public class SACanvas extends JComponent {
     private Ort lastScoutPos = new Ort();
 
     // Let's define some colors, so that everybody uses the same..
-    public static final Color GREEN  = new Color(4,156,52);
-    public static final Color YELLOW = new Color(251,253,4);
-    public static final Color RED    = new Color(252,2,4);
-    public static final Color BLUE   = new Color(4,2,250);
-    public static final Color ROSA   = new Color(251,2,251);
-    public static final Color ORANGE = new Color(233,94,4);
-    public static final Color GRAY   = new Color(220,222,220);
-    public static final Color VIOLET = new Color(155,2,203);
+    public static final Color GREEN  = BotVis.GREEN;
+    public static final Color YELLOW = BotVis.YELLOW;
+    public static final Color RED    = BotVis.RED;
+    public static final Color BLUE   = BotVis.BLUE;
+    public static final Color ROSA   = BotVis.ROSA;
+    public static final Color ORANGE = BotVis.ORANGE;
+    public static final Color GRAY   = BotVis.GRAY;
+    public static final Color VIOLET = BotVis.VIOLET;
 
 
 
@@ -360,9 +360,10 @@ public class SACanvas extends JComponent {
 	int laenge = calculateLaserLength(source, target, laserFacing);
 	laenge*=64;
 
-	Color c = getRobColor(sourceRob.getName());
+        String name = sourceRob.getName();
 
-        SoundMan.playNextLaserSound();
+        Color c = getRobColor(name);
+        SoundMan.playSound(BotVis.getBotLaserSoundByName(name));
         synchronized(this){
 	  try {
 	    wait (50);
@@ -388,8 +389,10 @@ public class SACanvas extends JComponent {
 		 }
 	     }
 	}
+
 	// drawRobLaser=false;
 	if (SoundMan.isSoundActive()) {
+           // SoundMan.playSound(SoundMan.BUMM);
 	    synchronized(this){
 		try {
 		    wait (200);
