@@ -1,5 +1,8 @@
 package de.botsnscouts.server;
 
+import de.botsnscouts.comm.*;
+import de.botsnscouts.util.*;
+
 class ServerAusgabeThread extends Thread
 {
     Server server;
@@ -51,7 +54,7 @@ class ServerAusgabeThread extends Thread
                               break;
 
                           case ans.GIBSPIELFELDDIM: 
-                              komm.sendSpielfeldDim(server.feld.sizeX,server.feld.sizeY);
+                              komm.sendSpielfeldDim(server.feld.getSizeX(),server.feld.getSizeY());
                               break;
                             
                           case ans.GIBSPIELFELD:
@@ -59,7 +62,7 @@ class ServerAusgabeThread extends Thread
                               break;
                             
                           case ans.GIBFAHNENPOS:
-                              komm.sendFahnenpos(server.feld.flaggen);
+                              komm.sendFahnenpos(server.feld.getFlaggen());
                               break;
                             
                           case ans.GIBNAMEN:
@@ -74,10 +77,6 @@ class ServerAusgabeThread extends Thread
                                   server.ausgabeEntstoepseln(this,"RV");
                                   ende=true;
                               }
-                              break;
-                            
-                          case ans.GIBFELDINHALT:
-                              komm.sendFeldinhalt(server.feld.getFeld(ans.ort.x, ans.ort.y));      
                               break;
                             
                           case ans.GIBROBSTATUS:

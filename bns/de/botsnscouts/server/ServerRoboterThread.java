@@ -1,5 +1,8 @@
 package de.botsnscouts.server;
 
+import de.botsnscouts.util.*;
+import de.botsnscouts.comm.*;
+
 public class ServerRoboterThread extends Thread
 {
     Integer modus;
@@ -8,15 +11,17 @@ public class ServerRoboterThread extends Thread
     
     private Server server;
     private ServerAntwort ans;
-    protected RoboterServer rob;
+    protected KommServerRoboter komm;
+    protected Roboter rob;
 
     private boolean ende;
     
-    public ServerRoboterThread(RoboterServer r,Server s)
+    public ServerRoboterThread(Roboter r,Server s,KommServerRoboter k)
         {
             rob=r;
             server=s;
 	    modus = new Integer(s.NIX);
+	    komm=k;
         }
 
     private void notifyServer(){
@@ -35,12 +40,12 @@ public class ServerRoboterThread extends Thread
 	    d("starting up.");
             while((!ende)&&(!isInterrupted())){
                 try{
-                    ans=rob.Komm.warte();
+                    ans=komm.warte();
 		    d("Got a "+ans.getTyp());
                     synchronized(modus){
                         int m=modus.intValue();
                         switch(ans.typ){
-                            case ans.PROGRAMMIERUNG:
+                            case ServerAntwort.PROGRAMMIERUNG:
                                 if (m!=server.PROGRAMMIERUNG){
                                     d("RV: habe Programmierung im Modus "+m+" erhalten; und tschuess");
                                     server.roboterHinrichten(this,"RV");
@@ -48,7 +53,7 @@ public class ServerRoboterThread extends Thread
                                     return;
                                 }
 
-                                rob.naechsteRundeDeaktiviert=ans.ok; // PowerDown?
+                                rob.setNaechsteRundeDeaktiviert(ans.ok); // PowerDown?
                                 
                                 d("Setze Programmierung um.");
                                 // Zug loeschen
@@ -64,7 +69,7 @@ public class ServerRoboterThread extends Thread
                                 int ansidx=0;
                                 for (int i=0;i<5;i++)
                                     if (rob.getZug(i)==null)
-                                        rob.setZug(i,rob.zugeteilteKarten[ans.register[ansidx++]-1]);
+                                        rob.setZug(i,rob.getKarten()[ans.register[ansidx++]-1]);
                                 
                                 d("Programmierung umgesetzt. Roboter:");
                                 rob.zeige_Roboter();
@@ -73,7 +78,7 @@ public class ServerRoboterThread extends Thread
 
                                 break;
                             
-                            case ans.AUSRICHTUNG:
+                            case ServerAntwort.AUSRICHTUNG:
                                 if ((m!=server.INITAUSR)&&(m!=server.ZERSTOERT_SYNC)&&(m!=server.ZERSTOERT_ASYNC)){
                                     d("RV: habe Ausrichtung im Modus"+m+"erhalten; und tschuess");
                                     server.roboterHinrichten(this,"RV");
@@ -93,7 +98,7 @@ public class ServerRoboterThread extends Thread
                                 }
                                 break;
                                 
-                            case ans.REAKTIVIERUNG:
+                            case ServerAntwort.REAKTIVIERUNG:
                                 if (m!=server.POWERUP){
                                     d("RV: habe Reaktivierung im Modus "+m+" erhalten; und tschuess");
                                     server.roboterHinrichten(this,"RV");
@@ -106,7 +111,7 @@ public class ServerRoboterThread extends Thread
 				notifyServer();
                                 break;
                                 
-                            case ans.REPARATUR: 
+                            case ServerAntwort.REPARATUR: 
                                 if (m!=server.ENTSPERREN){
                                     d("RV: habe Reperatur im Modus "+m+" erhalten; und tschuess");
                                     server.roboterHinrichten(this,"RV");
@@ -121,7 +126,7 @@ public class ServerRoboterThread extends Thread
 
                                 break;
                                 
-                            case ans.ABMELDUNG:
+                            case ServerAntwort.ABMELDUNG:
 				d("Abmeldung. Modus: "+m);
                                 ende=true;
 				if ((m==server.PROGRAMMIERUNG)||(m==server.INITAUSR)||(m==server.ZERSTOERT_SYNC)||(m==server.POWERUP)||(m==server.ENTSPERREN)||(m==server.SPIELSTART)||(m==server.SPIELENDE))
@@ -129,7 +134,7 @@ public class ServerRoboterThread extends Thread
 				
                                 return;
                             
-                            case ans.AENDERUNGFERTIG:
+                            case ServerAntwort.AENDERUNGFERTIG:
                                 if ((m!=server.SPIELSTART)&&(m!=server.SPIELENDE)){
                                     d("RV: habe OK im Modus "+m+" erhalten; und tschuess");
                                     server.roboterHinrichten(this,"RV");
@@ -140,23 +145,23 @@ public class ServerRoboterThread extends Thread
 				notifyServer();
                                 break;
 
-                            case ans.GIBSPIELFELDDIM: 
-                                rob.Komm.sendSpielfeldDim(server.feld.sizeX,server.feld.sizeY);
+                            case ServerAntwort.GIBSPIELFELDDIM: 
+                                komm.sendSpielfeldDim(server.feld.getSizeX,server.feld.getSizeY);
                                 break;
                             
-                            case ans.GIBSPIELFELD:
-                                rob.Komm.sendSpielfeld(server.feld.getSpielfeldString());
+                            case ServerAntwort.GIBSPIELFELD:
+                                komm.sendSpielfeld(server.feld.getSpielfeldString());
                                 break;
                             
-                            case ans.GIBFAHNENPOS:
-                                rob.Komm.sendFahnenpos(server.feld.flaggen);
+                            case ServerAntwort.GIBFAHNENPOS:
+                                komm.sendFahnenpos(server.feld.getFlaggen);
                                 break;
                             
-                            case ans.GIBNAMEN:
-				rob.Komm.sendNamen(server.gibNamen());
+                            case ServerAntwort.GIBNAMEN:
+				komm.sendNamen(server.gibNamen());
                                 break;
                             
-                            case ans.GIBROBOTERPOS:
+                            case ServerAntwort.GIBROBOTERPOS:
                                 if ((m==server.SPIELSTART)||(m==server.SPIELENDE)||(m==server.NIX)){
                                     d("RV: habe GibRoboterPos im Modus "+m+" erhalten; und tschuess");
                                     server.roboterHinrichten(this,"RV");
@@ -174,7 +179,7 @@ public class ServerRoboterThread extends Thread
 
 				Ort o=server.gibRobPos(ans.name);
 				if (o!=null)
-				    rob.Komm.sendRobpos(o);
+				    komm.sendRobpos(o);
 
                                 else{
 				    d("RV: gibRoboterPos irgendwie unter falschen Voraussetzungen erhalten");
@@ -184,11 +189,11 @@ public class ServerRoboterThread extends Thread
                     
                                 break;
                             
-                            case ans.GIBFELDINHALT:
-				rob.Komm.sendFeldinhalt(server.feld.getFeld(ans.ort.x, ans.ort.y));      
+                            case ServerAntwort.GIBFELDINHALT:
+				komm.sendFeldinhalt(server.feld.getFeld(ans.ort.x, ans.ort.y));      
                                 break;
                             
-                            case ans.GIBROBSTATUS:
+                            case ServerAntwort.GIBROBSTATUS:
                             if ((m==server.SPIELSTART)||(m==server.SPIELENDE)||(m==server.NIX)){
                                     d("RV: habe GibRobStatus im Modus "+m+" erhalten; und tschuess");
                                     server.roboterHinrichten(this,"RV");
@@ -205,30 +210,30 @@ public class ServerRoboterThread extends Thread
                                 Roboter r;
                                 r = server.roboterStatus(ans.name);
                                 if(r.getName().compareTo("")!=0){
-                                    rob.Komm.sendRobStatus(r);
+                                    komm.sendRobStatus(r);
                                 }else{ 
-                                    rob.Komm.sendRobStatus(); 
+                                    komm.sendRobStatus(); 
 				}
                                 break;
 
-                            case ans.GIBSPIELSTAND:
+                            case ServerAntwort.GIBSPIELSTAND:
 				if(server.spiellaeuft()){
-                                    rob.Komm.spielstand(new Boolean(true),  server.auswertung());
+                                    komm.spielstand(new Boolean(true),  server.auswertung());
                                 }else
-                                    rob.Komm.spielstand(new Boolean(false), server.auswertung());
+                                    komm.spielstand(new Boolean(false), server.auswertung());
                                 break;
                             
-                            case ans.GIBAUSWERTUNGSSTATUS:
-				rob.Komm.spielStatus(server.gibAuswertungsStatus());
+                            case ServerAntwort.GIBAUSWERTUNGSSTATUS:
+				komm.spielStatus(server.gibAuswertungsStatus());
                                 break;
                             
-                            case ans.GIBTIMEOUT:
-				rob.Komm.sendTimeOut(server.zugto/1000); 
+                            case ServerAntwort.GIBTIMEOUT:
+				komm.sendTimeOut(server.zugto/1000); 
                                 break;
-			    case ans.GIBFARBEN:	
-                                rob.Komm.sendFarben(server.angemeldet);
+			    case ServerAntwort.GIBFARBEN:	
+                                komm.sendFarben(server.angemeldet);
 				break;
-			     case ans.MESSAGE:
+			     case ServerAntwort.MESSAGE:
 				 String[] tmp=new String[ans.msg.length-1];
 				 for (int k=1;k<ans.msg.length;k++)
 				     tmp[k-1]=ans.msg[k];

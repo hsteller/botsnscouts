@@ -139,7 +139,7 @@ public Server(	int 		anzahlmitspieler,
     public Ort gibRobPos(String name){
 	for (Iterator it=rThreads.iterator();it.hasNext();){
 	    ServerRoboterThread srt=(ServerRoboterThread)it.next();
-	    if (srt.rob.name.equals(name))
+	    if (srt.rob.getName().equals(name))
 		return srt.rob.getPos();
 	} 
 	return null;
@@ -362,7 +362,7 @@ public synchronized void ausgabenBenachrichtigen(String[] s){
     protected void roboterHinrichten(ServerRoboterThread t, String grund ) {
 	d("roboterHinrichten aufgerufen. robname="+t.rob.getName()+"; grund="+grund);
 	try{
-	    t.rob.Komm.entfernen(grund);
+	    t.komm.entfernen(grund);
 	}
 	catch(KommFutschException ex) {
 	    new Fehlermeldung(Message.say("Server","eKommFutschR", t.rob.getName()));
@@ -457,7 +457,7 @@ public synchronized void ausgabenBenachrichtigen(String[] s){
 		ServerRoboterThread unfertigerRob = null;
 		for (Iterator e=rThreadsAufDieIchWarte.iterator();e.hasNext();){
 		    ServerRoboterThread tmp = (ServerRoboterThread  )e.next();
-		    d(tmp.rob.name+"fertig?        "+tmp.fertig);
+		    d(tmp.rob.getName()+"fertig?        "+tmp.fertig);
 		    if (!tmp.fertig) {
 			unfertig++;
 			unfertigerRob = tmp;
@@ -506,7 +506,7 @@ public synchronized void ausgabenBenachrichtigen(String[] s){
 	    //Broadcast an die betroffenen Threads, Inhalt je nach Modus
 	    for (Iterator e=rThreadsAufDieIchWarte.iterator();e.hasNext();) {
 		ServerRoboterThread srt = (ServerRoboterThread )e.next();
-		KommServerRoboter komm = srt.rob.Komm;
+		KommServerRoboter komm = srt.komm;
 
 		try{
 		    switch(modus) {
@@ -518,7 +518,7 @@ public synchronized void ausgabenBenachrichtigen(String[] s){
 			break;
 		    case PROGRAMMIERUNG:
 		    //PRE: Im RoboterServer stehen die richtigen Karten
-			komm.zugabgabe(srt.rob.zugeteilteKarten);
+			komm.zugabgabe(srt.rob.getKarten());
 			break;
 		    case POWERUP:
 			komm.reaktivierung();
@@ -774,10 +774,10 @@ private synchronized boolean anmeldung(){
 private void setzeStartPunkt(){
 	// setzen der x-, y-, archivX- und archivY-Koordinaten in den Robots auf 
 	// die Koordinaten der ersten Flagge
-	d("setze x und archivX in robots auf "+feld.flaggen[0].getX());
-	d("setze y und archivY in robots auf "+feld.flaggen[0].getY());
+	d("setze x und archivX in robots auf "+feld.getFlaggen()[0].getX());
+	d("setze y und archivY in robots auf "+feld.getFlaggen()[0].getY());
 	for(int i = 0; i < aktRoboter.size(); i++){
-	    ((ServerRoboterThread)(aktRoboter.elementAt(i))).rob.setPos(feld.flaggen[0]);
+	    ((ServerRoboterThread)(aktRoboter.elementAt(i))).rob.setPos(feld.getFlaggen()[0]);
 	    ((ServerRoboterThread)(aktRoboter.elementAt(i))).rob.touchArchiv();
 	}
 }
@@ -962,11 +962,11 @@ private void roboterThreadStart(){
 		ServerRoboterThread tmp = ((ServerRoboterThread )e.next());
 		if (!tmp.rob.istAktiviert()) 
 		    rThreadsAufDieIchWarte.addElement(tmp);
-		else if (tmp.rob.naechsteRundeDeaktiviert) {
+		else if (tmp.rob.isNaechsteRundeDeaktiviert()) {
 		    //Auschalten der, die letzte Mal PowerDown gesagt haben.
 		    d(tmp.rob.getName()+" ist naechste Runde ausgeschaltet.");
 		    tmp.rob.setAktiviert(false);
-		    tmp.rob.naechsteRundeDeaktiviert = false;
+		    tmp.rob.setNaechsteRundeDeaktiviert(false);
                     tmp.rob.setSchaden(0);
 		}
 		
@@ -1050,7 +1050,7 @@ private void roboterThreadStart(){
 		    for (Iterator e=aktRoboter.listIterator(); e.hasNext();) {
 			ServerRoboterThread tmp = (ServerRoboterThread )e.next();
 			// Gewinner?
-			if (tmp.rob.getNaechsteFlagge() == feld.flaggen.length+1) {
+			if (tmp.rob.getNaechsteFlagge() == feld.getFlaggen.length+1) {
 			    //raus aus aktiven Robos, in Gewinnerliste,
                             // vom Plan nehmen, ausgabenbenachrichtigen
 			    synchronized(tmp.modus) {
@@ -1065,7 +1065,7 @@ private void roboterThreadStart(){
 			    ausgabenMsg("mGewinn",tmpstr);	
 			    // ...........................
 			    try{
-				tmp.rob.Komm.entfernen("GO");
+				tmp.komm.entfernen("GO");
 			    }
 			    catch(KommException ex) {
 				d("Roboter "+tmp.rob.getName()+" konnte nicht mehr von seiner Entfernung wg. GO(Gewinn) benachrichtigt werden: "+ex);
@@ -1091,7 +1091,7 @@ private void roboterThreadStart(){
 				tmp.rob.setSchaden(2);
 				//Register entsperren
 				tmp.rob.entsperreAlleRegs();
-                                tmp.rob.naechsteRundeDeaktiviert=false;
+                                tmp.rob.setNaechsteRundeDeaktiviert(false);
                                 
 				zerstoerteRoboter.addElement(tmp);
 				synchronized(tmp.modus) {
@@ -1099,7 +1099,7 @@ private void roboterThreadStart(){
 				    tmp.modus = new Integer(ZERSTOERT_ASYNC);
 				}
 				try {
-				    tmp.rob.Komm.zerstoert();
+				    tmp.komm.zerstoert();
 				}
                                 catch(KommFutschException ex){
                                     new Fehlermeldung(Message.say("Server", "eKommFutschR",tmp.rob.getName()));
@@ -1114,7 +1114,7 @@ private void roboterThreadStart(){
 				    tmp.modus = new Integer(SPIELENDE);
 				}
 				try {
-				    tmp.rob.Komm.entfernen("LL");
+				    tmp.komm.entfernen("LL");
 				}
 				catch (KommException ex){
 				    d("Kommunikationsfehler beim Entfernen eines Roboters");

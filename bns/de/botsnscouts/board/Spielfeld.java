@@ -188,6 +188,13 @@ public class Spielfeld implements de.botsnscouts.util.Directions
   /** Sicherungskopie des Spielfeldstrings */
   protected String SpielfeldString;
 
+    public int getSizeX(){
+	return sizeX;
+    }
+    public int getSizeY(){
+	return sizeY;
+    }
+
   /***** Konstruktoren *****/
 
   /** Initialisiert ein Spielfeld aus zweien. Zerstört unter Umständen Teile der hereingegebenen

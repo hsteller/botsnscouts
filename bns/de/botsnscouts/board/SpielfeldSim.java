@@ -4,8 +4,7 @@ import java.util.Vector;
 import java.util.Enumeration;
 
 
-import de.botsnscouts.util.Roboter;
-import de.botsnscouts.util.Ort;
+import de.botsnscouts.util.*;
 import de.botsnscouts.server.Server;
 
 /** Das intelligente Spielfeld

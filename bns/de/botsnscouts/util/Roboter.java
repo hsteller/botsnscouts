@@ -118,6 +118,14 @@ public class Roboter {
 	}
     }
 
+    public boolean isNaechsteRundeDeaktiviert(){
+	return nextTurnPowerDown;
+    }
+
+    public void setNaechsteRundeDeaktiviert(boolean b){
+	nextTurnPowerDown=b;
+    }
+
     public String getName(){
 	return name;
     }

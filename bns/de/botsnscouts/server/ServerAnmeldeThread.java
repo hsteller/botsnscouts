@@ -2,7 +2,8 @@ package de.botsnscouts.server;
 
 import java.io.*; 
 import java.net.*; 
-
+import de.botsnscouts.util.*;
+import de.botsnscouts.comm.*;
 
 /** 
  * Handhabt eine Connection nebenlaeufig.
@@ -223,10 +224,10 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 			} //synchronized server.angemeldet
 			d("Farbe Nr. "+farbe+" zugeteilt.");
 
-			RoboterServer h=new RoboterServer(clientname);
-			h.Komm = new KommServerRoboter(in,out);
+			Roboter h=Roboter.getNewInstance(clientname);
+			KommServerRoboter komm = new KommServerRoboter(in,out);
 			try{
-			    h.Komm.anmeldeBestaetigung(true);
+			    komm.anmeldeBestaetigung(true);
 			}catch(KommException ke){
 			    d("ok konnte nicht an roboter gesendet werden");
 			    return;
@@ -236,7 +237,7 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 			oberThread.anzSpieler=new Integer(oberThread.anzSpieler.intValue()+1);
 			d(""+oberThread.anzSpieler+". Roboter mit Name "+clientname+" erzeugt.");
 			
-			ServerRoboterThread neu=new ServerRoboterThread(h,server);
+			ServerRoboterThread neu=new ServerRoboterThread(h,server,komm);
 			server.addRoboterThread(neu);
 			d("ServerRoboterThread erzeugt und einsortiert.");
 			oberThread.addName(" "+clientname+" ");
