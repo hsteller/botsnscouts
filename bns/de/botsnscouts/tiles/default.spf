@@ -1,9 +1,15 @@
-#Sat Mar 17 17:21:54 GMT+01:00 2001
-flag2y=2
-flag2x=3
+#Sat Jun 02 01:33:10 CEST 2001
+flag3x=3
+flag0y=3
+flag0x=21
+kach0,0=BotsN.rra
 dreh0,0=0
-flag1y=6
-flag1x=10
-flag0y=11
-flag0x=3
-kach0,0=swp1.rra
+kach1,0=NScouts.rra
+flag2y=8
+flag2x=23
+dreh1,0=0
+flag4y=6
+flag4x=12
+flag1y=12
+flag1x=9
+flag3y=10
