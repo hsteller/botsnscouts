@@ -180,9 +180,9 @@ public class StartServer extends Thread{
 	    System.err.println("StartServer: Kann nicht mit dem StartSpielerListener kommunizieren!(SGL)");
     }
     
-    public boolean neuerSpieler(String name, int farbe,Server s){
-	if(!comPass.sendString("NSA\n"+name+"\n"+farbe,cltIP[searchServ(s)],cltPort[searchServ(s)])){
-	    System.err.println("StartServer: Kann nicht mit dem StartSpielerListener kommunizieren!(NSA)"+cltPort[searchServ(s)]+" "+cltIP[searchServ(s)]);
+    public boolean neuerSpieler(String name, int farbe,ThreadMaintainer s){
+	if(!comPass.sendString("NSA\n"+name+"\n"+farbe,cltIP[searchServ((Server)s)],cltPort[searchServ((Server)s)])){
+	    System.err.println("StartServer: Kann nicht mit dem StartSpielerListener kommunizieren!(NSA)"+cltPort[searchServ((Server)s)]+" "+cltIP[searchServ((Server)s)]);
 	    return false;
 	}
 	else

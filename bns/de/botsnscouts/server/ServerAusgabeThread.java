@@ -7,6 +7,7 @@ class ServerAusgabeThread extends Thread implements Waitable
 {
     private InfoRequestAnswerer info;
     private OKListener ok;
+    private MOKListener mok;
     private ServerOutputThreadMaintainer outMaint;
     private KommServerAusgabe komm;
     private boolean ende;
@@ -22,9 +23,10 @@ class ServerAusgabeThread extends Thread implements Waitable
 	version=v;
     }
 
-    public ServerAusgabeThread(KommServerAusgabe ksa, OKListener okL, InfoRequestAnswerer info, ServerOutputThreadMaintainer m)
+    public ServerAusgabeThread(KommServerAusgabe ksa, OKListener okL, MOKListener mokl, InfoRequestAnswerer info, ServerOutputThreadMaintainer m)
         {
             ok=okL;
+	    mok=mokl;
 	    this.info=info;
 	    outMaint=m;
             komm=ksa;
@@ -123,6 +125,11 @@ class ServerAusgabeThread extends Thread implements Waitable
 			      notifyServer();
 			      return;
 
+		          case ServerAntwort.MSG_ACK:
+			      d("Msg_ack received.");
+			      mok.notifyDone(this);
+			      break;
+
 		      default:
                               d("Erhielt einen Typ "+ans.typ+"; ich weiss nicht was ich damit soll und entstoepsle mich.");
                               outMaint.deleteOutput(this,"RV");
@@ -159,6 +166,9 @@ class ServerAusgabeThread extends Thread implements Waitable
     synchronized void endGame() throws java.io.IOException{
 	komm.in.close();
 	komm.out.close();
+    }
+    synchronized void sendMsg(String id, String[] args){
+	komm.message(id,args);
     }
 
 }

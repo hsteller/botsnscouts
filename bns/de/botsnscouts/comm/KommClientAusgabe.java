@@ -36,6 +36,11 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
       }
   }
 
+    /** Acknowledges a Message has been received */
+    public void acknowledgeMsg() throws KommException{
+	this.senden("MOK");
+    }
+
     /** This methods asks for the actual game stats (laserhits).
 	@exception ..if an error occurs
 	@return A sorted list of Stats-objects.

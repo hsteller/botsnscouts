@@ -150,8 +150,17 @@ public class Ausgabe extends Thread {
 		    }
 		}
 
+		try{
+		    kommClient.acknowledgeMsg();
+		} catch (KommFutschException ke) {
+		    System.err.println("ke2: "+ke.getMessage());
+		    return;
+		}
+		catch (KommException kE) {
+		    System.err.println(kE.getMessage());
+		    return;
+		}
 
-		kommClient.bestaetigung();
 		break;
 	    }
 

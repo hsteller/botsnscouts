@@ -12,7 +12,7 @@ import de.botsnscouts.comm.*;
 
 public class ServerAnmeldeThread extends Thread{
 
-    private Server server;
+    private ThreadMaintainer server;
     private Socket socket;
     private ServerAnmeldeOberThread oberThread;
 
@@ -51,7 +51,7 @@ public class ServerAnmeldeThread extends Thread{
 	    d("schaue nach ob Client etwas geschickt hat.");
 
 	    String erhalten;
-	    socket.setSoTimeout(server.anmeldeto);
+	    socket.setSoTimeout(server.getSignUpTimeout());
 	    erhalten = in.readLine();
 	    d("erhalten = "+erhalten);
 	    socket.setSoTimeout(0);
@@ -147,7 +147,7 @@ public class ServerAnmeldeThread extends Thread{
 		d("ok konnte nicht an Ausgabekanal gesendet werden");
 		return;
 	    }
-	    ServerAusgabeThread neu = new ServerAusgabeThread(ksa, server, server, server);
+	    ServerAusgabeThread neu = new ServerAusgabeThread(ksa, server.getOKListener(), server.getMOKListener(), server.getInfoRequestAnswerer(), server.getOutputThreadMaintainer());
 
 	    if (clienttype==AUSGABEV2)
 		neu.setVersion(2);
@@ -157,7 +157,7 @@ public class ServerAnmeldeThread extends Thread{
 	    synchronized (oberThread.namen){
 		if (oberThread.isLegalName(clientname)){
 		    oberThread.addName(" ( "+clientname+" ) ");
-		    server.addAusgabeThread(neu);
+		    server.addOutput(neu);
 		    d("neuen Ausgabethread erzeugt");
 		}
 		else {
@@ -201,7 +201,7 @@ public class ServerAnmeldeThread extends Thread{
 		    d("Der Name ist jedenfalls noch nicht vergeben.");
 
 		    synchronized(oberThread.anzSpieler){
-			if (oberThread.anzSpieler.intValue()==server.anzSpieler){
+			if (oberThread.anzSpieler.intValue()==server.getMaxPlayers()){
 			    d("Zuviele Spieler. Kille Verbindung");
 			    out.println("REN(ZS)");
 			    try{
@@ -212,17 +212,7 @@ public class ServerAnmeldeThread extends Thread{
 			} // Zuviele Spieler
 			d("Noch nicht zuviele Spieler.");
 
-			// Farbe festlegen und eintragen
-			synchronized(server.angemeldet){
-			    if ((farbe>0)&&(server.angemeldet[farbe-1]==null))
-				farbe--;
-			    else{
-				farbe=(int)(Math.random()*7+1);
-				while (server.angemeldet[farbe]!=null)
-				    farbe=(farbe+1)%8;
-			    }
-			    server.angemeldet[farbe]=clientname;
-			} //synchronized server.angemeldet
+			farbe=server.allocateColor(farbe,clientname);
 			d("Farbe Nr. "+farbe+" zugeteilt.");
 
 			Roboter h=Roboter.getNewInstance(clientname);
@@ -239,13 +229,13 @@ public class ServerAnmeldeThread extends Thread{
 			oberThread.anzSpieler=new Integer(oberThread.anzSpieler.intValue()+1);
 			d(""+oberThread.anzSpieler+". Roboter mit Name "+clientname+" erzeugt.");
 
-			ServerRoboterThread neu=new ServerRoboterThread(h,server,server,server,komm);
-			server.addRoboterThread(neu);
+			ServerRoboterThread neu=new ServerRoboterThread(h,server.getOKListener(),server.getInfoRequestAnswerer(),server.getRobThreadMaintainer(),komm);
+			server.addRobotThread(neu);
 			d("ServerRoboterThread erzeugt und einsortiert.");
 			oberThread.addName(" "+clientname+" ");
-			server.startServer.neuerSpieler(clientname,farbe,server);
+			server.getStartServer().neuerSpieler(clientname,farbe,server);
 
-			if (oberThread.anzSpieler.intValue()>=server.anzSpieler){ // alle da
+			if (oberThread.anzSpieler.intValue()>=server.getMaxPlayers()){ // alle da
 			    try {
 				sleep(5000);
 			    }

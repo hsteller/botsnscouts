@@ -7,12 +7,13 @@ import de.botsnscouts.board.*;
 import de.botsnscouts.comm.*;
 
 public class Server extends Thread 
-    implements ServerRobotThreadMaintainer, ServerOutputThreadMaintainer,
+    implements ServerRobotThreadMaintainer, ServerOutputThreadMaintainer, ThreadMaintainer,
     OKListener, InfoRequestAnswerer{
 
     // Vektoren
     private Vector aThreads		= new Vector();	// ServerAusgabeThread
     private Vector ausgabenEintrittsListe	= new Vector();	// ServerAusgabeThread
+
     private Vector rThreads		= new Vector();	// ServerRoboterThread
     private Vector aktRoboter		= new Vector();	// ServerRoboterThread
     private Vector zerstoerteRoboter	= new Vector();	// ServerRoboterThread
@@ -21,6 +22,8 @@ public class Server extends Thread
     private Vector gewinner               = new Vector(); //ServerRoboterThread (Letzte Fahne erreicht)
 
     private ServerAnmeldeOberThread sAnmeldeThread;
+    private MessageThread messageThread;
+    
     protected SpielfeldSim feld;	
     private Ort[] flaggen;	
     protected int anzSpieler;
@@ -31,8 +34,6 @@ public class Server extends Thread
     private boolean gameover = false;
     private int aktPhase=0; // enthaelt die Nummer der gerade auswertenden Phase. 0 wenn nicht ausgewertet wird
 
-    private Vector msgQ; // Um zu sendende Messages zwischenzuspeichern
-    
     // Timeouts
     protected int zugto;
     private int kommto; //Für Dinge, die nur eine Reaktion erwarten, kein Nachdenken, z.B. Spielstart
@@ -118,85 +119,7 @@ public class Server extends Thread
 
     /** Schickt eine Nachricht an alle Ausgaben >= Version 2.0 */
     public void sendMsg(String id,String s[]){
-
-	/* Vorsicht: Nur der ServerThread darf diese Methode wirklich ausführen!
-	   Ansonsten legt sich ein anderer Thread sleepen, und der Server wird
-	   notifyed - wenn er womöglich ganz woanders sleept... */
-        
-	/*        d("sendMsg aufgerufen. id="+id);
-
-        if (Thread.currentThread()!=this){
-	d("Uh-oh: sendMsg von "+Thread.currentThread()+"aufgerufen... Packe msg in Q...");
-
-	synchronized(msgQ){
-	msgQ.addElement(id);
-	msgQ.addElement(s);
-	}
-
-	synchronized(this){
-	d("Notifie ServerThread, damit die Nachrichten geschickt werden...");
-	this.notify();
-	}
-                    
-	return;
-        }        
-
-        synchronized(aThreads){
-	for (Iterator it=aThreads.iterator();it.hasNext();){
-	ServerAusgabeThread tmp=(ServerAusgabeThread)it.next();
-
-	if (!tmp.isAlive()){
-	it.remove();      //aus aThreads
-	continue;
-	}
-		
-	if (tmp.version >= 2)
-	tmp.fertig=false;
-	else{
-	tmp.fertig=true;
-	continue;
-	}
-                
-	synchronized (tmp.modus){
-	tmp.modus=new Integer(FRAGENERLAUBT);
-	}
-	tmp.komm.message(id, s);
-	} //for
-	d("Msg: Alle relevanten AusgabeThreads benachrichtigt und in den richtigen Modus versetzt.");
-        }
-
-        if (aThreads.size()==0)
-	return;              // die Muehe koennen wir uns dann auch gerade schenken...
-    
-        Vector killList=new Vector();  // nach TO zu entstoepselnde Ausgaben
-    
-        aThreadsAufDieIchWarte=aThreads;
-
-        ausgabenWecker.setTimer(ausgabennotifyto,this);
-        synchronized(ausgabenWecker){
-	ausgabenWecker.notify();
-        }
-        try{
-	while (!(ausgabenWecker.vorbei()||alleAusgabenFertig()))
-	wait();
-        } catch (InterruptedException ex){
-	d("Interruptiert worden.");
-        }
-        ausgabenWecker.interrupt();
-        
-        synchronized(aThreads){
-	for (Iterator e=aThreads.iterator();e.hasNext();){
-	ServerAusgabeThread tmp=(ServerAusgabeThread)e.next();
-	tmp.modus=new Integer(KEINEFRAGEN);
-	if (!tmp.fertig){
-	d("Ausgabe nicht fertig. Überführe in Killliste.");
-	killList.addElement(tmp);
-	}
-	}
-        } // synchronized aThreads
-        
-        for (Iterator e=killList.iterator();e.hasNext();)
-	deleteOutput((ServerAusgabeThread)e.next(),"TO");*/
+	messageThread.append(id,s);
     }
 
     public void reEntry(ServerRoboterThread s){
@@ -221,6 +144,38 @@ public class Server extends Thread
     }
 
     public int getOutputTimeout(){ return ausgabennotifyto; }
+
+    // Methods mandated by interface ThreadMaintainer
+    public Vector getActiveOutputs(){ return aThreads; }
+    public MOKListener getMOKListener(){ return messageThread; }
+    public OKListener getOKListener(){ return this; }
+    public ServerRobotThreadMaintainer getRobThreadMaintainer(){ return this; }
+    public ServerOutputThreadMaintainer getOutputThreadMaintainer(){ return this; }
+    public InfoRequestAnswerer getInfoRequestAnswerer(){ return this; }
+    public StartServer getStartServer(){ return startServer; }
+    public int getSignUpTimeout(){ return anmeldeto; }
+    public int getMaxPlayers(){ return anzSpieler; }
+    public void addOutput(ServerAusgabeThread s){
+	d("Addiere Ausgabe zu Eintrittsliste hinzu");
+	ausgabenEintrittsListe.addElement(s);
+    }
+    public void addRobotThread(ServerRoboterThread s){
+	rThreads.addElement(s);
+	aktRoboter.addElement(s);
+    }
+    public synchronized int allocateColor(int color, String name){
+	if ((color>0)&&(angemeldet[color-1]==null))
+	    color--;
+	else{
+	    color=(int)(Math.random()*7+1);
+	    while (angemeldet[color]!=null)
+		color=(color+1)%8;
+	}
+	angemeldet[color]=name;
+	return color;
+    }
+
+    
 
     // Methods mandated by interface InfoRequestAnswerer
 
@@ -337,7 +292,6 @@ public class Server extends Thread
       	zugto = zugabgabetimeout*1000;
 	startServer = sserver;	
 	flaggen = Flaggen;
-        msgQ=new Vector();
 
 	try{
 	    feld=new SpielfeldSim(x,y,Spielfeld,flaggen,this);
@@ -355,18 +309,6 @@ public class Server extends Thread
       	d("spielfeld             : \n"+feld);
     }
 
-    // For ServerAnmeldeThread
-
-    public void addAusgabeThread(ServerAusgabeThread s){
-	d("Addiere Ausgabe zu Eintrittsliste hinzu");
-	ausgabenEintrittsListe.addElement(s);
-    }
-
-    public void addRoboterThread(ServerRoboterThread s){
-	rThreads.addElement(s);
-	aktRoboter.addElement(s);
-    }
-
     // For the Board, to send the "something has changed"-message
    
     public void ausgabenBenachrichtigen(String[] s){
@@ -379,69 +321,46 @@ public class Server extends Thread
 	    throw new RuntimeException("nur der Serverthread darf Server.sendMsgWennNoetig aufrufen.");
 	}
 	
-	//sendMsgWennNoetig();      // Dies ist ein guter Zeitpunkt alles los zu werden :-)
-	
 	d("Größe der eintrittsliste: "+ausgabenEintrittsListe.size()+"; aThreads: "+aThreads.size());
 	setzeAusgaben();         // neue Ausgaben begrüßen
 	d("Größe der eintrittsliste: "+ausgabenEintrittsListe.size()+"; aThreads: "+aThreads.size());
 
-	waitablesImWaitingFor=new WaitingForSet(aThreads);
+	synchronized(aThreads){
+	    waitablesImWaitingFor=new WaitingForSet(aThreads);
 	
-	for (Iterator it=aThreads.iterator();it.hasNext();){
-	    ServerAusgabeThread tmp=(ServerAusgabeThread)it.next();
-	    if (!tmp.isAlive()){
-		it.remove(); //aus aThreads
-		waitablesImWaitingFor.remove(tmp);
-		continue;
-	    }
+	    for (Iterator it=aThreads.iterator();it.hasNext();){
+		ServerAusgabeThread tmp=(ServerAusgabeThread)it.next();
+		if (!tmp.isAlive()){
+		    it.remove(); //aus aThreads
+		    waitablesImWaitingFor.remove(tmp);
+		    continue;
+		}
+		
+		tmp.setMode(FRAGENERLAUBT);
+		
+		try{
+		    tmp.notifyChange(s);
+		}
+		catch (KommFutschException ex){
+		    new Fehlermeldung(Message.say("Server","eKommFutschA"));
+		}
+		catch (KommException ex){
+		    d("ausgabenBenachrichtigen: Es ist eine KommException aufgetreten.");
+		}
+	    } //for
+	    d("Alle AusgabeThreads benachrichtigt und in den richtigen Modus versetzt.");
+	
+	    if (aThreads.size()==0)
+		return;              // die Muehe koennen wir uns dann auch gerade schenken...
+	
+	    d("Der Server wartet jetzt "+ausgabennotifyto+" Millisek. auf seine AusgabenThreads (aenderung()).");
+	    Iterator it=waitablesImWaitingFor.waitFor(ausgabennotifyto);
 	    
-	    tmp.setMode(FRAGENERLAUBT);
-
-	    try{
-		tmp.notifyChange(s);
-	    }
-	    catch (KommFutschException ex){
-		new Fehlermeldung(Message.say("Server","eKommFutschA"));
-	    }
-	    catch (KommException ex){
-		d("ausgabenBenachrichtigen: Es ist eine KommException aufgetreten.");
-	    }
-	} //for
-	d("Alle AusgabeThreads benachrichtigt und in den richtigen Modus versetzt.");
-	
-	if (aThreads.size()==0)
-	    return;              // die Muehe koennen wir uns dann auch gerade schenken...
-	
-	d("Der Server wartet jetzt "+ausgabennotifyto+" Millisek. auf seine AusgabenThreads (aenderung()).");
-	Iterator it=waitablesImWaitingFor.waitFor(ausgabennotifyto);
-	
-	while (it.hasNext())
-	    deleteOutput((ServerAusgabeThread)it.next(),"TO");
-    }
-
-
-    /** Schickt Messages aus der msgQ an die Ausgaben */
-    private void sendMsgWennNoetig()
-    {
-	// PRE: currentThread ist der ServerThread
-	//  ... aber wir pruefen das lieber nochmal :-)
-            
-	if (Thread.currentThread()!=this){
-	    d("sendMsgWennNoetig: DAS IST NICHT DER SERVERTHREAD HIER, sondern "+Thread.currentThread());
-	    throw new RuntimeException("nur der Serverthread darf Server.sendMsgWennNoetig aufrufen.");
-	}
-            
-	d("sendMsgWennNoetig aufgerufen...");
-	synchronized(msgQ){
-	    while (msgQ.size()>0){
-		d("Die Q hat "+msgQ.size()+"Elemente... Sende "+(String)msgQ.elementAt(0)+".");
-		sendMsg((String)msgQ.elementAt(0),(String [])msgQ.elementAt(1));
-		msgQ.removeElementAt(0);
-		msgQ.removeElementAt(0);  // The first one already is gone...
-	    }
+	    while (it.hasNext())
+		deleteOutput((ServerAusgabeThread)it.next(),"TO");
 	}
     }
-    
+
     // Private methods needed by run()
 
     /** Modus in ServerRoboterThreads setzen und warten, bis sie zu Potte kommen.
@@ -562,46 +481,50 @@ public class Server extends Thread
     }
 
     /** Uebertraegt ausgabeneintrittsliste in offizielle Ausgabenliste */
-    private synchronized void setzeAusgaben(){
+    private void setzeAusgaben(){
+	d("setzeAusgaben");
+	synchronized (aThreads){
+	    d("lock on aThreads");
+	    synchronized (ausgabenEintrittsListe){
+		d("lock on ausgabenEintrittsListe");
+		if (ausgabenEintrittsListe.size()==0)
+		    return;
+		else
+		    d("Es gibt neue Ausgaben. Begrüße sie.");
 
-	synchronized (ausgabenEintrittsListe){
-	    if (ausgabenEintrittsListe.size()==0)
-		return;
-	    else
-		d("Es gibt neue Ausgaben. Begrüße sie.");
+		waitablesImWaitingFor = new WaitingForSet(ausgabenEintrittsListe);
 
-	    waitablesImWaitingFor = new WaitingForSet(ausgabenEintrittsListe);
-
-	    for (Iterator e=ausgabenEintrittsListe.iterator();e.hasNext();){
-		ServerAusgabeThread tmp=(ServerAusgabeThread)e.next();
-		tmp.setMode(FRAGENERLAUBT);
-		try{
-		    tmp.startGame();
-		}
-		catch (KommFutschException ex){
-		    new Fehlermeldung(Message.say("Server", "eKummFutschA"));
-		}
-		catch (KommException ex){
-		    d("setzeAusgaben: Es ist eine KommException aufgetreten.");
-		}
-		tmp.start();
-	    } //for
-	    d("Alle ael-s benachrichtigt und in den richtigen Modus versetzt.");
+		for (Iterator e=ausgabenEintrittsListe.iterator();e.hasNext();){
+		    ServerAusgabeThread tmp=(ServerAusgabeThread)e.next();
+		    tmp.setMode(FRAGENERLAUBT);
+		    try{
+			tmp.startGame();
+		    }
+		    catch (KommFutschException ex){
+			new Fehlermeldung(Message.say("Server", "eKummFutschA"));
+		    }
+		    catch (KommException ex){
+			d("setzeAusgaben: Es ist eine KommException aufgetreten.");
+		    }
+		    tmp.start();
+		} //for
+		d("Alle ael-s benachrichtigt und in den richtigen Modus versetzt.");
     
-	    Iterator it = waitablesImWaitingFor.waitFor(ausgabennotifyto);
+		Iterator it = waitablesImWaitingFor.waitFor(ausgabennotifyto);
 
-	    while (it.hasNext())
-		ausgabenEintrittsListe.remove(it.next());
+		while (it.hasNext())
+		    ausgabenEintrittsListe.remove(it.next());
 
-	    d("Kopiere ael: "+ausgabenEintrittsListe.size());
-	    for (Iterator iter=ausgabenEintrittsListe.iterator();iter.hasNext();){
-		ServerAusgabeThread tmp=(ServerAusgabeThread)iter.next();
-		tmp.setMode(KEINEFRAGEN);
-		iter.remove();     // aus ael
-		d("Addiere einen zu aThreads hinzu");
-		aThreads.addElement(tmp);
-	    }
-	} // synchronized ausgabenEL
+		d("Kopiere ael: "+ausgabenEintrittsListe.size());
+		for (Iterator iter=ausgabenEintrittsListe.iterator();iter.hasNext();){
+		    ServerAusgabeThread tmp=(ServerAusgabeThread)iter.next();
+		    tmp.setMode(KEINEFRAGEN);
+		    iter.remove();     // aus ael
+		    d("Addiere einen zu aThreads hinzu");
+		    aThreads.addElement(tmp);
+		}
+	    } // synchronized ausgabenEL
+	} // sync aThreads
     }    
 	
     // returns false if interrupted, true if all is ok
@@ -670,6 +593,10 @@ public class Server extends Thread
      */
     public void run(){
         setName("ServerThread");
+
+	d("MsgThreadStart");
+	messageThread=new MessageThread(this, kommto);
+	messageThread.start();
         
 	d("anmeldung()");
 	boolean spielgestartet=anmeldung();
@@ -1050,12 +977,10 @@ public class Server extends Thread
                     }
                 } //for
                 d("Alle AusgabeThreads vom Spielende benachrichtigt und in den richtigen Modus versetzt.");
-            }
             
-	    waitablesImWaitingFor = new WaitingForSet(aThreads);
-	    waitablesImWaitingFor.waitFor(ausgabennotifyto);
+		waitablesImWaitingFor = new WaitingForSet(aThreads);
+		waitablesImWaitingFor.waitFor(ausgabennotifyto);
             
-            synchronized(aThreads){
                 for (Iterator e=aThreads.iterator();e.hasNext();){
                     ServerAusgabeThread tmp=(ServerAusgabeThread)e.next();
                     try{
@@ -1076,10 +1001,14 @@ public class Server extends Thread
             d("IOException beim AnmeldeThreadKillen.");
         }
         
-	d("Ende meiner run()-Methode erreicht!!!");
+	// MessageThread killen
+	messageThread.interrupt();
+
 	//leo
 	d("rufe spielZuEnde() beim StartServer auf");
 	startServer.spielZuEnde(this);
+
+	d("Ende meiner run()-Methode erreicht!!!");
     }// run() ende
 
     private void d(String s){

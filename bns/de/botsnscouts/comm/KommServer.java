@@ -537,6 +537,10 @@ public class KommServer {
 	      }
 	      break;
 	  }
+	  if ((nd=='O')&&(rd=='K')){
+	      back.typ=back.MSG_ACK;
+	      break;
+	  }
       }
       default : {
 	error=true;
