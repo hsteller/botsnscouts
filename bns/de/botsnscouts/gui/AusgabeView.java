@@ -183,7 +183,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	int x1 = Math.max( x - w2 , 0);
 	int y1 = Math.max( y - h2 , 0);
 
-	// soll ich ¸berhaupt scrollen?
+	// soll ich Åberhaupt scrollen?
 	// in X-Richtung
 	if ((x < ( (gameBoardView.getViewPosition().x)+10 ) ) ||
 	    x > ( (gameBoardView.getViewPosition().x+sz.width)-10 )) {

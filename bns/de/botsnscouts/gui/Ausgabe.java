@@ -227,7 +227,7 @@ public class Ausgabe extends Thread {
 		    // --------- Neue Roboter-Position an Spielfeld senden ---------
 		    try {
 			Thread.sleep(100);
-		    } // Verzögerung der Ausgabegeschwindigkeit
+		    } // Verz÷gerung der Ausgabegeschwindigkeit
 		    catch (Exception e) {
 			System.err.println(e.getMessage());
 		    }
@@ -434,7 +434,7 @@ public class Ausgabe extends Thread {
 
     /**
      * Zeigt einen Text im Splashscreen an
-     * (erzeugt den Splashscreen, falls nötig)
+     * (erzeugt den Splashscreen, falls n÷tig)
      */
     private void showSplash(String s) {
 	if(!nosplash) {
@@ -448,7 +448,7 @@ public class Ausgabe extends Thread {
 
     /**
      * Zeigt einen Text im Splashscreen an
-     * (erzeugt den Splashscreen, falls nötig)
+     * (erzeugt den Splashscreen, falls n÷tig)
      */
     private void removeSplash() {
 	if(!nosplash) {

@@ -138,9 +138,9 @@ public class HumanPlayer extends Thread {
 	    // robot destroyed or initally set on the board
 	    case (ClientAntwort.ZERSTOERUNG): {
 		humanView.showGetDirection();
-		Global.debug(this,"Habe einee Zerstörung bekommen.");
+		Global.debug(this,"Habe einee Zerst÷rung bekommen.");
 		showMessage(Message.say("SpielerMensch","roboauffeld"));
-		   // --- Spielfeld für den Klugscheisser holen
+		   // --- Spielfeld fr den Klugscheisser holen
 		if (intelliBoard==null) {
 		    initIntelligentBoard();
 		    wisenheimer = new Wisenheimer(intelliBoard);

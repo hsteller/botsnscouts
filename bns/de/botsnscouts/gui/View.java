@@ -77,12 +77,12 @@ public class View extends JFrame {
    }
 */
     synchronized private void initView() {
-	// Fenstergröße auf Vollbild setzen
+	// Fenstergr÷˜e auf Vollbild setzen
 	Toolkit tk=Toolkit.getDefaultToolkit();
 	setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);
 	setLocation(4,4);
 
-	// Fentster-Schließen behandeln
+	// Fentster-Schlie˜en behandeln
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e){
 		      if (ausgabeView!=null){
