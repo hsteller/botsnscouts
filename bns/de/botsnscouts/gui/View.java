@@ -47,12 +47,12 @@ public class View extends JFrame {
 	getContentPane().add(hv, BorderLayout.EAST);
     }
 
-
+/*
     public void shutup() {
 	System.exit(0);
     }
 
-
+*/
 
 
     public static void main (String args[]) {
@@ -72,7 +72,15 @@ public class View extends JFrame {
 	// Fentster-Schlieﬂen behandeln
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e){
-		    shutup();
+		      if (ausgabeView!=null){
+                          ausgabeView.quit(false); // will tell all the others to quit, using
+                                                   // the same functions like the Quit-game-button;
+                                                   // quitHumanPlayer() will be called, too
+                      }
+                      else {
+                          CAT.fatal("ausgabeView is null!!!");
+                      }
+                     //shutup()
 		}});
 
 	// Layout erzeugen
@@ -132,7 +140,7 @@ public class View extends JFrame {
     }
 
     protected void quitHumanPlayer() {
-         CAT.debug("Telling the human player to quit..");
+        CAT.debug("View is telling the human player to quit..");
         if (humanView!=null) {
           humanView.quitHumanPlayer();
           humanView=null;
@@ -142,9 +150,12 @@ public class View extends JFrame {
           CAT.debug("There seems to be no human player, I'm propably a standalone Ausgabe(view)..");
         }
         CAT.debug("Disposing the frame..");
-        dispose();
+        setVisible(false);
+        CAT.debug("View is now invisible");
 
     }
+
+
 
 
 

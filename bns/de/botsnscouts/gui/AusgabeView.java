@@ -9,12 +9,16 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import org.apache.log4j.Category;
+
 /**
  * Zeigt das Spielfeld und alle Statusmeldungen an
  * @author Lukasz Pekacki
  */
 
 public class AusgabeView extends JPanel implements AusgabeViewInterface {
+    static Category CAT = Category.getInstance(AusgabeView.class);
+
     // --- objects
     private JScrollPane spielFeldScrollFenster;
     private JViewport spielFeldView;
@@ -109,10 +113,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
     }
 
+    /*
     public void shutup() {
 	System.exit(0);
     }
-
+*/
 
 
     /**
@@ -224,7 +229,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     }
 
     /** parameter will be ignored*/
-     private void quit(boolean keepWatching) {
+     protected void quit(boolean keepWatching) {
+        CAT.debug("AusgabeView starts procedure to quit the client..");
         ausgabe.quit(keepWatching);
     }
 

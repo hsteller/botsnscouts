@@ -240,8 +240,8 @@ public class Ausgabe extends Thread {
 	    }
 
 	}
-	Global.debug(this,"I reached the end of my run() method");
-	showActionMessage(Message.say("AusgabeFrame","spielende"));
+	CAT.debug("Ausgabe reached end of its run method");
+	//showActionMessage(Message.say("AusgabeFrame","spielende"));
 	return;
     }
 
@@ -481,48 +481,30 @@ public class Ausgabe extends Thread {
     }
 
     protected void quit (boolean keepWatching) {
+        CAT.debug("Ausgabe sends quit..");
+        abmelden();
+        CAT.debug("Ausgabe sets condition for exiting its run method..");
+        spielEnde=true;
+        CAT.debug("Ausgabe tells the view to propagate quitting..");
         view.quitHumanPlayer(); // Tell the view to tell the HumanPlayer to quit, if there is any
-      //  if (!keepWatching){
-          abmelden();
-          spielEnde=true;
-       // }
     }
+/*
+    protected void quit() {
+        abmelden();
+        spielEnde=true;
+        view.setVisible(false);
+    }
+
+*/
+
+
+
+
+
+
 
 /*
-
-
-
-
-    }
-
-
-    private class MenuBarListener implements ActionListener {
-
-	public void actionPerformed (ActionEvent e) {
-	    String mPunkt = e.getActionCommand();
-	    if (mPunkt.equals(Message.say("AusgabeFrame","mFinish"))) {
-
-		dispose();
-	    }
-	}
-    }
-
-
      private void initMenus(JFrame frame, JMenu trackMenu) {
-
-	// Menüleiste einfügen
-	JMenuBar hauptMenu = new JMenuBar();
-	MenuBarListener mBL = new MenuBarListener();
-
-	JMenu dateiMenu = new JMenu(Message.say("AusgabeFrame","mFile"));
-	JMenuItem mBeenden = new JMenuItem((Message.say("AusgabeFrame","mFinish")));
-	mBeenden.addActionListener(mBL);
-	dateiMenu.add (mBeenden);
-	hauptMenu.add(dateiMenu);
-
-
-
-
 
 
 	JMenu scrollFlag = new JMenu (Message.say("AusgabeFrame","mflagMenu"));

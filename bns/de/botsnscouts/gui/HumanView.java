@@ -8,12 +8,16 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import org.apache.log4j.Category;
+
 /**
  * view for the human player
  * @author Lukasz Pekacki
  */
 
 public class HumanView extends JPanel implements HumanViewInterface {
+
+    static Category CAT = Category.getInstance(HumanView.class);
 
     private HumanPlayer human;
     private CardLayout panelSwitcher = new CardLayout();
@@ -261,8 +265,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
      *  exit the programm
      *  eihter by game over or by user request
      */
-    public void shutup() {
-    }
+   // public void shutup() {}
 
 
     protected void updateRegisters(Karte[] robRegs){
@@ -362,6 +365,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
 
     protected void quitHumanPlayer() {
+      CAT.debug("HumanView asks the HumanPLayer to quit..");
       human.quit();
     }
 

@@ -20,7 +20,7 @@ import javax.swing.plaf.metal.*;
  * @author Lukasz Pekacki
  */
 public class HumanPlayer extends Thread {
-    static Category CAT = Category.getInstance(SACanvas.class);
+    static Category CAT = Category.getInstance(HumanPlayer.class);
 
 
     protected final static int MODE_PROGRAM = 0;
@@ -216,13 +216,15 @@ public class HumanPlayer extends Thread {
 	    }
 	}
 
-	CAT.debug("Human Player finishes");
+	CAT.debug("Human Player reached end of run-method");
         //view.removeChatPane();
 
         try {
+        CAT.debug("Waiting for Ausgabe (join())..");
          ausgabe.join();
+        CAT.debug("Ausgabe is now ready,,");
 	} catch(InterruptedException e){e.printStackTrace();}
-
+        CAT.info("HUMANPLAYER FINISHED!");
 	return;
 
     }
@@ -333,12 +335,18 @@ public class HumanPlayer extends Thread {
     /** meldet den Spieler beim Server ab und beendet diesen Thread.
      */
     protected void quit() {
-	Global.debug(this, "Roboter "+name+" is leaving the party.");
+        if (CAT.isDebugEnabled())
+          CAT.debug(name+"was called to quit");
+	CAT.debug("sending quit to server..");
 	comm.abmelden(name);
+        CAT.debug("setting condition for leaving the run()-method");
         gameOver=true;
-	//Dafuer sorgen, dass Thread aufhoert
+
+               //Dafuer sorgen, dass Thread aufhoert
 	//System.exit(0);
     }
+
+
 
     protected void passUpdatedScout(int chosen, Roboter[] robs) {
 	ausgabe.showScout(chosen,robs);

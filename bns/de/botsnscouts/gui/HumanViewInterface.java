@@ -7,7 +7,7 @@ import de.botsnscouts.util.*;
  */
 
 public interface HumanViewInterface {
-    
+
     /**
      * display a message that is shown only to this player
      */
@@ -80,7 +80,7 @@ public interface HumanViewInterface {
      *  exit the programm
      *  eihter by game over or by user request
      */
-    public void shutup();
+   // public void shutup();
 }
 
 

@@ -7,13 +7,13 @@ import de.botsnscouts.util.*;
  */
 
 public interface AusgabeViewInterface {
-    
+
     /**
      * Schreibt in die Statuszeile einen Text
      */
-    public void showActionMessage(String s);     
-    
-    
+    public void showActionMessage(String s);
+
+
     /**
      *  Zentriert das Fenster auf die angegebene Position
      */
@@ -32,7 +32,7 @@ public interface AusgabeViewInterface {
     /**
      *  Behandelt das Fensterschlieﬂen
      */
-    public void shutup();
+    //public void shutup();
 
 
     /**
