@@ -1,4 +1,5 @@
-body { background-color:#373737; 
+body { 
+  background-color:#373737; 
   background-image:url(images/garage2.jpg);
   font-family:verdana,helvetica,sans-serif; 
   color:#cec4c4; 
@@ -28,7 +29,7 @@ div {
  }
 
 div.navi { 
-  background-image:url(images/semigray.gif);
+  background-image:url(images/semigray.png);
   border:1px solid black;
 }
 
