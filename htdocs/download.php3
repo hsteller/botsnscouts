@@ -18,7 +18,7 @@ You need one of the following packages :
 HREF="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.2.zip">Bots'n'Scouts 
 0.8.2 (binary only) </A>(1.27MB)</LI>
 <LI><A
-HREF="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.2-src.zip">
+HREF="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.2-srconly.zip">
 Bots'n'Scouts 0.8.2 (source edition, no class files)</A>(1.27MB)</LI>
 </UL>
 For completeness sake, you can still download the previous version here (but really ... why should you?)
