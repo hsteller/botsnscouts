@@ -212,7 +212,12 @@ public class GameFieldPanel extends JPanel{
 		}});
 
 	name=new JLabel(Message.say("Start","mName"));
-	nam=new JTextField(KrimsKrams.randomName());
+	String n=Conf.getProperty("robot.name");   // Set in bns.config?
+	if (n==null || n.equals(""))
+	    n=Conf.getProperty("user.name");	      // System property
+	if (n==null || n.equals(""))
+	    n=KrimsKrams.randomName();	      // KrimsKrams-Random
+	nam=new JTextField(n);
 	farbe=new JLabel(Message.say("Start","mFarbe"));
 	farben=new RoboBox(true);
 	mitspielen=new JCheckBox(Message.say("Start","mTeilnehmenBox"),true);
