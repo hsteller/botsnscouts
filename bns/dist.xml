@@ -85,13 +85,14 @@
     <copy todir="${dest.bin}">
       <fileset dir="${basedir}/tools/distrib.binary" excludes="*.nodist" />
     </copy>
+    <copy tofile="${build}/${maindir}/conf/log4j.conf" file="${basedir}/tools/log4j.noDebug" />
     <jar jarfile="${dest.bin}/botsnscouts.jar" manifest="tools/manifest">
        <fileset dir="${build}" />
     </jar>
   </target>
 
   <target name="dist-src">
-    <!-- Creates a binary bns-tree under ${dest.src} -->
+    <!-- Creates a source bns-tree under ${dest.src} -->
     <mkdir dir="${dest.src}" />
     <mkdir dir="${dest.src}/lib" />
     <mkdir dir="${dest.src}/src" />
@@ -119,7 +120,7 @@
 	</patternset>
       </fileset>
     </copy>
-<!--    <copy todir="${todir}" file="${basedir}/build.xml" /> -->
+    <copy tofile="${dest.src}/src/${maindir}/conf/log4j.conf" file="${basedir}/tools/log4j.noDebug" />
   </target>
 
 </project>
