@@ -10,7 +10,7 @@
 <I>An addictive multiplayer networked strategy game inspired by RoboRally, written in Java.</I>
 </CENTER>
 <h2>News</h2>
-Version 0.8.2 is available! Go directly to <a href="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.2.zip">downloading botsnscouts-0.8.1.zip</a>. It includes some smaller optimizations and JDK1.4 compatibility fixes. 
+Version 0.8.2 is available! Go directly to <a href="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.2.zip">downloading botsnscouts-0.8.2.zip</a>. It includes some smaller optimizations and JDK1.4 compatibility fixes. 
 <P>
 We still proudly announce what was new in 0.8:
 <ul>

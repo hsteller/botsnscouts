@@ -14,10 +14,12 @@ Bots'n'Scouts is available as free software under the <A HREF="http://www.fsf.or
 You need one of the following packages :
 <BR>
 <UL>
-<LI><A HREF="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.1.zip">Bots'n'Scouts 0.8.1 (binary only) </A>(1.27MB)</LI>
 <LI><A
-HREF="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.1-src.zip">
-Bots'n'Scouts 0.8.1 (source edition, no class files)</A>(1.27MB)</LI>
+HREF="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.2.zip">Bots'n'Scouts 
+0.8.2 (binary only) </A>(1.27MB)</LI>
+<LI><A
+HREF="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.2-src.zip">
+Bots'n'Scouts 0.8.2 (source edition, no class files)</A>(1.27MB)</LI>
 </UL>
 For completeness sake, you can still download the previous version here (but really ... why should you?)
 <BR>
