@@ -4,6 +4,8 @@ import java.awt.*;
 import javax.swing.*;
 
 import de.botsnscouts.util.*;
+import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.OptionPane;
 
 /** Shown when something is happening, yet we don't know
     how long it'll take to complete

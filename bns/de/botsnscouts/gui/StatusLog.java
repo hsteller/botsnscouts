@@ -26,6 +26,8 @@
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
+import de.botsnscouts.widgets.OptionPane;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;

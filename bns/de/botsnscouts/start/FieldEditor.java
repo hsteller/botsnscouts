@@ -36,6 +36,7 @@ import java.net.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.board.*;
 import de.botsnscouts.gui.ColoredPanel;
+import de.botsnscouts.widgets.TransparentButton;
 
 public class FieldEditor extends JPanel implements  ActionListener, TileClickListener,ListSelectionListener{
 

@@ -30,7 +30,7 @@ import de.botsnscouts.gui.ColoredPanel;
 import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Message;
-import de.botsnscouts.util.TransparentButton;
+import de.botsnscouts.widgets.TransparentButton;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

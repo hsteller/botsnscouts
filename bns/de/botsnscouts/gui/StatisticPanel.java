@@ -34,7 +34,7 @@ import de.botsnscouts.util.BotVis;
 import de.botsnscouts.util.StatsList;
 import de.botsnscouts.util.Stats;
 import de.botsnscouts.util.Message;
-import de.botsnscouts.util.TJLabel;
+import de.botsnscouts.widgets.TJLabel;
 
 
 

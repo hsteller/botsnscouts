@@ -23,51 +23,44 @@
 
  *******************************************************************/
 
-package de.botsnscouts.gui;
+package de.botsnscouts.widgets;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.TJLabel;
-import de.botsnscouts.widgets.TJPanel;
-
-import java.awt.*;
 import javax.swing.*;
+import java.awt.*;
+import de.botsnscouts.gui.ColoredComponent;
+import de.botsnscouts.widgets.OptionPane;
 
+public class PaintPanel extends JPanel {
+    Paint paint;
+    boolean shade;
 
-public class ZielfahneErreicht extends TJPanel{
-
-    private static final Color backColor = new Color(4,64,4);
-    private static final Color foreColor2 = new Color(140,255,140);
-
-    public ZielfahneErreicht() {
-	this("",false);
+    static Color color;
+    static {
+        Color c = ColoredComponent.defaultColor;
+        color = new Color(c.getRed(), c.getGreen(), c.getBlue(), ColoredComponent.alpha);
     }
 
 
-    public ZielfahneErreicht(String inhalt, boolean tot) {
-	setLayout(new GridLayout((inhalt.length()+6),3));
-	for (int i = 0; i < 9; i++) add(new TJLabel(""));
-	for (int i = 0; i < inhalt.length(); i++) {
-	    TJLabel l = new TJLabel(inhalt.substring(i,i+1));
-	    l.setFont(new Font("Sans", Font.BOLD, 24));
-	    // ist der Robi tot, dann schreibe rot
-	    if (tot) l.setForeground(Color.red);
-	    else l.setForeground(foreColor2);
-	    add(new TJLabel(""));
-	    add(l);
-	    add(new TJLabel(""));
-	}
+
+    public PaintPanel( Paint paint ) {
+        this( paint, false );
     }
 
-    public Dimension getPreferredSize() {
-	return new Dimension(180,550);
+    public PaintPanel( Paint paint, boolean shade ) {
+        this.paint = paint;
+        this.shade = shade;
     }
 
-    public static void main (String args[]) {
-	Message.setLanguage("deutsch");
-	Frame f = new Frame("Test");
-	f.setSize(200,640);
-	ZielfahneErreicht zf = new ZielfahneErreicht();
-	f.add(zf);
-	f.setVisible(true);
+    public void paintComponent(Graphics g) {
+	Graphics2D g2d = (Graphics2D) g;
+	Dimension d = getSize();
+	g2d.setPaint( OptionPane.getBackgroundPaint(this) );
+	g2d.fillRect(0,0, d.width, d.height);
+        if( shade ) {
+            g2d.setPaint( color );
+            g2d.fillRect(0,0, d.width, d.height);
+        }
     }
+
+
 }

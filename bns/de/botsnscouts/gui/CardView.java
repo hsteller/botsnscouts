@@ -26,6 +26,8 @@
 package de.botsnscouts.gui;
 
 import  de.botsnscouts.util.*;
+import de.botsnscouts.widgets.GreenTheme;
+
 import javax.swing.plaf.metal.*;
 import java.awt.*;
 import java.io.*;

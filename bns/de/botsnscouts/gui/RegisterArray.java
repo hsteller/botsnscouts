@@ -26,6 +26,8 @@
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
+import de.botsnscouts.widgets.TJPanel;
+import de.botsnscouts.widgets.GreenTheme;
 
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;

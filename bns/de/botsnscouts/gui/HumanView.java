@@ -26,6 +26,9 @@
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
+import de.botsnscouts.widgets.TJPanel;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.PaintPanel;
 
 
 import java.awt.*;

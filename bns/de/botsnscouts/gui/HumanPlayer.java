@@ -30,6 +30,7 @@ import de.botsnscouts.comm.ClientAntwort;
 import de.botsnscouts.comm.KommClientSpieler;
 import de.botsnscouts.comm.KommException;
 import de.botsnscouts.util.*;
+import de.botsnscouts.widgets.GreenTheme;
 import org.apache.log4j.Category;
 
 import javax.swing.plaf.metal.MetalLookAndFeel;

@@ -27,6 +27,7 @@ package de.botsnscouts.editor;
 
 
 import de.botsnscouts.BotsNScouts;
+import de.botsnscouts.widgets.GreenTheme;
 import de.botsnscouts.autobot.AdvDistanceCalculator;
 import de.botsnscouts.autobot.DistanceCalculator;
 import de.botsnscouts.board.FlagException;

@@ -26,8 +26,8 @@
 package de.botsnscouts.start;
 
 import de.botsnscouts.util.Message;
-import de.botsnscouts.util.OptionPane;
-import de.botsnscouts.util.TransparentButton;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.TransparentButton;
 import org.apache.log4j.Category;
 
 import javax.swing.*;

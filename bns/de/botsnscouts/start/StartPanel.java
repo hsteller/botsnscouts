@@ -27,6 +27,9 @@ package de.botsnscouts.start;
 
 import de.botsnscouts.gui.ColoredComponent;
 import de.botsnscouts.util.*;
+import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJPanel;
+import de.botsnscouts.widgets.TransparentButton;
 import org.apache.log4j.Category;
 
 import javax.swing.*;

@@ -27,6 +27,8 @@ package de.botsnscouts.gui;
 
 import de.botsnscouts.gui.hotkey.*;
 import de.botsnscouts.util.*;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.PaintPanel;
 import org.apache.log4j.Category;
 
 import javax.swing.*;

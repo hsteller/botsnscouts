@@ -27,6 +27,8 @@ package de.botsnscouts.start;
 
 import de.botsnscouts.gui.Splash;
 import de.botsnscouts.util.*;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.GreenTheme;
 import org.apache.log4j.Category;
 
 import javax.swing.*;

@@ -1,6 +1,6 @@
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.OptionPane;
+import de.botsnscouts.widgets.OptionPane;
 import org.apache.log4j.Category;
 
 import javax.swing.*;
