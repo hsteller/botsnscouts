@@ -79,8 +79,13 @@ public class StartSpielfeldBut extends JPanel implements  ActionListener, Change
 
 	spielfeld=new JLabel(Message.say("Start","mSpielfeld"));
 	String[] spielfeldAr=loadSpielfelder();
+	String defSpf=null;
+	for (int i=0;i<spielfeldAr.length;i++){
+	    if (spielfeldAr[i].equals("default")){
+		defSpf=spielfeldAr[i];
+	    }
+	}
 	spielfelder=new JComboBox(spielfeldAr);
-	spielfelder.addItemListener(this);
 	save=new TransparentButton(Message.say("Start","bSave"));
 
 	spielfeld.setVisible(false);
@@ -103,24 +108,20 @@ public class StartSpielfeldBut extends JPanel implements  ActionListener, Change
 	name.setFont(font);
 	nam.setFont(font);
 	farbe.setFont(font);
-	//farben.setFont(font);
+
 	mitspielen.setFont(font);
 
 	save.setEnabled(true);
 	spielfelder.setEnabled(true);
 
-	//spielfeld.setForeground(Color.lightGray);
 	spielfelder.setOpaque(false);
-	//name.setForeground(Color.lightGray);
-	//farbe.setForeground(Color.lightGray);
-	////farben.setOpaque(false);
-	//mitspielen.setForeground(Color.lightGray);
+
 	mitspielen.setOpaque(false);
 	mitspielen.addChangeListener(this);
 
 	bearbeiten.setActionCommand("bearbeiten");
 	bearbeiten.addActionListener(this);
-	//farben.setRenderer(new MyCellRenderer());
+
 	nam.setEditable(true);
 	nam.setEnabled(true);
 	nam.setOpaque(false);
@@ -139,8 +140,15 @@ public class StartSpielfeldBut extends JPanel implements  ActionListener, Change
 
 	add(inner);
     	//lade das erste gefundene Spielfeld Configuration
-	Properties spfProp=helfer.getProperties(spielfeldAr[0]);
+	Properties spfProp=null;
+	if (defSpf==null){
+	    spfProp=helfer.getProperties(spielfeldAr[0]);
+	}else{
+	    spfProp=helfer.getProperties(defSpf);
+	    spielfelder.setSelectedItem(defSpf);
+	}
 	parent.fassade.loadSpfProp(spfProp);
+	spielfelder.addItemListener(this);
 }
 
     public void actionPerformed(ActionEvent e){

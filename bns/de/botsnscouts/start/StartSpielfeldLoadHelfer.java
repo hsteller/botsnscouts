@@ -27,7 +27,8 @@ public class StartSpielfeldLoadHelfer{
 	    FileInputStream istream=new FileInputStream("kacheln/"+name+".spf");
 	    spfProp.load(istream);
 	}catch(FileNotFoundException e){
-	    System.err.println(e);
+	    //	    System.err.println(e);
+	    return null;
 	}catch(IOException e){
 	    System.err.println(e);
 	}

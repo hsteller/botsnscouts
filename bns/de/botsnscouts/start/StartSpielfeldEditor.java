@@ -81,17 +81,9 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 
 	BorderLayout lay=new BorderLayout();
 
-//	lay.setHgap(50);
-//	lay.setVgap(50);
-
-//	setBorder(new EmptyBorder(50,50,50,50));
-
 	setLayout(lay);
 	setOpaque(false);
 
-// 	modeFlaggeSetzen=new JToggleButton("Flagge setzen");
-// 	modeFlaggeEntfernen=new JToggleButton("Flagge entfernen");
-// 	modeFlaggeVerschieben=new JToggleButton("Flagge verschieben");
 	modeFlaggeSetzen=new JToggleButton(new ImageIcon(images[0]));
 	modeFlaggeEntfernen=new JToggleButton(new ImageIcon(images[2]));
 	modeFlaggeVerschieben=new JToggleButton(new ImageIcon(images[1]));
@@ -108,9 +100,6 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	modeFlaggeEntfernen.addActionListener(this);
 	modeFlaggeVerschieben.addActionListener(this);
 
-// 	modeKachelSetzen=new JToggleButton("Kachel setzen");
-// 	modeKachelEntfernen=new JToggleButton("Kachel entfernen");
-// 	modeKachelDrehen=new JToggleButton("Kachel drehen");
 	modeKachelSetzen=new JToggleButton(new ImageIcon(images[5]));
 	modeKachelEntfernen=new JToggleButton(new ImageIcon(images[4]));
 	modeKachelDrehen=new JToggleButton(new ImageIcon(images[3]));
@@ -149,19 +138,14 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	add(BorderLayout.NORTH,flaggenButtons);
 
 	kachelListe=new JList(kachelInfos);
-//	kachelListe.setCellRenderer(new ListItemComponent(kachelInfos));
+
 	kachelListe.setCellRenderer(new ThumbsCellRenderer());
 	kachelListe.setOpaque(false);
 	fuerKachelListe=new JScrollPane();
 	fuerKachelListe.getViewport().setView(kachelListe);
-//	add(BorderLayout.EAST,kachelListe);
+
 	add(BorderLayout.EAST,fuerKachelListe);
 	kachelListe.addListSelectionListener(this);
-// 	kachelnButtons=new JPanel();
-// 	kachelnButtons.setLayout(new GridLayout(1,2));
-// 	kachelnButtons.add(modeKachelSetzen);
-// 	kachelnButtons.add(modeKachelEntfernen);
-// 	add(kachelnButtons);
 
 	ok=new TransparentButton(Message.say("Start","mOK"));
 	zurueck=new TransparentButton(Message.say("Start","mAbbr"));
