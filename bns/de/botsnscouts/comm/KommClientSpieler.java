@@ -51,7 +51,6 @@ NEW: Encodes the client name
      *  */
     public boolean anmelden2 (String ipnr, int portnr, String name, int farbe) throws KommException{
 	if ((farbe>0)&&(farbe<9)){
-	    System.out.println("name="+URLEncoder.encode(name));
             return super.anmelden (ipnr, portnr, (URLEncoder.encode(name)+","+farbe), "RS2");
 	}
         else
