@@ -21,12 +21,6 @@ We still proudly announce what was new in 0.8:
 <P>
 There really are fans out there! Jude provided <A HREF="rules.php3">a manual</A>!
 <P>
-<br>If you want to be notified when we release something new, please submit your email-adress below. 
-<form method="GET" action="cgi-bin/t1.py">
-<input type="text" name="addr">
-<input type="submit" value="Notify me!">
-</form-->
-<P>
 <h2>For those who don't know yet:</h2>
 
 Robots make a race through an old factory. Robots don't move like human beings would do - they have to be programmed and execute their programm afterwards.

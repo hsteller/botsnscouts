@@ -29,6 +29,9 @@ Thanks to
 Please send comments, bugreports and questions to <A
 HREF="mailto:botsnscouts-devel@sourceforge.net">botsnscouts-devel@sourceforge.net</A>.
 <P>
+If you want to be notified about new releases, please subscribe to our
+<a href="http://lists.sourceforge.net/lists/listinfo/botsnscouts-announce">announce-mailinglist</a>.
+<P>
 The current Bots'n'Scouts developers are:<BR>
 <P>
 Enno Brehm<BR>
