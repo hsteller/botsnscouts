@@ -102,7 +102,9 @@ public class Floor implements FloorConstants {
     }
 
     public Floor getWithCrusher(int phases) {
-        CAT.assert(isBelt(), "requesting crusher on non-belt-floor");
+        //CAT.assert(isBelt(), "requesting crusher on non-belt-floor");
+        if (isBelt())
+          CAT.warn("ASSERT: requesting crusher on non-belt-floor!");
         return Floor.getFloor(type, phases);
     }
 
@@ -135,12 +137,16 @@ public class Floor implements FloorConstants {
     }
 
     public int getBeltInfo() {
-        CAT.assert(isBelt(), "getBeltInfo() called on non-belt-floor");
+       // CAT.assert(isBelt(), "getBeltInfo() called on non-belt-floor");
+        if (isBelt())
+          CAT.warn("ASSERT: getBeltInfo() called on non-belt-floor!");
         return type % 100;
     }
 
     public int getBeltDirection() {
-        CAT.assert(isBelt(), "getBeltDirection() called on non-belt-floor");
+       // CAT.assert(isBelt(), "getBeltDirection() called on non-belt-floor");
+       if (isBelt())
+          CAT.warn("ASSERT: getBeltDirection() called on non-belt-floor!");
         return type % 10;
     }
 
