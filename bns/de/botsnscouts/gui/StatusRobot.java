@@ -2,7 +2,10 @@ package de.botsnscouts.gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
+
 import javax.swing.*;
+
 import de.botsnscouts.util.Bot;
 
 
@@ -11,13 +14,19 @@ public class StatusRobot extends JButton {
     Icon bigBot, smallBot;
     Bot robot;
 
+    boolean turnPicAccordingToFacing = true;
+    
     public StatusRobot( Icon bigBot, Icon smallBot ) {
         this( bigBot, smallBot, null );
     }
 
     public StatusRobot( Icon bigBot, Icon smallBot, Bot r ) {
         lifesLeft = 2;
-        this.bigBot = bigBot;
+       
+        if (turnPicAccordingToFacing)
+            this.bigBot = new ImageIcon(RobotInfo.roboImages[r.getBotVis()*4+r.getFacing()]);
+        else
+            this.bigBot = bigBot;
         this.smallBot = smallBot;
         this.robot = r;
         setBorderPainted( false );
@@ -52,8 +61,11 @@ public class StatusRobot extends JButton {
         }
         else
             g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.86f));
-
+        
+        
         bigBot.paintIcon(this, g, -10, -10);
+        
+
         if( lifesLeft == 2 ) smallBot.paintIcon(this, g, w, 6);
         if( lifesLeft >= 1 ) smallBot.paintIcon(this, g, w, smallBot.getIconHeight()-3);
         if( robot != null && !robot.isActivated() ) {
@@ -95,6 +107,13 @@ public class StatusRobot extends JButton {
         }
         frame.getContentPane().add( b, BorderLayout.CENTER );
         frame.setVisible( true );
+    }
+    
+    protected void updateRobot (Bot newValues/*, ImageIcon bigIcon*/){
+        robot = newValues;
+        if (turnPicAccordingToFacing)
+            bigBot= new ImageIcon(RobotInfo.roboImages[robot.getBotVis()*4+robot.getFacing()]);
+        repaint();
     }
 
 }

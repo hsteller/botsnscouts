@@ -82,6 +82,8 @@ public class Ausgabe extends BNSThread {
     private boolean quitByMyself = false;
 
 
+    
+    
     /** A dummy that is used to map various message types to one single AbstractMessageAction
      *  that does nothing else than displaying the message in the transparent chatpane
      */
@@ -99,7 +101,7 @@ public class Ausgabe extends BNSThread {
     /** Turns animation of robot movement on or off;
      *  visibility is public (not private), because the GUI (BoardView) needs to know about that, too.
      */
-   public static final boolean IS_ROB_MOVE_ANIMATION_ENABLED =  new Boolean (System.getProperty("enableRobMoveAnimation")).booleanValue();//false;
+   public static final boolean IS_ROB_MOVE_ANIMATION_ENABLED =  new Boolean (System.getProperty("enableRobMoveAnimation","true")).booleanValue();//false;
 
     public Ausgabe() {
         this("localhost", 8077, false);
@@ -912,7 +914,7 @@ public class Ausgabe extends BNSThread {
         Stats actualStats = stats.getStats(r1.getName());
         actualStats.incAskWisenheimer();
     }
-
+  
 
     private void comMsgHandleActionStart(ClientAntwort ca) {
         CAT.debug("got an action start");
@@ -985,12 +987,8 @@ public class Ausgabe extends BNSThread {
 
 
     private void initMessageToActionMapping() {
-        sequencer.addActionMapping(MessageID.NO_SCOUT,
-                new AbstractMessageAction() {
-                    public void invoke(ClientAntwort msgData) {
 
-                    }
-                });
+        
         sequencer.addActionMapping(MessageID.SIGNAL_ACTION_START,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {

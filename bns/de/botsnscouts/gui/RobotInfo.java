@@ -19,12 +19,13 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     static final Color COLOR_LED_OFF = new Color(0,0,50);
     static final Color COLOR_LED_ON  = Color.green;
     static final Color COLOR_LED_RED = Color.red;
-
+    
+   
 
     static final int MINI_IMAGE_COUNT = 4;
     DamageBar damageBar1 = new DamageBar();
     FlagBar flagBar2 = new FlagBar();
-    StatusRobot statusRobot1 = new StatusRobot();
+    StatusRobot statusRobot1; // must not be initialized here because it needs the bot images that might not be loaded yet
     JButton diskButton1 = new JButton();
     int viz;
     int ranking = 0;
@@ -67,7 +68,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     RobotInfo(Bot r, int flagCount, int viz) {
         this.robot = r;
         this.viz = viz;
-        Icon big = new ImageIcon(roboImages[viz*4]);
+        Icon big = new ImageIcon(roboImages[viz*4+robot.getFacing()]);
         Icon small = new ImageIcon(cursors[viz]);
         damageBar1 = new DamageBar();
         flagBar2 = new FlagBar(flagCount);
@@ -87,6 +88,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
 
     public RobotInfo() {
         try {
+            statusRobot1 = new StatusRobot();
             initLayout();
         }
         catch(Exception e) {
@@ -227,11 +229,13 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     }
 
     public void updateRobot(Bot r) {
+        
         robot = r;
         damageBar1.setDamageValue(r.getDamage());
         damageBar1.setToolTipText(Message.say("RobotInfo", "damage",r.getName(), r.getDamage()+""));
         flagBar2.setReachedFlag(r.getNextFlag()-1);
         statusRobot1.setLifesLeft( r.getLivesLeft() - 1);
+        statusRobot1.updateRobot(robot/*, new ImageIcon(roboImages[viz*4+robot.getFacing()])*/);
         setDead( r.getLivesLeft() <= 0 );
         repaint();
     }
@@ -336,4 +340,6 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     public boolean isDead() {
         return dead;
     }
+    
+   
 }

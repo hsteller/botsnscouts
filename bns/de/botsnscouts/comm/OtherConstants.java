@@ -13,4 +13,7 @@ public interface OtherConstants {
   //                                     appended part: ^^^^^^^^^^^^^^^^^^^^
   public static final String MESSAGE_NUMBER = "message_number";
 
+public static final int BOT_TURN_CLOCKWISE = 1;
+public static final int BOT_TURN_COUNTER_CLOCKWISE=2;
+
 }

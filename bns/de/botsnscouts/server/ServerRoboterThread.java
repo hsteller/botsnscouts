@@ -108,7 +108,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 			    if (m==Server.ZERSTOERT_SYNC || m==Server.ZERSTOERT_ASYNC){
 				// Implizit synchronized
 				robMaint.reEntry(this);
-
+				
 				if (m==Server.ZERSTOERT_SYNC)
 				    notifyServer();
 
@@ -247,6 +247,14 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 			case ServerAntwort.GIBFARBEN:
 			    komm.sendFarben(info.getNamesByColor());
 			    break;
+			case ServerAntwort.IS_SCOUT_ALLOWED: {
+			    komm.sendBoolean(info.isScoutAllowed());
+			    break;
+			}
+			case ServerAntwort.IS_WISENHEIMER_ALLOWED: {
+			    komm.sendBoolean(info.isWisenheimerAllowed());
+			    break;
+			}
 			case ServerAntwort.MESSAGE:
 			    String[] tmp=new String[ans.msg.length-1];
 			    for (int k=1;k<ans.msg.length;k++)

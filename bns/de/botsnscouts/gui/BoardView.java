@@ -27,6 +27,7 @@ package de.botsnscouts.gui;
 
 import de.botsnscouts.board.*;
 import de.botsnscouts.comm.MessageID;
+import de.botsnscouts.comm.OtherConstants;
 import de.botsnscouts.util.*;
 import org.apache.log4j.Category;
 
@@ -581,7 +582,7 @@ public class BoardView extends JLayeredPane {
        
         int oldFacing = internal.getFacing();
                 
-        if (direction == MessageID.BOT_TURN_CLOCKWISE){
+        if (direction == OtherConstants.BOT_TURN_CLOCKWISE){
             turnRobot(internal, 90,TURN_ROB_ANIMATION_STEPS, true);
             internal.turnClockwise();
         }

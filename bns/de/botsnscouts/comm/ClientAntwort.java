@@ -98,6 +98,7 @@ public class ClientAntwort implements Comparable{
     public final static int TIMEOUT=14;
     public final static int SPIELSTART=15;
     public final static int MESSAGE=16;
+    public final static int BOOLEAN = 17;
     /** Liefert den (Konstanten-)Namen des Typs des Antwortobjektes zurück*/
     public String getTyp() {
 	switch (this.typ) {
@@ -117,6 +118,7 @@ public class ClientAntwort implements Comparable{
 	case TIMEOUT: return "TIMEOUT";
 	case SPIELSTART: return "SPIELSTART";
 	case MESSAGE: return "MESSAGE";
+	case BOOLEAN: return "BOOLEAN";
 	default: return "ERROR - UNKNOWN KIND OF COMMUNICATION (Typ: "+this.typ+")";
 	}
     }

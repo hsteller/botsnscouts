@@ -65,6 +65,9 @@ public class HumanPlayer extends BNSThread {
     private boolean gameOver = false, nosplash = false;
     private Wisenheimer wisenheimer;
 
+    private boolean isScoutAllowed = true;
+    private boolean isWisenheimerAllowed = true;
+    
     private Timer timeoutWatcher;
     private volatile boolean cardsSent;
    private static final int bufferSecondsBeforeTimeout = 25;
@@ -122,6 +125,7 @@ public class HumanPlayer extends BNSThread {
             switch (commAnswer.typ) {
                 case (ClientAntwort.MACHEZUG):
                     {
+                    	
                     	mode = MODE_PROGRAM;
                     	Global.debug(this, "I am requested to send cards");
                     	if (timeoutWatcher != null){
@@ -144,7 +148,8 @@ public class HumanPlayer extends BNSThread {
                         try {
                             Bot tempRob = comm.getRobStatus(name);
                             d("rob has the following locked registers: ");
-                            for (int i = 0; i < tempRob.getLockedRegisters().length; i++) d("index: " + i + " ist " + tempRob.getLockedRegisters()[i]);
+                            for (int i = 0; i < tempRob.getLockedRegisters().length; i++) 
+                                d("index: " + i + " ist " + tempRob.getLockedRegisters()[i]);
                             humanView.updateRegisters(tempRob.getLockedRegisters());
                         } catch (KommException kE) {
                             System.err.println("SpielerMenschERROR: " + kE.getMessage());
@@ -156,18 +161,7 @@ public class HumanPlayer extends BNSThread {
                             cards.add(i, new HumanCard(commAnswer.karten[i]));
                         }
                         humanView.showCards(cards);
-                        // ----- Abgabe der Programmierung -----
-
-                        /*	start Timer
-                            if (temptimeout == 0) {
-                            showMessage(Message.say("SpielerMensch","legalZug"));
-                            int gesperrteRegister = 0;
-                            for (int i = 0;i < 5; i++) if (uI.register[i].status == GESPERRT) gesperrteRegister++;
-                            int[] prog = new int[(5-gesperrteRegister)];
-                            for (int i = 0; i < prog.length; i++) prog[i] = (i+1);
-                            comm.registerProg(name,prog,false);
-                            }
-                        */
+                        
                         break;
                     }
 
@@ -185,10 +179,11 @@ public class HumanPlayer extends BNSThread {
                         humanView.showGetDirection();
                         Global.debug(this, "Habe eine Zerstoerung bekommen.");
                         showMessage(Message.say("SpielerMensch", "roboauffeld"));
-// --- Board f\uFFFDr den Klugscheisser holen
+// ---get board for wisenheimer
                         if (intelliBoard == null) {
                             initIntelligentBoard();
                             wisenheimer = new Wisenheimer(intelliBoard);
+                            initScoutAndWisenheimerPermissions();
                         }
 
                         // ----- ask for timeout -------
@@ -473,6 +468,26 @@ public class HumanPlayer extends BNSThread {
         return wisenheimer.getPrediction(registerList, cardList, ausgabe.getBot(name));
     }
 
+    private void initScoutAndWisenheimerPermissions() {
+        try {
+            isScoutAllowed = comm.getIsScoutAllowed();
+            isWisenheimerAllowed = comm.getIsWisenheimerAllowed();
+           
+            if(!isScoutAllowed){
+                humanView.scoutView.setEnabled(false);
+                humanView.scoutView.setSelected(false);
+            }
+            if (!isWisenheimerAllowed) {
+                humanView.wisenheimerView.setEnabled(false);
+                humanView.wisenheimerView.setSelected(false);
+            }
+        }
+        catch (KommException ke){
+            // neither  likely nor critical, we will go on with the default values
+            CAT.error("Exception getting scout/wisenheimer permissions", ke);
+        }
+    }
+    
     private void initIntelligentBoard() {
         int dimx, dimy;
         Location dimension;

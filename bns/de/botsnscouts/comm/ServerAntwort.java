@@ -69,7 +69,9 @@ public class ServerAntwort {
     public static final int MESSAGE=18;
     public static final int STATS=19;
     public static final int MSG_ACK=20;
-
+    public static final int IS_SCOUT_ALLOWED=21;
+    public static final int IS_WISENHEIMER_ALLOWED=22;
+    
     /** zu Debug-/Informationszwecken:
 	Die Methode liefert den Namen der ServerAntwort-Konstanten (mit Wert t) als String zurück.*/
     public String getTyp () {
@@ -94,6 +96,8 @@ public class ServerAntwort {
 	case MESSAGE: return "MESSAGE (MSG)";
 	case STATS: return "STATS (GST)";
 	case MSG_ACK: return "MSG_ACK (MOK)";
+	case IS_SCOUT_ALLOWED : return "IS SCOUT ALLOWED (ISS)";
+	case IS_WISENHEIMER_ALLOWED: return "IS WISENHEIMER ALLOWED (ISW)";
 	default: return "ERROR - UNKNOWN KIND OF COMMUNICATION";
 	          
 	}

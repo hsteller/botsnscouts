@@ -26,11 +26,5 @@ public interface MessageID {
 
     public static final String NTC = "NOTIFY_CHANGE";
 
-    public static final String NO_SCOUT = "mNoScout";
-    public static final String NO_WISENHEIMER = "mNoWisenheimer";
-
-    // TODO find a better place for those int constants
-    public static final int BOT_TURN_CLOCKWISE = 1;
-    public static final int BOT_TURN_COUNTER_CLOCKWISE=2;
     
 }

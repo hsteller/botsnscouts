@@ -230,7 +230,7 @@ public class KommClient {
 	    catch (Exception e) {
 		throw new KommException ("einlesen: REN erhalten, aber der String \""+back+"\" verursachte in wait2 eine Exception;\n Message:"+e.getMessage());
 	    }
-	    if (xyz.typ==xyz.ENTFERNUNG)
+	    if (xyz.typ==ClientAntwort.ENTFERNUNG)
 		throw new KommFutschException ("Client was removed;\n Reason: "+xyz.str);
 	}
 	// Hey, we made nothing wrong. The client is still alive :-)
@@ -1128,7 +1128,29 @@ public class KommClient {
 
 
     }
-
+    
+    public boolean getIsScoutAllowed() throws KommException{
+        this.senden("ISS");
+        String value = this.einlesen();
+        if (value != null){
+            if (value.equals("true"))
+                return true;
+            else if (value.equals("false"))
+                return false;     
+        }
+        throw new KommException("Question isScoutAllowed got unknown answer: "+value);
+    }
+    public boolean getIsWisenheimerAllowed() throws KommException{
+        this.senden("ISW");
+        String value = this.einlesen();
+        if (value != null){
+            if (value.equals("true"))
+                return true;
+            else if (value.equals("false"))
+                return false;     
+        }
+        throw new KommException("Question isWisenheimerAllowed got unknown answer: "+value);
+    }
 
     /** Request zur Abfrage des Timeouts. Rueckgabewert: Timeout in Sekunden
 	@exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.*/

@@ -39,4 +39,8 @@ interface InfoRequestAnswerer{
     de.botsnscouts.util.Status[] getEvalStatus();
     String[] getNamesByColor();
     de.botsnscouts.util.StatsList getStats();
+    
+    boolean isScoutAllowed();
+    boolean isWisenheimerAllowed();
+    
 }

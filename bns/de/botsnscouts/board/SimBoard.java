@@ -28,6 +28,7 @@ package de.botsnscouts.board;
 import de.botsnscouts.server.Server;
 import de.botsnscouts.util.*;
 import de.botsnscouts.comm.MessageID;
+import de.botsnscouts.comm.OtherConstants;
 
 
 import java.util.Enumeration;
@@ -531,7 +532,7 @@ public class SimBoard extends Board implements Directions {
         //d("dreheRoboter called. "+robbi.getName()+" nach "+drehR);
         // drehR = DrehRichtung
         
-        int direction = MessageID.BOT_TURN_CLOCKWISE;
+        int direction = OtherConstants.BOT_TURN_CLOCKWISE;
         switch (drehR) {
             case GEAR_CLOCKWISE:
                 //robbi.setFacing((robbi.getFacing() + 1) % 4);        
@@ -543,7 +544,7 @@ public class SimBoard extends Board implements Directions {
               //      robbi.setFacing(3);
                robbi.turnCounterClockwise();
                 
-                direction = MessageID.BOT_TURN_COUNTER_CLOCKWISE;
+                direction = OtherConstants.BOT_TURN_COUNTER_CLOCKWISE;
                 break;
         } // switch
         ausgabenMsgString2(MessageID.BOT_TURN, robbi.getName(),direction+"");
@@ -554,13 +555,13 @@ public class SimBoard extends Board implements Directions {
         //d("dreheRoboterGedacht called. robbi="+robbi.getName()+"; drehR="+drehR);
         // veraendert die gedachte Ausrichtung
         // drehR = DrehRichtung
-        int direction = MessageID.BOT_TURN_CLOCKWISE;
+        int direction = OtherConstants.BOT_TURN_CLOCKWISE;
         switch (drehR) {
             case GEAR_CLOCKWISE:
                 robbi.aa = (robbi.getFacing() + 1) % 4;
                 break;
             case GEAR_COUNTERCLOCKWISE:
-                direction=MessageID.BOT_TURN_COUNTER_CLOCKWISE;
+                direction=OtherConstants.BOT_TURN_COUNTER_CLOCKWISE;
                 robbi.aa = (robbi.getFacing() - 1);
                 if (robbi.aa == -1)
                     robbi.aa = 3;

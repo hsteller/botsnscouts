@@ -242,6 +242,14 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
         return options.getMaxPlayers();
     }
 
+    public boolean isScoutAllowed (){
+        return options.isAllowScout();
+    }
+    
+    public boolean isWisenheimerAllowed(){
+        return options.isAllowWisenheimer();
+    }
+    
     int getRegistrationPort() {
         return options.getRegistrationPort();
     }
@@ -721,14 +729,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 // 2. Bot
             sendMsg("mWelcome", "");
-            if (!options.isAllowScout()){
-                CAT.debug("No scout this game.");
-                sendMsg("mNoScoutAllowed", "");
-            }
-            if (!options.isAllowWisenheimer()){
-                CAT.debug("No Wisenheimer this game.");
-                sendMsg("mNoWisenheimerAllowed", "");
-            }
+           
             d("Spiel starten.");
             modus = SPIELSTART;
             waitablesImWaitingFor = new WaitingForSet(rThreads);
