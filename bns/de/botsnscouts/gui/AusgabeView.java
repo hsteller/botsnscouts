@@ -293,7 +293,19 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     /** parameter will be ignored*/
      protected void quit(boolean keepWatching) {
         CAT.debug("AusgabeView starts procedure to quit the client..");
+	JLabel[] msg = new JLabel[2];
+	msg[0] = new JLabel(Message.say("AusgabeView", "reallyQuit1"));
+	msg[1] = new JLabel(Message.say("AusgabeView","reallyQuit2")); 
+	if (JOptionPane.showConfirmDialog(this, msg,
+	Message.say("AusgabeView","reallyQuitTitle"),
+	JOptionPane.OK_CANCEL_OPTION, 
+	JOptionPane.QUESTION_MESSAGE) 
+	                        == JOptionPane.OK_OPTION){
+	 // null means CANCEL
         ausgabe.quit(keepWatching);
+	// Since this does not work properly by now, we do:
+	System.exit(0);
+     }
     }
 
     private void d(String s){
