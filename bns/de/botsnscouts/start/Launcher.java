@@ -1,4 +1,7 @@
 package de.botsnscouts.start;
+import de.botsnscouts.gui.*;
+import de.botsnscouts.util.*;
+import de.botsnscouts.autobot.*;
 
 // startet SpielerMensch, AusgabeFrame u.s.w.
 

@@ -1,6 +1,6 @@
 package de.botsnscouts.start;
 
-
+import de.botsnscouts.util.*;
 import java.awt.*;
 import javax.swing.*;
 

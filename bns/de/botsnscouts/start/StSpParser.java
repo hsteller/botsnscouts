@@ -1,7 +1,8 @@
 package de.botsnscouts.start;
 
 import java.io.*;
-
+import de.botsnscouts.util.*;
+import de.botsnscouts.board.*;
 public class StSpParser{
 
  public StSpParser(){}

@@ -3,6 +3,9 @@ package de.botsnscouts.start;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import de.botsnscouts.util.*;
+import de.botsnscouts.gui.*;
+import de.botsnscouts.board.*;
 
 public class StSpVorschau extends Frame implements ActionListener, WindowListener{
 
