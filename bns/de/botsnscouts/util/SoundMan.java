@@ -167,7 +167,7 @@ public class SoundMan {
 		    SoundMan.CAT.debug("Initializing sounds..");
 
 		    for (int i=0; i<sounds.length; i++){
-                        System.out.println("Lade "+filenames[i]);
+                        SoundMan.CAT.debug("Lade "+filenames[i]);
 			sounds[i] = loadSound(filenames[i]);
 			if (sounds[i] == null)
 			    throw new Exception("Sound "+filenames[i]+" was not loaded");
@@ -177,7 +177,7 @@ public class SoundMan {
 
 		  } catch (Throwable thr) {
 		    SoundMan.CAT.error("Error occured while loading sounds");
-		    SoundMan.CAT.debug(thr);
+		    SoundMan.CAT.debug("", thr);
                     SoundMan.CAT.error("sounds deactivated for safety..");
                     soundsLoaded=false;
                  }
