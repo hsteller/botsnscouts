@@ -1,13 +1,17 @@
 package de.botsnscouts.start;
 
-import java.awt.*;
-import java.io.*;
-import java.util.*;
-import java.net.*;
 import de.botsnscouts.board.*;
 import de.botsnscouts.util.*;
+import java.awt.*;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import de.botsnscouts.BotsNScouts;
+import org.apache.log4j.*;
 
 public class TileFactory extends Thread{
+
+    public static final Category CAT = Category.getInstance( TileFactory.class );
 
     private Hashtable tileTab;
     private int thGR;
@@ -20,20 +24,10 @@ public class TileFactory extends Thread{
 	tileTab=new Hashtable();
     }
     public void run(){
-// 	URL kurl=getClass().getResource("kacheln");
-// 	File kd=new File(kurl.getFile());
 
+	// Load those from bns.home/tiles
 	File kd=null;
-	//	try{
-	    kd=new File(Conf.getBnsHome()+System.getProperty("file.separator")+"kacheln");
-	    /*}catch(Exception e){
-	    try{
-		kd=new File(Conf.getBnsHome()+System.getProperty("file.separator")+"tiles");
-	    }catch (Exception ee){
-		return;
-		}
-		}*/
-	// 	File kdj=new File(de.botsnscouts.BotsNScouts.class.getResource("kacheln").getFile());
+	kd=new File(Conf.getBnsHome()+System.getProperty("file.separator")+"kacheln");
 	File[] all = kd.listFiles(new RRAFilter());
 	//File[] allj = kdj.listFiles(new RRAFilter());
 	FileInputStream istream;
@@ -47,21 +41,42 @@ public class TileFactory extends Thread{
 		putOneTile(istream,all[i].getName());
 	    }
 	}
-	/*if(allj!=null){
-	    for (int i=0;i<allj.length;i++){
-		try{
-		    istream = new FileInputStream( allj[i] );
-		}catch(FileNotFoundException e){
-		    continue;
-		}
-		putOneTile(istream,allj[i].getName());
+
+	// Load those from the distribution
+	InputStream stream = BotsNScouts.class.getResourceAsStream("tiles/tile.index");
+	if (stream==null){
+	    CAT.warn("Couldn't find tiles/tile.index");
+	    return;
+	}
+	Properties prop=new Properties();
+	try{
+	    prop.load(stream);
+	}catch(IOException e){
+	    CAT.warn("Couldn't load tile.index from distrib.");
+	}
+	int numTiles=0;
+	try{
+	    numTiles=Integer.parseInt(prop.getProperty("numTiles"));
+	}catch(NumberFormatException e){
+	    CAT.warn("Error parsing numTiles in tile.index!");
+	}
+	for (int i=0;i<numTiles;i++){
+	    String name=prop.getProperty("tile"+i);
+	    stream=BotsNScouts.class.getResourceAsStream("tiles/"+name);
+	    if (stream==null){
+		CAT.warn("Error loading tile"+i+" from distribution.");
+		continue;
 	    }
-	    }*/
+	    putOneTile(stream,name);
+	}
     }
 
-    //liest eine Tile aus der Datei ein und speichert die in hashtable
+    /** Reads one tile and puts into the hashtable */
     private void putOneTile(InputStream istream, String name){
-	//öfene die Tiledatei
+	if (tileTab.get(name)!=null){
+	    CAT.warn("Trying to redefine tile "+name);
+	    return;
+	}
 	StringBuffer str=new StringBuffer();
 	try{
 	    BufferedReader kachReader =new BufferedReader(new InputStreamReader(istream));
