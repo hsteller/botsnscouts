@@ -402,6 +402,7 @@ public class SimBoard extends Board implements Directions {
             moved[rob] = true;
         } else if (aktion.equals("UT")) {  // U-Turn
             robbis[rob].setFacing((robbis[rob].getFacing() + 2) % 4);
+            ausgabenMsgString(MessageID.BOT_UTURN, robbis[rob].getName());
             moved[rob] = true;
         } else
             throw new DoPhaseException("Nicht erlaubte Card '" + aktion + "' fuer Bot " + robbis[rob].getName());
@@ -529,32 +530,44 @@ public class SimBoard extends Board implements Directions {
     private void turnBot(BoardBot robbi, int drehR) {
         //d("dreheRoboter called. "+robbi.getName()+" nach "+drehR);
         // drehR = DrehRichtung
+        
+        int direction = MessageID.BOT_TURN_CLOCKWISE;
         switch (drehR) {
             case GEAR_CLOCKWISE:
-                robbi.setFacing((robbi.getFacing() + 1) % 4);
+                //robbi.setFacing((robbi.getFacing() + 1) % 4);        
+                robbi.turnClockwise();
                 break;
             case GEAR_COUNTERCLOCKWISE:
-                robbi.setFacing(robbi.getFacing() - 1);
-                if (robbi.getFacing() == -1)
-                    robbi.setFacing(3);
+              //  robbi.setFacing(robbi.getFacing() - 1);
+              //  if (robbi.getFacing() == -1)
+              //      robbi.setFacing(3);
+               robbi.turnCounterClockwise();
+                
+                direction = MessageID.BOT_TURN_COUNTER_CLOCKWISE;
                 break;
         } // switch
+        ausgabenMsgString2(MessageID.BOT_TURN, robbi.getName(),direction+"");
+        
     }
 
     private void turnBotIntended(BoardBot robbi, int drehR) {
         //d("dreheRoboterGedacht called. robbi="+robbi.getName()+"; drehR="+drehR);
         // veraendert die gedachte Ausrichtung
         // drehR = DrehRichtung
+        int direction = MessageID.BOT_TURN_CLOCKWISE;
         switch (drehR) {
             case GEAR_CLOCKWISE:
                 robbi.aa = (robbi.getFacing() + 1) % 4;
                 break;
             case GEAR_COUNTERCLOCKWISE:
+                direction=MessageID.BOT_TURN_COUNTER_CLOCKWISE;
                 robbi.aa = (robbi.getFacing() - 1);
                 if (robbi.aa == -1)
                     robbi.aa = 3;
                 break;
         } // switch
+        ausgabenMsgString2(MessageID.BOT_TURN, robbi.getName(),direction+"");
+        
     }
 
     private void doExpressBelts(BoardBot[] bots) {
