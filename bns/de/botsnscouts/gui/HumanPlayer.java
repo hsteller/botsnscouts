@@ -389,13 +389,22 @@ public class HumanPlayer extends BNSThread {
 	showMessage(Message.say("SpielerMensch","sendregrep"));
     }
 
-    /** Schickt eine ChatMessage von mir an den Server */
-    protected void sendMessage(String msg){
-	d("sende: "+msg);
+    /** Sends a ChatMessage to the server */
+    protected void sendChat(String msg){
 	String[] tmp=new String[2];
 	tmp[0]=name;
 	tmp[1]=msg;
-	comm.message("mChat",tmp);
+	sendMessage("mChat",tmp);
+    }
+    /** Sends Message to the server */
+    protected void sendMessage(String code, String[] args){
+	comm.message(code, args);
+    }
+    
+    /** Sends the wisenheimer-activated-msg */
+    protected void sendWisenheimerMsg(){
+	String[] tmp={name};
+	sendMessage("mKlugSchKlick",tmp);
     }
 
     protected Roboter getRob() {

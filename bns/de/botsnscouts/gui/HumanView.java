@@ -87,6 +87,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 		    if (( (KlugscheisserLatte) e.getSource()).selected()) {
 			//			d(this,"wisenheimer, wake up!");
 			klugscheisserClicked(true);
+			human.sendWisenheimerMsg();
 		    }
 		    else {
 			//			d(this,"wisenheimer, go home!");

@@ -25,9 +25,11 @@
  
 package de.botsnscouts.gui;
 
-import javax.swing.*;
-import java.awt.event.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.util.StringTokenizer;
+import javax.swing.*;
+
 import de.botsnscouts.util.*;
 
 /** Ein ChatPanel, das unterhalb des Spielfeldes angezeigt werden soll.
@@ -40,8 +42,16 @@ public class ChatPane extends JPanel{
 	public void actionPerformed(ActionEvent e){
 	    if (nachricht.getText().equals(""))
 		return;
-	    parent.sendMessage(nachricht.getText());
+	    parent.sendChat(filter(nachricht.getText()));
 	    nachricht.setText("");
+	}
+	/** filters out disallowed chars */
+	private String filter(String in){
+	    StringBuffer out=new StringBuffer();
+	    StringTokenizer st=new StringTokenizer(in, "$,");
+	    while (st.hasMoreTokens())
+		out.append(st.nextToken());
+	    return out.toString();
 	}
     }
 
