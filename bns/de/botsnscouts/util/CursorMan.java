@@ -28,7 +28,7 @@ package de.botsnscouts.util;
 import java.io.*;
 import java.awt.*;
 import java.awt.image.*;
-
+import org.apache.log4j.Category;
 
 public class CursorMan {
     public final static int
@@ -38,7 +38,7 @@ public class CursorMan {
 	DAMAGE = 3,
 	WINNER = 4;
 
-
+    static final Category CAT = Category.getInstance( ImageMan.class );
 
 
 
@@ -86,9 +86,9 @@ public class CursorMan {
 	imageLoader = new BNSThread() {
 	    public void run() {
 		try {
-		    System.err.println("started loading and cropping of images in background");
+		    CursorMan.CAT.debug("started loading and cropping of images in background");
 		    tracker.waitForAll();
-		    System.err.println("images ready");
+		    CursorMan.CAT.debug("images ready");
 		}catch(InterruptedException ie) { System.err.println( ie ); }
 	    }
 	};
