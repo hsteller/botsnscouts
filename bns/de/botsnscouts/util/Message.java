@@ -5,22 +5,25 @@ import java.util.*;
 import java.lang.*;
 import de.botsnscouts.*;
 import java.text.*;
-/**
-* Diese Klasse setzt Meldungen aller Art in verschiedene Sprachen um,
-* abhaengig vom File conf/messages.language
-*/
 
+import org.apache.log4j.Category;
 
+/** Internationalization
+ *   All texts (except for debug-messages) are not hard coded
+ *   but represented by labels that are defined in con/MessageBundle_<locale>.
+ */
 public class Message{
-    
+
+    static Category CAT = Category.getInstance(SoundMan.class);    
+
     private static String language = "empty"; 
     private static String country="empty";
     
     private static ResourceBundle messages;
     private static MessageFormat formatter;
     private static LocaleFilter localeFilter;
-    /**
-     * Sprache mit setLanguage waehlen
+
+    /** Set the language for all text messages.. 
      */
     public static void setLanguage(String lang){
 	if (lang.equals("deutsch")){
@@ -33,8 +36,7 @@ public class Message{
 	setLanguage(new Locale(language,country));
     }
 
-    /**
-     * Sprache mit setLanguage waehlen
+    /** Set the language for all text messages.
      */
     public static void setLanguage(Locale loc){
 	Locale myLocale=loc;
@@ -72,19 +74,17 @@ public class Message{
 	try{
 	    return messages.getString(id);
 	} catch (MissingResourceException e){
-	    System.err.println("Could not find resource for "+id);
+	    CAT.error("Could not find resource for "+id);
 	    return id;   // so the program doesn't crash and we at least see *something*
 	}
     }
 
-    /**
-     * Umsetzen von Meldungs-IDs in Strings.
-     * Der erste Parameter ist die Sektion (String),
-     * der zweite Parameter ist die Meldungs-ID (String)
-     * beginnend mit "m" (Meldung),"x" (Exception), "b" (Button), oder "e" (Error).
-     *
-     * Danach folgen null(0) bis zu vier(4) weitere Parameter, einzusetzen in die Platzhalter 
-     * Diese bis zu 4 Parameter dürfen wahlweise vom Typ String oder int sein. 
+    /** Transform message-IDs to Strings.
+     *  @param callerSection The sectionString (see the MessageBundle-Files)
+     *  @param id The ID used to reference this string in the code.
+     *            IDs starting with "m" are messages, with "x" Exceptions,
+     *            with "b" button labels and with "e" errors.
+     *  @param args Up to four parameters for the message.
      */
     public static String say(String callerSection,String id,String[] args){
 	switch (args.length){
@@ -104,8 +104,8 @@ public class Message{
     public static String say(String callerSection,String id){ 
 	return getString(callerSection+"."+id);
     }
-    public static String say(String callerSection,String id,String P1){ // Parameter String
-	//Global.debug(Message.class,"Messages ist: "+messages+ "formatter : "+formatter);
+    public static String say(String callerSection,String id,String P1){ 
+// Parameter String
 	formatter.applyPattern(getString(callerSection+"."+id));
 	Object[] params={P1};
 	return formatter.format(params);
@@ -206,7 +206,7 @@ public class Message{
 	return say(callerSection,id,""+P1,""+P2,""+P3,""+P4);
     }
     
-} // Ende Klasse "Message"
+} // end Message
 
 
 class LocaleFilter implements FilenameFilter{
@@ -216,7 +216,10 @@ class LocaleFilter implements FilenameFilter{
 	    boolean ok=name.endsWith(".properties")&&name.startsWith("MessagesBundle_");
 	    ok=ok&&name.length()==31&&name.charAt(17)=='_';
 	    return ok;
-	} catch(Throwable t){return false;}
+	} catch(Throwable t){
+	    Message.CAT.debug("Error in LocaleFilter: "+t);
+	    return false;
+	}
     }
 }    
 
