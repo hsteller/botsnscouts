@@ -33,11 +33,11 @@ public class BNSThread extends Thread {
     private static ThreadGroup threadGroup = new ThreadGroup("BNS Threads") {
         public void uncaughtException( Thread t, Throwable e ) {
             if( e instanceof ThreadDeath )
-                return; // do nothing
-            CAT.error("Exception in thread: " + t.getName(), e);
+                CAT.debug("Thread "+t.getName()+" exited gracefully.");
+            else
+                CAT.error("Exception in thread: " + t.getName(), e);
         }
     };
-
 
     public static ThreadGroup getBNSThreadGroup() {
         // if s.o. ever needs to build ones own threadgroup, this one should be its parent
