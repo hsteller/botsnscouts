@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.util;
 
 /**
  * Roboter-Objekt, wie es vom Server verwendet wird

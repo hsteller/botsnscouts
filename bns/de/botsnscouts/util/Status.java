@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.util;
 
 /** Hilfsklasse, deren Objekte die Informationen enthalten, die beim Info-Request 'gibSpielstatus' benoetigt werden
 *@author Hendrik<BR>
