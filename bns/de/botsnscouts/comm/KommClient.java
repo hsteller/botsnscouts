@@ -796,7 +796,7 @@ public class KommClient {
     */
     public Roboter getRobStatus (String name) throws KommException {
 	String com ="";
-	Roboter robot=new Roboter(name);
+	Roboter robot=Roboter.getNewInstance(name);
         String raus ="GRS("+name+")";
 	this.senden(raus); 
 	//Server sends "RS(Richtung(N,O..), Ort(1,1), LFlag, LArchF, Schaden, VLeben, GespRegister, Aktiv, Virtuell, RSreserveiert)"
