@@ -164,7 +164,6 @@ public class HumanView extends JPanel implements HumanViewInterface {
     public void showMessageToPlayer(String s) {
 	userInfo.setInfo(s);
 	panelSwitcher.show(switcherPanel,"userInfo");
-	invalidate();
     }
 
     /**
@@ -178,7 +177,6 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	    CAT.debug("All Registes locked!");
 	    cards.activateButton();
 	}
-	invalidate();
     }
 
 
@@ -365,7 +363,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	    d("send to Server: "+registers.getCards() + " powerDown: "+cards.wishesPowerDown());
 	    human.sendCards(registers.getCards(),cards.wishesPowerDown());
 	    if (cards.wishesPowerDown()) {
-		showPowerDown();
+	      showPowerDown();
 	    }
 	    cards.resetAll();
 	}

@@ -137,11 +137,9 @@ public class Ausgabe extends BNSThread {
 		if (msgId.equals("mRobLaser")){ // robots shooting
 		    CAT.debug("Got message telling "+kommAntwort.namen[1]+" shot "
 			      +kommAntwort.namen[2]+".");
-                    Roboter r1,r2;
-                    r1=r2=null; //temp. variables
 
-		    r1 =(Roboter )robots.get(kommAntwort.namen[1]);
-		    r2 =(Roboter )robots.get(kommAntwort.namen[2]);
+		    Roboter r1 =(Roboter )robots.get(kommAntwort.namen[1]);
+		    Roboter r2 =(Roboter )robots.get(kommAntwort.namen[2]);
 
 		    // updating statistics
 		    Stats actualStats=stats.getStats(r1.getName());
@@ -473,7 +471,8 @@ public class Ausgabe extends BNSThread {
      * Zeigt einen Text im Splashscreen an
      * (erzeugt den Splashscreen, falls noetig)
      */
-    private void showSplash(String s) {
+    void showSplash(String s) {
+      CAT.debug("showSplash: "+s+ "("+nosplash+")");
 	if(!nosplash) {
 	    if (splashScreen==null){
 		splashScreen = new Splash();
@@ -520,7 +519,7 @@ public class Ausgabe extends BNSThread {
 		CAT.error(kE.getMessage());
 		showSplash(Message.say("AusgabeFrame","msplashFehlerAnmeldung"));
 		versuche++;
-		try {Thread.sleep(3000);} catch (Exception e) {System.err.println(e.getMessage());}
+		try {Thread.sleep(3000);} catch (Exception e) {CAT.error(e.getMessage());}
 	    }
 	}
 
@@ -531,12 +530,9 @@ public class Ausgabe extends BNSThread {
 	else {
 	    Global.debug(this, "could not register at the server: "+host);
 	    showSplash(Message.say("AusgabeFrame","msplashEnde"));
-	    try {Thread.sleep(2000);} catch (Exception e) {System.err.println(e.getMessage());}
+	    try {Thread.sleep(2000);} catch (Exception e) {CAT.error(e.getMessage());}
 	    removeSplash();
 	}
-
-
-
 
     }
 

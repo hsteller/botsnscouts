@@ -72,12 +72,6 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
     protected int speed=MEDIUM;
 
-
-
-    /** @args SpielerMensch spielerref ist Referenz auf umgebenden
-     *  MenschlichenSpieler, falls Ausgabe zu einem Spieler gehoert,
-     *  null sonst.
-     */
     public AusgabeView() {
         super();
         this.initMenus();
