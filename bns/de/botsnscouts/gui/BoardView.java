@@ -1046,32 +1046,32 @@ public class BoardView extends JComponent {
                 return cbeltCrop[4];
 
             case (Board.NFW1):
-                if (turner(xpos, ypos - 1, Board.NORD))
+                if (turner(xpos, ypos - 1, Board.NORTH))
                     return cbeltCrop[15];
                 else
                     return cbeltCrop[6];
             case (Board.NFE1):
-                if (turner(xpos, ypos - 1, Board.NORD))
+                if (turner(xpos, ypos - 1, Board.NORTH))
                     return cbeltCrop[18];
                 else
                     return cbeltCrop[7];
             case (Board.SFW1):
-                if (turner(xpos, ypos + 1, Board.SUED))
+                if (turner(xpos, ypos + 1, Board.SOUTH))
                     return cbeltCrop[13];
                 else
                     return cbeltCrop[3];
             case (Board.SFE1):
-                if (turner(xpos, ypos + 1, Board.SUED))
+                if (turner(xpos, ypos + 1, Board.SOUTH))
                     return cbeltCrop[10];
                 else
                     return cbeltCrop[0];
             case (Board.EFN1):
-                if (turner(xpos - 1, ypos, Board.OST))
+                if (turner(xpos - 1, ypos, Board.EAST))
                     return cbeltCrop[16];
                 else
                     return cbeltCrop[5];
             case (Board.EFS1):
-                if (turner(xpos - 1, ypos, Board.OST))
+                if (turner(xpos - 1, ypos, Board.EAST))
                     return cbeltCrop[12];
                 else
                     return cbeltCrop[2];
@@ -1107,32 +1107,32 @@ public class BoardView extends JComponent {
                 return ebeltCrop[4];
 
             case (Board.NFW2):
-                if (turner(xpos, ypos - 1, Board.NORD))
+                if (turner(xpos, ypos - 1, Board.NORTH))
                     return ebeltCrop[16];
                 else
                     return ebeltCrop[6];
             case (Board.NFE2):
-                if (turner(xpos, ypos - 1, Board.NORD))
+                if (turner(xpos, ypos - 1, Board.NORTH))
                     return ebeltCrop[17];
                 else
                     return ebeltCrop[7];
             case (Board.SFW2):
-                if (turner(xpos, ypos + 1, Board.SUED))
+                if (turner(xpos, ypos + 1, Board.SOUTH))
                     return ebeltCrop[13];
                 else
                     return ebeltCrop[3];
             case (Board.SFE2):
-                if (turner(xpos, ypos + 1, Board.SUED))
+                if (turner(xpos, ypos + 1, Board.SOUTH))
                     return ebeltCrop[10];
                 else
                     return ebeltCrop[0];
             case (Board.EFN2):
-                if (turner(xpos - 1, ypos, Board.OST))
+                if (turner(xpos - 1, ypos, Board.EAST))
                     return ebeltCrop[15];
                 else
                     return ebeltCrop[5];
             case (Board.EFS2):
-                if (turner(xpos - 1, ypos, Board.OST))
+                if (turner(xpos - 1, ypos, Board.EAST))
                     return ebeltCrop[12];
                 else
                     return ebeltCrop[2];

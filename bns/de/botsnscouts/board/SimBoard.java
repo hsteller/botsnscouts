@@ -420,15 +420,15 @@ public class SimBoard extends Board implements Directions {
         // first, check for Wall
         //d("MoveRobOne called. Nr. "+robbis[rob].getName()+"; dir="+direction+"; schubsen: "+(schubsen?"ja":"nein"));
         switch (direction) {
-            case NORD:
+            case NORTH:
                 if (nw(robbis[rob].getX(), robbis[rob].getY()).isExisting())
                     return (false);
                 break;
-            case OST:
+            case EAST:
                 if (ew(robbis[rob].getX(), robbis[rob].getY()).isExisting())
                     return (false);
                 break;
-            case SUED:
+            case SOUTH:
                 if (sw(robbis[rob].getX(), robbis[rob].getY()).isExisting())
                     return (false);
                 break;
@@ -444,13 +444,13 @@ public class SimBoard extends Board implements Directions {
             int xx = robbis[rob].getX();
             int yy = robbis[rob].getY();
             switch (direction) {
-                case NORD:
+                case NORTH:
                     yy++;
                     break;
-                case OST:
+                case EAST:
                     xx++;
                     break;
-                case SUED:
+                case SOUTH:
                     yy--;
                     break;
                 case WEST:
@@ -473,15 +473,15 @@ public class SimBoard extends Board implements Directions {
         else {
             //d("no schubsen. doing changes");
             switch (direction) {
-                case NORD:
+                case NORTH:
                     robbis[rob].yy = robbis[rob].getY() + 1;
                     robbis[rob].xx = robbis[rob].getX();
                     break;
-                case OST:
+                case EAST:
                     robbis[rob].yy = robbis[rob].getY();
                     robbis[rob].xx = robbis[rob].getX() + 1;
                     break;
-                case SUED:
+                case SOUTH:
                     robbis[rob].yy = robbis[rob].getY() - 1;
                     robbis[rob].xx = robbis[rob].getX();
                     break;
@@ -588,13 +588,13 @@ public class SimBoard extends Board implements Directions {
         //d("ausfuehrenFliessband called. rob="+rob+"; typ="+typ);
         switch (typ % 10) {
             case BELT_NORTH:
-                if (!moveRobOne(robbis, rob, NORD, false)) return; // Abbruch falls vor die Wall gelaufen
+                if (!moveRobOne(robbis, rob, NORTH, false)) return; // Abbruch falls vor die Wall gelaufen
                 break;
             case BELT_EAST:
-                if (!moveRobOne(robbis, rob, OST, false)) return;
+                if (!moveRobOne(robbis, rob, EAST, false)) return;
                 break;
             case BELT_SOUTH:
-                if (!moveRobOne(robbis, rob, SUED, false)) return;
+                if (!moveRobOne(robbis, rob, SOUTH, false)) return;
                 break;
             case BELT_WEST:
                 if (!moveRobOne(robbis, rob, WEST, false)) return;
@@ -632,13 +632,13 @@ public class SimBoard extends Board implements Directions {
             int x = r.getX();
             int y = r.getY();
             if (nw(x, y).isSouthPusherActive(phase))
-                moveRobOne(robbis, i, SUED, false);
+                moveRobOne(robbis, i, SOUTH, false);
             if (sw(x, y).isNorthPusherActive(phase))
-                moveRobOne(robbis, i, NORD, false);
+                moveRobOne(robbis, i, NORTH, false);
             if (ew(x, y).isWestPusherActive(phase))
                 moveRobOne(robbis, i, WEST, false);
             if (ww(x, y).isEastPusherActive(phase))
-                moveRobOne(robbis, i, OST, false);
+                moveRobOne(robbis, i, EAST, false);
         } //for
         checkForPitVictims(robbis, true);
         doIntended(robbis);
@@ -775,7 +775,7 @@ public class SimBoard extends Board implements Directions {
             int x = robbis[rob].getX();
             int y = robbis[rob].getY();
             switch (robbis[rob].getFacing()) {
-                case OST:
+                case EAST:
                     if (ew(x, y).isExisting())
                         continue aussen2;
                     x++;  // Start auf Folgefeld
@@ -818,7 +818,7 @@ public class SimBoard extends Board implements Directions {
                         x--;
                     }
                     break;
-                case NORD:
+                case NORTH:
                     if (nw(x, y).isExisting())
                         continue aussen2;
                     y++;
@@ -836,7 +836,7 @@ public class SimBoard extends Board implements Directions {
                         y++;
                     }
                     break;
-                case SUED:
+                case SOUTH:
                     if (sw(x, y).isExisting())
                         continue aussen2;
                     y--;

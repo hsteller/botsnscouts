@@ -60,7 +60,7 @@ public class GetDirection extends TJPanel {
 	p.setLayout(new GridLayout(3,3));
 	p.setSize(200,200);
 	p.add(Box.createGlue());
-	PfeilC no = new PfeilC("NORD",Directions.NORD);
+	PfeilC no = new PfeilC("NORTH",Directions.NORTH);
 	no.addActionListener(al);
 	p.add(no);
 	p.add(Box.createGlue());
@@ -70,11 +70,11 @@ public class GetDirection extends TJPanel {
 	p.add(we);
 	//p.add(new JButton());
         p.add(Box.createGlue());
-	PfeilC os = new PfeilC("OST",Directions.EAST);
+	PfeilC os = new PfeilC("EAST",Directions.EAST);
 	os.addActionListener(al);
 	p.add(os);
 	p.add(Box.createGlue());
-	PfeilC su = new PfeilC("SUED",Directions.SOUTH);
+	PfeilC su = new PfeilC("SOUTH",Directions.SOUTH);
 	su.addActionListener(al);
 	p.add(su);
 	p.add(Box.createGlue());
@@ -85,7 +85,7 @@ public class GetDirection extends TJPanel {
 
 
     private class PfeilC extends JButton {
-	private int richt = Directions.NORD;
+	private int richt = Directions.NORTH;
 	PfeilC(String s, int r){
 	    this.setOpaque(false);
             setBorderPainted( false );
@@ -102,7 +102,7 @@ public class GetDirection extends TJPanel {
 	}
 
 	public void paintComponent(Graphics g){
-	    if (richt == Directions.NORD){
+	    if (richt == Directions.NORTH){
 		int[] x = {5,55,30};
 		int[] y = {55,55,5};
 		g.fillPolygon(x,y,3);
