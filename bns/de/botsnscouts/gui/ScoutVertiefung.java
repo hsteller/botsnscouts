@@ -42,8 +42,16 @@ import de.botsnscouts.util.*;
 public class ScoutVertiefung extends JToggleButton {
 
     int xsize=60, ysize=60;
-    Image imageActive[];
-    Image imageDream[];
+    Image[] imageActive;
+    Image[] imageDream;
+
+    public Dimension getMinimumSize() {
+	return new Dimension(xsize,ysize);
+    }
+
+    public Dimension getPreferredSize() {
+	return new Dimension(xsize,ysize);
+    }
 
     public ScoutVertiefung(ActionListener al) {
 	imageActive=ImageMan.getImages(ImageMan.SCHLAFPLATZ);
@@ -60,16 +68,7 @@ public class ScoutVertiefung extends JToggleButton {
 
     }
 
-    public Dimension getMinimumSize() {
-	return new Dimension(xsize,ysize);
-    }
-
-    public Dimension getPreferredSize() {
-	return new Dimension(xsize,ysize);
-    }
-
-
-    public static void main (String args[]) {
+    public static void main (String[] args) {
 	Message.setLanguage("deutsch");
         JFrame f = new JFrame();
 	f.setSize(100,100);

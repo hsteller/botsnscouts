@@ -91,8 +91,9 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         this.setOpaque( true );
         damageBar1.setBounds(new Rectangle(9, 7, 5, 54));
         flagBar2.setBounds(new Rectangle(15, 7, 70, 16));
+
         statusRobot1.setBounds(new Rectangle(18, 20, 68, 44));
-        diskButton1.setIcon( new ImageIcon( RobotInfo.getDisk() ) );
+        diskButton1.setIcon( new ImageIcon( RobotInfo.getDisk()) );
         diskButton1.setBounds(new Rectangle(0, 23, 16, 16));
         diskButton1.setBorder(null);
         diskButton1.setBorderPainted(false);
@@ -101,6 +102,11 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         statusRobot1.setLayout( null );
         statusRobot1.add(diskButton1, null);
         this.add(flagBar2, null);
+
+        diskButton1.setToolTipText(Message.say("RobotInfo", "archive",robot.getName()));
+        flagBar2.setToolTipText(Message.say("RobotInfo", "nextFlag", robot.getName()));
+        statusRobot1.setToolTipText(Message.say("RobotInfo", "botPos", robot.getName()));
+        damageBar1.setToolTipText(Message.say("RobotInfo", "damage", robot.getName(),""+robot.getDamage()));
     }
 
 
@@ -195,6 +201,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     public void updateRobot(Bot r) {
         robot = r;
         damageBar1.setDamageValue(r.getDamage());
+        damageBar1.setToolTipText(Message.say("RobotInfo", "damage",r.getName(), r.getDamage()+""));
         flagBar2.setReachedFlag(r.getNextFlag()-1);
         statusRobot1.setLifesLeft( r.getLivesLeft() - 1);
         setDead( r.getLivesLeft() == 0 );

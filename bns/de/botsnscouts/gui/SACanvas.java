@@ -135,9 +135,7 @@ public class SACanvas extends JComponent {
 
     /** last position of our famous scout ;-) */
     private Location lastScoutPos = new Location();
-
     // Let's define some colors, so that everybody uses the same..
-    public static final Color GREEN  = BotVis.GREEN;
     public static final Color YELLOW = BotVis.YELLOW;
     public static final Color RED    = BotVis.RED;
     public static final Color BLUE   = BotVis.BLUE;
@@ -145,7 +143,7 @@ public class SACanvas extends JComponent {
     public static final Color ORANGE = BotVis.ORANGE;
     public static final Color GRAY   = BotVis.GRAY;
     public static final Color VIOLET = BotVis.VIOLET;
-
+    public static final Color GREEN  = BotVis.GREEN;
 
 
     //  public static final Color[] robocolor = { Color.green, Color.yellow, Color.red,Color.blue, Color.magenta, Color.orange, Color.gray, Color.magenta.darker()};
@@ -1005,14 +1003,14 @@ public class SACanvas extends JComponent {
 	dest.height = (int)scaledFeldSize;
     }
 
+    public Point ort2Point( Location ort, Point p ) {
+        return ort2Point( ort.x, ort.y, p );
+    }
+
     public Location point2Ort( Point p, Location ort ) {
         ort.x = (int)(p.x / scaledFeldSize) + 1;
         ort.y = (int)((getHeight() - p.y) / scaledFeldSize) + 1;
         return ort;
-    }
-
-    public Point ort2Point( Location ort, Point p ) {
-        return ort2Point( ort.x, ort.y, p );
     }
 
     public Point ort2Point( int ortx, int orty, Point p ) {
@@ -1275,6 +1273,8 @@ public class SACanvas extends JComponent {
 
   // Little helper for getting thumbnails of the board
     private static SACanvas sac = null;
+
+
     public static Image createThumb(SimBoard sim, int size) {
 	if( sac == null ) {
 	    sac = new SACanvas(sim);

@@ -12,7 +12,9 @@ import java.util.*;
  */
 
 public interface RobotInfoListener extends EventListener {
-    public void flagClicked(RobotInfoEvent e);
     public void robotClicked(RobotInfoEvent e);
+
+    public void flagClicked(RobotInfoEvent e);
+
     public void diskClicked(RobotInfoEvent e);
 }

@@ -622,7 +622,7 @@ public class Ausgabe extends BNSThread {
                 }
           });
 
-
+      statsWindow.toFront();
       statsWindow.pack();
     }
 

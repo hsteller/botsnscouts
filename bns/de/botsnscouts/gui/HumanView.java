@@ -88,8 +88,12 @@ public class HumanView extends JPanel implements HumanViewInterface {
 		public void actionPerformed(ActionEvent e) {
 		    if (( (KlugscheisserLatte) e.getSource()).selected()) {
 			//			d(this,"wisenheimer, wake up!");
-			klugscheisserClicked(true);
-			human.sendWisenheimerMsg();
+			if (human.mode == HumanPlayer.MODE_PROGRAM) {
+                           klugscheisserClicked(true);
+      			   human.sendWisenheimerMsg();
+                        }
+                        else
+                          CAT.debug("asked wisenheimer but it did not make sense at this moment");
 		    }
 		    else {
 			//			d(this,"wisenheimer, go home!");

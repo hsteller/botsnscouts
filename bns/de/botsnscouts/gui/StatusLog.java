@@ -38,16 +38,6 @@ import org.apache.log4j.Category;
  */
 
 public class StatusLog  extends JPanel implements ActionListener{
-    static Category CAT = Category.getInstance(StatusLog.class);
-
-    // Objects
-    private JTextArea textArea = new JTextArea();
-    private JLabel singleMessage = new JLabel();
-
-    private View parent;
-    private LogFrame lF;
-    protected TextArea ta = new TextArea(Message.say("StatusLog","afLog"),5,40);
-
     public StatusLog(View out) {
         parent = out;
 
@@ -59,6 +49,16 @@ public class StatusLog  extends JPanel implements ActionListener{
 	setLayout(new FlowLayout(FlowLayout.LEFT));
 	add(singleMessage);
     }
+
+    static Category CAT = Category.getInstance(StatusLog.class);
+
+    // Objects
+    private JTextArea textArea = new JTextArea();
+    private JLabel singleMessage = new JLabel();
+
+    private View parent;
+    private LogFrame lF;
+    protected TextArea ta = new TextArea(Message.say("StatusLog","afLog"),5,40);
 
     public void addMessage(String s) {
 	singleMessage.setText(s);
