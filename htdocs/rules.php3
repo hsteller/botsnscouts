@@ -2,7 +2,7 @@
 <HEAD>
 <TITLE>How to Play Bots'n'Scouts</TITLE>
 <?php include('bnsheader.pht');?> 
-<div class=content" >
+<div class="content">
 <CENTER><H1>Rules (How to Play Bots'n'Scouts)</H1></CENTER>
 <HR>
 <H2>Background</H2>

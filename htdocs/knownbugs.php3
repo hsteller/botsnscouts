@@ -2,7 +2,7 @@
 <head>
 <title>Bots'n'Scouts - Known Bugs</title>
 <?php include('bnsheader.pht');?>
-<div class=content" >
+<div class="content" >
 <CENTER>
 <H1>Known Bugs and other things to do</H1>
 </CENTER>
