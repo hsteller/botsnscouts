@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.util;
 
 import java.applet.Applet;
@@ -57,7 +57,7 @@ public class SoundMan {
     /** Sound of a robot pushing another one. */
     public static final int PUSHING = 5;
 
-    /** How to locate the sounds relative to de.botsnscouts.BotsNScouts 
+    /** How to locate the sounds relative to de.botsnscouts.BotsNScouts
      *  Mind the ordering.
      */
     private static final String[] filenames = {
@@ -79,8 +79,7 @@ public class SoundMan {
     private static boolean soundsLoaded;
     private static boolean soundsEnabled;
 
-  public SoundMan() {
-    actualLaserSound=0;
+  static {
     String tmp=Conf.getProperty("sound.active");
     if (tmp==null)
 	soundsEnabled=false;
@@ -88,15 +87,20 @@ public class SoundMan {
 	soundsEnabled=tmp.equals("true");
   }
 
+  public SoundMan() {
+    actualLaserSound=0;
+
+  }
+
     public static synchronized void playSound(int sound){
 	try {
 	    if (soundsLoaded && soundsEnabled){
 		sounds[sound].play();
-	    } 
+	    }
 	}catch (ArrayIndexOutOfBoundsException ex){
 	    CAT.error("Invalid sound constant chosen.");
 	}
-    } 
+    }
 
   public static synchronized void playNextLaserSound(){
       try {
@@ -116,12 +120,21 @@ public class SoundMan {
   public static synchronized void setSoundActive(boolean soundOn){
     soundsEnabled=soundOn;
     Conf.setProperty("sound.active",soundOn?"true":"false");
+    Conf.saveProperties();
     if (!soundsLoaded)
 	loadSounds();
   }
 
+  /** Returns true if the user  has enabled sound AND the sounds are already loaded
+   *  */
   public synchronized static boolean isSoundActive(){
     return soundsEnabled&&soundsLoaded;
+  }
+
+  /** Returns true if the user has enabled sounds.
+   *   */
+  public static boolean isSoundEnabled(){
+    return soundsEnabled;
   }
 
 
@@ -139,7 +152,7 @@ public class SoundMan {
 			if (sounds[i] == null)
 			    throw new Exception("Sound "+filenames[i]+" was not loaded");
 		    }
-		    
+
 		    soundsLoaded = true;
 
 		  } catch (Throwable thr) {

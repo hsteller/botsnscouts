@@ -395,7 +395,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
   private class SoundMenu extends JMenu {
      SoundMenu () {
         super ((Message.say("AusgabeView","mSound")));
-        soundOn = SoundMan.isSoundActive();
+        soundOn = SoundMan.isSoundEnabled();
       //  String tmp = Conf.getProperty("sound.active");
       //  if (tmp!=null)
       //     soundOn = tmp.equals("true");
