@@ -30,11 +30,8 @@ public class Splash{
 	int x = (screen.width-width)/2;
 	int y = (screen.height-height)/2;
 	splash.setBounds(x,y,width,height);
-	try{
-	    bildLabel = new JLabel(new ImageIcon("bnslogo.jpg"));
-	    bildLabel.setBorder( new EtchedBorder(8));
-	}
-	catch(ClassNotFoundException cnfe) {System.err.println("splash: kaputt "+cnfe.getMessage()); System.exit(0);}
+	bildLabel = new JLabel(new ImageIcon("bnslogo.jpg"));
+	bildLabel.setBorder( new EtchedBorder(8));
 	textLabel = new JLabel("  "+s);
 	textLabel.setBorder( new EtchedBorder(8));
 	//textLabel.setBackground(Color.black);
