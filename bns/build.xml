@@ -2,7 +2,7 @@
 <project name="BotsNScouts" default="compile">
 
   <!-- Global properties for this build -->
-  <property name="src" value="src"/>
+  <property name="src" value="."/>
   <property name="build" value="${basedir}/classes"/>
   <property name="maindir" value="de/botsnscouts"/>
   <property name="dist" value="dist"/>
@@ -27,7 +27,7 @@
 
   <target name="compile" depends="init">
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}" 
+    <javac srcdir="${src}" includes="${maindir}/**/*.java" destdir="${build}" 
 	   classpath="${jars}:${build}" />
   </target>
 
@@ -83,13 +83,13 @@
       <fileset dir="${basedir}/tools/distrib" excludes="*.nodist" />
     </copy>
     <copy todir="${dist}/source">
-      <fileset dir="${basedir}/tools/distrib.binary" excludes="*.nodist" />
+      <fileset dir="${basedir}/tools/distrib.src" excludes="*.nodist" />
     </copy>
     <copy todir="${dist}/source/classes">
       <fileset dir="${build}" />
     </copy>
-    <copy todir="${dist}/source/src" includeEmptyDirs="false">
-      <fileset dir="${src}" />
+    <copy todir="${dist}/source" includeEmptyDirs="false">
+      <fileset dir="${src}" includes="${maindir}/**/*.java" />
     </copy>
     <copy todir="${dist}/source" file="${basedir}/build.xml" />
   </target>
@@ -105,5 +105,6 @@
     <!-- Delete the ${build} and ${dist} directory trees -->
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
+    <delete dir="${doc}"/>
   </target>
 </project>
