@@ -40,7 +40,7 @@ public class Wisenheimer{
     public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Wisenheimer.class);
 
     private SpielfeldKS aiBoard;
-    private Permu wirbel;
+    private SearchRecursively wirbel;
     private Roboter simRob = Roboter.getNewInstance("dummy");
     // damit wir nicht immer für jede Simulation einen neuen Robby brauchen
     private int[] predict=new int[5];
@@ -48,7 +48,7 @@ public class Wisenheimer{
 
     public Wisenheimer (SpielfeldKS aiB) {
 	aiBoard=aiB;
-	wirbel = new Permu(aiBoard,0);
+	wirbel = new SearchRecursively(aiBoard,0);
     }
 
     //berechnet den zug neu und gibt index der Karte zurück
@@ -84,7 +84,7 @@ public class Wisenheimer{
 	for (int i = 0; i < simRob.getGesperrteRegister().length; i++){
 	    simRob.setZug(i, simRob.getGesperrteRegister(i));
 	}
-	Karte[] vonPermut = wirbel.permutiere(simCards, simRob);
+	Karte[] vonPermut = wirbel.findBestMove(simCards, simRob);
 	for (int i=0;i<5;i++){
 	    predict[i]=vonPermut[i].getprio();
 	}

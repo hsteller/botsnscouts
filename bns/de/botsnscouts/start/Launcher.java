@@ -64,7 +64,7 @@ public class Launcher{
     public Thread  kuenstlicheSpielerStarten(String ip, int port, boolean local, int iq, KommSpPr com){
 	if (local){
 	    Thread ks;
-	    ks = new SpielerKuenstlich(ip,port,iq);
+	    ks = new AutoBot(ip,port,iq);
 	    if(ks!=null){
 		ks.start();
 		ks.setPriority(java.lang.Thread.MIN_PRIORITY);

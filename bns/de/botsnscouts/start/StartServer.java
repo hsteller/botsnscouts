@@ -114,7 +114,7 @@ public class StartServer extends BNSThread {
             } else if(spcnt < 0) {
                 //Künstliche Spieler starten
                 for(int i = 0; i < (-spcnt); i++) {
-                    SpielerKuenstlich tmp = new SpielerKuenstlich("127.0.0.1", com.port, com.iq);
+                    AutoBot tmp = new AutoBot("127.0.0.1", com.port, com.iq);
                     tmp.start();
                     tmp.setPriority(Thread.MIN_PRIORITY);
                     //     Global.debug(""+spcnt+" künstliche Spieler, "+com.port+" Port");
