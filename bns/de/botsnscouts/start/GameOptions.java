@@ -3,9 +3,15 @@ package de.botsnscouts.start;
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Conf;
 import nanoxml.XMLElement;
+import nanoxml.XMLParseException;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
+
+import org.apache.log4j.Category;
 
 /*
  *******************************************************************
@@ -29,6 +35,8 @@ public class GameOptions {
     static final int DPORT;//=8077;
     static final int DPLAYERS;//=8;
     static final int DTO;//=200;
+
+    private final static Category CAT = Category.getInstance(GameOptions.class);
 
     static {
         String stmp;
@@ -85,7 +93,11 @@ public class GameOptions {
      */
     private String comment;
 
+    /** A name for the game */
+    private String name;
 
+    /** Game hosted by */
+    private String invitor;
 
     /**
      * Set the relevant information later.
@@ -152,6 +164,9 @@ public class GameOptions {
      * @param flags   Location of the flags
      * @param x        "First coordinate of the board's dimension"
      * @param y        "Second coordinate of the board's dimension"
+     * @param comment Description of the game
+     * @param name A name for the game
+     * @param invitor the name of the human host who started the game
      */
     public GameOptions(int noPlayers,
                        int port,
@@ -162,9 +177,13 @@ public class GameOptions {
                        int y,
                        boolean allowScout,
                        boolean allowWisenheimer,
-                       String comment) {
+                       String comment,
+                       String name,
+                       String invitor) {
         this(noPlayers, port, timeout, board, flags, x, y, allowScout, allowWisenheimer);
         this.comment = comment;
+        this.name = name;
+        this.invitor = invitor;
     }
 
     /**
@@ -270,28 +289,76 @@ public class GameOptions {
     public XMLElement toXML() throws UnknownHostException {
         XMLElement xml = new XMLElement();
         xml.setName("game");
+        xml.setAttribute("name", name);
+        xml.setAttribute("invitor", invitor);
         xml.setAttribute("host", InetAddress.getLocalHost().getHostAddress());
         xml.setIntAttribute("port", registrationPort);
         xml.setAttribute("allowWisenheimer", allowWisenheimer?"true":"false");
         xml.setAttribute("allowScout", allowScout?"true":"false");
+        xml.setAttribute("comment", comment);
         XMLElement boardElement = new XMLElement();
         boardElement.setName("board");
         boardElement.setAttribute("field", board);
         boardElement.setIntAttribute("x", x);
         boardElement.setIntAttribute("y", y);
-        XMLElement flagsElement = new XMLElement();
-        flagsElement.setName("flags");
         for (int i=0; i<flags.length; i++) {
             XMLElement flag = new XMLElement();
             flag.setName("flag");
             flag.setIntAttribute("no", i);
             flag.setIntAttribute("x", flags[i].getX());
             flag.setIntAttribute("y", flags[i].getY());
-            flagsElement.addChild(flag);
+            boardElement.addChild(flag);
         }
-        boardElement.addChild(flagsElement);
         xml.addChild(boardElement);
         return xml;
+    }
+
+    /**
+     * Parses an xml-games-construct into a hashtable.
+     * @return A hashtable mapping game names to objects of type GameOptions.
+     */
+    static HashMap parseXMLGames( XMLElement xml ) {
+        HashMap map = new HashMap();
+
+        assertXMLTagName(xml, "games");
+        for( Iterator it = xml.getChildren().iterator(); it.hasNext(); ) {
+            XMLElement game = (XMLElement )it.next();
+            assertXMLTagName(game, "game");
+            Vector boardElems = game.getChildren();
+            if (boardElems.size()!=1) {
+                throw new XMLParseException("game", "Must have exactly one child board");
+            }
+            XMLElement board = (XMLElement )boardElems.elementAt(0);
+            Vector flagElements = board.getChildren();
+            Location[] flags = new Location[flagElements.size()];
+            for (Iterator flagIt = flagElements.iterator(); flagIt.hasNext(); ) {
+                XMLElement flag = (XMLElement )flagIt.next();
+                assertXMLTagName(flag, "flag");
+                flags[ flag.getIntAttribute("no")] = new Location( flag.getIntAttribute("x"),
+                                                                   flag.getIntAttribute("y") );
+            }
+
+            GameOptions gameOptions = new GameOptions( DPLAYERS, game.getIntAttribute("port"), DTO,
+                    board.getStringAttribute("field"), flags,
+                    board.getIntAttribute("x"), board.getIntAttribute("y"),
+                    Boolean.valueOf(game.getStringAttribute("allowWisenheimer")).booleanValue(),
+                    Boolean.valueOf(game.getStringAttribute("allowWisenheimer")).booleanValue(),
+                    game.getStringAttribute("comment"),
+                    game.getStringAttribute("name"), game.getStringAttribute("invitor")
+                    );
+            if (!map.containsKey(gameOptions.name)) {
+                map.put( gameOptions.name, gameOptions);
+            }  else {
+                CAT.info("Ignoring game named "+gameOptions.name+" introduced by "+gameOptions.invitor+
+                        "because we already know a game by that name.");
+            }
+        }
+        return map;
+    }
+
+    private static void assertXMLTagName(XMLElement xml, String name) {
+        if (!xml.getName().equals(name))
+            throw new XMLParseException(xml.getName(),"Expected tag: "+name);
     }
 
 }
