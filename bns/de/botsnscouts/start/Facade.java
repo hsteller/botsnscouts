@@ -17,11 +17,27 @@ public class Facade{
     private TileFactory tileFactory;
     private int thumbGR;
 
-    private static final String DIP="127.0.0.1";
-    private static final int DPORT=8077;
-    private static final int LPORT=8889;
-    private static final int DPLAYERS=8;
-    private static final int DTO=200;
+    private static final String DIP;//="127.0.0.1";
+    private static final int DPORT;//=8077;
+    private static final int LPORT;//=8889;
+    private static final int DPLAYERS;//=8;
+    private static final int DTO;//=200;
+
+    //initiere static constants
+    static{
+	String stmp;
+	int tmp;
+	stmp=Conf.getProperty("server.IP");
+	DIP=(stmp==null?"127.0.0.1":stmp);
+	tmp=Conf.getIntProperty("server.port");
+	DPORT=(tmp==-1?8077:tmp);
+	tmp=Conf.getIntProperty("startserver.port");
+	LPORT=(tmp==-1?8889:tmp);
+	tmp=Conf.getIntProperty("players");
+	DPLAYERS=(tmp==-1?8:tmp);
+	tmp=Conf.getIntProperty("timeout");
+	DTO=(tmp==-1?200:tmp);
+    }
 
 ////////////////////////////////////////
     // instanziiert alle benötigten Klassen

@@ -27,6 +27,15 @@ public class Conf{
 	return data;
     }
 
+    public static int getIntProperty(String key){
+	String data=getProperty(key);
+	int ret=-1;
+	try{
+	    ret=Integer.parseInt(data);
+	}catch(Exception e){}
+	return ret;
+    }
+
     public static void setProperty(String key, String data){
 	properties.setProperty(key, data);
     }
