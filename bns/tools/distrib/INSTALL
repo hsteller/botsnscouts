@@ -1,0 +1,42 @@
+Installing and starting instructions for Bots'n'Scouts
+
+Generic installation instructions:
+1. Check whether you have a Java 1.2 Runtime Environment installed.
+   If not, download and install it:
+   Linux:<"http://www.blackdown.org/java-linux/mirrors.html">
+   Windows 95/98/NT: 	
+   <"http://java.sun.com/products/jdk/1.2/jre/download-windows.html"> (8MB)
+2. There are two kinds of distribution: the binary-only and the source 
+   distribution. They are called "botsnscouts-<ver>.zip" and 
+   "botsnscouts-<ver>-src.zip", respectively. Download one of these. 
+   Probably you've done that already.
+3. Unpack it in any place you like. 
+
+
+
+Starting Instructions:
+GNU/Linux and other UNIX-like OSes:
+
+Change the working directory to where you installed Bots'n'Scouts.
+
+"start.sh" will start the game, in the language specified in the file "language". 
+That may be either "english" or "deutsch".
+
+"tileeditor.sh" will start the tile editor in the language specified in "language".
+
+"fullscreen.sh" starts up a new X server without a window manager and run 
+Bots 'n' Scouts in fullscreen mode. This might only work as root, depending on 
+your distribution (works as non-root in SuSE, doesn't in debian). Will probably 
+only work under Linux. If your system lacks memory (<64MB) it may be helpful 
+not starting a window manager but starting fullscreen.sh from console only.
+If you don't understand this, don't worry and use "start.sh"
+
+
+Windows:
+
+There are batch files for starting up the game or the tile editor in either 
+english or german.
+These files are: "start-english.bat" and "start-german.bat" to start the game and
+"tileeditor-english.bat" and "tileeditor-german.bat" to create your own tiles.
+
+No real fullscreen mode, sorry.

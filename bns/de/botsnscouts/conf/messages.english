@@ -1,0 +1,378 @@
+# Messages for the English version
+# author: Dirk
+
+[Global]
+[AboutFenster]
+mok OK
+mtext  Bots 'n' Scouts Version 0.7\n14.03.2000, Ludwigsstadt, Germany\n\nAn addictive multiplayer networked strategy game for Java.\nFor contact, questions and new versions go to:\nHomepage: http://www.spline.inf.fu-berlin.de/botsnscouts\nContact: botsnscouts@gmx.de\n\nThis Program is Free Software (GPL).
+mtitel About
+[KommClient]
+[KommClientAusgabe]
+[KommClientSpieler]
+[KommServer]
+[KommServerAusgabe]
+[KommServerRoboter]
+[KommStSrv]
+[KrimsKrams]
+[Roboter]
+[RoboterServer]
+[MSG]
+mAbmeldung $1 Quit the game.
+mAuswCrushers Crushers are active now.
+mAuswExprFl Express conveyor belts are moving.
+mAuswFl Conveyor belts are moving.
+mAuswPusher Pushers are active now.
+mAuswRobBew Starting programmed moves.
+mAuswRot Rotating gears are active now.
+mBoardLaser A boardlaser with strength $2 hits $1!
+mGewinn Congratulations! $1 has reached the last flag in place $2!
+mHinrLL $1 lost all lives and cannot play anymore. :(
+mHinrRV $1 is being removed due to a rule violation.
+mHinrTO $1 has been removed, was too slow!
+mKlugSchKlick $1 needed to ask for the know-it-all's help!
+mNeueRunde Starting turn $1!
+mNextFlag $1 has reached flag number $2!
+mRepFeld $1 is being repaired $2 damage on a repair site.
+mRepFlag $1 is being repaired on a flag.
+mRobLaser $1 hits $2!
+mUnfertigerRob Everyone is waiting for $1 to finish programming the registers...
+mZerstSync We are waiting for the destroyed robot(s) ($1) to select their facing.
+mPowUpFrage Asking robots ($1) if they want to power up again.
+mGrubenopfer $1 fell into a pit!
+[ServerAnmeldung]
+[ServerAusgabeThread]
+[Server]
+eKommFutschA There was a communication error with a viewer. (Maybe network problems?)
+eKommFutschR There was a communication error with player $1. (Network problems?)
+[ServerRoboterThread]
+[SpielerKuenstlich]
+[SpielerMensch]
+gameName Bots'n'Scouts
+gesperrt LOCKED
+istPowerDown Power Down Mode
+istPowerDownZusatz active
+kartenabgabe Sent the cards...
+legalZug Timeout - I've sent a legal move for you.
+mcregister Register $1
+mflagreached Goal reached
+mkilled Robot destroyed
+mregrep Repair register
+mregwahl Select $1 register(s).
+mwartereg Please program your registers...
+nextrunde Next round: 
+ok OK
+powerdown Power down
+powerdownwieder Start next turn powered down?
+register Register
+registerrep Register(s) can be repaired.
+richtungwahl Please select facing.
+roboauffeld Robots were placed.
+roboreaktiviert Robot reactivated.
+roboreaktwtitle Robot reactivated.
+sekunden seconds.
+senden Send
+sendregrep Register-Repair wish sent.
+spielende The game is over.
+spielgehtlos The game starts now!
+weiterspielen Continue playing
+wiederPowerFrage power down
+wunschschicken Power Down Selection Sent.
+zeitAblauf Time is running out: 
+[Spielfeld]
+eFlagNotInField Flag $1 is out of bounds!
+eFlagOnHole Flag $1 is positioned over a pit!
+mFlagProbConvBelt Flag is on a conveyor belt.\nIt's hard to reach it.\n
+mFlagProbManyWalls Flag is on a cell with $1 walls.\nTherefore, it's very hard to reach it.\n
+mFlagProbNoFlagSet No flags set.
+xCharNotAllowed Didn't find one of the allowed chars '$2' at position $1
+xCharsNotFound Didn't find any of the allowed chars $1 in Position $2; instead there's: $3
+xExpectedChar Expected $1 at position $2!
+xNoWhitespaceAtPos Expected whitespace at position $2!
+xTurnConvBeltNoSense We only support sane rotating conveyor belts. Problem at char $1
+[SpielfeldKS]
+[StartServer]
+eNoConnection Cannot establish a connection to specified ip/port!
+
+[StartSpieler]
+eFalPort Wrong port number
+eFalscheAngaben Faulty Input!
+eFalscheArg Wrong number of arguments in addFile!
+eKeineFl You have not placed enough flags!
+eKeineKach There is no tile chosen here.
+eKeineSpieler There are no players connected yet!
+eNoSuchFile Tile file doesn't exist or has a wrong format!
+eSpielGesch The game couldn't be started!
+eStehtSchon There's already a flag on that cell.
+eZuViel too many flags
+mAKErzUanm Start and connect a viewer
+mAnmRob Connected robots:
+mAnzahl Number
+mAusgErzUanm Create and Connect viewer
+mAusgSt Watch a game
+mDaIstKeine There's no flag there!
+mDumm dumb
+mEinAKSt Start a viewer
+mEinSpSt Start a player
+mExit Exit
+mFarb Choose a color:
+mFarb0 Random
+mFarb1 Green
+mFarb2 Yellow
+mFarb3 Red
+mFarb4 Blue
+mFarb5 Magenta
+mFarb6 Orange
+mFarb7 Grey
+mFarb8 Dark Magenta
+mFeldClick Click on a square on the left to place a tile
+mFlagDel Remove Flag
+mFlagSetz Place Flag
+mFlagVersch Move Flag
+mIP IP Address / Name of Server
+mIPGeaendert Started a new StartServer and a game on 127.0.0.1
+mKSAnm Start Artificial Players
+mKSSt Start Artificial Players
+mKacLab Tiles
+mKachDel Delete tile
+mKanName Channel name
+mLokRech local computer
+mName Name
+mNeuSp New Game
+mNeuSpAnmTim Beginning timeout in sec.
+mNeuSpAnz Maximum number of players
+mNeuSpZugTim Turn timeout in sec.
+mPort TCP Port
+mQuickDirty1 Quick & Dirty
+mQuickDirty2 Game Start
+mRRMenu Bots 'n' Scouts Start Menu
+mRightClick You may rotate tiles with the right mouse button.
+mSchlau smart
+mServer Server
+mSpErzUanm Create and connect player
+mSpFOK Board OK
+mSpGl The game has
+mSpGl2 started!
+mSpLadF Error while loading the board
+mSpLos Host a Game
+mSpName Player name
+mSpSt Flags OK
+mSpWerdenGest Players will be started on the following system:
+mSpfLab Board
+mSpieLocSt Player started locally
+mSpieServSt Player started on the server
+mSpielGest Game started successfully
+mStBarAus Watch a Game on port $2 on server $1
+mStBarBereit Ready
+mStBarExit Quit Program
+mStBarKS Start artificial players on Server $1 on Port $2
+mStBarNeuSp Starting new game with port $1 on game server $2.
+mStBarTeil Connect to game on Server $1 and Port $2
+mStartGesch Start failed!
+mTeilnehmen Connect to a server
+mThumbClick Right click a tile
+mTitel Bots 'n' Scouts Player Interface
+mVorschau Preview
+mZurSpF1 Back to
+mZurSpF2 Board
+[StSpVorschau]
+[StSpHalloCanv]
+[AusgabeFrame]
+Anmeldung Connecting to Server...
+afLog Log
+aktiviert Active
+archPos Archive Position
+eAnmeldung Connection to server failed.
+ereigLog Action Log...
+gAufLang Speed set to slow
+gAufMitt Speed set to medium
+gAufUn set speed to fast
+gameName Bots 'n' Scouts
+gelKarte played cards
+gespReg locked registers
+goalFlag next flag 
+hurt damage 
+klatte log
+klugScheisser know-it-all
+lifes lifes 
+mAbout About
+mFast fast
+mFile Game
+mFinish Quit
+mHelpMenuName Help
+mMiddle medium
+mOptions Options
+mRoboTrack RoboTrack
+mSlow slow
+mSpeed speed
+mflagMenu Flags
+msplashEnde Quitting.
+msplashFehlerAnmeldung Connection failed - retrying...
+msplashWarte Initializing game. Please wait...
+phase Phase
+pos Position
+ready Ready
+schlafplatz rest place
+scout Scout
+spielende Game over.
+statusVon Status for
+trackAus none
+virtuell virtual
+[SACanvas]
+[HalloCanvas]
+[Abspann]
+mAbspannPlazierung Place $1: $2
+mTitelAbspann Ranking
+mTitelAbspannTot Game over
+mTitelAbspannTotInfo All Robots died on the way.
+[Message]
+xCanNotLoadFile Couldn't load file $1
+xErrorInLanguageFile Language file $1 contains an error and wasn't loaded.
+xKeyNotFound ID $1 not found in section $2
+xSectionNotFound Couldn't find section $1
+[TestMessage]
+mFirstOutMessage Hello, this $1 program has $2 command line parameters\nGreat, huh?!
+[UserConfig]
+xCanNotLoadFile Couldn't find language file $1
+xErrorInLanguageFile Language file $1 contains an error and wasn't loaded.
+xKeyNotFound Couldn't find ID $1 in section $2
+xSectionNotFound Couldn't find section $1!
+[Start]
+bSave Save...
+mAbbr Cancel
+mAbbrechen Quit Game
+mAngem Connected Players:
+mBG images/garage2.jpg
+mBearbeiten Edit...
+mBeendeAlles Game Over!
+mBeenden Quit
+mDumm dumb
+mError Error
+mFarbe Color:
+mFarbeBlau Blue
+mFarbeDunkelMagenta Dark Magenta
+mFarbeEgal Random
+mFarbeGelb Yellow 
+mFarbeGrau Grey
+mFarbeGruen Green
+mFarbeMagenta Magenat
+mFarbeOrange Orange
+mFarbeRot Red
+mFlagge1x 1
+mFlagge1y 3
+mFlagge2x 4
+mFlagge2y 8
+mFlagge3x 10
+mFlagge3y 12
+mFlaggen 3
+mGoButton Go!
+mIntel Intelligence
+mKSStarten Start
+mKachel00 X.rra
+mKachelLoeschen Do you really want to delete the tile, including all flags on it?
+mKachelSetzen Do you really want to replace the tile, including all flags on it?
+mKachelSetzenTitel Question
+mLaden Load...
+mLokaleMS Start local players
+mLos Go!
+mMeldung Info
+mName Player name:
+mNichtZus The board tiles aren't connected!
+mOK OK
+mPort TCP Port number:
+mPortInh 8077
+mSchlau smart
+mServer Server Name / IP:
+mServerInh localhost
+mSpF0 default
+mSpF0Flagge1 1 12
+mSpF0Flagge2 9 8
+mSpF0Flagge3 21 12
+mSpF0Flagge4 3 1
+mSpF0Flaggen 4
+mSpF0Kachel00 cross.rra
+mSpF0Kachel01 leer
+mSpF0Kachel02 leer
+mSpF0Kachel10 leer
+mSpF0Kachel11 leer
+mSpF0Kachel12 leer
+mSpF0Kachel20 leer
+mSpF0Kachel21 leer
+mSpF0Kachel22 leer
+mSpF1 first
+mSpF1Flagge1 1 12
+mSpF1Flagge2 9 8
+mSpF1Flagge3 21 12
+mSpF1Flagge4 3 1 
+mSpF1Flaggen 4
+mSpF1Kachel00 cross.rra
+mSpF1Kachel01 leer
+mSpF1Kachel02 leer
+mSpF1Kachel10 X.rra
+mSpF1Kachel11 leer
+mSpF1Kachel12 leer
+mSpF1Kachel20 leer 
+mSpF1Kachel21 leer
+mSpF1Kachel22 leer
+mSpF2 second
+mSpF2Flagge1 6 6
+mSpF2Flagge2 4 24 
+mSpF2Flagge3 1 13
+mSpF2Flagge4 7 5
+mSpF2Flaggen 5
+mSpF2Kachel00 island.rra
+mSpF2Kachel01 maelstrom.rra
+mSpF2Kachel02 leer
+mSpF2Kachel10 leer
+mSpF2Kachel11 leer
+mSpF2Kachel12 leer
+mSpF2Kachel20 leer
+mSpF2Kachel21 leer
+mSpF2Kachel22 leer
+mSpFAnzahl 3
+mSpielStarten Start Game
+mSpielfeld Board
+mStartKS Start AutoBots
+mStartTitel Bots 'n' Scouts 
+mTTFlaggeEntfernen Remove Flag
+mTTFlaggeSetzen Place Flag
+mTTFlaggeVerschieben Move Flag
+mTTKachelDrehen Rotate Tile
+mTTKachelEntfernen Remove Tile
+mTTKachelSetzen Place Tile
+mTeilnehmen Join a Game
+mTeilnehmenBox Participate
+mWirklich Are you sure you want to do that?
+mZurueckButton Back 
+mZuschauen Watch a Game
+mZweiFlaggen There should be at least 2 flags on the board!
+eSpielEnde Warning: Game End could be unstable! Use Control-C to end the game!
+[Fehlermeldung]
+eError Error: $1
+[ZielfahneErreicht]
+[KachelEditor]
+bBeenden Quit
+bClear Clear board
+bLaden Load...
+bOk OK
+bSpeichern Save...
+eBadFormat The file is not a valid tile-file
+eDateiErr Couldn't open the file!
+mBla Fasel
+mCrusher Select crusher phases
+mDatEx The file already exists. Overwrite?
+mDatNotEx The file doesn't exist!
+mDateiErr Couldn't open file kacheln/$1.rra!
+mKachelLoad Enter tile name
+mKachelSave Enter tile name
+mLaser Select laser strength
+mPhase Phase
+mPusher Select pusher phases
+mStaerke Strength
+mTitel Tile Editor
+mWarnung Warning
+
+[ScoutVertiefung]
+mtooltip Scout
+
+[KlugscheisserLatte]
+mtooltip know-it-all

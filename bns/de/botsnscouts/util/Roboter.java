@@ -1,0 +1,388 @@
+package de.spline.rr;
+
+/**
+* Die Klasse enthaelt den Status des Roboters.
+* @author Miriam (zumindest nach Refactoring...)
+*/
+
+public class Roboter {
+
+    final static int ANZKARTEN = 9;
+    final static int ANZREG = 5;
+
+    protected String name="";
+    /**
+     * gibt die Ausrichtung des Roboters auf dem Spielfeld an
+     * N = 0; O = 1; S = 2; W = 3;
+     */
+    protected int ausrichtung;		   
+    /**
+     * gibt Position des Roboters auf dem Spielfeld an
+     */
+    protected Ort pos = new Ort();;
+
+    /**
+     * gibt die Nummer der nächsten Flagge an
+     */
+    protected int naechsteFlagge=2;
+    /**
+     * gibt die x-Koordinate auf dem Spielfeld an, auf dem der Roboter nach einer
+     * Zerstörung wieder in das Spielfeld gesetzt wird.
+     */
+    protected int archivX=1;			
+    /**
+     * gibt die y-Koordinate auf dem Spielfeld an, auf dem der Roboter nach einer
+     * Zerstörung wieder in das Spielfeld gesetzt wird.
+     */
+    protected int archivY=1;
+    /**
+     * gibt an, ob der Roboter virtuell (true) ist oder nicht (false)
+     */
+    protected boolean virtuell=true;
+    /**
+     * gibt die noch zur Verfügung stehenden Leben an
+     */	
+    protected int leben=4;
+    /**
+     * enthaelt die Programmierung
+     */
+    protected Karte[] zug = new Karte[ANZREG];
+    /**
+     * enthält die Karten der gesperrten Register 
+     */
+    protected Karte[] gesperrteRegister = new Karte[ANZREG];	// null wenn nichts gesoert ist
+    /**
+     * gibt an, ob der Roboter aktiviert (true) oder deaktiviert (false) ist
+     */
+    protected boolean aktiviert=true;
+    /**
+     * Die Anzahl der Schadenpnkte
+     */
+    protected int schaden=0;
+    /**
+     *Temporaere X-Postion des Roboters waehrend der Zugausfuerung.
+     *wird nur intern von Spielfeld verwendet.
+     */
+    protected int xx ;
+    /**
+     *Temporaere Y-Postion des Roboters waehrend der Zugausfuerung.
+     *wird nur intern von Spielfeld verwendet.
+     */
+    protected int yy ;
+    /** Temporaere Ausrichtung. Spielfeld-Intern. */
+    protected int aa;
+
+    protected final static Ort grube = new Ort(0,0);
+    
+    /**
+     *  Konstruktor
+     *  @param Name des Spielers bzw. Roboters.
+     */
+
+    public Roboter(String robName) {
+	name = robName;
+	ausrichtung=0;
+	pos.set(1,1);
+	naechsteFlagge=2;
+	archivX = 1;
+	archivY = 1;
+	virtuell = true;
+	leben = 3;
+	aktiviert = true;
+	schaden = 0;
+
+    }	 
+	
+    public Roboter(Roboter r ) {
+	super();
+	name = r.name;
+	ausrichtung = r.ausrichtung;
+	pos.set(r.pos);
+	schaden = r.schaden;
+	naechsteFlagge = r.naechsteFlagge;
+	archivX = r.archivX;
+	archivY = r.archivY;
+	virtuell = r.virtuell;
+	leben = r.leben;
+	aktiviert = r.aktiviert;
+	for(int i=0;i<5;i++) 
+	    if(r.zug[i] != null) 
+		zug[i] = new Karte(r.zug[i].getprio(), r.zug[i].getaktion());
+	for(int i=0;i<5;i++) {
+	    if (r.gesperrteRegister[i]!=null) 
+		gesperrteRegister[i]=new Karte(r.gesperrteRegister[i].getprio(),
+					       r.gesperrteRegister[i].getaktion());
+	}
+    }
+
+    public String getName(){
+	return name;
+    }
+
+    public int getAusrichtung() {
+	return ausrichtung;
+    }
+
+    public int getX(){
+	return pos.x;
+    }
+
+    public int getY() {
+	return pos.y;
+    }
+
+    public Ort getPos() {
+	return pos;
+    }
+
+    public int getArchivX(){
+	return archivX;
+    }
+
+    public int getArchivY(){
+	return archivY;
+    }
+
+    public int getSchaden(){
+	return schaden;
+    }
+
+    public int getLeben() {
+	return leben;
+    }
+
+
+    public int getNaechsteFlagge() {
+	return naechsteFlagge;
+    }
+
+    public boolean istVirtuell() {
+	return virtuell;
+    }
+
+    public boolean istAktiviert(){
+	return aktiviert;
+    }
+
+
+    /** Prüft, ob der Roboter gerade in eine Grube gefallen ist. */
+    public boolean istInGrube(){
+	return (schaden==10) && pos.equals(grube);
+    }
+
+
+    public Karte getGesperrteRegister(int i){
+	return gesperrteRegister[i];
+    }
+
+    public Karte[] getGesperrteRegister() {
+	return gesperrteRegister;
+    }
+
+    public Karte getZug(int i){
+	return zug[i];
+    }
+
+    public Karte[] getZug(){
+	return zug;
+    }
+
+    /** Liefert, ob zwei Roboter den gleichen Namen haben. 
+     * (Dann sollten sie eigentlich gleich sein.)
+     */
+    public boolean sameName(Roboter r) {
+	return name.equals(r.name);
+    }
+
+    /** Prüft, ob sich die Roboter an derselben Position aufhalten.
+     *  Sind beide in dieselbe Grube gefallen, sind sie trotzdem nicht am
+     *  selben Ort.
+     */
+    public boolean samePos(Roboter r) {
+	return (r.pos.equals(pos) && !r.istInGrube());
+    }
+
+    /** Liefert die Anzahl der gesperrten Register
+     * @author Miriam
+     */
+    public int gesperrteRegs() {
+	int c=0;
+	for (int i=0; i<5; i++)
+	    if (gesperrteRegister[i]!=null)
+		c++;
+	return c;
+    }
+	
+    /** entsperrt alle Register */
+    public void entsperreAlleRegs() {
+	for (int i=0; i<5; i++)
+	    gesperrteRegister[i] = null;
+    }
+
+    /** Aktuelle Position wird archiviert. */
+    public void touchArchiv(){
+	setArchiv(pos.x, pos.y);
+    }
+
+    public void setArchiv(int x, int y) {
+	archivX = x;
+	archivY = y;
+    }
+
+    public void setArchiv(Ort o) {
+	archivX = o.x;
+	archivY = o.y;
+    }
+    
+    /** schickt den Roboter in eine Grube 
+     *  Wenn ein Roboter in eine Grube faellt, verliert er ein Leben,
+     *  hat teporär Schaden 10 und die Position (0,0)
+     */
+    public void falleInGrube(){
+	leben--;
+	schaden=10;
+	pos=grube;
+    }
+
+    /** bewegt den Roboter nach (x,Y) */
+    public void moveTo(int x, int y){
+	setPos(x,y);
+    }
+
+    /** bewegt den Roboter nach Ort */
+    public void moveTo(Ort o){
+	setPos(o);
+    }
+
+    public void setPos(int x, int y){
+	this.pos.x = x;
+	this.pos.y = y;
+    }
+
+    public void setPos(Ort o) {
+	this.pos.set(o);
+    }
+
+    public void setVirtuell() {
+	setVirtuell(true);
+    }
+
+    public void setVirtuell(boolean b) {
+	virtuell = b;
+    }
+
+
+    public void setAktiviert() {
+	setAktiviert(true);
+    }
+
+    public void setAktiviert(boolean b) {
+	aktiviert = b;
+    }
+
+    /** Erhoeht den Schaden um 1 */
+    public void incSchaden() {
+	this.schaden++;
+    }
+
+
+    public void decrSchaden(int i) {
+	schaden -= i;
+    }
+
+    /** erhoeht den Schaden um eins */
+    public void setSchaden(int schaden) {
+	this.schaden = schaden;
+    }
+
+    public void decrLeben() {
+	leben--;
+    }
+
+    /** Setze Leben - warum tut das jemand??? */
+    public void setLeben(int i) {
+	leben = i;
+    }
+
+    public void setInvalidPos() {
+	this.pos.x = 0;
+	this.pos.y = 0;
+    }
+
+    /** Dreht den Roboter in die angegebene Richtung */
+    public void dreheNach(int richtung){
+	setAusrichtung(richtung);
+    }
+
+    public void setAusrichtung(int neu) {
+	this.ausrichtung = neu;
+    }
+
+    public void incNaechsteFlagge() {
+	naechsteFlagge++;
+    }
+
+    public void setNaechsteFlagge(int i){
+	naechsteFlagge = i;
+    }
+
+    /** Setzt den Roboter zurueck auf seine Archivposition
+     * @author Miriam  
+     */
+    public void zumArchiv() {
+	pos.set(archivX, archivY);
+    }
+
+    /** Register n wird gesperrt, es liegt gerade Karte karte 
+	(Rückwartskompatibilität, eigentlich sollte sperreReg(int i)
+	aufgerufen werden.
+     */
+    public void sperreRegister(int n, Karte karte) {
+	gesperrteRegister[n] = karte;
+    }
+
+    public void sperreReg(int n){
+	gesperrteRegister[n] = zug[n];
+    }
+    
+
+
+    public void sperreRegister(Karte[] karten) {
+	gesperrteRegister = karten;
+    }
+
+    public void setZug(int i, Karte karte) {
+	zug[i] = karte;
+    }
+
+
+    public String toString()
+        {
+            String s="";
+            s+="name: "+name+"; ausrichtung: "+ausrichtung+"; (x,y): "+pos+"\n";
+            s+="naechsteflagge: "+naechsteFlagge+"; archiv (x,y): ("+archivX+", "+archivY+"); leben: "+leben+"; schaden: "+schaden+"\n";
+            s+="virtuell:  "+virtuell+"; aktiviert: "+aktiviert;
+            s+="zug: [p|a]: ";
+            for(int i=0;i<zug.length;i++)
+                if (zug[i]!=null)
+                    s+="["+zug[i].getprio()+"|"+zug[i].getaktion()+"] ";
+                else
+                    s+="#";		
+				
+            s+="\ngesperrteRegister: ";
+            for(int i=0;i<5;i++)
+                if (gesperrteRegister[i]!=null)
+                    s+="["+gesperrteRegister[i].getprio()+"|"+gesperrteRegister[i].getaktion()+"] ";
+                else
+                    s+="#";
+						
+            s+="\n";
+            return s;
+        }
+    
+    public void zeige_Roboter()
+        {
+            Global.debug(this,this.toString());
+        }
+}
+

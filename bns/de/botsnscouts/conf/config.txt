@@ -1,0 +1,52 @@
+# 
+# In dieser Datei befinden sich die Konfigurations-Einstellungen zu RoboRally
+# Sie ist in [Sektionen] aufgeteilt die die Programmteile beschreiben.
+#
+# Jedes Sektions-Element besteht aus einer config-ID und einem Wert.
+# <config-id> <wert>
+#
+# Zeilen mit # am Anfang sind Kommentar
+#
+# ---------------------------------------------------------------------------
+#
+# This file contains all user configuration-data of RoboRally.
+# It is separated in sections for each part of the program, containing entry.
+#
+# An entry is divided into config-ID and value (only one line per entry!).
+# <config-id> <value>
+#
+# Lines beginning with a # are comments 
+#
+
+
+[All]
+Language german
+
+
+[StartServer]
+[StartSpieler]
+
+[KommClient]
+[KommClientAusgabe]
+[KommClientSpieler]
+[KommServer]
+[KommServerAusgabe]
+[KommServerRoboter]
+[KommStSrv]
+[KrimsKrams]
+[Roboter]
+[RoboterServer]
+[ServerAnmeldung]
+[ServerAusgabeThread]
+[Server]
+[ServerRoboterThread]
+[SpielerKuenstlich]
+[SpielerMensch]
+[Spielfeld]
+[SpielfeldKS]
+[StartServer]
+[StartSpieler]
+[StSpHalloCanv]
+[AusgabeFrame]
+[SACanvas]
+[HalloCanvas]

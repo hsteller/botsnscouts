@@ -1,0 +1,20 @@
+Bots'n'Scouts README for fullscreen mode
+
+Run fullscreen.sh to play the game in fullscreen mode.
+The game will start a new X Server on the next available virtual 
+console and run the game.
+
+You will probably need to adapt this script to your environment.
+
+
+Common problems/solutions:
+
+- you are not allowed to start a new X Server
+On some distributions you are not allowed to start a new XServer as user from
+an already running X. You can start fullscreen.sh as root or try to
+start it directly from a console.
+
+- an XServer starts but the game does not
+You probably have a ~/.xinitrc file that interferes with the start of the game.
+Try to mv the file an restart fullscreen.sh. Don't forget to mv the file back
+after you played the game.

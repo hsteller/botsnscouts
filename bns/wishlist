@@ -1,0 +1,9 @@
+Wunschliste für RoboRally.
+------------------------------------------------------------------------------
+Dirk -> Lukasz:
+Eigener Thread für Klugscheisserberechnung, der mit java.lang.Thread.\
+MINPRIORITY läuft.
+------------------------------------------------------------------------------
+wenigstens ein Beep ausgeben, wenn man irgendwas eingeben soll (ausrichtung, registerprogrammierung)
+geht einfach mit Toolkit.getDefaultToolkit().beep()
+------------------------------------------------------------------------------

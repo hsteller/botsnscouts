@@ -1,0 +1,35 @@
+Bots'n'Scouts
+
+                       ****** System Requirements ******
+
+Since Bots'n'Scouts is entirely written in Java, it runs under any system
+(Linux, Windows, Solaris...) as long as you meet the hardware requirements.
+
+
+HARDWARE:
+
+We recommend 64MB memory (tested for Linux and Windows.) As usual, the more the
+better...
+
+We tested with 48MB under Linux,too. Instead of starting a window manager
+manually, start Bots'n'Scouts via "fullscreen.sh" from console. (But
+"fullscreen.sh" is experimental, see README.fullscreen.)
+
+We tested with 32MB but we cannot recommend it.
+
+Bots'n'Scouts uses 2MB of disk space installed.
+
+Your monitor resolution should be at least 800x600, higher recommended.
+
+SOFTWARE:
+
+Besides the Bots'n'Scout distribution you also need a Java Runtime Environment,
+version 1.2.
+For downloading we recommend
+<"http://www.blackdown.org/java-linux/mirrors.html"> for Linux and
+
+<"http://java.sun.com/products/jdk/1.2/jre/download-windows.html"> for 
+Windows 95/98/NT.
+
+
+Check <"http://www.spline.inf.fu-berlin.de/botsnscouts"> for the latest.

@@ -1,0 +1,428 @@
+# 
+# In dieser Datei befinden sich die Ausgabe-Meldungen zu RoboRally
+# Sie ist in [Sektionen] aufgeteilt die die Programmteile beschreiben.
+#
+# Jedes Sektions-Element besteht aus einer Meldungs-ID und einer Meldung.
+# <meldungs-id> <meldung>
+#
+# Zeilen mit # am Anfang sind Kommentar
+#
+# Meldungstyp:   Art:	     <Meldungs-ID> <Meldung>
+# m		 message     mHallo Willkommen bei RoboRally.
+# x		 exception   xNoFile Die Datei wurde nicht gefunden!
+# e		 error       eSoNicht Die Daten sind fehlerhaft.
+# b		 button      bSpeichern Datei speichern
+#
+# Wenn die einzelnen Meldungstypen je Sektion zusammen stehen ist es uebersichtlicher
+# (also zB erst alle messages, dann alle exceptions, dann alle errors)
+#
+# Achtung: Wird ein Schlüssel vom Programm nicht gefunden, dann stürzt die
+#          Umsetzung (Message.say bzw. Message.sayIt) ab !
+#          Das sieht zwar ziemlich blöd aus, erleichtert aber das Debuggen.
+#
+
+
+
+
+[Global]
+
+[AboutFenster]
+mtitel Über
+mtext  Bots 'n' Scouts Version 0.7\n14.03.2000, Ludwigsstadt, Germany\n\nMultiplayer-Netzwerk-Strategie-Spiel in Java.\n
+Aktuelle Versionen und Infos sind zu finden unter\nHomepage: http://www.spline.inf.fu-berlin.de/botsnscouts\nMailing list: botsnscouts@gmx.de\n\nDieses Programm ist freie Software (GPL).
+mok OK
+
+[KommClient]
+[KommClientAusgabe]
+[KommClientSpieler]
+[KommServer]
+[KommServerAusgabe]
+[KommServerRoboter]
+[KommStSrv]
+
+[KrimsKrams]
+
+[Roboter]
+[RoboterServer]
+
+# Nachrichten die der Server an die Ausgaben schicken kann
+[MSG]
+mNeueRunde Es beginnt nun Runde $1!
+mHinrLL	$1 hat alle Leben verspielt und spielt nicht mehr mit. :(
+mHinrTO $1 ist nicht mehr dabei, war zu langsam!
+mHinrRV $1 wird wegen einer Regelverletzung aus dem Spiel geworfen!
+mAbmeldung $1 hat sich abgemeldet.
+mGewinn Gratulation: $1 hat das Ziel als $2. erreicht!
+mUnfertigerRob	Alle warten noch darauf, dass $1 die Register fertig programmiert...
+mBoardLaser Ein Boardlaser mit Stärke $2 trifft $1!
+mRobLaser $1 schießt $2 ab!
+mRepFeld $1 steht auf einem Reperaturfeld und hat nun $2 Schaden weniger.
+mRepFlag $1 wird auf einer Flagge repariert.
+mNextFlag $1 hat jetzt die $2. Flagge erreicht!
+mKlugSchKlick $1 kommt nicht ohne die Hilfe des Klugscheißers aus!
+mZerstSync Wir warten noch auf die Richtungswahl der zerstören Roboter ($1).
+mPowUpFrage Frage Roboter ($1), ob sie wieder Power up haben möchten.
+mGrubenopfer $1 ist in eine Grube gefallen!
+mAuswRobBew Beginne mit Auswertung der programmierten Register.
+mAuswExprFl Expreßfließbänder bewegen sich.
+mAuswFl Fließbänder bewegen sich.
+mAuswPusher Pusher sind aktiv.
+mAuswRot Drehelemente sind aktiv.
+mAuswCrushers Crusher sind aktiv.
+
+[ServerAnmeldung]
+[ServerAusgabeThread]
+[Server]
+eKommFutschA Es ist ein Kommunikationsfehler mit einer Ausgabe aufgetreten. (Netzwerkprobleme oder interner Fehler?)
+eKommFutschR Es ist ein Kommunikationsfehler mit Spieler $1 aufgetreten. (Netzwerkprobleme oder interner Fehler?)
+
+[ServerRoboterThread]
+
+[SpielerKuenstlich]
+
+[SpielerMensch]
+gameName Bots´n´Scouts
+legalZug Timeout ist eingetreten - habe irgendeinen Zug abgegeben...
+zeitAblauf Die Zeit läuft ab: 
+sekunden Sekunden.
+spielgehtlos Das Spiel geht los!
+roboauffeld Roboter wurde auf das Feld gesetzt.
+roboreaktiviert Roboter reaktiviert.
+wunschschicken Wunsch für den PowerDown geschickt.
+registerrep Register können repariert werden.
+sendregrep Register-Reparatur geschickt.
+spielende Das Spiel ist beendet.
+kartenabgabe Karten abgegeben...
+nextrunde Ich will:
+powerdown powerdown
+senden los!
+register Register
+gesperrt GESPERRT
+richtungwahl Richtung wählen
+roboreaktwtitle Roboter reaktiviert.
+powerdownwieder Was nun?
+wiederPowerFrage powerDown
+weiterspielen weiterspielen
+ok OK
+mcregister Register $1
+mregrep Register reparieren
+mregwahl Repariere $1 Register.
+mwartereg Warte auf Registerprogrammierung...
+istPowerDown Power Down Modus
+istPowerDownZusatz aktiviert
+mflagreached Ziel erreicht
+mkilled Robi zerstört
+
+[Spielfeld]
+mFlagProbNoFlagSet Keine Flaggen gesetzt.
+eFlagNotInField Flagge Nr. $1 ausserhalb des Spielfeldes!
+eFlagOnHole Flagge Nr. $1 ist auf einer Grube!
+mFlagProbManyWalls Flagge steht auf einem Feld mit $1 Wänden.\n Das macht es sehr schwer, sie zu erreichen...\n
+mFlagProbConvBelt Flagge steht auf einem Fließband.\n Dadurch wird der Spielverlauf eventuell undurchsichtig für die Spieler.\n
+xCharNotAllowed Keines der erlaubten Zeichen '$2' gefunden in Position $1
+xTurnConvBeltNoSense Es werden nur vernuenftige Drehfliessbaender unterstuetzt. Problem bei Zeichen $1
+xCharsNotFound Fand keinen der erlaubten Chars $1 in Position $2; da ist:$3
+xExpectedChar $1 erwartet an Position $2!
+xNoWhitespaceAtPos Kein Whitespace an Position $1
+[SpielfeldKS]
+
+[StartServer]
+eNoConnection Kann nicht das angegebene ip/port öffnen
+
+[StartSpieler]
+mTitel RoboRally Spieler Interface
+mEinSpSt Einen Spieler starten
+mSpName Spielername
+mName Name
+mSpErzUanm Spieler erzeugen und anmelden
+mEinAKSt Einen Ausgabekanal starten
+mKanName Kanalname
+mAusgErzUanm Ausgabe erzeugen und anmelden
+mRRMenu RoboRally Menü
+mAKErzUanm Einen Ausgabekanal erzeugen und anmelden
+mStBarBereit Bereit
+mIP IP Adresse/Name des Servers
+mPort Anmeldeport
+mExit Verlassen
+mNeuSp Neues Spiel starten
+mTeilnehmen Am Spiel teilnehmen
+mKSAnm Künstliche Spieler starten
+mAusgSt Einem Spiel zuschauen
+eFalPort Falsche Portnummer
+mStBarNeuSp Startet ein neues Spiel mit angegebenem Anmeldeport $1  auf dem Spieleserver $2
+mStBarTeil Am Spiel auf Rechner $1 auf Anmeldeport $2 teilnehmen
+mStBarKS Künstliche Spieler am Spiel auf Rechner $1 auf Anmeldeport $2 teilnehmen lassen
+mStBarAus Dem Spiel auf Rechner $1 auf Anmeldeport $1 zuschauen
+mStBarExit Das Programm beenden
+mNeuSpAnmTim Anmeldetimeout in sec.
+mNeuSpZugTim Zugabgabetimeout in sec.
+mNeuSpAnz Anzahl der Mitspieler
+eKeineFl Sie haben zu wenige  Flaggen gesetzt!
+mSpielGest Spiel wurde erfolgreich gestartet
+eSpielGesch Spielstart ist gescheitert!
+eFalscheAngaben Falsche Angaben!
+eKeineKach Hier ist keine Kachel gewählt
+eStehtSchon Auf diesem Feld steht schon eine Flagge
+eZuViel Zu viele Flaggen
+mKachDel Kachel löschen
+mVorschau Vorschau
+mSpFOK Spielfeld OK
+mSpSt Flaggen OK
+mSpLos Spiel starten
+mFlagSetz Flagge setzen
+mFlagVersch Flagge umsetzen
+mFlagDel Flagge entfernen
+mKSSt Künstliche Spieler starten
+mAnzahl Anzahl
+mSpWerdenGest Spieler werden auf dem folenden System gestartet:
+mLokRech lokaler Rechner
+mServer Server
+mSpErzUanm Spieler erzeugen und anmelden
+mDumm dumm
+mSchlau schlau
+mSpieServSt Spieler auf dem Server gestartet
+mSpieLocSt Spieler lokal gestartet
+mStartGesch Start hat gescheitert!
+eFalscheArg Falsche argumente in addFile!
+eNoSuchFile Kacheldatei existiert nicht oder enthält Daten in falschem Format!
+mAnmRob Angemeldete Roboter:
+mSpGl Das Spiel hat
+mSpGl2 angefangen!
+mZurSpF1 Zurück zum
+mZurSpF2 Spielfeld
+mQuickDirty1 Quick&Dirty
+mQuickDirty2 Spielstart
+mDaIstKeine Da ist keine Flagge!
+mThumbClick Klicken Sie eine Kachel rechts an
+mFeldClick Klicken Sie in einem Rechteck links um eine Kachel zu setzen
+mRightClick Mit rechter Maustaste können Sie die Kacheln auf dem Spielfeld drehen
+mSpfLab Spielfeld
+mKacLab Kacheln
+mSpLadF Beim Laden des Spielfeldes ist ein Fehler aufgetretten
+mIPGeaendert Neuen StartServer und ein Spiel auf 127.0.0.1 gestartet
+mFarb0 Zufällig
+mFarb1 Grün
+mFarb2 Gelb
+mFarb3 Rot
+mFarb4 Blau
+mFarb5 Magenta
+mFarb6 Orange
+mFarb7 Grau
+mFarb8 Dunkel Magenta
+mFarb Gewünschte Farbe:
+eKeineSpieler Es gibt noch keine angemeldete Spieler!
+[StSpVorschau]
+[StSpHalloCanv]
+
+[AusgabeFrame]
+mHelpMenuName Hilfe
+mAbout Über
+msplashEnde Das Programm wird beendet.
+msplashFehlerAnmeldung Die Anmeldung ist fehlgeschlagen - versuche erneut...
+msplashWarte Das Spiel wird initialisiert. Bitte warten...
+mflagMenu Flaggen
+afLog Log
+gameName Bots´n´Scouts
+mFile Spiel
+mFinish Beenden
+mOptions Optionen
+mSpeed Geschwindigkeit
+mSlow langsam
+mMiddle mittel
+mFast ungebremst
+mRoboTrack Robotrack
+ready Bereit.
+goalFlag Zielfahne 
+lifes Leben 
+hurt Schaden 
+klugScheisser Klugscheißer
+klatte Latte
+scout Scout
+schlafplatz Schlafplatz
+ereigLog Log der Ereignisse...
+statusVon Status von 
+gespReg gesperrte Register 
+gelKarte gelegte Karten 
+archPos Archivposition
+aktiviert Aktiviert 
+virtuell Virtuell
+pos Position
+gAufLang Geschwindigkeit auf langsam gestellt
+gAufMitt Geschwindigkeit auf mittel gestellt
+gAufUn Geschwindigkeit auf ungebremst gestellt
+Anmeldung Anmeldung am Server...
+phase Phase 
+trackAus ausschalten
+spielende Das Spiel ist beendet.
+eAnmeldung Eine Anmeldung beim Server war leider nicht möglich.
+
+[SACanvas]
+[HalloCanvas]
+[Abspann]
+mTitelAbspann Gewinnerliste
+mTitelAbspannTot Game over
+mTitelAbspannTotInfo Alle Spieler sind unterwegs gestorben.
+mAbspannPlazierung Platz $1: $2
+
+[Message]
+xCanNotLoadFile Die Sprachendatei $1 konnte nicht geladen werden.
+xErrorInLanguageFile Die Sprechendatei $1 enthält einen Fehler und wurde nicht geladen.
+xKeyNotFound Die Message-ID $1 konnte nicht in der Sektion [$2] gefunden werden!!!
+xSectionNotFound Die Sektion $1 konnte nicht gefunden werden!!!
+
+[TestMessage]
+mFirstOutMessage Hallo, dieses $1 Programm hat $2 Kommandozeilenparameter. \nToll, was !?
+
+[UserConfig]
+xCanNotLoadFile Die Sprachendatei $1 konnte nicht geladen werden.
+xErrorInLanguageFile Die Sprechendatei $1 enthält einen Fehler und wurde nicht geladen.
+xKeyNotFound Die Message-ID $1 konnte nicht in der Sektion [$2] gefunden werden!!!
+xSectionNotFound Die Sektion $1 konnte nicht gefunden werden!!!
+
+[Start]
+mStartTitel Bots'n'Scouts
+mSpielStarten Spiel Starten
+mTeilnehmen Am Spiel teilnehmen
+mZuschauen Einem Spiel zuschauen
+mBeenden Beenden
+mBG images/garage2.jpg
+mServer Server Name/IP:
+mPort Port am Server:
+mServerInh localhost
+mPortInh 8077
+mGoButton Go!
+mZurueckButton Zurück
+mLokaleMS Lokale Mitspieler
+mStartKS AutoBots starten
+mName Spielername:
+mFarbe Farbe:
+mFarbeEgal Egal
+mFarbeGruen Grün
+mFarbeGelb Gelb
+mFarbeRot Rot
+mFarbeBlau Blau
+mFarbeMagenta Magenta
+mFarbeOrange Orange
+mFarbeGrau Grau
+mFarbeDunkelMagenta Dunkel Magenta
+mSpielfeld Spielfeld:
+mLaden Laden...
+mBearbeiten Bearbeiten...
+mKachel00 X.rra
+mFlaggen 3
+mFlagge1x 1
+mFlagge1y 3
+mFlagge2x 4
+mFlagge2y 8
+mFlagge3x 10
+mFlagge3y 12
+mLos Los!
+mAbbrechen Spiel abbrechen
+mAngem Angemeldete Spieler:
+mIntel Intelligenz
+mDumm Dumm
+mSchlau Schlau
+mKSStarten Start
+mOK OK
+mAbbr Abbrechen
+mTTFlaggeSetzen Flagge Setzen
+mTTFlaggeVerschieben Flagge Verschieben
+mTTFlaggeEntfernen Flagge Entfernen
+mTTKachelSetzen Kachel Setzen
+mTTKachelDrehen Kachel Drehen
+mTTKachelEntfernen KachelEntfernen
+mKachelSetzen Die darunter liegende Kachel enthält Flaggen. Sind Sie sicher, daß sie ersetzt werden soll?
+mKachelLoeschen Sind Sie sicher, daß Sie die Kachel mit allen Flaggen löschen wollen?
+mKachelSetzenTitel Frage
+mWirklich Wollen Sie das wirklich tun?
+mZweiFlaggen Auf dem Spielfeld sollen sich mindestens zwei Flaggen befinden!
+mError Fehler
+mNichtZus Das Spielfeld ist nicht zusammenhängend!
+mBeendeAlles Das Spiel ist zu Ende!
+mMeldung Info
+mTeilnehmenBox am Spiel teilnehmen
+eSpielEnde Warnung: Spielende kann u.U. instabil sein! Benutzen Sie ggf. Control-C!
+
+mSpFAnzahl 3
+mSpF0 default
+mSpF0Kachel00 cross.rra
+mSpF0Kachel01 leer
+mSpF0Kachel02 leer
+mSpF0Kachel10 leer
+mSpF0Kachel11 leer
+mSpF0Kachel12 leer
+mSpF0Kachel20 leer
+mSpF0Kachel21 leer
+mSpF0Kachel22 leer
+mSpF0Flaggen 4
+mSpF0Flagge1 1 12
+mSpF0Flagge2 9 8
+mSpF0Flagge3 21 12
+mSpF0Flagge4 3 1
+
+mSpF1 first
+mSpF1Kachel00 cross.rra
+mSpF1Kachel01 leer
+mSpF1Kachel02 leer
+mSpF1Kachel10 X.rra
+mSpF1Kachel11 leer
+mSpF1Kachel12 leer
+mSpF1Kachel20 leer
+mSpF1Kachel21 leer
+mSpF1Kachel22 leer
+mSpF1Flaggen 4
+mSpF1Flagge1 1 12
+mSpF1Flagge2 9 8
+mSpF1Flagge3 21 12
+mSpF1Flagge4 3 1
+
+mSpF2 second
+mSpF2Kachel00 island.rra
+mSpF2Kachel01 maelstrom.rra
+mSpF2Kachel02 leer
+mSpF2Kachel10 leer
+mSpF2Kachel11 leer
+mSpF2Kachel12 leer
+mSpF2Kachel20 leer
+mSpF2Kachel21 leer
+mSpF2Kachel22 leer
+mSpF2Flaggen 5
+mSpF2Flagge1 6 6
+mSpF2Flagge2 4 24
+mSpF2Flagge3 1 13
+mSpF2Flagge4 7 5
+bSave Speichern
+
+[Fehlermeldung]
+eError Fehler: $1
+
+[ZielfahneErreicht]
+
+[KachelEditor]
+mTitel KachelEditor
+bSpeichern Speichern...
+bLaden Laden...
+bClear Feld leeren
+bBeenden Beenden
+mKachelSave Geben Sie Kachelname ein
+mKachelLoad Geben Sie Kachelname ein
+mPhase Phase
+bOk OK
+mWarnung Warnung
+mStaerke Stärke
+mDateiErr Kann die Datei kacheln/$1.rra nicht öffnen!
+mDatNotEx Die Datei existiert nicht!
+mDatNotEx Die Datei existiert nicht!
+mDatEx Die Datei $1 existiert bereits. Überschreiben?
+eBadFormat Die Datei ist keine gültige Kacheldatei
+eDateiErr Kann die Datei nicht öffnen!
+mPusher Wählen Sie Pusherphasen
+mLaser Wählen Sie Laserstärke
+mCrusher Wählen Sie Crusherphasen
+mBla Fasel
+
+[ScoutVertiefung]
+mtooltip Scout
+
+[KlugscheisserLatte]
+mtooltip Klugscheisser
