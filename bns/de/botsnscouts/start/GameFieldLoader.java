@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.start;
 
 import de.botsnscouts.util.*;
@@ -46,11 +46,24 @@ class GameFieldLoader{
     private static HashSet distSpf = new HashSet(); // The spfs from the distribution
 
     public String[] getSpielfelder(){
- 	File kd=new File("tiles");
-	String[] part1 = kd.list(new SpfFilter());
-	for (int i=0;i<part1.length;i++){
-	    part1[i]=part1[i].substring(0,part1[i].length()-4);
-	}
+
+
+
+
+
+	String[] part1;
+
+        File kd=new File("tiles");
+        if (kd != null && kd.exists()) {
+          part1 = kd.list(new SpfFilter());
+          for (int i=0;i<part1.length;i++){
+              part1[i]=part1[i].substring(0,part1[i].length()-4);
+          }
+        }
+        else {
+          CAT.debug("could not find tiles directory for custom tiles");
+          part1 = new  String [0];
+        }
 
 	// Load those from the distribution
 	InputStream stream = BotsNScouts.class.getResourceAsStream("tiles/tile.index");
