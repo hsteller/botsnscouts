@@ -33,8 +33,8 @@ package de.botsnscouts.autobot;
  * Id: $Id$
  */
 
-import de.botsnscouts.board.BoardRoboter;
-import de.botsnscouts.board.SpielfeldKS;
+import de.botsnscouts.board.BoardBot;
+import de.botsnscouts.board.DistanceCalculatingBoard;
 import de.botsnscouts.server.KartenStapel;
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Bot;
@@ -44,7 +44,7 @@ import java.util.Arrays;
 public class SearchRecursively {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(SearchRecursively.class);
 
-    private SpielfeldKS sf;
+    private DistanceCalculatingBoard sf;
     private Card[] bestCards;
     private int bestScore;
     private int malus;
@@ -57,7 +57,7 @@ public class SearchRecursively {
     private static final int[] mali = {25, 15, 15, 15, 10};
     private static final int maliSum = 80;
 
-    public SearchRecursively(SpielfeldKS s, int m) {
+    public SearchRecursively(DistanceCalculatingBoard s, int m) {
         sf = s;
         malus = m;
     }
@@ -89,17 +89,17 @@ public class SearchRecursively {
             len++;
         Arrays.sort(ka, 0, len, Card.INVERSE_PRIORITY_COMPARATOR);
 
-        recurse((BoardRoboter) r, ka, 0);
+        recurse((BoardBot) r, ka, 0);
         return bestCards;
     }
 
     /** We need one temp per level of recursion, however we don't want to
      create a new one on each call. */
-    private BoardRoboter[] tmp = {new BoardRoboter(), new BoardRoboter(),
-                                  new BoardRoboter(), new BoardRoboter(),
-                                  new BoardRoboter(), new BoardRoboter()};
+    private BoardBot[] tmp = {new BoardBot(), new BoardBot(),
+                                  new BoardBot(), new BoardBot(),
+                                  new BoardBot(), new BoardBot()};
 
-    private void recurse(final BoardRoboter r, Card[] ka, int recursionLevel) {
+    private void recurse(final BoardBot r, Card[] ka, int recursionLevel) {
         if (r.getDamage() == 10) return;
         int anzahl = 0;
         for (int i = 0; i < 5; i++)
@@ -109,7 +109,7 @@ public class SearchRecursively {
 
             // If we are standing on a conveyor belt, check what cards we need
             // to not die next phase
-            if (sf.bo(r.getX(), r.getY()).isBelt()) { // Belt
+            if (sf.floor(r.getX(), r.getY()).isBelt()) { // Belt
                 for (int i = 0; i < malusCards.length; i++) {
                     tmp[recursionLevel].initFrom(r);
                     tmp[recursionLevel].setZug(0, malusCards[i]);
@@ -121,7 +121,7 @@ public class SearchRecursively {
                     return; // we die surely, discard this choice
             }
 
-            int score = sf.getBewertung(r, malus) + diemalus;
+            int score = sf.getDistance(r, malus) + diemalus;
             if (score <= bestScore) {
                 bestScore = score;
                 for (int i = 0; i < 5; i++)

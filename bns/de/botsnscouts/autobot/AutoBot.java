@@ -25,8 +25,8 @@
 
 package de.botsnscouts.autobot;
 
-import de.botsnscouts.board.FlaggenException;
-import de.botsnscouts.board.SpielfeldKS;
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.board.DistanceCalculatingBoard;
 import de.botsnscouts.comm.ClientAntwort;
 import de.botsnscouts.comm.KommClientSpieler;
 import de.botsnscouts.comm.KommException;
@@ -68,7 +68,7 @@ public class AutoBot extends BNSThread {
     KommClientSpieler myComm = new KommClientSpieler();
     ClientAntwort answer = new ClientAntwort();
 
-    SpielfeldKS myMap;
+    DistanceCalculatingBoard myMap;
 
     /**
      * run-Methode erzeugt zufaelligen Namen fuer den kuenstlichen Spieler, meldet ihn an
@@ -223,8 +223,8 @@ public class AutoBot extends BNSThread {
 
     /**
      * erzeugt mit der Spielfelddimension, den Fahnenpositionen und dem
-     * Spielfeldstring das Spielfeld des kuenstlichen Spielers, ruft
-     * ausserdem die Entfernungsberechnung in SpielfeldKS auf
+     * Spielfeldstring das Board des kuenstlichen Spielers, ruft
+     * ausserdem die Entfernungsberechnung in DistanceCalculatingBoard auf
      */
     public void initField() {
         cat.debug("initializing field...");
@@ -242,9 +242,9 @@ public class AutoBot extends BNSThread {
             //d(spielfeldstring);
 
             try {
-                myMap = SpielfeldKS.getInstance(dimx, dimy, fieldAsString, flags);
+                myMap = DistanceCalculatingBoard.getInstance(dimx, dimy, fieldAsString, flags);
 
-            } catch (FlaggenException fe) {
+            } catch (FlagException fe) {
                 cat.warn("Flag on pit", fe);
             } catch (FormatException e) {
                 cat.error("Malformed field", e);
@@ -281,7 +281,7 @@ public class AutoBot extends BNSThread {
         cat.debug("Bot destroyed. Looking for new facing.");
         for (int i = 0; i < 4; i++) {
             testRobbi.setAusrichtung(i);
-            newDistance = myMap.getEntfernung(testRobbi);
+            newDistance = myMap.getDistance(testRobbi);
             if (newDistance < bestDistance) {
                 bestDistance = newDistance;
                 direction = i;
