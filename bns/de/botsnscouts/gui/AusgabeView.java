@@ -238,7 +238,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 
     private void initMenus() {
-
+      menus.add(new ZoomMenu());
       menus.add(new OptionsMenu());
       menus.add(new HelpMenu());
 
@@ -247,7 +247,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private class OptionsMenu extends JMenu {
        OptionsMenu () {
         super(Message.say("AusgabeFrame","mOptions"));
-        add(new ZoomMenu());
+        //add(new ZoomMenu());
         add(new SpeedMenu());
         add(new SoundMenu());
        }

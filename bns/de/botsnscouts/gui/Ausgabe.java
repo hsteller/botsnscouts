@@ -498,29 +498,6 @@ public class Ausgabe extends Thread {
     }
 
 
-    private class SpeedMenuListener implements ActionListener {
-	public void actionPerformed(ActionEvent e) {
-	    Global.debug(this,"Speed-Menu klicked");
-	    if (e.getSource() == lSpeed) {
-		speed=LANGSAM;
-		showMessage(Message.say("AusgabeFrame","gAufLang"));
-	    }
-	    else if (e.getSource() == mSpeed) {
-		speed=MITTEL;
-                if (humanView!=null)
-                    ausgabe.showMessage(Message.say("AusgabeFrame","gAufMitt"));
-                if (ausgabeView!=null)
-		  ausgabeView.showMessage(Message.say("AusgabeFrame","gAufMitt"));
-
-            }
-	    else {
-		speed=UNGEBREMST;
-	        showMessage(Message.say("AusgabeFrame","gAufUn"));
-	    }
-
-	}
-    }
-
      private void initMenus(JFrame frame, JMenu trackMenu) {
 
 	// Menüleiste einfügen
