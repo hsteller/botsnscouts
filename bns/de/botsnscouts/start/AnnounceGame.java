@@ -79,7 +79,7 @@ class AnnounceGame {
                 if (s.charAt(i)==':') {
                     //ok, serverName is before, portNo after ':'
                     portNo = Integer.parseInt(s.substring(i+1, s.length()));
-                    serverName = s.substring(0, i-1);
+                    serverName = s.substring(0, i);
                     break;
                 }
                 if (!Character.isLetterOrDigit(s.charAt(i)) && s.charAt(i)!='.') {
