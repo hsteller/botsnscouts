@@ -29,9 +29,11 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
     protected final int UNGEBREMST = 0;
     protected final boolean NURAUSGABE = true;
     protected final boolean MENSCHAUSGABE = false;
-    protected static final double MIN_ZOOM = 0.4;
-    protected static final double MAX_ZOOM = 1.0;
-    protected static final double ZOOM_STEP = 0.1;
+
+    // Einstellungen fuers Zoom-Menu
+    protected static final int MIN_ZOOM = 40;
+    protected static final int MAX_ZOOM = 100;
+    protected static final int ZOOM_STEP = 10;
 
     // ---- Variablen
     private boolean spielerErhalten;
@@ -267,6 +269,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
      * @see SACanvas.ClickListener, MouseEvent.getModifiers()
      */
     public void feldClicked(int x, int y, int modifiers ) {
+	System.out.println("tracking button at " + x + " " + y);
 	trackPos(x,y);
     }
 
@@ -841,8 +844,9 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	    super("Zoom");
 	    ButtonGroup group = new ButtonGroup();
 	    JRadioButtonMenuItem item = null;
-	    for(double d = MIN_ZOOM; d <= MAX_ZOOM; d += ZOOM_STEP ) {
-		item = new JRadioButtonMenuItem( "" + d );
+	    for(int d = MIN_ZOOM; d <= MAX_ZOOM; d += ZOOM_STEP ) {
+		item = new JRadioButtonMenuItem( "" + d + "%" );
+		item.setActionCommand("" + d);
 		item.addActionListener( this );
 		super.add( item );
 		group.add( item );
@@ -853,15 +857,15 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	}
 			
 	public void actionPerformed(ActionEvent e) {
-	    double scale;
+	    int iScale;
 	    try {
 		String s = e.getActionCommand();
-		scale = Double.parseDouble( s );
+	        iScale = Integer.parseInt( s );
 	    } catch( NumberFormatException ne ) {
-		scale = 1.0;
-		Global.debug(this, "bad zommmenu action command. using default 1.0");
+	        iScale = 10;
+		Global.debug(this, "bad zommmenu action command. using default 100%");
 	    }
-	    final double sc = scale;
+	    final double sc = iScale / 100.0;
 	    SwingUtilities.invokeLater( new Runnable() {
 		    public void run() {
 			spielFeld.setScale( sc );
@@ -1204,6 +1208,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
       		// Fuege das Spielfeld ein
 		//		mP.add(spielFeld);
 		mP.setViewportView(spielFeld);
+		mP.getViewport().setBackingStoreEnabled(true);
 		spielFeld.setScrollPane(mP);
 		mP.validate();
 		kCA.spielstart(); // Bestaetigung an den Server senden

@@ -35,7 +35,7 @@ import de.botsnscouts.*;
  *    damit viel schneller, ebenso die Spielfeld-Vorschau
  */
 
-public class SACanvas extends Component {
+public class SACanvas extends JComponent {
     // inner classes
     public static interface ClickListener {
 	void feldClicked( int x, int y, int modifiers );
@@ -204,6 +204,7 @@ public class SACanvas extends Component {
 	    mLaserWav [1] = Applet.newAudioClip(u);
 	    
 	}
+	setDoubleBuffered( true );
 	setScale( dScale ); // does setSize()
 	//setSize(x,y);
 
@@ -1009,7 +1010,12 @@ public class SACanvas extends Component {
     }
 
     Graphics2D g_off;
-    public void paint(Graphics g) {
+    Rectangle rcVis = new Rectangle();
+    public void paintComponent(Graphics g) {
+	//computeVisibleRect( rcVis );
+	//	System.out.println("REPAINT SACANVAS" + g.getClipBounds());
+	// System.out.println("VISIBLE RECT    " + rcVis );
+	/*
 	if(dbi == null || rescaled ) {
 	    createOffscreenImage();
 	    rescaled = false;
@@ -1017,14 +1023,17 @@ public class SACanvas extends Component {
 	Graphics2D dbg = (Graphics2D)g_off;
 	Rectangle clip = g.getClipBounds();
 	//dbg.setClip( clip );
+	*/
 
+	Graphics2D dbg = (Graphics2D) g;
+	dbg.scale( dScale, dScale );
 	paintSpielfeldBoden( dbg );
 	paintLaserStrahlen( dbg );
 	paintWaende( dbg );
 	paintFlaggen( dbg );
 	paintScout( dbg );
 	paintRobos( dbg );
-
+	/*
 	Rectangle rc = g.getClipBounds();
 	int x0 = rc.x, 
 	    y0 = rc.y,
@@ -1032,6 +1041,7 @@ public class SACanvas extends Component {
 	    y1 = rc.y + rc.height;
 	g.drawImage( dbi, 0, 0, this );
 	//g.drawImage(dbi, x0, y0, x1, y1, x0, y0, x1, y1, this);
+	*/
     }
 
     private void paintUnbuffered(Graphics dbg) {
