@@ -2,6 +2,8 @@ package de.botsnscouts.server;
 
 import java.io.*; 
 import java.net.*; 
+
+
 /** 
  * Handhabt eine Connection nebenlaeufig.
  * modified for 2.0 by Dirk
