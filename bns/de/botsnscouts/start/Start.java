@@ -25,22 +25,19 @@
 
 package de.botsnscouts.start;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import javax.swing.*;
-import javax.swing.plaf.metal.*;
-import java.util.*;
-import java.net.*;
-import java.io.*;
-
+import de.botsnscouts.gui.Splash;
+import de.botsnscouts.util.*;
 import org.apache.log4j.Category;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.gui.Splash;
+import javax.swing.*;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.Locale;
+import java.util.Properties;
 
-public class Start extends JFrame implements WindowListener{
+public class Start extends JFrame implements WindowListener {
 
     private static final Category CAT = Category.getInstance(Start.class);
 
@@ -48,327 +45,338 @@ public class Start extends JFrame implements WindowListener{
 
     protected Paint paint;
     private MainMenu mainMenu;                // Start screen
-    private static String MAIN_MENU="main";
+    private static String MAIN_MENU = "main";
     protected GameFieldPanel gameFieldPanel;          //build your board
-    private static String GAME_FIELD="gamefield";
+    private static String GAME_FIELD = "gamefield";
     private ParticipatePanel partPanel;        //participate
-    private static String PARTICIPATE="participate";
+    private static String PARTICIPATE = "participate";
     private WatchPanel watchPanel;          //watch
-    private static String WATCH="watch";
+    private static String WATCH = "watch";
     protected StartPanel startPanel;                  //Screen with all information and start button
-    private static String START="start";
+    private static String START = "start";
     private FieldEditor fieldEditor;
-    private static String FIELD_EDITOR="fieldedit";
+    private static String FIELD_EDITOR = "fieldedit";
     private DoingStuffPanel busyPanel;
-    private static String BUSY="busy";
-    private CardLayout layout=new CardLayout();
+    private static String BUSY = "busy";
+    private CardLayout layout = new CardLayout();
 
     protected WaiterThread wth;
 
     private Splash splash;
 
-    private Start(Splash splash){
-	super(Message.say("Start","mStartTitel"));
+    private Start(Splash splash) {
+        super(Message.say("Start", "mStartTitel"));
 
-	this.splash=splash;
-	getContentPane().setLayout(layout);
+        this.splash = splash;
+        getContentPane().setLayout(layout);
 
-	wth=new WaiterThread(this);
-	Toolkit tk=Toolkit.getDefaultToolkit();
-	if(tk.getScreenSize().height<600){
-	    fassade=new Facade(150);
-	}else{
-	    fassade=new Facade();
-	}
-	setSize(tk.getScreenSize());
-	setLocation(0,0);
+        wth = new WaiterThread(this);
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        if (tk.getScreenSize().height < 600) {
+            fassade = new Facade(150);
+        } else {
+            fassade = new Facade();
+        }
+        setSize(tk.getScreenSize());
+        setLocation(0, 0);
 
-//	ImageIcon icon = ImageMan.getIcon( "garage2.jpg");
-//	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-//	Graphics g = bgimg.getGraphics();
-//	icon.paintIcon(this, g, 0,0);
-//	g.dispose();
-//	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
-//	paint = new TexturePaint( bgimg, anchor );
         paint = OptionPane.getBackgroundPaint(this);
 
-	mainMenu=new MainMenu(this);
-	getContentPane().add(mainMenu, MAIN_MENU);
+        mainMenu = new MainMenu(this);
+        getContentPane().add(mainMenu, MAIN_MENU);
 
-	showMainMenu();
+        showMainMenu();
 
-	busyPanel=new DoingStuffPanel(paint);
-	getContentPane().add(busyPanel, BUSY);
+        busyPanel = new DoingStuffPanel(paint);
+        getContentPane().add(busyPanel, BUSY);
 
-	addWindowListener(this);
-	show();
+        addWindowListener(this);
+        show();
     }
 
-    private void switchCard(String to){
-	layout.show(getContentPane(),to);
+    private void switchCard(String to) {
+        layout.show(getContentPane(), to);
     }
 
-    protected void showBusy(String txt){
-	CAT.debug("setting busypanel. txt: "+txt);
-	busyPanel.setText(txt);
+    protected void showBusy(String txt) {
+        CAT.debug("setting busypanel. txt: " + txt);
+        busyPanel.setText(txt);
 
-	switchCard(BUSY);
+        switchCard(BUSY);
 
-	animatorThread=new Thread(busyAnimator);
-	animatorThread.start();
+        animatorThread = new Thread(busyAnimator);
+        animatorThread.start();
     }
 
     private Thread animatorThread;
-    private Runnable busyAnimator=new Runnable(){
-	    public void run(){
-		while(!Thread.currentThread().isInterrupted()){
-		    busyPanel.inc();
-		    try{
-			Thread.sleep(50);
-		    }catch(InterruptedException ex){
-			break;
-		    }
-		}
-		CAT.debug("Animatorthread exiting.");
-	    }
-	};
+    private Runnable busyAnimator = new Runnable() {
+        public void run() {
+            while (!Thread.currentThread().isInterrupted()) {
+                busyPanel.inc();
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ex) {
+                    break;
+                }
+            }
+            CAT.debug("Animatorthread exiting.");
+        }
+    };
 
-    protected void stopBusy(){
-	animatorThread.interrupt();
+    protected void stopBusy() {
+        animatorThread.interrupt();
     }
 
-    public void showMainMenu(){
-	switchCard(MAIN_MENU);
-	mainMenu.unrollOverButs();
-	setTitle(Message.say("Start","mStartTitel"));
+    public void showMainMenu() {
+        switchCard(MAIN_MENU);
+        mainMenu.unrollOverButs();
+        setTitle(Message.say("Start", "mStartTitel"));
     }
 
-    public void windowDeactivated(WindowEvent e) {}
-    public void windowOpened(WindowEvent e)      {
-	splash.noSplash();
+    public void windowDeactivated(WindowEvent e) {
+    }
+
+    public void windowOpened(WindowEvent e) {
+        splash.noSplash();
         CAT.debug("window opened");
         CAT.debug("triggering tilefactory");
 
-	// Needed so our window is actually drawn before triggering
-	// tile-loading
-	new Thread(new Runnable(){
-		public void run(){
-		    	try{ Thread.sleep(1000);
-			}catch(InterruptedException ie){}
-			fassade.prepareTiles();
-		}}).start();
+        // Needed so our window is actually drawn before triggering
+        // tile-loading
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {
+                }
+                fassade.prepareTiles();
+            }
+        }).start();
     }
+
     public void windowClosing(WindowEvent e) {
-	myclose();
-    }
-    public void windowClosed(WindowEvent e)      {}
-    public void windowIconified(WindowEvent e)   {}
-    public void windowDeiconified(WindowEvent e) {}
-    public void windowActivated(WindowEvent e)   {}
-
-    public void myclose(){
-	dispose();
-	System.exit(0);
+        myclose();
     }
 
-    public void addKS(Thread k){
-	wth.addThread(k);
+    public void windowClosed(WindowEvent e) {
     }
 
-    public void addServer(){
-	wth.setServer();
+    public void windowIconified(WindowEvent e) {
     }
 
-    public void resetWaiter(){
-	wth.beende();
-	wth.reset();
-	wth=new WaiterThread(this);
+    public void windowDeiconified(WindowEvent e) {
     }
 
-    public void beenden(){
-	CAT.debug("beenden() wurde aufgerufen");
-	try{
-	    if(!wth.isAlive()){
-		wth.start();
-	    }
-	}catch(IllegalThreadStateException e){
-	    System.err.println(Message.say("Start","eSpielEnde"));
-	}
-        CAT.debug( "disposing start frame");
+    public void windowActivated(WindowEvent e) {
+    }
+
+    public void myclose() {
         dispose();
-        CAT.debug( this );
+        System.exit(0);
     }
 
-    protected void showGameFieldPanel(){
-	showBusy(Message.say("Start","mLoadGameFieldPanel"));
-	new Thread(new Runnable(){
-		public void run(){
-		    if(gameFieldPanel==null){
-			gameFieldPanel=new GameFieldPanel(Start.this);
-			getContentPane().add(gameFieldPanel,GAME_FIELD);
-		    }
-		    CAT.debug("setting gameFieldPanel");
-		    switchCard(GAME_FIELD);
-		    stopBusy();
-		}}).start();
+    public void addKS(Thread k) {
+        wth.addThread(k);
     }
 
-    protected void showParticipatePanel(){
-	showBusy(Message.say("Start","mLoadParticipatePanel"));
-	new Thread(new Runnable(){
-		public void run(){
-		    if(partPanel==null){
-		        partPanel=new ParticipatePanel(Start.this);
-			getContentPane().add(partPanel,PARTICIPATE);
-		    }
-		    switchCard(PARTICIPATE);
-		    stopBusy();
-		}}).start();
+    public void addServer() {
+        wth.setServer();
     }
 
-    protected void showWatchPanel(){
-	showBusy(Message.say("Start","mLoadWatchPanel"));
-	new Thread(new Runnable(){
-		public void run(){
-		    if(watchPanel==null){
-			    watchPanel=new WatchPanel(Start.this);
-			    getContentPane().add(watchPanel,WATCH);
-		    }
-		    switchCard(WATCH);
-		    stopBusy();
-		}}).start();
+    public void resetWaiter() {
+        wth.beende();
+        wth.reset();
+        wth = new WaiterThread(this);
     }
 
-    protected void showFieldEditor(final FieldGrid spf){
-	showBusy(Message.say("Start","mLoadFieldEditor"));
-	new Thread(new Runnable(){
-		public void run(){
-		    if(fieldEditor==null){
-			fieldEditor=new FieldEditor(Start.this,spf);
-			getContentPane().add(fieldEditor,FIELD_EDITOR);
-		    }else{
-			fieldEditor.spf.addTileClickListener(fieldEditor);
-			fieldEditor.fuerSpf.add(fieldEditor.spf);
-		    }
-		    fassade.saveTileRaster();
-		    switchCard(FIELD_EDITOR);
-		    stopBusy();
-		}}).start();
+    public void beenden() {
+        CAT.debug("beenden() wurde aufgerufen");
+        try {
+            if (!wth.isAlive()) {
+                wth.start();
+            }
+        } catch (IllegalThreadStateException e) {
+            System.err.println(Message.say("Start", "eSpielEnde"));
+        }
+        CAT.debug("disposing start frame");
+        dispose();
+        CAT.debug(this);
     }
 
-    protected void showNewStartPanel(){
-	showBusy(Message.say("Start","mStartingServer"));
-	new Thread(new Runnable(){
-		public void run(){
-		    try{
-			if(startPanel==null){
-			    startPanel=new StartPanel(Start.this);
-			    getContentPane().add(startPanel,START);
-			}
-			fassade.startGame();//starte Spiel
-			addServer();
-			switchCard(START);
-			stopBusy();
-		    }catch(OneFlagException ex){
-			JOptionPane.showMessageDialog(Start.this,Message.say("Start","mZweiFlaggen"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
+    protected void showGameFieldPanel() {
+        showBusy(Message.say("Start", "mLoadGameFieldPanel"));
+        new Thread(new Runnable() {
+            public void run() {
+                if (gameFieldPanel == null) {
+                    gameFieldPanel = new GameFieldPanel(Start.this);
+                    getContentPane().add(gameFieldPanel, GAME_FIELD);
+                }
+                CAT.debug("setting gameFieldPanel");
+                switchCard(GAME_FIELD);
+                stopBusy();
+            }
+        }).start();
+    }
 
-		    }catch(NonContiguousMapException exc){
-			JOptionPane.showMessageDialog(Start.this,Message.say("Start","mNichtZus"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
+    protected void showParticipatePanel() {
+        showBusy(Message.say("Start", "mLoadParticipatePanel"));
+        new Thread(new Runnable() {
+            public void run() {
+                if (partPanel == null) {
+                    partPanel = new ParticipatePanel(Start.this);
+                    getContentPane().add(partPanel, PARTICIPATE);
+                }
+                switchCard(PARTICIPATE);
+                stopBusy();
+            }
+        }).start();
+    }
 
-		    }
-		}}).start();
+    protected void showWatchPanel() {
+        showBusy(Message.say("Start", "mLoadWatchPanel"));
+        new Thread(new Runnable() {
+            public void run() {
+                if (watchPanel == null) {
+                    watchPanel = new WatchPanel(Start.this);
+                    getContentPane().add(watchPanel, WATCH);
+                }
+                switchCard(WATCH);
+                stopBusy();
+            }
+        }).start();
+    }
+
+    protected void showFieldEditor(final FieldGrid spf) {
+        showBusy(Message.say("Start", "mLoadFieldEditor"));
+        new Thread(new Runnable() {
+            public void run() {
+                if (fieldEditor == null) {
+                    fieldEditor = new FieldEditor(Start.this, spf);
+                    getContentPane().add(fieldEditor, FIELD_EDITOR);
+                } else {
+                    fieldEditor.spf.addTileClickListener(fieldEditor);
+                    fieldEditor.fuerSpf.add(fieldEditor.spf);
+                }
+                fassade.saveTileRaster();
+                switchCard(FIELD_EDITOR);
+                stopBusy();
+            }
+        }).start();
+    }
+
+    protected void showNewStartPanel() {
+        showBusy(Message.say("Start", "mStartingServer"));
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    if (startPanel == null) {
+                        startPanel = new StartPanel(Start.this);
+                        getContentPane().add(startPanel, START);
+                    }
+                    fassade.startGame(startPanel.getListener());//starte Spiel
+                    addServer();
+                    switchCard(START);
+                    stopBusy();
+                } catch (OneFlagException ex) {
+                    JOptionPane.showMessageDialog(Start.this, Message.say("Start", "mZweiFlaggen"), Message.say("Start", "mError"), JOptionPane.ERROR_MESSAGE);
+
+                } catch (NonContiguousMapException exc) {
+                    JOptionPane.showMessageDialog(Start.this, Message.say("Start", "mNichtZus"), Message.say("Start", "mError"), JOptionPane.ERROR_MESSAGE);
+
+                }
+            }
+        }).start();
 
     }
 
 
     protected static void initBasics() {
-      MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
+        MetalLookAndFeel.setCurrentTheme(new GreenTheme());
 
         //load Sounds
         CAT.debug("starting soundman..");
         SoundMan.loadSounds();
         CAT.debug("..done");
 
-	//language conf
-	Locale myLocale=null;
-	String loc=Conf.getProperty("language.isSet");
-	if (loc != null){
-	    myLocale=new Locale(Conf.getProperty("language.lang"),Conf.getProperty("language.country"));
-	}else{
-	    Locale[] list=Message.getLocales();
-	    String[] locals=new String[list.length];
-	    for (int i=0;i<locals.length;i++){
-		locals[i]=list[i].getDisplayLanguage();
-	    }
-	    int sel=JOptionPane.showOptionDialog(null,"Please select your Language","Language selection",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,locals,locals[0]);
-	    if (sel==JOptionPane.CLOSED_OPTION){
-		myLocale=new Locale("en","US");
-	    }else{
-		myLocale=list[sel];
-		Conf.setProperty("language.isSet","yes");
-		Conf.setProperty("language.lang",myLocale.getLanguage());
-		Conf.setProperty("language.country",myLocale.getCountry());
-		Conf.saveProperties();
-	    }
-	}
+        //language conf
+        Locale myLocale = null;
+        String loc = Conf.getProperty("language.isSet");
+        if (loc != null) {
+            myLocale = new Locale(Conf.getProperty("language.lang"), Conf.getProperty("language.country"));
+        } else {
+            Locale[] list = Message.getLocales();
+            String[] locals = new String[list.length];
+            for (int i = 0; i < locals.length; i++) {
+                locals[i] = list[i].getDisplayLanguage();
+            }
+            int sel = JOptionPane.showOptionDialog(null, "Please select your Language", "Language selection", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, locals, locals[0]);
+            if (sel == JOptionPane.CLOSED_OPTION) {
+                myLocale = new Locale("en", "US");
+            } else {
+                myLocale = list[sel];
+                Conf.setProperty("language.isSet", "yes");
+                Conf.setProperty("language.lang", myLocale.getLanguage());
+                Conf.setProperty("language.country", myLocale.getCountry());
+                Conf.saveProperties();
+            }
+        }
 
-	Message.setLanguage(myLocale);
-	//ende language conf
+        Message.setLanguage(myLocale);
+        //ende language conf
 
     }
 
 
-
-    public static void main(String[] argv, Splash splash){
+    public static void main(String[] argv, Splash splash) {
 
         initBasics();
 
-	if(argv.length>=4){
-	    try{
+        if (argv.length >= 4) {
+            try {
 
                 String spielfeld = argv[1];
-                if (spielfeld.toLowerCase().endsWith(".spf")){
-                    spielfeld=spielfeld.substring(0,spielfeld.length()-4);
+                if (spielfeld.toLowerCase().endsWith(".spf")) {
+                    spielfeld = spielfeld.substring(0, spielfeld.length() - 4);
                 }
-                CAT.debug("Board "+spielfeld);
-                GameFieldLoader loader=new GameFieldLoader();
-                Facade fassade=new Facade();
+                CAT.debug("Board " + spielfeld);
+                GameFieldLoader loader = new GameFieldLoader();
+                Facade fassade = new Facade();
                 Properties prop = loader.getProperties(spielfeld);
-                CAT.debug("Properties "+prop);
+                CAT.debug("Properties " + prop);
                 fassade.loadSpfProp(prop);
                 CAT.debug("Spielfed loaded");
                 fassade.startGame();
                 CAT.debug("Server gestartet");
-        	if (argv[2].equals("yes")){
-		    fassade.amSpielTeilnehmen(KrimsKrams.randomName(),0);
-		    CAT.debug("Menschlichen Spieler gestartet");
-		}else{
-		    fassade.einemSpielZuschauen();
-		    CAT.debug("Ausgabe gestartet");
-		}
-		int anzKS=0;
-		try{
-		    anzKS=Integer.parseInt(argv[3]);
-		    for (int i=0;i<anzKS;i++){
-			fassade.kuenstlicheSpielerStarten(40, true);
-		    CAT.debug("Künstlichen Spieler gestartet");
-		    }
-		}catch(NumberFormatException e){
-		}
-		try{
-		    Thread.sleep((anzKS+1)*3000);
-		}catch(InterruptedException e){
-		    System.err.println(e);
-		}
-		fassade.spielGehtLos();
-		CAT.debug("Spiel geht los");
-		return;
-	    }catch(Exception e){
-		System.err.println(e);
-	    }
-	}else{
-	new Start(splash);
-	}
+                if (argv[2].equals("yes")) {
+                    fassade.amSpielTeilnehmen(KrimsKrams.randomName(), 0);
+                    CAT.debug("Menschlichen Spieler gestartet");
+                } else {
+                    fassade.einemSpielZuschauen();
+                    CAT.debug("Ausgabe gestartet");
+                }
+                int anzKS = 0;
+                try {
+                    anzKS = Integer.parseInt(argv[3]);
+                    for (int i = 0; i < anzKS; i++) {
+                        fassade.kuenstlicheSpielerStarten(40, true);
+                        CAT.debug("Künstlichen Spieler gestartet");
+                    }
+                } catch (NumberFormatException e) {
+                }
+                try {
+                    Thread.sleep((anzKS + 1) * 3000);
+                } catch (InterruptedException e) {
+                    System.err.println(e);
+                }
+                fassade.spielGehtLos();
+                CAT.debug("Spiel geht los");
+                return;
+            } catch (Exception e) {
+                System.err.println(e);
+            }
+        } else {
+            new Start(splash);
+        }
     }
 
 }//class Start end

@@ -262,7 +262,7 @@ public class ServerAnmeldeThread extends Thread{
 			server.addRobotThread(neu);
 			d("ServerRoboterThread erzeugt und einsortiert.");
 			oberThread.addName(" "+clientname+" ");
-			server.getStartServer().neuerSpieler(clientname,farbe,server);
+			server.updateNewBot(clientname,farbe);
 
 			if (oberThread.anzSpieler.intValue()>=server.getMaxPlayers()){ // alle da
 			    try {

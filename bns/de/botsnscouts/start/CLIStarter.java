@@ -7,6 +7,7 @@ import de.botsnscouts.util.Message;
 import java.io.*;
 import java.util.Locale;
 
+/** Helper to aloow starting a server on the command line */
 public class CLIStarter {
 
   /** Define the number of columns (only used for centered headlines)*/
@@ -36,7 +37,7 @@ public class CLIStarter {
 
   }
 
-  /**@todo: implement (or don't..) */
+  /**todo: implement (or don't..) */
   private static void printUsage() {
   }
 
@@ -193,7 +194,7 @@ public class CLIStarter {
   }
 
   private static void step4StartServer() {
-
+     //TODO: Implement me.
 
   }
 

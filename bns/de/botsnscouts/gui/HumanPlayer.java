@@ -101,7 +101,7 @@ public class HumanPlayer extends BNSThread {
 	}
 	else {
 	  ErrorView.show(Message.say("HumanPlayer","eNoServerRunning",host,port));
-
+      CAT.fatal("No server running on host "+host+" at port "+port);
 	  return;
 	}
 

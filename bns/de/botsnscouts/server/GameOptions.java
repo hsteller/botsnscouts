@@ -23,7 +23,7 @@ public class GameOptions {
     private int maxPlayers;
     /** TCP/IP port for registration */
     private int registrationPort;
-    /** Timeout in ms for handing in cards. */
+    /** Tiwmeout in ms for handing in cards. */
     private int handInTimeout;
     /** The board for the game.
      * Represented as a string in the fucking old board format.
@@ -41,7 +41,16 @@ public class GameOptions {
      * "Second coordinate of the board's dimension"
      */
     private int y;
-
+    /**
+     *
+     * @param noPlayers  Max number of players for this game
+     * @param port TCP/IP port for registration
+     * @param timeout Timeout in ms for handing in cards.
+     * @param board   The board for the game.
+     * @param flags   Location of the flags
+     * @param x        "First coordinate of the board's dimension"
+     * @param y        "Second coordinate of the board's dimension"
+     */
     public GameOptions( int noPlayers,
                         int port,
                         int timeout,

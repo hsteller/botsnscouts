@@ -26,7 +26,6 @@
 package de.botsnscouts.start;
 import de.botsnscouts.util.*;
 
-
 public class WaiterThread extends BNSThread{
     Thread[] ks=new Thread[100];
     int ksanz=0;

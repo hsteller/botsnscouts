@@ -212,7 +212,7 @@ class RegistrationManager implements Runnable
         ServerRoboterThread neu=new ServerRoboterThread(h,server.getOKListener(),server.getInfoRequestAnswerer(),server.getRobThreadMaintainer(),komm);
         server.addRobotThread(neu);
         CAT.debug("ServerRoboterThread erzeugt und einsortiert.");
-        server.getStartServer().neuerSpieler(clientName,farbe,server);
+        server.updateNewBot(clientName,farbe);
 
         if (anzSpieler >= server.getMaxPlayers()){ // alle da
             try {

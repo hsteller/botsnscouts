@@ -41,7 +41,8 @@ public interface ThreadMaintainer{
     ServerRobotThreadMaintainer getRobThreadMaintainer();
     ServerOutputThreadMaintainer getOutputThreadMaintainer();
     InfoRequestAnswerer getInfoRequestAnswerer();
-    de.botsnscouts.start.StartServer getStartServer();
     int getSignUpTimeout();
     int getMaxPlayers();
+
+    void updateNewBot(String name, int color);
 }

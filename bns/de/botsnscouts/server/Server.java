@@ -52,10 +52,12 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     private RegistrationManager registrationManager;
     private MessageThread messageThread;
 
+    private StSpListener gameStartListener;
+
     protected SimBoard feld;
 
     protected String[] angemeldet = new String[8];
-    protected StartServer startServer;
+    //protected StartServer startServer;
     private boolean gameover = false;
     private boolean gameStarted = false;
     private int aktPhase = 0; // enthaelt die Nummer der gerade auswertenden Phase. 0 wenn nicht ausgewertet wird
@@ -88,9 +90,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
      *
      */
     public Server(GameOptions options,
-                  StartServer sserver)
+                  StSpListener listener)
     {
-        startServer = sserver;
+        gameStartListener = listener;
         this.options = options;
         try {
             feld = new SimBoard(options.getX(),
@@ -227,8 +229,10 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
         return this;
     }
 
-    public StartServer getStartServer() {
-        return startServer;
+    public void updateNewBot(String name, int color) {
+        if (gameStartListener != null) {
+            gameStartListener.updateNewBot(name, color);
+        }
     }
 
     public int getSignUpTimeout() {
@@ -623,8 +627,10 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
                 return false;
             }
-            //Spiel geht los
-            startServer.spielGehtLos(this);
+            //Spiel starts!
+            if (gameStartListener != null){
+                gameStartListener.updateStartGame();
+            }
             return true;
         } finally {
             CAT.debug("588 release Server");
@@ -1168,9 +1174,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             // MessageThread killen
             messageThread.interrupt();
 
-            //leo
-            d("rufe spielZuEnde() beim StartServer auf");
-            startServer.spielZuEnde(this);
+            if (gameStartListener != null) {
+                gameStartListener.updateGameFinished();
+            }
         } catch (Throwable t) {
             CAT.fatal("Exception:", t);
         }

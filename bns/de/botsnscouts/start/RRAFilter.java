@@ -25,12 +25,8 @@
  
 package de.botsnscouts.start;
 
-import java.awt.*;
-import java.io.*;
-import java.util.*;
-import java.net.*;
-import de.botsnscouts.board.*;
-import de.botsnscouts.util.*;
+import java.io.File;
+import java.io.FilenameFilter;
 
 class RRAFilter implements FilenameFilter{
 

@@ -24,79 +24,84 @@
  *******************************************************************/
 
 package de.botsnscouts.start;
+
 import de.botsnscouts.gui.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.autobot.*;
+import de.botsnscouts.server.Server;
+import de.botsnscouts.server.GameOptions;
 import org.apache.log4j.Category;
 
 // launches human player, output ...
 
-public class Launcher{
+public class Launcher {
 
-    static final Category CAT = Category.getInstance( Launcher.class );
+    static final Category CAT = Category.getInstance(Launcher.class);
+
+    private Server server;
+
     // launches output
-    public Thread einemSpielZuschauen(String ip, int port, boolean noSplash){
-	Thread ret;
-	try{
-	    ret=new BNSThread(new Ausgabe(ip, port,null,noSplash));
-	    ret.start();
-	}catch(Exception exp){
-	    return null;
-	}
-	return ret;
+    public Thread einemSpielZuschauen(String ip, int port, boolean noSplash) {
+        Thread ret;
+        try {
+            ret = new BNSThread(new Ausgabe(ip, port, null, noSplash));
+            ret.start();
+        } catch (Exception exp) {
+            return null;
+        }
+        return ret;
     }
 
     // launches human player
-    public Thread amSpielTeilnehmen(String ip, int port, String name, int farbe, boolean noSplash){
-	Thread ret;
-	try {
-	    if( CAT.isDebugEnabled() ) CAT.debug("Trying to start human player...");
-	    ret=(Thread) new HumanPlayer(ip,port,name,farbe,noSplash);
-	    ret.start();
-	} catch (Exception u){
-	  CAT.error("Error while starting the game for player "+name+": "+u.getMessage());
-	  return null;
-	}
-	return ret;
+    public Thread amSpielTeilnehmen(String ip, int port, String name, int farbe, boolean noSplash) {
+        Thread ret;
+        try {
+            if (CAT.isDebugEnabled()) CAT.debug("Trying to start human player...");
+            ret = new HumanPlayer(ip, port, name, farbe, noSplash);
+            ret.start();
+        } catch (Exception u) {
+            CAT.error("Error while starting the game for player " + name + ": " + u.getMessage());
+            return null;
+        }
+        return ret;
     }
 
     // launch autobots
-    public Thread  kuenstlicheSpielerStarten(String ip, int port, boolean local, int iq, KommSpPr com) {
-        return kuenstlicheSpielerStarten(ip, port, local, iq, false, com);
+    public Thread startAutoBot(String ip, int port, int iq) {
+        return startAutoBot(ip, port, iq, false);
     }
 
-   public Thread  kuenstlicheSpielerStarten(String ip, int port, boolean local, int iq, boolean beltAware, KommSpPr com){
-      return kuenstlicheSpielerStarten(ip, port, local, iq, beltAware, com, KrimsKrams.randomName());
+    public Thread startAutoBot(String ip, int port, int iq, boolean beltAware) {
+        return startAutoBot(ip, port, iq, beltAware, KrimsKrams.randomName());
     }
 
-    public Thread  kuenstlicheSpielerStarten(String ip, int port, boolean local,
-                                              int iq, boolean beltAware, KommSpPr com,
-                                              String botName){
-	if (local){
-	    Thread ks;
-	    ks = new AutoBot(ip,port,iq, beltAware, botName);
-		ks.start();
-		ks.setPriority(java.lang.Thread.MIN_PRIORITY);
-	    return ks;
-	}else{
-	    if(com.newKS(ip,port,1,iq))
-		return null;
-	    else
-		return null;
-	}
+    public Thread startAutoBot(String ip, int port, int iq, boolean beltAware,
+                                      String botName) {
+        Thread ks;
+        ks = new AutoBot(ip, port, iq, beltAware, botName);
+        ks.start();
+        ks.setPriority(java.lang.Thread.MIN_PRIORITY);
+        return ks;
     }
 
-    public boolean startGame(KommSpPr com, TileRaster tileRaster, String ip, int port, int pnum, int timeOut, int lisPort) throws OneFlagException, NonContiguousMapException{
-	Location dim = tileRaster.getSpielfeldSize();
-	int[][] flags = tileRaster.getRFlaggen();
-	String field=tileRaster.getSpielfeld();
-	int retFromNewGame = com.newGame(ip, port, pnum, 0, timeOut, field, flags[0], flags[1], dim.x, dim.y, lisPort);
-	return (retFromNewGame!=1);
+     public void startGame(TileRaster tileRaster, int pnum, int timeOut, int lisPort, StSpListener listener) throws OneFlagException, NonContiguousMapException {
+        Location dim = tileRaster.getSpielfeldSize();
+        String field = tileRaster.getSpielfeld();
+//        int retFromNewGame = com.newGame(ip, port, pnum, 0, timeOut, field, flags[0], flags[1], dim.x, dim.y, lisPort);
+//        return (retFromNewGame != 1);
+        server = new Server(new GameOptions(pnum, lisPort, 1000*timeOut, field,
+                    tileRaster.getRFlaggen(), dim.x, dim.y),
+                    listener);
+         server.start();
     }
 
+    public void spielGehtLos(String ip, int port) {
+        server.startGame();
+    }
 
-    public boolean spielGehtLos(KommSpPr com, String ip, int port){
-	return com.game(ip,port);
+    public void stopServer() {
+        // Not nice, but this is the way it was done before...
+        server.interrupt();
     }
 
 }

@@ -246,12 +246,12 @@ public class TileRaster{
     //* nicht für Fassade *//
 
     //gibt Flaggen mit evtl versetzten Koordinaten zurück
-    public int[][] getRFlaggen(){
+    public Location[] getRFlaggen(){
 	Location[] bounds=findBounds();
-	int[][] flags=new int[2][flaggenN];
+	Location[] flags=new Location[flaggenN];
 	for (int i=0;i<flaggenN;i++){
-	    flags[0][i]=flaggen[i].x-bounds[0].x*12;
-	    flags[1][i]=flaggen[i].y-bounds[0].y*12;
+	    flags[i] = new Location(flaggen[i].x-bounds[0].x*12,
+	                            flaggen[i].y-bounds[0].y*12);
 	}
 	return flags;
     }

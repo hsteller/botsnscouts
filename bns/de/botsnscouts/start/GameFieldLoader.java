@@ -25,18 +25,8 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.*;
 import java.io.*;
-import java.net.*;
 import java.util.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.*;
 import de.botsnscouts.BotsNScouts;
 
