@@ -70,7 +70,9 @@ class PlayersPanel extends ColoredPanel {
         map.put(name, new Integer(farbe));
         Global.debug(this, "neuer roboter:" + name + BoardView.ROBOCOLOR[farbe]);
         names.addElement(name);
+        Global.debug(this, name+" added to name list");
         roblist.setListData(names);
+        Global.debug(this, "name list replaced");
         parent.show();
     }
 

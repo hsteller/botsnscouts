@@ -32,12 +32,15 @@ import de.botsnscouts.util.Location;
 
 import java.awt.*;
 import java.util.Properties;
+import org.apache.log4j.Category;
 
 // Diese Klasse dient der Entkopplung der GUI-Schicht (StartSpieler)
 // von der Fachkonzeptschicht(...) und der Datenhaltungsschicht (...)
 
 public class Facade {
 
+    private static Category CAT = Category.getInstance(Facade.class);
+    
     private int thumbnailsize;
     private TileRaster tileRaster, tileRasterSave;
     private Launcher launcher;
@@ -73,7 +76,7 @@ public class Facade {
     }
 
     /**
-     * Rotates the tile 90° left
+     * Rotates the tile 90ï¿½ left
      */
     public void rotTile(int x, int y) {
         tileRaster.rotTile(x, y);
@@ -259,10 +262,12 @@ public class Facade {
     }
 
     public static BNSThread startAutoBot(int iq, boolean beltAware) {
+        CAT.debug("starte Autobot");
         return Launcher.startAutoBot(GameOptions.DHOST, GameOptions.DPORT, iq, beltAware);
     }
 
     public static BNSThread startAutoBot(int iq, boolean beltAware, String botName) {
+        CAT.debug ("starte Autobot ("+botName+")");
         return Launcher.startAutoBot(GameOptions.DHOST, GameOptions.DPORT, iq, beltAware, botName);
     }
 

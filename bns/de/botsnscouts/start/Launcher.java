@@ -80,10 +80,12 @@ public class Launcher {
 
     public static BNSThread startAutoBot(String ip, int port, int iq, boolean beltAware,
                                       String botName) {
+        CAT.debug("creating AutoBot-BNSThread for "+botName);
         BNSThread ks;
-        ks = new AutoBot(ip, port, iq, beltAware, botName);
-        ks.start();
+        ks = new AutoBot(ip, port, iq, beltAware, botName);       
         ks.setPriority(java.lang.Thread.MIN_PRIORITY);
+        ks.start();
+        CAT.debug(botName+" started");
         return ks;
     }
 

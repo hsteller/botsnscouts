@@ -289,17 +289,25 @@ public class StartPanel extends JPanel {
         gc.anchor = GridBagConstraints.NORTHWEST;
         panel.add(beltAware, gc);
 
-        JButton startAB = new TJButton(Message.say("Start", "mKSStarten"));
+        final JButton startAB = new TJButton(Message.say("Start", "mKSStarten"));
         startAB.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CAT.debug("intel ist jetzt " + intel.getValue());
-                String name = botNameField.getText();
-                if (name == null || name.length() == 0)
-                    name = KrimsKrams.randomName();
-                parent.addKS(Facade.startAutoBot(intel.getValue(),
-                        beltAware.getModel().isSelected(), name));
-
-                botNameField.setText(KrimsKrams.randomName());
+                new Thread() {
+                    public void run() {
+		                CAT.debug("intelligence is now" + intel.getValue());              
+		                String name = botNameField.getText();
+		                if (name == null || name.length() == 0)
+		                    name = KrimsKrams.randomName();
+		                parent.addKS(Facade.startAutoBot(intel.getValue(),
+		                        beltAware.getModel().isSelected(), name));
+		                CAT.debug("Bot started, setting new name in textfield..");
+		                String tmpname = KrimsKrams.randomName();
+		                CAT.debug("new name will be: "+tmpname);
+			            botNameField.setText(tmpname); // DEADLOCK here without new Thread..wtf?
+			             CAT.debug("new name set");       
+                    }
+               }.start();
+               
             }
         });
 
