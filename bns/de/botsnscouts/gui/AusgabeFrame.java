@@ -1,5 +1,7 @@
 package de.botsnscouts.gui;
 
+import de.botsnscouts.comm.*;
+import de.botsnscouts.util.*;
 import java.awt.*;
 import java.io.*;
 import java.awt.event.*;
@@ -370,7 +372,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	
 	StatusCanvas () {
 	    this.addMouseListener(this);
-	    r = new Roboter("foobar");
+	    r = Roboter.getNewInstance("foobar");
 	    r.leben = 0;
 	    this.setSize(75,60);
 	    this.setBackground(backColor);
