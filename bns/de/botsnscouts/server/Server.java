@@ -1010,10 +1010,7 @@ private void roboterThreadStart(){
 		if (tmp.rob.istAktiviert()) {
 		    rThreadsAufDieIchWarte.addElement(tmp);
 		    //Karten geben und dabei *beruecksichtigen*, wie viele der Roboter kriegt!
-		    for (int i=0; i<(9-tmp.rob.getSchaden()); i++)
-			tmp.rob.zugeteilteKarten[i]=stapel.gibKarte();
-		    for (int i=(9-tmp.rob.getSchaden());i<9;i++)
-			tmp.rob.zugeteilteKarten[i]=null;
+		    tmp.rob.setKarten(stapel.gibKarte(tmp.rob.anzKarten()));
 		}
 	    }
 	    if (rThreadsAufDieIchWarte.size() > 0) {

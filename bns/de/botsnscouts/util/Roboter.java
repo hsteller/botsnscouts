@@ -10,7 +10,14 @@ public class Roboter {
     final static int ANZKARTEN = 9;
     final static int ANZREG = 5;
 
-    protected String name="";
+    protected final static Ort grube = new Ort(0,0);
+
+    /** Roboter-Fabrik. Liefert neue Roboter */
+    public static Roboter getNewInstance(String name) {
+	return new de.botsnscouts.board.BoardRoboter(name);
+    }
+
+    protected String name;
     /**
      * gibt die Ausrichtung des Roboters auf dem Spielfeld an
      * N = 0; O = 1; S = 2; W = 3;
@@ -51,6 +58,10 @@ public class Roboter {
      * enthält die Karten der gesperrten Register 
      */
     protected Karte[] gesperrteRegister = new Karte[ANZREG];	// null wenn nichts gesoert ist
+
+    /** Zugeteilte Karten */
+    protected Karte[] karten = new Karte[ANZKARTEN];
+
     /**
      * gibt an, ob der Roboter aktiviert (true) oder deaktiviert (false) ist
      */
@@ -59,27 +70,19 @@ public class Roboter {
      * Die Anzahl der Schadenpnkte
      */
     protected int schaden=0;
-    /**
-     *Temporaere X-Postion des Roboters waehrend der Zugausfuerung.
-     *wird nur intern von Spielfeld verwendet.
-     */
-    protected int xx ;
-    /**
-     *Temporaere Y-Postion des Roboters waehrend der Zugausfuerung.
-     *wird nur intern von Spielfeld verwendet.
-     */
-    protected int yy ;
-    /** Temporaere Ausrichtung. Spielfeld-Intern. */
-    protected int aa;
 
-    protected final static Ort grube = new Ort(0,0);
+    /**
+     * Deaktiviert angemeldet fuer naechste Runde?
+     */
+    protected boolean nextTurnPowerDown;
     
     /**
      *  Konstruktor
      *  @param Name des Spielers bzw. Roboters.
+     *  Not public _on_purpose_. Use Roboter.getNewInstance() instead.
      */
 
-    public Roboter(String robName) {
+    protected Roboter(String robName) {
 	name = robName;
 	ausrichtung=0;
 	pos.set(1,1);
@@ -90,7 +93,7 @@ public class Roboter {
 	leben = 3;
 	aktiviert = true;
 	schaden = 0;
-
+	nextTurnPowerDown = false;
     }	 
 	
     public Roboter(Roboter r ) {
@@ -105,13 +108,13 @@ public class Roboter {
 	virtuell = r.virtuell;
 	leben = r.leben;
 	aktiviert = r.aktiviert;
-	for(int i=0;i<5;i++) 
-	    if(r.zug[i] != null) 
-		zug[i] = new Karte(r.zug[i].getprio(), r.zug[i].getaktion());
-	for(int i=0;i<5;i++) {
-	    if (r.gesperrteRegister[i]!=null) 
-		gesperrteRegister[i]=new Karte(r.gesperrteRegister[i].getprio(),
-					       r.gesperrteRegister[i].getaktion());
+	for(int i=0;i < zug.length;i++) 
+	    zug[i] = r.zug[i];
+	for(int i=0;i < gesperrteRegister.length; i++) {
+	    gesperrteRegister[i]=r.gesperrteRegister[i];
+	}
+	for (int i=0; i < karten.length; i++){
+	    karten[i] = r.karten[i];
 	}
     }
 
@@ -185,6 +188,11 @@ public class Roboter {
 
     public Karte[] getZug(){
 	return zug;
+    }
+
+
+    public Karte[] getKarten() {
+	return karten;
     }
 
     /** Liefert, ob zwei Roboter den gleichen Namen haben. 
@@ -355,6 +363,21 @@ public class Roboter {
 	zug[i] = karte;
     }
 
+
+    /** Neue Karten werden vom Server zugeteilt.
+     *  Pre: Das Array kommt frisch vom Kartenstapel und ist nur fuer mich da!
+     *  Der Roboter bekommt nur so viele Karten, wie er bekommen soll.
+     *  Wird mit null aufgefuellt.
+     */
+    public void setKarten(Karte[] karten) {
+	int i;
+	for (i=0; i < karten.length; i++) {
+	    this.karten[i]=karten[i];
+	}
+	for (; i < ANZKARTEN; i++){
+	    this.karten[i] = null;
+	}
+    }
 
     public String toString()
         {
