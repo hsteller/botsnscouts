@@ -353,7 +353,7 @@ public class Roboter {
 	gesperrteRegister[n] = zug[n];
     }
     
-
+    
 
     public void sperreRegister(Karte[] karten) {
 	gesperrteRegister = karten;

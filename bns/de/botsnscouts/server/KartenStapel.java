@@ -10,8 +10,8 @@ import de.botsnscouts.util.Karte;
  * Die Art der Karten ist festgelegt (kann nicht ohne Neukompilieren geändert werden).
  * Beim Initialisieren wird ein gemischter Stapel erzeugt. Von ihm kann man Karten mit
  * der Hilfe der Metode gibKarte() ziehen.
- * @author Alexander, Holger, Mohammad
- * @version 1.0 
+ * @version 1.0 (uralt)
+ * TODO: Neu programmieren oder durchlesen und verstehen!!!! (Miriam)
 */
 public class KartenStapel
 {
@@ -119,27 +119,6 @@ public class KartenStapel
 	    * @param gespert Ein Array mit den gesperten Karten
 	    */
 
-/*	public KartenStapel(Karte[] gespert)
-	{ 
-		schonVerteilteKarten=0;
-		int AnzahlderFreienKarten = 84-gespert.length;
-		stapel=new Karte[AnzahlderFreienKarten];
-		int zInStapel=0;
-		// stapel wird mit den noch nicht gesperten Karten gefühlt
-			 for(int z=0;z<84;z++)
-		{
-			if (!istKarteInArray(gespert,KartenMenge[z]))
-			{
-				stapel[zInStapel]=new Karte(0,"");
-				stapel[zInStapel].copy(KartenMenge[z]);
-				zInStapel++;	
-			}
-		}
-
-		mische();
-	}
-*/
-
     public KartenStapel(Vector gespert)
     { 
 	schonVerteilteKarten=0;
@@ -151,8 +130,7 @@ public class KartenStapel
 	    {
 		if (!istKarteInArray(gespert,KartenMenge[z]))
 		    {
-			stapel[zInStapel]=new Karte(0,"");
-			stapel[zInStapel].copy(KartenMenge[z]);
+			stapel[zInStapel] = KartenMenge[z];
 			zInStapel++;	
 		    }
 	    }
@@ -172,7 +150,7 @@ public class KartenStapel
 	for(int z=0;z<84;z++)
 	    {
 		stapel[z]=new Karte(0,"");
-		stapel[z].copy(KartenMenge[z]);
+		stapel[z]= KartenMenge[z];
 	    }
 	mische();
     }
@@ -193,6 +171,18 @@ public class KartenStapel
 	    }
     }
 
+    /** Ist noch schoener zu machen: 
+     * PRE: Es werden nicht zu viele Karten vom Server verteilt.
+     *
+     */
+    public Karte[] gibKarte(int n){
+	Karte[] k = new Karte[n];
+	for (int i=0; i < n; i++){
+	    k[i] = gibKarte();
+	}
+	return k;
+    }
+
     private void mische()
     {
 	Random rand=new Random();
@@ -203,9 +193,9 @@ public class KartenStapel
 	    {
 		int r=rand.nextInt()%(stapL-1-schonGemischt);
 		if(r<0) r=(-r);
-		k.copy(stapel[stapL-1-schonGemischt]);
-		stapel[stapL-1-schonGemischt].copy(stapel[r]);
-		stapel[r].copy(k);
+		k=stapel[stapL-1-schonGemischt];
+		stapel[stapL-1-schonGemischt]=stapel[r];
+		stapel[r]=k;
 		schonGemischt++;
 	    }
     }
