@@ -8,7 +8,7 @@
   <property name="dist" value="dist"/>
   <property name="doc" value="docs" />
   <property name="jars" value="lib"/>
-  <property name="bns.ver" value="0.8.1" />     
+  <property name="bns.ver" value="0.8.2" />     
 
   <target name="init">
      <!-- Create the time stamp -->

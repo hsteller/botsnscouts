@@ -38,7 +38,7 @@ public abstract class DistanceCalculator {
         if (robbi.getNextFlag() == board.getFlags().length + 1) {
             return 0;
         }
-        int distance = getDistance(robbi);
+        int distance = getDistance(robbi) / getScalingFactor();
 
         // take flag touching into account - simply, the farther we get
         // the better the value will be
@@ -75,6 +75,8 @@ public abstract class DistanceCalculator {
      */
     public abstract void preCalculate();
 
+    // if subclasses have larger "distances"
+    int getScalingFactor(){ return 1; }
 
     /// Utility functions for subclasses. Delegate to board.
 

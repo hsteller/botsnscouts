@@ -30,8 +30,12 @@ public class AdvDistanceCalculator extends DistanceCalculator {
     }
 
     protected int getDistance(int x, int y, int flag, int facing) {
-        CAT.debug("getDistance: "+x+","+y+" flag:"+flag+", facing:"+facing);
         return distances[flag-1][x][y][facing];
+    }
+
+    // if subclasses have larger "distances"
+    int getScalingFactor() {
+        return 4;
     }
 
     public void preCalculate() {
