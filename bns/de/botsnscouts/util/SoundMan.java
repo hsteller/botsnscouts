@@ -16,12 +16,21 @@ public class SoundMan {
 
     /** Sound of robot falling in a pit. */
     public static final int PIT = 0;
+
     /** Sound of robot laser */
     public static final int LASER1 = 1;
+
     /** Another Sound of robot laser */
     public static final int LASER2 = 2;
+
     /** Sound of robot reaching a flag. */
     public static final int FLAG_REACHED = 3;
+
+    /** Sound of a board laser */
+    public static final int BOARDLASER = 4;
+
+    /** Sound of a robot pushing another one. */
+    public static final int PUSHING = 5;
 
     /** How to locate the sounds relative to de.botsnscouts.BotsNScouts 
      *  Mind the ordering.
@@ -30,7 +39,9 @@ public class SoundMan {
 	"sounds/pit.wav",
 	"sounds/laserhit.wav",
 	"sounds/laser2.wav",
-	"sounds/flag_reached.wav"
+	"sounds/flag_reached.wav",
+	"sounds/boardlaser.wav",
+	"sounds/push.wav"
     };
 
     /** These sounds are robot laser sounds */

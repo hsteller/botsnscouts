@@ -153,7 +153,6 @@ public class Ausgabe extends BNSThread {
                     Stats actualStats=stats.getStats(r1.getName());
                     actualStats.incDamageByBoard();
 
-
 		    // get the origin of the laser (position and other stuff
                     // needed for animation)
 		    Ort laserPos = new Ort(0,0);
@@ -169,6 +168,10 @@ public class Ausgabe extends BNSThread {
 			CAT.error("Ausgabe: BoardLaser: NumberFormatException:");
 			CAT.error(nfe);
                         nfe.printStackTrace();
+		    }
+
+		    for (int i=0; i<strength; i++){
+			SoundMan.playSound(SoundMan.BOARDLASER);
 		    }
 
                     // if enough information,  show laser animation
