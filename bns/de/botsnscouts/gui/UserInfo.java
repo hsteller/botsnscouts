@@ -14,7 +14,7 @@ import java.util.*;
 public class UserInfo extends JPanel {
     
     private ArrayList labels = new ArrayList(10);
-    private static final int textWidth=20;
+    private static final int textWidth=15;
     
 
     public UserInfo() {

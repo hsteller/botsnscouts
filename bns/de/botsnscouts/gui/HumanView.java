@@ -162,7 +162,9 @@ public class HumanView extends JPanel implements HumanViewInterface {
     /**
      * display the register repair request
      */
-    public void showRegisterRepair() {
+    public void showRegisterRepair(Karte[] robRegs, int repairNumber) {
+	registers.updateRegisters(robRegs);
+	repairRegisters.setChoises(registers.getRegisterViewArray(), repairNumber);
 	panelSwitcher.show(switcherPanel,"repairRegisters");
     }
 
@@ -257,6 +259,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
     }
 
     private void sendRepairRegisters () {
+	showMessageToPlayer(Message.say("SpielerMensch","mkartenMisch"));
 	human.sendRepair(repairRegisters.getSelection());
     }
 

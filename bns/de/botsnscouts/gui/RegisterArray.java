@@ -108,6 +108,18 @@ public class RegisterArray extends JPanel {
 	f.setVisible(true);
     }
 
+    protected void updateRegisters(Karte[] roboCards) {
+	for (int i = 0; i < 5; i++) {
+	    if (roboCards[i] != null) {
+		((RegisterView)registerView.get(i)).getCard().setState(HumanCard.LOCKED);
+	    }
+	}
+    }
+
+    protected ArrayList getRegisterViewArray() {
+	return registerView;
+    }
+
     private int programmed() {
 	int oc = 0;
 	for (int i =0; i < registerView.size(); i++) {

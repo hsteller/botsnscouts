@@ -85,7 +85,7 @@ public class HumanPlayer extends Thread {
 		showMessage(Message.say("SpielerMensch","mwartereg"));
 				// ---------- gesperrte Register nachfragen
 		try{
-		   Global.debug(this,"Versuche, Robstatus von "+name+" zu bekommen.");
+		    Global.debug(this,"Versuche, Robstatus von "+name+" zu bekommen.");
 		    Roboter tempRob = comm.getRobStatus(name);
 		    for (int i=0; i < tempRob.getGesperrteRegister().length; i++) {
 			if (tempRob.getGesperrteRegister(i) != null) {
@@ -101,28 +101,28 @@ public class HumanPlayer extends Thread {
 		}
 		
 				// ----- Karten einsortieren  -----
-		    cards.clear();
-		    for (int i = 0; i < commAnswer.karten.length; i++) {
-			cards.add(i, new HumanCard(commAnswer.karten[i]));
-		    }
-		    humanView.showCards(cards);
-		    //		scoutAllowed=true;
+		cards.clear();
+		for (int i = 0; i < commAnswer.karten.length; i++) {
+		    cards.add(i, new HumanCard(commAnswer.karten[i]));
+		}
+		humanView.showCards(cards);
+		//		scoutAllowed=true;
 
-		    // --- ist der Klugscheisser aktiv?
-		    //		if (klugAktiv) fragKlug();
+		// --- ist der Klugscheisser aktiv?
+		//		if (klugAktiv) fragKlug();
 
 				// ----- Abgabe der Programmierung -----
 
-		    /*	start Timer
-		if (temptimeout == 0) {
-		    showMessage(Message.say("SpielerMensch","legalZug"));
-		    int gesperrteRegister = 0;
-		    for (int i = 0;i < 5; i++) if (uI.register[i].status == GESPERRT) gesperrteRegister++;
-		    int[] prog = new int[(5-gesperrteRegister)];
-		    for (int i = 0; i < prog.length; i++) prog[i] = (i+1);
-		    comm.registerProg(name,prog,false);
-		}
-		    */
+		/*	start Timer
+			if (temptimeout == 0) {
+			showMessage(Message.say("SpielerMensch","legalZug"));
+			int gesperrteRegister = 0;
+			for (int i = 0;i < 5; i++) if (uI.register[i].status == GESPERRT) gesperrteRegister++;
+			int[] prog = new int[(5-gesperrteRegister)];
+			for (int i = 0; i < prog.length; i++) prog[i] = (i+1);
+			comm.registerProg(name,prog,false);
+			}
+		*/
 		break;
 	    }
 
@@ -139,11 +139,11 @@ public class HumanPlayer extends Thread {
 		Global.debug(this,"Habe einee Zerstörung bekommen.");
 		showMessage(Message.say("SpielerMensch","roboauffeld"));
 		/* TODO
-		// --- Spielfeld für den Klugscheisser holen
-		if (intelliBoard==null) {
-		    spielfeldkreieren();
-		    wirbel = new Permu(intelliBoard,0);
-		}
+		   // --- Spielfeld für den Klugscheisser holen
+		   if (intelliBoard==null) {
+		   spielfeldkreieren();
+		   wirbel = new Permu(intelliBoard,0);
+		   }
 		*/
 	       	// ----- ask for timeout -------
 		if (globalTimeout ==0) {
@@ -161,55 +161,25 @@ public class HumanPlayer extends Thread {
 		showMessage(Message.say("SpielerMensch","roboreaktiviert"));
 				// -------- Nochmaliges PowerDown abfragen und senden ------
 		/* ask for powerDownagain, TODO
-		uICardLayout.show(userInterfaceContainer,"wiederpowerdown");
+		   uICardLayout.show(userInterfaceContainer,"wiederpowerdown");
 		*/
 		break;
 	    }
 
 	    // repair your registers
 	    case (commAnswer.REPARATUR):{ 
-		    Global.debug(this,"Reparatur erhalten");
-		    /* TODO
-		try {
-		    Global.debug(this,"Reparatur erhalten; ersuche, Status von "+name+"  zu erfragen...");
-		    Roboter tempRob = comm.getRobStatus(name);
+		Global.debug(this,"Reparatur erhalten");
 
-		    // Anzahl der Reparaturpunkte
-		    reparaturPunkte = commAnswer.zahl;
+		   try {
+		       Global.debug(this,"Reparatur erhalten; ersuche, Status von "+name+"  zu erfragen...");
+		       Roboter tempRob = comm.getRobStatus(name);
+		       int repPoints = commAnswer.zahl;
+		       humanView.showRegisterRepair(tempRob.getGesperrteRegister(), repPoints);
+		   }
+		   catch (KommException kE) {
+		       System.err.println("SpielerMensch: "+kE.getMessage());
+		   }
 
-
-		    for (int i=0; i < tempRob.getGesperrteRegister().length; i++) {
-			if (tempRob.getGesperrteRegister(i) != null) {
-
-			    uI.register[i].sperren();
-			    Global.debug(this,"Server sagt: Register gesperrt: "+i);
-			}
-			else {
-			    uI.register[i].status=FREI; 
-			uI.register[i].resetRegister(); 
-			}
-		    }
-		
-		}
-		catch (KommException kE) {
-		System.err.println("SpielerMensch: "+kE.getMessage());
-		}
-
-		  for (int i = 0; i < uI.register.length; i++) 
-		  Global.debug(this,"SpM: Register "+i+" hat Status: "+uI.register[i].status);	
-
-		showMessage(Message.say("SpielerMensch","registerrep"));
-		Global.debug(this,"Anzahln der Reparaturpunkte: "+reparaturPunkte);
-		
-		// ----- Abfrage und Senden der Register, die repariert werden sollen ---
-
-		// ergebnisArray auf null setzen
-		for (int i = 0; i < 5; i++) uI.regZuReparieren[i] = -1;
-
-		// Anfrage einblenden
-		uICardLayout.show(userInterfaceContainer,"zureparieren");
-		zuRepPanel.zeigeAuswahl();
-		    */
 		break;
 	    }
 
@@ -261,13 +231,13 @@ public class HumanPlayer extends Thread {
 	//3. port  "
 	//4. farbe "
 	/*	int sPort = 0;
-	SpielerMensch spM;
-	if ((args.length > 0) &&(args[0] != "") && (args[1]) !="") {
-	    try {sPort = Integer.parseInt(args[1]); } catch (Exception e) {System.err.println(e.getMessage());}
-	    spM = new SpielerMensch(args[0],sPort,createName());
-	}
-	else spM = new SpielerMensch();
-	spM.run();*/
+		SpielerMensch spM;
+		if ((args.length > 0) &&(args[0] != "") && (args[1]) !="") {
+		try {sPort = Integer.parseInt(args[1]); } catch (Exception e) {System.err.println(e.getMessage());}
+		spM = new SpielerMensch(args[0],sPort,createName());
+		}
+		else spM = new SpielerMensch();
+		spM.run();*/
 	String name, host="127.0.0.1";
 	int port=8077, farbe=0;
 	if (args[0] == null) name = KrimsKrams.randomName();
@@ -355,7 +325,7 @@ public class HumanPlayer extends Thread {
     }
 
     /** meldet den Spieler beim Server ab und beendet diesen Thread.
-    */
+     */
     private void quit() {
 	Global.debug(this, "Roboter "+name+" is leaving the party.");
 	comm.abmelden(name);
@@ -369,14 +339,12 @@ public class HumanPlayer extends Thread {
 
 
     protected void sendRepair(ArrayList respReparatur) {
-	/*
-		int[] repa = new int[reparaturPunkte];
-		for (int i = 0; i < repa.length; i++) {
-		}
-		comm.respReparatur(name,repa);
-		showMessage(Message.say("SpielerMensch","sendregrep"));
-	*/
-	// show wait message
+	int[] repa = new int[respReparatur.size()];
+	for (int i = 0; i < respReparatur.size(); i++) {
+	    repa[i] = ((Integer) respReparatur.get(i)).intValue();
+	}
+	comm.respReparatur(name,repa);
+	showMessage(Message.say("SpielerMensch","sendregrep"));
     }
     
     protected Roboter getRob() {
@@ -386,13 +354,13 @@ public class HumanPlayer extends Thread {
 
 
     protected void sendDirection(int r) {
-		comm.respZerstoert(name,r); 
-		// show wait message
+	comm.respZerstoert(name,r); 
+	// show wait message
     }
 
 
     protected void sendAgainPowerDown(boolean down) {
-		comm.respReaktivierung(name,down);
+	comm.respReaktivierung(name,down);
     }
 
 

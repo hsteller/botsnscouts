@@ -32,7 +32,7 @@ public interface HumanViewInterface {
     /**
      * display the register repair request
      */
-    public void showRegisterRepair();
+    //    public void showRegisterRepair();
 
     /**
      * update the position of the scout
