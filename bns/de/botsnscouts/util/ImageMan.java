@@ -54,14 +54,15 @@ public class ImageMan {
 	imagesLoading = true;
 
 	//Miriam: Bilder werden relativ zum Klassenpfad gesucht	
-	Class c;
+	Class c = de.botsnscouts.BotsNScouts.class;
+	/*
 	try {
 	    c = Class.forName("de.spline.rr.ImageMan");
 	} catch(ClassNotFoundException e) {
 	    System.out.println( e );
 	    throw new RuntimeException("ImageMan nicht gefunden");
 	}
-
+	*/
 	tracker = new MediaTracker(new Button());
 	Toolkit tk = Toolkit.getDefaultToolkit();
 	CropperField gridCropper = new CropperField(8, 8, 64, tk);
