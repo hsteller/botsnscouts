@@ -101,7 +101,7 @@ public class RegisterView extends JButton {
 	    Global.debug(this,"(myX,myY)=("+myX+","+myY+")");
 	}
 	if(locked()){
-	    g.drawImage(ImageMan.getPNGImage(ImageMan.REGLOCK),(myX-50)/2,(myY-50)/2,this);
+	    g.drawImage(ImageMan.getPNGImage(ImageMan.REGLOCK),(myX-50)/2,(myY-50),this);
 	}
     }
 
