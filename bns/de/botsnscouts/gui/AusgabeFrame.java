@@ -2,6 +2,7 @@ package de.botsnscouts.gui;
 
 import de.botsnscouts.comm.*;
 import de.botsnscouts.util.*;
+import de.botsnscouts.board.*
 import java.awt.*;
 import java.io.*;
 import java.awt.event.*;
@@ -269,14 +270,14 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	    int robiy=0;
 	    
 	    for (int i = 0; i < statusLine.sC.length; i++) {
-		if (rName.equals(statusLine.sC[i].r.name)) {
+		if (rName.equals(statusLine.sC[i].r.getName())) {
 		    if(statusLine.sC[i].r.getSchaden() < 10) {
 		    robix=statusLine.sC[i].r.getX();
 		    robiy=statusLine.sC[i].r.getY();
 		    }
 		    else {
-		    robix=statusLine.sC[i].r.archivX;
-		    robiy=statusLine.sC[i].r.archivY;
+		    robix=statusLine.sC[i].r.getArchivX();
+		    robiy=statusLine.sC[i].r.getArchivY();
 		    }
 		}
 	    }
@@ -349,7 +350,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	}
 	public void setRobStatus(String rname, Roboter rob) {
 	    for (int i = 0; i < sC.length; i++) 
-		if (rname.equals(sC[i].r.name)) {
+		if (rname.equals(sC[i].r.getName())) {
 		    sC[i].setRob(rob,i);
 		}
 	}
@@ -373,7 +374,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	StatusCanvas () {
 	    this.addMouseListener(this);
 	    r = Roboter.getNewInstance("foobar");
-	    r.leben = 0;
+	    r.getLeben() = 0;
 	    this.setSize(75,60);
 	    this.setBackground(backColor);
 	    this.setForeground(foreColor);
@@ -400,7 +401,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	
 
 	public void setName (String s) {
-	    r.name = s;
+	    r.getName() = s;
 	    this.repaint();
 	}
 
@@ -430,7 +431,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	    // Name
 	    g.setFont(new Font("SansSerif",Font.BOLD,12));
 	    g.setColor(robcolor);
-	    g.drawString(r.name,2,13);
+	    g.drawString(r.getName(),2,13);
 	    g.setColor(foreColor);
 	    if (r.getLeben() <= 0){
 		g.setColor(Color.red);
@@ -472,7 +473,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	    int mods = e.getModifiers();
 	    // mouse button 3: scroll to  clicked rob
 	    if( (mods & MouseEvent.BUTTON3_MASK) != 0 ) {
-		trackRob( r.name );
+		trackRob( r.getName() );
 		return;
 	    } 
 	    if(stc==null) stc = new ScopeStat(r); 
@@ -712,7 +713,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	public ScopeStat (Roboter r){
 	    this.setBackground(backColor);
 	    this.setForeground(foreColor);
-	    this.setTitle(Message.say("AusgabeFrame","statusVon")+r.name);
+	    this.setTitle(Message.say("AusgabeFrame","statusVon")+r.getName());
 	    int startx = ausgabeFrameLoc().x;
 	    int starty = ausgabeFrameLoc().y;
 	    this.setLocation((startx+ausgabeFrameSize().width-350),(starty+ausgabeFrameSize().height-200));
@@ -742,7 +743,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	    gelegt.setSize(xsize,ysize/7);
 	    gelegt.setLocation(5,ysize/7*2);
 	    this.add(gelegt);
-	    archivpos = new Label(Message.say("AusgabeFrame","archPos")+" x: "+r.archivX+" y: "+r.archivY);
+	    archivpos = new Label(Message.say("AusgabeFrame","archPos")+" x: "+r.getArchivX()+" y: "+r.getArchivY());
 	    archivpos.setSize(xsize,ysize/7);
 	    archivpos.setLocation(5,ysize/7*3);
 	    this.add(archivpos);
@@ -827,8 +828,8 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-	    roboOnTrack=r.name;
-	    trackRob( r.name );
+	    roboOnTrack=r.getName();
+	    trackRob( r.getName() );
 	}
     }
 
@@ -1002,7 +1003,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 			Global.debug(this,"Es gibt schon Spieler, die am Ziel sind; hole Gewinnerliste...");
 			for (int j = 0; j < spStand.length; j++) {
 			    for (int i = 0; i < statusLine.sC.length; i++) {
-				if (spStand[j].equals(statusLine.sC[i].r.name)) {
+				if (spStand[j].equals(statusLine.sC[i].r.getName())) {
 				    statusLine.sC[i].setGewinnerNr(j+1);
 				}
 			    }
@@ -1062,7 +1063,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 				// ------------- Spieler erfragen und den Status anlegen ------------
 		try { 
 		    Global.debug(this,"Versuche, Namen zu holen...");
-		    String[] spNamen = kCA.getNamen();
+		    String[] spNamen = kCA.name;
 		    String[] spColor = kCA.getFarben();
 		    int nco=0;
 		    for (int co=0;co<8;co++){
