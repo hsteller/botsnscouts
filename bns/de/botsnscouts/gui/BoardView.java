@@ -129,7 +129,7 @@ public class BoardView extends JComponent {
     /** This robot is used for calculations,
      *  like making a suggestion for the next move.
      */
-    private Bot vorschauRob;
+    private Bot previewRob;
 
     /** last position of our famous scout ;-) */
     private Location lastScoutPos = new Location();
@@ -946,23 +946,15 @@ public class BoardView extends JComponent {
         repaint();              // lasers again
     }
 
-
-
-
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    private boolean abbieger(int x, int y, int r) {
+    private boolean turner(int x, int y, int r) {
         Floor floor = sf.floor(x, y);
         return floor.isBelt() && (floor.getBeltDirection() == r);
     }
 
-    protected void vorschau(int phasen, Bot simRob) {
-        if (phasen == 0) {
+    protected void preview(int phase, Bot simRob) {
+        if (phase == 0) {
             //scoutOn = true; // flag for repaint: yes, paint scout!
-            vorschauRob = null;
+            previewRob = null;
             deleteScout();
             //repaint();
             return;
@@ -970,31 +962,31 @@ public class BoardView extends JComponent {
 
         Bot[] robs = new Bot[1];
         robs[0] = simRob;
-        for (int i = 1; i < phasen + 1; i++) {
-            //sf.doPhase(phasen, simRob);
-            sf.doPhase(phasen, robs);
+        for (int i = 1; i < phase + 1; i++) {
+            //sf.doPhase(phase, simRob);
+            sf.doPhase(phase, robs);
         }
-        //vorschauRob = vorschauRobArray[0];
-        vorschauRob = simRob;
+        //previewRob = vorschauRobArray[0];
+        previewRob = simRob;
         showScout(simRob.getPos());
 
         //repaint();
 
     }
 
-    protected void vorschau(int phasen, Bot[] vorschauRobArray) {
+    protected void preview(int phasen, Bot[] previewRoboters) {
         if (phasen == 0) {
-            vorschauRob = null;
+            previewRob = null;
             deleteScout();
             //repaint();
             return;
         }
 
         for (int i = 1; i < phasen + 1; i++) {
-            sf.doPhase(i, vorschauRobArray);
+            sf.doPhase(i, previewRoboters);
         }
-        vorschauRob = vorschauRobArray[0];
-        showScout(vorschauRob.getPos());
+        previewRob = previewRoboters[0];
+        showScout(previewRob.getPos());
         //repaint();
 
     }
@@ -1048,42 +1040,42 @@ public class BoardView extends JComponent {
                 return cbeltCrop[4];
 
             case (Board.NFW1):
-                if (abbieger(xpos, ypos - 1, Board.NORD))
+                if (turner(xpos, ypos - 1, Board.NORD))
                     return cbeltCrop[15];
                 else
                     return cbeltCrop[6];
             case (Board.NFE1):
-                if (abbieger(xpos, ypos - 1, Board.NORD))
+                if (turner(xpos, ypos - 1, Board.NORD))
                     return cbeltCrop[18];
                 else
                     return cbeltCrop[7];
             case (Board.SFW1):
-                if (abbieger(xpos, ypos + 1, Board.SUED))
+                if (turner(xpos, ypos + 1, Board.SUED))
                     return cbeltCrop[13];
                 else
                     return cbeltCrop[3];
             case (Board.SFE1):
-                if (abbieger(xpos, ypos + 1, Board.SUED))
+                if (turner(xpos, ypos + 1, Board.SUED))
                     return cbeltCrop[10];
                 else
                     return cbeltCrop[0];
             case (Board.EFN1):
-                if (abbieger(xpos - 1, ypos, Board.OST))
+                if (turner(xpos - 1, ypos, Board.OST))
                     return cbeltCrop[16];
                 else
                     return cbeltCrop[5];
             case (Board.EFS1):
-                if (abbieger(xpos - 1, ypos, Board.OST))
+                if (turner(xpos - 1, ypos, Board.OST))
                     return cbeltCrop[12];
                 else
                     return cbeltCrop[2];
             case (Board.WFN1):
-                if (abbieger(xpos + 1, ypos, Board.WEST))
+                if (turner(xpos + 1, ypos, Board.WEST))
                     return cbeltCrop[17];
                 else
                     return cbeltCrop[8];
             case (Board.WFS1):
-                if (abbieger(xpos + 1, ypos, Board.WEST))
+                if (turner(xpos + 1, ypos, Board.WEST))
                     return cbeltCrop[11];
                 else
                     return cbeltCrop[1];
@@ -1109,42 +1101,42 @@ public class BoardView extends JComponent {
                 return ebeltCrop[4];
 
             case (Board.NFW2):
-                if (abbieger(xpos, ypos - 1, Board.NORD))
+                if (turner(xpos, ypos - 1, Board.NORD))
                     return ebeltCrop[16];
                 else
                     return ebeltCrop[6];
             case (Board.NFE2):
-                if (abbieger(xpos, ypos - 1, Board.NORD))
+                if (turner(xpos, ypos - 1, Board.NORD))
                     return ebeltCrop[17];
                 else
                     return ebeltCrop[7];
             case (Board.SFW2):
-                if (abbieger(xpos, ypos + 1, Board.SUED))
+                if (turner(xpos, ypos + 1, Board.SUED))
                     return ebeltCrop[13];
                 else
                     return ebeltCrop[3];
             case (Board.SFE2):
-                if (abbieger(xpos, ypos + 1, Board.SUED))
+                if (turner(xpos, ypos + 1, Board.SUED))
                     return ebeltCrop[10];
                 else
                     return ebeltCrop[0];
             case (Board.EFN2):
-                if (abbieger(xpos - 1, ypos, Board.OST))
+                if (turner(xpos - 1, ypos, Board.OST))
                     return ebeltCrop[15];
                 else
                     return ebeltCrop[5];
             case (Board.EFS2):
-                if (abbieger(xpos - 1, ypos, Board.OST))
+                if (turner(xpos - 1, ypos, Board.OST))
                     return ebeltCrop[12];
                 else
                     return ebeltCrop[2];
             case (Board.WFN2):
-                if (abbieger(xpos + 1, ypos, Board.WEST))
+                if (turner(xpos + 1, ypos, Board.WEST))
                     return ebeltCrop[18];
                 else
                     return ebeltCrop[8];
             case (Board.WFS2):
-                if (abbieger(xpos + 1, ypos, Board.WEST))
+                if (turner(xpos + 1, ypos, Board.WEST))
                     return ebeltCrop[11];
                 else
                     return ebeltCrop[1];
@@ -1501,17 +1493,17 @@ public class BoardView extends JComponent {
     protected void paintScout(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
 
-        if (vorschauRob == null)
+        if (previewRob == null)
             return;
 
-        int xpos = vorschauRob.getX() - 1;
-        int ypos = sf.getSizeY() - vorschauRob.getY();
+        int xpos = previewRob.getX() - 1;
+        int ypos = sf.getSizeY() - previewRob.getY();
         int xpos64 = xpos * 64;
         int ypos64 = ypos * 64;
         // Scout
         AlphaComposite ac = AC_SRC_OVER_07;
         g2d.setComposite(ac);
-        g.drawImage(scoutCrop[vorschauRob.getFacing()], xpos64, ypos64, 64, 64, this);
+        g.drawImage(scoutCrop[previewRob.getFacing()], xpos64, ypos64, 64, 64, this);
         g2d.setComposite(AC_SRC);
     }
 
