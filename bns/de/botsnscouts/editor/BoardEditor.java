@@ -70,7 +70,8 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
     protected int elemX=0,elemY=0,indx=0;
     protected int spfX=0,spfY=0;
     protected int phasen=0;
-    protected String spfString=null;
+
+    private String magicBoardString=null;
     protected int laserSt=1;
     protected int[] elemTyp={122,123,131,132,102,121,120,130,133,103,122,123,131,132,100,120,121,133,130,101,152,153,150,151,222,223,231,232,202,221,220,230,233,203,222,223,231,232,200,221,220,230,233,201,252,253,250,251,0,10,10,-1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     protected int[] elemSpez={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,2,2,2,2,2,2,1,0,1,0,0,0,0,0,0,0,0,0,0};
@@ -125,6 +126,14 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 	setLocation(0,25);
 	setVisible(true);
     }//ende konstruktor
+
+    protected String getMagicBoardString() {
+        return magicBoardString;
+    }
+
+    protected void setMagicBoardString(String magicBoardString) {
+        this.magicBoardString = magicBoardString;
+    }
 
     private boolean loadImg(){
         // enno: habe eingebaut, dass BoardEditor und BoardView die gleichen

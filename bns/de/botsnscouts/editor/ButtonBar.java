@@ -196,7 +196,7 @@ class ButtonBar extends JPanel implements ActionListener{
 	    CAT.debug("Speichern geclicked, gete String");
 	    String tmp=editor.board.getComputedString();
 	    CAT.debug( "String bekommen:\n"+tmp);
-	    editor.spfString=tmp;
+	    editor.setMagicBoardString(tmp);
 	    CAT.debug( "Starte FileDialog");
 
 	    //	    new NameDialog(editor,Message.say("BoardEditor","mKachelSave"),true);
@@ -233,7 +233,7 @@ class ButtonBar extends JPanel implements ActionListener{
 		    CAT.debug("FileOutputStream opened");
 		    PrintWriter pw=new PrintWriter(fop);
 		    CAT.debug("PrintWriter opened");
-		    pw.println(editor.spfString);
+		    pw.println(editor.getMagicBoardString());
 		    CAT.debug("String in File written");
 		    pw.close();
 		    CAT.debug("File closed");
@@ -266,7 +266,7 @@ class ButtonBar extends JPanel implements ActionListener{
 		    return;
 		}
 
-		String save=editor.spfString;
+		String save=editor.getMagicBoardString();
 		try{
 		    FileInputStream istream=new FileInputStream( file );
 		    //FileInputStream istream=new FileInputStream("kacheln" + File.separator + name);
@@ -277,9 +277,9 @@ class ButtonBar extends JPanel implements ActionListener{
 		    while((tmp=kachReader.readLine())!=null)
 			str.append(tmp+"\n");
 		    //CAT.debug(str.toString());
-		    editor.spfString=str.toString();
+		    editor.setMagicBoardString(str.toString());
 		    //Leo's Code
-		    editor.board=new EditableBoard(12,12,editor.spfString,null);
+		    editor.board=new EditableBoard(12,12,editor.getMagicBoardString(),null);
 		    CAT.debug( "Board erzeugt");
 
 		    editor.sp.remove(editor.boardView);
@@ -291,16 +291,14 @@ class ButtonBar extends JPanel implements ActionListener{
 		    CAT.debug( "sac added");
 		}catch(FormatException ex){
 		    System.err.println(Message.say("BoardEditor","eDatNotEx")+ex);
-		    editor.spfString=save;
+		    editor.setMagicBoardString(save);
 		}catch(FlagException ex){
 		    System.err.println(Message.say("BoardEditor","eDatNotEx")+ex);
-		    editor.spfString=save;
+            editor.setMagicBoardString(save);
 		}catch(IOException ex){
 		    System.err.println(Message.say("BoardEditor","eDateiErr")+ex);
-		    editor.spfString=save;
-		}/*catch(Exception ex){
-		   System.err.println(Message.say("BoardEditor","eDatNotEx")+ex);
-		   }*/
+            editor.setMagicBoardString(save);
+		}
 	    }
 	    //new LadenDialog(editor,Message.say("BoardEditor","mKachelSave"),true);
 	} else if (e.getActionCommand().compareTo("Flag") == 0) {
