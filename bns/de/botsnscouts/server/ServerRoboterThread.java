@@ -89,7 +89,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 			    d("Setze Programmierung um.");
 			    rob.program(ans.register);
 			    d("Programmierung umgesetzt. Bot:");
-			    rob.zeige_Roboter();
+			    rob.debug();
 
 			    notifyServer();
 
@@ -102,7 +102,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 				ende=true;
 				break;
 			    }
-			    rob.setAusrichtung(ans.wohin);
+			    rob.setFacing(ans.wohin);
 			    if (m==Server.ZERSTOERT_SYNC || m==Server.ZERSTOERT_ASYNC){
 				// Implizit synchronized
 				robMaint.reEntry(this);
@@ -123,7 +123,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 				break;
 			    }
 
-			    rob.setAktiviert(ans.ok);
+			    rob.setActivated(ans.ok);
 
 			    notifyServer();
 			    break;
@@ -137,7 +137,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 			    }
 
 			    for (int i=0;i<ans.register.length;i++)
-				rob.entsperreReg(ans.register[i]-1);
+				rob.unlockRegister(ans.register[i]-1);
 
 			    notifyServer();
 
@@ -286,7 +286,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 	komm.zerstoert();
     }
     synchronized void makeYourMove() throws KommException{
-	komm.zugabgabe(rob.getKarten());
+	komm.zugabgabe(rob.getCards());
     }
     synchronized void reEntry() throws KommException{
 	komm.reaktivierung();

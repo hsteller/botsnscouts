@@ -114,7 +114,7 @@ public class SearchRecursively {
             if (sf.floor(r.getX(), r.getY()).isBelt()) { // Belt
                 for (int i = 0; i < malusCards.length; i++) {
                     tmp[recursionLevel].initFrom(r);
-                    tmp[recursionLevel].setZug(0, malusCards[i]);
+                    tmp[recursionLevel].setMove(0, malusCards[i]);
                     sf.doPhase(1, tmp[recursionLevel]);
                     if (tmp[recursionLevel].getDamage() == 10)
                         diemalus += mali[i];
@@ -141,7 +141,7 @@ public class SearchRecursively {
 
             int j = 0;
             while (tmp[recursionLevel].getMove(j) != null) j++;
-            tmp[recursionLevel].setZug(j, cardTemp);
+            tmp[recursionLevel].setMove(j, cardTemp);
             while ((j < 5) && (tmp[recursionLevel].getMove(j) != null)) {
                 sf.doPhase(j + 1, tmp[recursionLevel]);
                 j++;

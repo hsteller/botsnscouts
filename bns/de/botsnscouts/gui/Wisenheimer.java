@@ -75,12 +75,12 @@ public class Wisenheimer{
 	// gelegte Karten in das enstprechende gesperrte Register des Robis packen
 	for (int l = 0; l<registers.size();l++) {
 	    if ((registers.get(l) != null)&&(!((HumanCard)registers.get(l)).free())) {
-		simRob.sperreRegister(l,  KartenStapel.get(((HumanCard)registers.get(l)).getprio(),((HumanCard)registers.get(l)).getaktion()));
+		simRob.lockRegister(l,  KartenStapel.get(((HumanCard)registers.get(l)).getprio(),((HumanCard)registers.get(l)).getaktion()));
 	    }
 	}
 	// gesperrte Register in simRob.zug schreiben
 	for (int i = 0; i < simRob.getLockedRegisters().length; i++){
-	    simRob.setZug(i, simRob.getLockedRegister(i));
+	    simRob.setMove(i, simRob.getLockedRegister(i));
 	}
 	Card[] vonPermut = wirbel.findBestMove(simCards, simRob);
 	for (int i=0;i<5;i++){

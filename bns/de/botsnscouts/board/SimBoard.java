@@ -341,7 +341,7 @@ public class SimBoard extends Board implements Directions {
             turnBot(robbis[rob], GEAR_CLOCKWISE);
             moved[rob] = true;
         } else if (aktion.equals("UT")) {  // U-Turn
-            robbis[rob].setAusrichtung((robbis[rob].getFacing() + 2) % 4);
+            robbis[rob].setFacing((robbis[rob].getFacing() + 2) % 4);
             moved[rob] = true;
         } else
             throw new DoPhaseException("Nicht erlaubte Card '" + aktion + "' fuer Bot " + robbis[rob].getName());
@@ -458,8 +458,8 @@ public class SimBoard extends Board implements Directions {
      */
     private void destroyBot(BoardBot thorsten) {
         //d("vernichteRoboter: "+thorsten.getName());
-        thorsten.setSchaden(10);
-        thorsten.setVirtuell();
+        thorsten.setDamage(10);
+        thorsten.setVirtual();
         thorsten.setInvalidPos();
         thorsten.xx = 0;
         thorsten.yy = 0;
@@ -470,12 +470,12 @@ public class SimBoard extends Board implements Directions {
         // drehR = DrehRichtung
         switch (drehR) {
             case GEAR_CLOCKWISE:
-                robbi.setAusrichtung((robbi.getFacing() + 1) % 4);
+                robbi.setFacing((robbi.getFacing() + 1) % 4);
                 break;
             case GEAR_COUNTERCLOCKWISE:
-                robbi.setAusrichtung(robbi.getFacing() - 1);
+                robbi.setFacing(robbi.getFacing() - 1);
                 if (robbi.getFacing() == -1)
-                    robbi.setAusrichtung(3);
+                    robbi.setFacing(3);
                 break;
         } // switch
     }
@@ -606,7 +606,7 @@ public class SimBoard extends Board implements Directions {
             if (robmove[i]) {
                 robbis[i].setPos(robbis[i].xx, robbis[i].yy);
                 if (robbis[i].aa > -1) {
-                    robbis[i].setAusrichtung(robbis[i].aa);
+                    robbis[i].setFacing(robbis[i].aa);
                     robbis[i].aa = -1; // angenommene Ausrichtung auf ungueltig setzen
                 }
                 moved[i] = true;
@@ -668,7 +668,7 @@ public class SimBoard extends Board implements Directions {
                         if (robbis[j].isVirtual()) {
                             // Virtuelle Robots kriegen Schaden, blocken aber nicht
                             for (int s = l.strength; s > 0; s--) {  // Schaden zufügen und Register sperren
-                                robbis[j].incSchaden();
+                                robbis[j].incDamage();
                                 registerSperren(robbis[j]);
                             }
                             moved[j] = true;
@@ -676,7 +676,7 @@ public class SimBoard extends Board implements Directions {
                             // Maximal ein nichtvirtueller Bot wird getroffen
                             // Danach wird dieser Laser beendet (hit==true)
                             for (int s = l.strength; s > 0; s--) {
-                                robbis[j].incSchaden();
+                                robbis[j].incDamage();
                                 registerSperren(robbis[j]);
                             }
                             moved[j] = true;
@@ -720,7 +720,7 @@ public class SimBoard extends Board implements Directions {
                     while ((x <= sizeX) && (!ww(x, y).isExisting())) {
                         for (int j = 0; j < robbis.length; j++)
                             if ((robbis[j].getX() == x) && (robbis[j].getY() == y) && (!robbis[j].isVirtual())) { // Treffer
-                                robbis[j].incSchaden();
+                                robbis[j].incDamage();
                                 registerSperren(robbis[j]);
                                 moved[j] = true; // Änderung erfolgt
 
@@ -745,7 +745,7 @@ public class SimBoard extends Board implements Directions {
                     while ((x > 0) && (!ew(x, y).isExisting())) {
                         for (int j = 0; j < robbis.length; j++)
                             if ((robbis[j].getX() == x) && (robbis[j].getY() == y) && (!robbis[j].isVirtual())) { //Treffer
-                                robbis[j].incSchaden();
+                                robbis[j].incDamage();
                                 registerSperren(robbis[j]);
                                 moved[j] = true;
 
@@ -763,7 +763,7 @@ public class SimBoard extends Board implements Directions {
                     while ((y <= sizeY) && (!sw(x, y).isExisting())) {
                         for (int j = 0; j < robbis.length; j++)
                             if ((robbis[j].getX() == x) && (robbis[j].getY() == y) && (!robbis[j].isVirtual())) { //Treffer
-                                robbis[j].incSchaden();
+                                robbis[j].incDamage();
                                 registerSperren(robbis[j]);
                                 moved[j] = true;
 
@@ -781,7 +781,7 @@ public class SimBoard extends Board implements Directions {
                     while ((y > 0) && (!nw(x, y).isExisting())) {
                         for (int j = 0; j < robbis.length; j++)
                             if ((robbis[j].getX() == x) && (robbis[j].getY() == y) && (!robbis[j].isVirtual())) { //Treffer
-                                robbis[j].incSchaden();
+                                robbis[j].incDamage();
                                 registerSperren(robbis[j]);
                                 moved[j] = true;
 
@@ -803,13 +803,13 @@ public class SimBoard extends Board implements Directions {
             Floor floor = floor(robbis[i].getX(), robbis[i].getY());
 
             if (floor.isRepairing()) {
-                robbis[i].setArchiv(robbis[i].getPos());
+                robbis[i].setArchive(robbis[i].getPos());
                 moved[i] = true;
                 //d(robbis[i].getName()+" ist auf einem Reperaturfeld. Archivpos updated");
             }
             for (int j = 0; j < flags.length; j++)
                 if ((robbis[i].getX() == flags[j].x) && (robbis[i].getY() == flags[j].y)) {
-                    robbis[i].touchArchiv();
+                    robbis[i].touchArchive();
                     moved[i] = true;
                     //d(robbis[i].getName()+" ist auf einer Flagge (R1). Archivpos updated");
                 }
@@ -823,7 +823,7 @@ public class SimBoard extends Board implements Directions {
             if (robbis[i].getNextFlag() == flags.length + 1)
                 continue;
             if ((robbis[i].getX() == flags[robbis[i].getNextFlag() - 1].x) && (robbis[i].getY() == flags[robbis[i].getNextFlag() - 1].y)) {
-                robbis[i].incNaechsteFlagge();
+                robbis[i].incNextFlag();
                 moved[i] = true;
                 //d(robbis[i].getName()+" hat naechste Flagge erreicht.");
                 ausgabenMsgString2(de.botsnscouts.comm.MessageID.FLAG_REACHED,
@@ -843,7 +843,7 @@ public class SimBoard extends Board implements Directions {
             Floor floor = floor(robbis[i].getX(), robbis[i].getY());
             if (floor.isRepairing()) {
                 boolean msg = robbis[i].getDamage() > 0;
-                robbis[i].decrSchaden(floor.getInfo());
+                robbis[i].decrDamage(floor.getInfo());
                 moved[i] = true;
                 //d(robbis[i].getName()+" repariert wegen Repa-Feld.");
                 if (msg)
@@ -853,7 +853,7 @@ public class SimBoard extends Board implements Directions {
             for (int j = 0; j < flags.length; j++)
                 if ((robbis[i].getX() == flags[j].x) && (robbis[i].getY() == flags[j].y)) {
                     boolean msg = robbis[i].getDamage() > 0;
-                    robbis[i].decrSchaden(1);
+                    robbis[i].decrDamage(1);
                     moved[i] = true;
                     //d(robbis[i].getName()+" repariert wegen Flagge.");
                     if (msg)
@@ -861,7 +861,7 @@ public class SimBoard extends Board implements Directions {
                 }
 
             if (robbis[i].getDamage() < 0)
-                robbis[i].setSchaden(0);
+                robbis[i].setDamage(0);
         }
     } // doRepairs
 
@@ -883,7 +883,7 @@ public class SimBoard extends Board implements Directions {
                         }
                 if (cont) continue;  // naechsten Bot bearbeiten
                 if (bots[a].getDamage() < 10) {
-                    bots[a].setVirtuell(false);     // wenn er nicht zerstoert ist: entvirtualisieren durchführen
+                    bots[a].setVirtual(false);     // wenn er nicht zerstoert ist: entvirtualisieren durchführen
                     //d("Entvirtualisiere Bot "+robbis[a].getName());
                     moved[a] = true;
                 }
@@ -891,7 +891,7 @@ public class SimBoard extends Board implements Directions {
         } // for Schleife 1
         if (bots.length == 1)          // Sonderfall einzelner Bot
             if (bots[0].getDamage() < 10) {
-                bots[0].setVirtuell(false);
+                bots[0].setVirtual(false);
                 //d("Entvirtualisiere einzelnen Bot "+robbis[0].getName());
                 moved[0] = true;
             }
@@ -912,7 +912,7 @@ public class SimBoard extends Board implements Directions {
             for (int i = 4; i >= 0; i--) {
                 if (robbi.getLockedRegisters()[i] == null) {
                     if (robbi.getMove()[i] != null) {
-                        robbi.sperreReg(i);
+                        robbi.lockRegister(i);
                         //d("Sperre Register "+i);
                     }
                     return;

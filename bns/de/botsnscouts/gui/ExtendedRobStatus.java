@@ -62,8 +62,8 @@ public class ExtendedRobStatus extends JFrame {
 
 	// ---- gesperrte Regisster toString
 	String gespReg = "[ ";
-	if (r.gesperrteRegs() > 0) { 
-	    for (int i = 0; i < r.gesperrteRegs(); i++) 
+	if (r.countLockedRegisters() > 0) {
+	    for (int i = 0; i < r.countLockedRegisters(); i++)
 		if (r.getLockedRegister(i) != null) {
 		    gespReg+= r.getLockedRegisters()[i].getaktion() + " | ";
 		}

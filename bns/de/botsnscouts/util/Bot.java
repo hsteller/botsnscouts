@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.util;
 
 /**
@@ -136,8 +136,7 @@ public class Bot {
     protected int botVis=0;
 
     /**
-     *  Konstruktor
-     *  @param Name des Spielers bzw. Roboters.
+     *  @param Name of the player/robot.
      *  Not public _on_purpose_. Use Bot.getNewInstance() instead.
      */
     protected Bot(String robName) {
@@ -176,9 +175,9 @@ public class Bot {
 	}
     }
 
-    /** setzt in diesen Bot die fuer eine Simulation nötigen Daten
-     *  diese werden aus dem übergebenen Robbi kopiert.
-     *  (ausrichtung, position, schaden, leben, Zielflagge, Archivpon, aktiv)
+    /**
+     *  Copy a bot. Needed for simulation.
+     * @param The bot whose status is to be copied.
      */
     public void copyRob( Bot r ) {
 	facing = r.facing;
@@ -326,29 +325,24 @@ public class Bot {
     }
 
 
-    public Card[] getKarten() {
+    public Card[] getCards() {
 	return cards;
     }
 
-    /** Liefert, ob zwei Bot den gleichen Namen haben.
-     * (Dann sollten sie eigentlich gleich sein.)
-     */
-    public boolean sameName(Bot r) {
-	return name.equals(r.name);
-    }
 
-    /** Prüft, ob sich die Bot an derselben Position aufhalten.
-     *  Sind beide in dieselbe Grube gefallen, sind sie trotzdem nicht am
-     *  selben Location.
+    /**
+     * Checks whether two bots are at the same location.
+     * If both are in a pitch, they are never at the same position.
      */
     public boolean samePos(Bot r) {
 	return (r.pos.equals(pos) && !r.isInPit());
     }
 
-    /** Liefert die Anzahl der gesperrten Register
-     * @author Miriam
+    /**
+     * Get number of lockedRegisters.
      */
-    public int gesperrteRegs() {
+
+    public int countLockedRegisters() {
 	int c=0;
 	for (int i=0; i<NUM_REG; i++)
 	    if (lockedRegisters[i])
@@ -357,42 +351,45 @@ public class Bot {
     }
 
     /** entsperrt alle Register */
-    public void entsperreAlleRegs() {
+    public void unlockAllRegisters() {
 	for (int i=0; i<NUM_REG; i++)
 	    lockedRegisters[i] = false;
     }
 
-    /** Aktuelle Position wird archiviert. */
-    public void touchArchiv(){
-	setArchiv(pos.x, pos.y);
+    /** Remember the curent poition as archive position */
+    public void touchArchive(){
+	setArchive(pos.x, pos.y);
     }
 
-    public void setArchiv(int x, int y) {
+    public void setArchive(int x, int y) {
 	archiveX = x;
 	archiveY = y;
     }
 
-    public void setArchiv(Location o) {
+    public void setArchive(Location o) {
 	archiveX = o.x;
 	archiveY = o.y;
     }
 
-    /** schickt den Bot in eine Grube
-     *  Wenn ein Bot in eine Grube faellt, verliert er ein Leben,
-     *  hat teporär Schaden 10 und die Position (0,0)
+    /**
+     * The bot is falling into a pitch.
+     * I.e. it looses one life, gets full damage temporatily and
+     * moves to the virtual possition (0,0).
      */
-    public void falleInGrube(){
+    public void fallIntoPitch(){
 	lives--;
 	damage=10;
 	pos=inPit;
     }
 
-    /** bewegt den Bot nach (x,Y) */
+    /**
+     * Move bot to specified position.
+     */
     public void moveTo(int x, int y){
 	setPos(x,y);
     }
 
-    /** bewegt den Bot nach Location */
+    /** ove bot to specified Location */
     public void moveTo(Location o){
 	setPos(o);
     }
@@ -406,44 +403,44 @@ public class Bot {
 	this.pos.set(o);
     }
 
-    public void setVirtuell() {
-	setVirtuell(true);
+    public void setVirtual() {
+	setVirtual(true);
     }
 
-    public void setVirtuell(boolean b) {
+    public void setVirtual(boolean b) {
 	virtual = b;
     }
 
 
-    public void setAktiviert() {
-	setAktiviert(true);
+    public void setActivated() {
+	setActivated(true);
     }
 
-    public void setAktiviert(boolean b) {
+    public void setActivated(boolean b) {
 	activated = b;
     }
 
-    /** Erhoeht den Schaden um 1 */
-    public void incSchaden() {
+    /** Increment damage by one */
+    public void incDamage() {
 	this.damage++;
     }
 
 
-    public void decrSchaden(int i) {
+    public void decrDamage(int i) {
 	damage -= i;
     }
 
-    /** erhoeht den Schaden um eins */
-    public void setSchaden(int schaden) {
+    /** Set damage. */
+    public void setDamage(int schaden) {
 	this.damage = schaden;
     }
 
-    public void decrLeben() {
+    public void decrLife() {
 	lives--;
     }
 
     /** Setze Leben - warum tut das jemand??? */
-    public void setLeben(int i) {
+    public void setLives(int i) {
 	lives = i;
     }
 
@@ -452,34 +449,34 @@ public class Bot {
 	this.pos.y = 0;
     }
 
-    /** Dreht den Bot in die angegebene Richtung */
-    public void dreheNach(int richtung){
-	setAusrichtung(richtung);
+    /** Turns bot to given direction. */
+    public void turnTo(int richtung){
+	setFacing(richtung);
     }
 
-    public void setAusrichtung(int neu) {
+    public void setFacing(int neu) {
 	this.facing = neu;
     }
 
-    public void incNaechsteFlagge() {
+    public void incNextFlag() {
 	nextFlag++;
     }
 
-    public void setNaechsteFlagge(int i){
+    public void setNextFlag(int i){
 	nextFlag = i;
     }
 
-    /** Setzt den Bot zurueck auf seine Archivposition
+    /** Move the bot to its last archive position.
      * @author Miriam
      */
-    public void zumArchiv() {
+    public void toArchive() {
 	pos.set(archiveX, archiveY);
     }
 
     /** Register n wird gesperrt und mit Card k belegt.
      *  deprecated Eigentlich hat man die entsprechende Card ja bereits im letzten Zug drin!!!
      */
-    public void sperreRegister(int i, Card k){
+    public void lockRegister(int i, Card k){
 	move[i] = k;
 	lockedRegisters[i] = true;
     }
@@ -488,12 +485,12 @@ public class Bot {
     /** Register n wird gesperrt,
      */
 
-    public void sperreReg(int n){
+    public void lockRegister(int n){
 	lockedRegisters[n] = true;
     }
 
 
-    public void entsperreReg(int n){
+    public void unlockRegister(int n){
 	lockedRegisters[n] = false;
     }
 
@@ -511,17 +508,18 @@ public class Bot {
     }
 
 
-    public void setZug(int i, Card karte) {
+    public void setMove(int i, Card karte) {
 	move[i] = karte;
     }
 
 
-    /** Neue Karten werden vom Server zugeteilt.
+    /**
+     * Get new cards by the server.
      *
-     *  Der Bot bekommt nur so viele Karten, wie er bekommen soll.
-     *  Wird mit null aufgefuellt.
+     * The bot gets only as many cards as it should,
+     * the array is filled with nulls at the end.
      */
-    public void setKarten(Card[] karten) {
+    public void setCards(Card[] karten) {
 	int i;
 	for (i=0; i < karten.length; i++) {
 	    this.cards[i]=karten[i];
@@ -574,7 +572,7 @@ public class Bot {
             return s;
         }
 
-    public void zeige_Roboter()
+    public void debug()
         {
             Global.debug(this,this.toString());
         }

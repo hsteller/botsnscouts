@@ -877,18 +877,18 @@ public class KommClient {
 	*/
 	com=this.einlesen();
 	if (com.equals("RSE")){
-	    robot.setLeben(-1);
+	    robot.setLives(-1);
 	}
 	else{
 	    char richtung =com.charAt(3); // Richtung auslesen
 	    if (richtung=='N')
-		robot.setAusrichtung(0);
+		robot.setFacing(0);
 	    else if (richtung=='S')
-		robot.setAusrichtung(2);
+		robot.setFacing(2);
 	    else if ((richtung=='E')||(richtung=='O'))
-		robot.setAusrichtung(1);
+		robot.setFacing(1);
 	    else if (richtung=='W')
-		robot.setAusrichtung(3);
+		robot.setFacing(3);
 	    int kommapos=com.indexOf(',');
 	    if (kommapos==-1)
 		throw new KommException("getrobStatus: kein Komma gefunden");
@@ -907,7 +907,7 @@ public class KommClient {
 	    kommapos=com.indexOf(',');
 	    String flagge = com.substring(0,kommapos);
 	    try {
-		robot.setNaechsteFlagge(Integer.parseInt(flagge)+1);// +1, weil unser Bot die naechste und nicht die letzte Flagge haben will
+		robot.setNextFlag(Integer.parseInt(flagge)+1);// +1, weil unser Bot die naechste und nicht die letzte Flagge haben will
 	    }
 	    catch (NumberFormatException nfe2) {
 		throw new KommException ("getRobStatus: (L-Flag-Parsen) NumberFormatException(Message: "+nfe2.getMessage());
@@ -919,7 +919,7 @@ public class KommClient {
 	    xk=com.substring(1,kommapos); // Archiv - Location
 	    yk=com.substring(kommapos+1,klazupos);
 	    try {
-		robot.setArchiv(Integer.parseInt(xk),Integer.parseInt(yk));
+		robot.setArchive(Integer.parseInt(xk),Integer.parseInt(yk));
 	    }
 	    catch (NumberFormatException nfe3) {
 		throw new KommException ("getRobStatus: NumberFormatException (Archiv-Parsen)(Message: "+nfe3.getMessage());
@@ -929,7 +929,7 @@ public class KommClient {
 	    kommapos=com.indexOf(',');
 	    String schaden = com.substring(0,kommapos);
 	    try {
-		robot.setSchaden(Integer.parseInt(schaden));
+		robot.setDamage(Integer.parseInt(schaden));
 	    }
 	    catch (NumberFormatException nfe4) {
 		throw new KommException ("getRobStatus: NumberFormatException (Schaden-Parsen)(Message: "+nfe4.getMessage());
@@ -941,7 +941,7 @@ public class KommClient {
 	    kommapos=com.indexOf(',');
 	    String vLeben = com.substring(0,kommapos);
 	    try {
-		robot.setLeben(3-Integer.parseInt(vLeben));
+		robot.setLives(3-Integer.parseInt(vLeben));
 	    }
 	    catch (NumberFormatException nfe5) {
 		throw new KommException ("getRobStatus: NumberFormatException (Leben-Parsen)(Message: "+nfe5.getMessage());
@@ -969,13 +969,13 @@ public class KommClient {
 	    char aktiv = com.charAt(0);
 	    char virtuell = com.charAt(2);
 	    if ((aktiv=='t')||(aktiv=='T'))
-		robot.setAktiviert(true);
+		robot.setActivated(true);
 	    else
-		robot.setAktiviert(false);
+		robot.setActivated(false);
 	    if ((virtuell=='t')||(virtuell=='T'))
-		robot.setVirtuell(true);
+		robot.setVirtual(true);
 	    else
-		robot.setVirtuell(false);
+		robot.setVirtual(false);
 
 
 	    //return robot;

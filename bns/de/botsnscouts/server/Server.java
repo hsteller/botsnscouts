@@ -442,7 +442,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			srt.reEntry();
 			break;
 		    case ENTSPERREN:
-			srt.registerRepair(srt.rob.gesperrteRegs()-srt.rob.getDamage()+4);
+			srt.registerRepair(srt.rob.countLockedRegisters()-srt.rob.getDamage()+4);
 			break;
 		    case SPIELENDE:
 			srt.deleteMe("GO");
@@ -588,7 +588,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	d("setze y und archivY in robots auf "+feld.getFlags()[0].getY());
 	for(int i = 0; i < aktRoboter.size(); i++){
 	    ((ServerRoboterThread)(aktRoboter.elementAt(i))).rob.setPos(feld.getFlags()[0]);
-	    ((ServerRoboterThread)(aktRoboter.elementAt(i))).rob.touchArchiv();
+	    ((ServerRoboterThread)(aktRoboter.elementAt(i))).rob.touchArchive();
 	}
     }
 
@@ -611,14 +611,14 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
      * Liefert true, falls erst erfragt werden muss, welche  Register entsperren.werden sollen.
      */
     private boolean repariereGgf(ServerRoboterThread t) {
-	if (t.rob.gesperrteRegs()==0)
+	if (t.rob.countLockedRegisters()==0)
 	    return false;
-        if ((t.rob.gesperrteRegs()>0)&&(t.rob.getDamage()<5)){
-	    t.rob.entsperreAlleRegs();
+        if ((t.rob.countLockedRegisters()>0)&&(t.rob.getDamage()<5)){
+	    t.rob.unlockAllRegisters();
 	    return false;
 	}
 
-        return (t.rob.getDamage()-4 < t.rob.gesperrteRegs());
+        return (t.rob.getDamage()-4 < t.rob.countLockedRegisters());
     }
 
     /** Die eigentliche Spielmethode!
@@ -732,18 +732,18 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			// In eigener while-Schleife, damit danach wiedereinsetzen korrekt geprueft
 			// wird!
 			ServerRoboterThread tmp = ((ServerRoboterThread )e.next());
-			tmp.rob.zumArchiv();
+			tmp.rob.toArchive();
 		    }
 		    for(Iterator e=roboterEintrittsListe.iterator();e.hasNext();) {
 			ServerRoboterThread tmp = ((ServerRoboterThread )e.next());
 			// Ggf. devirtualisieren.
 			// Achtung, auch aktRoboter beruecksichtigen, die aber reell bleiben.
-			tmp.rob.setVirtuell(false);  //Default: Real einsetzen, ABER....
+			tmp.rob.setVirtual(false);  //Default: Real einsetzen, ABER....
 			// Virtuell, wenn ein aktiver auch da steht
 			for (Iterator f=aktRoboter.iterator();f.hasNext();) {
 			    Bot anderer = ((ServerRoboterThread )f.next()).rob;
 			    if (tmp.rob.getX() == anderer.getX() && tmp.rob.getY() == anderer.getY()){
-				tmp.rob.setVirtuell();
+				tmp.rob.setVirtual();
 				break;
 			    }
 			}
@@ -752,7 +752,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			    for (Iterator f=roboterEintrittsListe.iterator();f.hasNext();) {
 				Bot anderer = ((ServerRoboterThread )f.next()).rob;
 				if (anderer!=tmp.rob && anderer.getX() == tmp.rob.getX() && anderer.getY() == tmp.rob.getY()) {
-				    tmp.rob.setVirtuell();
+				    tmp.rob.setVirtual();
 				}
 			    }
 			}
@@ -782,9 +782,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    else if (tmp.rob.isPoweredDownNextTurn()) {
 			//Auschalten der, die letzte Mal PowerDown gesagt haben.
 			d(tmp.rob.getName()+" ist naechste Runde ausgeschaltet.");
-			tmp.rob.setAktiviert(false);
+			tmp.rob.setActivated(false);
 			tmp.rob.setNextTurnPoweredDown(false);
-			tmp.rob.setSchaden(0);
+			tmp.rob.setDamage(0);
 		    }
 
 		}
@@ -813,7 +813,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    for (Iterator it=toBeAsked.iterator();it.hasNext();){
 			ServerRoboterThread srt=((ServerRoboterThread)it.next());
 			if (!srt.rob.isActivated())
-			    srt.rob.setSchaden(0);
+			    srt.rob.setDamage(0);
 		    }
 		}
 
@@ -831,7 +831,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    if (tmp.rob.isActivated()) {
 			activeThisRound.addElement(tmp);
                         //Karten geben und dabei *beruecksichtigen*, wie viele der Bot kriegt!
-			tmp.rob.setKarten(stapel.gibKarte(tmp.rob.cardsToGive()));
+			tmp.rob.setCards(stapel.gibKarte(tmp.rob.cardsToGive()));
 		    }
 		}
 		if (activeThisRound.size() > 0) {
@@ -893,7 +893,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 				}
 
 				tmp.rob.setInvalidPos();
-				tmp.rob.setVirtuell();
+				tmp.rob.setVirtual();
 
 				namen=new String[1];
 				namen[0]=tmp.rob.getName();
@@ -905,13 +905,13 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			    // Schaden > 9
 			    if (tmp.rob.getDamage() > 9) {
 				e.remove();  //aus aktRoboter
-				tmp.rob.decrLeben();
+				tmp.rob.decrLife();
 
 				// Voellig tot?
 				if (tmp.rob.getLivesLeft() > 0) {
-				    tmp.rob.setSchaden(2);
+				    tmp.rob.setDamage(2);
 				    //Register entsperren
-				    tmp.rob.entsperreAlleRegs();
+				    tmp.rob.unlockAllRegisters();
 				    tmp.rob.setNextTurnPoweredDown(false);
 
 				    zerstoerteRoboter.addElement(tmp);

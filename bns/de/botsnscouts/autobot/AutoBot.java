@@ -140,8 +140,8 @@ public class AutoBot extends BNSThread {
                     Bot pRob = Bot.getCopy(myBot);
                     // copy locked registers
                     for (int i = 0; i < pRob.getLockedRegisters().length; i++)
-                        pRob.setZug(i, pRob.getLockedRegister(i));
-                    pRob.zeige_Roboter();
+                        pRob.setMove(i, pRob.getLockedRegister(i));
+                    pRob.debug();
 
                     Card[] vonPermut = wirbel.findBestMove(maxCards, pRob);
 
@@ -173,13 +173,13 @@ public class AutoBot extends BNSThread {
                     simRobs[0] = simRob;
                     int schadenAlt = simRob.getDamage();
                     for (int i = 1; i < 6; i++) {
-                        simRobs[0].setZug(i - 1, vonPermut[i - 1]);
+                        simRobs[0].setMove(i - 1, vonPermut[i - 1]);
                         myMap.doPhase(i, simRobs);       // geplante Belegung simulieren
-                        simRobs[0].setZug(i - 1, null);
+                        simRobs[0].setMove(i - 1, null);
                     }
                     if ((simRobs[0].getDamage() > 5) || (java.lang.Math.random() < (((double) simRobs[0].getDamage() - 1) * 0.1))) {
-                        simRobs[0].setAktiviert(false);
-                        simRobs[0].setSchaden(0);
+                        simRobs[0].setActivated(false);
+                        simRobs[0].setDamage(0);
                         for (int i = 1; i < 6; i++) {                    // die Phase mit powerdown simulieren
                             myMap.doPhase(i, simRobs);
                         }
@@ -273,14 +273,14 @@ public class AutoBot extends BNSThread {
         int direction = 0;
         Bot testRobbi = Bot.getCopy(myBot);
 
-        testRobbi.zumArchiv();
+        testRobbi.toArchive();
 
         int bestDistance = 9999;
         int newDistance;
 
         cat.debug("Bot destroyed. Looking for new facing.");
         for (int i = 0; i < 4; i++) {
-            testRobbi.setAusrichtung(i);
+            testRobbi.setFacing(i);
             newDistance = DistanceCalculator.getInstance(myMap).getDistance(testRobbi);
             if (newDistance < bestDistance) {
                 bestDistance = newDistance;

@@ -236,9 +236,9 @@ f     */
 	    ArrayList alreadyChosen = registers.getAlreadyChosen();
 	    d("already chosen registers:"+alreadyChosen);
 	    for (int m = 0; m < alreadyChosen.size(); m++) {
-		doPhaseRob[0].setZug(m, ((HumanCard) alreadyChosen.get(m)));
+		doPhaseRob[0].setMove(m, ((HumanCard) alreadyChosen.get(m)));
 	    }
-	    doPhaseRob[0].zeige_Roboter();
+	    doPhaseRob[0].debug();
 	    human.passUpdatedScout(alreadyChosen.size(),doPhaseRob);
 	}
     }
@@ -256,7 +256,7 @@ f     */
     public void removeScout() {
 	    Bot[] doPhaseRob = new Bot[1];
 	    doPhaseRob[0] = Bot.getCopy(human.getRob());
-	    doPhaseRob[0].zeige_Roboter();
+	    doPhaseRob[0].debug();
 	    human.passUpdatedScout(0,doPhaseRob);
     }
 

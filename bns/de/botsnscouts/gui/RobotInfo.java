@@ -221,7 +221,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         Box b = Box.createHorizontalBox();
         for(int i=0; i<6; i++) {
             Bot robot = Bot.getNewInstance("TestRob " + i);
-            robot.setAktiviert( i % 2 == 0 );
+            robot.setActivated( i % 2 == 0 );
             final RobotInfo db = new RobotInfo( robot, 7, i);
             db.setWinnerNumber(i);
             db.setBorder( BorderFactory.createLineBorder(Color.black) );
