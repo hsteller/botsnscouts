@@ -2,6 +2,8 @@ package de.botsnscouts.start;
 
 import java.awt.*;
 import de.botsnscouts.board.*;
+import de.botsnscouts.gui.*;
+import de.botsnscouts.util.*;
 
 //Die Klasse die zu Kachel Image und name speichert,
 //ein gedrehtes Clone zurück gibt

@@ -4,8 +4,9 @@ import java.awt.*;
 import java.awt.event.*; 
 import java.net.*;
 import java.io.*;
-import de.botsnscouts.server.Server;
+import de.botsnscouts.server.*;
 import de.botsnscouts.util.*;
+import de.botsnscouts.autobot.*;
 
 /**
 * StartServer startet neuen Spielserver oder künstliche Spieler auf Requests von StartSpieler
