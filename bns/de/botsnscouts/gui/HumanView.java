@@ -71,6 +71,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 		    int direct = Integer.parseInt(ae.getActionCommand());
 		    Global.debug(this,"I have choosen direction: "+direct);
 		    sendDirection(direct);
+                    dialogInSidebarActive = false;
 		}
 	    }
 					       );
@@ -78,6 +79,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 		public void actionPerformed(ActionEvent ae) {
 		    CAT.debug("The user clicked: "+ae.getActionCommand());
 		    sendAgainPowerDown(ae.getActionCommand().equals("powerdownagain"));
+                    dialogInSidebarActive = false;
 		}
 	    }
 							   );
@@ -117,6 +119,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	repairRegisters = new RepairRegisters(new ActionListener(){
 		public void actionPerformed(ActionEvent ae) {
 		    sendRepairRegisters();
+                    dialogInSidebarActive = false;
 		}
 	    });
 
@@ -167,7 +170,10 @@ public class HumanView extends JPanel implements HumanViewInterface {
     /**
      * display a message that is shown only to this player
      */
-    public void showMessageToPlayer(String s) {
+    public synchronized void showMessageToPlayer(String s) {
+        if( dialogInSidebarActive ) { /* don't switch :-) */
+            return;
+        }
 	userInfo.setInfo(s);
 	panelSwitcher.show(switcherPanel,"userInfo");
 	this.requestFocus();
@@ -200,28 +206,32 @@ public class HumanView extends JPanel implements HumanViewInterface {
     /**
      * display the get direction request
      */
-    public void showGetDirection() {
+    boolean dialogInSidebarActive = false;
+    public synchronized void showGetDirection() {
 	panelSwitcher.show(switcherPanel,"getDirection");
 	this.requestFocus();
+        dialogInSidebarActive = true;
     }
 
     /**
      * display the power down again request
 f     */
-    public void showRePowerDown() {
+    public synchronized void showRePowerDown() {
 	panelSwitcher.show(switcherPanel,"againPowerDown");
 	this.requestFocus();
+        dialogInSidebarActive = true;
     }
 
     /**
      * display the register repair request
      */
-    public void showRegisterRepair(Card[] robRegs, int repairNumber) {
+    public synchronized void showRegisterRepair(Card[] robRegs, int repairNumber) {
       CAT.debug("Show Register Repair");
 	registers.updateRegisters(robRegs);
 	repairRegisters.setChoises(registers.getRegisterViewArray(), repairNumber);
 	panelSwitcher.show(switcherPanel,"repairRegisters");
 	this.requestFocus();
+        dialogInSidebarActive = true;
     }
 
 
