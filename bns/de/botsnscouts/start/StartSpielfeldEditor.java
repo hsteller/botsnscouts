@@ -184,6 +184,10 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	fuerfuerSpf=new JScrollPane();
 	fuerfuerSpf.setOpaque(false);
 	fuerfuerSpf.getViewport().setView(fuerSpf);
+	fuerfuerSpf.getViewport().scrollRectToVisible(new Rectangle(0,540,10,530));
+// 	JViewport vp=fuerfuerSpf.getViewport();
+// 	Dimension ddd=vp.getExtentSize();
+// 	vp.toViewCoordinates(new Point());
 	add(BorderLayout.CENTER,fuerfuerSpf);
 
 	spf.addKachelClickListener(this);
