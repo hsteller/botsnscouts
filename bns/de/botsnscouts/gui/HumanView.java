@@ -453,6 +453,7 @@ f     */
     private synchronized void setDialogInSidebarActive(boolean dialogInSidebarActive) {
         this.dialogInSidebarActive = dialogInSidebarActive;
         if(!dialogInSidebarActive) {
+            userInfo.setInfo(Message.say("SpielerMensch","mrelax");
             panelSwitcher.show(switcherPanel,"userInfo");
         }
     }
