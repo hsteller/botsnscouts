@@ -97,9 +97,9 @@ public class Ausgabe extends BNSThread {
 
 
     /** Turns animation of robot movement on or off;
-     *  visibility is proteced (not private), because BoardView needs to know about that, too.
+     *  visibility is public (not private), because the GUI (BoardView) needs to know about that, too.
      */
-    protected static boolean enableRobMoveAnimation =  new Boolean (System.getProperty("enableRobMoveAnimation")).booleanValue();//false;
+   public static final boolean IS_ROB_MOVE_ANIMATION_ENABLED =  new Boolean (System.getProperty("enableRobMoveAnimation")).booleanValue();//false;
 
     public Ausgabe() {
         this("localhost", 8077, false);
@@ -1058,7 +1058,7 @@ public class Ausgabe extends BNSThread {
         sequencer.addActionMapping(MessageID.BOT_MOVE,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {
-                        if (enableRobMoveAnimation)
+                        if (IS_ROB_MOVE_ANIMATION_ENABLED)
                             comMsgHandleRobotMove(msgData);
                     }
                 });
