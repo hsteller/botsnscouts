@@ -5,7 +5,7 @@ import de.botsnscouts.board.*;
 
 public class KachelRaster{
     private int KX=3, KY=3, FL=6 ;
-    private Kachel kacheln[][]=new Kachel[KX][KY];
+    private Tile kacheln[][]=new Tile[KX][KY];
     private Ort[] flaggen = new Ort[FL];
     private int flaggenN=0;
     private int[][] kachind = new int[KX][KY];
@@ -15,7 +15,7 @@ public class KachelRaster{
 	kachFactory=kachF;
     }
 
-    //setzt übergebene Kachel an Stelle (x,y)
+    //setzt übergebene Tile an Stelle (x,y)
     public void setKachel(int x, int y, String name) throws FlaggenVorhandenException{
 	if (sindFlaggen(x,y))
 	    throw new FlaggenVorhandenException();
@@ -184,12 +184,12 @@ public class KachelRaster{
     }
 
     //gibt Kacheln als 2-dim Array von Spielfeld zurück
-    public Kachel[][] getKacheln(){
+    public Tile[][] getKacheln(){
 	return kacheln;
     }
 
     //gibt eine Kachel an der gegebenen Position
-    public Kachel getKachelAt(int x, int y){
+    public Tile getKachelAt(int x, int y){
 	return kacheln[x][y];
     }
 

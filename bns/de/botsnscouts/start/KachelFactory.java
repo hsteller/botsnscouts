@@ -58,10 +58,10 @@ public class KachelFactory extends Thread{
 	    System.err.println(e);
 	}
 	//erzeige Kachel mit der Kachelstring
-	Kachel kach=null;
+	Tile kach=null;
 	try{
-	    kach = new Kachel(name,str.toString(), thGR);
-	    Kachel[] kachAr=new Kachel[4];
+	    kach = new Tile(name,str.toString(), thGR);
+	    Tile[] kachAr=new Tile[4];
 	    kachAr[0]=kach;//Die Kachel mit Drehung 0 wird initialisiert
 	    kachelTab.put(name, kachAr);
 	}catch(FlaggenException e){
@@ -72,9 +72,9 @@ public class KachelFactory extends Thread{
     }
 
     //gibt eine Kachel mit Drehung zurück
-    public Kachel getKachel(String name, int drehung){
+    public Tile getKachel(String name, int drehung){
 	checkLadeStatus();	
-	Kachel[] kachAr=(Kachel[])kachelTab.get(name);
+	Tile[] kachAr=(Tile[])kachelTab.get(name);
 	//Global.debug(this,kachelTab.toString());
 	if (kachAr[drehung]!=null){
 	    return kachAr[drehung];
@@ -96,7 +96,7 @@ public class KachelFactory extends Thread{
           }
 	Arrays.sort(all);
 	for (i=0;i<anz;i++){
-	    infos[i]=new KachelInfo(all[i],((Kachel[])kachelTab.get(all[i]))[0].getImage());
+	    infos[i]=new KachelInfo(all[i],((Tile[])kachelTab.get(all[i]))[0].getImage());
 	}
 	return infos;
     }

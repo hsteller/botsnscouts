@@ -175,7 +175,7 @@ public class Facade{
     //gibt das aktuelle Spielfeld als Properties zurück
     public Properties getSpfProp(){
 	Properties spfProp=new Properties();
-	Kachel[][] kach=getKacheln();
+	Tile[][] kach=getKacheln();
 	for (int i=0;i<kach.length;i++){
 	    for (int j=0;j<kach[0].length;j++){
 		if (kach[i][j]!=null){

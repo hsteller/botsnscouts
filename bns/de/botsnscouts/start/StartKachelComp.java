@@ -48,7 +48,7 @@ public class StartKachelComp extends JComponent implements  MouseListener, Mouse
     public void rasterChanged(){
 	//hole den neuen Image
 	//Global.debug(this, "rasterChanged "+myX+","+myY);
-	Kachel tmpKachel=fassade.getKachelAt(myX, myY);
+	Tile tmpKachel=fassade.getKachelAt(myX, myY);
 	if (tmpKachel!=null){
 	    Image newKachelImage=tmpKachel.getImage();
 	    int newDrehung=tmpKachel.getRotation();
