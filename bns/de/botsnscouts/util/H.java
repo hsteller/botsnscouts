@@ -213,7 +213,7 @@ public class H {
 		m=Integer.parseInt(in.readLine());
 		if (!((m>a)&&(m<b))){
 		    okay2=false;
-		    System.out.println ("Die Zahl muss kleiner als "+b+" und groesser als "+a+" sein!");
+		    System.out.println ("Please enter a value between "+(a+1)+" and "+(b-1));
 		}
 	    }
 	    catch (NumberFormatException se){
