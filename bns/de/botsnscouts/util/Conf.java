@@ -29,6 +29,10 @@ import org.apache.log4j.*;
 import java.util.*;
 import java.io.*;
 
+
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
 /** Used to access configuration that users may change */
 public class Conf{
     public static final Category CAT = Category.getInstance( de.botsnscouts.BotsNScouts.class );
@@ -36,6 +40,8 @@ public class Conf{
     private static final String CONFNAME="bns.config";
     private static final String bnsHome;
     private static Properties properties;
+    private static final char MULTIPLE_PROP_SEPARATOR = ',';
+
 
     /**
      * Used to access the bns installation directory.
@@ -58,7 +64,29 @@ public class Conf{
 	String data=System.getProperty(key);
 	if (data==null)
 	    data=properties.getProperty(key);
+        if (data != null)
+          return URLDecoder.decode(data);
 	return data;
+    }
+
+    public static String [] getMultipleProperty (String key) {
+      String data=System.getProperty(key);
+	if (data==null)
+	    data=properties.getProperty(key);
+      String [] back = null;
+      if (data != null) {
+          if (data.indexOf(MULTIPLE_PROP_SEPARATOR)>-1) {
+            StringTokenizer st = new StringTokenizer(data, ""+MULTIPLE_PROP_SEPARATOR);
+            back = new String [st.countTokens()];
+            for (int i=0;i<back.length;i++) {
+              back[i] = URLDecoder.decode(st.nextToken());
+            }
+          }
+          else {
+            back = new String [] {URLDecoder.decode(data)};
+          }
+      }
+      return back;
     }
 
     public static int getIntProperty(String key){
@@ -71,7 +99,20 @@ public class Conf{
     }
 
     public static void setProperty(String key, String data){
-	properties.setProperty(key, data);
+	properties.setProperty(key, URLEncoder.encode(data));
+    }
+
+    public static void setMultipleProperty (String key, String [] values) {
+      if (values == null || values.length<1) {
+        properties.setProperty(key, "");
+        return;
+      }
+      StringBuffer sb = new StringBuffer();
+      sb.append(URLEncoder.encode(values[0]));
+      for (int i=1;i<values.length;i++){
+        sb.append(MULTIPLE_PROP_SEPARATOR).append(values[i]);
+      }
+      properties.setProperty(key, sb.toString());
     }
 
     public static void saveProperties(){
