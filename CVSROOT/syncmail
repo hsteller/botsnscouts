@@ -14,7 +14,7 @@ set this up, create a loginfo entry that looks something like this:
 
 In this example, whenever a checkin that matches `mymodule' is made, this
 script is invoked, which will generate the diff containing email, and send it
-to some-email-addr@your.domain.
+to some-email-addr@your.domain.com
 
     Note: This module used to also do repository synchronizations via
     rsync-over-ssh, but since the repository has been moved to SourceForge,
