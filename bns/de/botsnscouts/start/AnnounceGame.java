@@ -59,7 +59,8 @@ class AnnounceGame {
                     else throw new UnableToAnnounceGameException();
                 }
             } catch (IOException ex) {
-                throw new UnableToAnnounceGameException();
+                CAT.warn(ex);
+                throw new UnableToAnnounceGameException(ex.getMessage());
             }
         }
     }
