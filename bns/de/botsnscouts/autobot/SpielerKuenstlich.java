@@ -57,6 +57,7 @@ public class SpielerKuenstlich extends Thread {
 
             try{
                 antwort=meinKomm.warte();
+		hotfix();
                 if (antwort.typ==antwort.SPIELSTART){
                     meinKomm.spielstart();
                 }
