@@ -16,8 +16,8 @@ public class KartenStapel {
     public static final String[] types = {"UT","RR","RL","BU","M1","M2","M3"};
     /** Number of each type of cards */
     public static final int[] nr = {6,18,18,6,17,13,6};
-    
-    /** Array of all valid cards 
+
+    /** Array of all valid cards
      *  Invariant: The cards are kept sorted by priority.
      */
     private static KarteImpl[] allCards = null;
@@ -27,11 +27,11 @@ public class KartenStapel {
     /** The real card deck */
     private Vector deck = new Vector();
 
-    private java.util.Random random = new Random(); 
+    private java.util.Random random = new Random();
 
     /** creates a new card deck respecting which card are stuck in
      *  locked registers.
-     *  @param Vector locked - the cards that are not present in the 
+     *  @param Vector locked - the cards that are not present in the
      *  new desk.
      */
 
@@ -41,7 +41,7 @@ public class KartenStapel {
 	createAllCardsIfNeeded();
 	// -----------------------------------------
 
-	java.util.Arrays.sort(locked);
+	java.util.Arrays.sort(locked, Karte.PRIORITY_COMPARATOR);
 	int cLocked = 0;
 	for (int i=0; i < allCards.length; i++){
 	    if (cLocked < locked.length && locked[cLocked].equals(allCards[i])){
@@ -55,7 +55,7 @@ public class KartenStapel {
 
 
     /** creates new card deck */
-    protected KartenStapel() { 
+    protected KartenStapel() {
 	this(new Karte[0]);
     }
 
@@ -68,12 +68,12 @@ public class KartenStapel {
 	    }
 	    Global.debug("Es gibt "+size+" Karten im Spiel.");
 	    allCards = new KarteImpl[size];
-	    int i=0; 
+	    int i=0;
 	    int max = 0;
-	    for (int n=0; n<nr.length; n++){ 
-		max += nr[n]; 
-		for(; i<max; i++){ 
-		    
+	    for (int n=0; n<nr.length; n++){
+		max += nr[n];
+		for(; i<max; i++){
+
 		    allCards[i] = new KarteImpl(i+1, types[n]);
 		    Global.debug(allCards[i].toString()+" erzeugt.");
 		}
@@ -91,7 +91,7 @@ public class KartenStapel {
 	Karte k = (Karte )deck.remove(index);
 	return k;
     }
-    
+
     /** returns an array of n cards from the deck.
      * PRE: Es werden nicht zu viele Karten vom Server verteilt.
      *
@@ -114,7 +114,7 @@ public class KartenStapel {
     }
 
 
-    /** returns one card as a reference for a kind of cards 
+    /** returns one card as a reference for a kind of cards
      *  null if String is invalid.
      */
     public static Karte getRefCard(String kind){
@@ -138,5 +138,5 @@ public class KartenStapel {
 	return new String(s);
     }
 
-}	 
-   
+}
+
