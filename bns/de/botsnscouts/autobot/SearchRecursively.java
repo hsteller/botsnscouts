@@ -58,10 +58,14 @@ public class SearchRecursively {
     private static final int[] mali = {25, 15, 15, 15, 10};
     private static final int maliSum = 80;
 
-    public SearchRecursively(SimBoard s, int m) {
+    public SearchRecursively(SimBoard s, int malus){
+        this(s, malus, SimpleDistanceCalculator.getInstance(s));
+    }
+
+    public SearchRecursively(SimBoard s, int malus, DistanceCalculator calc) {
         sf = s;
-        calc = SimpleDistanceCalculator.getInstance(sf);
-        malus = m;
+        this.calc = calc;
+        this.malus = malus;
     }
 
     public Card[] findBestMove(Card[] ka, final Bot r) {

@@ -44,52 +44,21 @@ import org.apache.log4j.Category;
  *  the next flag. Highly useful for the autobots and the wisenheimer.
  *  Id: $Id$
  */
-public class SimpleDistanceCalculator implements DistanceCalculator {
+public class SimpleDistanceCalculator extends DistanceCalculator {
     static final Category CAT=Category.getInstance(SimpleDistanceCalculator.class);
 
     private int[][][] distances;
-    private Board board;
 
     private SimpleDistanceCalculator(Board board) {
-        this.board=board;
+        super(board);
         calculateDistances();
-    }
-
-    /*
-     * Takes into account actual distance, flag, damage, repair possibility
-     * and play strength.
-     */
-    public int getDistance(Bot robbi, int malus) {
-        // If this path leads to winning -> do it!
-        if (robbi.getNextFlag() == board.getFlags().length + 1) {
-            return 0;
-        }
-        int distance = getDistance(robbi);
-        // take flag touching in this turn into account
-        distance += (8 - robbi.getNextFlag()) * 40;
-        // Damage
-        distance += (robbi.getDamage()) * (5 - robbi.getLivesLeft());
-        // Repair fields are gut - even if not damaged (we might be)
-        if (floor(robbi.getX(), robbi.getY()).isRepairing()) {
-            distance -= (robbi.getDamage());
-        }
-        // Playing strength
-        distance += (int) Math.floor(Math.random() * malus);
-
-        return distance;
     }
 
     /**
      *  Gives the distance to the next flag, tahes into account neccesary turns.
      */
-    public int getDistance(Bot robbi) {
-        if (robbi.getDamage() == 10) {
-            return 1000;
-        }
-        int x = robbi.getX();
-        int y = robbi.getY();
-        int m = robbi.getNextFlag() - 1;
-        int facing = robbi.getFacing();
+    public int getDistance(int x, int y, int flag, int facing) {
+        int m = flag - 1;
 
         if (distances[m][x][y] == 0) {
             return 0;
@@ -170,22 +139,6 @@ public class SimpleDistanceCalculator implements DistanceCalculator {
             distances[m][flags[m].x][flags[m].y] = 0;
             calculateDistancesForField(distances[m], flags[m].x, flags[m].y, flags[m].x, flags[m].y);
         }
-    }
-
-    private boolean hasNorthWall(int x, int y) {
-        return board.hasNorthWall(x, y);
-    }
-    private boolean hasEastWall(int x, int y) {
-        return board.hasEastWall(x, y);
-    }
-    private boolean hasSouthWall(int x, int y) {
-        return board.hasSouthWall(x, y);
-    }
-    private boolean hasWestWall(int x, int y) {
-        return board.hasWestWall(x, y);
-    }
-    private Floor floor(int x, int y) {
-        return board.floor(x, y);
     }
 
     private void calculateDistancesForField(int enftab[][], int u, int v, int x, int y) {
