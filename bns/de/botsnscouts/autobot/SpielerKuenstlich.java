@@ -319,13 +319,13 @@ public class SpielerKuenstlich extends Thread {
 
     private void hotfix(){
 	try{
-	    sleep(2500);
+	    sleep(500);
 	}catch(InterruptedException e){}
     }
 
     private void d(String s)
         {
-            Global.debug(this,s);
+            Global.debug(this," "+realname+": "+s);
         }
 }
 

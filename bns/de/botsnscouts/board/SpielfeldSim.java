@@ -32,8 +32,6 @@ public class SpielfeldSim extends Spielfeld
   /* Enthaelt bewegte Roboter, um String[] erzeugen zu koennen */
   protected boolean[] bewegt;
 
-    private BoardRoboter[] br=new BoardRoboter[1]; /* Singleton-Array um einen Robi effizient casten zu können*/
-
     /** Contains the laser stats*/
     private StatsList stats=null;
     private Stats actualStats=null;
@@ -204,8 +202,9 @@ public Vector getLasers(){
 
 
     /** Führt eine Phase mit nur einem Roboter aus */
-    public void doPhase(int phase, Roboter r){
-	br[0]=(BoardRoboter)r;
+    public void doPhase(int phase, BoardRoboter r){
+        BoardRoboter[] br=new BoardRoboter[1];
+	br[0]=r;
 	doPhaseReal(phase, br);
     }
 

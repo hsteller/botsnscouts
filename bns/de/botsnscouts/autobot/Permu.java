@@ -12,12 +12,16 @@ import de.botsnscouts.board.BoardRoboter;
 
 public class Permu {
 
-    SpielfeldKS sf;
-    Karte[] bestZug;
-    int bestScore;
-    int malus;
+    private SpielfeldKS sf;
+    private Karte[] bestZug;
+    private int bestScore;
+    private int malus;
 
-    private static final String[] zuege = { "RL", "M1", "M2", "M3", "BU" };
+    private static final Karte[] zuege = { new Karte(110,"RL"), 
+                                           new Karte(110,"M1"),
+                                           new Karte(110,"M2"),
+                                           new Karte(110,"M3"),
+                                           new Karte(110,"BU") };
     private static final int[] zuegemali = { 25, 15, 15, 15, 10 };
     private static final int zuegemalisumme = 80;
 
@@ -72,32 +76,31 @@ public class Permu {
             ka[highind]=null;
         }
         
-	permut(r,so);
+	permut((BoardRoboter)r,so);
 	return bestZug;
     }
 
-    private void permut(Roboter r, Karte[] ka) {
+    private void permut(BoardRoboter r, Karte[] ka) {
 	if (r.getSchaden() == 10) return;
 	int anzahl = 0;
 	for (int i = 0; i < 5; i++)
 	    if (r.getZug(i) != null) anzahl++;
 	if (anzahl == 5) {
-            int malus=0;
+            int diemalus=0;
             
             if (sf.bo(r.getX(),r.getY()).typ>=100){ // Fliessband
-                Roboter[] tmp=new Roboter[1];
                 for (int i=0;i<zuege.length;i++){
-                    tmp[0] = Roboter.getCopy(r);
-                    tmp[0].setZug(0,new Karte(110,zuege[i]));
+                    BoardRoboter tmp = (BoardRoboter)Roboter.getCopy(r);
+                    tmp.setZug(0,zuege[i]);
                     sf.doPhase(1,tmp);
-                    if(tmp[0].getSchaden()==10) // wenn wir naechste Runde sterben ...
-                        malus+=zuegemali[i];    
+                    if(tmp.getSchaden()==10) // wenn wir naechste Runde sterben ...
+                        diemalus+=zuegemali[i];    
                 }
-                if (malus==zuegemalisumme)
+                if (diemalus==zuegemalisumme)
                     return; // keine Chance ...
             }
             
-	    int entf = sf.getBewertung(r,malus)+malus;
+	    int entf = sf.getBewertung(r,malus)+diemalus;
 	    if (entf <= bestScore) {
 		bestScore = entf;
 		for (int i = 0; i < 5; i++) 
@@ -109,23 +112,20 @@ public class Permu {
 	    if (ka[i] == null) 
                 continue;
 	    Karte katemp = ka[i];
-	    Roboter rtemp = Roboter.getCopy(r);
+	    BoardRoboter rBackup = (BoardRoboter)Roboter.getCopy(r);
 	    ka[i] = null; // ausspielen
 	    int j = 0;
 	    while (r.getZug(j) != null) j++;
 	    r.setZug(j, katemp);
 	    while ((j < 5) && (r.getZug(j) != null)){
-		Roboter[] ra = new Roboter[1];
-		ra[0] = r;
-		sf.doPhase(j+1,ra);
+		sf.doPhase(j+1,r);
 		j++;
 	    }
 	    permut(r,ka);
 	    ka[i] = katemp;
-	    r = rtemp;
+	    r = rBackup;
             
-                // Karten mit derselben Aktion ueberspringen; die haben
-                // an dieser Stelle dieselben Auswrikungen
+                // Skip cards with identical action
 
             while ((i<8)&&((ka[i+1]==null)||(ka[i+1].getaktion().equals(katemp.getaktion()))))
                 i++;
