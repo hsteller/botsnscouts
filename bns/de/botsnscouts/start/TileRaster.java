@@ -41,10 +41,10 @@ public class TileRaster{
     }
 
     //setzt übergebene Tile an Stelle (x,y)
-    public void setTile(int x, int y, String name) throws FlaggenVorhandenException{
+    public void setTile(int x, int y, int rot, String name) throws FlaggenVorhandenException{
 	if (sindFlaggen(x,y))
 	    throw new FlaggenVorhandenException();
-	tiles[x][y]=tileFactory.getTile(name,0);
+	tiles[x][y]=tileFactory.getTile(name,rot);
     }
 
     //dreht die Tile um 90° nach links

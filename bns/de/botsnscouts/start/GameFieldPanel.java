@@ -182,8 +182,8 @@ public class GameFieldPanel extends JPanel{
 			//falls datei existiert
 			if(file.exists()) {
 			    Object[] options = { Message.say("Start","mOK"),Message.say("Start","mAbbr") };
-			    String msg  = Message.say("KachelEditor", "mDatEx", filename );
-			    String warn = Message.say("KachelEditor", "mWarnung");
+			    String msg  = Message.say("BoardEditor", "mDatEx", filename );
+			    String warn = Message.say("BoardEditor", "mWarnung");
 			    int r = JOptionPane.showOptionDialog(null, msg, warn, JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 			    if( r != 0 ) {
 				return;

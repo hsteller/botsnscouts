@@ -316,7 +316,7 @@ public class FieldEditor extends JPanel implements  ActionListener, TileClickLis
 	    }
 	    try{
 		parent.fassade.delTile(rx,ry);
-		parent.fassade.setTile(rx,ry,tileInfos[currentTile].toString());
+		parent.fassade.setTile(rx,ry,0,tileInfos[currentTile].toString());
 	    }catch (FlaggenVorhandenException ex){
 		System.err.println("You cannot place here a field!");
 	    }

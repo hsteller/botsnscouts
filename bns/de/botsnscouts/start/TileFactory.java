@@ -27,6 +27,7 @@ package de.botsnscouts.start;
 
 import de.botsnscouts.board.*;
 import de.botsnscouts.util.*;
+import de.botsnscouts.gui.*;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
@@ -39,6 +40,7 @@ public class TileFactory {
     public static final Category CAT = Category.getInstance( TileFactory.class );
 
     private Hashtable tileTab;
+    private Hashtable imgTab;
     private int thumbnailsize;
     boolean fertig = false;
     Object lock=new Object();
@@ -46,6 +48,7 @@ public class TileFactory {
 
     public TileFactory(int thumbnailsize){
 	tileTab=new Hashtable();
+	imgTab=new Hashtable();
 	this.thumbnailsize=thumbnailsize;
     }
 
@@ -123,6 +126,7 @@ public class TileFactory {
 	Tile kach=null;
 	try{
 	    kach = new Tile(name,str.toString(),thumbnailsize);
+	    //kach.getImage();
 	    Tile[] kachAr=new Tile[4];
 	    kachAr[0]=kach;//Die Tile mit Drehung 0 wird initialisiert
 	    tileTab.put(name, kachAr);
@@ -141,10 +145,21 @@ public class TileFactory {
 	if (kachAr[drehung]!=null){
 	    return kachAr[drehung];
 	}
-	//nehme erst an, es wird jedes mal nur um 90 Grad gedreht
-	//also die Drehung davor existiert
-	kachAr[drehung]=kachAr[drehung-1].getGedreht();
+	for (int i=1;i<=drehung;i++){
+	    if(kachAr[i]==null)
+		kachAr[i]=kachAr[i-1].getGedreht();
+	}
 	return kachAr[drehung];
+    }
+
+    public Image getImage(String name){
+	if (imgTab.get(name)!=null)
+	    return (Image)imgTab.get(name);
+	Tile[] kachAr=(Tile[])tileTab.get(name);
+	CAT.debug("creating image on-demand.");
+	Image img=SACanvas.createThumb(kachAr[0],thumbnailsize);
+	imgTab.put(name,img);
+	return img;
     }
 
     public TileInfo[] getTileInfos(){
@@ -158,7 +173,9 @@ public class TileFactory {
           }
 	Arrays.sort(all);
 	for (i=0;i<anz;i++){
-	    infos[i]=new TileInfo(all[i],((Tile[])tileTab.get(all[i]))[0].getImage());
+	    CAT.debug(all[i]);
+	    infos[i]=new TileInfo(all[i],getImage(all[i]));
+	    //((Tile[])tileTab.get(all[i]))[0].getImage());
 	}
 	return infos;
     }

@@ -93,10 +93,10 @@ public class Facade{
     }
 
     // aktualisiert das Spielfeld
-    public void setTile(int x, int y, String tile) throws FlaggenVorhandenException{
+    public void setTile(int x, int y, int rot, String tile) throws FlaggenVorhandenException{
 	// to be written......
 	//Global.debug(this,"setTile "+x+","+y+" "+tile);
-	tileRaster.setTile(x,y,tile);
+	tileRaster.setTile(x,y,rot,tile);
     }
 
     //dreht die Tile um r*90° nach rechts
@@ -223,12 +223,13 @@ public class Facade{
 		delTile(i,j);
 		if(name!=null){
 		    //falls vorhanden
+		    int rot=Integer.parseInt(spfProp.getProperty("dreh"+i+","+j));
 		    try{
 			//setze Tile
-			setTile(i,j,name);
+			setTile(i,j,rot,name);
 		    }catch(FlaggenVorhandenException e){
 		    }
-		    try{
+		    /*   try{
 			//lese Drehung aus
 			int dr=Integer.parseInt(spfProp.getProperty("dreh"+i+","+j));
 			//drehe Tile
@@ -236,7 +237,7 @@ public class Facade{
 			    rotTile(i,j);
 			}
 		    }catch(NumberFormatException e){
-		    }
+		    }*/
 		}
 	    }
 	}
@@ -264,6 +265,9 @@ public class Facade{
     //gibt TileInfos zurück
     public TileInfo[] getTileInfos(){
 	return tileFactory.getTileInfos();
+    }
+    public Image getImage(String name){
+	return tileFactory.getImage(name);
     }
 
     //*Launcher*//

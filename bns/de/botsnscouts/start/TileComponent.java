@@ -75,7 +75,7 @@ public class TileComponent extends JComponent implements  MouseListener, MouseMo
 	//Global.debug(this, "rasterChanged "+myX+","+myY);
 	Tile tmpTile=fassade.getTileAt(myX, myY);
 	if (tmpTile!=null){
-	    Image newTileImage=tmpTile.getImage();
+	    Image newTileImage=fassade.getImage(tmpTile.getName());
 	    int newDrehung=tmpTile.getRotation();
 	    tileChanged=(tileImage!=newTileImage||drehung!=newDrehung);
 	    tileImage=newTileImage;
