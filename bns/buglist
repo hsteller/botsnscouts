@@ -213,11 +213,6 @@ Miriam: DONE (Miriam, Dirk)
 Roboter wurde reell eingesetzt, obwohl da schon ein reeler stand!!   
 (Server...)
 -------------------------------------------------------------------------------
-Dirk:	DONE (Gero)
-In Dialogboxen erscheinen \n statt newlines
-(Internationalisierung)
--------------------------------------------------------------------------------
-
 
 Miriam: DONE (Miriam, Dirk)
 Mehrere kuenstliche Spieler aendern unsynchronisiert Global.verbose
