@@ -2,6 +2,7 @@ package de.botsnscouts.autobot;
 
 import de.botsnscouts.comm.KommClientSpieler;
 import de.botsnscouts.board.SpielfeldKS;
+import de.botsnscouts.util.*;
 
 /** SpielerKuenstlich implementiert den kuenstlichen Spieler
  */

@@ -7,9 +7,7 @@ package de.botsnscouts.autobot;
  */
 
 import de.botsnscouts.board.SpielfeldKS;
-import de.botsnscouts.util.Karte;
-import de.botsnscouts.util.Ort;
-import de.botsnscouts.util.KrimsKrams;
+import de.botsnscouts.util.*;
 import de.botsnscouts.board.BoardRoboter;
 
 class Permu {

@@ -12,44 +12,6 @@ import de.botsnscouts.util.*;
 public class Spielfeld implements de.botsnscouts.util.Directions
 {
 
-
-
-  //  protected inner classes 
-
-  /** 
-   * Definition der Wand 
-   */
-  protected class Wand
-  {
-    boolean da;
-    int[] wandEl;      // 0: links oder oben
-                      //  1:rechts oder unten
-    int[] spez;      //   Laserstärke / Pusherphasen
-
-    Wand()
-      {
-	wandEl=new int[2];
-	wandEl[0]=WKEINS;
-	wandEl[1]=WKEINS;
-	spez=new int[2];
-	da=false;
-      }
-  }
-  /** Definition des Bodens */
-  protected class Boden
-  {
-    int typ;           // generelle Bodenart
-    int spez;         //  spezielle Eigenschaften:
-    //   Crusherphasen (Feld ist Crusher wenn spez>0 und Feld Fliessband)
-    //   Drehrichtung von Drehelementen
-    //   Staerke des Reparaturfeldes
-    Boden()
-      {
-	spez=0;
-	typ=BDNORMAL;
-      }
-  }
-
   /***** Protected Konstanten *****/
 
   // Wandgerätetypen
@@ -894,44 +856,44 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 
 
   /* Bodentyp */
-  protected Boden bo(int x,int y) {
+  public Boden bo(int x,int y) {
     return(boden[x][y]);
   }
   
   /* Nordwand */
-  protected Wand nw(int x,int y) {
+  public Wand nw(int x,int y) {
     return(hWand[x-1][y]);
   }
 
   /* Ostwand */
-  protected Wand ow(int x,int y) {
+  public Wand ow(int x,int y) {
     return(vWand[x][y-1]);
   }
-  protected Wand ew(int x,int y) {
+  public Wand ew(int x,int y) {
     return(ow(x,y));
   }
 
   /* Suedwand */
-  protected Wand sw(int x,int y) {
+  public Wand sw(int x,int y) {
     return(hWand[x-1][y-1]);
   }
 
   /* Westwand */
-  protected Wand ww(int x,int y) {
+  public Wand ww(int x,int y) {
     return(vWand[x-1][y-1]);
   }
 
   /** Gibt true zurueck, wenn ein Crusher mit Spezifikationszahl spez
     in phase aktiv ist. False sonst.
     */
-  protected boolean isCrusherActive(int spez,int phase)
+  public boolean isCrusherActive(int spez,int phase)
     {
       return((spez>>(phase-1))%2==1);
     }
   /** Gibt true zurueck, wenn ein Pusher mit Spezifikationszahl spez
     in phase aktiv ist. False sonst.
     */
-  protected boolean isPusherActive(int spez,int phase)
+  public boolean isPusherActive(int spez,int phase)
     {
       return((spez>>(phase-1))%2==1);
     }
