@@ -4,7 +4,7 @@ import de.botsnscouts.util.*;
 import de.botsnscouts.comm.*;
 import de.botsnscouts.comm.*;
 import de.botsnscouts.util.*;
-import de.botsnscouts.board.*
+import de.botsnscouts.board.*;
 import java.awt.*;
 import java.io.*;
 import java.awt.event.*;
@@ -376,7 +376,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	StatusCanvas () {
 	    this.addMouseListener(this);
 	    r = Roboter.getNewInstance("foobar");
-	    r.getLeben() = 0;
+	    r.setLeben(0);
 	    this.setSize(75,60);
 	    this.setBackground(backColor);
 	    this.setForeground(foreColor);
@@ -403,7 +403,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	
 
 	public void setName (String s) {
-	    r.getName() = s;
+	    //	    r.setName(s);
 	    this.repaint();
 	}
 
@@ -412,7 +412,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	    if ((r.getLeben() != rob.getLeben()) || 
 		(r.getNaechsteFlagge() != rob.getNaechsteFlagge()) ||
 		(r.getSchaden() != rob.getSchaden()) ||
-		(r.aktiviert != rob.aktiviert)) {
+		(r.istAktiviert() != rob.aktiviert)) {
 		r = rob;
 		robcolor = roboNcolor[color];
 		this.repaint();
