@@ -89,12 +89,12 @@ public class SACanvas extends JComponent {
 	use isSoundActive() instead.
     */
     private boolean soundActive;
-    
+
     private boolean soundsLoaded=false;
     private int laserWavCount;
     private static final String SOUND_DIR="de/botsnscouts/sounds";
     private static SoundFileFilter soundFilter = new SoundFileFilter();
- 
+
 
     private Image dbi;
     private Image[] cbeltCrop,ebeltCrop,diverseCrop,robosCrop,scoutCrop;//,robosCrop2;
@@ -216,12 +216,12 @@ public class SACanvas extends JComponent {
 	Thread t = new Thread () {
 		public void run() {
 		    CAT.debug("Initializing sounds..");
-		   
+
 		    // if not in a jar..
 		    /*
 		    File f = new File (SOUND_DIR);
 		    CAT.error("SOUND_DIR="+f.getAbsolutePath());
-		  
+
 		    if (f!=null && f.exists() && f.isDirectory()){
 			String [] list = f.list(soundFilter);
 			if (list == null) {
@@ -229,7 +229,7 @@ public class SACanvas extends JComponent {
 			    return;
 			}
 			CAT.debug("Got "+list.length+" sounds");
-		    			
+
 			URL u = null;
 			AudioClip a = null;
 			Vector v = new Vector();
@@ -244,7 +244,7 @@ public class SACanvas extends JComponent {
 			    if (a!=null)
 				v.add(a);
 			}
-			
+
 			int l = v.size();
 			mLaserWav = new AudioClip [l];
 			for (int i=0;i<l;i++)
@@ -279,11 +279,11 @@ public class SACanvas extends JComponent {
 	    };
 	t.start();
     }
-    
+
     public boolean isSoundActive() {
 	return soundsLoaded && soundActive;
     }
-    
+
     public void setSoundActive(boolean on) {
 	CAT.debug("sound was set to "+on);
 	soundActive = on;
@@ -1213,7 +1213,8 @@ public class SACanvas extends JComponent {
 
     /** ein Image des Spielfeldes anlegen, ohne aktive Elemente */
     private void createBoardImage() {
-	preBoard = new BufferedImage(x,y, BufferedImage.TYPE_BYTE_INDEXED);
+	//preBoard = new BufferedImage(x,y, BufferedImage.TYPE_BYTE_INDEXED);
+	preBoard = new BufferedImage(x,y, BufferedImage.TYPE_INT_RGB);
 	g_off = (Graphics2D)preBoard.getGraphics();
 	g_off.setClip(0,0,x,y);
 	g_off.scale( dScale, dScale );

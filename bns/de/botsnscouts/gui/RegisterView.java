@@ -99,6 +99,8 @@ public class RegisterView extends JButton {
 	return h;
     }
 
+//    static final Image lockedImage = ImageMan.getPNGImage(ImageMan.REGLOCK);
+    static final Image lockedImage = ImageMan.getImage(ImageMan.PNG_REGLOCK);
     public void paintComponent(Graphics g){
 	super.paintComponent(g);
 	if(myX==0||myY==0){
@@ -108,7 +110,8 @@ public class RegisterView extends JButton {
 	    Global.debug(this,"(myX,myY)=("+myX+","+myY+")");
 	}
 	if(locked()){
-	    g.drawImage(ImageMan.getPNGImage(ImageMan.REGLOCK),(myX-50)/2,(myY-50)-1,this);
+	    //g.drawImage( lockedImage,(myX-50)/2,(myY-50)-1,this);
+	    g.drawImage( lockedImage,0,0,this);
 	}
 	g.setFont(prioFont);
 	g.setColor(prioColor);

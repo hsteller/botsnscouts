@@ -23,7 +23,6 @@ public class HumanPlayer extends Thread {
     static Category CAT = Category.getInstance(SACanvas.class);
 
 
-
     protected final static int MODE_PROGRAM = 0;
     protected final static int MODE_OTHER = 1;
 

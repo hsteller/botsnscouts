@@ -14,9 +14,7 @@ import javax.swing.border.*;
      * gui-container that has a card
      */
 public class CardView extends JButton {
-    ImageIcon cardFree = ImageMan.CardRUECK;
-    ImageIcon cardImage;
-    HumanCard h;
+    private HumanCard h;
     private boolean wisenheimerPresent = false;
     private Font prioFont=new Font("SansSerif",Font.PLAIN,8);
     private Color prioColor=Color.darkGray;
@@ -36,7 +34,7 @@ public class CardView extends JButton {
     public CardView (ActionListener al) {
 	setContentAreaFilled(false);
 	setBorder(null);
-	setIcon(cardFree);
+	setIcon(ImageMan.CardRUECK);
 	setEnabled(false);
 	addActionListener(al);
     }
@@ -44,7 +42,7 @@ public class CardView extends JButton {
     public void reset() {
 	setSelected(false);
 	wisenheimerPresent=false;
-	setIcon(cardFree);
+	setIcon(ImageMan.CardRUECK);
 	h = null;
     }
 
@@ -61,16 +59,15 @@ public class CardView extends JButton {
     public void setCard(HumanCard h) {
 	this.h = h;
 	String ktyp = h.getaktion();
-	if (ktyp.equals("M1")) cardImage = ImageMan.CardM1;
-	else if (ktyp.equals("M2")) cardImage = ImageMan.CardM2;
-	else if (ktyp.equals("M3")) cardImage = ImageMan.CardM3;
-	else if (ktyp.equals("BU")) cardImage = ImageMan.CardBU;
-	else if (ktyp.equals("RL")) cardImage = ImageMan.CardRL;
-	else if (ktyp.equals("RR")) cardImage = ImageMan.CardRR;
-	else if (ktyp.equals("UT")) cardImage = ImageMan.CardUT;
+	if (ktyp.equals("M1")) setIcon(ImageMan.CardM1);
+	else if (ktyp.equals("M2")) setIcon(ImageMan.CardM2);
+	else if (ktyp.equals("M3")) setIcon(ImageMan.CardM3);
+	else if (ktyp.equals("BU")) setIcon(ImageMan.CardBU);
+	else if (ktyp.equals("RL")) setIcon(ImageMan.CardRL);
+	else if (ktyp.equals("RR")) setIcon(ImageMan.CardRR);
+	else if (ktyp.equals("UT")) setIcon(ImageMan.CardUT);
 	else System.err.println("CardView: the card is bad.");
-	setIcon(cardImage);
-	setSelectedIcon(cardFree);
+	setSelectedIcon(ImageMan.CardRUECK);
 	setEnabled(true);
     }
 
@@ -78,7 +75,7 @@ public class CardView extends JButton {
 	return h;
     }
 
-    
+
 
     public static void main (String args[]) {
 	Message.setLanguage("deutsch");
@@ -92,7 +89,7 @@ public class CardView extends JButton {
 	f.setLocation(100,100);
 	f.setVisible(true);
     }
-    
+
     public void paintComponent(Graphics g){
 	super.paintComponent(g);
 	g.setFont(prioFont);
@@ -102,7 +99,7 @@ public class CardView extends JButton {
 
 	if (wisenheimerPresent) g.drawImage(wisenheimerPic,25,42,this);
     }
-    
+
 
     protected void setWisenheimer() {
 	wisenheimerPresent = true;

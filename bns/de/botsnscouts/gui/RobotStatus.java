@@ -23,8 +23,10 @@ public class RobotStatus extends JPanel {
     JPanel roboInfo;
 //    Image robotImage[];
     Image flagge = CursorMan.getImages(CursorMan.CURSOR)[0];
-    ImageIcon botcenterImage = ImageMan.getPNGImageIcon(ImageMan.ROBOCENTER);
-    ImageIcon damageImage = ImageMan.getPNGImageIcon(ImageMan.BOTDAMAGE);
+    ImageIcon botcenterImage = ImageMan.getImageIcon(ImageMan.PNG_ROBOCENTER);
+    ImageIcon damageImage = ImageMan.getImageIcon(ImageMan.PNG_BOTDAMAGE);
+//    ImageIcon botcenterImage = ImageMan.getPNGImageIcon(ImageMan.ROBOCENTER);
+//    ImageIcon damageImage = ImageMan.getPNGImageIcon(ImageMan.BOTDAMAGE);
     Image[] robotImages = CursorMan.getImages(CursorMan.STATUSROBOTS);
     Roboter robot;
 
