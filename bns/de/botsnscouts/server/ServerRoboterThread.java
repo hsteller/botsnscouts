@@ -45,6 +45,8 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 
     private boolean ende;
 
+
+
     public ServerRoboterThread(Bot r, OKListener ok, InfoRequestAnswerer inf, ServerRobotThreadMaintainer maint,KommServerRoboter k)
     {
 	super(r.getName());
@@ -79,7 +81,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 			case ServerAntwort.PROGRAMMIERUNG:
 			    if (m!=Server.PROGRAMMIERUNG){
 				d("RV: habe Programmierung im Modus "+m+" erhalten; und tschuess");
-				robMaint.deleteRob(this,"RV");
+				robMaint.deleteRob(this,OtherConstants.REASON_RULE_VIOLATION);
 				ende=true;
 				return;
 			    }
@@ -98,7 +100,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 			case ServerAntwort.AUSRICHTUNG:
 			    if ((m!=Server.INITAUSR)&&(m!=Server.ZERSTOERT_SYNC)&&(m!=Server.ZERSTOERT_ASYNC)){
 				d("RV: habe Ausrichtung im Modus"+m+"erhalten; und tschuess");
-				robMaint.deleteRob(this,"RV");
+				robMaint.deleteRob(this,OtherConstants.REASON_RULE_VIOLATION);
 				ende=true;
 				break;
 			    }
@@ -118,7 +120,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 			case ServerAntwort.REAKTIVIERUNG:
 			    if (m!=Server.POWERUP){
 				d("RV: habe Reaktivierung im Modus "+m+" erhalten; und tschuess");
-				robMaint.deleteRob(this,"RV");
+				robMaint.deleteRob(this,OtherConstants.REASON_RULE_VIOLATION);
 				ende=true;
 				break;
 			    }
@@ -131,7 +133,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 			case ServerAntwort.REPARATUR:
 			    if (m!=Server.ENTSPERREN){
 				d("RV: habe Reperatur im Modus "+m+" erhalten; und tschuess");
-				robMaint.deleteRob(this,"RV");
+				robMaint.deleteRob(this,OtherConstants.REASON_RULE_VIOLATION);
 				ende=true;
 				break;
 			    }
@@ -147,13 +149,13 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 			    d("Abmeldung. Modus: "+m);
                             abgemeldet = true;
 			    ende=true;
-			    robMaint.deleteRob(this,"LL");
+			    robMaint.deleteRob(this,MessageID.SOMEONE_QUIT);
 			    break;
 
 			case ServerAntwort.AENDERUNGFERTIG:
 			    if ((m!=Server.SPIELSTART)&&(m!=Server.SPIELENDE)){
 				d("RV: habe OK im Modus "+m+" erhalten; und tschuess");
-				robMaint.deleteRob(this,"RV");
+				robMaint.deleteRob(this,OtherConstants.REASON_RULE_VIOLATION);
 				ende=true;
 				return;
 			    }
@@ -180,13 +182,13 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 			case ServerAntwort.GIBROBOTERPOS:
 			    if ((m==Server.SPIELSTART)||(m==Server.SPIELENDE)||(m==Server.NIX)){
 				d("RV: habe GibRoboterPos im Modus "+m+" erhalten; und tschuess");
-				robMaint.deleteRob(this,"RV");
+				robMaint.deleteRob(this,OtherConstants.REASON_RULE_VIOLATION);
 				ende=true;
 				return;
 			    }
 			    if (((m==Server.ZERSTOERT_SYNC)||(m==Server.ZERSTOERT_ASYNC))&&(!ans.name.equals(rob.getName()))){
 				d("RV: habe GibRoboterPos fuer nicht-mich im Modus "+m+" erhalten; und tschuess");
-				robMaint.deleteRob(this,"RV");
+				robMaint.deleteRob(this,OtherConstants.REASON_RULE_VIOLATION);
 				ende=true;
 				return;
 			    }
@@ -199,7 +201,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 
 			    else{
 				d("RV: gibRoboterPos irgendwie unter falschen Voraussetzungen erhalten");
-				robMaint.deleteRob(this,"RV");
+				robMaint.deleteRob(this,OtherConstants.REASON_RULE_VIOLATION);
 				ende=true;
 			    }
 
@@ -208,13 +210,13 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 			case ServerAntwort.GIBROBSTATUS:
                             if ((m==Server.SPIELSTART)||(m==Server.SPIELENDE)||(m==Server.NIX)){
 				d("RV: habe GibRobStatus im Modus "+m+" erhalten; und tschuess");
-				robMaint.deleteRob(this,"RV");
+				robMaint.deleteRob(this,OtherConstants.REASON_RULE_VIOLATION);
 				ende=true;
 				return;
 			    }
 			    if (((m==Server.ZERSTOERT_SYNC)||(m==Server.ZERSTOERT_ASYNC))&&(!ans.name.equals(rob.getName()))){
 				d("RV: habe GibRobStatus fuer nicht-mich im Modus "+m+" erhalten; und tschuess");
-				robMaint.deleteRob(this,"RV");
+				robMaint.deleteRob(this,OtherConstants.REASON_RULE_VIOLATION);
 				ende=true;
 				return;
 			    }
@@ -260,7 +262,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 		}
                 catch (KommException e){
                     d("RV: KommException ist aufgetreten:("+e+") Beende mich.");
-                    robMaint.deleteRob(this,"RV");
+                    robMaint.deleteRob(this,OtherConstants.REASON_RULE_VIOLATION);
                     ende=true;
                 }
             } //Endlosschleife

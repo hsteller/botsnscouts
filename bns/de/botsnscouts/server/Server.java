@@ -103,6 +103,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	d("deleteRob aufgerufen. robname="+t.rob.getName()+"; grund="+grund);
 	waitablesImWaitingFor.removeAndNotify(t);
 	try{
+            t.rob.setLives(0); // Hendrik: dont know whether this is the right place to do..
 	    t.deleteMe(grund);
 	}
 	catch(KommFutschException ex) {
@@ -120,12 +121,10 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 	String[] tmpstr=new String[1];
 	tmpstr[0]=t.rob.getName();
-	if (grund.equals("LL"))
-	    sendMsg("mHinrLL",tmpstr);
-	else if (grund.equals("TO"))
-	    sendMsg("mHinrTO",tmpstr);
-	else if (grund.equals("RV"))
-	    sendMsg("mHinrRV",tmpstr);
+	if (grund.startsWith(MessageID.BOT_REMOVED))
+	  sendMsg(MessageID.BOT_REMOVED+grund, tmpstr);
+        else if (grund.equals(MessageID.SOMEONE_QUIT))
+	    sendMsg(MessageID.SOMEONE_QUIT,tmpstr);
 
 	gameover = istSpielende();
     }
@@ -477,7 +476,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    new Fehlermeldung(Message.say("Server","eKommFutschR", srt.rob.getName()));
 		}
 		catch (KommException ex) {
-		    deleteRob(srt, "RV");
+		    deleteRob(srt, OtherConstants.REASON_RULE_VIOLATION);
 		}
 	    }//for Iterator
 	}//synch
@@ -490,7 +489,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	    ServerRoboterThread tmp=(ServerRoboterThread)it.next();
 	    d("!!!ServerRoboterThread "+tmp.rob.getName()+" rauswerfen wegen Timeout!!!");
 	    it.remove();
-	    deleteRob(tmp,"TO");
+	    deleteRob(tmp,OtherConstants.REASON_TIMEOUT);
 	}
     }
 

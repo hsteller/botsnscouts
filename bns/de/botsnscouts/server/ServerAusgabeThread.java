@@ -80,7 +80,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 			if (m==Server.KEINEFRAGEN){ // dumm gelaufen...
 			    if (ans.typ!=ans.ABMELDUNG){
 				d("Keine Fragen erlaubt. Ausgabe entstoepseln."+this);
-				outMaint.deleteOutput(this,"RV");
+				outMaint.deleteOutput(this,OtherConstants.REASON_RULE_VIOLATION);
 				break outer;
 			    } else
 				return;
@@ -113,7 +113,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 			    if (o!=null)
 				komm.sendRobpos(o);
 			    else{
-				outMaint.deleteOutput(this,"RV");
+				outMaint.deleteOutput(this,OtherConstants.REASON_RULE_VIOLATION);
 				ende=true;
 			    }
 			    break;
@@ -157,7 +157,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 			    notifyServer();
                             mok.notifyDone(this);// otherwise the sever will deadlock
                                                  // if ABMELDUNG occurs while doing the phases
-                            outMaint.deleteOutput(this, "bla");
+                            outMaint.deleteOutput(this, MessageID.SOMEONE_QUIT);
 			    return;
 
 			case ServerAntwort.MSG_ACK:
@@ -167,7 +167,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 
 			default:
 			    d("Erhielt einen Typ "+ans.typ+"; ich weiss nicht was ich damit soll und entstoepsle mich.");
-			    outMaint.deleteOutput(this,"RV");
+			    outMaint.deleteOutput(this,OtherConstants.REASON_RULE_VIOLATION);
 			    notifyServer();
 			    break;
 			} // switch
@@ -177,7 +177,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
                     CAT.error(e.getMessage(), e);
 		    d("KommException ist aufgetreten. Beende mich.");
 		    d("Message: "+e.getMessage());
-		    outMaint.deleteOutput(this,"RV");
+		    outMaint.deleteOutput(this,OtherConstants.REASON_RULE_VIOLATION);
 		    ende=true;
 		}
                 finally {
