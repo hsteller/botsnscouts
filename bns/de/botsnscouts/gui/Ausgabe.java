@@ -477,7 +477,7 @@ public class Ausgabe extends BNSThread {
 	    if (splashScreen==null){
 		splashScreen = new Splash();
 	    }
-	    splashScreen.showSplash(s);
+	    splashScreen.showSplash();
 	}
 
     }

@@ -32,8 +32,15 @@ import java.awt.geom.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.net.*;
+
+import org.apache.log4j.Category;
+
 import de.botsnscouts.util.*;
+
 public class MainMenu extends JPanel implements  ActionListener{
+
+    static Category CAT = Category.getInstance(MainMenu.class);
+
     Paint paint;
 
     TransparentButton gameBut;
@@ -105,26 +112,43 @@ public class MainMenu extends JPanel implements  ActionListener{
 	if(e.getActionCommand().equals("endBut")){
 	    parent.myclose();
 	}else if(e.getActionCommand().equals("gameBut")){
-	    if(parent.gameFieldPanel==null){
-		parent.gameFieldPanel=new GameFieldPanel(parent);
-	    }
-	    parent.current=parent.gameFieldPanel;
-	    parent.setContentPane(parent.current);
-	    parent.show();
+	    new Thread(new Runnable(){
+		    public void run(){
+			parent.showBusy(Message.say("Start","mLoadGameFieldPanel"));
+			if(parent.gameFieldPanel==null){
+			    parent.gameFieldPanel=new GameFieldPanel(parent);
+			}
+			try{Thread.sleep(5000);}catch(InterruptedException ex){}
+			CAT.debug("setting gameFieldPanel");
+			parent.current=parent.gameFieldPanel;
+			parent.setContentPane(parent.current);
+			parent.show();
+			parent.stopBusy();
+		    }}).start();	    
 	}else if(e.getActionCommand().equals("partBut")){
-	    if(parent.partPanel==null){
-		parent.partPanel=new ParticipatePanel(parent);
-	    }
-	    parent.current=parent.partPanel;
-	    parent.setContentPane(parent.current);
-	    parent.show();
+	    new Thread(new Runnable(){
+		    public void run(){
+			parent.showBusy(Message.say("Start","mLoadParticipatePanel"));
+			if(parent.partPanel==null){
+			    parent.partPanel=new ParticipatePanel(parent);
+			}
+			parent.current=parent.partPanel;
+			parent.setContentPane(parent.current);
+			parent.stopBusy();
+			parent.show();
+		    }}).start();
 	}else if(e.getActionCommand().equals("watchBut")){
-	    if(parent.watchPanel==null){
-		parent.watchPanel=new WatchPanel(parent);
-	    }
-	    parent.current=parent.watchPanel;
-	    parent.setContentPane(parent.current);
-	    parent.show();
+	    new Thread(new Runnable(){
+		    public void run(){
+			parent.showBusy(Message.say("Start","mLoadWatchPanel"));
+			if(parent.watchPanel==null){
+			    parent.watchPanel=new WatchPanel(parent);
+			}
+			parent.current=parent.watchPanel;
+			parent.setContentPane(parent.current);
+			parent.stopBusy();
+			parent.show();
+		    }}).start();
 	} else if (e.getActionCommand().equals("editBut")){
 	  new de.botsnscouts.editor.BoardEditor();
 	}

@@ -25,17 +25,22 @@
  
 package de.botsnscouts;
 import org.apache.log4j.*;
-
+import de.botsnscouts.gui.Splash;
 
 public class BotsNScouts{
-    public static final Category CAT = Category.getInstance( BotsNScouts.class );
+    public static Category CAT;
 
     public static void main(String[] args) throws Throwable {
 	try {
+	        Splash splash=new Splash();
+	        splash.showSplash();
+
+	        CAT = Category.getInstance( BotsNScouts.class );
+
         	PropertyConfigurator.configure(BotsNScouts.class.getResource("conf/log4j.conf"));
 	        CAT.debug("Starting app");
 		CAT.debug("User.dir: "+System.getProperty("user.dir"));
-		de.botsnscouts.start.Start.main(args);
+		de.botsnscouts.start.Start.main(args, splash);
 	} catch( Throwable t ) {
 		CAT.fatal("Exception:", t);
 		throw t;

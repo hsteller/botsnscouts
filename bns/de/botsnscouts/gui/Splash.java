@@ -28,46 +28,57 @@ package de.botsnscouts.gui;
 import de.botsnscouts.util.*;
 
 import java.awt.*;
-import javax.swing.*;
-import javax.swing.border.*;
 import java.net.*;
 
 /**
- * @author Daniel Holtz
+ * @author Daniel Holtz, modified by Dirk
  */
 
 public class Splash{
-    JWindow splash;
-    JPanel panel;
-    JLabel bildLabel,textLabel;
-    String labelText;
+    Window splash;
+    Frame dummy;
+    Label textLabel;
 
     public void setText(String s){ 
-	textLabel.setText("  "+s);
+	textLabel.setText(s);
+	splash.add(textLabel,BorderLayout.SOUTH);
+	splash.repaint();
     }
 
-    public void showSplash(String s){
-	splash = new JWindow();
-        panel = (JPanel)splash.getContentPane();
-	int width = 744;
-	int height = 184;
+    public static final int WIDTH = 744;
+    public static final int HEIGHT = 184;
+
+    public void showSplash(){
+	dummy=new Frame();
+	splash = new Window(dummy);
+	
 	Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-	int x = (screen.width-width)/2;
-	int y = (screen.height-height)/2;
-	splash.setBounds(x,y,width,height);
-	bildLabel = new JLabel(ImageMan.getIcon("bnslogo.jpg"));
-	bildLabel.setBorder( new EtchedBorder(8));
-	textLabel = new JLabel("  "+s);
-	textLabel.setBorder( new EtchedBorder(8));
-	//textLabel.setBackground(Color.black);
+	int x = (screen.width-WIDTH)/2;
+	int y = (screen.height-HEIGHT)/2;
+	splash.setBounds(x,y,WIDTH,HEIGHT);
+	
+	ImageCanvas ic=new ImageCanvas(Toolkit.getDefaultToolkit().getImage(de.botsnscouts.BotsNScouts.class.getResource("images/bnslogo.jpg")));
+	splash.add(ic,BorderLayout.CENTER);
+	
+	textLabel=new Label();
 	textLabel.setFont(new Font("Sans-Serif", Font.BOLD, 12));
-	panel.add(bildLabel, BorderLayout.CENTER);
-	panel.add(textLabel, BorderLayout.SOUTH);	
+	
 	splash.pack();
 	splash.setVisible(true);
     }    
 
     public void noSplash(){
 	splash.setVisible(false);
+	splash=null;
+    }
+
+    private class ImageCanvas extends Canvas{
+	private Image im;
+	public ImageCanvas(Image im){ this.im=im; }
+	public void paint(Graphics g){
+	    g.drawImage(im,0,0,im.getWidth(this),im.getHeight(this),this);
+	}
+	private Dimension d=new Dimension(Splash.this.WIDTH,Splash.this.HEIGHT);
+	public Dimension getPreferredSize(){ return d; }
     }
 }

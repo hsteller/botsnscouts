@@ -35,11 +35,10 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
-
 import org.apache.log4j.Category;
 
 import de.botsnscouts.util.*;
-
+import de.botsnscouts.gui.Splash;
 
 public class Start extends JFrame implements WindowListener{
 
@@ -54,12 +53,18 @@ public class Start extends JFrame implements WindowListener{
     WatchPanel watchPanel;          //watch
     StartPanel startPanel;                  //Screen with all information and start button
     FieldEditor fieldEditor;
+    DoingStuffPanel busyPanel;
 
     JPanel current;         //was in moment angezeigt wird
     WaiterThread wth;
 
-    public Start(){
+    Splash splash;
+
+    private Start(Splash splash){
 	super(Message.say("Start","mStartTitel"));
+
+	this.splash=splash;
+
 	wth=new WaiterThread(this);
 	Toolkit tk=Toolkit.getDefaultToolkit();
 	if(tk.getScreenSize().height<600){
@@ -82,8 +87,39 @@ public class Start extends JFrame implements WindowListener{
 	current=mainMenu;
 	setContentPane(current);
 
+	busyPanel=new DoingStuffPanel(paint);
+	
 	addWindowListener(this);
 	show();
+    }
+
+    protected void showBusy(String txt){
+	CAT.debug("setting busypanel. txt: "+txt);
+	busyPanel.setText(txt);
+	current=busyPanel;
+	setContentPane(current);
+	animatorThread=new Thread(busyAnimator);
+	animatorThread.start();
+	repaint();
+    }
+
+    private Thread animatorThread;
+    private Runnable busyAnimator=new Runnable(){
+	    public void run(){
+		while(!Thread.currentThread().isInterrupted()){
+		    busyPanel.inc();
+		    try{
+			Thread.sleep(50);
+		    }catch(InterruptedException ex){
+			break;
+		    }
+		}
+		CAT.debug("Animatorthread exiting.");
+	    }
+	};
+
+    protected void stopBusy(){
+	animatorThread.interrupt();
     }
 
     public void toMainMenu(){
@@ -95,9 +131,18 @@ public class Start extends JFrame implements WindowListener{
 
     public void windowDeactivated(WindowEvent e) {}
     public void windowOpened(WindowEvent e)      {
+	splash.noSplash();
         CAT.debug("window opened");
         CAT.debug("triggering tilefactory");
-        fassade.prepareTiles();
+	
+	// Needed so our window is actually drawn before triggering
+	// tile-loading
+	new Thread(new Runnable(){
+		public void run(){
+		    	try{ Thread.sleep(1000);
+			}catch(InterruptedException ie){}
+			fassade.prepareTiles();
+		}}).start();
     }
     public void windowClosing(WindowEvent e) {
 	myclose();
@@ -142,10 +187,8 @@ public class Start extends JFrame implements WindowListener{
 
 
 
-    public static void main(String[] argv){
-	Global.verbose=true;
+    public static void main(String[] argv, Splash splash){
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
-
 
         //load Sounds
         CAT.debug("starting soundman..");
@@ -222,7 +265,7 @@ public class Start extends JFrame implements WindowListener{
 		System.err.println(e);
 	    }
 	}else{
-	new Start();
+	new Start(splash);
 	}
     }
 
