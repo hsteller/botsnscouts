@@ -30,6 +30,7 @@ import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.autobot.AdvDistanceCalculator;
 import de.botsnscouts.autobot.DistanceCalculator;
 import de.botsnscouts.board.FlagException;
+import de.botsnscouts.board.Board;
 import de.botsnscouts.util.*;
 import org.apache.log4j.Category;
 import org.apache.log4j.PropertyConfigurator;
@@ -42,8 +43,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Locale;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 public class BoardEditor extends JFrame implements WindowListener, ActionListener {
     // enno:
@@ -188,6 +188,38 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
             repaint();
         }
     }
+
+    /**
+     * Load a new file into the editor.
+     * @param file
+     */
+    void loadTileFile(File file) {
+        String save = getMagicBoardString();
+        try {
+            magicBoardString = Board.readMagicString(file);
+            //Leo's Code
+            board = new EditableBoard(12, 12, magicBoardString, null);
+            CAT.debug("Board erzeugt");
+
+            sp.remove(boardView);
+            CAT.debug("sac removed");
+            boardView = new EditorBoardView(board, this);
+            CAT.debug("sac neu erzeugt");
+            sp.getViewport().setView(boardView);
+
+            CAT.debug("sac added");
+        } catch (FormatException ex) {
+            System.err.println(Message.say("BoardEditor", "eDatNotEx") + ex);
+            magicBoardString = save;
+        } catch (FlagException ex) {
+            System.err.println(Message.say("BoardEditor", "eDatNotEx") + ex);
+            magicBoardString = save;
+        } catch (IOException ex) {
+            System.err.println(Message.say("BoardEditor", "eDateiErr") + ex);
+            magicBoardString = save;
+        }
+    }
+
 
     public void actionPerformed(ActionEvent e) {
         String a = e.getActionCommand();

@@ -33,6 +33,8 @@ package de.botsnscouts.board;
 
 import de.botsnscouts.util.*;
 
+import java.io.*;
+
 public class Board implements de.botsnscouts.util.Directions, FloorConstants {
 
     /* not static on purpose, need to inherit it */
@@ -408,6 +410,7 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
     }
 
     public void setFloor(int a, int b, Floor aFloor) {
+        CAT.debug("Setting new floor elemnt to ("+a+","+b+")");
         floor[a][b] = aFloor;
     }
 
@@ -482,6 +485,17 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
             }
             p("");
         }
+    }
+
+    public static String readMagicString(File file) throws IOException {
+        BufferedReader kachReader = new BufferedReader(new InputStreamReader(
+                                                       new FileInputStream(file)));
+        StringBuffer str = new StringBuffer();
+        String tmp = null;
+        //read board:
+        while ((tmp = kachReader.readLine()) != null)
+            str.append(tmp + "\n");
+        return new String(str);
     }
 
 }

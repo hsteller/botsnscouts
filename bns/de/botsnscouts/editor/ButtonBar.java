@@ -25,8 +25,6 @@
 
 package de.botsnscouts.editor;
 
-import de.botsnscouts.board.FlagException;
-import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.Message;
 import org.apache.log4j.Category;
 
@@ -35,7 +33,10 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 
 class ButtonBar extends JPanel implements ActionListener {
@@ -263,38 +264,7 @@ class ButtonBar extends JPanel implements ActionListener {
                     return;
                 }
 
-                String save = editor.getMagicBoardString();
-                try {
-                    FileInputStream istream = new FileInputStream(file);
-                    //FileInputStream istream=new FileInputStream("kacheln" + File.separator + name);
-                    BufferedReader kachReader = new BufferedReader(new InputStreamReader(istream));
-                    StringBuffer str = new StringBuffer();
-                    String tmp = null;
-//und lese Board aus
-                    while ((tmp = kachReader.readLine()) != null)
-                        str.append(tmp + "\n");
-                    editor.setMagicBoardString(str.toString());
-                    //Leo's Code
-                    editor.board = new EditableBoard(12, 12, editor.getMagicBoardString(), null);
-                    CAT.debug("Board erzeugt");
-
-                    editor.sp.remove(editor.boardView);
-                    CAT.debug("sac removed");
-                    editor.boardView = new EditorBoardView(editor.board, editor);
-                    CAT.debug("sac neu erzeugt");
-                    editor.sp.getViewport().setView(editor.boardView);
-
-                    CAT.debug("sac added");
-                } catch (FormatException ex) {
-                    System.err.println(Message.say("BoardEditor", "eDatNotEx") + ex);
-                    editor.setMagicBoardString(save);
-                } catch (FlagException ex) {
-                    System.err.println(Message.say("BoardEditor", "eDatNotEx") + ex);
-                    editor.setMagicBoardString(save);
-                } catch (IOException ex) {
-                    System.err.println(Message.say("BoardEditor", "eDateiErr") + ex);
-                    editor.setMagicBoardString(save);
-                }
+                editor.loadTileFile(file);
             }
             //new LadenDialog(editor,Message.say("BoardEditor","mKachelSave"),true);
         } else if (e.getActionCommand().compareTo("Flag") == 0) {
@@ -304,4 +274,4 @@ class ButtonBar extends JPanel implements ActionListener {
         }
     }
 
-}//ende class ButtonBar
+}
