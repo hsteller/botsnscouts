@@ -94,7 +94,6 @@
     <!-- Creates a binary bns-tree under ${dest.src} -->
     <mkdir dir="${dest.src}" />
     <mkdir dir="${dest.src}/lib" />
-    <mkdir dir="${dest.src}/classes" />
     <mkdir dir="${dest.src}/src" />
     <mkdir dir="${dest.src}/tiles" />
     <copy todir="${dest.src}/tiles">
@@ -109,11 +108,16 @@
     <copy todir="${dest.src}">
       <fileset dir="${basedir}/tools/distrib.src" excludes="*.nodist" />
     </copy>
-    <copy todir="${dest.src}/classes">
-      <fileset dir="${build}" />
-    </copy>
-    <copy todir="${dest.src}" includeEmptyDirs="false">
-      <fileset dir="${src}/de" includes="${maindir}/**/*.java" />
+    <copy todir="${dest.src}/src/de" includeEmptyDirs="false">
+      <fileset dir="${basedir}/de">
+        <patternset id="foo">
+          <include name="**/*.java" />
+	  <include name="botsnscouts/conf/*" />
+	  <include name="botsnscouts/sounds/*" />
+	  <include name="botsnscouts/images/*" />
+	  <include name="botsnscouts/tiles/*" />
+	</patternset>
+      </fileset>
     </copy>
 <!--    <copy todir="${todir}" file="${basedir}/build.xml" /> -->
   </target>

@@ -1,0 +1,73 @@
+Installing and starting instructions for Bots'n'Scouts
+------------------------------------------------------
+
+Installation instructions:
+1. Check whether you have a Java 1.2 or later Runtime Environment installed.
+   If not, download and install it:
+   Linux:<"http://www.blackdown.org/java-linux/mirrors.html">
+   Windows 95/98/NT: 	
+   <"http://java.sun.com/j2se/1.3/jre/download-windows.html"> (8MB)
+2. There are two kinds of distribution: the binary-only and the source 
+   distribution. They are called "botsnscouts-<ver>.zip" and 
+   "botsnscouts-<ver>-src.zip", respectively. Download one of these. 
+   Probably you've done that already.
+3. Unpack it in any place you like. 
+
+
+Compilation instructions:
+If you are a Java developer, you probably can figure out what to do; a
+"javac src/de/botsnscouts/BotsNScouts.java" will probably be enough,
+provided you have all the jars in lib/ in your CLASSPATH.
+We recommend compiling using ant, which is also how we do it. Look at
+<http://jakarta.apache.org/ant> to get more information about that and
+to download it. After installing ant, you can type "ant compile" to
+compile, "ant run" to start the game and "ant editor" to run the tile
+editor. "ant clean" will clean up everything.
+
+
+Starting Instructions:
+These will only work if you compiled using ant, see above. If you
+didn't, you're on your own. Our main class is called 
+de.botsnscouts.BotsNScouts .
+
+GNU/Linux and other UNIX-like OSes:
+
+Change the working directory to where you installed Bots'n'Scouts.
+
+"start.sh" will start the game.
+"tileeditor.sh" will start the tile editor.
+
+Note: You cannot symlink to these files and expect that to work; the
+location of the Bots'n'Scouts binaries is determined relative to the
+position of the command executed. Please create a file like this instead:
+
+#!/bin/sh
+exec /path/to/start.sh
+
+and put that into the desired bin/ - directory.
+
+"fullscreen.sh" starts up a new X server without a window manager and run 
+Bots 'n' Scouts in fullscreen mode. This might only work as root, depending on 
+your distribution (works as non-root in SuSE, doesn't in debian). Will probably 
+only work under Linux. If your system lacks memory (<64MB) it may be helpful 
+not starting a window manager but starting fullscreen.sh from console only.
+If you don't understand this, don't worry and use "start.sh"
+
+
+Windows:
+
+There are batch files for starting up the game or the tile editor.
+These files are: "start.bat" to start the game and "tileeditor" to create 
+your own tiles.
+
+No real fullscreen mode, sorry.
+
+Note: You cannot link to these files and expect that to work. The location
+of the Bots'n'Scouts binaries is determined by the current working directory
+of the process. Create a .bat file like this instead:
+
+C:
+cd \path\to\botsnscouts
+start.bat
+
+and link to that.

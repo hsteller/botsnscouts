@@ -1,0 +1,122 @@
+<!-- This is an ant build file. See: "http://jakarta.apache.org/ant"-->
+<project name="BotsNScouts" default="compile">
+
+  <!-- Global properties for this build -->
+  <property name="src" value="src"/>
+  <property name="build" value="${basedir}/classes"/>
+  <property name="maindir" value="de/botsnscouts"/>
+  <property name="doc" value="docs" />
+  <property name="jars" value="lib"/>
+  <property name="bns.ver" value="0.8" />     
+
+  <target name="init">
+     <!-- Create the time stamp -->
+     <tstamp/>
+     <mkdir dir="${build}/${maindir}"/>      
+     <!-- Create the build directory structure used by compile -->
+     <available property="dontLink" file="${build}/${maindir}/conf" />
+     <antcall target="linkOnLin">
+        <param name="what" value="sounds" />
+     </antcall>
+     <antcall target="linkOnLin">
+        <param name="what" value="conf" />
+     </antcall>
+     <antcall target="linkOnLin">
+        <param name="what" value="tiles" />
+     </antcall>
+     <antcall target="linkOnLin">
+        <param name="what" value="images" />
+     </antcall>
+     <available property="noNeedToCopy" file="${build}/${maindir}/conf" />
+     <antcall target="copyResources" />
+  </target>
+
+  <target name="copyResources" unless="noNeedToCopy" >
+     <copy todir="${build}/${maindir}/conf">
+        <fileset dir="${src}/${maindir}/conf" />
+     </copy>
+     <copy todir="${build}/${maindir}/images">
+        <fileset dir="${src}/${maindir}/images" />
+     </copy>
+     <copy todir="${build}/${maindir}/tiles">
+        <fileset dir="${src}/${maindir}/tiles" />
+     </copy>
+     <copy todir="${build}/${maindir}/sounds">
+        <fileset dir="${src}/${maindir}/sounds" />
+     </copy>
+  </target>
+
+  <target name="linkOnLin" unless="dontLink">
+  <!-- property what must be set to the link to link -->
+     <exec executable="ln" os="Unix,Linux" >
+	<arg line="-s ${basedir}/${src}/${maindir}/${what} ${build}/${maindir}" />
+     </exec>
+  </target>
+  
+  <target name="rmOnLin" if="needToRemove">
+  <!-- property what must be set to the link to remove -->
+     <exec executable="rm" os="Unix,Linux">
+        <arg line="${build}/${maindir}/${what}" />
+     </exec>
+  </target>
+
+  <target name="removeLinksOnLin" unless="dontLink">
+     <available property="needToRemove" file="${build}/${maindir}/conf" />
+     <antcall target="rmOnLin">
+        <param name="what" value="conf" />
+     </antcall>
+     <antcall target="rmOnLin">
+        <param name="what" value="images" />
+     </antcall>
+     <antcall target="rmOnLin">
+        <param name="what" value="tiles" />
+     </antcall>
+     <antcall target="rmOnLin">
+        <param name="what" value="sounds" />
+     </antcall>
+  </target>
+
+  <target name="compile" depends="init">
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" includes="${maindir}/**/*.java" 
+     destdir="${build}" encoding="ISO-8859-1">
+      <classpath>
+         <fileset dir="${jars}" includes="*.jar" />
+      </classpath>	      
+    </javac>
+  </target>
+
+  <target name="run" depends="compile">
+     <java classname="de.botsnscouts.BotsNScouts" fork="true">
+        <classpath>
+	   <fileset dir="${jars}" includes="*.jar" />
+	   <pathelement path="${build}" />
+	</classpath>
+     </java>
+  </target>
+
+  <target name="editor" depends="compile">
+     <java classname="de.botsnscouts.editor.BoardEditor" fork="true">
+        <classpath>
+	   <fileset dir="${jars}" includes="*.jar" />
+	   <pathelement path="${build}" />
+	</classpath>
+     </java>
+  </target>
+
+  <target name="doc">
+     <mkdir dir="${doc}" />
+     <javadoc sourcepath="${src}" destdir="${doc}" 
+      windowtitle="Bots 'n' Scouts API" packagenames="de.botsnscouts.*"
+      package="yes" />
+  </target>
+  
+  <target name="clean" depends="removeLinksOnLin">
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+    <delete dir="${doc}"/>
+
+  </target>
+
+</project>
