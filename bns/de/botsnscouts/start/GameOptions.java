@@ -2,6 +2,10 @@ package de.botsnscouts.start;
 
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Conf;
+import nanoxml.XMLElement;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /*
  *******************************************************************
@@ -261,6 +265,33 @@ public class GameOptions {
 
     public String toString() {
         return "numberPlayers=" + maxPlayers + ", registrationPort" + registrationPort + "...";
+    }
+
+    public XMLElement toXML() throws UnknownHostException {
+        XMLElement xml = new XMLElement();
+        xml.setName("game");
+        xml.setAttribute("host", InetAddress.getLocalHost());
+        xml.setIntAttribute("port", registrationPort);
+        xml.setAttribute("allowWisenheimer", allowWisenheimer?"true":"false");
+        xml.setAttribute("allowScout", allowScout?"true":"false");
+        XMLElement boardElement = new XMLElement();
+        boardElement.setName("board");
+        boardElement.setAttribute("field", board);
+        boardElement.setIntAttribute("x", x);
+        boardElement.setIntAttribute("y", y);
+        XMLElement flagsElement = new XMLElement();
+        flagsElement.setName("flags");
+        for (int i=0; i<flags.length; i++) {
+            XMLElement flag = new XMLElement();
+            flag.setName("flag");
+            flag.setIntAttribute("no", i);
+            flag.setIntAttribute("x", flags[i].getX());
+            flag.setIntAttribute("y", flags[i].getY());
+            flagsElement.addChild(flag);
+        }
+        boardElement.addChild(flagsElement);
+        xml.addChild(boardElement);
+        return xml;
     }
 
 }

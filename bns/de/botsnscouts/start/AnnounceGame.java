@@ -4,6 +4,11 @@ import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.InvalidInputException;
 import org.apache.log4j.Category;
 
+import java.io.*;
+import java.net.Socket;
+
+import nanoxml.XMLElement;
+
 /**  Announce the new game at a meta server.
  * @author Miriam Busch - <miriam.busch@codimi.de>
  */
@@ -35,12 +40,27 @@ class AnnounceGame {
      *         not be possible for clients to connect to our game server, e.g. because
      *         we are behind a firewall.
      */
-    void announceGame(de.botsnscouts.start.GameOptions gameOptions)
+    void announceGame(GameOptions gameOptions)
             throws UnableToAnnounceGameException, YouAreNotReachable {
         if (doAnnounce) {
             CAT.info("Going to announce game at meta server "+getServerString());
-            CAT.warn("Not yet implemented.");
-            //TODO
+
+            try {
+                Socket s = new Socket( serverName, portNo);
+                Reader reader = new InputStreamReader(s.getInputStream());
+                Writer writer = new OutputStreamWriter(s.getOutputStream());
+                writer.write(gameOptions.toXML().toString());
+                writer.flush();
+                XMLElement answer = new XMLElement();
+                answer.parseFromReader(reader);
+                if (!answer.getName().equals("announced")) {
+                    if (answer.getAttribute("reason").equals("noBNSServerAccessible"))
+                        throw new YouAreNotReachable();
+                    else throw new UnableToAnnounceGameException();
+                }
+            } catch (IOException ex) {
+                throw new UnableToAnnounceGameException();
+            }
         }
     }
 
