@@ -9,7 +9,7 @@ import javax.swing.border.*;
 import java.net.*;
 import de.botsnscouts.util.*;
 
-public class StartSpielfeldOkZur extends JPanel implements  ActionListener, MouseListener{
+public class StartSpielfeldOkZur extends JPanel implements  ActionListener{
 
     JButton ok;
     JButton zurueck;
@@ -69,6 +69,7 @@ public class StartSpielfeldOkZur extends JPanel implements  ActionListener, Mous
 	    Global.debug(this,"starte spiel!");
 	    parent.fassade.startSpiel();//starte Spiel
 	    Global.debug(this,"spielGestartet!");
+	    parent.addServer();
 	    if(parent.startSpielfeld.buttons.mitspielen.getSelectedObjects()!=null){//starte einen SpielerMensch
 		Thread smth=parent.fassade.amSpielTeilnehmenNoSplash(parent.startSpielfeld.buttons.nam.getText(),parent.startSpielfeld.buttons.farben.getSelectedIndex()); 
 		parent.addKS(smth);
@@ -87,21 +88,5 @@ public class StartSpielfeldOkZur extends JPanel implements  ActionListener, Mous
 	}
 	
     }//okclicked
-
-    public void mouseEntered(MouseEvent e){
-	
-    }
-
-    public void mouseExited(MouseEvent e){
-
-    }
-
-
-    public void mouseClicked(MouseEvent e){
-
-    }
-
-    public void mousePressed(MouseEvent e){}
-    public void mouseReleased(MouseEvent e){}
 
 }

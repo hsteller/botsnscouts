@@ -24,39 +24,22 @@ public class WaiterThread extends Thread{
         Global.debug(this,"starte mich und warte auf "+ksanz+" threads");
 	for(int i=0;i<ksanz;i++){
 	    try{
-		while(ks[i]!=null&&ks[i].isAlive()){
-		    for(int j=0;j<ksanz;j++){
-			if(ks[j]!=null){
-			    //Global.debug(this,i+" habe "+ksanz+" threads; "+j+":"+ks[j]+" isAlive: "+ks[j].isAlive());
-			}
-			else{
-			    //Global.debug(this,i+" habe "+ksanz+" threads; "+j+":"+ks[j]+" ist null");
-			}
-		    }
-		    Thread.sleep(5000);
-		}
+		ks[i].join();
 	    }catch(InterruptedException ex){
 		System.err.println("Interrupted while waiting for Threads!");
 	    }
 	}
-
-	for(int j=0;j<ksanz;j++){
-	    if(ks[j]!=null){
-		//Global.debug(this,"habe "+ksanz+" threads; "+j+":"+ks[j]+" isAlive: "+ks[j].isAlive());
-	    }
-	    else{
-		//Global.debug(this,"habe "+ksanz+" threads; "+j+":"+ks[j]+" ist null");
+	if (waitServer){
+	    Global.debug(this,"gonna wait for Server");
+	    while(!beendemich){
+		try{
+		    sleep(3000);
+		}catch(InterruptedException ex){
+		    System.err.println("Interrupted while waiting for Server!");
+		}	
 	    }
 	}
-	Global.debug(this,"gonna wait for Server");
-	while(!beendemich){
-	    try{
-		sleep(3000);
-	    }catch(InterruptedException ex){
-		System.err.println("Interrupted while waiting for Server!");
-	    }	
-	}
-        Global.debug(this,"in 5 sec. beende alles!");
+	Global.debug(this,"in 5 sec. beende alles!");
 	try{
 	    sleep(5000);
 	}catch(InterruptedException ex){
@@ -65,7 +48,7 @@ public class WaiterThread extends Thread{
  	if(meldung){
  	    javax.swing.JOptionPane.showMessageDialog(null,Message.say("Start","mBeendeAlles"),Message.say("Start","mMeldung"),javax.swing.JOptionPane.INFORMATION_MESSAGE);
  	}
-
+	
 	parent.fassade.killStartServer();
 	parent.fassade=null;
 	parent.dispose();

@@ -88,6 +88,10 @@ public class Start extends JFrame implements WindowListener{
 	wth.addThread(k);
     }
 
+    public void addServer(){
+	wth.setServer();
+    }
+
     public void resetWaiter(){
 	wth.beende();
 	wth.reset();

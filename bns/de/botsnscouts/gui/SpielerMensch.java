@@ -1068,6 +1068,9 @@ public class SpielerMensch extends Thread {
 	}
 	if (!anmeldungErfolg) {
 	    Global.debug(this,"Beende Versuche, mich anzumelden.");  
+	    try{
+		th.join();
+	    }catch(InterruptedException e){}
 	    return;
 	    
 	}
@@ -1094,7 +1097,12 @@ public class SpielerMensch extends Thread {
 	    catch (KommException kE) {
 		Global.debug(this,kE.getMessage());
 	    }
-	    if (isInterrupted()) return;
+	    if (isInterrupted()){
+		try{
+		    th.join();
+		}catch(InterruptedException e){}
+		return;
+	    }
 
 	    // ------  Servermeldung behandeln ---------
 	    switch (cA.typ) {
@@ -1332,6 +1340,9 @@ public class SpielerMensch extends Thread {
 	}
 	
 	Global.debug(this," ende meiner run-Methode erreicht!");
+	try{
+	    th.join();
+	}catch(InterruptedException e){}
 	return;
     }
     
