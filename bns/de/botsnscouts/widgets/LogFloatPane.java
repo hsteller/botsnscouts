@@ -1,17 +1,26 @@
-package de.botsnscouts.gui;
+package de.botsnscouts.widgets;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
-import java.util.List;
 import de.botsnscouts.widgets.ColoredComponent;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class LogFloatPane extends ColoredComponent implements ComponentListener {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( ColoredComponent.class.getName() );
 
-    Component master;
-    Container container;
+    private Component master;
+    private Container container;
+    private Font font = new Font("Sans", Font.BOLD, 12 );
+    private LinkedList msgs = new LinkedList();
+    private boolean expanded = false;
+    private java.awt.Dimension expandedSize;
+    private java.awt.Dimension normalSize;
+
 
     public LogFloatPane(Component master, Container container) {
         this.master = master;
@@ -23,7 +32,6 @@ public class LogFloatPane extends ColoredComponent implements ComponentListener 
         enableEvents(AWTEvent.MOUSE_EVENT_MASK);
     }
 
-    Font font = new Font("Sans", Font.BOLD, 12 );
     public void paintComponent(Graphics g) {
         Insets in = getInsets();
         g.setFont( font );
@@ -54,13 +62,8 @@ public class LogFloatPane extends ColoredComponent implements ComponentListener 
         super.paintBorder(g);
 
     }
-    LinkedList msgs = new LinkedList();
-    boolean expanded = false;
-    private java.awt.Dimension expandedSize;
-    private java.awt.Dimension normalSize;
 
-
-    void setExpanded( boolean newExp ) {
+    public void setExpanded( boolean newExp ) {
         expanded = newExp;
         setSize();
     }
@@ -82,7 +85,6 @@ public class LogFloatPane extends ColoredComponent implements ComponentListener 
     private void setSize() {
         Rectangle r = recalcBounds();
         setBounds( r );
-        Insets in = getInsets();
     }
 
     void switchSize() {
