@@ -43,9 +43,9 @@ public class TransparentButton extends JButton {
             c = c.brighter();
         }
 
-        Color c1 = new Color( col.getRed(), col.getGreen(), col.getBlue(), 255 );
+        Color c1 = new Color( col.getRed(), col.getGreen(), col.getBlue(), 200 );
         Color c2 = new Color( col.getRed()/2, col.getGreen()/2, col.getBlue()/2, 128 );
-        Paint p = new GradientPaint( rc.x, rc.y, c1, rc.x + rc.width, rc.y + rc.height, c2 );
+        Paint p = new GradientPaint( rc.x, rc.y, c1, rc.x + rc.width, rc.y + rc.height * 2, c2 );
         g.setPaint( p );
         rc.grow(-3, -3);
         g.fillRect( rc.x, rc.y, rc.width, rc.height );
@@ -87,7 +87,7 @@ public class TransparentButton extends JButton {
 	} else if( getModel().isRollover() ) {
 	  mypaint2(g, Color.green );
 	} else {
-	  mypaint2(g, Color.green.darker().darker() );
+	  mypaint2(g, Color.green.darker() );
 	}
       }
 
