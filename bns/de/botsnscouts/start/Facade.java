@@ -226,11 +226,11 @@ public class Facade {
     }
 
     public Thread watchAGame() {
-        return launcher.watchAGame(GameOptions.DIP, GameOptions.DPORT, false);
+        return launcher.watchAGame(GameOptions.DHOST, GameOptions.DPORT, false);
     }
 
     public Thread watchAGameNoSplash() {
-        return launcher.watchAGame(GameOptions.DIP, GameOptions.DPORT, true);
+        return launcher.watchAGame(GameOptions.DHOST, GameOptions.DPORT, true);
     }
 
     /**
@@ -245,11 +245,11 @@ public class Facade {
     }
 
     public Thread participateInAGame(String name, int color) {
-        return launcher.participateInAGame(GameOptions.DIP, GameOptions.DPORT, name, color, false);
+        return launcher.participateInAGame(GameOptions.DHOST, GameOptions.DPORT, name, color, false);
     }
 
     public Thread participateInAGameNoSplash(String name, int color) {
-        return launcher.participateInAGame(GameOptions.DIP, GameOptions.DPORT, name, color, true);
+        return launcher.participateInAGame(GameOptions.DHOST, GameOptions.DPORT, name, color, true);
     }
 
     public Thread startAutoBot(String ip, int port, int iq) {
@@ -257,11 +257,11 @@ public class Facade {
     }
 
     public Thread startAutoBot(int iq, boolean beltAware) {
-        return launcher.startAutoBot(GameOptions.DIP, GameOptions.DPORT, iq, beltAware);
+        return launcher.startAutoBot(GameOptions.DHOST, GameOptions.DPORT, iq, beltAware);
     }
 
     public Thread startAutoBot(int iq, boolean beltAware, String botName) {
-        return launcher.startAutoBot(GameOptions.DIP, GameOptions.DPORT, iq, beltAware, botName);
+        return launcher.startAutoBot(GameOptions.DHOST, GameOptions.DPORT, iq, beltAware, botName);
     }
 
     public void startGame() throws OneFlagException, NonContiguousMapException {
@@ -274,7 +274,7 @@ public class Facade {
 
     public void gameStarts() {
         tileFactory.forgetTiles();
-        launcher.gameStarts(GameOptions.DIP, GameOptions.DPORT);
+        launcher.gameStarts(GameOptions.DHOST, GameOptions.DPORT);
     }
 
     public void killServer() {

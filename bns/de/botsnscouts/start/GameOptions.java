@@ -32,7 +32,7 @@ import org.apache.log4j.Category;
  */
 public class GameOptions {
 
-    static final String DIP;//="127.0.0.1";
+    static final String DHOST;
     static final int DPORT;//=8077;
     static final int DPLAYERS;//=8;
     static final int DTO;//=200;
@@ -43,7 +43,13 @@ public class GameOptions {
         String stmp;
         int tmp;
         stmp = Conf.getProperty("server.IP");
-        DIP = (stmp == null ? "127.0.0.1" : stmp);
+        try {
+            stmp = (stmp == null ? InetAddress.getLocalHost().getHostAddress() : stmp);
+        } catch (UnknownHostException ex) {
+            CAT.info("Could not determine IP address for this computer, using localhost/127.0.0.1");
+            stmp = "127.0.0.1";
+        }
+        DHOST = stmp;
         tmp = Conf.getIntProperty("server.port");
         DPORT = (tmp == -1 ? 8077 : tmp);
         tmp = Conf.getIntProperty("players");
@@ -304,7 +310,6 @@ public class GameOptions {
             xml.setAttribute("name", name);
         if (invitor != null )
             xml.setAttribute("invitor", invitor);
-        xml.setAttribute("host", InetAddress.getLocalHost().getHostAddress());
         xml.setIntAttribute("port", registrationPort);
         xml.setAttribute("allowWisenheimer", allowWisenheimer?"true":"false");
         xml.setAttribute("allowScout", allowScout?"true":"false");
@@ -386,6 +391,10 @@ public class GameOptions {
 
     public String getHost() {
         return host;
+    }
+
+    public String getInvitor() {
+        return invitor;
     }
 
 }

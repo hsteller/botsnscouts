@@ -28,10 +28,12 @@ public class Handler extends Thread {
 
     private Reader reader;
     private Writer writer;
+    private String partner;
 
     Handler(Socket s) throws IOException {
         reader = new InputStreamReader(s.getInputStream());
         writer = new OutputStreamWriter(s.getOutputStream());
+        partner = s.getInetAddress().getHostName();
     }
 
     private void delegate(XMLElement request) throws IOException {
@@ -40,6 +42,7 @@ public class Handler extends Thread {
 
         try {
             if (request.getName().equals("game")) {
+                request.setAttribute("host", partner);
                 answer = MetaServer.getInstance().announce(request);
                 answer.write(writer);
                 writer.flush();

@@ -65,7 +65,7 @@ public class MetaServer {
      * @throws IOException
      */
     XMLElement announce( XMLElement request ) throws IOException {
-        debug("announce  game received");
+        debug("game announcement received ");
         XMLElement answer;
         /* Check, if accessible. */
         try {
@@ -74,7 +74,7 @@ public class MetaServer {
             if (checkBNSServer(host, port)) {
                 /* If ok, announnce. */
                 announcedGames++;
-                games.add( request );
+                games.addElement( request );
                 answer = new XMLElement();
                 answer.setName("announced");
             } else {
@@ -105,6 +105,7 @@ public class MetaServer {
      * @return wether a BNS server is accessible at the given port of the given host.
      */
     private boolean checkBNSServer(String host, int port) {
+
         try {
             debug("Host "+host+", port "+port);
             Socket socket = new Socket(host,port);
@@ -170,6 +171,6 @@ public class MetaServer {
     /** No longer announce the game orginally announced by this announce-request*/
     public void revoke(XMLElement request) {
         //TODO: implement more efficiently
-        games.remove(request);
+        games.removeElement(request);
     }
 }

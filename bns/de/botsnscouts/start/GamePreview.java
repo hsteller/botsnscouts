@@ -13,6 +13,8 @@ import java.net.Socket;
 import java.io.*;
 
 import de.botsnscouts.util.Conf;
+import de.botsnscouts.widgets.TJTextField;
+import de.botsnscouts.widgets.TJLabel;
 import org.apache.log4j.Category;
 
 /*
@@ -38,7 +40,10 @@ public class GamePreview extends JPanel implements ActionListener {
     private HashMap gameMap;
     private JList gameList;
     private JTextField hostField;
+    private TJLabel info = new TJLabel();
+
     private static String QUERY = "<query />";
+
 
     private static Category CAT = Category.getInstance(GamePreview.class);
 
@@ -50,17 +55,29 @@ public class GamePreview extends JPanel implements ActionListener {
                 setContent( (GameOptions )gameMap.get( gameList.getSelectedValue()) );
             }
         });
-
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add (info );
     }
 
     /** call this to stop the current preview */
     void clear() {
+        info.setVisible(false);
 
     }
 
     void setContent( GameOptions game ) {
         hostField.setText( game.getHost());
+        String inv = game.getInvitor();
+        info.setText("Game hosted by "+(inv==null?"?":inv+" at "+game.getHost())+"\n"
+                    + game.getComment()+"\n"
+                    + "Rules: "+(game.isAllowScout()?"Scout allowed":"NoScout")+", "
+                    + (game.isAllowWisenheimer()?"Wisenheimer allowed":"No Wisenheimer")
+                    );
+        //TODO: Display icons for wisenheimer&scout instead of text
+        //TODO: display board
+        info.setVisible(true);
     }
+
 
     /** Query Metaserver */
     public void actionPerformed(ActionEvent event) {
