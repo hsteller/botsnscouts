@@ -86,6 +86,7 @@ public class Floor implements FloorConstants {
         try {
             StringBuffer sb = new StringBuffer(10);
             Floor.write(sb, type, info);
+            CAT.debug("Going to return '"+sb+"'");
             return Floor.getFloor(sb.toString());
         } catch (FormatException ex) {
             CAT.fatal("getFloor triggers after constructing string itself", ex);
@@ -263,7 +264,7 @@ public class Floor implements FloorConstants {
         return type >= 100 && ((info >> (phase - 1)) % 2 == 1);
     }
 
-    private static int skipFloorDef(int pos, String s) throws FormatException {
+    private static int skipFloorDef(int pos, String s) {
         // there always comes a wall after a floor element, so we only have to look
         // for the next char that starts a wall defintion
         int idx = pos + 1;
