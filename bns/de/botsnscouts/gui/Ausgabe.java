@@ -78,6 +78,8 @@ public class Ausgabe extends BNSThread {
     // information like we are doing it in case of a regular "game over"
     // -> see last case in the run()-method and abmelden()
     private boolean quitByMyself = false;
+    private boolean mayNotLeave = false;
+
 
     public Ausgabe() {
 	this("localhost",8077,false);
@@ -113,231 +115,43 @@ public class Ausgabe extends BNSThread {
 
 	while (!spielEnde) {
 	    try {
+                // waiting for server messages
 		kommAntwort = kommClient.warte();
 	    }
-	    catch (KommFutschException kE) {
-		CAT.error("KE: "+kE.getMessage());
-		return;
+	    catch (KommFutschException kE) {  // lost network communication with server
+		CAT.error("KE: "+kE.getMessage()); return;
 	    }
-	    catch (KommException ke) {
-		CAT.error("ke: "+ke.getMessage());
-		return;
+	    catch (KommException ke) { // something went wrong parsing the server's message
+		CAT.error("ke: "+ke.getMessage()); return;
 	    }
 	    // what did the server send?
 	    switch (kommAntwort.typ) {
-	    case (ClientAntwort.MESSAGE):{
-		CAT.debug("Server send me: "+kommAntwort.namen[0]);
-
-                // getting parts of the message
-                String[] tmpstr=new String[kommAntwort.namen.length-1];
-		for (int i=0;i<tmpstr.length;i++)
-		    tmpstr[i]=kommAntwort.namen[i+1];
-
-                // check the kind of message
-                String msgId = kommAntwort.namen[0];
-		if (!(msgId.substring(0,5).equals(de.botsnscouts.comm.MessageID.AUSWERTUNG))) {
-                    if (CAT.isDebugEnabled())
-		      CAT.debug("kommAntowrtnamen[0] ist: "+msgId+ "tmpstr ist: "+tmpstr[0]);
-		    // display the message in the statusbar
-                    showActionMessage(Message.say("MSG",msgId,tmpstr));
-//                    view.chatFloatPane.addMessage( Message.say("MSG",msgId,tmpstr) );
-                    if(msgId.startsWith(MessageID.PROG_DONE)) {
-                        Bot r1 = getBot(kommAntwort.namen[1]);
-                        ausgabeView.notifyBotProgrammingDone(r1);
-                    }
-		}
-
-		if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_LASER)){ // robots shooting
-		    CAT.debug("Got message telling "+kommAntwort.namen[1]+" shot "
-			      +kommAntwort.namen[2]+".");
-
-		    Bot r1 =(Bot )robots.get(kommAntwort.namen[1]);
-		    Bot r2 =(Bot )robots.get(kommAntwort.namen[2]);
-
-		    // updating statistics
-		    Stats actualStats=stats.getStats(r1.getName());
-		    actualStats.incHits();
-		    if (r2.getDamage()>=10) // was the robot r2(hit) killed ny r1?
-			actualStats.incKills();
-		    actualStats=stats.getStats(r2.getName());
-		    actualStats.incDamageByRobots();
-
-                    // paint animation and play sounds
-		    ausgabeView.showRobLaser(r1, r2);
-		}
-                else if (msgId.equals(de.botsnscouts.comm.MessageID.CHAT)){
-                   SoundMan.playSound(SoundMan.MESSAGE);
-                }
-
-
-                else if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_IN_PIT)) {// robot fell into a pit
-                    // play the sound for "robot fell into pit"
-                    SoundMan.playSound(SoundMan.PIT);
-                }
-
-                else if (msgId.equals(de.botsnscouts.comm.MessageID.FLAG_REACHED)) {
-                    SoundMan.playSound(SoundMan.FLAG_REACHED);
-                }
-
-                else if (msgId.equals(de.botsnscouts.comm.MessageID.LAST_PROG)) {
-                    Stats actualStats = stats.getStats(kommAntwort.namen[1]);
-                    actualStats.incWasSlowest();
-                }
-
-		else if (msgId.equals(de.botsnscouts.comm.MessageID.BORD_LASER_SHOT)){ // boardlaser shooting
-
-		    // get damaged robot
-		    Bot r1= (Bot )robots.get(kommAntwort.namen[1]);
-		    Location r1Pos = r1.getPos();
-
-                    // updating statistics for the robot hit
-                    Stats actualStats=stats.getStats(r1.getName());
-                    actualStats.incDamageByBoard();
-
-		    // get the origin of the laser (position and other stuff
-                    // needed for animation)
-		    Location laserPos = new Location(0,0);
-		    int facing=-1;
-		    int strength=-1;
-		    try {
-	 		strength   = Integer.parseInt(kommAntwort.namen[2]);
-			laserPos.x = Integer.parseInt(kommAntwort.namen[3]);
-			laserPos.y = Integer.parseInt(kommAntwort.namen[4]);
-			facing     = Integer.parseInt(kommAntwort.namen[5]);
-       		    }
-		    catch (NumberFormatException nfe) {
-			CAT.error("Ausgabe: BoardLaser: NumberFormatException:");
-			CAT.error(nfe);
-                        nfe.printStackTrace();
-		    }
-
-		    for (int i=0; i<strength; i++){
-			SoundMan.playSound(SoundMan.BOARDLASER);
-		    }
-
-                    // if enough information,  show laser animation
-		    if ((laserPos!=null)&&(facing>=0)&&(r1Pos!=null)&&(strength>=0)){
-			ausgabeView.showBoardLaser(laserPos, facing, strength, r1Pos);
-                    }
-		    else {
-                        if (CAT.isDebugEnabled()){
-			  CAT.error("Ausgabe: unable to calculate Laseranimation: ");
-			  CAT.debug("laserPos: "+laserPos);
-			  CAT.debug("facing: "+facing);
-			  CAT.debug("r1Pos: "+r1Pos);
-			  CAT.debug("strength: "+strength);
-                        }
-		    }
-		}
-                else if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_CRUSHED)){
-                  SoundMan.playSound(SoundMan.CRUSHED);
-                }
-
-                else if (msgId.equals(de.botsnscouts.comm.MessageID.WISE_USED)){
-                    SoundMan.playSound(SoundMan.BOO);
-                    Bot r1= (Bot )robots.get(kommAntwort.namen[1]);
-                    Stats actualStats=stats.getStats(r1.getName());
-                    actualStats.incAskWisenheimer();
-                }
-		try{
-                    // send response to the server that we got the message
-                    // and did all the stuff we wanted to do, so the server can
-                    // send the next message
-		    kommClient.acknowledgeMsg();
-		} catch (KommFutschException ke) {
-		    CAT.error("ke2: "+ke.getMessage());
-		    CAT.error(ke);
-                    return;
-		}
-		catch (KommException kE) {
-		    CAT.error(kE.getMessage());
-		    CAT.error(kE);
-                    return;
-		}
-
+	    case (ClientAntwort.MESSAGE):{ // (user information) messages about stuff that happend;
+                                           // for advanced displaying, playing sounds at the right time
+                comHandleMessages(kommAntwort);
 		break;
 	    }
-
-	    case (ClientAntwort.AENDERUNG): {// notify change; something happened
-		CAT.debug("Server send me: change occured.");
-
-		// ------- get changes  -----------
-		CAT.debug(kommAntwort.namen.length+" robs have been updated.");
-		try {
-		    String[] playerNames = kommAntwort.namen;
-		    for (int i=0; i < playerNames.length; i++) {
-			robots.put(playerNames[i],kommClient.getRobStatus(playerNames[i]));
-		    }
-
-		    ausgabeView.showUpdatedRobots(getRoboterArray());
-
-                    // --------- Neue Bot-Position an Board senden ---------
-		    try {
-			Thread.sleep(100);
-		    } // Verz÷gerung der Ausgabegeschwindigkeit
-		    catch (Exception e) {
-			System.err.println(e.getMessage());
-		    }
-
-		    // --------- get other information from the server
-		    Status[] stArray = kommClient.getSpielstatus();
-		    if (stArray != null) {
-			if (stArray[0].aktPhase != lastPhase) {
-                            /* its ok to do the reset on each phase change,
-                                will not do anything if all are reset */
-                            ausgabeView.resetProgrammingLEDs();
-			    view.showGameStatusMessage(Message.say("AusgabeFrame","phase")+ " " + stArray[0].aktPhase);
-			    lastPhase = stArray[0].aktPhase;
-			}
-		    }
-		    // --------- has somebody already reached the final flag?
-		    String[] winnerStateList = kommClient.getSpielstand();
-		    ausgabeView.showWinnerState(winnerStateList);
-		}
-		catch (KommFutschException ke) {
-		    CAT.error("ke2: "+ke.getMessage());
-		    return;
-		}
-		catch (KommException kE) {
-		    CAT.error(kE.getMessage());
-		    return;
-		}
-
-		kommClient.aenderungFertig();
-		break;
+	    case (ClientAntwort.AENDERUNG): {// notify change; something happened (to a robot);
+	        try {
+                  comHandleNotifyChange(kommAntwort);
+	        }
+                catch (KommFutschException ke) {
+                    CAT.error("ke2: "+ke.getMessage(), ke);
+                    return;
+                }
+                catch (KommException kE) {
+                    CAT.error(kE.getMessage(), kE);
+                    return;
+                }
+                break;
 	    }
 
-	    case (ClientAntwort.ENTFERNUNG): {
+	    case (ClientAntwort.ENTFERNUNG): { // we were removed for some reason, i.e. game is over,
+                                               // there was a timeout, we violated some protocol rule
 		CAT.info("Game over.");
-
-                if (quitByMyself) { // hendrik was here..
-                  CAT.debug("server seems to confirm our request for quitting the game");
-                  CAT.debug("this is great because chances are that server is not deadlocked now! :)");
-                  return;
-                }
-
-		try {
-		    String[] spielErgebnis = kommClient.getSpielstand();
-		    if (spielErgebnis != null) {
-			CAT.debug("We have "+spielErgebnis.length+" winners");
-			ausgabeView.showWinnerlist(spielErgebnis);
-		    }
-		    else CAT.debug("No winner exists");
-		}
-		catch (KommException e) {
-		    CAT.error(e.getMessage());
-		    return;
-		}
-		try {
-		    Thread.sleep(2000);
-		}
-		catch (InterruptedException e) {
-		    CAT.error("Ausgabe: Interrupted by "+e.toString());
-		}
-		kommClient.spielstart();
-		spielEnde = true;
+                comHandleWeWereRemoved(kommAntwort);
 	    }
-	    }
+          }
 
 	}
 	CAT.debug("Ausgabe reached end of its run method");
@@ -361,42 +175,18 @@ public class Ausgabe extends BNSThread {
 	}
 
 	if (kommAntwort.typ == kommAntwort.SPIELSTART) {
-	    Global.debug(this,"Server send me: game start.");
+	   CAT.debug("Server send me: game start.");
 
 	    // ------- fetching the board -----
 	    try {
 		String[] playerNames = kommClient.getNamen();
 		String[] playerColors = kommClient.getFarben();
-
 		Hashtable playerColorHash = new Hashtable(playerColors.length);
-		for (int i = 0; i < playerColors.length; i++) {
-		    if (! playerColors[i].equals("0")) {
-			playerColorHash.put(playerColors[i],new Integer(i));
-		    }
-		}
-                BotVis.initBotVis( playerColorHash );
 
-		Location boardDim = kommClient.getSpielfeldDim();
-		boardDimension = new Dimension(boardDim.x,boardDim.y);
-		flags = kommClient.getFahnenPos();
-		// !!HACK!!
+                // some magic for setting the robot colors
+                Color [] robotsNewColor = initRobotColors(playerColorHash, playerColors) ;
 
-		Color[] robotsDefaultColor = BoardView.robocolor;
-		Color[] robotsNewColor = new Color[8];
-
-		int[] colorMap = new int[8];
-
-		int j=0;
-		for (int i=0;i<8;i++) {
-		    if(!playerColors[i].equals("0")) {
-			robotsNewColor[j]=robotsDefaultColor[i];
-			colorMap[j]=i;
-			j++;
-		    }
-		}
-
-		// !! END OF HACK !!
-
+                // Initializing the robots an applying the colors to their visualization
 		for (int i=0; i < playerNames.length; i++) {
 		    d("Hole Roboterstatus von: "+playerNames[i]);
 		    Bot tempRob = kommClient.getRobStatus(playerNames[i]);
@@ -407,27 +197,8 @@ public class Ausgabe extends BNSThread {
 		}
 
 
-		SimBoard sim = new SimBoard(boardDimension.width,
-						    boardDimension.height,
-						    kommClient.getSpielfeld(),
-						    flags);
+		initBoard(robotsNewColor);
 
-
-                BoardView board = new BoardView(sim,robotsNewColor);
-                board.setAutoscrolls( true );
-		ausgabeView = new AusgabeView(board,getRoboterArray(),this);
-                board.addMouseListener( new MouseAdapter() {
-                    public void mouseReleased( MouseEvent me ) {
-                        if( (me.getModifiers() & MouseEvent.BUTTON3_MASK) > 0) {
-                            CAT.debug("mouse clicked in canvas " + me.getPoint() );
-                            Location ort = new Location();
-                            BoardView brd = (BoardView) me.getSource();
-                            brd.point2Ort( me.getPoint(), ort );
-                            CAT.debug("corresponding ort is: " + ort );
-                            ausgabeView.showPixelPos( me.getPoint().x, me.getPoint().y );
-                        }
-                    }
-                });
 
 		if (view == null) {
 		    view=new View(ausgabeView);
@@ -438,27 +209,13 @@ public class Ausgabe extends BNSThread {
                 }
 
                 // fetching initial stats
-                try {
-                  CAT.debug("fetching stats..");
-                  stats = kommClient.getStats();
-                  if (CAT.isDebugEnabled()){
-                    CAT.debug("..done");
-                    CAT.debug("stats ist: ");
-                    CAT.debug(stats.toString());
-                  }
-                }
-                catch (KommException ke) {
-                  CAT.error(ke.getMessage(), ke);
-                  CAT.error("KommException occured!");
-                  CAT.error("Failed to initialize Statistics-Menu!!!");
-                  CAT.error("!!YOU BETTER DO NOT CLICK ON THE STATISTICS MENU !!!");
-                }
-
+                initStats();
+                // we are done, removing splashscreen
 		removeSplash();
 
 		// send OK to server
 		kommClient.spielstart();
-
+                // set the viewport to the first flag
 		scrollFlag(1);
 
 	    }
@@ -475,14 +232,65 @@ public class Ausgabe extends BNSThread {
 	    }
 	}
 	else {
-	    // Problem: the server sends shit
-	    Global.debug(this, "server does not send a game start at game start... fui!");
+	    // Problem: the server sends garbage
+	    CAT.debug("server does not send a game start at game start... pfui!");
 	}
 
 	registered = true;
 
     }
 
+    private Color [] initRobotColors (Hashtable playerColorHash, String [] playerColors) throws KommException{
+       for (int i = 0; i < playerColors.length; i++) {
+          if (! playerColors[i].equals("0"))
+              playerColorHash.put(playerColors[i],new Integer(i));
+       }
+       BotVis.initBotVis( playerColorHash );
+
+       Location boardDim = kommClient.getSpielfeldDim();
+       boardDimension = new Dimension(boardDim.x,boardDim.y);
+       flags = kommClient.getFahnenPos();
+
+       Color[] robotsDefaultColor = BoardView.robocolor;
+       Color[] robotsNewColor = new Color[8];
+
+       int[] colorMap = new int[8];
+
+       int j=0;
+       for (int i=0;i<8;i++) {
+         if(!playerColors[i].equals("0")) {
+              robotsNewColor[j]=robotsDefaultColor[i];
+              colorMap[j]=i;
+              j++;
+          }
+       }
+
+       return robotsNewColor;
+    }
+
+    private void initBoard(Color [] robotsNewColor) throws KommException, FormatException, FlagException{
+      SimBoard sim = new SimBoard(boardDimension.width,
+						    boardDimension.height,
+						    kommClient.getSpielfeld(),
+						    flags);
+
+
+      BoardView board = new BoardView(sim,robotsNewColor);
+      board.setAutoscrolls( true );
+      ausgabeView = new AusgabeView(board,getRoboterArray(),this);
+      board.addMouseListener( new MouseAdapter() {
+          public void mouseReleased( MouseEvent me ) {
+              if( (me.getModifiers() & MouseEvent.BUTTON3_MASK) > 0) {
+                  CAT.debug("mouse clicked in canvas " + me.getPoint() );
+                  Location ort = new Location();
+                  BoardView brd = (BoardView) me.getSource();
+                  brd.point2Ort( me.getPoint(), ort );
+                  CAT.debug("corresponding ort is: " + ort );
+                  ausgabeView.showPixelPos( me.getPoint().x, me.getPoint().y );
+              }
+          }
+      });
+    }
 
 
     /**
@@ -519,10 +327,6 @@ public class Ausgabe extends BNSThread {
 
     }
 
-    /**
-     * Zeigt einen Text im Splashscreen an
-     * (erzeugt den Splashscreen, falls n”tig)
-     */
     private void removeSplash() {
 	if(!nosplash) {
 	    splashScreen.noSplash();
@@ -562,10 +366,10 @@ public class Ausgabe extends BNSThread {
 
 
 	if (anmeldungErfolg) {
-	    Global.debug(this,"registered for game as new view with name: "+name);
+	    CAT.debug("registered for game as new view with name: "+name);
 	}
 	else {
-	    Global.debug(this, "could not register at the server: "+host);
+	    CAT.debug("could not register at the server: "+host);
 	    showSplash(Message.say("AusgabeFrame","msplashEnde"));
 	    try {Thread.sleep(2000);} catch (Exception e) {CAT.error(e.getMessage());}
 	    removeSplash();
@@ -612,30 +416,50 @@ public class Ausgabe extends BNSThread {
 	Global.debug(this, s);
     }
 
+    private void initStats() {
+       try {
+          CAT.debug("fetching stats..");
+          stats = kommClient.getStats();
+          if (CAT.isDebugEnabled()){
+            CAT.debug("..done");
+            CAT.debug("stats ist: ");
+            CAT.debug(stats.toString());
+          }
+       }
+       catch (KommException ke) {
+         CAT.error(ke.getMessage(), ke);
+         CAT.error("KommException occured!");
+         CAT.error("Failed to initialize Statistics-Menu!!!");
+         CAT.error("!!YOU BETTER DO NOT CLICK ON THE STATISTICS MENU !!!");
+       }
+    }
+
 
     private void abmelden() {
+     /* while (mayNotLeave) {
+        synchronized (this) {
+          try {
+            wait();
+          }
+          catch(InterruptedException ie) {
+            CAT.error("interrupted");
+            CAT.error(ie.getMessage(), ie);
+          }
+        }
+      }*/
+      CAT.debug("Ausgabe sets condition(s) for leaving its ru() method");
       quitByMyself = true;
       spielEnde=true;
+      CAT.debug("Ausgabe deregisters from server");
       kommClient.abmelden( name );
     }
 
     protected void quit (boolean keepWatching) {
-       // CAT.debug("Ausgabe sends quit..");
-       // abmelden();
-        CAT.debug("Ausgabe sets condition for exiting its run method..");
-
         abmelden();
         CAT.debug("Ausgabe tells the view to propagate quitting..");
         view.quitHumanPlayer(); // Tell the view to tell the HumanPlayer to quit, if there is any
     }
-/*
-    protected void quit() {
-        abmelden();
-        spielEnde=true;
-        view.setVisible(false);
-    }
 
-*/
 
   protected View getView() {
     return view;
@@ -663,6 +487,260 @@ public class Ausgabe extends BNSThread {
     statsWindow.show();
   }
 
+  private void comHandleWeWereRemoved(ClientAntwort kommAntwort) {
+    // we asked the server to be removed..
+    if (quitByMyself) { // hendrik was here..
+      CAT.debug("server seems to confirm our request for quitting the game");
+      CAT.debug("this is great because chances are that server is not deadlocked now! :)");
+      return;
+    }
+
+    spielEnde = true; // for leaving the main loop of the run()-method
+
+    try {
+        String[] spielErgebnis = kommClient.getSpielstand();
+        if (spielErgebnis != null) { // were we removed because the game is over?
+            CAT.debug("We have "+spielErgebnis.length+" winners");
+            ausgabeView.showWinnerlist(spielErgebnis);
+        }
+        else
+            CAT.debug("No winner exists");
+    }
+    catch (KommException e) {
+        CAT.error(e.getMessage(), e);
+        return;
+    }
+    try {
+        Thread.sleep(2000);
+    }
+    catch (InterruptedException e) {
+        CAT.error("Ausgabe: Interrupted by "+e.toString(), e);
+    }
+    kommClient.spielstart(); // I think that meant sending an "ok" to server
+                             // to confirm that we are done
+
+  }
+
+  private void comHandleNotifyChange (ClientAntwort kommAntwort) throws KommException {
+      if (CAT.isDebugEnabled()) {
+        CAT.debug("Server send me: change occured.");
+        // ------- get changes  -----------
+        CAT.debug(kommAntwort.namen.length+" robs have been updated.");
+      }
+       // getting the names of the players that have some changed values
+          String[] playerNames = kommAntwort.namen;
+          for (int i=0; i < playerNames.length; i++) {
+              robots.put(playerNames[i],kommClient.getRobStatus(playerNames[i]));//updating the my internal robots
+        }
+        // telling the display to update itself with the new robot values
+        ausgabeView.showUpdatedRobots(getRoboterArray());
+
+        try { // wait a little for the display to update
+            Thread.sleep(100);
+        }
+        catch (Exception e) {
+            CAT.error(e.getMessage(), e);
+        }
+
+        // --------- get other information from the server
+        Status[] stArray = kommClient.getSpielstatus();
+        if (stArray != null) {
+            if (stArray[0].aktPhase != lastPhase) {
+                // its ok to do the reset on each phase change,
+                // will not do anything if all are reset
+                ausgabeView.resetProgrammingLEDs();
+                view.showGameStatusMessage(Message.say("AusgabeFrame","phase")+ " " + stArray[0].aktPhase);
+                lastPhase = stArray[0].aktPhase;
+            }
+        }
+        // --------- has somebody already reached the final flag?
+        String[] winnerStateList = kommClient.getSpielstand();
+        ausgabeView.showWinnerState(winnerStateList);
+
+      // tell the server that we finished our stuff and he can send the next notify change
+      kommClient.aenderungFertig();
+  }
+
+  private void comHandleMessages(ClientAntwort kommAntwort){
+      CAT.debug("Server send me: "+kommAntwort.namen[0]);
+      // getting parts of the message
+      String[] tmpstr=new String[kommAntwort.namen.length-1];
+      for (int i=0;i<tmpstr.length;i++)
+          tmpstr[i]=kommAntwort.namen[i+1];
+      // check the kind of message
+      String msgId = kommAntwort.namen[0];
+
+      // check whether we have to display an information message in the transparent
+      // chat- and actionlog on the bottomline of the board
+      if (!(msgId.substring(0,5).equals(de.botsnscouts.comm.MessageID.AUSWERTUNG))) {
+        if (CAT.isDebugEnabled())
+          CAT.debug("kommAntowrtnamen[0] ist: "+msgId+ "tmpstr ist: "+tmpstr[0]);
+        // display the message in the statusbar
+        showActionMessage(Message.say("MSG",msgId,tmpstr));
+     }
+
+     if(msgId.startsWith(MessageID.PROG_DONE)) {
+        comMsgHandleProgrammingDone(kommAntwort);
+     }
+     else if (msgId.equals(MessageID.SOMEONE_QUIT) || (msgId.startsWith(MessageID.BOT_REMOVED))){
+        comMsgHandleRobotRemoved(kommAntwort);
+     }
+     else if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_LASER)){ // robots shooting
+        comMsgHandleRobotLaser(kommAntwort);
+     }
+     else if (msgId.equals(de.botsnscouts.comm.MessageID.CHAT)){
+        comMsgHandleChat(kommAntwort);
+     }
+     else if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_IN_PIT)) {// robot fell into a pit
+        comMsgHandleRobotFellIntoPit(kommAntwort);
+     }
+     else if (msgId.equals(de.botsnscouts.comm.MessageID.FLAG_REACHED)) {
+        comMsgHandleRobotReachedFlag(kommAntwort);
+     }
+     else if (msgId.equals(de.botsnscouts.comm.MessageID.LAST_PROG)) {
+        comMsgHandleLastProgrammerFinished(kommAntwort);
+     }
+     else if (msgId.equals(de.botsnscouts.comm.MessageID.BORD_LASER_SHOT)){ // boardlaser shooting
+        comMsgHandleBoardLaser(kommAntwort);
+     }
+     else if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_CRUSHED)){
+        comMsgHandleRobotCrushed(kommAntwort);
+     }
+     else if (msgId.equals(de.botsnscouts.comm.MessageID.WISE_USED)){
+        comMsgHandleSomeoneAskedWisenheimer(kommAntwort);
+     }
+
+    acknowledgeMessage();
+  }
+  /** send response to the server that we got the message
+   and did all the stuff we wanted to do, so the server can
+   send the next message
+  */
+  private void acknowledgeMessage(){
+    try{
+        kommClient.acknowledgeMsg();
+    }
+    catch (KommFutschException ke) {
+        CAT.error("ke2: "+ke.getMessage(), ke);
+    }
+    catch (KommException kE) {
+        CAT.error(kE.getMessage(), kE);
+    }
+  }
+
+  private void comMsgHandleProgrammingDone(ClientAntwort kommAntwort) {
+    Bot r1 = getBot(kommAntwort.namen[1]);
+    ausgabeView.notifyBotProgrammingDone(r1);
+  }
+
+   private void comMsgHandleRobotRemoved(ClientAntwort kommAntwort) {
+    try {
+      Bot actual = kommClient.getRobStatus(kommAntwort.namen[1]);
+      robots.put(kommAntwort.namen[1], actual);
+      ausgabeView.showUpdatedRobots(getRoboterArray());
+
+    }
+    catch (KommFutschException ke) {
+      CAT.error(ke.getMessage(), ke);
+    }
+    catch (KommException kE){
+      CAT.error(kE.getMessage(), kE);
+    }
+    try {
+      Thread.sleep(100);
+    }
+    catch (Exception e) {
+      CAT.error(e.getMessage(), e);
+    }
+  }
+
+  private void comMsgHandleRobotLaser(ClientAntwort kommAntwort) {
+   CAT.debug("Got message telling "+kommAntwort.namen[1]+" shot "
+			      +kommAntwort.namen[2]+".");
+    Bot r1 =(Bot )robots.get(kommAntwort.namen[1]);
+    Bot r2 =(Bot )robots.get(kommAntwort.namen[2]);
+    // updating statistics
+    Stats actualStats=stats.getStats(r1.getName());
+    actualStats.incHits();
+    if (r2.getDamage()>=10) // was the robot r2(hit) killed by r1?
+        actualStats.incKills();
+    actualStats=stats.getStats(r2.getName());
+    actualStats.incDamageByRobots();
+    // paint animation and play sounds
+    ausgabeView.showRobLaser(r1, r2);
+  }
+
+  private void comMsgHandleChat(ClientAntwort kommAntwort) {
+     SoundMan.playSound(SoundMan.MESSAGE);
+  }
+
+  private void comMsgHandleRobotFellIntoPit(ClientAntwort kommAntwort) {
+     SoundMan.playSound(SoundMan.PIT);
+  }
+
+  private void comMsgHandleRobotReachedFlag(ClientAntwort kommAntwort) {
+      SoundMan.playSound(SoundMan.FLAG_REACHED);
+  }
+
+  private void comMsgHandleLastProgrammerFinished (ClientAntwort kommAntwort) {
+      Stats actualStats = stats.getStats(kommAntwort.namen[1]);
+      actualStats.incWasSlowest();
+  }
+
+   private void comMsgHandleBoardLaser(ClientAntwort kommAntwort) {
+       // get damaged robot
+      Bot r1= (Bot )robots.get(kommAntwort.namen[1]);
+      Location r1Pos = r1.getPos();
+
+      // updating statistics for the robot hit
+      Stats actualStats=stats.getStats(r1.getName());
+      actualStats.incDamageByBoard();
+
+      // get the origin of the laser (position and other stuff
+      // needed for animation)
+      Location laserPos = new Location(0,0);
+      int facing=-1;
+      int strength=-1;
+      try {
+          strength   = Integer.parseInt(kommAntwort.namen[2]);
+          laserPos.x = Integer.parseInt(kommAntwort.namen[3]);
+          laserPos.y = Integer.parseInt(kommAntwort.namen[4]);
+          facing     = Integer.parseInt(kommAntwort.namen[5]);
+      }
+      catch (NumberFormatException nfe) {
+          CAT.error("Ausgabe: BoardLaser: NumberFormatException:", nfe);
+      }
+
+      for (int i=0; i<strength; i++){
+          SoundMan.playSound(SoundMan.BOARDLASER);
+      }
+      // if enough information,  show laser animation
+      if ((laserPos!=null)&&(facing>=0)&&(r1Pos!=null)&&(strength>=0)){
+          ausgabeView.showBoardLaser(laserPos, facing, strength, r1Pos);
+      }
+      else {
+          if (CAT.isDebugEnabled()){
+            CAT.error("Ausgabe: unable to calculate Laseranimation: ");
+            CAT.debug("laserPos: "+laserPos);
+            CAT.debug("facing: "+facing);
+            CAT.debug("r1Pos: "+r1Pos);
+            CAT.debug("strength: "+strength);
+          }
+      }
+
+  }
+
+
+  private void comMsgHandleRobotCrushed (ClientAntwort kommAntwort) {
+      SoundMan.playSound(SoundMan.CRUSHED);
+  }
+
+  private void comMsgHandleSomeoneAskedWisenheimer(ClientAntwort kommAntwort) {
+      SoundMan.playSound(SoundMan.BOO);
+      Bot r1= (Bot )robots.get(kommAntwort.namen[1]);
+      Stats actualStats=stats.getStats(r1.getName());
+      actualStats.incAskWisenheimer();
+  }
 
 
 
