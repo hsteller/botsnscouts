@@ -83,6 +83,13 @@ public class Roboter {
      */
     protected boolean nextTurnPowerDown;
     
+
+    /**
+     * Visualisation id of the bot
+     * @see de.botsnscouts.util.BotVis
+     **/
+    protected int botVis=0;
+
     /**
      *  Konstruktor
      *  @param Name des Spielers bzw. Roboters.
@@ -137,6 +144,7 @@ public class Roboter {
 	archivX = r.archivX;
 	archivY = r.archivY;
 	virtuell = r.virtuell;
+	botVis = r.botVis;
 	leben = r.leben;
 	aktiviert = r.aktiviert;
 	for(int i=0;i < zug.length;i++) 
@@ -149,6 +157,22 @@ public class Roboter {
 	}
     }
 	
+
+    /**
+     * get the visualiation id of the bot
+     * @see de.botsnscouts.util.BotVis
+     */
+    public int getBotVis() {
+	return botVis;
+    }
+
+    /**
+     * set the visualiation id of the bot
+     * @see de.botsnscouts.util.BotVis
+     */
+    public void setBotVis(int vis) {
+	botVis =vis;
+    }
     
 
     /** liefert Zahl der zu erhaltenden Karten */
@@ -255,6 +279,22 @@ public class Roboter {
     public boolean samePos(Roboter r) {
 	return (r.pos.equals(pos) && !r.istInGrube());
     }
+
+    /** 
+     * Compare wheather tow robs are 
+     * equal
+     */
+    public boolean sameState(Roboter r) {
+	return ( (sameName(r)) ||
+		 (samePos(r)) || 
+		 (r.getSchaden() == getSchaden()) ||
+		 (r.getNaechsteFlagge() == getNaechsteFlagge()) ||
+		 (r.getAusrichtung() == getAusrichtung()) ||
+		 (r.istVirtuell() == istVirtuell()) ||
+		 (r.istAktiviert() == istAktiviert())
+		 );
+    }
+
 
     /** Liefert die Anzahl der gesperrten Register
      * @author Miriam
