@@ -272,12 +272,15 @@ public class GameFieldPanel extends JPanel {
         inner.add(nam, gc);
         inner.add(new TJLabel(Message.say("Start", "mFarbe")), gc);
         inner.add(farben, gc);
-        inner.add(allowWisenheimer, gc);
-        //gc.fill = GridBagConstraints.NONE;
-        inner.add(allowScout, gc);
-        inner.add(announce, gc);
-        inner.add(metaServer, gc);
-        gc.fill = GridBagConstraints.HORIZONTAL;
+	
+	//not fully implemented yet -- commented out, do not remove.
+	if (false) {
+            inner.add(allowWisenheimer, gc);
+	    inner.add(allowScout, gc);
+            inner.add(announce, gc);
+            inner.add(metaServer, gc);
+        }
+	gc.fill = GridBagConstraints.HORIZONTAL;
 
         panel.add(inner);
         //Add new game options below this one.
