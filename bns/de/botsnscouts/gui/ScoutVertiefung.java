@@ -9,6 +9,8 @@ import java.net.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import de.botsnscouts.util.*;
+
     /**
      * Scoutvertiefung, die im oben rechts in der Infoleiste dargestellt ist
      */

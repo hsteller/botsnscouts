@@ -10,7 +10,7 @@ import de.botsnscouts.board.SpielfeldKS;
 import de.botsnscouts.util.*;
 import de.botsnscouts.board.BoardRoboter;
 
-class Permu {
+public class Permu {
 
     SpielfeldKS sf;
     Karte[] bestZug;

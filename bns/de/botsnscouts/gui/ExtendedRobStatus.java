@@ -1,4 +1,5 @@
-package de.spline.rr;
+package de.botsnscouts.gui;
+
 
 import java.awt.*;
 import java.io.*;
@@ -8,6 +9,8 @@ import java.net.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+
+import de.botsnscouts.util.*;
 /**
  * Fenster, das weitere Statusinfos anzeigt
  * @author Lukasz Pekacki
@@ -19,12 +22,14 @@ public class ExtendedRobStatus extends JFrame {
     int xsize = 350;
     int ysize = 200;
 
+    
     public ExtendedRobStatus () {
-	this(new Roboter("DefaultRob"),100,100);
+	this(Roboter.getNewInstance("DefaultRob"),100,100);
     }
+    
 
     public ExtendedRobStatus (Roboter r, int locationX, int locationY) {
-	setTitle(Message.say("Ausgabe","statusVon")+r.name);
+	setTitle(Message.say("Ausgabe","statusVon")+r.getName());
 	setLocation(locationX,locationY);
 	setSize(xsize,ysize);
 	JPanel hauptPanel = new JPanel();
@@ -34,7 +39,7 @@ public class ExtendedRobStatus extends JFrame {
 	if (r.gesperrteRegs() > 0) { 
 	    for (int i = 0; i < r.gesperrteRegs(); i++) 
 		if (r.getGesperrteRegister(i) != null) {
-		    gespReg+= r.gesperrteRegister[i].getaktion() + " | ";
+		    gespReg+= r.getGesperrteRegister()[i].getaktion() + " | ";
 		}
 	    gespReg += "]";
 	}
@@ -50,11 +55,11 @@ public class ExtendedRobStatus extends JFrame {
 	hauptPanel.add(gesperrt);
 	gelegt = new JLabel(Message.say("Ausgabe","gelKarte")+gelegtKarte);
 	hauptPanel.add(gelegt);
-	archivpos = new JLabel(Message.say("Ausgabe","archPos")+" x: "+r.archivX+" y: "+r.archivY);
+	archivpos = new JLabel(Message.say("Ausgabe","archPos")+" x: "+r.getArchivX()+" y: "+r.getArchivY());
 	hauptPanel.add(archivpos);
-	aktiviert = new JLabel(Message.say("Ausgabe","aktiviert")+r.aktiviert);
+	aktiviert = new JLabel(Message.say("Ausgabe","aktiviert")+r.istAktiviert());
 	hauptPanel.add(aktiviert);
-	virtuell = new JLabel(Message.say("Ausgabe","virtuell")+r.virtuell);
+	virtuell = new JLabel(Message.say("Ausgabe","virtuell")+r.istVirtuell());
 	hauptPanel.add(virtuell);
 	pos = new JLabel(Message.say("Ausgabe","pos")+" x: "+r.getX()+" y: "+r.getY());
 	hauptPanel.add(pos);
