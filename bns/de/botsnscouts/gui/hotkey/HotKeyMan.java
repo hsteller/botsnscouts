@@ -54,7 +54,7 @@ public class HotKeyMan {
 	                  inputMap.put(newStroke, keyName );	                
 	                  HotKeyConf.setHotKey(k); // save the now changed configuration
 	                  //   keycodeToHotkey.remove(new Integer(oldStroke.getKeyCode()));
-	                  CAT.debug(dump());              
+	                   
 	                  return true;
 	            }
           }          
@@ -82,7 +82,7 @@ public class HotKeyMan {
         actionMap.put(keyname, key.getAction());
     }
     
-    CAT.debug(dump());
+
   }
 
 /*
