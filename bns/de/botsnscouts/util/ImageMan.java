@@ -116,7 +116,7 @@ public class ImageMan {
     // Abfrage der Images ... ACHTUNG: die Referenzen in den
     // zurückgegebenen Arrays sind erst gültig, wenn finishLoading()
     // erfolgreich aufgerufen wurde
-    static Image[] getImages(int id) {
+    public static Image[] getImages(int id) {
 	if( !imagesLoading ) 
 	    loadImages();
 
