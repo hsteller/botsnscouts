@@ -9,7 +9,7 @@ import java.awt.*;
  */
 
 public class BotVis {
-
+/*
 
     public static final Color GREEN  = new Color(4,156,52);
     public static final Color YELLOW = new Color(251,253,4);
@@ -35,6 +35,7 @@ public class BotVis {
     public Image getFacing (int visualID, int facing) {
 	return images[(visualID*4)+facing];
     }
+*/
 }
 
 
