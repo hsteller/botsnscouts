@@ -9,10 +9,16 @@ import javax.swing.plaf.metal.*;
 import java.util.*;
 import java.net.*;
 import java.io.*;
+
+
+import org.apache.log4j.Category;
+
 import de.botsnscouts.util.*;
 
 
 public class Start extends JFrame implements WindowListener{
+
+    static Category CAT = Category.getInstance(Start.class);
 
     Facade fassade;
 
@@ -26,8 +32,8 @@ public class Start extends JFrame implements WindowListener{
 
     JPanel current;         //was in moment angezeigt wird
     WaiterThread wth;
-    
-    public Start(){  
+
+    public Start(){
 	super(Message.say("Start","mStartTitel"));
 	wth=new WaiterThread(this);
 	Toolkit tk=Toolkit.getDefaultToolkit();
@@ -90,7 +96,7 @@ public class Start extends JFrame implements WindowListener{
 	wth.reset();
 	wth=new WaiterThread(this);
     }
-    
+
     public void beenden(){
 	Global.debug(this,"beenden() wurde aufgerufen");
 	try{
@@ -106,6 +112,12 @@ public class Start extends JFrame implements WindowListener{
     public static void main(String[] argv){
 	Global.verbose=true;
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
+
+
+        //load Sounds
+        CAT.debug("starting soundman..");
+        SoundMan.loadSounds();
+        CAT.debug("..done");
 
 	//language conf
 	Locale myLocale=null;
