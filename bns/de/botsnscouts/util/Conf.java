@@ -161,11 +161,27 @@ public class Conf {
 
     //TODO
     public static String getDefaultMetaServer() {
-        return "www.botsnscouts.de";
+        //return "www.botsnscouts.de";
+        return "localhost";
     }
 
     public static int getDefaultMetaServerPort() {
         return 8725;
+    }
+
+    public static Vector getFavoriteGameServers() {
+        //TODO
+        Vector v = new Vector();
+        //v.add("fuldigor.hause");
+        //v.add("codi.hause");
+        return v;
+    }
+
+    public static Vector getMetaServers() {
+        //TODO
+        Vector v = new Vector();
+        v.add(getDefaultMetaServer());
+        return v;
     }
 
 }
