@@ -82,19 +82,12 @@ class RegistrationManager extends Thread
     /** Wartet server.anmeldeto auf eine Aktion, kreiert ggf. neue ServerRoboterThread-
      *  bzw ServerAusgabeThread-Objekte und haengt diese in die richtigen Vektoren ein.
      */
-    private static final int ILLEGAL=-1;
-    private static final int SPIELER=0;
-    private static final int AUSGABE=1;
-    private static final int SPIELERV2=2;
-    private static final int AUSGABEV2=3;
 
     public void register(Socket socket) {
         PrintWriter out=null;
         BufferedReader in=null;
-	int clienttype=ILLEGAL;
 	String clientName="";
 	int farbe=-1;
-	boolean exception=false;
 
 	try{
 	    CAT.debug("out = new PrintWriter    ...");
@@ -130,6 +123,10 @@ class RegistrationManager extends Thread
                 registerPlayer(clientName, farbe, in, out, 2.0f );
             else if( type.equals("RA2") )
                 registerOutput( clientName, in, out, 2.0f );
+            else {
+                CAT.fatal("should never be here");
+                throw new Error("should never be here");
+            }
         } catch( Exception ee ) {
             CAT.debug( ee );
             try { in.close(); } catch( IOException e ) {}
