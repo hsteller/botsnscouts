@@ -11,7 +11,7 @@ import java.util.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.gui.*;
 
-public class StartStartAnmeldung extends JPanel implements  ActionListener, MouseListener{
+public class StartStartAnmeldung extends JPanel{
     JList roblist;
     Start parent;
     Vector names = new Vector();
@@ -21,14 +21,12 @@ public class StartStartAnmeldung extends JPanel implements  ActionListener, Mous
 	parent=par;
 	roblist = new JList();
 	roblist.setOpaque( false );
-	//	roblist.setFixedCellHeight(64);
 	roblist.setFixedCellWidth(250);
 	roblist.setSize(100, 100);
 	roblist.setOpaque( false );
 	roblist.setBorder( new EtchedBorder(4) );
 	roblist.setFont(new Font("Sans", Font.BOLD, 24));
 	roblist.setCellRenderer( new CellRenderer() );
-
 
 	JPanel p = new JPanel();
 	p.setOpaque( false );
@@ -51,34 +49,9 @@ public class StartStartAnmeldung extends JPanel implements  ActionListener, Mous
     public void reset(){
     }
 
-    public void actionPerformed(ActionEvent e){
-    }
-
-    public void mouseEntered(MouseEvent e){
-	
-    }
-
-    public void mouseExited(MouseEvent e){
-
-    }
-
-
-    public void mouseClicked(MouseEvent e){
-
-    }
-
-    public void mousePressed(MouseEvent e){}
-    public void mouseReleased(MouseEvent e){}
-
     public void neurob(String name, int farbe){
 	map.put( name, new Integer(farbe) );
 	Global.debug(this,"neuer roboter:"+name+SACanvas.robocolor[farbe]);
-	/*
-	JLabel tmp=new JLabel(name);
-	tmp.setForeground(SACanvas.robocolor[farbe]);
-	tmp.setFont(new Font("Sans", Font.BOLD, 24));
-	add(tmp);
-	*/
 	names.addElement( name );
 	roblist.setListData( names );
 	parent.show();
@@ -95,18 +68,9 @@ public class StartStartAnmeldung extends JPanel implements  ActionListener, Mous
     }
 
 
-
-
     class CellRenderer extends JLabel implements ListCellRenderer {
-
-	ImageIcon[] robIcons = new ImageIcon[8];
 	Dimension size;
 	CellRenderer() {
-	    Image[] robbis = ImageMan.getImages(ImageMan.ROBOS);
-	    for (int i=0; i<8;i++) {
-		robIcons[i]=new ImageIcon(robbis[i*4]);
-	    }
-	    //	 size=new Dimension(robIcons[0].getIconWidth(),robIcons[0].getIconHeight());
 	    size=new Dimension(200,48);
 	}
 	
@@ -122,18 +86,7 @@ public class StartStartAnmeldung extends JPanel implements  ActionListener, Mous
 	 
 	    setText( name );
 	    int farbe = ((Integer)map.get( name )).intValue();
-	    setIcon( robIcons[farbe] );
-	    /*
-	      if (isSelected) {
-	      setBackground(list.getSelectionBackground());
-	      setForeground(list.getSelectionForeground());
-	      }
-	      else {
-	      setBackground(list.getBackground());
-	      setForeground(list.getForeground());
-	      }
-	      setEnabled(list.isEnabled());
-	    */
+	    setIcon( MyCellRenderer.robIcons[farbe] );
 	    this.setFont(list.getFont());
 	    this.setOpaque( false );
 	    return this;

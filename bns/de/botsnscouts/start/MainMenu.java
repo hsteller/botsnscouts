@@ -73,10 +73,10 @@ public class MainMenu extends JPanel implements  ActionListener{
 	if(e.getActionCommand().equals("endBut")){
 	    parent.myclose();
 	}else if(e.getActionCommand().equals("gameBut")){
-	    if(parent.startSpielfeld==null){
-		parent.startSpielfeld=new StartSpielfeld(parent);
+	    if(parent.gameFieldPanel==null){
+		parent.gameFieldPanel=new GameFieldPanel(parent);
 	    }
-	    parent.current=parent.startSpielfeld;
+	    parent.current=parent.gameFieldPanel;
 	    parent.setContentPane(parent.current);
 	    parent.show();
 	}else if(e.getActionCommand().equals("partBut")){

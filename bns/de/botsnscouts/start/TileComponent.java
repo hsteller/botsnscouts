@@ -10,7 +10,7 @@ import java.net.*;
 import java.io.*;
 import de.botsnscouts.util.*;
 
-public class StartTileComp extends JComponent implements  MouseListener, MouseMotionListener{
+public class TileComponent extends JComponent implements  MouseListener, MouseMotionListener{
 
     Image tileImage;
     int drehung;
@@ -19,13 +19,13 @@ public class StartTileComp extends JComponent implements  MouseListener, MouseMo
     Paint paint;
     int W=150, H=150;
     int[] flagNum=new int[0];
-    Ort[] flagPos=new Ort[0]; 
+    Ort[] flagPos=new Ort[0];
 
     private boolean flagsChanged, tileChanged;
 
     TileClickListener tileClickListener;
 
-    public StartTileComp(Facade fas, int x, int y){
+    public TileComponent(Facade fas, int x, int y){
 	setOpaque(false);
 	fassade=fas;
 	W=H=fassade.getThumbGR();

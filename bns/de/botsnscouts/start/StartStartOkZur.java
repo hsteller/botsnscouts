@@ -52,7 +52,7 @@ public class StartStartOkZur extends JPanel implements  ActionListener, MouseLis
 	    parent.startPanel.anmeldung.reset();
 	    parent.startPanel.listen.closeSock();
 	    //schalte auf Spielfeld um
-	    parent.current=parent.startSpielfeld;
+	    parent.current=parent.gameFieldPanel;
 	    parent.startPanel=null;
 	    parent.setContentPane(parent.current);
 	    parent.show();
@@ -62,15 +62,6 @@ public class StartStartOkZur extends JPanel implements  ActionListener, MouseLis
 	    Global.debug(this,"ok, Spiel ging los");
 	    parent.hide();
 	    parent.beenden();
-//	    parent.nullen();
-	    /*if(parent.startPanel.thread!=null){
-		try{
-		    parent.startPanel.thread.join();
-		}catch(InterruptedException ex){
-		    System.err.println(ex);
-		}
-	    }
-	    parent.show();*/
 	}
     }
 

@@ -18,11 +18,11 @@ public class Start extends JFrame implements WindowListener{
 
     Paint paint;
     MainMenu mainMenu;                //startbildschirm
-    StartSpielfeld startSpielfeld;          //spielfeld zusammenstellen
+    GameFieldPanel gameFieldPanel;          //spielfeld zusammenstellen
     StartTeilnehmen startTeilnehmen;        //am spiel teilnehmen
     StartZuschauen startZuschauen;          //einem spiel zuschauen
     StartPanel startPanel;                  //bildschirm mit anmeldeinfos und LOS button
-    StartSpielfeldEditor startSpielfeldEditor;
+    FieldEditor fieldEditor;
 
     JPanel current;         //was in moment angezeigt wird
     WaiterThread wth;

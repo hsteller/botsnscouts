@@ -33,9 +33,6 @@ public class StartPanel extends JPanel implements  ActionListener, MouseListener
 	setLayout(lay);
 	setBorder(new EmptyBorder(50,50,50,50));
 	setOpaque( false );
-// 	anmeldung
-// 	unten
-//      ks
 
 	angem=new JLabel(Message.say("Start","mAngem"));
 	anmeldung=new StartStartAnmeldung(parent);

@@ -12,10 +12,17 @@ import de.botsnscouts.util.*;
 
 public class MyCellRenderer extends JLabel implements ListCellRenderer {
 
-    ImageIcon[] robIcons = new ImageIcon[8];
+    public static ImageIcon[] robIcons = new ImageIcon[8];
     String zufall = Message.say("Start", "mFarbeEgal");
     Dimension size;
     boolean withEgal = true;
+
+    static{
+	Image[] robbis = ImageMan.getImages(ImageMan.ROBOS);
+	for (int i=0; i<8;i++) {
+	    robIcons[i]=new ImageIcon(robbis[i*4]);
+	}
+    }
 
     MyCellRenderer() {
 	this( true );
@@ -23,18 +30,15 @@ public class MyCellRenderer extends JLabel implements ListCellRenderer {
 
     MyCellRenderer(boolean wEgal) {
 	withEgal = wEgal;
-	Image[] robbis = ImageMan.getImages(ImageMan.ROBOS);
-	for (int i=0; i<8;i++) {
-	    robIcons[i]=new ImageIcon(robbis[i*4]);
-	}
 	size=new Dimension(96,48);
     }
-    public Component getListCellRendererComponent(
-						  JList list,
-						  Object value,            // value to display
-						  int index,               // cell index
-						  boolean isSelected,      // is the cell selected
-						  boolean cellHasFocus)    // the list and the cell have the focus
+    public Component getListCellRendererComponent
+	(
+	 JList list,
+	 Object value,         // value to display
+	 int index,	       // cell index
+	 boolean isSelected,   // is the cell selected
+	 boolean cellHasFocus) // the list and the cell have the focus
     {
 	 
 	if (index==-1) {

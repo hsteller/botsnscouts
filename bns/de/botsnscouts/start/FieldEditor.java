@@ -11,7 +11,7 @@ import java.net.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.board.*;
 
-public class StartSpielfeldEditor extends JPanel implements  ActionListener, TileClickListener,ListSelectionListener{
+public class FieldEditor extends JPanel implements  ActionListener, TileClickListener,ListSelectionListener{
 
     public static final int MODE_FLAGGE_SETZEN=0;
     public static final int MODE_FLAGGE_ENTFERNEN=1;
@@ -29,7 +29,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Til
 	CURSOR_FLAGGE_LOESCHEN = 5;
 
 
-    GameFieldPanel spf;
+    FieldGrid spf;
     Start parent;
     Paint paint;
 
@@ -67,7 +67,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Til
     TileInfo[] tileInfos;
     Cursor[] cursors;
 
-    public StartSpielfeldEditor(Start par,GameFieldPanel spf){
+    public FieldEditor(Start par,FieldGrid spf){
 	parent=par;
 	paint=parent.paint;
 	this.spf=spf;
@@ -179,12 +179,12 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Til
 	if(e.getActionCommand().equals("ok")){
 	    try{
 		parent.fassade.checkSpielfeld();
-		if(parent.startSpielfeld==null){
-		    parent.startSpielfeld=new StartSpielfeld(parent);
+		if(parent.gameFieldPanel==null){
+		    parent.gameFieldPanel=new GameFieldPanel(parent);
 		}
 		spf.removeTileClickListener();
-		parent.startSpielfeld.pnl.add(spf);
-		parent.current=parent.startSpielfeld;
+		parent.gameFieldPanel.pnl.add(spf);
+		parent.current=parent.gameFieldPanel;
 		parent.setContentPane(parent.current);
 		parent.show();
 	    }catch(OneFlagException ex){
@@ -196,17 +196,17 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Til
 	    }
 
 	}else if(e.getActionCommand().equals("abbrechen")){
-	    if(parent.startSpielfeld==null){
-		parent.startSpielfeld=new StartSpielfeld(parent);
+	    if(parent.gameFieldPanel==null){
+		parent.gameFieldPanel=new GameFieldPanel(parent);
 	    }
 	    parent.fassade.restorTileRaster();
 	    spf.removeTileClickListener();
-	    parent.startSpielfeld.pnl.add(spf);
-	    parent.current=parent.startSpielfeld;
+	    parent.gameFieldPanel.pnl.add(spf);
+	    parent.current=parent.gameFieldPanel;
 	    parent.setContentPane(parent.current);
 	    spf.rasterChanged();
 
-	    parent.startSpielfeld.unrollOverButs();
+	    parent.gameFieldPanel.unrollOverButs();
 	    parent.show();
 	}else if(e.getActionCommand().equals("flSetzen")){
 	    currentMode=MODE_FLAGGE_SETZEN;
