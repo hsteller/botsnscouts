@@ -1087,8 +1087,11 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     private class RobProgListener implements RemovalListener{
 	public void waitableRemoved(Waitable w){
 	    sendMsg("mProgReceived", new String[] { ((ServerRoboterThread)w).rob.getName() } );
-	    if (waitablesImWaitingFor.size()==1)
-		sendMsg("mLastProg", new String[] { ((ServerRoboterThread)waitablesImWaitingFor.getElement()).rob.getName() } );
+	    if (waitablesImWaitingFor.size()==1) {
+		String robName = ((ServerRoboterThread)waitablesImWaitingFor.getElement()).rob.getName();
+                stats.getStats(robName).incWasSlowest();
+                sendMsg(MessageID.LAST_PROG, new String[] { robName } );
+            }
 	}
     }
 

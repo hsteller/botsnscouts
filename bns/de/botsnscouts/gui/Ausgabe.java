@@ -137,7 +137,6 @@ public class Ausgabe extends BNSThread {
                     if(msgId.startsWith(MessageID.PROG_DONE)) {
                         Bot r1 = getBot(kommAntwort.namen[1]);
                         ausgabeView.notifyBotProgrammingDone(r1);
-                        stats.updateCardsSent(r1);
                     }
 		}
 
@@ -171,6 +170,11 @@ public class Ausgabe extends BNSThread {
 
                 else if (msgId.equals(de.botsnscouts.comm.MessageID.FLAG_REACHED)) {
                     SoundMan.playSound(SoundMan.FLAG_REACHED);
+                }
+
+                else if (msgId.equals(de.botsnscouts.comm.MessageID.LAST_PROG)) {
+                    Stats actualStats = stats.getStats(kommAntwort.namen[1]);
+                    actualStats.incWasSlowest();
                 }
 
 		else if (msgId.equals(de.botsnscouts.comm.MessageID.BORD_LASER_SHOT)){ // boardlaser shooting

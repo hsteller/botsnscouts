@@ -34,6 +34,8 @@ import de.botsnscouts.util.BotVis;
 import de.botsnscouts.util.StatsList;
 import de.botsnscouts.util.Stats;
 import de.botsnscouts.util.Message;
+import de.botsnscouts.util.TJLabel;
+
 
 
 public class StatisticPanel extends JPanel implements ActionListener {
@@ -44,20 +46,21 @@ public class StatisticPanel extends JPanel implements ActionListener {
 
     private static final int COL_COUNT=8;
     private static final String MESSAGE_SECTION="StatisticPanel";
-    private static final JLabel [] COL_HEADINGS = {
+    private static final TJLabel [] COL_HEADINGS = {
       //new JLabel(""),// robot icon
-      new JLabel(Message.say(MESSAGE_SECTION, "name"), SwingConstants.LEFT),// robot name
-      new JLabel(Message.say(MESSAGE_SECTION, "hits"), SwingConstants.CENTER),
-      new JLabel(Message.say(MESSAGE_SECTION, "kills"), SwingConstants.CENTER),
-      new JLabel(Message.say(MESSAGE_SECTION, "damage_by_board"), SwingConstants.CENTER),
-      new JLabel(Message.say(MESSAGE_SECTION, "damage_by_robots"), SwingConstants.CENTER),
-      new JLabel(Message.say(MESSAGE_SECTION, "asked_wise"), SwingConstants.CENTER),
-      new JLabel(Message.say(MESSAGE_SECTION, "slowestProgrammer", SwingConstants.CENTER))
+      new TJLabel(Message.say(MESSAGE_SECTION, "name"), SwingConstants.LEFT),// robot name
+      new TJLabel(Message.say(MESSAGE_SECTION, "hits"), SwingConstants.CENTER),
+      new TJLabel(Message.say(MESSAGE_SECTION, "kills"), SwingConstants.CENTER),
+      new TJLabel(Message.say(MESSAGE_SECTION, "damage_by_board"), SwingConstants.CENTER),
+      new TJLabel(Message.say(MESSAGE_SECTION, "damage_by_robots"), SwingConstants.CENTER),
+      new TJLabel(Message.say(MESSAGE_SECTION, "asked_wise"), SwingConstants.CENTER),
+      new TJLabel(Message.say(MESSAGE_SECTION, "slowestProgrammer", SwingConstants.CENTER))
 
     };
 
     public StatisticPanel (StatsList stats){
       super();
+      setOpaque(false);
       list = stats;
       init();
       list.addActionListener(this);
@@ -87,7 +90,7 @@ public class StatisticPanel extends JPanel implements ActionListener {
       // add colum titles
        // "Bot" over the first two columns (robot name and icon)
       COL_HEADINGS[0].setForeground(Color.white);
-      COL_HEADINGS[0].setFont(new Font("Times", Font.BOLD, 16));
+      COL_HEADINGS[0].setFont(new Font("Times", Font.BOLD, 14));
       this.add (COL_HEADINGS[0], new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
                                     GridBagConstraints.CENTER,
                                     GridBagConstraints.HORIZONTAL,
@@ -95,7 +98,7 @@ public class StatisticPanel extends JPanel implements ActionListener {
 
       for (int i=1;i<COL_COUNT-1;i++){
         COL_HEADINGS[i].setForeground(Color.white);
-        COL_HEADINGS[i].setFont(new Font("Times", Font.BOLD, 16));
+        COL_HEADINGS[i].setFont(new Font("Times", Font.BOLD, 14));
         this.add (COL_HEADINGS[i], new GridBagConstraints(i+1, 0, 1,1,0.0,0.0,
                                     GridBagConstraints.CENTER,
                                     GridBagConstraints.NONE,

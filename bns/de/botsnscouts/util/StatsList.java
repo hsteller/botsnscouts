@@ -50,7 +50,7 @@ public class StatsList implements ActionListener{
      *  Is used to determine which bot needed the most time for programming in this turn.
      *  @see setCardsSent(Bot)
      */
-    private int cardsSentCounter;
+    //private int cardsSentCounter;
 
     /** Creates a new list with length 0*/
     public StatsList () {
@@ -201,7 +201,7 @@ public class StatsList implements ActionListener{
     }
 
 
-    public void updateCardsSent(Bot robot){
+    /*public void updateCardsSent(Bot robot){
         CAT.debug("update cards for "+robot.getName());
         ++cardsSentCounter;
         if (cardsSentCounter == size()){ // this one was the slowest; Blame him!!!
@@ -211,6 +211,7 @@ public class StatsList implements ActionListener{
             cardsSentCounter = 0;
         }
     }
+*/
 
     public void actionPerformed(ActionEvent e){
       CAT.debug("underlying stats have changed..");
