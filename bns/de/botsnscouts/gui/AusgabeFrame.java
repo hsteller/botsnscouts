@@ -293,7 +293,29 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	Global.debug(this,"Scrolle zur Flagge: "+nr);
 	int x = flagsPosition[nr-1].x*64;
 	int y = spielFeld.getHeight()-(flagsPosition[nr-1].y*64);
-	trackPos(x,y);
+	//trackPos(x,y);
+
+ /******************************************************************/
+	Dimension sz = view.getExtentSize();
+	int w2 = sz.width/2;
+	int h2 = sz.height/2;
+	
+
+	// make sure we dont want to scoll 'out' to
+	// the left and top
+	int x1 = Math.max( x - w2 , 0);
+	int y1 = Math.max( y - h2 , 0);
+
+	// ... and right and bottom
+       	x1 = Math.min( x1, (spielFeld.getWidth() - sz.width) );
+	y1 = Math.min( y1, (spielFeld.getHeight() - sz.height) );
+
+	if ((view.getViewPosition().x != x1) || (view.getViewPosition().y != y1))  {
+	    view.setViewPosition(new Point(x1, y1));
+	}
+/************************************************************************/
+
+
     }
 
     public void trackPos (int robix, int robiy) {
