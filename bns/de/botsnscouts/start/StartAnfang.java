@@ -7,7 +7,7 @@ import java.awt.geom.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.net.*;
-
+import de.botsnscouts.util.*;
 public class StartAnfang extends JPanel implements  ActionListener, MouseListener{
     Paint paint;
 
