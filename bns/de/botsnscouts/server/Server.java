@@ -1,10 +1,11 @@
 package de.botsnscouts.server;
 
 import java.util.*;
-import de.botsnscouts.start.*;
-import de.botsnscouts.util.*;
+
 import de.botsnscouts.board.*;
 import de.botsnscouts.comm.*;
+import de.botsnscouts.start.*;
+import de.botsnscouts.util.*;
 
 public class Server extends Thread 
     implements ServerRobotThreadMaintainer, ServerOutputThreadMaintainer, ThreadMaintainer,
@@ -402,9 +403,7 @@ public class Server extends Thread
 			break;
 		    case PROGRAMMIERUNG:
 			//PRE: Im RoboterServer stehen die richtigen Karten
-			d("Telling "+srt.rob.getName()+" to program its registers.");
 			srt.makeYourMove();
-			d("Told it.");
 			break;
 		    case POWERUP:
 			srt.reEntry();
@@ -803,8 +802,9 @@ public class Server extends Thread
 		modus = PROGRAMMIERUNG;
 		waitablesImWaitingFor = new WaitingForSet(activeThisRound);
 		wechselModus(activeThisRound.iterator(), PROGRAMMIERUNG);
+		waitablesImWaitingFor.addRemovalListener(robProgListener);
 		broadcastUndWarteAufRoboter();
-		d("Programmierung zurueckErhalten");
+		d("Programmierung zurueckerhalten");
 	    }	    
 		
 	    // Auswertung beginnt
@@ -1013,6 +1013,15 @@ public class Server extends Thread
 
     private void d(String s){
 	Global.debug(this, s);
+    }
+
+    private RobProgListener robProgListener = new RobProgListener();
+    private class RobProgListener implements RemovalListener{
+	public void waitableRemoved(Waitable w){
+	    sendMsg("mProgReceived", new String[] { ((ServerRoboterThread)w).rob.getName() } );
+	    if (waitablesImWaitingFor.size()==1)
+		sendMsg("mLastProg", new String[] { ((ServerRoboterThread)waitablesImWaitingFor.getElement()).rob.getName() } );
+	}
     }
 
 }// class Server ende

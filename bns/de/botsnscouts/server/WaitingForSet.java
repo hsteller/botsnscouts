@@ -8,7 +8,7 @@ import java.util.*;
  */
  class WaitingForSet {
 
-     private Collection waitingFor;
+     private Vector waitingFor;
 
      /** Constructs the set of elements to wait for.  
       */
@@ -22,11 +22,9 @@ import java.util.*;
       */
      synchronized Iterator waitFor(int timeout){
 	 if (waitingFor.isEmpty()){
-	     d("set already emtpy, returning...");
 	     return waitingFor.iterator();
 	 }
 	 try{
-	     d("starting wait");
 	     wait(timeout);
 	 }catch (InterruptedException e){
 		 d("InterruptedException, shouldn't happen: "+e.getMessage());
@@ -39,18 +37,41 @@ import java.util.*;
       * @throws RuntimeException if we didn't wait for that element. 
       */
      synchronized void removeAndNotify(Waitable w){
-	 d("removing...");
-	 waitingFor.remove(w);
+	 if (waitingFor.remove(w))
+	     fireRemovalEvent(w);
 	 if (waitingFor.isEmpty()){
-	     d("notifying");
 	     notify();
 	 }
-	 d("done with removing");
      }
 
      boolean isEmpty(){ return waitingFor.isEmpty(); }
      Iterator iterator(){ return waitingFor.iterator(); }
      synchronized void remove(Waitable w){ waitingFor.remove(w); }
+     int size() { return waitingFor.size(); }
+     synchronized Waitable getElement(){
+	 if (waitingFor.size()!=1)
+	     throw new RuntimeException("Precondition: only one element left violated.");
+	 return (Waitable)waitingFor.get(0);
+     }
+
+     // Event-throwing
+     Vector listeners=new Vector();
+     public void addRemovalListener(RemovalListener l){
+	 synchronized (listeners){
+	     listeners.add(l);
+	 }
+     }
+     public void removeRemovalListener(RemovalListener l){
+	 synchronized (listeners){
+	     listeners.remove(l);
+	 }
+     }
+     private void fireRemovalEvent(Waitable removed){
+	 synchronized (listeners){
+	     for (Iterator it=listeners.iterator();it.hasNext();)
+		 ((RemovalListener)it.next()).waitableRemoved(removed);
+	 }
+     }
 
      private void d(String s){
 	 de.botsnscouts.util.Global.debug(this,s);
