@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.util;
 
 /** Hilfsklasse, die eine Position auf dem Spielfeld durch ihre x - und y - Koordinate darstellt
 *@author Hendrik<BR>*/

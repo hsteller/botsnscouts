@@ -1,5 +1,4 @@
-package de.spline.rr;
-
+package de.botsnscouts.util;
 
 import java.awt.image.*;
 import java.awt.Image;

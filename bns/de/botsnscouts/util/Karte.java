@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.util;
 
 /**
 *Die Klasse Karte.
@@ -10,70 +10,66 @@ package de.spline.rr;
 */
 
 public class Karte{ 
-        //Attribute 
+    //Attribute 
  
-        	private int prio; 
-   	private String aktion; 
+    private int prio; 
+    private String aktion; 
     
-/** 
-*Der Konstruktor erwartet 2 Argumente.
-*<p> 
-*<pre> 
-*  1.die Nummer der Prioritaet dieser Karte.
-*  2.das Zeichen der Aktion dieser Karte 
-*<p> 
-*@param prioritaet Prioritaet der Karte als Integer
-*@param action Aktion der Karte als String lauf "Protokolle und Datenformate" 
-*/ 
-	public Karte(){
-		prio = 0;
-		aktion = "";
-	}   
-	public Karte(int prioritaet,String action){
- 	    	prio = prioritaet;
-            	aktion = action;
-      	}  
-    
-      // 3 Objektmethoden 
-/**
- * Mohammad hat gerade gesagt, daß er später noch einen Komentar zu dieser Methode schreiben möchte!!!
- */
-public Karte ToKarte(){
-	Karte k = new Karte(this.prio,this.aktion);
-	return k;
-}
-	
+    /** 
+     *Der Konstruktor erwartet 2 Argumente.
+     *<p> 
+     *<pre> 
+     *  1.die Nummer der Prioritaet dieser Karte.
+     *  2.das Zeichen der Aktion dieser Karte 
+     *<p> 
+     *@param prioritaet Prioritaet der Karte als Integer
+     *@param action Aktion der Karte als String lauf "Protokolle und Datenformate" 
+     */ 
+    public Karte(){
+	prio = 0;
+	aktion = "";
+    }   
+
+    public Karte(int prioritaet,String action){
+	prio = prioritaet;
+	aktion = action;
+    }
+
+    //Miriam: Ich will nicht, dass Karten kopiert werden!
+
+    /** 
+     *<p> 
+     *Eine Objektmethode. 
+     *Kopiert den Inhalt des übergebenen Karten-Objektes k in die auf das 
+     *Karten-Objekt, auf das die Methode angewandt wird. 
+     */  
+    /*
+    public Karte(Karte k) 
+    { 
+	prio=k.getprio(); 
+	aktion=k.getaktion(); 
+    }     
+    */
 
 
-
-/** 
-*Eine Objektmethode. 
-*Liefert die Prioritaet zurueck     
-*@return Prioritaet der Karte als Integer 
-*/
+    /** 
+     *Eine Objektmethode. 
+     *Liefert die Prioritaet zurueck     
+     *@return Prioritaet der Karte als Integer 
+     */
    
-   public int getprio(){ 
-      return prio; 
-   } 
+    public int getprio(){ 
+	return prio; 
+    } 
        
-/** 
-*<p> 
-*Eine Objektmethode. 
-*Liefert die Aktion zurueck.       
-*@return Aktion als String laut "Protokolle und Datenformate" 
-*/ 
-        public String getaktion(){ 
-      return aktion; 
-   } 
-/** 
-*<p> 
-*Eine Objektmethode. 
-*Kopiert den Inhalt des übergebenen Karten-Objektes k in die auf das 
-*Karten-Objekt, auf das die Methode angewandt wird. 
-*/  
-   public void copy(Karte k) 
-   { 
-      prio=k.getprio(); 
-      aktion=k.getaktion(); 
-   } 
+    /** 
+     *<p> 
+     *Eine Objektmethode. 
+     *Liefert die Aktion zurueck.       
+     *@return Aktion als String laut "Protokolle und Datenformate" 
+     */ 
+    public String getaktion(){ 
+	return aktion; 
+    } 
+
 }

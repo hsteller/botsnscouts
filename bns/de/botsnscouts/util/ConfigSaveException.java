@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.util;
 
 /**
  * ConfigSaveException wird Problemen beim Speichern in config.txt 

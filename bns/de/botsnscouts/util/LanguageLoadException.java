@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.util;
 
 /**
  * LanguageLoadException wird bei Abweichungen vom messages-FileFormat

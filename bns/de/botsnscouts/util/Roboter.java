@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.util;
 
 /**
 * Die Klasse enthaelt den Status des Roboters.

@@ -1,9 +1,10 @@
+package de.botsnscouts.util;
+
 /** Ausgabe von Fehlermeldungen
     zunächst nur auf die Konsole, erweiterbar auf Fenster
     @author Miriam
 */
 
-package de.spline.rr;
 
 import java.io.*;
 

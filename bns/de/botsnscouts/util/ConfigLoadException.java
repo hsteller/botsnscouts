@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.util;
 
 /**
  * ConfigLoadException wird bei Problemen beim Lesen von config.txt

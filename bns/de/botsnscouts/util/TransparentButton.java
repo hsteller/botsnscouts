@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.util;
 
 import javax.swing.*;
 import javax.swing.border.*;
