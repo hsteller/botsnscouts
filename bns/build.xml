@@ -70,7 +70,8 @@
 
   <target name="compile" depends="init">
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" includes="${maindir}/**/*.java" destdir="${build}">
+    <javac srcdir="${src}" includes="${maindir}/**/*.java" 
+     destdir="${build}" encoding="ISO-8859-1">
       <classpath>
          <fileset dir="${jars}" includes="*.jar" />
       </classpath>	      

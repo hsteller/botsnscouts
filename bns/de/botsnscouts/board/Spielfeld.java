@@ -261,22 +261,24 @@ public class Spielfeld implements de.botsnscouts.util.Directions
       initArys();
    
       int strpos=0;            // Current pos in the String
+      Wand neu;
+      Boden nbo;
       for (int zeile=sizeY;zeile > 0;zeile--){      // Anfang parsen
 	//parse ZwischenReihe (Nordwaende)
 	for (int spalte=0;spalte < sizeX;spalte++){
-	  Wand neu=new Wand();
+	  neu=new Wand();
 	  strpos=parseWand(strpos,kacheln,neu);
 	  hWand[spalte][zeile]=neu;
 	  //d("spalte="+spalte+"; zeile="+zeile+";neu: "+neu.wandEl[0]+"|"+neu.spez[0]+(neu.da?"#":"_")+neu.wandEl[1]+"|"+neu.spez[1]);
 	}//for spalte, ZwischenR-parsen
 	strpos=assertws(kacheln,strpos);
 	//parse erste Wand
-	Wand neu=new Wand();
+	neu=new Wand();
 	strpos=parseWand(strpos,kacheln,neu);
 	//parse Boden,Wand
 	vWand[0][zeile-1]=neu;
 	for (int spalte=1;spalte <= sizeX;spalte++){
-	  Boden nbo=new Boden();
+	  nbo=new Boden();
 	  strpos=parseBoden(strpos,kacheln,nbo);
 	  boden[spalte][zeile]=nbo;
 	  neu=new Wand();
@@ -288,7 +290,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
       }    // for zeile
       // parse unterste ZwischenReihe
       for (int spalte=0;spalte < sizeX;spalte++){
-	Wand neu=new Wand();
+	neu=new Wand();
 	strpos=parseWand(strpos,kacheln,neu);
 	hWand[spalte][0]=neu;                     // Ende parsen
       }
