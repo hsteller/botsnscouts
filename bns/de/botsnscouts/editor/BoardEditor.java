@@ -232,7 +232,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
             CAT.debug("setting flag to "+x+", "+y);
             board.setFlags(new Location[] { new Location(x, y)} );
             calc=SimpleDistanceCalculator.getInstance(board);
-            calc.calculateDistances();
+            calc.preCalculate();
             boardView.setCalc(calc);
             repaint();
         }

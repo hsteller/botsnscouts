@@ -16,17 +16,20 @@ public abstract class DistanceCalculator {
 
     public DistanceCalculator(Board board) {
         this.board = board;
-    }
-
-    public int getDistance(Bot robbi) {
-        return getDistance(robbi, 0);
+        preCalculate();
     }
 
     /*
      * Takes into account actual distance, flag, damage, repair possibility
-     * and play strength.
+     * and play strength. The lower the return value is, the better.
      */
-    public int getDistance(Bot robbi, int malus) {
+    public int getGoodness(Bot robbi) {
+        return getGoodness(robbi, 0);
+    }
+
+    /** Also takes a malus into account
+     */
+    public int getGoodness(Bot robbi, int malus) {
         if (robbi.getDamage() == 10) {
             return 1000;
         }
@@ -35,8 +38,7 @@ public abstract class DistanceCalculator {
         if (robbi.getNextFlag() == board.getFlags().length + 1) {
             return 0;
         }
-        int distance = getDistance(robbi.getX(), robbi.getY(),
-                robbi.getNextFlag(), robbi.getFacing());
+        int distance = getDistance(robbi);
 
         // take flag touching into account - simply, the farther we get
         // the better the value will be
@@ -56,6 +58,12 @@ public abstract class DistanceCalculator {
         return distance;
     }
 
+    /** Gives the "raw" distance, without fancier mechanisms */
+    public int getDistance(Bot robbi) {
+        return getDistance(robbi.getX(), robbi.getY(),
+                robbi.getNextFlag(), robbi.getFacing());
+    }
+
     /**
      *  Gives the distance to the next flag, tahes into account whatever
      *  the subclass thinks necessary.
@@ -65,7 +73,10 @@ public abstract class DistanceCalculator {
     /**
      * Does any necessary pre-calculations.
      */
-    public abstract void calculateDistances();
+    public abstract void preCalculate();
+
+
+    /// Utility functions for subclasses. Delegate to board.
 
     boolean hasNorthWall(int x, int y) {
         return board.hasNorthWall(x, y);

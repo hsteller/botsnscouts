@@ -68,6 +68,7 @@ class EditorBoardView extends BoardView{
             g.setFont(myFont);
             g.setColor(Color.red);
             bot.moveTo(xpos, ypos);
+            bot.setDamage(0);
             bot.setFacing(Directions.NORTH);
             g.drawString(""+calc.getDistance(bot), x, y-20);
             bot.setFacing(Directions.SOUTH);

@@ -25,33 +25,26 @@
 
 package de.botsnscouts.autobot;
 
-import de.botsnscouts.util.Bot;
-import de.botsnscouts.util.FormatException;
-import de.botsnscouts.util.Location;
-import de.botsnscouts.util.Directions;
-import de.botsnscouts.board.SimBoard;
-import de.botsnscouts.board.FlagException;
 import de.botsnscouts.board.Board;
-import de.botsnscouts.board.Floor;
+import de.botsnscouts.util.Directions;
+import de.botsnscouts.util.Location;
+import org.apache.log4j.Category;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Category;
-
 /**
- *  This class can also calculate the distance a robot is from
- *  the next flag. Highly useful for the autobots and the wisenheimer.
+ *  This class can calculate the distance a robot is from
+ *  the next flag. Does not take conveyor belts into account.
  *  Id: $Id$
  */
 public class SimpleDistanceCalculator extends DistanceCalculator {
-    static final Category CAT=Category.getInstance(SimpleDistanceCalculator.class);
+    static final Category CAT = Category.getInstance(SimpleDistanceCalculator.class);
 
     private int[][][] distances;
 
     private SimpleDistanceCalculator(Board board) {
         super(board);
-        calculateDistances();
     }
 
     /**
@@ -122,7 +115,7 @@ public class SimpleDistanceCalculator extends DistanceCalculator {
     /**
      * Initializes the distances-Array.
      */
-    public void calculateDistances() {
+    public void preCalculate() {
         Location[] flags = board.getFlags();
         distances = new int[flags.length][][];
 
@@ -208,17 +201,17 @@ public class SimpleDistanceCalculator extends DistanceCalculator {
         }
     }
 
-
     private static Map uniqueInstances = new HashMap();
+
     /**
-     * Returnns a reference to a DistanceCalculator. To be used instead
+     * Returns a reference to a SimpleDistanceCalculator. To be used instead
      * of constructor. Guarantees only one DCB (which is reusable) is initialized
      * per vm.
      */
     public static synchronized SimpleDistanceCalculator getInstance(Board board) {
         if (uniqueInstances.get(board) == null)
             uniqueInstances.put(board, new SimpleDistanceCalculator(board));
-        return (SimpleDistanceCalculator)uniqueInstances.get(board);
+        return (SimpleDistanceCalculator) uniqueInstances.get(board);
     }
 
 }

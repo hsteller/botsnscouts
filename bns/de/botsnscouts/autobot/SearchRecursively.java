@@ -127,7 +127,7 @@ public class SearchRecursively {
                     return; // we die surely, discard this choice
             }
 
-            int score = calc.getDistance(r, malus) + diemalus;
+            int score = calc.getGoodness(r, malus) + diemalus;
             if (score <= bestScore) {
                 bestScore = score;
                 for (int i = 0; i < 5; i++)
