@@ -78,7 +78,8 @@ public class StartSpielfeldBut extends JPanel implements  ActionListener, Change
 	Font font=new Font("Sans", Font.BOLD, 12);
 
 	spielfeld=new JLabel(Message.say("Start","mSpielfeld"));
-	spielfelder=new JComboBox(loadSpielfelder());
+	String[] spielfeldAr=loadSpielfelder();
+	spielfelder=new JComboBox(spielfeldAr);
 	spielfelder.addItemListener(this);
 	save=new TransparentButton(Message.say("Start","bSave"));
 
@@ -128,15 +129,19 @@ public class StartSpielfeldBut extends JPanel implements  ActionListener, Change
 	inner.add(spielfelder,gc);
 	inner.add(save,gc);
 	inner.add(bearbeiten,gc);
+	inner.add(mitspielen,gc);
 	inner.add(name,gc);
 	inner.add(nam,gc);
 	inner.add(farbe,gc);
 	gc.fill = GridBagConstraints.NONE;
 	inner.add(farben,gc);
 	gc.fill = GridBagConstraints.HORIZONTAL;
-	inner.add(mitspielen,gc);
+
 	add(inner);
-    }
+    	//lade das erste gefundene Spielfeld Configuration
+	Properties spfProp=helfer.getProperties(spielfeldAr[0]);
+	parent.fassade.loadSpfProp(spfProp);
+}
 
     public void actionPerformed(ActionEvent e){
 	if(e.getActionCommand().equals("bearbeiten")){//end else if "ok"

@@ -15,6 +15,7 @@ public class StartSpielfeldLoadHelfer{
 	for (int i=0;i<all.length;i++){
 	    all[i]=all[i].substring(0,all[i].length()-4);
 	}
+	Arrays.sort(all);
 	return all;
     }
 

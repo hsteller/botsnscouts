@@ -58,7 +58,8 @@ public class StartSpielfeld extends JPanel implements  ActionListener{
 	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
 	paint = new TexturePaint( bgimg, anchor );
 
-    }
+   	spf.rasterChanged();
+ }
 
     public void actionPerformed(ActionEvent e){
 

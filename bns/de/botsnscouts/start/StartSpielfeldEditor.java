@@ -425,7 +425,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 	cursors=new Cursor[cursorImages.length+1];
 	Toolkit tk = Toolkit.getDefaultToolkit();
 	for(int i=1;i<cursors.length-1;i++){
-	    cursors[i]=tk.createCustomCursor(cursorImages[i-1],new Point(5,20),"cursor"+i);
+	    cursors[i]=tk.createCustomCursor(cursorImages[i-1],new Point(5,23),"cursor"+i);
 
 	}
 	int last=cursors.length-1;

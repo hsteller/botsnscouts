@@ -34,23 +34,6 @@ public class StartSpielfeldSpf extends JPanel{
 		add(kachP[i][j]);
 	    }
 	}
-	//lade default Spielfeld
-	try{
-	     fassade.setKachel(0,0,Message.say("Start","mKachel00"));
-	}catch(FlaggenVorhandenException e){
-	    System.err.println(e);
-	}
-	//lade default Flaggen
-	for (int i=0;i<Integer.parseInt(Message.say("Start","mFlaggen"));i++){
-	    try{
-		fassade.addFlagge(Integer.parseInt(Message.say("Start","mFlagge"+(i+1)+"x")),Integer.parseInt(Message.say("Start","mFlagge"+(i+1)+"y")));
-	    }catch(FlaggenException e){
-		System.err.println(e);
-	    }
-	}
-	//sage der Kachel 0,0 sie soll sich aktualisieren
-	kachP[0][0].rasterChanged();
-
     }
 
     public void rasterChanged(){
