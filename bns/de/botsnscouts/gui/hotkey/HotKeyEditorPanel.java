@@ -25,7 +25,7 @@ public class HotKeyEditorPanel extends JPanel {
   public final JLabel colChatMesgLbl   = new JLabel(Message.say(SEC,"editMessageLabel"));
   public final JLabel colChatCommitLbl = new JLabel(Message.say(SEC, "autoCommitBoxLabel"));
 
-  private final static int KEY_FIELD_SIZE = 2;
+  private final static int KEY_FIELD_SIZE = 5;
   private final static Color labelColor = Color.black;
 
 
@@ -184,6 +184,7 @@ public class HotKeyEditorPanel extends JPanel {
       keyedit.addKeyListener (new AbstractHotKeyListener(k){
         public void doStuff (KeyEvent e, int hotKeyCode) {
           String oldText = keyedit.getText();
+          keyedit.setText("");
           CAT.debug("oldText="+oldText);
           HotKey hk = getHotKey();
           try {
@@ -191,8 +192,8 @@ public class HotKeyEditorPanel extends JPanel {
             keyman.setHotKey(hk);
             if (e.isActionKey())
               keyedit.setText(hk.getKeyText());
-            else
-              keyedit.setText(e.getKeyChar()+"");
+           // else
+            //  keyedit.setText(e.getKeyChar()+"");
           }
           catch (KeyReserved kr) {
              CAT.debug("reserved key!");
@@ -200,14 +201,17 @@ public class HotKeyEditorPanel extends JPanel {
           }
         }
       });
-      // hack! funzt nur teilweise
-      char c = (char)k.getKeyCode();
-      if (Character.isISOControl(c))
-           keyedit.setText(k.getKeyText());
-      else
-        keyedit.setText(new Character(c).charValue()+"");
 
-
+      // <hack alert>
+      int i = k.getKeyCode();
+      String text  = KeyEvent.getKeyText(i);
+      String s = text.toLowerCase();
+      if (s.startsWith("unknown"))  // inefficient & nothing to be proud of..
+            text=""+((char)i);
+      else if (s.equals("minus"))
+        text= "-";
+      keyedit.setText(text);
+      // </hack alert>
       return keyedit;
   }
 
