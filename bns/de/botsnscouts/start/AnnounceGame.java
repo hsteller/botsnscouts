@@ -80,8 +80,8 @@ class AnnounceGame {
                     //ok, serverName is before, portNo after ':'
                     portNo = Integer.parseInt(s.substring(i+1, s.length()));
                     serverName = s.substring(0, i);
-                    System.setProperty("meta.server", serverName);
-                    System.setProperty("meta.port", ""+portNo);
+                    Conf.setProperty("meta.server", serverName);
+                    Conf.setProperty("meta.port", ""+portNo);
                     Conf.saveProperties();
                     break;
                 }
