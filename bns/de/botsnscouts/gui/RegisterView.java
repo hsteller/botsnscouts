@@ -93,6 +93,7 @@ public class RegisterView extends JButton {
     public void paintComponent(Graphics g){
 	super.paintComponent(g);
 	if(locked()) g.drawString("Locked",55,55);
+//	g.drawImage();
     }
 
     public static void main (String args[]) {

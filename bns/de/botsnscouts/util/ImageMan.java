@@ -23,9 +23,10 @@ public class ImageMan {
 	KSCHLAF = 8,
 	KWACH = 9;
 
-
+    // PNG-IDs
     public final static int 
-	ROBOCENTER = 0;
+	ROBOCENTER = 0,
+	REGLOCK =1;
 
 
     static Class c = de.botsnscouts.BotsNScouts.class;
@@ -41,7 +42,8 @@ public class ImageMan {
     public final static  ImageIcon CardRLEER = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/register-leer.gif")));
 	
     public final static String[] PngImages = {
-	"images/robocenter.png"
+	"images/robocenter.png",
+	"images/lock.png"
     };
 
     public static ImageIcon[] PNGImageIcons = new ImageIcon[PngImages.length];

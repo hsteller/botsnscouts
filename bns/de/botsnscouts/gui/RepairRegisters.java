@@ -65,7 +65,7 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	    tmp.add(rv);
 	    add(rv);
 	    rv.setActionCommand(""+i);
-	    locked[i]=((RegisterView)registers.get(i)).locked();
+	    locked[i]=lo;
 	    if (locked[i]) {Global.debug(this,"Das Register "+(i+1)+" ist gelockt");}
 	}
 	this.registers=tmp;
@@ -86,7 +86,7 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	ArrayList lst=new ArrayList(cntr);
 	for(int i=0;i<registers.size();i++){
 	    if(torepair[i]){
-		lst.add(new Integer(i));
+		lst.add(new Integer(i+1));
 	    }
 	}
 	return lst;

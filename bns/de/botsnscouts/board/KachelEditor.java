@@ -343,8 +343,8 @@ class LeftPanel extends SACanvas implements MouseListener{
 	else{ //fliessband etc.
 	    par.spf.boden[par.spfX+1][12-par.spfY].typ =par.elemTyp[par.indx];
 	    par.spf.boden[par.spfX+1][12-par.spfY].spez=par.elemSpez[par.indx];
-	    Global.debug(this,"hab' ich");
 	}
+	Global.debug(this,"hab' ich");
 	repaint();
     }
 
