@@ -174,11 +174,7 @@ private int x=800,y=600,x1=500,y1=100;
 		lang=argv[0];
 	    }
 	}
-	try{
-	    Message.setLanguage(lang);
-	}catch(LanguageLoadException exc){
-	    System.err.println(exc+"kann nicht!");
-	}
+	Message.setLanguage(lang);
 	Global.verbose=false;
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
 	new KachelEditor();
