@@ -724,7 +724,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             stats = new StatsList(alleN);
             feld.initStats(stats);
 
-            notifyViews(alleN);
+            notifyViews(alleN); 
 
 // 2. Bot
             sendMsg("mWelcome", "");
@@ -753,8 +753,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                     alleN[i++] = ((ServerRoboterThread) e.next()).rob.getName();
             }
             CAT.debug("716 release rthreads");
-            notifyViews(alleN);
-
+            //notifyViews(alleN); // HS: HIERHIERHIER initiale Ausrichtungen
+            sendMsg(MessageID.INITIAL_FACINGS, alleN);
+            
             // Loop for all turns.
             gameover = false;
             Vector gesperrteKarten = new Vector(); //Vector of cards!
@@ -795,7 +796,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                     }
                     CAT.debug("release roboterEL");
                     if (alleN.length > 0)
-                        notifyViews(alleN);
+                        notifyViews(alleN); 
                 }
                 d("Es werden " + roboterEintrittsListe.size() + " nach ihrer Zerstörung wieder eingesetzt");
 
