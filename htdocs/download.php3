@@ -34,7 +34,8 @@ JRE for Windows 95/98/NT/Linux/Solaris V1.3</A>
 </LI>
 </UL>
 <H2>For the Brave and Experienced Only</H2>
-If you are a developer yourself and if maybe there was a long time no release from us, you may want to risk a look into our CVS-repository. Read <A HREF="http://sourceforge.net/cvs/?group_id=3883">how to access</a> it and if you have got<A HREF="http://ant.apache.org">ant</A> 
+If you are a developer yourself and if maybe there was a long time no release from us, you may want to risk a look into our CVS-repository. Read <A HREF="http://sourceforge.net/cvs/?group_id=3883">how to access</a> it and if you have got
+<A HREF="http://ant.apache.org">ant</A> 
 installed simply type '<code>ant run</code>'. 
 <br>
 Sorry, the code is not easy to read because a) we were not as good as now when we started the project and b) huge chunks are still in German. We are working on it...
