@@ -1,6 +1,7 @@
 package de.botsnscouts.gui.hotkey;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Locale;
@@ -90,7 +91,7 @@ public class HotKeyEditorPanel extends JPanel {
       }
       JLabel desc = new JLabel(k.getAction().getDescription());
       JTextField edit = createHotKeyEditField(k);
-
+      edit.setText(k.getKeyText());
       JComponent additionals[] = k.getAction().getOptionalComponents();
       JComponent additional1 = null;
       JComponent additional2 = null;
@@ -222,49 +223,8 @@ public class HotKeyEditorPanel extends JPanel {
     return startLine;
   }
 
-   private JTextField createHotKeyEditField(HotKey k) {
-    final JTextField keyedit = new JTextField(KEY_FIELD_SIZE);
-      keyedit.addKeyListener (new AbstractHotKeyListener(k.getName()){
-        public void doStuff (KeyEvent e, int hotKeyCode) {
-          //CAT.debug(keyman.dump());
-          String oldText = keyedit.getText();
-          keyedit.setText("");
-          CAT.debug("oldText="+oldText);
-          String id = getKeyName();
-          try {
-            Integer code = new Integer(hotKeyCode);
-            HotKey old = keyman.getHotKey(code);
-            if (old == null || old.getName().equals(id)){// code is unused or the old code of id
-              keyman.updateHotkeyCode(id, code); // update keycode->hotkey  and keyname->hotkey mapping in keyman
-              HotKey hk = keyman.getHotKey(code);
-              if (e.isActionKey())
-                keyedit.setText(hk.getKeyText());
-
-            }
-            else {
-              keyedit.setText(oldText);
-            }
-            //CAT.debug(keyman.dump());
-          }
-          catch (KeyReserved kr) {
-             CAT.debug("reserved key!");
-             keyedit.setText(oldText);
-          }
-        }
-      });
-
-      // <hack alert>
-      int i = k.getKeyCode();
-      String text  = KeyEvent.getKeyText(i);
-      String s = text.toLowerCase();
-      if (s.startsWith("unknown"))  // inefficient & nothing to be proud of..
-            text=""+((char)i);
-      else if (s.equals("minus"))
-        text= "-";
-      keyedit.setText(text);
-      // </hack alert>
-      return keyedit;
+  private JTextField createHotKeyEditField(HotKey k) {
+      return new HotKeyInputField(k, KEY_FIELD_SIZE, keyman);
   }
-
 
 }

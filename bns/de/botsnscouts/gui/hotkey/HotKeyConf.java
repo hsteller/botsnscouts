@@ -4,6 +4,9 @@ import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.Message;
 
 import java.awt.event.KeyEvent;
+import java.util.HashSet;
+
+import javax.swing.KeyStroke;
 
 import org.apache.log4j.Category;
 
@@ -15,29 +18,23 @@ public class HotKeyConf {
 
   static Category CAT = Category.getInstance(HotKeyConf.class);
 
-  /** Neccessary because in IBM JDK1.3 getKeyText(VK_ENTER) will
-   *  return "Unknown keyCode: 0x0" or some similiar crap.
-   *  Interesting: KeyEvent.paramString() will return "*,Enter" anyway..
-   *                                ???
-   *                              ? o o ?
-   *                                 I
-   */
 
-  public static final int MAGIC_OFFSET_HACK = 10000;
-
-  public static final String SHOW_CHATLINE_TEXT = "Enter";
-  public static final int SHOW_CHATLINE = KeyEvent.VK_ENTER+MAGIC_OFFSET_HACK;
+  /** String to display for the 'Enter' key that is used to activate the Chatline;
+   * Reason: toString() didn't work for the first implementation..TODO test if still necessary 
+   * */
+  public static final String SHOW_CHATLINE_TEXT = "Enter"; 
   public static final String HOTKEY_SHOW_CHATLINE = "reservedKeyShowChat";
 
+  
+  
+  private static HashSet reservedKeys;
   static {
-    Conf.setProperty(HOTKEY_SHOW_CHATLINE, SHOW_CHATLINE+"");
+             reservedKeys =  new HashSet();
+             reservedKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+             reservedKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0 ));
+             reservedKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
   }
 
-  public static final int [] RESERVED_KEYS = new int [] {
-                                                      SHOW_CHATLINE,
-                                                      KeyEvent.VK_BACK_SPACE,
-                                                      KeyEvent.VK_SPACE
-                                                      };
 
   public static final String CODE_SUFFIX = "Code";
   public static final String TEXT_SUFFIX = "Text";
@@ -58,7 +55,13 @@ public class HotKeyConf {
   public static final String HOTKEY_SHOW_FLAG5 = "keyShowFlag5";
   public static final String HOTKEY_SHOW_FLAG6 = "keyShowFlag6";
 
-
+  // for easier access in loops:
+  public static final String [] HOTKEY_SHOW_FLAG_X = new String [] {
+                  HOTKEY_SHOW_FLAG1,HOTKEY_SHOW_FLAG2,HOTKEY_SHOW_FLAG3,
+                  HOTKEY_SHOW_FLAG4,HOTKEY_SHOW_FLAG5,HOTKEY_SHOW_FLAG6
+  };
+  
+  
   // Stuff used for ordering the keys in the HotKeyEditorpanel:
    public static final String [] GROUP_MESSAGES = {
                                          HOTKEY_MSG1,
@@ -86,32 +89,32 @@ public class HotKeyConf {
       return s;
   }
 
-  protected static Integer getKeyCode(String keyName){
+  /** Loads  the KeyStroke that is saved for the given keyName.
+   * 
+   * @param keyName the name of the key
+   * @return the KeyStroke for the keycode that was saved for the keyname or NULL if no (parsable) keycode was found
+   */ 
+  protected static KeyStroke getKeyStroke(String keyName){
+     
      String [] s = Conf.getMultipleProperty(keyName+CODE_SUFFIX);
-     CAT.debug("loading code: name="+keyName);
-
      if (s==null || s.length<1){
-      CAT.debug("no values, returing null");
-      return null;
+	      CAT.debug("no values, returing null");
+	      return null;
      }
-
      String codeS = s[0];
      if (codeS==null || codeS.length()==0){
-      CAT.warn ("code for "+keyName+" not found!");
-      return null;
-     }
-
-
-     Integer back=null;
+	      CAT.warn ("code for "+keyName+" not found!");
+	      return null;
+     }     
      try {
-        back = new Integer(codeS);
+         int keycode = Integer.parseInt(codeS);
+         KeyStroke back = KeyStroke.getKeyStroke(keycode,0);
+         return back;
      }
-     catch (NumberFormatException ne){
-        char c = codeS.charAt(0);
-        back = new Integer(c);
+     catch (NumberFormatException nfe){
+         CAT.error(nfe.getMessage(), nfe);
      }
-     CAT.debug("returning for code: "+keyName+"\tvalue="+back.intValue());
-     return back;
+     return null;
 
   }
 
@@ -121,13 +124,13 @@ public class HotKeyConf {
   }
 
   protected static void setHotKey (HotKey k, boolean save){
-   Integer code =  k.getKeyCodeI();
-   if (code == null || isReserved(code.intValue()))
+   KeyStroke stroke  =  k.getKeyStroke();
+   if (stroke == null || isReserved(stroke))
       return;
    HotKeyAction act = k.getAction();
    String [] opts = act.getOptionalValues();
    String keyName = k.getName();
-   Conf.setProperty(keyName+CODE_SUFFIX, code.toString());
+   Conf.setProperty(keyName+CODE_SUFFIX, ""+stroke.getKeyCode()); 
    if (opts != null && opts.length>0)
      Conf.setMultipleProperty(keyName+TEXT_SUFFIX, opts);
    if (save)
@@ -143,11 +146,8 @@ public class HotKeyConf {
     Conf.saveProperties();
   }
 
-  public static boolean isReserved (int keyCode){
-    for (int i=0;i<RESERVED_KEYS.length; i++)
-      if (RESERVED_KEYS[i] == keyCode)
-        return true;
-    return false;
+  public static boolean isReserved (KeyStroke keyStroke){
+      return reservedKeys.contains(keyStroke);
   }
 
 

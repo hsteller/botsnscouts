@@ -36,13 +36,13 @@ public class ChatMessageEditor  {
   private JCheckBox  autoCommitBox;
 
 
-  public ChatMessageEditor(String message, boolean autoCommit, HotKeyMan keyman, String hotkeyID) {
+  private ChatMessageEditor(String message, boolean autoCommit, HotKeyMan keyman, String hotkeyID) {
     this(keyman, hotkeyID);
     messageField.setText(message);
     autoCommitBox.setSelected(autoCommit);
   }
 
-  public ChatMessageEditor(HotKeyMan keyman, String hotkeyID) {
+  private ChatMessageEditor(HotKeyMan keyman, String hotkeyID) {
     messageField = new JTextField();
     autoCommitBox = new JCheckBox();
   }
@@ -70,7 +70,6 @@ public class ChatMessageEditor  {
 
   }
 
-
   private void initListeners(){
     autoCommitBox.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent e) {
@@ -92,5 +91,35 @@ public class ChatMessageEditor  {
 
     });
   }
+  
+
+  public static ChatMessageEditor createEditorForMessage (String propertyNameOfMessage, HotKeyMan keyMan){
+      	ChatMessageEditor editPanel;  
+      	String [] s = HotKeyConf.getOptinalValues(propertyNameOfMessage);
+		  if (s == null || s.length==0) { 
+		      // no message properties or even message found 
+		      // => creating Panel with empty message-Textfield and autocommit-Checkbox
+		    CAT.debug("no message properties found");
+		    editPanel = new ChatMessageEditor(keyMan, propertyNameOfMessage);
+		  }
+		  else if (s.length==1){
+		     // found only one message but nothing about autocommit
+		     // => textfield will be filled, autocommit will be unchecked
+		    CAT.debug("found chatmessage: "+s[0]);
+		    CAT.debug("did not find autoCommit");
+		    editPanel = new ChatMessageEditor(s[0], false,
+		                keyMan, propertyNameOfMessage);
+		  }
+		  else { //s.length>1
+		     // found all informations for the message => 
+		      // creating Textfield and autocommit-Box accordingly           
+		    CAT.debug("found chatmessage: "+s[0]);
+		    CAT.debug("found autoCommit property: "+s[1]);
+		    editPanel = new ChatMessageEditor(s[0], new Boolean(s[1]).booleanValue(),
+		                keyMan, propertyNameOfMessage);
+		  }
+		  return editPanel;
+  }
+
 
 }

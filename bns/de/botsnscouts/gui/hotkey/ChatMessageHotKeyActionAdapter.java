@@ -1,5 +1,7 @@
 package de.botsnscouts.gui.hotkey;
 
+import java.awt.event.ActionEvent;
+
 import javax.swing.*;
 
 public class ChatMessageHotKeyActionAdapter extends HotKeyAction {
@@ -40,8 +42,8 @@ public class ChatMessageHotKeyActionAdapter extends HotKeyAction {
   public String getMessage() {
     return editor.getMessage();
   }
-
-  public void execute() {
+/** Override this */
+  public void actionPerformed(ActionEvent act) {
 
   }
 }

@@ -1,10 +1,11 @@
 package de.botsnscouts.gui.hotkey;
 
+import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 
 import org.apache.log4j.Category;
 
-public abstract class HotKeyAction{
+public abstract class HotKeyAction extends AbstractAction{
 
   Category CAT = Category.getInstance(HotKeyAction.class);
 
@@ -51,6 +52,6 @@ public abstract class HotKeyAction{
     optionalValues = values;
   }
 
-  public abstract void execute();
+
 
 }

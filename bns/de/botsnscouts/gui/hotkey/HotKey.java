@@ -1,17 +1,19 @@
 package de.botsnscouts.gui.hotkey;
 
-//?? getter and setter for keycode synchronizen ??
-public class HotKey{
+import java.awt.event.KeyEvent;
 
-  public static final int UNDEFINED = -1;
+import javax.swing.KeyStroke;
 
-  private Integer keyCode;
+public class HotKey {
+
+
+  private KeyStroke key;
   private HotKeyAction action;
   private String keyName;
 
 
-   public HotKey (String keyName, Integer keyCode,  HotKeyAction action) {
-    this.keyCode =keyCode;
+   public HotKey (String keyName, KeyStroke key,  HotKeyAction action) {
+    this.key = key;
     this.keyName = keyName;
     this.action = action;
     action.setDescription(HotKeyConf.getDescription(keyName));
@@ -20,35 +22,28 @@ public class HotKey{
   }
 
   public HotKey (String keyName, HotKeyAction action) {
-    this(keyName, HotKeyConf.getKeyCode(keyName),action);
-
+    this(keyName, HotKeyConf.getKeyStroke(keyName),action);
   }
 
 
-  public Integer getKeyCodeI(){
-    return keyCode;
+
+
+  protected KeyStroke getKeyStroke(){
+      return key;
   }
-
-  public int getKeyCode(){
-    if ( keyCode != null)
-      return keyCode.intValue();
-    else
-      return UNDEFINED;
-  }
-
-
-  protected void setKeyCode(Integer key) throws KeyReserved{
-      if (keyCode != null && keyCode.equals(key))
+  
+  protected void setKeyStroke(KeyStroke keyS) throws KeyReserved{
+      if (keyS == null)
         return;
-      if (key != null && HotKeyConf.isReserved(key.intValue()))
+      if (HotKeyConf.isReserved(keyS))
         throw new KeyReserved();
-      this.keyCode = key;
-      HotKeyConf.setHotKey(this);
+      this.key= keyS;
+    // HotKeyConf.setHotKey(this);
 
   }
 
   public void executeAction() {
-    action.execute();
+    action.actionPerformed(null);
   }
 
   public HotKeyAction getAction(){
@@ -72,12 +67,12 @@ public class HotKey{
     if (keyName.equals(HotKeyConf.HOTKEY_SHOW_CHATLINE))
       return HotKeyConf.SHOW_CHATLINE_TEXT;
     else
-      return java.awt.event.KeyEvent.getKeyText(keyCode.intValue());
+      return KeyEvent.getKeyText(key.getKeyCode());
 
   }
 
   public String toString() {
-    StringBuffer sb = new StringBuffer("Hotkey: code= ").append(keyCode);
+    StringBuffer sb = new StringBuffer("Hotkey: code= ").append(key);
     sb.append("   name=").append(keyName);
     sb.append("  action=").append(action.toString());
     sb.append("  optional=");
@@ -88,15 +83,16 @@ public class HotKey{
     return sb.toString();
   }
 
+  /** FIXME move elsewhere */
   public static String dumpEvent(java.awt.event.KeyEvent e) {
       StringBuffer sb = new StringBuffer(200);
       sb.append("KEYEVENT\n keychar: "+e.getKeyChar()+"\nkeycode: "+e.getKeyCode()
                 +"\nnumValue: "+Character.getNumericValue(e.getKeyChar()));
 
       int mods = e.getModifiers();
-      String ms = e.getKeyModifiersText(mods);
+      String ms = KeyEvent.getKeyModifiersText(mods);
       sb.append("\nmods="+mods+"\tmodString="+ms);
-      sb.append("\nkeyText="+e.getKeyText(e.getKeyCode()));
+      sb.append("\nkeyText="+KeyEvent.getKeyText(e.getKeyCode()));
       sb.append("\nID="+e.getID());
       sb.append("\nparamString="+e.paramString());
       sb.append("\nconsumed?"+e.isConsumed());
