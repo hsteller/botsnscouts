@@ -1044,7 +1044,7 @@ public class SpielerMensch extends Thread {
      * Start des Menschlichen Spielers
      */ 
     public void run(){
-
+	Global.debug(this,"SpielerMensch run() angefangen!");
 	Thread th = new Thread(f);
 	th.start();
 

@@ -51,14 +51,14 @@ public class HumanCard implements Karte{
 
     /** returns the priority */
     public int getprio() {
-	return 0;
+	return prio;
     }
        
     /** returns the kind of the card in the usual form
 	(M1, M2, M3, UT, BU, RR, RL)
     */
     public String getaktion() {
-	return null;
+	return action;
     }
 
     

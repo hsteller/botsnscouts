@@ -47,6 +47,11 @@ public class RegisterView extends JButton {
 	return h.locked();
     }
 
+    public void setLocked(boolean b){
+	if(b) h.setState(HumanCard.LOCKED);
+	else  h.setState(HumanCard.FREE);
+    }
+
 
     public void setCard(HumanCard h) {
 	this.h = h;
@@ -67,6 +72,10 @@ public class RegisterView extends JButton {
 	return h;
     }
 
+    public void paintComponent(Graphics g){
+	super.paintComponent(g);
+	if(locked()) g.drawString("Locked",55,55);
+    }
 
     public static void main (String args[]) {
 	Message.setLanguage("deutsch");

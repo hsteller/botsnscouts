@@ -16,16 +16,11 @@ public class RepairRegisters extends JPanel implements ActionListener{
     private JButton fertig;
     private JLabel titel;
 
-    private JCheckBox cb1 = new JCheckBox(Message.say("SpielerMensch","mcregister","1"),false);
-    private JCheckBox cb2 = new JCheckBox(Message.say("SpielerMensch","mcregister","2"),false);
-    private JCheckBox cb3 = new JCheckBox(Message.say("SpielerMensch","mcregister","3"),false);
-    private JCheckBox cb4 = new JCheckBox(Message.say("SpielerMensch","mcregister","4"),false);
-    private JCheckBox cb5 = new JCheckBox(Message.say("SpielerMensch","mcregister","5"),false);
-
     private int zuVerteilen=0;
     private int repairPoints=0;
 
     private ArrayList registers;
+    private boolean[] locked;
 
     public RepairRegisters() {
 	this(new ActionListener(){
@@ -39,44 +34,10 @@ public class RepairRegisters extends JPanel implements ActionListener{
     public RepairRegisters(ActionListener al) {
 	setBorder(new EmptyBorder(10,10,10,10));
 	setLayout(new GridLayout(9,1));
-	cb1.addActionListener(this);
-	cb2.addActionListener(this);
-	cb3.addActionListener(this);
-	cb4.addActionListener(this);
-	cb5.addActionListener(this);
-	cb1.setActionCommand("0");
-	cb1.setActionCommand("1");
-	cb1.setActionCommand("2");
-	cb1.setActionCommand("3");
-	cb1.setActionCommand("4");
-	add(cb1);
-	add(cb2);
-	add(cb3);
-	add(cb4);
-	add(cb5);
 
-	add(new JLabel(""));
-	titel = new JLabel(Message.say("SpielerMensch","mregwahl",repairPoints));
-	add(titel);
-
+	titel = new JLabel();
 	fertig=new JButton(Message.say("SpielerMensch","ok"));
-
 	fertig.addActionListener(al);
-	add(fertig);
-    }
-
-    private void resetAll() {
-	cb1.setSelected(false);
-	cb2.setSelected(false);
-	cb3.setSelected(false);
-	cb4.setSelected(false);
-	cb5.setSelected(false);
-
-	cb1.setEnabled(false);
-	cb2.setEnabled(false);
-	cb3.setEnabled(false);
-	cb4.setEnabled(false);
-	cb5.setEnabled(false);
     }
 
     
@@ -85,57 +46,38 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	this.registers=registers;
 	zuVerteilen = repairPoints;
 
-	resetAll();
+//	resetAll();
 
 	titel.setText(Message.say("SpielerMensch","mregwahl",repairPoints));
-
-	if(((CardView) registers.get(0)).getCard().getState() == HumanCard.LOCKED) {
-	    cb1.setEnabled(true);
+	locked=new boolean[registers.size()];
+	for(int i=0;i<registers.size();i++){
+	    add((RegisterView)registers.get(i));
+	    ((RegisterView)registers.get(i)).setActionCommand(""+i);
+	    locked[i]=((RegisterView)registers.get(i)).locked();
 	}
-	if(((CardView) registers.get(1)).getCard().getState() == HumanCard.LOCKED){
-	    cb2.setEnabled(true);
-	}
-	if(((CardView) registers.get(2)).getCard().getState() == HumanCard.LOCKED){
-	    cb3.setEnabled(true);
-	}
-	if(((CardView) registers.get(3)).getCard().getState() == HumanCard.LOCKED){
-	    cb4.setEnabled(true);
-	}
-	if(((CardView) registers.get(4)).getCard().getState() == HumanCard.LOCKED){
-	    cb5.setEnabled(true);
-	}
+	add(titel);
+	add(fertig);
     }
 
-    public ArrayList getSelection() {
-	while (zuVerteilen > 0) {
-	    for (int i=0; ((i < registers.size())&&(zuVerteilen >0)); i++) {
-		if(((HumanCard) registers.get(i)).getState() == HumanCard.LOCKED){
-		    ((HumanCard) registers.get(i)).setState(HumanCard.FREE);
-		    zuVerteilen--;
-		}
-	    }
+    public ArrayList getSelection() {	
+	ArrayList lst=new ArrayList(5);
+	for(int i=0;i<registers.size();i++){
+	    lst.add(new Boolean(((RegisterView)registers.get(i)).locked()));
 	}
-	return registers;
+	return lst;
     }
-
 
     public void actionPerformed (ActionEvent e) {
-	if ( ((JCheckBox) e.getSource()).getModel().isSelected()) { 
-	    if (zuVerteilen > 0) {
-		((HumanCard) registers.get(
-					   Integer.parseInt(e.getActionCommand()))
-		 ).setState(HumanCard.FREE);
-		zuVerteilen--; 
-	    }
-	    else { 
-		((JCheckBox) e.getSource()).getModel().setSelected(false);
-		((HumanCard) registers.get(
-					   Integer.parseInt(e.getActionCommand()))
-		 ).setState(HumanCard.LOCKED);
-	    }
-	}
-	else if (zuVerteilen < repairPoints) {
+	int num=Integer.parseInt(e.getActionCommand());
+	RegisterView rv=((RegisterView) e.getSource());
+	if(rv.locked()&&(zuVerteilen>0)){
+	    rv.setLocked(false);
+	    zuVerteilen--;
+	    titel.setText(Message.say("SpielerMensch","mregwahl",zuVerteilen));
+	}else if((!rv.locked())&&locked[num]){
+	    rv.setLocked(true);
 	    zuVerteilen++;
+	    titel.setText(Message.say("SpielerMensch","mregwahl",zuVerteilen));
 	}
     }
     
@@ -147,6 +89,19 @@ public class RepairRegisters extends JPanel implements ActionListener{
 
         RepairRegisters re = new RepairRegisters();
 
+	ArrayList ra=new ArrayList(5);
+	RegisterView rv;
+	for(int i=0;i<5;i++){
+	    rv=new RegisterView(re);
+	    rv.setCard(new HumanCard(100+i,"M2"));
+	    ra.add(rv);
+	}
+	
+	((RegisterView)ra.get(2)).setLocked(true);
+	((RegisterView)ra.get(0)).setLocked(true);
+	((RegisterView)ra.get(4)).setLocked(true);
+
+	re.setChoises(ra,2);
 	f.getContentPane().add(re);
 	f.pack();
 	f.setLocation(100,100);
