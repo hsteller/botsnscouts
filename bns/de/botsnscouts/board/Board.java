@@ -35,7 +35,9 @@ import de.botsnscouts.util.*;
 
 public class Board implements de.botsnscouts.util.Directions, FloorConstants {
 
-    public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Board.class);
+    /* not static on purpose, need to inherit it */
+    org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Board.class);
+    static org.apache.log4j.Category sCAT = org.apache.log4j.Category.getInstance(Board.class);
 
     /** Preview-Image is possibly saved along with the tile */
     protected java.awt.Image img;
@@ -336,11 +338,11 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
     }
 
     protected final static void p(String s) {
-        CAT.debug(s);
+        sCAT.debug(s);
     }
 
     protected final static void pn(String s) {
-        CAT.debug(s);
+        sCAT.debug(s);
     }
 
     public boolean hasNorthWall(int x, int y) {

@@ -33,17 +33,24 @@ import java.util.Vector;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.apache.log4j.Priority;
+
 /**
  * This board is also able to do phases.
  * @author: Dirk Materlik
  * Id: $Id$
  */
 public class SimBoard extends Board implements Directions {
-    protected boolean debugMessages = true; // Damit mehrere KIs auf einem
-    // Rechner sich synchronisieren
+
+    private Priority origLevel = null;
     public void setDebug(boolean b) {
-        //TODO: use log4j Categories!
-        debugMessages=b;
+        if (origLevel == null)
+            origLevel = CAT.getPriority();
+
+        if (b)
+            CAT.setPriority(origLevel);
+        else
+            CAT.setPriority(Priority.FATAL);
     }
 
     protected Vector /* of LaserDef */ lasers;
@@ -920,12 +927,6 @@ public class SimBoard extends Board implements Directions {
             } // for
         } // if
     } // registerSperren ende
-
-    protected void d(String s) {
-        if (debugMessages) {
-            Global.debug(this, s);
-        }
-    }
 
     private static Map instances = new HashMap();
     public static SimBoard getInstance(int x, int y, String field, Location[] flags) throws FormatException, FlagException{

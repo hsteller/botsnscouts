@@ -207,7 +207,7 @@ public class StartPanel extends JPanel{
 	gc.insets = noInsets;
 	panel.add( ks, gc);
 
-	JLabel lb = new TJLabel(Message.say("Start", "mDumm"), JLabel.LEFT);
+	JLabel lb = new TJLabel(Message.say("Start", "mSchlau"), JLabel.LEFT);
 	gc.insets = insets;
 	gc.gridx = GridBagConstraints.RELATIVE;
 	gc.gridy++;
@@ -219,6 +219,8 @@ public class StartPanel extends JPanel{
 	// Slider
         intel=new JSlider();
 	intel.setOpaque(false);
+        intel.getModel().setMinimum(0);
+        intel.getModel().setMaximum(130);
 	gc.gridwidth = 2;
 	gc.gridheight = 1;
 	gc.anchor = GridBagConstraints.CENTER;
@@ -227,13 +229,14 @@ public class StartPanel extends JPanel{
 
 	// Label schlau
 	gc.anchor = GridBagConstraints.EAST;
-	lb = new TJLabel(Message.say("Start", "mSchlau"), JLabel.RIGHT);
+	lb = new TJLabel(Message.say("Start", "mDumm"), JLabel.RIGHT);
 	gc.fill =  GridBagConstraints.HORIZONTAL;
 	panel.add( lb, gc );
 
         JButton startAB=new TransparentButton(Message.say("Start","mKSStarten"));
 	startAB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
+                    CAT.debug("intel ist jetzt "+intel.getValue());
 		    parent.addKS(parent.fassade.kuenstlicheSpielerStarten(intel.getValue()));
 		}});
 

@@ -72,9 +72,9 @@ class EditorBoardView extends BoardView{
             bot.setFacing(Directions.SOUTH);
             g.drawString(""+calc.getDistance(bot), x, y+20);
             bot.setFacing(Directions.EAST);
-            g.drawString(""+calc.getDistance(bot), x+20, y);
+            g.drawString(""+calc.getDistance(bot), x+5, y);
             bot.setFacing(Directions.WEST);
-            g.drawString(""+calc.getDistance(bot), x-20, y);
+            g.drawString(""+calc.getDistance(bot), x-30, y);
         }
     }
 }
