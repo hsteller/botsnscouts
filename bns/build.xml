@@ -88,8 +88,16 @@
   </target>
 
   <target name="run" depends="compile">
-     <echo message="${jars}:${build}" />
      <java classname="de.botsnscouts.BotsNScouts" fork="true">
+        <classpath>
+	   <fileset dir="${jars}" includes="*.jar" />
+	   <pathelement path="${build}" />
+	</classpath>
+     </java>
+  </target>
+
+  <target name="editor" depends="compile">
+     <java classname="de.botsnscouts.board.KachelEditor" fork="true">
         <classpath>
 	   <fileset dir="${jars}" includes="*.jar" />
 	   <pathelement path="${build}" />
