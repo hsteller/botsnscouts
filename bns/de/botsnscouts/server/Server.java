@@ -30,8 +30,8 @@ public class Server extends Thread{
         private int aktPhase=0; // enthaelt die Nummer der gerade auswertenden Phase. 0 wenn nicht ausgewertet wird
 
         private Vector msgQ; // Um zu sendende Messages zwischenzuspeichern
-        private Timer roboterWecker;
-        private Timer ausgabenWecker;
+        private de.botsnscouts.server.Timer roboterWecker;
+        private de.botsnscouts.server.Timer ausgabenWecker;
     
 	// Timeouts
 	protected int zugto;
@@ -95,8 +95,8 @@ public Server(	int 		anzahlmitspieler,
 	startServer = sserver;	
 	flaggen = Flaggen;
         msgQ=new Vector();
-        roboterWecker=new Timer();
-        ausgabenWecker=new Timer();
+        roboterWecker=new de.botsnscouts.server.Timer();
+        ausgabenWecker=new de.botsnscouts.server.Timer();
        
 
 	try{
