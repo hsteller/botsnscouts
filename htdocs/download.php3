@@ -27,9 +27,9 @@ Download and unzip one of the distributions. It includes two files README and IN
 <P>
 <H2>Java Runtime Environment</H2>
 You also need Java 2 for running Bots'n'Scouts. We recommend Version 1.3 for
-V0.8pre, but it should be running under V1.2, too. If you haven't got a JRE or
+V0.8pre, but it should be running under V1.2 and V1.4, too. If you haven't got a JRE or
 JDK for Java 2 installed, you may get it from the following location: <UL>
-<LI> <A HREF="http://java.sun.com/products/jdk/1.3/jre"> 
+<LI> <A HREF="http://java.sun.com/j2se/1.3/"> 
 JRE for Windows 95/98/NT/Linux/Solaris V1.3</A>
 </LI>
 </UL>
