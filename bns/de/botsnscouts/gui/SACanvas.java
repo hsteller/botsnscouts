@@ -1024,7 +1024,7 @@ public class SACanvas extends JComponent {
 	highlightPos.x = x;	
 	highlightPos.y = y;
 	
-	Timer t = new Timer(5000, new ActionListener() {
+	javax.swing.Timer t = new javax.swing.Timer(5000, new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 		    unhighlight();
 		}

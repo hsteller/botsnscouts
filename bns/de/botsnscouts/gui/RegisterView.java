@@ -53,7 +53,7 @@ public class RegisterView extends JButton {
 	else return false;
     }
 
-    public String getAction(){
+    public String getCardAction(){
 	return h.getaktion();
     }
 

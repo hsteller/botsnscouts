@@ -57,7 +57,7 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	for(int i=0;i<registers.size();i++){
 	    rv=(RegisterView)registers.get(i);
 	    lo=rv.locked();
-	    act=rv.getAction();
+	    act=rv.getCardAction();
 	    prio=rv.getPrio();
 	    rv=new RegisterView(this);
 	    rv.setCard(new HumanCard(prio,act));
