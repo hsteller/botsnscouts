@@ -32,14 +32,15 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
+import org.apache.log4j.*;
 /**
  * ask the user for the register reparation
  * @author Lukasz Pekacki
  */
 public class RepairRegisters extends JPanel implements ActionListener{
 
-    private JButton fertig;
-    private JLabel titel;
+    private JButton done;
+    private JLabel title;
 
     private int zuVerteilen=0;
     private int repairPoints=0;
@@ -47,10 +48,12 @@ public class RepairRegisters extends JPanel implements ActionListener{
     private ArrayList registers;
     private boolean[] locked;
 
-    public RepairRegisters() {
+    private Box left = new Box(BoxLayout.Y_AXIS);
+
+     private RepairRegisters() {
 	this(new ActionListener(){
 		public void actionPerformed(ActionEvent ae) {
-		    System.err.println("Send.");
+		  System.err.println("Send.");
 		}
 	    });
 	     
@@ -58,11 +61,22 @@ public class RepairRegisters extends JPanel implements ActionListener{
 
     public RepairRegisters(ActionListener al) {
 	setBorder(new EmptyBorder(10,10,10,10));
-	setLayout(new GridLayout(9,1));
+	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	title = new JLabel();
+	done=new JButton(Message.say("SpielerMensch","ok"));
+	done.addActionListener(al);
 
-	titel = new JLabel();
-	fertig=new JButton(Message.say("SpielerMensch","ok"));
-	fertig.addActionListener(al);
+	Box right = new Box(BoxLayout.Y_AXIS);
+	Box buttonBox = new Box(BoxLayout.X_AXIS);
+	Box main = new Box(BoxLayout.X_AXIS);
+	main.add(left);
+	main.add(right);
+	buttonBox.add(Box.createHorizontalGlue());
+	buttonBox.add(done);
+	right.add(buttonBox);
+	right.add(Box.createVerticalGlue());
+	add(title);
+	add(main);
     }
 
     
@@ -73,7 +87,7 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	ArrayList tmp=new ArrayList(5);
 //	resetAll();
 
-	titel.setText(Message.say("SpielerMensch","mregwahl",repairPoints));
+	title.setText(Message.say("SpielerMensch","mregwahl",repairPoints));
 	locked=new boolean[registers.size()];
 	RegisterView rv;
 	boolean lo;
@@ -88,14 +102,12 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	    rv.setCard(new HumanCard(prio,act));
 	    rv.setLocked(lo);
 	    tmp.add(rv);
-	    add(rv);
+	    left.add(rv);
 	    rv.setActionCommand(""+i);
 	    locked[i]=lo;
 	    if (locked[i]) {Global.debug(this,"Das Register "+(i+1)+" ist gelockt");}
 	}
 	this.registers=tmp;
-	add(titel);
-	add(fertig);
     }
 
     public ArrayList getSelection() {	
@@ -116,24 +128,25 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	return lst;
     }
 
-    public void actionPerformed (ActionEvent e) {
+      public void actionPerformed (ActionEvent e) {
 	int num=Integer.parseInt(e.getActionCommand());
 	RegisterView rv=((RegisterView) e.getSource());
 	if(rv.locked()&&(zuVerteilen>0)){
 	    rv.setLocked(false);
 	    zuVerteilen--;
-	    titel.setText(Message.say("SpielerMensch","mregwahl",zuVerteilen));
+	    title.setText(Message.say("SpielerMensch","mregwahl",zuVerteilen));
 	}else if((!rv.locked())&&locked[num]){
 	    rv.setLocked(true);
 	    zuVerteilen++;
-	    titel.setText(Message.say("SpielerMensch","mregwahl",zuVerteilen));
+	    title.setText(Message.say("SpielerMensch","mregwahl",zuVerteilen));
 	}
-    }
+      }
     
 
     public static void main (String args[]) {
+	BasicConfigurator.configure();
 	Message.setLanguage("deutsch");
-        JWindow f = new JWindow();
+        JFrame f = new JFrame("testing RepairRegisters");
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
 
         RepairRegisters re = new RepairRegisters();
@@ -154,6 +167,7 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	f.getContentPane().add(re);
 	f.pack();
 	f.setLocation(100,100);
+
 	f.setVisible(true);
     }
 
