@@ -143,24 +143,6 @@ public class DistanceCalculatingBoard extends SimBoard {
         // never reached
     }
 
-    public void pr() {
-        // for debugging only.
-        String wert;
-        int laenge;
-        for (int m = 0; m < flags.length; m++) {
-            for (int y = sizeY + 1; y > -1; y--) {
-                for (int x = 0; x < sizeX + 2; x++) {
-                    wert = "" + distances[m][x][y];
-                    laenge = wert.length();
-                    for (int i = 0; i < (5 - laenge); i++) {
-                        //Global.debug(" ");
-                    }
-                    //Global.debug(""+entftab[m][x][y]);
-                }
-            }
-        }
-    }
-
     /**
      * Initializes the distances-Array.
      */
