@@ -53,6 +53,8 @@ public class SpielfeldSim extends Spielfeld
   /* Enthaelt bewegte Roboter, um String[] erzeugen zu koennen */
   protected boolean[] bewegt;
 
+    private BoardRoboter[] br=new BoardRoboter[1]; /* Singleton-Array um einen Robi effizient casten zu können*/
+
   private void bewegt2false()
     {
       for (int i=0;i<bewegt.length;i++)
@@ -60,7 +62,7 @@ public class SpielfeldSim extends Spielfeld
     }
   
   /* Benachrichtigt die Ausgaben von Aenderungen */
-  private void benachrichtige(Roboter[] robbis){
+  private void benachrichtige(BoardRoboter[] robbis){
     if (server==null)
       return;
     
@@ -202,6 +204,13 @@ public class SpielfeldSim extends Spielfeld
       }
     }
 
+
+    /** Führt eine Phase mit nur einem Roboter aus */
+    public void doPhase(int phase, Roboter r){
+	br[0]=(BoardRoboter)r;
+	doPhaseReal(phase, br);
+    }
+
   /** F&uuml;hrt eine Phase aus. Falls mit Ausgabekanalkomm-Objekten
     initialisiert, werden diese von jeder &Auml;nderung benachrichtigt.
     Ergebnisr&uuml;ckgabe erfolgt durch &Auml;nderung der &uuml;bergebenen
@@ -209,7 +218,14 @@ public class SpielfeldSim extends Spielfeld
     @param phase Die zu simulierende Phase
     @param robbis Die dabei zu beachtenden Roboter
     */
-  public void doPhase(int phase,Roboter[] robbis)
+    public void doPhase(int phase, Roboter[] robbis){
+	BoardRoboter[] b=new BoardRoboter[robbis.length];
+	for (int i=0;i<robbis.length;i++)
+	    b[i]=(BoardRoboter)robbis[i];
+	doPhaseReal(phase, b);
+    }
+
+  private void doPhaseReal(int phase,BoardRoboter[] robbis)
     {
       for (int i=0;i<robbis.length;i++) // angedachte Richtung (aa) auf ungueltig (-1) setzen
 	robbis[i].aa=-1;
@@ -254,7 +270,7 @@ public class SpielfeldSim extends Spielfeld
 	benachrichtige(robbis);
       }
     }
-  private void doRobBew(int phase,Roboter[] robbis)
+  private void doRobBew(int phase,BoardRoboter[] robbis)
     {
       d("doRobBew called.");
       boolean[] bewegt=new boolean[robbis.length];
@@ -280,7 +296,7 @@ public class SpielfeldSim extends Spielfeld
 	todo--;
       }
     }
-  private void moveRob(Roboter[] robbis,int rob,String aktion)
+  private void moveRob(BoardRoboter[] robbis,int rob,String aktion)
     {
       d("MoveRob: "+robbis[rob].getName()+"; aktion="+aktion);
 
@@ -321,7 +337,7 @@ public class SpielfeldSim extends Spielfeld
       else
 	throw new RRdoPhaseException("Nicht erlaubte Karte '"+aktion+"' fuer Roboter "+robbis[rob].getName());
     }
-  private boolean moveRobOne(Roboter[] robbis,int rob,int direction, boolean schubsen)
+  private boolean moveRobOne(BoardRoboter[] robbis,int rob,int direction, boolean schubsen)
     {
       // Bewegt Roboter Nr. rob in direction wenn nix im Weg ist
 
@@ -408,7 +424,7 @@ public class SpielfeldSim extends Spielfeld
       return(true);
     }
 
-  private void checkGrubenOpfer(Roboter[] robbis, boolean xxyy) 
+  private void checkGrubenOpfer(BoardRoboter[] robbis, boolean xxyy) 
     { 
       // d("cGrube: "+(xxyy?"xxyy":"richtige Koordinaten"));
       // Schaut ob jemand in eine Grube gefallen ist
@@ -432,7 +448,7 @@ public class SpielfeldSim extends Spielfeld
   /**
     Roboter auf zerstört setzen (Schaden=10, virtuell=true)
    */
-  private void vernichteRoboter(Roboter thorsten)
+  private void vernichteRoboter(BoardRoboter thorsten)
     {
       d("vernichteRoboter: "+thorsten.getName());
       thorsten.setSchaden(10);
@@ -442,7 +458,7 @@ public class SpielfeldSim extends Spielfeld
       thorsten.yy=0;
     }
 
-  private void dreheRoboter(Roboter robbi, int drehR)
+  private void dreheRoboter(BoardRoboter robbi, int drehR)
     { 
       d("dreheRoboter called. "+robbi.getName()+" nach "+drehR);
       // drehR = DrehRichtung
@@ -457,7 +473,7 @@ public class SpielfeldSim extends Spielfeld
 	break;
       } // switch
     }
-  private void dreheRoboterGedacht(Roboter robbi, int drehR)
+  private void dreheRoboterGedacht(BoardRoboter robbi, int drehR)
     { 
       d("dreheRoboterGedacht called. robbi="+robbi.getName()+"; drehR="+drehR);
       // veraendert die gedachte Ausrichtung
@@ -474,7 +490,7 @@ public class SpielfeldSim extends Spielfeld
       } // switch
     }
 
-  private void doExprFl(int phase,Roboter[] robbis)
+  private void doExprFl(int phase,BoardRoboter[] robbis)
     {
       d("doExprFl called");
       // ExpressFliessband
@@ -486,7 +502,7 @@ public class SpielfeldSim extends Spielfeld
       gedachtesAusfuehren(robbis);
     }
 
-  private void doFl(int phase,Roboter[] robbis)
+  private void doFl(int phase,BoardRoboter[] robbis)
     {
       d("doFliessband called");
       // Fliessband (normal)
@@ -502,7 +518,7 @@ public class SpielfeldSim extends Spielfeld
     Ausführen der Fließbandbewegungen
    */
 
-  private void ausfuehrenFliessband(Roboter[] robbis,int rob,int typ)
+  private void ausfuehrenFliessband(BoardRoboter[] robbis,int rob,int typ)
     {
       d("ausfuehrenFliessband called. rob="+rob+"; typ="+typ);
       switch (typ%10) {
@@ -529,7 +545,7 @@ public class SpielfeldSim extends Spielfeld
 	  dreheRoboterGedacht(robbis[rob],DUHRZ);
     } // ausfuehrenFliessband
 
-  private void gedachteWerteInitialisieren(Roboter[] robbis)
+  private void gedachteWerteInitialisieren(BoardRoboter[] robbis)
     {
       for (int i=0;i<robbis.length;i++){
 	robbis[i].xx=robbis[i].getX();
@@ -541,7 +557,7 @@ public class SpielfeldSim extends Spielfeld
   /**
 	Ausführen der in dieser Phase aktiven Boardpusher
    */
-  private void doPushers(int phase,Roboter[] robbis)
+  private void doPushers(int phase,BoardRoboter[] robbis)
     {
       d("doPushers called.");
       gedachteWerteInitialisieren(robbis);
@@ -562,7 +578,7 @@ public class SpielfeldSim extends Spielfeld
       gedachtesAusfuehren(robbis);
     } // doPushers
 
-  private void gedachtesAusfuehren(Roboter[] robbis)
+  private void gedachtesAusfuehren(BoardRoboter[] robbis)
     {
       // zuvor angedachte Zuege jetzt ausfuehren, falls sie keine Konflikte ergeben.
       boolean[] robmove= new boolean[robbis.length];
@@ -597,7 +613,7 @@ public class SpielfeldSim extends Spielfeld
   /**
     Ausführen der Drehelemente (Drehelemente != Drehfließbaender!!)
    */
-  private void doDrehEl(int phase,Roboter[] robbis)
+  private void doDrehEl(int phase,BoardRoboter[] robbis)
     {
       d("doDrehEl called.");
       
@@ -611,7 +627,7 @@ public class SpielfeldSim extends Spielfeld
   /**
     Ausführen der in dieser Phase aktiven Crusher
    */
-  private void doCrushers(int phase,Roboter[] robbis)
+  private void doCrushers(int phase,BoardRoboter[] robbis)
     {
       d("doCrushers called.");
       
@@ -624,7 +640,7 @@ public class SpielfeldSim extends Spielfeld
   /**
     Ausführen der Board-Laser
    */
-  private void doLasers(int phase,Roboter[] robbis)
+  private void doLasers(int phase,BoardRoboter[] robbis)
     {
       d("doLasers called.");
       
@@ -774,7 +790,7 @@ public class SpielfeldSim extends Spielfeld
     } //for rob
     } // doLasers
 
-  private void doArchivUpdate(int phase,Roboter[] robbis)
+  private void doArchivUpdate(int phase,BoardRoboter[] robbis)
     {
       d("doArchivUpdate called.");
       
@@ -794,7 +810,7 @@ public class SpielfeldSim extends Spielfeld
       }      
     } // doArchivUpdate
 
-  private void doFlaggenUpdate(int phase,Roboter[] robbis)
+  private void doFlaggenUpdate(int phase,BoardRoboter[] robbis)
     { 
       d("doFlaggenUpdate called.");
       
@@ -815,7 +831,7 @@ public class SpielfeldSim extends Spielfeld
     Roboter am Ende der 5. Phase reparieren, falls er auf einem
     Reparaturfeld/Flaggenfeld steht und beschädigt ist.
    */
-  private void doRepairs(int phase,Roboter[] robbis)
+  private void doRepairs(int phase,BoardRoboter[] robbis)
     {
       d("doRepairs called.");
       
@@ -850,7 +866,7 @@ public class SpielfeldSim extends Spielfeld
     Roboter auf ihm steht, so wird der Roboter wieder normal
     (entvirtualisiert).
    */
-  private void entvirtualisiere(int phase, Roboter[] robbis)    // extended edition
+  private void entvirtualisiere(int phase, BoardRoboter[] robbis)    // extended edition
     {
       boolean cont;
       for (int a=0;a<robbis.length;a++) {      // Schleife 1
@@ -884,7 +900,7 @@ public class SpielfeldSim extends Spielfeld
   /**
     Weiteres Register gesperren, falls mehr als 4 Schaden
    */
-  private void registerSperren(Roboter robbi)
+  private void registerSperren(BoardRoboter robbi)
     {
       d("registerSperren called mit "+robbi.getName());
 
