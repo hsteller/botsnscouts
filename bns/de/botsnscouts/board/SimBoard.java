@@ -39,7 +39,7 @@ import org.apache.log4j.Priority;
 
 /**
  * This board is also able to do phases.
- * @author: Dirk Materlik
+ * @author Dirk Materlik
  * Id: $Id$
  */
 public class SimBoard extends Board implements Directions {
@@ -300,12 +300,12 @@ public class SimBoard extends Board implements Directions {
         ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
         ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswExprFl");
-        doExpressBelts(phase, bots);        // Expressfliessbaender 1
+        doExpressBelts(bots);        // Expressfliessbaender 1
         fireBotsChanged(bots);
         ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
         ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswFl");
-        doBelts(phase, bots);            // Exprf 2, Fliessbaender 1
+        doBelts(bots);            // Exprf 2, Fliessbaender 1
         fireBotsChanged(bots);
         ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
         ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
@@ -315,7 +315,7 @@ public class SimBoard extends Board implements Directions {
         ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
         ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswRot", null);
-        doRotatingGears(phase, bots);        // Rotating Gears
+        doRotatingGears(bots);        // Rotating Gears
         fireBotsChanged(bots);
         ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
         ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
@@ -324,18 +324,18 @@ public class SimBoard extends Board implements Directions {
         fireBotsChanged(bots);
         ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
         ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
-        doLasers(phase, bots);        // Lasers, board & robbi
+        doLasers(bots);        // Lasers, board & robbi
         fireBotsChanged(bots);
         ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
 
-        doArchiveUpdate(phase, bots);  // Archivpointupdate
+        doArchiveUpdate(bots);  // Archivpointupdate
         fireBotsChanged(bots);
-        doFlaggenUpdate(phase, bots);  // letzte besuchte Flaggenupdate
+        doFlaggenUpdate(bots);  // letzte besuchte Flaggenupdate
         fireBotsChanged(bots);
         if (phase == 5) {                 // Ende Phase 5
-            doRepairs(phase, bots);     // Reperaturfelder
+            doRepairs(bots);     // Reperaturfelder
             fireBotsChanged(bots);
-            entvirtualisiere(phase, bots); // Bot falls moeglich entvirtualisieren
+            entvirtualisiere(bots); // Bot falls moeglich entvirtualisieren
             fireBotsChanged(bots);
         }
     }
@@ -550,7 +550,7 @@ public class SimBoard extends Board implements Directions {
         } // switch
     }
 
-    private void doExpressBelts(int phase, BoardBot[] bots) {
+    private void doExpressBelts(BoardBot[] bots) {
         //d("doExprFl called");
         // ExpressFliessband
         initIntendedValues(bots);
@@ -563,7 +563,7 @@ public class SimBoard extends Board implements Directions {
         doIntended(bots);
     }
 
-    private void doBelts(int phase, BoardBot[] bots) {
+    private void doBelts(BoardBot[] bots) {
         //d("doFliessband called");
         // Fliessband (normal)
         initIntendedValues(bots);
@@ -667,7 +667,7 @@ public class SimBoard extends Board implements Directions {
             }
     } // gedachesAusfuehren
 
-    private void doRotatingGears(int phase, BoardBot[] robbis) {
+    private void doRotatingGears(BoardBot[] robbis) {
         //d("doDrehEl called.");
 
         for (int i = 0; i < robbis.length; i++) {
@@ -691,7 +691,7 @@ public class SimBoard extends Board implements Directions {
         }
     } // doCrushers
 
-    private void doLasers(int phase, BoardBot[] robbis) {
+    private void doLasers(BoardBot[] robbis) {
         //d("doLasers called.");
 
         // die Board-Laser
@@ -850,7 +850,7 @@ public class SimBoard extends Board implements Directions {
         } //for rob
     } // doLasers
 
-    private void doArchiveUpdate(int phase, BoardBot[] robbis) {
+    private void doArchiveUpdate(BoardBot[] robbis) {
         //d("doArchivUpdate called.");
 
         for (int i = 0; i < robbis.length; i++) {
@@ -870,7 +870,7 @@ public class SimBoard extends Board implements Directions {
         }
     } // doArchivUpdate
 
-    private void doFlaggenUpdate(int phase, BoardBot[] robbis) {
+    private void doFlaggenUpdate(BoardBot[] robbis) {
         //d("doFlaggenUpdate called.");
 
         for (int i = 0; i < robbis.length; i++) {
@@ -890,7 +890,7 @@ public class SimBoard extends Board implements Directions {
     /**
      * Repair bots at end of 5th phase
      */
-    private void doRepairs(int phase, BoardBot[] robbis) {
+    private void doRepairs(BoardBot[] robbis) {
         //d("doRepairs called.");
 
         for (int i = 0; i < robbis.length; i++) {
@@ -923,7 +923,7 @@ public class SimBoard extends Board implements Directions {
     /**
   Devirtualize a bot if he is not destroyed and alone on a field
      */
-    private void entvirtualisiere(int phase, BoardBot[] bots) {
+    private void entvirtualisiere(BoardBot[] bots) {
         boolean cont;
         for (int a = 0; a < bots.length; a++) {      // Schleife 1
             cont = false;
