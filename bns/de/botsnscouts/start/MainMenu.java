@@ -80,17 +80,17 @@ public class MainMenu extends JPanel implements  ActionListener{
 	    parent.setContentPane(parent.current);
 	    parent.show();
 	}else if(e.getActionCommand().equals("partBut")){
-	    if(parent.startTeilnehmen==null){
-		parent.startTeilnehmen=new StartTeilnehmen(parent);
+	    if(parent.partPanel==null){
+		parent.partPanel=new ParticipatePanel(parent);
 	    }
-	    parent.current=parent.startTeilnehmen;
+	    parent.current=parent.partPanel;
 	    parent.setContentPane(parent.current);
 	    parent.show();
 	}else if(e.getActionCommand().equals("watchBut")){
-	    if(parent.startZuschauen==null){
-		parent.startZuschauen=new StartZuschauen(parent);
+	    if(parent.watchPanel==null){
+		parent.watchPanel=new WatchPanel(parent);
 	    }
-	    parent.current=parent.startZuschauen;
+	    parent.current=parent.watchPanel;
 	    parent.setContentPane(parent.current);
 	    parent.show();
 	}

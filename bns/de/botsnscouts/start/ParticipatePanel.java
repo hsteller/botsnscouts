@@ -9,7 +9,7 @@ import javax.swing.border.*;
 import java.net.*;
 import de.botsnscouts.util.*;
 
-public class StartTeilnehmen extends JPanel implements  ActionListener{
+public class ParticipatePanel extends JPanel implements  ActionListener{
     
     JLabel server;    
     JLabel name;    
@@ -28,7 +28,7 @@ public class StartTeilnehmen extends JPanel implements  ActionListener{
 
     Font font;
 
-    public StartTeilnehmen(Start par){
+    public ParticipatePanel(Start par){
 	parent=par;
 	parent.setTitle(Message.say("Start","mTeilnehmen"));
 	paint=parent.paint;

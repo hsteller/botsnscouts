@@ -9,7 +9,7 @@ import javax.swing.border.*;
 import java.net.*;
 import de.botsnscouts.util.*;
 
-public class StartZuschauen extends JPanel implements  ActionListener, MouseListener{
+public class WatchPanel extends JPanel implements  ActionListener, MouseListener{
 
     JLabel server;    
     //JLabel port;    
@@ -26,7 +26,7 @@ public class StartZuschauen extends JPanel implements  ActionListener, MouseList
 
     Font font;
 
-    public StartZuschauen(Start par){
+    public WatchPanel(Start par){
 	parent=par;
 	parent.setTitle(Message.say("Start","mZuschauen"));
 	paint=parent.paint;

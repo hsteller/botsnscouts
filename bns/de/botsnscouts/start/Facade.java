@@ -304,5 +304,8 @@ public class Facade{
     public void killServer(int port){
 	com.cancelGame(DIP,port);
     }
+    public void killServer(){
+	com.cancelGame(DIP,DPORT);
+    }
 
 }
