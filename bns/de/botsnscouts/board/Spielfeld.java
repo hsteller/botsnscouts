@@ -16,7 +16,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 
   /***** Public Konstanten *****/
 
-  // Wandgerätetypen
+  // Wall types 
   // ================
 //  moved into class Wand (is representation)
 //  /** Kein Wandgerät in der Wand */
@@ -28,7 +28,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 
   public static final int W_LEFT_OR_UPPER   = 0;
   public static final int W_WRIGHT_OR_BOTTOM  = 1;
-  //  Bodentypen
+  //  Ground types
   //  ==========
 
   /** Boden Grube */

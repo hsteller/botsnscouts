@@ -86,17 +86,17 @@ public class Ausgabe extends Thread {
 		kommAntwort = kommClient.warte();
 	    }
 	    catch (KommFutschException kE) {
-		System.err.println("KE: "+kE.getMessage());
+		CAT.error("KE: "+kE.getMessage());
 		return;
 	    }
 	    catch (KommException ke) {
-		System.err.println("ke: "+ke.getMessage());
+		CAT.error("ke: "+ke.getMessage());
 		return;
 	    }
 	    // what did the server send?
 	    switch (kommAntwort.typ) {
 	    case (ClientAntwort.MESSAGE):{
-		CAT.debug("Server send me: some messsage.");
+		CAT.debug("Server send me: "+kommAntwort.namen[0]);
 
                 // getting parts of the message
                 String[] tmpstr=new String[kommAntwort.namen.length-1];
@@ -113,6 +113,8 @@ public class Ausgabe extends Thread {
 		}
 
 		if (msgId.equals("mRobLaser")){ // robots shooting
+		    CAT.debug("Got message telling "+kommAntwort.namen[1]+" shot "
+			      +kommAntwort.namen[2]+".");
                     Roboter r1,r2;
                     r1=r2=null; //temp. variables
 
@@ -212,10 +214,10 @@ public class Ausgabe extends Thread {
 	    }
 
 	    case (ClientAntwort.AENDERUNG): {// notify change; something happened
-		Global.debug(this,"Server send me: change occured.");
+		CAT.debug("Server send me: change occured.");
 
 		// ------- get changes  -----------
-		Global.debug(this,kommAntwort.namen.length+" robs have been updated.");
+		CAT.debug(kommAntwort.namen.length+" robs have been updated.");
 		try {
 		    String[] playerNames = kommAntwort.namen;
 		    for (int i=0; i < playerNames.length; i++) {
@@ -227,7 +229,7 @@ public class Ausgabe extends Thread {
 		    // --------- Neue Roboter-Position an Spielfeld senden ---------
 		    try {
 			Thread.sleep(100);
-		    } // Verz÷gerung der Ausgabegeschwindigkeit
+		    } // Verzögerung der Ausgabegeschwindigkeit
 		    catch (Exception e) {
 			System.err.println(e.getMessage());
 		    }

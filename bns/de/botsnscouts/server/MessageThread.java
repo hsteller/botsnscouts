@@ -3,8 +3,12 @@ package de.botsnscouts.server;
 import java.util.Vector;
 import java.util.Iterator;
 
+import org.apache.log4j.Category;
+
 class MessageThread extends Thread
     implements MOKListener{
+
+    static final Category CAT = Category.getInstance( MessageThread.class );
 
     private WaitingForSet wait;
     private ThreadMaintainer server;
@@ -28,14 +32,32 @@ class MessageThread extends Thread
 	msgQ.addMsg(id,args);
     }
 
+    /** Blocks calling thread until all waiting messages are send. 
+     *  (Sometimes message-sending needs to be synchronized with game-logic,
+     *  so clearing the queue may be triggered by another thread.)
+     *  CAUTION: Problem is not really fixed by now: We wait until the
+     *           queue is empty, not until everyone ack'ed receiving the msg.
+     */
+    void blockUntilQEmpty() {
+	CAT.debug("Blocking until all messages are send.");
+	try{
+	    msgQ.blockUntilQEmpty();
+	} catch (InterruptedException ex){
+	    CAT.warn("Got an unexpected InterruptedException: "+ex);
+	}
+	CAT.debug("All messages send.");
+    }
+
+
+
     private void sendMsg(Msg msg){
 	Vector v=server.getActiveOutputs();
 	// Synchronization between MessageThread and ServerThread: whenever one of
 	// them wishes to communicate with the Outputs, it synchronizes on the 
 	// Vector that contains them all.
-	d("Sending msg: "+msg.id);
+	CAT.debug("Sending msg: "+msg.id);
 	synchronized(v){
-	    d("Got lock");
+	    CAT.debug("Got lock");
 	    wait = new WaitingForSet(v);
 	    for (Iterator it=v.iterator();it.hasNext();){
 		ServerAusgabeThread tmp=(ServerAusgabeThread)it.next();
@@ -44,13 +66,13 @@ class MessageThread extends Thread
 		else
 		    tmp.sendMsg(msg.id,msg.args);
 	    }
-	    d("now starting wait");
+	    CAT.debug("now starting wait");
 	    Iterator it=wait.waitFor(timeout);
-	    d("end of wait");
+	    CAT.debug("end of wait");
 	    while(it.hasNext())
 		server.deleteOutput((ServerAusgabeThread)it.next(),"TO");
 	}
-	d("released lock");
+	CAT.debug("released lock");
     }
 
     public void run(){
@@ -85,15 +107,19 @@ class MessageThread extends Thread
 	    notifyAll();
 	}
 	public synchronized Msg getMsg() throws InterruptedException{
-	    while (ids.size()==0)
+	    while (ids.size()==0){
 		wait();
+	    }
 	    msg.id=(String)ids.remove(0);
 	    msg.args=(String[])argss.remove(0);
-	    return msg;
+	    notifyAll();
+	    return msg;	    
+	}
+	public synchronized void blockUntilQEmpty() throws InterruptedException{
+	    while (ids.size()>0){
+		wait();
+	    }
 	}
     }
     
-    private void d(String s){
-	de.botsnscouts.util.Global.debug(this,s);
-    }
 }

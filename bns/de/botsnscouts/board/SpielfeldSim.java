@@ -36,6 +36,9 @@ public class SpielfeldSim extends Spielfeld
     private StatsList stats=null;
     private Stats actualStats=null;
 
+    private Vector msgIdsQ = new Vector();
+    private Vector msgArgsQ = new Vector();
+
 public Vector getLasers(){
 	return lasers;
     }
@@ -73,33 +76,43 @@ public Vector getLasers(){
     //d(str);
 
     server.ausgabenBenachrichtigen(s);
-
+    sendCollectedMsgs();
     bewegt2false();
   }
 
-    /** Schickt eine Nachricht an alle Ausgaben, falls wir einen Server haben
+
+    /** Collects the messages which are sent later after NTC.
+	Only has effect, if this is the server's board.
      */
     public void ausgabenMsg(String id, String[] args){
-	if (server != null)
-	    server.sendMsg(id,args);
+	if (server != null){
+	    msgIdsQ.add(id);
+	    msgArgsQ.add(args);
+	}
     }
     private void ausgabenMsgString(String id, String arg){
-	if (server == null)
-	    return;
-	String[] tmp=new String[1];
-	tmp[0]=arg;
-	ausgabenMsg(id,tmp);
+	if (server != null){
+	    String[] tmp=new String[1];
+	    tmp[0]=arg;
+	    ausgabenMsg(id,tmp);
+	}
     }
     private void ausgabenMsgString2(String id, String arg1, String arg2){
-	if (server==null)
-	    return;
-	String[] tmp=new String[2];
-	tmp[0]=arg1;
-	tmp[1]=arg2;
-	ausgabenMsg(id,tmp);
+	if (server!=null){
+	    String[] tmp=new String[2];
+	    tmp[0]=arg1;
+	    tmp[1]=arg2;
+	    ausgabenMsg(id,tmp);
+	}
     }
 
-
+    private void sendCollectedMsgs(){
+	if (server != null){
+	    while (msgIdsQ.size() > 0){
+		server.sendMsg((String )msgIdsQ.remove(0),(String[] )msgArgsQ.remove(0));
+	    }	    
+	}
+    }
 
     /** Creates the internal StatsList.
     @param sl The robots that should be managed in the StatsList

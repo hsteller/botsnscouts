@@ -358,8 +358,10 @@ public class Server extends Thread implements ModusConstants, ServerOutputThread
 	    while (it.hasNext())
 		deleteOutput((ServerAusgabeThread)it.next(),"TO");
 	}
-	Thread.yield();                 // allow possibly generated messages to be sent
-                                        // synchronizes laser-fire-animations.
+	// allow possibly generated messages to be sent
+	// synchronizes laser-fire-animations.
+	messageThread.blockUntilQEmpty();
+	Thread.yield();                 
     }
 
     // Private methods needed by run()
