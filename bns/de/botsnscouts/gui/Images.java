@@ -12,7 +12,7 @@ import java.awt.image.*;
 public class Images {
 
     // Scout
-    static Class c = Images.class;
+    static Class c = de.botsnscouts.BotsNScouts.class;
     public  final static  Image SCOUTSCHLAF = Toolkit.getDefaultToolkit().getImage(c.getResource("images/scoutschlaf.gif"));
     public  final static  Image SCOUT = Toolkit.getDefaultToolkit().getImage(c.getResource("images/scout.gif"));
     // Klugscheisser

@@ -19,7 +19,7 @@ import javax.swing.border.*;
  * @author Lukasz Pekacki
  */
 
-public class AusgabeFrame extends JFrame implements Runnable {
+public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickListener {
 
 
     // -----------  Konstanten -----------
@@ -29,6 +29,9 @@ public class AusgabeFrame extends JFrame implements Runnable {
     protected final int UNGEBREMST = 0;
     protected final boolean NURAUSGABE = true;
     protected final boolean MENSCHAUSGABE = false;
+    protected static final double MIN_ZOOM = 0.4;
+    protected static final double MAX_ZOOM = 1.0;
+    protected static final double ZOOM_STEP = 0.1;
 
     // ---- Variablen
     private boolean spielerErhalten;
@@ -181,7 +184,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	optionenMenu.add(optTrack);
 
 	hauptMenu.add(optionenMenu);
-
+	hauptMenu.add( new ZoomMenu() );
 	JMenu help = new JMenu(Message.say("AusgabeFrame","mHelpMenuName"));
 	JMenuItem about = new JMenuItem(Message.say("AusgabeFrame","mAbout"));
 	about.addActionListener(new ActionListener() {
@@ -259,8 +262,13 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	return getSize();
     }
 
-
-
+    /** 
+     * needed for beeing used as a SACanvas.ClickListener
+     * @see SACanvas.ClickListener, MouseEvent.getModifiers()
+     */
+    public void feldClicked(int x, int y, int modifiers ) {
+	trackPos(x,y);
+    }
 
 
     public void trackRob (String rName) {
@@ -827,6 +835,44 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	}
     }
 
+
+    private class ZoomMenu extends JMenu implements ActionListener {
+	ZoomMenu() {
+	    super("Zoom");
+	    ButtonGroup group = new ButtonGroup();
+	    JRadioButtonMenuItem item = null;
+	    for(double d = MIN_ZOOM; d <= MAX_ZOOM; d += ZOOM_STEP ) {
+		item = new JRadioButtonMenuItem( "" + d );
+		item.addActionListener( this );
+		super.add( item );
+		group.add( item );
+	    }
+	    if( item != null ) {
+		group.setSelected( item.getModel(), true );
+	    }
+	}
+			
+	public void actionPerformed(ActionEvent e) {
+	    double scale;
+	    try {
+		String s = e.getActionCommand();
+		scale = Double.parseDouble( s );
+	    } catch( NumberFormatException ne ) {
+		scale = 1.0;
+		Global.debug(this, "bad zommmenu action command. using default 1.0");
+	    }
+	    final double sc = scale;
+	    SwingUtilities.invokeLater( new Runnable() {
+		    public void run() {
+			spielFeld.setScale( sc );
+		    }
+		});
+	}
+    }
+
+
+
+
     /**
      * Wartet auf einen Menuklick
      */
@@ -1124,6 +1170,8 @@ public class AusgabeFrame extends JFrame implements Runnable {
 			trackItem.addActionListener( new RoboTrackListener(statusLine.sC[i].r));
 			optTrack.add(trackItem);
 		    }    
+
+		    spielFeld.addClickListener( this );
 
 		    // ----------- Flaggen in das Menü eintragen
 		    flagsPosition = kCA.getFahnenPos();

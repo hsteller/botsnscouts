@@ -185,7 +185,7 @@ public class SACanvas extends Component {
 
     
     private void init(SpielfeldSim sf_neu, Color [] robColors) {
-	soundActive=true;
+	soundActive=Boolean.getBoolean("sound");
 	robocolor2=robColors;
 	//	drawRobLaser=false;
 	//drawBordLaser=false;

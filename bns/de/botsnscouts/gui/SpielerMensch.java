@@ -550,7 +550,7 @@ public class SpielerMensch extends Thread {
 	public void paint(Graphics g)
 	{
 	    g.drawImage(img,0,0,this);
-	    g.setFont(new Font("SansSerif",0,8));
+	    g.setFont(new Font("SansSerif",Font.PLAIN,8));
 	    g.setColor(Color.darkGray);
 	    if ((status == FREI) && (prio>0)) g.drawString(""+prio,23,19);
 	    if (klugScheisser) g.drawImage(Images.KSCHEISSER,25,42,this);
