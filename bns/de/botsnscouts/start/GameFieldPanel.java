@@ -28,6 +28,7 @@ package de.botsnscouts.start;
 import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Message;
+import de.botsnscouts.util.Task;
 import de.botsnscouts.widgets.*;
 
 import javax.swing.*;
@@ -68,8 +69,8 @@ public class GameFieldPanel extends JPanel {
     JCheckBox allowScout;
 
     /** Announce the game at a meta server? */
-    JCheckBox announceGame;
-    JTextField metaServer;
+    private AnnounceGame announceGame = new AnnounceGame();
+    //private final static Category CAT = Category.getInstance(GameFieldPanel.class);
 
     public GameFieldPanel(Start par) {
         parent = par;
@@ -216,20 +217,26 @@ public class GameFieldPanel extends JPanel {
         allowScout = new TJCheckBox(Message.say("Start", "mAllowScout"), true);
         allowWisenheimer = new TJCheckBox(Message.say("Start", "mAllowWisenheimer"), true);
 
-        boolean defaultAnnounceGame = false;
-        announceGame = new TJCheckBox(Message.say("Start", "mAnnounceMetaServer"),
-                defaultAnnounceGame);
-        announceGame.addActionListener(
-                new ActionListener() {
+        final JTextField metaServer = new TJTextField(announceGame.getServerString());
+        metaServer.setEnabled(announceGame.willBeAnnounced());
+        final JCheckBox announce = new TJCheckBox(Message.say("Start", "mAnnounceMetaServer"),
+                announceGame.willBeAnnounced());
+        announce.addActionListener(
+            new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        metaServer.setEnabled(announceGame.isSelected());
-                        metaServer.setEditable(announceGame.isSelected());
+                        metaServer.setEnabled(announce.isSelected());
+                        metaServer.setEditable(announce.isSelected());
+                        announceGame.setAnnounce(announce.isSelected());
                     }
-        }
-
+            }
         );
-        metaServer = new TJTextField(Conf.getDefaultMetaServer());
-        metaServer.setEnabled(defaultAnnounceGame);
+        metaServer.addActionListener(
+            new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    announceGame.parse(((JTextField )e.getSource()).getText());
+                }
+            }
+        );
 
         spielfelder.setFont(font);
         save.setFont(font);
@@ -263,7 +270,7 @@ public class GameFieldPanel extends JPanel {
         inner.add(allowWisenheimer, gc);
         //gc.fill = GridBagConstraints.NONE;
         inner.add(allowScout, gc);
-        inner.add(announceGame, gc);
+        inner.add(announce, gc);
         inner.add(metaServer, gc);
         gc.fill = GridBagConstraints.HORIZONTAL;
 
@@ -314,15 +321,13 @@ public class GameFieldPanel extends JPanel {
     private void okClicked() {
         parent.fassade.setAllowWisenheimer(allowWisenheimer.isSelected());
         parent.fassade.setAllowScout(allowScout.isSelected());
-        parent.showNewStartPanel();
-        new Thread(new Runnable() {
-            public void run() {
-                // give the Server some time to come up
-                //TODO: Handle this in a more sane way!
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException iex) {
-                }
+        /* Handig over a postServerStartTask is still a bit weird, but
+           it is much more sane and faster than before...
+         */
+        parent.showNewStartPanel(
+            new Task() {
+            public void doIt() {
+
                 if (mitspielen.getSelectedObjects() != null) {
                     Thread smth = parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(), farben.getSelectedIndex());
                     parent.addKS(smth);
@@ -330,8 +335,16 @@ public class GameFieldPanel extends JPanel {
                 } else {//starte einen AusgabeFrame
                     parent.addKS(parent.fassade.einemSpielZuschauenNoSplash());
                 }
+                // Announce game, if we shall do this.
+                try {
+                    announceGame.announceGame();
+                } catch (UnableToAnnounceGameException e) {
+                    e.printStackTrace(); //TODO: give info
+                } catch (YouAreNotReachable youAreNotReachable) {
+                    youAreNotReachable.printStackTrace(); //TODO: give info
+                }
             }
-        }).start();
+        });
     }//okclicked
 
     void unrollOverButs() {

@@ -161,7 +161,11 @@ public class Conf {
 
     //TODO
     public static String getDefaultMetaServer() {
-        return "Not yet implemented.";
+        return "www.botsnscouts.de";
+    }
+
+    public static int getDefaultMetaServerPort() {
+        return 8725;
     }
 
 }

@@ -266,7 +266,7 @@ public class Start extends JFrame implements WindowListener {
         }).start();
     }
 
-    protected void showNewStartPanel() {
+    protected void showNewStartPanel(final Task postServerStartTask) {
         showBusy(Message.say("Start", "mStartingServer"));
         new Thread(new Runnable() {
             public void run() {
@@ -277,6 +277,8 @@ public class Start extends JFrame implements WindowListener {
                     }
                     fassade.startGame(startPanel.getListener());//starte Spiel
                     addServer();
+                    postServerStartTask.doIt();
+
                     switchCard(START);
                     stopBusy();
                 } catch (OneFlagException ex) {
