@@ -8,14 +8,14 @@ import de.botsnscouts.util.*;
 //saves image and name of tiles
 //gives rotated image
 
-public class Kachel extends SpielfeldSim{
+public class Tile extends SpielfeldSim{
 
     Image img;
     String kName;
     int rotat;
 
     //create new tile
-    public Kachel(String name, String field, int GR) throws FormatException, FlaggenException{
+    public Tile(String name, String field, int GR) throws FormatException, FlaggenException{
 	super(12,12,field,null);
 	kName=name;
 	rotat=0;
@@ -23,7 +23,7 @@ public class Kachel extends SpielfeldSim{
     }
 
     //create rotated tile
-    public Kachel(String name, String field, int rot, Image im) throws FormatException, FlaggenException{
+    public Tile(String name, String field, int rot, Image im) throws FormatException, FlaggenException{
 	super(12,12,field,null);
 	kName=name;
 	rotat=rot;
@@ -43,17 +43,17 @@ public class Kachel extends SpielfeldSim{
     }
 
     //gibt um 90° gedrehtes Clone
-    public Kachel getGedreht(){
-	String gedrKachel=get90GradGedreht();
-	Kachel drKachel = null;
+    public Tile getGedreht(){
+	String gedrTile=get90GradGedreht();
+	Tile drTile = null;
 	try{
-	    drKachel =new Kachel(kName,gedrKachel,(rotat+1)%4,img);
+	    drTile =new Tile(kName,gedrTile,(rotat+1)%4,img);
 	}catch(FlaggenException e){
 	    System.err.println(e);
 	}catch(FormatException e){
 	    System.err.println(e);
 	}
-	return drKachel;
+	return drTile;
     }
 
     //prüft ob Flagge(n) gültige Position hat(haben)
