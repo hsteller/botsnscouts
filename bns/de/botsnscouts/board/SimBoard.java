@@ -99,30 +99,26 @@ public class SimBoard extends Board implements Directions {
         if (server == null) {
             return;
         }
-
+        sendCollectedMsgs();
+        
+        int botNum = moved.length;
         int num = 0;
-        for (int i = 0; i < moved.length; i++) {
+        for (int i = 0; i < botNum; i++) {
             if (moved[i]) {
                 num++;
             }
         }
-
-        if (num == 0) {
-            return;
+      
+        if (num != 0) {  
+	        String[] names = new String[num];       
+	        for (int i = 0, j=0; i<botNum; i++) {
+	            if (moved[i]) {
+	               names[j++] = robbis[i].getName();
+	            }
+	        }
+	        server.notifyViews(++seqNumber, names);
         }
-
-        String[] s = new String[num];
-        int j = 0;
-
-        for (int i = 0; i < moved.length; i++) {
-            if (moved[i]) {
-                s[j++] = robbis[i].getName();
-            }
-        }
-
-        sendCollectedMsgs();
-        server.notifyViews(++seqNumber, s);
-
+       
         moved2false();
     }
 
@@ -727,11 +723,14 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void doCrushers(int phase, BoardBot[] robbis) {
-        for (int i = 0; i < robbis.length; i++) {
-            Floor floor = floor(robbis[i].getX(), robbis[i].getY());
+        BoardBot b;
+        int botcount =  robbis.length;
+        for (int i = 0; i < botcount; i++) {
+            b= robbis[i];
+            Floor floor = floor(b.getX(), b.getY());
             if (floor.isCrusherActive(phase)) {
-                destroyBot(robbis[i]);
-                ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_CRUSHED, robbis[i].getName());
+                ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_CRUSHED, b.getName());
+                destroyBot(b);                
             }
         }
     }
