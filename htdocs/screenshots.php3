@@ -1,10 +1,8 @@
 <html>
-  <head>
-    <title>Bots'n'Scouts - Screenshots</title>
-  </head>
-
+<head>
+<title>Bots'n'Scouts - Screenshots</title>
 <?php include('bnsheader.pht');?>
-
+<div class="content" >
 	<center>
       <h1>Bots'n'Scouts Screenshots!</h1>
 	</center>
@@ -24,6 +22,6 @@ The screenshots are taken from version 0.8pre.<br>
       <p>
 	  <a href=images/screenshot4.jpg><img src="images/tn_screenshot4.jpg" border=0></a>
 	  You can create your own tiles with the tile editor.
-
+</div>
 <?php include('bnsfooter.pht');?>
 

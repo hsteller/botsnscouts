@@ -1,7 +1,7 @@
 <HEAD>
 <TITLE>Bots'n'Scouts - System Requirements</TITLE>
-</HEAD>
 <?php include('bnsheader.pht');?>
+<div class="content">
 <H1>System Requirements</H1>
 </CENTER>
 <P>
@@ -33,4 +33,5 @@ With V0.7.1, there seem to be problems with Version 1.3, but V0.8pre runs fine<B
 
 <P>
 See <A HREF="download.php3">Download</A>.
+</div>
 <?php include('bnsfooter.pht');?>

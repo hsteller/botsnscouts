@@ -1,7 +1,8 @@
-<body bgcolor="#000000" text="#40bf40" link="red" alink="red" vlink="darkred">
+<link rel="stylesheet" type="text/css" href="bns.css" media="screen">
 </head>
-<FONT face=helvetica>
+<div class="navi">
 <CENTER>
+<SMALL>
 <A HREF="index.php3">home</A>&nbsp;&nbsp;&nbsp;
 <A HREF="screenshots.php3">screenshots</A>&nbsp;&nbsp;&nbsp;
 <A HREF="download.php3">download</A>&nbsp;&nbsp;&nbsp;
@@ -9,10 +10,11 @@
 <A HREF="systemreq.php3">system requirements</A>&nbsp;&nbsp;&nbsp;
 <A HREF="knownbugs.php3">known problems</A>&nbsp;&nbsp;&nbsp;
 <A HREF="projectncredits.php3">about/credits/contact</A>
+</SMALL>
 </CENTER>
-<HR>
-<CENTER>
+</div>
 <P>
+<CENTER>
 <IMG SRC="images/bnslogo75.jpg"><BR><BR>
 </CENTER>
 <P>

@@ -1,8 +1,8 @@
 <html>
 <head>
 <title>Bots'n'Scouts - Known Bugs</title>
-</head>
 <?php include('bnsheader.pht');?>
+<div class=content" >
 <CENTER>
 <H1>Known Bugs and other things to do</H1>
 </CENTER>
@@ -40,4 +40,5 @@ including the server. Don't confirm if the other players want to continue.
 <LI> We haven't written FAQ yet.
 </UL>
 <P>
+</div>
 <?php include('bnsfooter.pht');?>

@@ -1,9 +1,8 @@
 <html>
 <head>
 <title>Bots'n'Scouts - about/credits/contact</title>
-</head>
 <?php include('bnsheader.pht');?>
-
+<div class="content">
 <H2>About the Project</H2>
 
 The Bots'n'Scouts project started as a university course at the <A HREF="http://www.inf.fu-berlin.de">Institute for Computer Science</A> at the Freie Universität Berlin.
@@ -32,7 +31,7 @@ HREF="mailto:botsnscouts-devel@sourceforge.net">botsnscouts-devel@sourceforge.ne
 If you want to be notified about new releases, please subscribe to our
 <a href="http://lists.sourceforge.net/lists/listinfo/botsnscouts-announce">announce-mailinglist</a>.
 <P>
-The current Bots'n'Scouts developers are:<BR>
+The Bots'n'Scouts developers are:<BR>
 <P>
 Enno Brehm<BR>
 Miriam Busch<BR>
@@ -44,5 +43,5 @@ Ludmila Scharf<BR>
 Hendrik Steller<BR>
 Dima Suliman<BR>
 
-
+</div>
 <?php include('bnsfooter.pht');?>

@@ -1,8 +1,8 @@
 <HTML>
 <HEAD>
 <TITLE>How to Play Bots'n'Scouts</TITLE>
-</HEAD>
 <?php include('bnsheader.pht');?> 
+<div class=content" >
 <CENTER><H1>Rules (How to Play Bots'n'Scouts)</H1></CENTER>
 <HR>
 <H2>Background</H2>
@@ -293,6 +293,7 @@ Have fun!
 The Bots'n'Scouts developer thank Jude for providing this description!
 </SMALL>
 <BR>
+</div>
 <?php include('bnsfooter.pht');?> 
 </BODY>
 </HTML>

@@ -1,8 +1,10 @@
 <html>
 <head>
 <title>Bots'n'Scouts - Download</title>
+<link rel="stylesheet" type="text/css" href="bns.css" media="screen">
 </head>
 <?php include('bnsheader.pht');?>
+<div class="content">
 <CENTER>
 <H1>Download</H1>
 </CENTER>
@@ -51,4 +53,5 @@ JRE for Windows 95/98/NT V1.2</A>
 If you are a developer yourself and if maybe there was a long time no release from us, you may want to risk a look into our CVS-repository. Read <A HREF="http://sourceforge.net/cvs/?group_id=3883">how to access</a> it and if you have got ant installed simply type "ant run". 
 <br>
 Sorry, the code is not easy to read because a) we were not as good as now when we started the project and b) huge chunks are still in German. We are working on it...
+</div>
 <?php include('bnsfooter.pht');?>

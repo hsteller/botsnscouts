@@ -2,13 +2,15 @@
 <META NAME="KEYWORDS" CONTENT="roborally; robo; rally; game; board; editor; computer; java" />
 <head>
 <title>Bots'n'Scouts</title>
-</head>
 <?php include('bnsheader.pht');?>
+<div class="content">
 <CENTER>
 <H2>Bots'n'Scouts Version 0.8.2</H2>
 <P>
 <I>An addictive multiplayer networked strategy game inspired by RoboRally, written in Java.</I>
 </CENTER>
+</div>
+<div class="content">
 <h2>News</h2>
 The newest available version is still 0.8.2. Go directly to <a href="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.2.zip">downloading botsnscouts-0.8.2.zip</a>. It includes some smaller optimizations and JDK1.4 compatibility fixes. 
 <P>
@@ -21,6 +23,8 @@ We still proudly announce what was new in 0.8:
 <P>
 There really are fans out there! Jude provided <A HREF="rules.php3">a manual</A>!
 <P>
+</div>
+<div class="content">
 <h2>For those who don't know yet:</h2>
 
 Robots make a race through an old factory. Robots don't move like human beings would do - they have to be programmed and execute their programm afterwards.
@@ -36,4 +40,5 @@ published in the U.S. from
 In Germany it's distributed by <A HREF="http://www.amigo-spiele.de">Amigo-Spiele</A>.
 <BR>
 There're lots of other websites to find out more about Roborally. Google yourself.
+</div>
 <?php include('bnsfooter.pht');?>
