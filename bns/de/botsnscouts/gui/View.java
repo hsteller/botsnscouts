@@ -203,7 +203,7 @@ public class View extends JFrame {
     Dimension ssize = BotsNScouts.getScreenSize(); 
 	this.setSize(ssize.width-8,ssize.height-8);	
 	this.setLocation(4,4);
-
+	this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	// handle window closing 
 	this.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e){
