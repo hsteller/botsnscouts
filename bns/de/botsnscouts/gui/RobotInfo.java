@@ -230,7 +230,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         damageBar1.setToolTipText(Message.say("RobotInfo", "damage",r.getName(), r.getDamage()+""));
         flagBar2.setReachedFlag(r.getNextFlag()-1);
         statusRobot1.setLifesLeft( r.getLivesLeft() - 1);
-        setDead( r.getLivesLeft() == 0 );
+        setDead( r.getLivesLeft() <= 0 );
         repaint();
     }
 
