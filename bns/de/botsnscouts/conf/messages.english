@@ -47,6 +47,8 @@ eKommFutschR There was a communication error with player $1. (Network problems?)
 [ServerRoboterThread]
 [SpielerKuenstlich]
 [SpielerMensch]
+mkartenMisch Shuffling the play cards.
+mbitteWarten Please stand by...
 gameName Bots'n'Scouts
 gesperrt LOCKED
 istPowerDown Power Down Mode
