@@ -1,0 +1,45 @@
+<P>
+<center>
+    <table>
+      <tr>
+	<td align=center><img src=images/leer.gif height=1 width=80></td>
+	<td align=center><img src=images/leer.gif height=1 width=80></td>
+	<td align=center><img src=images/leer.gif height=1 width=80></td>
+	<td align=center><img src=images/leer.gif height=1 width=80></td>
+	<td align=center><img src=images/leer.gif height=1 width=80></td>
+	<td align=center><img src=images/leer.gif height=1 width=80></td>
+      </tr>
+      <tr>
+	<td align=center><a href="index.php3"><img src=images/m175.jpg border=0></a></td>
+	<td align=center><a href="screenshots.php3"><img src=images/ut75.jpg border=0></a></td>
+	<td align=center><a href="download.php3"><img src=images/m275.jpg border=0></a></td>
+	<td align=center><a href="systemreq.php3"><img src=images/m375.jpg border=0></a></td>
+	<td align=center><a href="knownbugs.php3"><img src=images/bu75.jpg border=0></a></td>
+	<td align=center><a href="projectncredits.php3"><img src=images/rl75.jpg border=0></a></td>
+      </tr>
+      <tr>
+	<td align=center><a href="index.php3">home</a></td>
+	<td align=center><a href="screenshots.php3">screenshots</a></td>
+	<td align=center><a href="download.php3">download</a></td>
+	<td align=center><a href="systemreq.php3">system<br>requirements</a></td>
+	<td align=center><a href="knownbugs.php3">known<br>bugs</a></td>
+	<td align=center><a href="projectncredits.php3">abouts<br>credits<br>contact</a></td>
+      </tr>
+    </table>
+
+</center>
+<HR>
+<P>
+<SMALL>
+<FONT face=sans>
+
+<A href="http://sourceforge.net"> 
+<IMG src="http://sourceforge.net/sflogo.php?group_id=3883&amp;type=1" width="88" height="31" border="0" alt="SourceForge Logo" ALIGN=top"> </A>
+<BR>
+<a href="http://sourceforge.net/project/?group_id=3883">Our project page at SF</A>
+<BR>
+<P>
+Last change: December 2000. Maintained by the <A HREF="mailto:botsnscouts-devel@lists.sourceforge.net">Bots'n'Scouts developers</A>.
+</SMALL>
+</HTML>
+
