@@ -380,15 +380,19 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	msg[0] = new JLabel(Message.say("AusgabeView", "reallyQuit1"));
 	msg[1] = new JLabel(Message.say("AusgabeView","reallyQuit2"));
 	if (JOptionPane.showConfirmDialog(this, msg,
-	Message.say("AusgabeView","reallyQuitTitle"),
-	JOptionPane.OK_CANCEL_OPTION,
-	JOptionPane.QUESTION_MESSAGE)
+	                Message.say("AusgabeView","reallyQuitTitle"),
+		JOptionPane.OK_CANCEL_OPTION,
+		JOptionPane.QUESTION_MESSAGE)
 	                        == JOptionPane.OK_OPTION){
 	 // null means CANCEL
         ausgabe.quit(keepWatching);
+     
 	// Since this does not work properly by now, we do:
 	//System.exit(0);
      }
+	else {  // dont quit
+	}
+	
     }
 
     private void d(String s){
