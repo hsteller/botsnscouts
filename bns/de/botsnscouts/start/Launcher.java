@@ -11,7 +11,8 @@ public class Launcher{
     public Thread einemSpielZuschauen(String ip, int port, boolean noSplash){
 	Thread ret;
 	try{
-	    ret=new Thread(new AusgabeFrame(ip, port,null,noSplash));
+	    //	    ret=new Thread(new AusgabeFrame(ip, port,null,noSplash));
+	    ret=new Thread(new Ausgabe(ip, port,null,noSplash));
 	    ret.start();
 	}catch(Exception exp){
 	    return null;
