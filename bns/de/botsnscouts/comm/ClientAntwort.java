@@ -45,7 +45,7 @@ public class ClientAntwort implements Comparable {
      */
     public String str;
     /**
-     * Container; Falls mehrere Strings (Namen) geschickt wurden, sind diese in ´namen´ abgelegt (bei SPIELERNAMEN, SPIELSTAND)
+     * Container; Falls mehrere Strings (Namen) geschickt wurden, sind diese in ï¿½namenï¿½ abgelegt (bei SPIELERNAMEN, SPIELSTAND)
      */
     public String[] namen;
 
@@ -58,7 +58,7 @@ public class ClientAntwort implements Comparable {
      */
     public boolean ok;
     /**
-     * Container; enthaelt bei SPIELSTATUS für jeden Bot ein Statusobjekt
+     * Container; enthaelt bei SPIELSTATUS fï¿½r jeden Bot ein Statusobjekt
      */
     public Status[] stati;
     /**
@@ -112,40 +112,40 @@ public class ClientAntwort implements Comparable {
     public final static int BOOLEAN = 17;
 
     /**
-     * Liefert den (Konstanten-)Namen des Typs des Antwortobjektes zurück
+     * Liefert den (Konstanten-)Namen des Typs des Antwortobjektes zurï¿½ck
      */
     public String getTyp() {
         switch (this.typ) {
             case SPIELFELDDIM:
-                return "SPIELFELDDIM";
+                return "BOARD_DIMENSION";
             case FAHNENPOS:
-                return "FAHNENPOS";
+                return "FLAG_POSITION";
             case SPIELERNAMEN:
-                return "SPIELERNAMEN";
+                return "PLAYER_NAMES";
             case ROBOTERPOS:
-                return "ROBOTERPOS";
+                return "BOT_POSITION";
             case SPIELSTAND:
-                return "SPIELSTAND";
+                return "GAME_RESULT";
             case SPIELSTATUS:
-                return "SPIELSTATUS";
+                return "GAME_STATUS";
             case MACHEZUG:
-                return "MACHEZUG";
+                return "MAKE_MOVE";
             case ANGEMELDET:
-                return "ANGEMELDET";
+                return "REGISTERED";
             case ZERSTOERUNG:
-                return "ZERSTOERUNG";
+                return "DESTRUCTION";
             case REAKTIVIERUNG:
-                return "REAKTIVIERUMG";
+                return "REACTIVATION";
             case REPARATUR:
-                return "REPARATUR";
+                return "REPAIR";
             case ENTFERNUNG:
-                return "ENTFERNUNG";
+                return "DISTANCE";
             case AENDERUNG:
-                return "AENDERUNG";
+                return "CHANGE";
             case TIMEOUT:
                 return "TIMEOUT";
             case SPIELSTART:
-                return "SPIELSTART";
+                return "GAME_START";
             case MESSAGE:
                 return "MESSAGE";
             case BOOLEAN:
