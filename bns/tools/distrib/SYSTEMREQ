@@ -24,12 +24,6 @@ Your monitor resolution should be at least 800x600, higher recommended.
 SOFTWARE:
 
 Besides the Bots'n'Scout distribution you also need a Java Runtime Environment,
-version 1.2.
-For downloading we recommend
-<"http://www.blackdown.org/java-linux/mirrors.html"> for Linux and
+version 1.2 or higher.
 
-<"http://java.sun.com/products/jdk/1.2/jre/download-windows.html"> for 
-Windows 95/98/NT.
-
-
-Check <"http://www.spline.inf.fu-berlin.de/botsnscouts"> for the latest.
+See INSTALL for information on where to get this.

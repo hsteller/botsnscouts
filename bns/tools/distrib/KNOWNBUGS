@@ -6,28 +6,17 @@ KNOWN BUGS:
 
     * On real multi-user operating systems you cannot save tiles if you haven't
       installed Bots'n'Scouts yourself.
-    * Sometimes the scrollbars don't work. Try resizing the window or use the
-      right mouse button to scroll.
     * Layout is nicer with higher monitor resolution. 800 x 600 causes some
       minor problems.
     * Adjust the size of the board and the number of auto-bots to the power of
       your computer.
+    * The game will likely crash if a player quits in the middle of a game.
     * Confirming "game over" at the end of the game _IMMEDIATELY_ stops
       everything, including the server. Don't confirm if the other players want
       to continue.
     * You may set only up to six flags and no more than eight players. The
       names mustn't contain anything but letters from 'A' to 'z', sorry.
+    * Chat messages may not contain kommas, sorry.
     * Linux: "fullscreen.sh" is experimental. Read README.fullscreen which
       comes with your distribution.
-    * We haven't written an FAQ yet.
 
-
-WE ARE CURRENTLY WORKING ON:
-
-    * reducing the need for system ressources,
-    * sound,
-    * handling timeouts (if AutoRobs don't manage to make their move in time)
-    * refactoring our source code which has a lot of cruft...
-    * cool features
-
-Check <"http://www.spline.inf.fu-berlin.de/botsnscouts"> for the latest.
