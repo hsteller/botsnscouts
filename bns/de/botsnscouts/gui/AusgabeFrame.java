@@ -57,6 +57,10 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
     
     // --- Objekte
 
+    // Statistik-Verwaltung
+    StatsList stats;
+    Stats actualStats;
+    
     // Das Log-Fenster
     LogFrame lF;
     // Komm-Objekt der Ausgabe
@@ -224,6 +228,9 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	getContentPane().add(stBP,BorderLayout.SOUTH);
 	// KommClientAusgabe erzeugen
 	kCA = new KommClientAusgabe();
+
+	
+
     }
 
 
@@ -978,17 +985,21 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 		    Roboter r2=null;
 		    try {
 			r1=kCA.getRobStatus(cA.namen[1]);// schiessender Roboter
-		    }
-		    catch (KommException k) {
-			k.printStackTrace();
-		    }
-		    try {
 			r2=kCA.getRobStatus(cA.namen[2]);// getroffener Roboter
+			
+			actualStats=stats.getStats(r1.getName());
+			actualStats.incHits();
+			if (r2.getSchaden()>=10)
+			    actualStats.incKills();
+		  
+			actualStats=stats.getStats(r2.getName());
+			actualStats.incDamageByRobots();
 		    }
 		    catch (KommException k) {
 			k.printStackTrace();
 		    }
 		     spielFeld.doRobLaser(r1, r2);
+		     // System.err.println(stats.toString());
 		}
 		else if (cA.namen[0].equals("mBoardLaser")){
 		    Roboter r1=null;
@@ -1012,11 +1023,15 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 			facing     = Integer.parseInt(cA.namen[5]); 
        		    }
 		    catch (NumberFormatException nfe) {
-			System.err.println("AusgabeFrame: BoardLaser: NumberFormatException:");
+			//System.err.println("AusgabeFrame: BoardLaser: NumberFormatException:");
 			nfe.printStackTrace();
 		    }
-		    if ((laserPos!=null)&&(facing>=0)&&(r1Pos!=null)&&(strength>=0))
+		    if ((laserPos!=null)&&(facing>=0)&&(r1Pos!=null)&&(strength>=0)){
 			spielFeld.doBordLaser(laserPos, facing, strength, r1Pos,mP.getViewport());
+			actualStats=stats.getStats(r1.getName());
+			actualStats.incDamageByBoard();
+			System.err.println(stats.toString());
+		    }
 		    else {
 			System.err.println("AusgabeFrame: unable to calculate Laseranimation: ");
 			System.err.println("laserPos: "+laserPos);
@@ -1132,6 +1147,8 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	    }
 	    
 	    // ------- Einmaliges Holen des Spielfeldes und ermitteln der Spieler -----
+	    // ...und holen der Statistik.. 
+	    
 	    if (!spielFeldErhalten) {
 
 				// ------------- Spieler erfragen und den Status anlegen ------------
@@ -1155,7 +1172,20 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 							      kCA.getFahnenPos()),roboNcolor);
 		    Global.debug("Ausgabe: Spielfeld erhalten und aktualisiert.");
 		    spielFeldErhalten = true; // haben Spielfeld true-en
-		    
+		    // ------------- erste Statistikdaten holen-------------
+		    Global.debug(this,"Hole Statistikdaten");
+		    try {
+			stats = kCA.getStats();
+		    }
+		    catch (KommException kex) {
+			System.err.println("KommException!");
+			System.err.println("Message: "+kex.getMessage());
+			kex.printStackTrace();
+			stats=null;
+		    }
+		    Global.debug(this, "Stats ist:\n"+stats.toString());
+
+
 		    // ------------- unnoetige entfernen -------------
 		    for (int i = 8; i > spNamen.length; i--) statusLine.stat.remove(statusLine.stat.getComponentCount()-1);
 		    Roboter robsAnSpielfeld[] = new Roboter[statusLine.stat.getComponentCount()];

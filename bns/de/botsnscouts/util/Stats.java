@@ -50,6 +50,24 @@ public class Stats {
 	this.damageByRobots=i;
     }
 
+    /** Increases this Stats number of hits by(?) one*/
+    public void incHits() {
+	++hits;
+    }
+    /** Increases this Stats number of kills by(?) one*/
+    public void incKills() {
+	++kills;
+    }
+   /** Increases this Stats number of damage got by Boardlasers by(?) one*/
+    public void incDamageByBoard() {
+	++damageByBoard;
+    }
+    /** Increases this Stats number of damage got by(?) robotlasers by(?) one*/
+    public void incDamageByRobots() {
+	++damageByRobots;
+    }
+
+
     public String toSendString () {
 	return (this.name+","+this.hits+","+this.kills+","+this.damageByBoard+","+this.damageByRobots);
     }

@@ -34,7 +34,11 @@ public class SpielfeldSim extends Spielfeld
 
     private BoardRoboter[] br=new BoardRoboter[1]; /* Singleton-Array um einen Robi effizient casten zu können*/
 
-    public Vector getLasers(){
+    /** Contains the laser stats*/
+    private StatsList stats=null;
+    private Stats actualStats=null;
+
+public Vector getLasers(){
 	return lasers;
     }
 
@@ -97,6 +101,15 @@ public class SpielfeldSim extends Spielfeld
 	ausgabenMsg(id,tmp);
     }
 
+   
+    
+    /** Creates the internal StatsList.
+    @param sl The robots that should be managed in the StatsList 
+     */
+    public void initStats (StatsList sl)  {
+	stats= sl;
+    }
+
   /** Initialisiert mit Unterst&uuml;tzung f&uuml;r Ausgabenbenachrichtigung.
     @param kacheln Das Feld im f&uuml;r Netzkommunikation spezifizierten Format.
     @param flaggen Die Flaggen im f&uuml;r Netzkommunikation spezifizierten Format.
@@ -108,6 +121,8 @@ public class SpielfeldSim extends Spielfeld
     {
       super(sx,sy,kacheln,flaggen);
       server=s;
+
+      actualStats= new Stats("foo");
 
       // Baue die LaserListe auf.
       lasers=new Vector();
@@ -645,6 +660,10 @@ public class SpielfeldSim extends Spielfeld
 		      tmp[3]=""+l.y;
 		      tmp[4]=""+l.facing;
 		      d("Boardlasertreffer auf "+robbis[j].getName());
+		      actualStats = stats.getStats (robbis[j].getName());
+		      actualStats.incDamageByBoard();
+		      
+		      
 		      ausgabenMsg("mBoardLaser",tmp);
 		  }
 
@@ -709,7 +728,15 @@ public class SpielfeldSim extends Spielfeld
 		bewegt[j]=true; // Änderung erfolgt
 		
 		ausgabenMsgString2("mRobLaser",robbis[rob].getName(),robbis[j].getName());
+		actualStats=stats.getStats(robbis[rob].getName());
+		actualStats.incHits();
+		if (robbis[j].getSchaden()>=10)
+		    actualStats.incKills();
+		actualStats=stats.getStats(robbis[j].getName());
+		actualStats.incDamageByRobots();
 		
+
+
 		continue aussen2;
 	    }
 	  x++;

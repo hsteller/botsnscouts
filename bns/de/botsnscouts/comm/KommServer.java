@@ -212,8 +212,11 @@ public class KommServer {
 	  else if (rd=='F'){
 	      back.typ=back.GIBFARBEN;
 	  }
+	  else if (rd=='T'){
+	      back.typ=back.STATS;
+	  }
 	  else {
-	    errormsg="GS->danach nichts aus ['A','N','D','S','F'] gefunden"; 
+	    errormsg="GS->danach nichts aus ['A','N','D','S','F','T'] gefunden"; 
 	    error=true;
 	    break;
 	  }

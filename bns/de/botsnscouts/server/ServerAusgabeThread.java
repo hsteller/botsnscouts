@@ -108,6 +108,9 @@ class ServerAusgabeThread extends Thread
 		          case ans.GIBFARBEN:
 			      komm.sendFarben(server.angemeldet);
 		              break;
+		          case ans.STATS:
+			      komm.sendStats(server.stats);
+			      break;
 			      
 		          case ans.ABMELDUNG:
 			      ende=true;

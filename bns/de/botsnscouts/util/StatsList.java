@@ -4,8 +4,11 @@ import java.util.Vector;
    Container class for Stats objects.
  */
 public class StatsList {
+    // perhaps additional a Hashtable ?!
     private Stats[] robots;
   
+
+
     /** Creates a new list with length 0*/
     public StatsList () {
 	robots = new Stats[0];
@@ -31,16 +34,40 @@ public class StatsList {
 	}
     }
 
+    /** Gets the Statsobject for the robot named <code>name</code>.
+	@param The robot's name
+	@return A reference to the robot's Stats-object
+	null, if no robot calles <code>name</code> was found.
+    */
+    public Stats getStats (String name) {
+	for (int i=0;i<robots.length;i++)
+	    if (robots[i].getName().equals(name))
+		return robots[i];
+	return null;
+    }
+
     /** This method exchanges the Stats-object for the robot neu.name (if the object exists).
 	@param neu The new Stats-objects, describing the stats for the robot neu.name.
-     */
-	public void update (Stats neu) {
+    */
+    public void update (Stats neu) {
 	for (int i=0;i<robots.length;i++)
 	    if (robots[i].getName().equals(neu.getName())){
 		robots [i]=neu;
 		break;
 	    }
 	
+    }
+
+    /** Sets the StatsList to <code>sl</code>
+	@param sl The new contents of the StatsList
+    */
+    public void update (StatsList sl) {
+	this.robots=sl.getStats();
+    }
+    /** Gets all Stats that are saved in the StatsList
+	@return The Stats of the StatsList*/
+    public Stats [] getStats() {
+	return this.robots;
     }
     
     /**
@@ -59,14 +86,14 @@ public class StatsList {
 	@return A sorted String (decreasing order) of the list's contents (Stats objects),
 	using the less-method of the Stats class.
     */
-    protected String toSendString () {
+    public String toSendString () {
 	sort();
 	StringBuffer back= new StringBuffer();
 	back.append("(");
 	for (int i=0;i<robots.length;i++){
 	    back.append(robots[i].toSendString());
-		if (i<robots.length-1)
-		    back.append(",");
+	    if (i<robots.length-1)
+		back.append(",");
 	}
 	back.append(")");
 	return back.toString();
@@ -98,9 +125,9 @@ public class StatsList {
 		robots[j] = swap;
 		// two robots can't be equal, because they have different names
 		/*	while ((i<=j)&&(robots[i].less(pivotelem))) 
-		    i++;
-		while ((i<=j)&&(pivotelem.less(robots[j]))) 
-		    j--;
+			i++;
+			while ((i<=j)&&(pivotelem.less(robots[j]))) 
+			j--;
 		*/
 		while ((i<=j)&&(pivotelem.less(robots[i]))) 
 		    i++;

@@ -47,6 +47,9 @@ public class Server extends Thread{
         private Vector rThreadsAufDieIchWarte = new Vector();
         private Vector aThreadsAufDieIchWarte = new Vector();
     
+        // um die Statistikdaten zu halten  
+        protected StatsList stats;
+
           // RoboterThreads auf die aktuell gewartet wird, 
           // Grund des Wartens ergibt sich aus Modus.
 
@@ -94,6 +97,7 @@ public Server(	int 		anzahlmitspieler,
         msgQ=new Vector();
         roboterWecker=new Timer();
         ausgabenWecker=new Timer();
+       
 
 	try{
       		feld=new SpielfeldSim(x,y,Spielfeld,flaggen,this);
@@ -136,6 +140,7 @@ public Server(	int 		anzahlmitspieler,
 	return s;
     }
 
+   
     public Ort gibRobPos(String name){
 	for (Iterator it=rThreads.iterator();it.hasNext();){
 	    ServerRoboterThread srt=(ServerRoboterThread)it.next();
@@ -823,6 +828,8 @@ private void roboterThreadStart(){
 	boolean spielgestartet=anmeldung();
 	if (!spielgestartet)
 	    return;
+	
+	
 
 	d("setzeStartPunkt()");
 	setzeStartPunkt();  
@@ -838,7 +845,10 @@ private void roboterThreadStart(){
             for(Iterator e=rThreads.iterator();e.hasNext();)
                 alleN[i++]=((ServerRoboterThread)e.next()).rob.getName();
         }
-
+	//initialisiere Statistik
+	stats = new StatsList(alleN);
+	feld.initStats(stats);
+	
         ausgabenBenachrichtigen(alleN);
         
             // 2. Roboter

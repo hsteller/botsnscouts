@@ -45,12 +45,11 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
 	// format: GST(name,int,int,int,int,name,..,name,int,int,int,int)
 	senden("GST");
 	String rein = einlesen();
-	Vector stats = new Vector();
-	StringTokenizer st = new StringTokenizer (rein.substring(0,rein.length()-1),",");
-	String notNeeded=st.nextToken();
-	notNeeded=null;
-	while (st.hasMoreElements()) {
-	    Stats s = new Stats (st.nextToken());
+	if (rein.startsWith("GST")) {
+	    Vector stats = new Vector();
+	    StringTokenizer st = new StringTokenizer (rein.substring(4,rein.length()-1),",");
+	    while (st.hasMoreElements()) {
+		Stats s = new Stats (st.nextToken());
 	    try {
 		s.setHits(Integer.parseInt(st.nextToken()));
 		s.setKills(Integer.parseInt(st.nextToken()));
@@ -61,8 +60,11 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
 	    catch (NumberFormatException nfe) {
 		nfe.printStackTrace();
 	    }
+	    }
+	    return new StatsList(stats);
 	}
-	return new StatsList(stats);
+	else 
+	    throw new KommException ("getStats: Wrong answer: "+rein);
     }
 	
 

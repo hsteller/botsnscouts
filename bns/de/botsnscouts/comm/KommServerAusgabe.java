@@ -1,5 +1,6 @@
 package de.botsnscouts.comm;
 
+import de.botsnscouts.util.StatsList;
 import java.io.*;
 // STAND : fertig 
 /**  
@@ -60,4 +61,12 @@ Klasse fuer die Komunikation des Servers mit Ausgabekanälen
 	 
 	 out.println(send);
      }
+
+     /** Sends the stats to the output-channel
+	 @param sl the current StatsList of the server 
+      */
+     public void sendStats (StatsList sl) {
+	 out.println("GST"+sl.toSendString());
+     }
+
  }
