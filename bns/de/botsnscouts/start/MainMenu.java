@@ -39,6 +39,7 @@ public class MainMenu extends JPanel implements  ActionListener{
     TransparentButton gameBut;
     TransparentButton partBut;
     TransparentButton watchBut;
+    TransparentButton editBut;
     TransparentButton endBut;
     JLabel logo;
 
@@ -49,9 +50,11 @@ public class MainMenu extends JPanel implements  ActionListener{
 	parent.setTitle(Message.say("Start","mStartTitel"));
 	paint=parent.paint;
 
-	GridLayout lay=new GridLayout(4,1);
+	GridLayout lay=new GridLayout(5,1);
 	lay.setHgap(170);
 	lay.setVgap(20);
+	//lay.setHgap(100);
+	//lay.setVgap(10);
 	JPanel buttons = new JPanel( lay );
 	buttons.setOpaque( false );
 	setLayout( new GridBagLayout() );
@@ -61,21 +64,25 @@ public class MainMenu extends JPanel implements  ActionListener{
 	gameBut=new TransparentButton(Message.say("Start","mSpielStarten"));
 	partBut=new TransparentButton(Message.say("Start","mTeilnehmen"));
 	watchBut=new TransparentButton(Message.say("Start","mZuschauen"));
+	editBut=new TransparentButton(Message.say("Start","mEdit"));
 	endBut=new TransparentButton(Message.say("Start","mBeenden"));
 
 	gameBut.addActionListener(this);
 	partBut.addActionListener(this);
 	watchBut.addActionListener(this);
+	editBut.addActionListener(this);	
 	endBut.addActionListener(this);
 
 	gameBut.setActionCommand("gameBut");
 	partBut.setActionCommand("partBut");
 	watchBut.setActionCommand("watchBut");
+	editBut.setActionCommand("editBut");
 	endBut.setActionCommand("endBut");
 
 	buttons.add(gameBut);
 	buttons.add(partBut);
 	buttons.add(watchBut);
+	buttons.add(editBut);
 	buttons.add(endBut);
 
 	GridBagConstraints con = new GridBagConstraints();
@@ -118,6 +125,8 @@ public class MainMenu extends JPanel implements  ActionListener{
 	    parent.current=parent.watchPanel;
 	    parent.setContentPane(parent.current);
 	    parent.show();
+	} else if (e.getActionCommand().equals("editBut")){
+	  new de.botsnscouts.editor.BoardEditor();
 	}
     }
 
@@ -126,6 +135,7 @@ public class MainMenu extends JPanel implements  ActionListener{
 	partBut.getModel().setRollover(false);
 	watchBut.getModel().setRollover(false);
 	endBut.getModel().setRollover(false);
+	editBut.getModel().setRollover(false);
     }
 
     public void paint(Graphics g) {
