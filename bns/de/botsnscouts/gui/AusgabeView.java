@@ -26,6 +26,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private JMenu optTrack = new JMenu("Track");
     private JMenuBar menus = new JMenuBar();
 
+    // settings for Zoom-Menu
+    protected static final int MIN_ZOOM = 40;
+    protected static final int MAX_ZOOM = 140;
+    protected static final int ZOOM_STEP = 10;
+
 
 
     /** @args SpielerMensch spielerref ist Referenz auf umgebenden
@@ -219,24 +224,16 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
     private void initMenus() {
 
+      menus.add(new OptionsMenu());
       menus.add(new HelpMenu());
-      menus.add(new ZoomMenu());
-
 
     }
 
-
-    private class HelpMenu extends JMenu {
-      HelpMenu () {
-        super (Message.say("AusgabeFrame","mHelpMenuName"));
-        JMenuItem about = new JMenuItem(Message.say("AusgabeFrame","mAbout"));
-	about.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    new AboutFenster();
-		}
-	    });
-      }
-
+    private class OptionsMenu extends JMenu {
+       OptionsMenu () {
+        super(Message.say("AusgabeFrame","mOptions"));
+        add(new ZoomMenu());
+       }
     }
 
     private class ZoomMenu extends JMenu implements ActionListener {
@@ -273,10 +270,22 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	}
   }
 
-    // Einstellungen fuers Zoom-Menu
-    protected static final int MIN_ZOOM = 40;
-    protected static final int MAX_ZOOM = 100;
-    protected static final int ZOOM_STEP = 10;
+   private class HelpMenu extends JMenu {
+      HelpMenu () {
+        super (Message.say("AusgabeFrame","mHelpMenuName"));
+        JMenuItem about = new JMenuItem(Message.say("AusgabeFrame","mAbout"));
+	about.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    new AboutFenster();
+		}
+	    });
+      }
+
+    }
+
+
+
+
 
 
 }
