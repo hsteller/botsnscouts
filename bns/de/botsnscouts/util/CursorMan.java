@@ -6,33 +6,33 @@ import java.awt.image.*;
 
 
 public class CursorMan {
-    public final static int 
+    public final static int
 	CURSOR = 0,
 	BOTCENTER=1,
 	STATUSROBOTS = 2,
 	DAMAGE = 3,
 	WINNER = 4;
-    
-	
 
-	
-    
+
+
+
+
     final static ImageSet[] imgSetDescr = {
-	new ImageSet("images/cursor.gif",   5, 5 ),
-	new ImageSet("images/botcenter.gif",   5, 5 ),
-	new ImageSet("images/minibots.gif", 8, 1),
-	new ImageSet("images/damage.gif", 1, 1),
-	new ImageSet("images/winner.gif", 8, 8)
-    }; 
+	ImageSet.getInstance("images/cursor.gif",   5, 5 ),
+	ImageSet.getInstance("images/botcenter.gif",   5, 5 ),
+	ImageSet.getInstance("images/minibots.gif", 8, 1),
+	ImageSet.getInstance("images/damage.gif", 1, 1),
+	ImageSet.getInstance("images/winner.gif", 8, 8)
+    };
 
     final static int IMGSETCOUNT = imgSetDescr.length;
 
 
     static Image[][] imgSets = new Image[IMGSETCOUNT][];
-    
+
     static boolean imagesLoading = false;
     static boolean loadingFinished = false;
-    
+
     static Thread imageLoader;
     static MediaTracker tracker;
 
@@ -41,7 +41,7 @@ public class CursorMan {
 	    return;
 	imagesLoading = true;
 
-	//Miriam: Bilder werden relativ zum Klassenpfad gesucht	
+	//Miriam: Bilder werden relativ zum Klassenpfad gesucht
 	Class c = de.botsnscouts.BotsNScouts.class;
 
 	tracker = new MediaTracker(new Button());
@@ -67,7 +67,7 @@ public class CursorMan {
 		}catch(InterruptedException ie) { System.err.println( ie ); }
 	    }
 	};
-	imageLoader.start();	
+	imageLoader.start();
     }
 
 
@@ -76,7 +76,7 @@ public class CursorMan {
 
     // Diese Methode ist nur fuer den Fall gedacht, dass man synchron
     // das Laden von Bildern erzwingen will
-    // Achtung: ein Aufruf dieser Methode triggert auch dann das Laden 
+    // Achtung: ein Aufruf dieser Methode triggert auch dann das Laden
     // ALLER Bilder (im Hintergrund) falls man nur einen Satz davon
     // haben will - aber sie wartet eben nur auf diesen einen Satz
     static Image[] waitForImages(int id) {
@@ -90,7 +90,7 @@ public class CursorMan {
 	try{
 	    tracker.waitForID( id );
 	}catch(InterruptedException ie) { System.err.println( ie ); }
-	    
+
 	return imgSets[id];
     }
     //////////////////////////////////////////////////////////////////////
@@ -99,16 +99,16 @@ public class CursorMan {
     // zurückgegebenen Arrays sind erst gültig, wenn finishLoading()
     // erfolgreich aufgerufen wurde
     public static Image[] getImages(int id) {
-	if( !imagesLoading ) 
+	if( !imagesLoading )
 	    loadImages();
 
 	return imgSets[id];
     }
 
     static void finishLoading() {
-	if(! imagesLoading ) 
+	if(! imagesLoading )
 	    loadImages();
-	
+
 	try{
 	    imageLoader.join();
         }catch(InterruptedException ie) { System.err.println( ie ); }

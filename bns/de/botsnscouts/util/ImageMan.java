@@ -8,9 +8,12 @@ import de.botsnscouts.BotsNScouts;
 import javax.swing.ImageIcon;
 import java.net.URL;
 
+import org.apache.log4j.Category;
 import com.sixlegs.image.png.PngImage;
 
+
 public class ImageMan {
+    static final Category CAT = Category.getInstance( ImageMan.class );
     public final static int
 	CBELTS = 0,
 	EBELTS = 1,
@@ -22,7 +25,10 @@ public class ImageMan {
 	SCHLAFSCOUT = 7,
 	KSCHLAF = 8,
         KWACH = 9,
-        WISENHEIMER_ACTIVE = 10;
+        WISENHEIMER_ACTIVE = 10,
+	PNG_ROBOCENTER = 11,
+	PNG_REGLOCK =12,
+	PNG_BOTDAMAGE =13;
 
     // PNG-IDs
     public final static int
@@ -54,17 +60,20 @@ public class ImageMan {
 
 
     final static ImageSet[] imgSetDescr = {
-	new ImageSet("images/cbelts.gif",   24, 5 ),
-	new ImageSet("images/ebelts.gif",   24, 5 ),
-	new ImageSet("images/diverse.gif",  30, 6 ),
-	new ImageSet("images/robos.gif",    32, 4 ),
-	new ImageSet("images/scoutklug.gif", 8, 4 ),
-	new ImageSet("images/startknoepfe.gif", 6, 6),
-	new ImageSet("images/schlafplatzmitscout.gif", 6, 6),
-	new ImageSet("images/schlafplatz.gif", 1, 1),
-	new ImageSet("images/klugschlaf.gif", 6, 6),
-	new ImageSet("images/klugwach.gif", 1, 1),
-	new ImageSet("images/kscheisser.gif", 1, 1),
+	ImageSet.getInstance("images/cbelts.gif",   24, 5 ),
+	ImageSet.getInstance("images/ebelts.gif",   24, 5 ),
+	ImageSet.getInstance("images/diverse.gif",  30, 6 ),
+	ImageSet.getInstance("images/robos.gif",    32, 4 ),
+	ImageSet.getInstance("images/scoutklug.gif", 8, 4 ),
+	ImageSet.getInstance("images/startknoepfe.gif", 6, 6),
+	ImageSet.getInstance("images/schlafplatzmitscout.gif", 6, 6),
+	ImageSet.getInstance("images/schlafplatz.gif", 1, 1),
+	ImageSet.getInstance("images/klugschlaf.gif", 6, 6),
+	ImageSet.getInstance("images/klugwach.gif", 1, 1),
+	ImageSet.getInstance("images/kscheisser.gif", 1, 1),
+	ImageSet.getInstance("images/robocenter.png", 1, 1),
+	ImageSet.getInstance("images/locked.png", 1, 1),
+	ImageSet.getInstance("images/boom.png", 1, 1),
     };
 
     final static int IMGSETCOUNT = imgSetDescr.length;
@@ -88,12 +97,20 @@ public class ImageMan {
 	CropperField gridCropper = new CropperField(8, 8, 64, tk);
 
 	for(int i=0; i<IMGSETCOUNT; i++) {
-	    ImageSet descr = imgSetDescr[i];
-
-	    Image img = tk.getImage( c.getResource( descr.name ) );
-	    tracker.addImage( img, i );
+          ImageSet descr = imgSetDescr[i];
+          try {
+            Image img = descr.getImage();
 	    imgSets[i] = new Image[ descr.size ];
-	    gridCropper.multiCrop( img, descr.rowlength, descr.size, imgSets[i], tracker, i);
+
+            tracker.addImage( img, i );
+            if( descr.size == 1 )
+                imgSets[i][0] = img;
+            else
+	        gridCropper.multiCrop( img, descr.rowlength, descr.size, imgSets[i], tracker, i);
+          } catch(IOException ioe) {
+            CAT.error("Couldn't load: " + descr.name, ioe);
+            imgSets[i] = new Image[0];
+          }
 	}
 
 	for (int i=0; i < PngImages.length; i++) {
@@ -153,21 +170,42 @@ public class ImageMan {
 	return imgSets[id];
     }
 
-    public static Image getPNGImage(int id) {
+    public static Image getImage(int setId, int index) {
 	if( !imagesLoading )
 	    loadImages();
-	return PNGImages[id];
+
+	return imgSets[setId][index];
     }
 
-    public static ImageIcon getPNGImageIcon(int id) {
+    public static Image getImage(int setId) {
 	if( !imagesLoading )
 	    loadImages();
-	if(PNGImageIcons[id]==null){
-	    PNGImageIcons[id]=new ImageIcon(PNGImages[id]);
-	}
-	return PNGImageIcons[id];
+
+	return imgSets[setId][0];
     }
 
+    public static ImageIcon getImageIcon(int setId, int index) {
+	return new ImageIcon(getImage( setId, index) );
+    }
+
+    public static ImageIcon getImageIcon(int setId) {
+	return new ImageIcon(getImage( setId ) );
+    }
+
+//    public static Image getPNGImage(int id) {
+//	if( !imagesLoading )
+//	    loadImages();
+//	return PNGImages[id];
+//    }
+//
+//    public static ImageIcon getPNGImageIcon(int id) {
+//	if( !imagesLoading )
+//	    loadImages();
+//	if(PNGImageIcons[id]==null){
+//	    PNGImageIcons[id]=new ImageIcon(PNGImages[id]);
+//	}
+//	return PNGImageIcons[id];
+//    }
 
     public static void finishLoading() {
 	if(! imagesLoading )
