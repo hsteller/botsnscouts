@@ -11,6 +11,8 @@ import java.applet.*;
 import java.awt.geom.*;
 import javax.swing.*;
 
+import org.apache.log4j.Category;
+
 import de.botsnscouts.board.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.*;
@@ -36,6 +38,8 @@ import de.botsnscouts.*;
  */
 
 public class SACanvas extends JComponent {
+    static Category CAT = Category.getInstance(SACanvas.class);
+
     // inner classes
     public static interface ClickListener {
 	void feldClicked( int x, int y, int modifiers );
@@ -211,18 +215,26 @@ public class SACanvas extends JComponent {
 	    return;
 	Thread t = new Thread () {
 		public void run() {
-		    Global.debug("Initializing sounds..");
+		    CAT.debug("Initializing sounds..");
 		    File f = new File (SOUND_DIR);
 		    if (f!=null && f.exists() && f.isDirectory()){
 			String [] list = f.list(soundFilter);
+			if (list == null) {
+			    CAT.debug("Got no sounds!");
+			    return;
+			}
+			CAT.debug("Got "+list.length+" sounds");
+  
+			
 			URL u = null;
 			AudioClip a = null;
 			Vector v = new Vector();
 			String s = null;
 			for (int i=0;i<list.length;i++){
 			    s = list [i];
-			    Global.debug(this, "Trying to load sound: "+s);
+			    CAT.debug("Trying to load sound: "+s);
 			    u = BotsNScouts.class.getResource(s);
+			    CAT.debug("sound-url: "+(u==null?"null":u.toString()));
 			    a = Applet.newAudioClip(u);
 			    if (a!=null)
 				v.add(a);
@@ -233,10 +245,10 @@ public class SACanvas extends JComponent {
 			for (int i=0;i<l;i++)
 			    mLaserWav[i] = (AudioClip) v.elementAt(i);
 			soundsLoaded=true;
-			Global.debug("Sounds loaded!");
+			CAT.debug("Sounds loaded!");
 		    }
 		    else {
-			System.err.println ("Error!: Unable to load sounds from "+SOUND_DIR);
+			CAT.error("Error!: Unable to load sounds from "+SOUND_DIR);
 		    }
 		}
 	    };
