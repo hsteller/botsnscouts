@@ -6,12 +6,12 @@
 
 package de.botsnscouts.editor;
 
-import de.botsnscouts.util.Message;
-
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import org.apache.log4j.Category;
+
+import de.botsnscouts.util.Message;
 
 class EditMouseListener extends MouseAdapter{
     private BoardEditor editor=null;

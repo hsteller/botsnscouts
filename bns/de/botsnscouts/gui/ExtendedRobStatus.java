@@ -26,16 +26,12 @@
 package de.botsnscouts.gui;
 
 
-import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.net.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-
-import de.botsnscouts.util.*;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.TJLabel;
 
 /**

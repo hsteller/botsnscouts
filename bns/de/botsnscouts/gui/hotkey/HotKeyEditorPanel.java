@@ -1,14 +1,19 @@
 package de.botsnscouts.gui.hotkey;
 
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.Locale;
-import de.botsnscouts.util.Message;
-import de.botsnscouts.util.Conf;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import org.apache.log4j.Category;
+
+import de.botsnscouts.util.Message;
 
 
 public class HotKeyEditorPanel extends JPanel {

@@ -1,14 +1,33 @@
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.CropperField2;
+import de.botsnscouts.util.CursorMan;
+import de.botsnscouts.util.ImageMan;
+import de.botsnscouts.util.Message;
 
 public class RobotInfo extends JComponent  implements RobotStatus, ActionListener {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( RobotInfo.class );

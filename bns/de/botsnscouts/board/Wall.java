@@ -32,11 +32,11 @@ package de.botsnscouts.board;
  *@created    21. April 2001
  */
 
+import java.util.HashMap;
+
 import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.util.ParseUtils;
-
-import java.util.HashMap;
 
 public class Wall {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Wall.class);

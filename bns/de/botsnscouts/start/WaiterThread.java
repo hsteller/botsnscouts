@@ -26,7 +26,9 @@ package de.botsnscouts.start;
 
 import org.apache.log4j.Category;
 
-import de.botsnscouts.util.*;
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.Message;
 
 public class WaiterThread extends BNSThread {
     static Category CAT = Category.getInstance(WaiterThread.class);

@@ -25,14 +25,15 @@
 
 package de.botsnscouts.start;
 
+import java.awt.Image;
+import java.util.Properties;
+
+import org.apache.log4j.Category;
+
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.server.Server;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Location;
-
-import java.awt.*;
-import java.util.Properties;
-import org.apache.log4j.Category;
 
 // Diese Klasse dient der Entkopplung der GUI-Schicht (StartSpieler)
 // von der Fachkonzeptschicht(...) und der Datenhaltungsschicht (...)

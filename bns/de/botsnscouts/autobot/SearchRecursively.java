@@ -33,13 +33,13 @@ package de.botsnscouts.autobot;
  * Id: $Id$
  */
 
+import java.util.Arrays;
+
 import de.botsnscouts.board.BoardBot;
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.server.Deck;
-import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Bot;
-
-import java.util.Arrays;
+import de.botsnscouts.util.Card;
 
 public class SearchRecursively {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(SearchRecursively.class);

@@ -25,12 +25,11 @@
 
 package de.botsnscouts.util;
 
-import java.util.Vector;
-import java.util.Iterator;
-import java.util.Arrays;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Vector;
 
 import org.apache.log4j.Category;
 

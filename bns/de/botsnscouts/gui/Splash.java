@@ -25,13 +25,20 @@
 
 package de.botsnscouts.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Label;
+import java.awt.Toolkit;
+import java.awt.Window;
+
 import de.botsnscouts.BotsNScouts;
-import de.botsnscouts.util.*;
 
-import java.awt.*;
-import java.net.*;
-
-/**
+/** $id$
  * @author Daniel Holtz, modified by Dirk
  */
 
@@ -81,7 +88,7 @@ public class Splash{
 	public void paint(Graphics g){
 	    g.drawImage(im,0,0,im.getWidth(this),im.getHeight(this),this);
 	}
-	private Dimension d=new Dimension(Splash.this.WIDTH,Splash.this.HEIGHT);
+	private Dimension d=new Dimension(Splash.WIDTH,Splash.HEIGHT);
 	public Dimension getPreferredSize(){ return d; }
     }
 }

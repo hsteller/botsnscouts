@@ -25,8 +25,10 @@
  
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.board.*;
+import de.botsnscouts.board.Board;
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.Location;
 
 public class TileRaster{
     private int KX=3, KY=3, FL=6 ;
@@ -40,14 +42,14 @@ public class TileRaster{
 	tileFactory=tileF;
     }
 
-    //setzt übergebene Tile an Stelle (x,y)
+    //setzt ï¿½bergebene Tile an Stelle (x,y)
     public void setTile(int x, int y, int rot, String name) throws FlagPresentException{
 	if (flagsOnTile(x,y))
 	    throw new FlagPresentException();
 	tiles[x][y]=tileFactory.getTile(name,rot);
     }
 
-    //dreht die Tile um 90° nach links
+    //dreht die Tile um 90ï¿½ nach links
     public void rotTile(int x, int y){
 	if (tiles[x][y]==null) return;
 	//hole rotierte Tile
@@ -70,7 +72,7 @@ public class TileRaster{
 	}
     }
     
-    //löscht die Tile at (x,y)
+    //lï¿½scht die Tile at (x,y)
     public void delTile(int x, int y){
 	//entferne Flaggen falls vorhanden
 	for (int i=flaggenN-1;i>=0;i--){
@@ -82,7 +84,7 @@ public class TileRaster{
 	tiles[x][y]=null;
     }
 
-    //prüft ob auf der Tile at (x,y) Flaggen stehen
+    //prï¿½ft ob auf der Tile at (x,y) Flaggen stehen
     public boolean flagsOnTile(int x, int y){
 	for (int i=0;i<flaggenN;i++){
 	    if ((flaggen[i].x-1)/12==x&&(flaggen[i].y-1)/12==y){
@@ -92,7 +94,7 @@ public class TileRaster{
 	return false;
     }
 
-    // gibt ein String zurück falls die FlaggenPosition ungünstig ist
+    // gibt ein String zurï¿½ck falls die FlaggenPosition ungï¿½nstig ist
     // "" sonst
     public String reasonFlagIllegal(int x,int y){
 	int kx=(x-1)/12;
@@ -112,7 +114,7 @@ public class TileRaster{
 	return komment;
     }
 
-    // prüft ob eine Flagge hinzugefügt werden kann
+    // prï¿½ft ob eine Flagge hinzugefï¿½gt werden kann
     public boolean legalFlagPosition(int x,int y){
 	//falls schon alle Flaggen da sind
 	if (flaggenN==FL){
@@ -121,7 +123,7 @@ public class TileRaster{
 	return legalFlagPosAfterMove(x,y);
     }
 
-    // prüft ob eine Flagge hinzugefügt werden kann
+    // prï¿½ft ob eine Flagge hinzugefï¿½gt werden kann
     public boolean legalFlagPosAfterMove(int x,int y){
 	int kx=(x-1)/12;
 	int ky=(y-1)/12;
@@ -130,11 +132,11 @@ public class TileRaster{
 	    return false;
 	}
 
-	//prüfe ob an der Stelle schon eine Flagge Steht
+	//prï¿½fe ob an der Stelle schon eine Flagge Steht
 	if (flagExists(x,y)){
 	    return false;
 	}
-	//prüfe Tileelement
+	//prï¿½fe Tileelement
 	Location[] flag=new Location[1];
 	flag[0]=new Location((x-1)%12+1,(y-1)%12+1);
 
@@ -142,14 +144,14 @@ public class TileRaster{
 	return testFl;
     }
 
-    // fügt eine Flagge hinzu 
+    // fï¿½gt eine Flagge hinzu 
     public void addFlag(int x,int y) throws FlagException{
 	if (!legalFlagPosition(x,y))
 	    throw new FlagException();
 	flaggen[flaggenN++]=new Location(x,y);
     }
 
-    // löscht eine Flagge
+    // lï¿½scht eine Flagge
     public void delFlag(int nr){
 	if (nr>=flaggenN) return;
 	for (int i=nr+1;i<flaggenN;i++){
@@ -158,7 +160,7 @@ public class TileRaster{
 	flaggen[--flaggenN]=null;
     }
 
-    // löscht eine Flagge an der Position
+    // lï¿½scht eine Flagge an der Position
     public void delFlag(int ax,int ay){
 	for (int i=0;i<flaggenN;i++){
 	    if (flaggen[i].x==ax&&flaggen[i].y==ay){
@@ -168,7 +170,7 @@ public class TileRaster{
 	}
     }
 
-    // prüft ob eine Flagge an der Position vorhanden ist
+    // prï¿½ft ob eine Flagge an der Position vorhanden ist
     public boolean flagExists(int ax,int ay){
 	for (int i=0;i<flaggenN;i++){
 	    if (flaggen[i].x==ax&&flaggen[i].y==ay){
@@ -195,17 +197,17 @@ public class TileRaster{
 	}
     }
 
-    //gibt die Flaggen zurück
+    //gibt die Flaggen zurï¿½ck
     public Location[] getFlagPositions(){
 	return flaggen;
     }
 
-    //gibt maximale Anzahl der Flaggen zurück
+    //gibt maximale Anzahl der Flaggen zurï¿½ck
     public int getMaxFlag(){
 	return FL;
     }
 
-    //gibt Tiles als 2-dim Array von Board zurück
+    //gibt Tiles als 2-dim Array von Board zurï¿½ck
     public Tile[][] getTiles(){
 	return tiles;
     }
@@ -215,18 +217,18 @@ public class TileRaster{
 	return tiles[x][y];
     }
 
-    //setzt Spielfeldgröße
+    //setzt Spielfeldgrï¿½ï¿½e
     public void setBoardDim(int x, int y){
 	KX=x;
 	KY=y;
     }
 
-    //gibt Spielfeldgröße zurück
+    //gibt Spielfeldgrï¿½ï¿½e zurï¿½ck
     public Location getBoardDim(){
 	return new Location(KX,KY);
     }
 
-    //gibt den "Clone" zurück
+    //gibt den "Clone" zurï¿½ck
     public TileRaster getClone(){
 	TileRaster tmpRaster = new TileRaster(tileFactory);
 	tmpRaster.flaggenN=flaggenN;
@@ -243,9 +245,9 @@ public class TileRaster{
 	return tmpRaster;
     }
 
-    //* nicht für Fassade *//
+    //* nicht fï¿½r Fassade *//
 
-    //gibt Flaggen mit evtl versetzten Koordinaten zurück
+    //gibt Flaggen mit evtl versetzten Koordinaten zurï¿½ck
     public Location[] getRFlaggen(){
 	Location[] bounds=findBounds();
 	Location[] flags=new Location[flaggenN];
@@ -431,18 +433,18 @@ public class TileRaster{
 	return bounds;
     }
 
-    //gibt Größe des Spielfeldes zurück
+    //gibt Grï¿½ï¿½e des Spielfeldes zurï¿½ck
     public Location getSpielfeldSize(){
 	Location[] bounds=findBounds();
 	return new Location((bounds[1].x-bounds[0].x+1)*12,(bounds[1].y-bounds[0].y+1)*12);
     }
     
-    //prüft ob Board gültig ist (plausibilitätstests)
+    //prï¿½ft ob Board gï¿½ltig ist (plausibilitï¿½tstests)
     public boolean isBoardValid() throws OneFlagException, NonContiguousMapException{
 	//zu wenig Flaggen
 	if (flaggenN<2)
 	    throw new OneFlagException();
-        //das Board ist nicht zusammenhängend
+        //das Board ist nicht zusammenhï¿½ngend
 	Location ftile=findFirstTile();
 	boolean[][] mark=new boolean[KX][KY];
 	for (int i=0;i<KX;i++)
@@ -470,7 +472,7 @@ public class TileRaster{
 	return null;
     }
 
-    //markiert alle (mit der ersten) zusammenhängende Tiles
+    //markiert alle (mit der ersten) zusammenhï¿½ngende Tiles
     void markNachbarn(Location tile, boolean[][] mark){
 	//shau nach links
 	if (tile.x-1>=0&&tiles[tile.x-1][tile.y]!=null&&!mark[tile.x-1][tile.y]){

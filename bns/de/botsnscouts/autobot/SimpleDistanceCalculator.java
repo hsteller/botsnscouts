@@ -25,13 +25,14 @@
 
 package de.botsnscouts.autobot;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Category;
+
 import de.botsnscouts.board.Board;
 import de.botsnscouts.util.Directions;
 import de.botsnscouts.util.Location;
-import org.apache.log4j.Category;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  This class can calculate the distance a robot is from

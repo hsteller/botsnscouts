@@ -25,6 +25,11 @@
 
 package de.botsnscouts.server;
 
+import java.util.Iterator;
+import java.util.Vector;
+
+import org.apache.log4j.Category;
+
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.comm.KommException;
@@ -33,11 +38,17 @@ import de.botsnscouts.comm.MessageID;
 import de.botsnscouts.comm.OtherConstants;
 import de.botsnscouts.start.GameOptions;
 import de.botsnscouts.start.ServerObserver;
-import de.botsnscouts.util.*;
-import org.apache.log4j.Category;
-
-import java.util.Iterator;
-import java.util.Vector;
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Card;
+import de.botsnscouts.util.Fehlermeldung;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.util.Shutdownable;
+import de.botsnscouts.util.Stats;
+import de.botsnscouts.util.StatsList;
+import de.botsnscouts.util.Status;
 
 public class Server extends BNSThread implements ModusConstants,  ServerOutputThreadMaintainer,
 																		InfoRequestAnswerer, OKListener, ServerRobotThreadMaintainer,
@@ -141,7 +152,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
             CAT.debug("Bot " + t.rob.getName() + " konnte nicht mehr von seiner Entfernung wg. " + reason + " benachrichtigt werden: " + ex);
         }
 
-        t.interrupt();     // Beende den Thread bei nächster Gelegenheit
+        t.interrupt();     // Beende den Thread bei nï¿½chster Gelegenheit
 
         botThreads.remove(t);
         curBotsThreads.remove(t);
@@ -452,9 +463,9 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
 
     /**
      * Modus in ServerRoboterThreads setzen und warten, bis sie zu Potte kommen.
-     * Wird bei allen Modi außer ZERSTÖRT benutzt.
+     * Wird bei allen Modi auï¿½er ZERSTï¿½RT benutzt.
      * PRE: Attribute rThreadsAufDieIchWarte und modus sind korrekt belegt,
-     * außerdem muessen die Bot korrekt initialisiert sein,
+     * auï¿½erdem muessen die Bot korrekt initialisiert sein,
      * konkret: Bei Programmierungsmodus wird auf die Karten zugegriffen.
      * POST: Der Modus wurde von unseren entsprechenden Threads bearbeitet
      */
@@ -585,7 +596,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                 if (ausgabenEnterRequestedThreads.size() == 0) {
                     return;
                 } else {
-                    CAT.debug("Es gibt neue Ausgaben. Begrüße sie.");
+                    CAT.debug("Es gibt neue Ausgaben. Begrï¿½ï¿½e sie.");
                 }
 
                 waitablesImWaitingFor = new WaitingForSet(ausgabenEnterRequestedThreads);
@@ -815,7 +826,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                         notifyViews(alleN);
                     }
                 }
-                CAT.debug("Es werden " + botEnterRequestedThreads.size() + " nach ihrer Zerstörung wieder eingesetzt");
+                CAT.debug("Es werden " + botEnterRequestedThreads.size() + " nach ihrer Zerstï¿½rung wieder eingesetzt");
 
                 String[] namen;   // fuer notifyChange
                 Vector toBeAsked = new Vector();
@@ -1148,7 +1159,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
 
             CAT.debug("Das Spiel ist jetzt zu Ende. (Rundenschleife verlassen.)");
 
-            /* Falls wir jemals ein anderes Ende haben wollen, muß man sich hier nochmal Gedanken
+            /* Falls wir jemals ein anderes Ende haben wollen, muï¿½ man sich hier nochmal Gedanken
                        machen (eines, bei dem nicht alle Bot auf der letzten Flagge angekommen sind.
 
                        if (rThreads.size()>0){

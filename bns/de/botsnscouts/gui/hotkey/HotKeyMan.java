@@ -1,7 +1,6 @@
 package de.botsnscouts.gui.hotkey;
 
 import java.awt.event.ActionEvent;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;

@@ -25,19 +25,26 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.TJPanel;
-import de.botsnscouts.widgets.OptionPane;
-import de.botsnscouts.widgets.GreenTheme;
-import de.botsnscouts.widgets.TJLabel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
-import javax.swing.plaf.metal.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import org.apache.log4j.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import org.apache.log4j.BasicConfigurator;
+
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJPanel;
 /**
  * ask the user for the register reparation
  * @author Lukasz Pekacki

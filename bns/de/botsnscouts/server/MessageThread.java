@@ -25,8 +25,8 @@
 
 package de.botsnscouts.server;
 
-import java.util.Vector;
 import java.util.Iterator;
+import java.util.Vector;
 
 import org.apache.log4j.Category;
 

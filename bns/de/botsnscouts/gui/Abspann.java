@@ -25,11 +25,15 @@
  
 package de.botsnscouts.gui;
 
-import de.botsnscouts.board.*;
-import de.botsnscouts.util.*;
-import java.awt.*;
-import java.net.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Label;
+
+import javax.swing.JPanel;
+
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.Message;
 /**
  * Diese Klasse spielt bei Spielende den Abspann ab
  **/

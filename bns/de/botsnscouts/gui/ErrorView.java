@@ -24,8 +24,10 @@
  *******************************************************************/
 package de.botsnscouts.gui;
 
-import java.awt.*;
+import java.awt.Component;
+
 import javax.swing.JOptionPane;
+
 import de.botsnscouts.util.Message;
 
 /** Tell that something went wrong. */

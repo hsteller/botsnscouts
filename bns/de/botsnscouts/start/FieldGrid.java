@@ -25,10 +25,11 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.Location;
+import java.awt.GridLayout;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+
+import de.botsnscouts.util.Location;
 
 class FieldGrid extends JPanel {
     private Start parent;

@@ -9,7 +9,6 @@ package de.botsnscouts.gui.board;
 import java.awt.AlphaComposite;
 import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -255,7 +254,7 @@ public class ElementCanvas extends Canvas implements DrawingConstants, Scalable{
        // XXX HS paintHighlight(dbg); -> nach Topcanvas
        
        dbg.scale(dScale, dScale);
-    // XXX HS  dbg.setComposite(AC_SRC); -> noch nötig?
+    // XXX HS  dbg.setComposite(AC_SRC); -> noch nï¿½tig?
     //   paintScout(dbg); -> BotCanvas/TopCanvas
    //    paintRobos(dbg); -> BotCanvas
        

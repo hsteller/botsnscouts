@@ -25,16 +25,27 @@
 
 package de.botsnscouts.start;
 
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.Paint;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import org.apache.log4j.Category;
+
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJButton;
-import org.apache.log4j.Category;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 
 public class MainMenu extends JPanel implements ActionListener {

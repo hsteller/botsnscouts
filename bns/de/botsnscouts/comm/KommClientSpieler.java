@@ -25,8 +25,7 @@
 
 package de.botsnscouts.comm;
 
-import java.io.*;
-import java.net.URLEncoder;
+import de.botsnscouts.util.Encoder;
 
 /** Klasse fuer die Dinge, die nicht in 'KommClient' vorkommen und die die Ausgabe nix angehen
 *@author Hendrik<BR>*/
@@ -44,17 +43,17 @@ NEW: Encodes the client name
 @exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.
 */
     public boolean anmelden (String ipnr, int portnr, String name) throws KommException{
-	return super.anmelden (ipnr, portnr, URLEncoder.encode(name), "RGS");
+	return super.anmelden (ipnr, portnr, Encoder.commEncode(name), "RGS");
     }
     /** Anmeldung; eine Farbe zwischen 1 und 8 waehlen
      *  NEW: Encodes the client name
      *  */
     public boolean anmelden2 (String ipnr, int portnr, String name, int farbe) throws KommException{
 	if ((farbe>0)&&(farbe<9)){
-            return super.anmelden (ipnr, portnr, (URLEncoder.encode(name)+","+farbe), "RS2");
+            return super.anmelden (ipnr, portnr, (Encoder.commEncode(name)+","+farbe), "RS2");
 	}
         else
-	    return super.anmelden (ipnr, portnr, URLEncoder.encode(name), "RGS");
+	    return super.anmelden (ipnr, portnr, Encoder.commEncode(name), "RGS");
     }
 
 
@@ -134,7 +133,7 @@ NEW: Encodes the client name
 
   /** Diese Methode dient zur Antwort auf die Frage,
    *  ob der powerdown-Bot deaktiviert bleiben will.
-   *  Abgesehen von seinem Namen übergibt der Bot einen boolean;
+   *  Abgesehen von seinem Namen ï¿½bergibt der Bot einen boolean;
    *  ist dieser true, heisst das, dass der Bot deaktiviert bleiben moechte.
    *
    * @param name WILL BE IGNORED
@@ -161,7 +160,7 @@ NEW: Encodes the client name
 	 if (namen!=null) {
 	     send+=",";
 	     for (int i=0;i<namen.length;i++) {
-		 send+=URLEncoder.encode(namen[i])+",";
+		 send+=Encoder.commEncode(namen[i])+",";
 	     }
 	 }
 	 send+=")";

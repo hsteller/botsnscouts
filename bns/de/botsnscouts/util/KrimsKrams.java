@@ -25,7 +25,7 @@
 
 package de.botsnscouts.util;
 
-import java.util.*;
+import java.util.Random;
 
 /**
  * Generating nice random names.

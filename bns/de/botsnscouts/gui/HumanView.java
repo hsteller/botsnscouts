@@ -25,19 +25,24 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.TJPanel;
-import de.botsnscouts.widgets.OptionPane;
-import de.botsnscouts.widgets.PaintPanel;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
 
 import org.apache.log4j.Category;
+
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Card;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.PaintPanel;
+import de.botsnscouts.widgets.TJPanel;
 
 /**
  * view for the human player

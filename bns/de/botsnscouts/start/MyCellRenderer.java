@@ -25,9 +25,17 @@
  
 package de.botsnscouts.start;
 
-import java.awt.*;
-import javax.swing.*;
-import de.botsnscouts.util.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Image;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+
+import de.botsnscouts.util.ImageMan;
+import de.botsnscouts.util.Message;
 
 public class MyCellRenderer extends JLabel implements ListCellRenderer {
 

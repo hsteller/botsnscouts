@@ -25,8 +25,9 @@
 
 package de.botsnscouts.widgets;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.LayoutManager;
+
+import javax.swing.JPanel;
 
 /** Transparent JPanel */
 public class TJPanel extends JPanel {

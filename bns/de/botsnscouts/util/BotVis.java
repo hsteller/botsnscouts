@@ -25,10 +25,11 @@
 
 package de.botsnscouts.util;
 
-import de.botsnscouts.gui.BoardView;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Image;
 import java.util.Hashtable;
+
+import de.botsnscouts.gui.BoardView;
 
 /**
  * Holds the mapping of the color and the image of a robot

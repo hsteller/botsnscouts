@@ -1,14 +1,22 @@
 package de.botsnscouts.widgets;
 
-import de.botsnscouts.widgets.ColoredComponent;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.AWTEvent;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import javax.swing.BorderFactory;
+import javax.swing.SwingUtilities;
 
 public class LogFloatPane extends ColoredComponent implements ComponentListener {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( ColoredComponent.class.getName() );

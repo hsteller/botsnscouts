@@ -25,19 +25,38 @@
 
 package de.botsnscouts.start;
 
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.util.CursorMan;
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.ColoredPanel;
 import de.botsnscouts.widgets.TJButton;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  */
@@ -313,7 +332,7 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
                 {
                     if (parent.facade.flagsOnTile(rx, ry)) {
                         int ret = JOptionPane.showConfirmDialog(this, Message.say("Start", "mKachelSetzen"), Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION, JOptionPane.DEFAULT_OPTION, new ImageIcon(images[4]));
-                        //fragen,ob kachel mit den flaggen gelöscht werden soll
+                        //fragen,ob kachel mit den flaggen gelï¿½scht werden soll
                         if (ret != JOptionPane.YES_OPTION) {
                             return;
                         }
@@ -330,7 +349,7 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
             case MODE_TILE_ENTFERNEN:
                 {
                     if (parent.facade.flagsOnTile(rx, ry)) {
-                        //fragen,ob kachel mit den flaggen gelöscht werden soll
+                        //fragen,ob kachel mit den flaggen gelï¿½scht werden soll
                         int ret = JOptionPane.showConfirmDialog(this, Message.say("Start", "mKachelLoeschen"), Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION, JOptionPane.DEFAULT_OPTION, new ImageIcon(images[4]));
                         if (ret == JOptionPane.YES_OPTION) {
                             parent.facade.delTile(rx, ry);

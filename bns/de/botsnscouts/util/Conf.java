@@ -25,14 +25,17 @@
 
 package de.botsnscouts.util;
 
-import org.apache.log4j.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-import java.util.*;
-import java.io.*;
-
-
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import org.apache.log4j.Category;
 
 /** Used to access configuration that users may change */
 public class Conf {
@@ -99,7 +102,7 @@ public class Conf {
         if (data == null)
             data = properties.getProperty(key);
         if (data != null)
-            return URLDecoder.decode(data);
+            return Encoder.propertyDecode(data);
         return data;
     }
 
@@ -113,10 +116,10 @@ public class Conf {
                 StringTokenizer st = new StringTokenizer(data, "" + MULTIPLE_PROP_SEPARATOR);
                 back = new String[st.countTokens()];
                 for (int i = 0; i < back.length; i++) {
-                    back[i] = URLDecoder.decode(st.nextToken());
+                    back[i] = Encoder.propertyDecode(st.nextToken());
                 }
             } else {
-                back = new String[]{URLDecoder.decode(data)};
+                back = new String[]{Encoder.propertyDecode(data)};
             }
         }
         return back;
@@ -132,10 +135,10 @@ public class Conf {
                 StringTokenizer st = new StringTokenizer(data, "" + MULTIPLE_PROP_SEPARATOR);
                 int length = st.countTokens();
                 for (int i = 0; i < length; i++) {
-                    back.addElement(URLDecoder.decode(st.nextToken()));
+                    back.addElement(Encoder.propertyDecode(st.nextToken()));
                 }
             } else {
-                back.add(URLDecoder.decode(data));
+                back.add(Encoder.propertyDecode(data));
             }
         }
         return back;
@@ -154,7 +157,7 @@ public class Conf {
     }
 
     public static void setProperty(String key, String data) {
-        properties.setProperty(key, URLEncoder.encode(data));
+        properties.setProperty(key, Encoder.propertyEncode(data));
     }
 
    public static void setMultipleProperty(String key, String[] values) {
@@ -163,7 +166,7 @@ public class Conf {
             return;
         }
         StringBuffer sb = new StringBuffer();
-        sb.append(URLEncoder.encode(values[0]));
+        sb.append(Encoder.propertyEncode(values[0]));
         for (int i = 1; i < values.length; i++) {
             sb.append(MULTIPLE_PROP_SEPARATOR).append(values[i]);
         }
@@ -176,7 +179,7 @@ public class Conf {
             return;
         }
         StringBuffer sb = new StringBuffer();
-        sb.append(URLEncoder.encode(values.elementAt(0).toString()));
+        sb.append(Encoder.propertyEncode(values.elementAt(0).toString()));
         for (int i = 1; i < values.size(); i++) {
             sb.append(MULTIPLE_PROP_SEPARATOR).append(values.elementAt(i));
         }

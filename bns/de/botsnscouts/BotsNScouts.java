@@ -25,12 +25,14 @@
 
 package de.botsnscouts;
 
-import de.botsnscouts.gui.Splash;
-import de.botsnscouts.start.Start;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 import org.apache.log4j.Category;
 import org.apache.log4j.PropertyConfigurator;
 
-import java.awt.*;
+import de.botsnscouts.gui.Splash;
+import de.botsnscouts.start.Start;
 
 public class BotsNScouts {
     private static Category CAT = Category.getInstance(BotsNScouts.class);

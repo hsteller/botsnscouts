@@ -25,11 +25,13 @@
  
 package de.botsnscouts.gui;
 
-import  java.util.*;
-import  de.botsnscouts.util.*;
-import  de.botsnscouts.autobot.*;
-import  de.botsnscouts.board.*;
-import  de.botsnscouts.server.*;
+import java.util.ArrayList;
+
+import de.botsnscouts.autobot.SearchRecursively;
+import de.botsnscouts.board.SimBoard;
+import de.botsnscouts.server.Deck;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Card;
 
 /** Wisenheimer's logic
  * 
@@ -41,7 +43,7 @@ public class Wisenheimer{
 
     private SearchRecursively wirbel;
     private Bot simRob = Bot.getNewInstance("dummy");
-    // damit wir nicht immer für jede Simulation einen neuen Robby brauchen
+    // damit wir nicht immer fï¿½r jede Simulation einen neuen Robby brauchen
     private int[] predict=new int[5];
     private int lastPredict;
 
@@ -49,7 +51,7 @@ public class Wisenheimer{
 	wirbel = new SearchRecursively(board, 0);
     }
 
-    //berechnet den zug neu und gibt index der Card zurück
+    //berechnet den zug neu und gibt index der Card zurï¿½ck
     protected int getPrediction(ArrayList registers, ArrayList cards, Bot robi){
         CAT.debug("Wisenheimer.getPrediction() called.");
 	//teste ob alle register belegt sind
@@ -64,7 +66,7 @@ public class Wisenheimer{
 	simRob.copyRob(robi);
 
 	Card[] simCards=new HumanCard[9];
-	// cards in simCards einlesen, gesperrte Karten werden nicht berücksichtigt
+	// cards in simCards einlesen, gesperrte Karten werden nicht berï¿½cksichtigt
 	int j=0;
 	for (int i = 0; i < cards.size(); i++) {
 	    if((cards.get(i) != null)&&((HumanCard)cards.get(i)).getState() == HumanCard.FREE) {
@@ -121,7 +123,7 @@ public class Wisenheimer{
 	return ind;
     }
 
-    //gibt die nächste karte von dem berechneten zug
+    //gibt die nï¿½chste karte von dem berechneten zug
     public int getNextPrediction(ArrayList registers,ArrayList robiCards){
         CAT.debug("Wisenheimer.getNextPrediction() called.");
 	//teste ob alle register belegt sind

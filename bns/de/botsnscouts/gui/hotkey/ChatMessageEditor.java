@@ -1,15 +1,19 @@
 package de.botsnscouts.gui.hotkey;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import org.apache.log4j.Category;
+
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.TJCheckBox;
 import de.botsnscouts.widgets.TJTextField;
-import org.apache.log4j.Category;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 
 /**  Contains a JTextField and a JCheckbox for editing the ChatMessage and the

@@ -24,7 +24,7 @@
  *******************************************************************/
  
 package de.botsnscouts.comm;
-import de.botsnscouts.util.*;
+import de.botsnscouts.util.Location;
 
 /** Hilfsklasse zum String-Entschluesseln
 *@author Hendrik<BR>
@@ -73,7 +73,7 @@ public class ServerAntwort {
     public static final int IS_WISENHEIMER_ALLOWED=22;
     
     /** zu Debug-/Informationszwecken:
-	Die Methode liefert den Namen der ServerAntwort-Konstanten (mit Wert t) als String zurück.*/
+	Die Methode liefert den Namen der ServerAntwort-Konstanten (mit Wert t) als String zurï¿½ck.*/
     public String getTyp () {
 	switch (this.typ) {
 	case PROGRAMMIERUNG:  return "PROGRAMMIERUNG (TRP)";

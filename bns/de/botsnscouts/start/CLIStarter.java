@@ -1,11 +1,11 @@
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.H;
-import de.botsnscouts.util.Conf;
-import de.botsnscouts.util.Message;
-
-import java.io.*;
+import java.io.File;
 import java.util.Locale;
+
+import de.botsnscouts.util.Conf;
+import de.botsnscouts.util.H;
+import de.botsnscouts.util.Message;
 
 /** Helper to aloow starting a server on the command line */
 public class CLIStarter {

@@ -1,6 +1,6 @@
 package de.botsnscouts.gui;
 
-import java.util.*;
+import java.util.EventObject;
 
 /**
  * Title:        

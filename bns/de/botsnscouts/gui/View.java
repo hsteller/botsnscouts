@@ -25,22 +25,39 @@
 
 package de.botsnscouts.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
+import javax.swing.MenuElement;
+import javax.swing.WindowConstants;
+
+import org.apache.log4j.Category;
+
 import de.botsnscouts.BotsNScouts;
-import de.botsnscouts.gui.hotkey.*;
+import de.botsnscouts.gui.hotkey.ChatMessageEditor;
+import de.botsnscouts.gui.hotkey.ChatMessageHotKeyActionAdapter;
+import de.botsnscouts.gui.hotkey.HotKey;
+import de.botsnscouts.gui.hotkey.HotKeyAction;
+import de.botsnscouts.gui.hotkey.HotKeyConf;
+import de.botsnscouts.gui.hotkey.HotKeyMan;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.widgets.LogFloatPane;
-import org.apache.log4j.Category;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 /**
  * Helper class for placing components

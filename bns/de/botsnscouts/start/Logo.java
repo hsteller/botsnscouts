@@ -25,9 +25,12 @@
  
 package de.botsnscouts.start;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import java.awt.Color;
+
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.border.EtchedBorder;
+
 import de.botsnscouts.util.ImageMan;
 
 public class Logo extends JLabel {

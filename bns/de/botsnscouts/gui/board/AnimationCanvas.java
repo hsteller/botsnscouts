@@ -9,7 +9,6 @@ package de.botsnscouts.gui.board;
 import java.awt.AlphaComposite;
 import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -19,9 +18,7 @@ import javax.swing.JViewport;
 
 import org.apache.log4j.Category;
 
-import de.botsnscouts.board.Floor;
 import de.botsnscouts.board.SimBoard;
-import de.botsnscouts.gui.AusgabeView;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.BotVis;
 import de.botsnscouts.util.Location;

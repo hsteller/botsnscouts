@@ -4,7 +4,6 @@
 package de.botsnscouts.gui;
 
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 
 import org.apache.log4j.Category;
 

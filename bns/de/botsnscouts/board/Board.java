@@ -31,9 +31,16 @@ package de.botsnscouts.board;
  * Id: $Id$
  */
 
-import de.botsnscouts.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-import java.io.*;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.util.ParseUtils;
 
 public class Board implements de.botsnscouts.util.Directions, FloorConstants {
 
@@ -72,7 +79,7 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
 
     /***** Construktors *****/
 
-    /** Initialisiert ein Board aus zweien. Zerstört unter Umständen Teile der hereingegebenen
+    /** Initialisiert ein Board aus zweien. Zerstï¿½rt unter Umstï¿½nden Teile der hereingegebenen
      Spielfelder!
      */
 //    // UNGETESTET!!!
@@ -242,14 +249,14 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
                 anzwand++;
 
             if (anzwand > 2) {
-                //Ludmila:String so geändert, daß keine Nummer angezeigt wird
+                //Ludmila:String so geï¿½ndert, daï¿½ keine Nummer angezeigt wird
                 // flaggenProbleme+=Message.say("Board","mFlagProbManyWalls",(i+1),anzwand); //original
-                flagErrors += Message.say("Board", "mFlagProbManyWalls", anzwand);//geändert
+                flagErrors += Message.say("Board", "mFlagProbManyWalls", anzwand);//geï¿½ndert
             }
 
             if (floor(f[i].x, f[i].y).isBelt()) { //Fliessband
                 //flaggenProbleme+=Message.say("Board","mFlagProbConvBelt",(i+1));//original
-                flagErrors += Message.say("Board", "mFlagProbConvBelt");//gfeändert
+                flagErrors += Message.say("Board", "mFlagProbConvBelt");//gfeï¿½ndert
             }
         }
     }
@@ -430,7 +437,7 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
         }
 
         p("");
-        p("vertikale Wände:");
+        p("vertikale Wï¿½nde:");
         p("X=" + vWall.length + "; Y=" + vWall[0].length);
         p("");
         pn("\t");
@@ -456,7 +463,7 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
         }
 
         p("");
-        p("horizontale Wände:");
+        p("horizontale Wï¿½nde:");
         p("X=" + hWall.length + "; Y=" + hWall[0].length);
         p("");
         pn("\t");

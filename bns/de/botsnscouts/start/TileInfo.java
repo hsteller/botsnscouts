@@ -25,10 +25,7 @@
  
 package de.botsnscouts.start;
 
-import java.awt.*;
-import de.botsnscouts.board.*;
-import de.botsnscouts.gui.*;
-import de.botsnscouts.util.*;
+import java.awt.Image;
 
 class TileInfo{
     private Image image;

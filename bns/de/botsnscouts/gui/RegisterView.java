@@ -25,17 +25,23 @@
 
 package de.botsnscouts.gui;
 
-import  de.botsnscouts.util.*;
-import de.botsnscouts.widgets.GreenTheme;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.plaf.metal.*;
-import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.net.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JWindow;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.ImageMan;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.GreenTheme;
 
     /**
      * gui-container that has a card

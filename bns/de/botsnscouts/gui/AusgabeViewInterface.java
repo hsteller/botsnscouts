@@ -25,7 +25,7 @@
  
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
+import de.botsnscouts.util.Bot;
 /**
  * Diese Klasse erledigt die Ausgabe von Board und Status
  * @author Lukasz Pekacki
@@ -55,7 +55,7 @@ public interface AusgabeViewInterface {
     public void showWinnerlist (String[] winners);
 
     /**
-     *  Behandelt das Fensterschließen
+     *  Behandelt das Fensterschlieï¿½en
      */
     //public void shutup();
 

@@ -25,13 +25,27 @@
 
 package de.botsnscouts.server;
 
-import java.net.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.apache.log4j.Category;
-import java.util.*;
 import org.apache.regexp.RE;
-import de.botsnscouts.util.*;
-import de.botsnscouts.comm.*;
+
+import de.botsnscouts.comm.KommException;
+import de.botsnscouts.comm.KommServerAusgabe;
+import de.botsnscouts.comm.KommServerRoboter;
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Encoder;
+import de.botsnscouts.util.Shutdownable;
 
 /**
  * Erlaubt die nebenlaeufige Anmeldung von Robotern und Ausgaben Startet fuer
@@ -169,7 +183,7 @@ class RegistrationManager implements Runnable, Shutdownable {
                 throw new RegistrationException("Register string not in the right format");
             
             String type = registerRE.getParen(1);
-            clientName = URLDecoder.decode(registerRE.getParen(2));
+            clientName = Encoder.commDecode(registerRE.getParen(2));
             
             if (registerRE.getParenCount() >= 5) {
                 //for (int i=0; i<=5;i++)

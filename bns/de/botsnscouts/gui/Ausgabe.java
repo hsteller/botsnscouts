@@ -25,14 +25,8 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.board.FlagException;
-import de.botsnscouts.board.SimBoard;
-import de.botsnscouts.comm.*;
-import de.botsnscouts.util.*;
-import org.apache.log4j.Category;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -40,6 +34,30 @@ import java.awt.event.WindowEvent;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+
+import javax.swing.JFrame;
+
+import org.apache.log4j.Category;
+
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.board.SimBoard;
+import de.botsnscouts.comm.ClientAntwort;
+import de.botsnscouts.comm.KommClientAusgabe;
+import de.botsnscouts.comm.KommException;
+import de.botsnscouts.comm.KommFutschException;
+import de.botsnscouts.comm.MessageID;
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.BotVis;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.KrimsKrams;
+import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.util.SoundMan;
+import de.botsnscouts.util.Stats;
+import de.botsnscouts.util.StatsList;
+import de.botsnscouts.util.Status;
 
 
 public class Ausgabe extends BNSThread {

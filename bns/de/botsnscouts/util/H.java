@@ -1,6 +1,14 @@
 package de.botsnscouts.util;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.StringTokenizer;
 
 
 /** Eine Klasse nit mehr oder minder hilfreichen Methoden*/
@@ -127,7 +135,7 @@ public class H {
 		    System.err.println("Versuche evtl. fehlendes Verzeichnis zu erzeugen...");
 		    try {
 			// zerhacken des Pfadnamens
-			StringTokenizer bar = new StringTokenizer (foo.toString(), foo.separator);
+			StringTokenizer bar = new StringTokenizer (foo.toString(),File.separator);
 			String [] foobar = new String[bar.countTokens()];
 			for (int i2=0;i2<foobar.length;i2++)
 			    foobar [i2]=bar.nextToken();
@@ -136,16 +144,16 @@ public class H {
 			if (foobar[0].indexOf(':')>0){ // wir haben in diesem Fallvermutlich Dos-Dateiname mit "c:"
 			    newpath=foobar[0]; // Verzeichniswurzel
 			    for (int i2=1;i2<foobar.length-1;i2++) {
-				newpath+=foobar[i2]+foo.separator;//stueckweiser Aufbau des neuen Pfades
+				newpath+=foobar[i2]+File.separator;//stueckweiser Aufbau des neuen Pfades
 				File temp = new File (newpath);
 				if (!temp.exists())
 				    temp.mkdir(); //erzeugen des Verzeichnisses, falls noch nicht vorhanden
 			    }
 			}
 			else { // vermutlich Linux/Unix Dateipfad
-			    newpath=foo.separator;
+			    newpath=File.separator;
 			    for (int i2=0;i2<foobar.length-1;i2++) {
-				newpath+=foobar[i2]+foo.separator;
+				newpath+=foobar[i2]+File.separator;
 				File temp = new File (newpath);
 				if (!temp.exists())
 				    temp.mkdir();

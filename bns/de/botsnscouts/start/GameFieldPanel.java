@@ -25,19 +25,57 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.*;
-import org.apache.log4j.Category;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.Paint;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.File;
+import java.util.Properties;
 
-import javax.swing.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.util.Properties;
+
+import org.apache.log4j.Category;
+
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Conf;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.InvalidInputException;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.util.Task;
+import de.botsnscouts.widgets.ColoredComponent;
+import de.botsnscouts.widgets.ColoredPanel;
+import de.botsnscouts.widgets.TJButton;
+import de.botsnscouts.widgets.TJCheckBox;
+import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJPanel;
+import de.botsnscouts.widgets.TJTextField;
 
 /**
  * You see this panel when you want to host a game.

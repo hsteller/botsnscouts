@@ -25,26 +25,56 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.gui.hotkey.*;
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.OptionPane;
-import de.botsnscouts.widgets.PaintPanel;
-import de.botsnscouts.widgets.TJLabel;
-import org.apache.log4j.Category;
-
-import javax.swing.*;
-
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.InterruptedIOException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
+
+import org.apache.log4j.Category;
+
+import de.botsnscouts.gui.hotkey.HotKey;
+import de.botsnscouts.gui.hotkey.HotKeyAction;
+import de.botsnscouts.gui.hotkey.HotKeyConf;
+import de.botsnscouts.gui.hotkey.HotKeyEditorPanel;
+import de.botsnscouts.gui.hotkey.HotKeyMan;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.BotVis;
+import de.botsnscouts.util.Conf;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.util.SoundMan;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.PaintPanel;
+import de.botsnscouts.widgets.TJLabel;
 
 public class AusgabeView extends JPanel implements AusgabeViewInterface {
     static Category CAT = Category.getInstance(AusgabeView.class);

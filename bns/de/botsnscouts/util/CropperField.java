@@ -25,10 +25,11 @@
 
 package de.botsnscouts.util;
 
-import java.awt.image.*;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
+import java.awt.image.CropImageFilter;
+import java.awt.image.FilteredImageSource;
 
 
 public class CropperField {

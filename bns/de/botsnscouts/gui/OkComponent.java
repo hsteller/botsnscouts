@@ -1,12 +1,14 @@
 package de.botsnscouts.gui;
 
-import de.botsnscouts.widgets.TJButton;
-import de.botsnscouts.util.Message;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.GridLayout;
 import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.TJButton;
 
 /*
   *******************************************************************

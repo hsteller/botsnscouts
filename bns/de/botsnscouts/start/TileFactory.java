@@ -25,6 +25,22 @@
 
 package de.botsnscouts.start;
 
+import java.awt.Image;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Locale;
+import java.util.Properties;
+
+import org.apache.log4j.Category;
+
 import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.gui.BoardView;
@@ -32,11 +48,6 @@ import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.Message;
-import org.apache.log4j.Category;
-
-import java.awt.*;
-import java.io.*;
-import java.util.*;
 
 public class TileFactory {
 
@@ -144,7 +155,7 @@ public class TileFactory {
         }
     }
 
-    //gibt eine Tile mit Drehung zurück
+    //gibt eine Tile mit Drehung zurï¿½ck
     public Tile getTile(String name, int drehung) {
         checkLadeStatus();
         Tile[] kachAr = (Tile[]) tileTab.get(name);

@@ -25,16 +25,31 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.TextArea;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+
+import org.apache.log4j.Category;
+
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJLabel;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import org.apache.log4j.Category;
 /**
  * shows the status messages and action messages on the scrren
  * @author Lukasz Pekacki

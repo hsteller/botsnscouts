@@ -25,7 +25,6 @@
 
 package de.botsnscouts.util;
 
-import org.apache.log4j.Category;
 
 /**
  * Represents one robot.

@@ -25,8 +25,11 @@
 
 package de.botsnscouts.widgets;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+
+import javax.swing.Icon;
+import javax.swing.JLabel;
 
 /**
  * Transparent JLabel

@@ -25,15 +25,19 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.board.*;
-import de.botsnscouts.comm.MessageID;
-import de.botsnscouts.comm.OtherConstants;
-import de.botsnscouts.util.*;
-
-import org.apache.log4j.Category;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Dimension;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -41,21 +45,38 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.RasterFormatException;
-import java.util.Collection;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileOutputStream;
+
+import javax.swing.JComponent;
+import javax.swing.JViewport;
+
+import org.apache.log4j.Category;
 
 import com.keypoint.PngEncoder;
 
+import de.botsnscouts.board.Board;
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.board.Floor;
+import de.botsnscouts.board.LaserDef;
+import de.botsnscouts.board.SimBoard;
+import de.botsnscouts.board.Wall;
+import de.botsnscouts.comm.OtherConstants;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.BotVis;
+import de.botsnscouts.util.Directions;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.ImageMan;
+import de.botsnscouts.util.Location;
+import de.botsnscouts.util.SoundMan;
+
 /**
  * Board-Ausgabe-Canvas ist das Objekt, das der Ausgabe und dem menschlichen Spieler das Board grafisch darstellt und verwaltet
- * @author some time ago Daniel Holtz
- * @version $id $
+ * 
+ * @version $Id$
  * 
  *  changes: enno v1.23
  * 1. beim painten wird nur noch der teil ins sichtbare kopiert, der auch
@@ -85,7 +106,7 @@ public class BoardView extends JComponent{
      * any dynamic components (bots, scout,highlight) drawn on it.
      * If false, this second BufferedImage will be null and another was to paint the background will be used. 
      */
-    private final boolean useStaticBg = false;
+    private final boolean useStaticBg = true;
     
     
     // inner classes
@@ -827,7 +848,7 @@ public class BoardView extends JComponent{
 	            internal.turnCounterClockwise();
 	        }
         }
-        // FIXME 
+        // better safe than sorry:
         catch ( RasterFormatException fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore){
             CAT.error(fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore);
         }
@@ -1061,7 +1082,7 @@ public class BoardView extends JComponent{
                     CAT.fatal("Got illgeal direction for animating robot");
                 }
         }
-        } // FIXME
+        } // better safe than sorry:
         catch ( RasterFormatException fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore){
             CAT.error(fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore);
         }
@@ -1689,9 +1710,7 @@ public class BoardView extends JComponent{
      on board and (pixel-)position (actx, acty)
      */
     private void paintWall(Graphics g, int xpos, int ypos, int actx, int acty) {
-        // paint wall in the north, if any
-       // Graphics2D g2 = (Graphics2D)g;
-        // XXX TODO make more values relative to dScale, e.g. "acty+((int)5*dScale)"
+       
         int vier = (int)(dScale*4);
         int fuenf = (int)(dScale*5);
         int sieben = (int)(dScale*7);
@@ -1701,7 +1720,8 @@ public class BoardView extends JComponent{
         int vier20 = (int) (dScale*24);
         int sieben30 = (int)(dScale*37);
         int zehn = (int)(dScale*10);
-    	if (sf.nw(xpos, ypos).isExisting()) {
+        // paint wall in the north, if any      
+        if (sf.nw(xpos, ypos).isExisting()) {
             // is there a boardlaser to paint at this wall?
             if (sf.nw(xpos, ypos).getSouthDeviceType() == Wall.TYPE_LASER) {
                 g.drawImage(diverseCrop[15], actx, acty + fuenf, scaledFeldSize, scaledFeldSize, this);

@@ -25,24 +25,26 @@
 
 package de.botsnscouts.gui.board;
 
-import de.botsnscouts.board.*;import de.botsnscouts.gui.*;
-import de.botsnscouts.util.*;
-import org.apache.log4j.Category;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
-import java.io.FileOutputStream;
+import java.util.HashMap;
 
-import com.keypoint.PngEncoder;
+import javax.swing.JLayeredPane;
+
+import org.apache.log4j.Category;
+
+import de.botsnscouts.board.Board;
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.board.SimBoard;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.BotVis;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.ImageMan;
+import de.botsnscouts.util.Location;
 
 /**
  * Board-Ausgabe-Canvas ist das Objekt, das der Ausgabe und dem menschlichen Spieler das Board grafisch darstellt und verwaltet

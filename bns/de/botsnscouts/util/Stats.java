@@ -25,12 +25,10 @@
 
 package de.botsnscouts.util;
 
-import java.util.Vector;
-import java.util.Iterator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import java.net.URLEncoder;
+import java.util.Iterator;
+import java.util.Vector;
 
 import org.apache.log4j.Category;
 
@@ -150,7 +148,7 @@ public class Stats implements Comparable{
 
 
     public String toSendString () {
-	return (URLEncoder.encode(this.name)+","+this.hits+","+this.kills+","+this.damageByBoard+","
+	return (Encoder.commEncode(this.name)+","+this.hits+","+this.kills+","+this.damageByBoard+","
                +this.damageByRobots+","+this.askedWisenheimer+","+sentCardsLast);
     }
 

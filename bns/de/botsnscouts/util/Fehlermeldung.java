@@ -26,12 +26,12 @@
 package de.botsnscouts.util;
 
 /** Ausgabe von Fehlermeldungen
-    zunächst nur auf die Konsole, erweiterbar auf Fenster
+    zunï¿½chst nur auf die Konsole, erweiterbar auf Fenster
     @author Miriam
 */
 
 
-import java.io.*;
+import java.io.PrintStream;
 
 public class Fehlermeldung{
 

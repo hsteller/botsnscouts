@@ -25,11 +25,13 @@
 
 package de.botsnscouts.comm;
 
-import de.botsnscouts.util.StatsList;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+
 import org.apache.log4j.Category;
 
-import java.net.*;
+import de.botsnscouts.util.Encoder;
+import de.botsnscouts.util.StatsList;
 
 // STAND : fertig
 /**  Communication from the server to the views.
@@ -42,9 +44,9 @@ import java.net.*;
  super (in, out, name);
  }
 
-  /** Zur Benachrichtigung der Ausgabekanäle von Änderungen.
-* Teilt (Ausgabe) mit, bei welchen Robotern Änderungen eingetreten sind.
-* Erhält die Namen als Argument.
+  /** Zur Benachrichtigung der Ausgabekanï¿½le von ï¿½nderungen.
+* Teilt (Ausgabe) mit, bei welchen Robotern ï¿½nderungen eingetreten sind.
+* Erhï¿½lt die Namen als Argument.
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
 */
    public void aenderung (int msgId, String [] roboternamen)  throws KommException {
@@ -55,7 +57,7 @@ import java.net.*;
        else
           raus = OtherConstants.MESSAGE_NUMBER+"="+msgId+",NTC(";
        for (int i=0;i<roboternamen.length;i++)
-	 raus = raus + URLEncoder.encode(roboternamen[i])+",";
+	 raus = raus + Encoder.commEncode(roboternamen[i])+",";
        raus +=")";
        out.println(raus);
        CAT.debug("Notify change send: "+raus);
@@ -75,32 +77,32 @@ import java.net.*;
 	  @param id Die Art der Nachricht bzw ihre id f&uuml;r die Message-Klasse
 	  @param name1 Ein zus&auml;tzliches Argument, f&uuml;r die Ausgabe von Nachrichten*/
      public void message (String id, String name1) {
-	 out.println("MSG("+id+","+URLEncoder.encode(name1)+")");
+	 out.println("MSG("+id+","+Encoder.commEncode(name1)+")");
 	 if (CAT.isDebugEnabled())
-	     CAT.debug("Message send: "+id+" "+URLEncoder.encode(name1));
+	     CAT.debug("Message send: "+id+" "+Encoder.commEncode(name1));
      }
      public void message (String id, String name1, String name2) {
-	 out.println("MSG("+id+","+URLEncoder.encode(name1)+","+URLEncoder.encode(name2)+")");
+	 out.println("MSG("+id+","+Encoder.commEncode(name1)+","+Encoder.commEncode(name2)+")");
 	 if (CAT.isDebugEnabled())
-	     CAT.debug("Message send: "+id+" "+URLEncoder.encode(name1)+" "+URLEncoder.encode(name2));
+	     CAT.debug("Message send: "+id+" "+Encoder.commEncode(name1)+" "+Encoder.commEncode(name2));
      }
      public void message (String id, String name1, String name2, String name3) {
-	 out.println("MSG("+id+","+URLEncoder.encode(name1)+","
-                      +URLEncoder.encode(name2)+","+URLEncoder.encode(name3)+")");
+	 out.println("MSG("+id+","+Encoder.commEncode(name1)+","
+                      +Encoder.commEncode(name2)+","+Encoder.commEncode(name3)+")");
 	 if (CAT.isDebugEnabled())
-	     CAT.debug("Message send: "+id+" "+URLEncoder.encode(name1)+" "
-                        +URLEncoder.encode(name2)+" "+URLEncoder.encode(name3));
+	     CAT.debug("Message send: "+id+" "+Encoder.commEncode(name1)+" "
+                        +Encoder.commEncode(name2)+" "+Encoder.commEncode(name3));
      }
      public void message (String id, String name1, String name2, String name3, String name4) {
-	 out.println("MSG("+id+","+URLEncoder.encode(name1)+","
-                      +URLEncoder.encode(name2)+","
-                      +URLEncoder.encode(name3)+","
-                      +URLEncoder.encode(name4)+")");
+	 out.println("MSG("+id+","+Encoder.commEncode(name1)+","
+                      +Encoder.commEncode(name2)+","
+                      +Encoder.commEncode(name3)+","
+                      +Encoder.commEncode(name4)+")");
 	 if (CAT.isDebugEnabled())
-	     CAT.debug("Message send: "+id+","+URLEncoder.encode(name1)+","
-                      +URLEncoder.encode(name2)+","
-                      +URLEncoder.encode(name3)+","
-                      +URLEncoder.encode(name4)+")");
+	     CAT.debug("Message send: "+id+","+Encoder.commEncode(name1)+","
+                      +Encoder.commEncode(name2)+","
+                      +Encoder.commEncode(name3)+","
+                      +Encoder.commEncode(name4)+")");
      }
      public void message (String id, String [] namen) {
 	 String send="MSG("+id;
@@ -109,7 +111,7 @@ import java.net.*;
 	     for (int i=0;i<namen.length;i++) {
                 CAT.debug("appending: "+namen[i]);
                  if (namen[i] != null)
-              	  send+=URLEncoder.encode(namen[i])+",";
+              	  send+=Encoder.commEncode(namen[i])+",";
 	         else
                   send+="null,";
              }

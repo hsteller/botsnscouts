@@ -25,22 +25,16 @@
  
 package de.botsnscouts.editor;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.io.*;
-import java.net.*;
-import java.util.Locale;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.plaf.metal.*;
+import java.awt.Button; 
+import java.awt.Checkbox;
+import java.awt.CheckboxGroup;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import de.botsnscouts.BotsNScouts;
-import de.botsnscouts.board.*;
-import de.botsnscouts.gui.*;
-import de.botsnscouts.util.*;
-import org.apache.log4j.*;
+import javax.swing.JDialog;
+
+import de.botsnscouts.util.Message;
 
 
 class StrengthDialog extends JDialog implements ActionListener{

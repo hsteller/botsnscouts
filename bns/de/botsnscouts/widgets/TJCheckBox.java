@@ -1,6 +1,6 @@
 package de.botsnscouts.widgets;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
 
 /**
  * @author Miriam Busch - <miriam.busch@codimi.de>

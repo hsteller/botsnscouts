@@ -25,11 +25,11 @@
  
 package de.botsnscouts.util;
 
-import java.io.*;
-import java.util.*;
-import java.lang.*;
+import java.io.BufferedReader;
+import java.util.Enumeration;
+import java.util.Hashtable;
 /**
-* Diese Klasse ermöglicht das Auslesen (read) und setzen(write)
+* Diese Klasse ermï¿½glicht das Auslesen (read) und setzen(write)
 * von Benutzereinstellungen 
 * abhaengig vom File conf/config.txt
 */
@@ -59,7 +59,7 @@ import java.lang.*;
 
 	    Hashtable Sektionen = new Hashtable();  // Hierdrin liegen die Sektionen, die wiederum die Meldungen enthalten
 
-	    try{	// syntax-Prüfung & Laden language-Datei
+	    try{	// syntax-Prï¿½fung & Laden language-Datei
 		String line=null;
 		String sectionName="";
 		int AnzahlSektionen=0;
@@ -108,14 +108,14 @@ import java.lang.*;
 	 * beginnend mit "m" (Meldung),"x" (Exception), oder "e" (Error).
 	 *
 	 * Danach folgen null(0) bis zu vier(4) weitere Parameter, einzusetzen in die Platzhalter $1,$2,$3,$4
-	 * Diese bis zu 4 Parameter dürfen wahlweise vom Typ String oder int sein. (Toll, was?) ;-)
+	 * Diese bis zu 4 Parameter dï¿½rfen wahlweise vom Typ String oder int sein. (Toll, was?) ;-)
 	 * 
-	 * say dient der Optionalität der vier Parametern und der Ermöglichung der Typauswahl String/int per Overloading.
+	 * say dient der Optionalitï¿½t der vier Parametern und der Ermï¿½glichung der Typauswahl String/int per Overloading.
 	 * Die Umsetzung der Meldungs-IDs in die richtige Sprache findet in sayIt statt.
 	 */
 
 	/**
-	 * sayIt führt die Umsetzung von Meldungs-IDs in Meldungen(in der richtigen Sprache) 
+	 * sayIt fï¿½hrt die Umsetzung von Meldungs-IDs in Meldungen(in der richtigen Sprache) 
 	 * und das Einsetzen der (bis zu) vier Parameter in die Platzhalter im Text dann wirklich aus:
 	 *
 	 * Der erste Parameter ist die Sektion "Section" (String),
@@ -126,8 +126,8 @@ import java.lang.*;
 	 * einzusetzenden Strings.
 	 * Ein Beispiel:
 	 *   Die Ausgabe: "Sie haben noch 6 Leben." 
-	 *   würde hier als  sayIt("MeineKlasse",mAnzLebenMitteilen,"6","","","") aufgerufen.
-	 *   Die Datei "messages.deutsch" müßte dann folgendes beinhalten:
+	 *   wï¿½rde hier als  sayIt("MeineKlasse",mAnzLebenMitteilen,"6","","","") aufgerufen.
+	 *   Die Datei "messages.deutsch" mï¿½ï¿½te dann folgendes beinhalten:
 	 *   
 	 *   [MeineKlasse]
 	 *   ....hier kann irgendwas stehen...
@@ -174,7 +174,7 @@ import java.lang.*;
 	}
 
 	/**
-	   Die Einstellungen aus der Datenbank auf den Datenträger schreiben
+	   Die Einstellungen aus der Datenbank auf den Datentrï¿½ger schreiben
 	 */
 	public static void saveConfigTable(){
 	    // geht noch nicht

@@ -25,14 +25,29 @@
 
 package de.botsnscouts.comm;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.server.Deck;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Category;
 
-import java.io.*;
-import java.util.*;
-import java.net.*;
+import de.botsnscouts.server.Deck;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Card;
+import de.botsnscouts.util.Directions;
+import de.botsnscouts.util.Encoder;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.util.Shutdownable;
+import de.botsnscouts.util.Status;
 
 
 
@@ -338,11 +353,11 @@ public class KommClient implements Shutdownable{
         // </hack for synchronizing display stuff>
 
 	if ((com.equals("ok")) || (com.equals("OK"))){
-	    back.typ=back.ANGEMELDET;
+	    back.typ=ClientAntwort.ANGEMELDET;
 	    back.ok = true;
 	}
 	else if ((com.equals("error")) || (com.equals("ERROR"))){
-	    back.typ=back.ANGEMELDET;
+	    back.typ=ClientAntwort.ANGEMELDET;
 	    back.ok=false;
 	}
 	//if (true){} // dummy
@@ -364,7 +379,7 @@ public class KommClient implements Shutdownable{
 				errormesg="TO -> dann folgte nicht (  )";
 			    }
 			    try {
-				back.typ=back.TIMEOUT;
+				back.typ=ClientAntwort.TIMEOUT;
 				back.zahl=Integer.parseInt(com.substring(klammerauf+1,klammerzu));
 			    }
 			    catch (NumberFormatException n) {
@@ -390,14 +405,14 @@ public class KommClient implements Shutdownable{
 		}
 		case 'M': {
 		    if ((nd=='S')&&(rd=='G')) {
-			back.typ=back.MESSAGE;
+			back.typ=ClientAntwort.MESSAGE;
 			int k1 = com.indexOf('(');
 			com = com.substring (k1+1,com.length()-1);
 			StringTokenizer sto= new StringTokenizer(com,",)");
 			String [] tmp = new String [sto.countTokens()];
 			int i=0;
 			while (sto.hasMoreTokens()){
-			    tmp[i]= URLDecoder.decode(sto.nextToken());
+			    tmp[i]= Encoder.commDecode(sto.nextToken());
 			    i++;
 			}
                         int lastElem = tmp.length-1;
@@ -457,7 +472,7 @@ public class KommClient implements Shutdownable{
 					// System.out.println (com + ", "+count);
 				    }
 				    // now there should be 'count' cards in karten1
-				    back.typ=back.MACHEZUG;
+				    back.typ=ClientAntwort.MACHEZUG;
 				    back.karten=new Card [count];
 
 				    for (int i=0; i<count;i++)
@@ -482,7 +497,7 @@ public class KommClient implements Shutdownable{
 				int klzu=com.indexOf(')');
 				String zahl=com.substring(klauf+1,klzu);
 				try {
-				    back.typ=back.REPARATUR;
+				    back.typ=ClientAntwort.REPARATUR;
 				    back.zahl=Integer.parseInt(zahl);
 				}
 				catch (NumberFormatException nfe) {
@@ -506,7 +521,7 @@ public class KommClient implements Shutdownable{
 		    }
 		    else if (nd=='N') {
 			if (rd=='R') {
-			    back.typ=back.ZERSTOERUNG;
+			    back.typ=ClientAntwort.ZERSTOERUNG;
 			    break;
 			}
 			else {
@@ -517,7 +532,7 @@ public class KommClient implements Shutdownable{
 		    }
 		    else if (nd=='B') {
 			if (rd=='D') {
-			    back.typ=back.REAKTIVIERUNG;
+			    back.typ=ClientAntwort.REAKTIVIERUNG;
 			    break;
 			}
 			else {
@@ -536,13 +551,13 @@ public class KommClient implements Shutdownable{
 		case 'N': {
 		    if (nd=='T') {
 			if (rd=='S'){
-			    back.typ=back.SPIELSTART;
+			    back.typ=ClientAntwort.SPIELSTART;
 			    back.ok=true;
 
 			}
 			else if (rd=='C'){
 			    try {
-				back.typ=back.AENDERUNG;
+				back.typ=ClientAntwort.AENDERUNG;
 				int klauf=com.indexOf('(');
                                 // getNamen2 does the URL-decoding of the names for us..
 				back.namen  = getNamen2(com.substring(klauf));
@@ -568,7 +583,7 @@ public class KommClient implements Shutdownable{
 		case 'S' : {
 		    if (nd=='S') {
 			try {
-			    back.typ=back.SPIELSTAND;
+			    back.typ=ClientAntwort.SPIELSTAND;
 			    if (com.length()==7){
 				back.namen=null;
 				back.ok=true;
@@ -591,7 +606,7 @@ public class KommClient implements Shutdownable{
 		    }
 		    else if (nd=='A') {
 			try {
-			    back.typ=back.SPIELSTATUS;
+			    back.typ=ClientAntwort.SPIELSTATUS;
 			    if (com.length()<=4)
 				back.ok=false; // => no phase processing
 			    else {
@@ -648,7 +663,7 @@ public class KommClient implements Shutdownable{
 		case 'R': {
 		    if ((nd=='E') && (rd=='N')) { // REN == robot has been removed
 			try {
-			    back.typ=back.ENTFERNUNG;
+			    back.typ=ClientAntwort.ENTFERNUNG;
 			    int klauf = com.indexOf('(');
 			    int klazu = com.lastIndexOf(')');
 			    String work = com.substring(klauf+1,klazu);
@@ -905,7 +920,7 @@ public class KommClient implements Shutdownable{
 	    rein = rein.substring (1); // remove '('
 	    for (int i=0;i<zaehler;i++) {
 		int kommapos = rein.indexOf(',');
-		raus [i] = URLDecoder.decode(rein.substring(0,kommapos));
+		raus [i] = Encoder.commDecode(rein.substring(0,kommapos));
 		rein = rein.substring(kommapos+1); // remove read names and ','
 	    }
 
@@ -941,7 +956,7 @@ public class KommClient implements Shutdownable{
     public Bot getRobStatus (String name) throws KommException {
         String com ="";
         Bot robot=Bot.getNewInstance(name);
-        String raus ="GRS("+URLEncoder.encode(name)+")";
+        String raus ="GRS("+Encoder.commEncode(name)+")";
         this.senden(raus);
         //Server sends "RS(Richtung(N,O..), Location(1,1), LFlag, LArchF, Schaden, VLeben, GespRegister, Aktiv, Virtuell, RSreserveiert)"
 	/*try{
@@ -1082,7 +1097,7 @@ public class KommClient implements Shutdownable{
 	String rein = this.einlesen();
 	xyz=wait2(rein);
 
-	if (xyz.typ==xyz.SPIELSTAND) {
+	if (xyz.typ==ClientAntwort.SPIELSTAND) {
 	    /*
 	      if (xyz.ok==true)
 	      return null;
@@ -1101,7 +1116,7 @@ public class KommClient implements Shutdownable{
     }
     /** Info-Request zur Abfrage des sogenannten Spielstatus.
 	Sie gibt f&uuml;r jeden Bot ein Statusobjekt zur&uuml;ck, das dessen Namen, seine bisher ausgewerteten Registerinhalte und die aktuelle Auswertungsphase als Attribute besitzt.
-	Falls gerade nicht ausgewertet wird, wird null zurückgegeben.
+	Falls gerade nicht ausgewertet wird, wird null zurï¿½ckgegeben.
 	@exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.*/
     public Status [] getSpielstatus() throws KommException{
 	ClientAntwort xyz= new ClientAntwort();
@@ -1114,7 +1129,7 @@ public class KommClient implements Shutdownable{
 	   catch (IOException ioe) {
 	   throw new KommException ("IOException bei getSpielstatus; Message: "+ioe.getMessage());
 	   }*/
-	if (xyz.typ==xyz.SPIELSTATUS){
+	if (xyz.typ==ClientAntwort.SPIELSTATUS){
 	    if (xyz.ok=false)
 		return null;
 	    else
@@ -1166,7 +1181,7 @@ public class KommClient implements Shutdownable{
 	   }*/
 	com=this.einlesen();
 	xyz=wait2(com);
-	if (xyz.typ==xyz.TIMEOUT)
+	if (xyz.typ==ClientAntwort.TIMEOUT)
 	    return xyz.zahl;
 	else
 	    throw new KommException ("getTimeOut: falsche Antwort(Typ: "+xyz.typ+")");
@@ -1241,7 +1256,7 @@ public class KommClient implements Shutdownable{
 	// in soll in etwa so aussehen: (name,PK(M1,123)PK(M2,456))
 	// oder Spezialfall: (name,)
 	int kommaName=in.indexOf(',');
-	back.robName= URLDecoder.decode(new String (in.substring(1,kommaName)));
+	back.robName= Encoder.decode(new String (in.substring(1,kommaName)));
 	in = in.substring(kommaName+1); // nur noch die Karten und die Klammerzu
 	String in2 = new String (in);
 	int kpos = in2.indexOf(',');

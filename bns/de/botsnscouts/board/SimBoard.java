@@ -25,16 +25,22 @@
 
 package de.botsnscouts.board;
 
-import de.botsnscouts.comm.MessageID;
-import de.botsnscouts.comm.OtherConstants;
-import de.botsnscouts.server.Server;
-import de.botsnscouts.util.*;
-import org.apache.log4j.Priority;
-
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+
+import org.apache.log4j.Priority;
+
+import de.botsnscouts.comm.MessageID;
+import de.botsnscouts.comm.OtherConstants;
+import de.botsnscouts.server.Server;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Directions;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Stats;
+import de.botsnscouts.util.StatsList;
 
 /**
  * This board is also able to do phases.
@@ -816,7 +822,7 @@ public class SimBoard extends Board implements Directions {
                             if ((robbis[j].getX() == x) && (robbis[j].getY() == y) && (!robbis[j].isVirtual())) { // Treffer
                                 robbis[j].incDamage();
                                 lockRegisters(robbis[j]);
-                                moved[j] = true; // Änderung erfolgt
+                                moved[j] = true; // ï¿½nderung erfolgt
 
                                 ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER, robbis[rob].getName(), robbis[j].getName());
                                 curStats = stats.getStats(robbis[rob].getName());
@@ -995,7 +1001,7 @@ public class SimBoard extends Board implements Directions {
                     continue;  // naechsten Bot bearbeiten
                 }
                 if (bots[a].getDamage() < 10) {
-                    bots[a].setVirtual(false);     // wenn er nicht zerstoert ist: entvirtualisieren durchführen
+                    bots[a].setVirtual(false);     // wenn er nicht zerstoert ist: entvirtualisieren durchfï¿½hren
                     //d("Entvirtualisiere Bot "+robbis[a].getName());
                     moved[a] = true;
                 }

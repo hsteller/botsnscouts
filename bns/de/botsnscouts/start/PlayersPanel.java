@@ -25,16 +25,24 @@
 
 package de.botsnscouts.start;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
+
 import de.botsnscouts.gui.BoardView;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.widgets.ColoredPanel;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJLabel;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.Hashtable;
-import java.util.Vector;
 
 
 class PlayersPanel extends ColoredPanel {

@@ -25,11 +25,11 @@
 
 package de.botsnscouts.board;
 
+import java.util.HashMap;
+
 import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.util.ParseUtils;
-
-import java.util.HashMap;
 
 public class Floor implements FloorConstants {
     private int type;
@@ -354,11 +354,11 @@ public class Floor implements FloorConstants {
             int crusher = 0;
             while (java.lang.Character.isDigit(s.charAt(pos))) {
                 crusher += (int) java.lang.Math.pow(2, java.lang.Character.digit(s.charAt(pos++), 10) - 1);
-                //d("parseFließbandCrusher: read "+s.charAt(pos-1)+"; crusher="+crusher);
+                //d("parseFlieï¿½bandCrusher: read "+s.charAt(pos-1)+"; crusher="+crusher);
                 ParseUtils.assertTrue(s, pos++, ',');
                 //if(((typus%100)/10)>1)
                 //  throw new FormatException("Keine Crusher auf Drehfliessbaendern! Problem nahe Zeichen "+pos);
-                //else if (((typus%100)/10)==0) //sonst ist's schon erhöht
+                //else if (((typus%100)/10)==0) //sonst ist's schon erhï¿½ht
                 //  typus+=10;
             }
             ParseUtils.assertTrue(s, pos++, ')');

@@ -1,22 +1,41 @@
 package de.botsnscouts.start;
 
-import de.botsnscouts.widgets.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import de.botsnscouts.gui.OkComponent;
 import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Message;
-import de.botsnscouts.util.Conf;
-import de.botsnscouts.gui.OkComponent;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.border.EmptyBorder;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.FocusEvent;
-import java.awt.*;
-import java.util.Vector;
+import de.botsnscouts.widgets.ColoredComponent;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.TJButton;
+import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJTextField;
 
 /*
   *******************************************************************

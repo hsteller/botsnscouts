@@ -25,9 +25,11 @@
 
 package de.botsnscouts.widgets;
 
+import java.awt.Color;
+import java.awt.Font;
+
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.DefaultMetalTheme;
-import java.awt.*;
 
 /**
  * Our default theme. (Not really "greenTheme" anymore...)

@@ -25,20 +25,27 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.board.SimBoard;
-import de.botsnscouts.comm.ClientAntwort;
-import de.botsnscouts.comm.KommClientSpieler;
-import de.botsnscouts.comm.KommException;
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.GreenTheme;
-import org.apache.log4j.Category;
-
-import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import org.apache.log4j.Category;
+
+import de.botsnscouts.board.SimBoard;
+import de.botsnscouts.comm.ClientAntwort;
+import de.botsnscouts.comm.KommClientSpieler;
+import de.botsnscouts.comm.KommException;
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.KrimsKrams;
+import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.GreenTheme;
 
 /**
  * logic for the human player

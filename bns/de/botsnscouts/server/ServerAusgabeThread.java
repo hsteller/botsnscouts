@@ -25,10 +25,17 @@
 
 package de.botsnscouts.server;
 
-import de.botsnscouts.comm.*;
-import de.botsnscouts.util.*;
-
 import org.apache.log4j.Category;
+
+import de.botsnscouts.comm.KommException;
+import de.botsnscouts.comm.KommServerAusgabe;
+import de.botsnscouts.comm.MessageID;
+import de.botsnscouts.comm.OtherConstants;
+import de.botsnscouts.comm.ServerAntwort;
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.Location;
 
 class ServerAusgabeThread extends BNSThread implements Waitable
 {
@@ -81,7 +88,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 		    synchronized(this){
 			int m=mode;
 			if (m==Server.KEINEFRAGEN){ // dumm gelaufen...
-			    if (ans.typ!=ans.ABMELDUNG){
+			    if (ans.typ!=ServerAntwort.ABMELDUNG){
 				d("Keine Fragen erlaubt. Ausgabe entstoepseln."+this);
 				outMaint.deleteOutput(this,OtherConstants.REASON_RULE_VIOLATION);
 				break outer;

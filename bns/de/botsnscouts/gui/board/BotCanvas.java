@@ -9,20 +9,16 @@ package de.botsnscouts.gui.board;
 import java.awt.AlphaComposite;
 import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
-import javax.swing.JViewport;
-
 import org.apache.log4j.Category;
 
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.gui.AnimationConfig;
-import de.botsnscouts.gui.Ausgabe;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Location;
 

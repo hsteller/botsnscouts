@@ -25,7 +25,10 @@
 
 package de.botsnscouts.server;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
+
 import org.apache.log4j.Category;
 
 /** Wait for some roboters or views for some reason.

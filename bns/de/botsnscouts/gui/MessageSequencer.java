@@ -1,10 +1,12 @@
 package de.botsnscouts.gui;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.TreeSet;
+
+import org.apache.log4j.Category;
+
 import de.botsnscouts.comm.ClientAntwort;
-
-import org.apache.log4j.*;
-
-import java.util.*;
 
 
 public class MessageSequencer {

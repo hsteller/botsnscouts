@@ -25,14 +25,30 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.*;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Conf;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.ColoredComponent;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.TJButton;
+import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJTextField;
 
 /**
  * The panel you get when you want to participate in a game hosted by someone else.
@@ -100,7 +116,7 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
 
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("go")) {
-            BNSThread smth = parent.facade.participateInAGame(hostName.getText(), port, robName.getText(),
+            BNSThread smth = Facade.participateInAGame(hostName.getText(), port, robName.getText(),
                     colors.getSelectedIndex());
             Global.debug(this, "SpielerMensch gestartet");
             parent.addKS(smth);

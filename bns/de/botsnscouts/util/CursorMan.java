@@ -25,9 +25,11 @@
  
 package de.botsnscouts.util;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.image.*;
+import java.awt.Button;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Toolkit;
+
 import org.apache.log4j.Category;
 
 public class CursorMan {
@@ -125,7 +127,7 @@ public class CursorMan {
     //////////////////////////////////////////////////////////////////////
 
     // Abfrage der Images ... ACHTUNG: die Referenzen in den
-    // zurückgegebenen Arrays sind erst gültig, wenn finishLoading()
+    // zurï¿½ckgegebenen Arrays sind erst gï¿½ltig, wenn finishLoading()
     // erfolgreich aufgerufen wurde
     public static Image[] getImages(int id) {
 	if( !imagesLoading )

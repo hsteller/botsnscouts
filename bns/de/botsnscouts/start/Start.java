@@ -25,21 +25,31 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.BotsNScouts;
-import de.botsnscouts.gui.Splash;
-import de.botsnscouts.server.Server;
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.OptionPane;
-import de.botsnscouts.widgets.GreenTheme;
-import org.apache.log4j.Category;
-
-import javax.swing.*;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.*;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.Paint;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Locale;
 import java.util.Properties;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import org.apache.log4j.Category;
+
+import de.botsnscouts.BotsNScouts;
+import de.botsnscouts.gui.Splash;
+import de.botsnscouts.server.Server;
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Conf;
+import de.botsnscouts.util.KrimsKrams;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.util.SoundMan;
+import de.botsnscouts.util.Task;
+import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.OptionPane;
 
 public class Start extends JFrame implements WindowListener {
 
@@ -377,18 +387,18 @@ public class Start extends JFrame implements WindowListener {
                 fassade.startGame();
                 CAT.debug("Server gestartet");
                 if (argv[2].equals("yes")) {
-                    fassade.participateInAGame(KrimsKrams.randomName(), 0);
-                    CAT.debug("Menschlichen Spieler gestartet");
+                    Facade.participateInAGame(KrimsKrams.randomName(), 0);
+                    CAT.debug("Human player started");
                 } else {
-                    fassade.watchAGame();
-                    CAT.debug("Ausgabe gestartet");
+                    Facade.watchAGame();
+                    CAT.debug("View started");
                 }
                 int anzKS = 0;
                 try {
                     anzKS = Integer.parseInt(argv[3]);
                     for (int i = 0; i < anzKS; i++) {
-                        fassade.startAutoBot(40, true);
-                        CAT.debug("Künstlichen Spieler gestartet");
+                        Facade.startAutoBot(40, true);
+                        CAT.debug("A.I. Bot started");
                     }
                 } catch (NumberFormatException e) {
                 }

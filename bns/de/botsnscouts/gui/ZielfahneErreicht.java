@@ -25,12 +25,15 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridLayout;
+
+import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJPanel;
-
-import java.awt.*;
-import javax.swing.*;
 
 
 public class ZielfahneErreicht extends TJPanel{

@@ -25,14 +25,19 @@
 
 package de.botsnscouts.autobot;
 
+import org.apache.log4j.Category;
+
 import de.botsnscouts.board.FlagException;
-import de.botsnscouts.board.Board;
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.comm.ClientAntwort;
 import de.botsnscouts.comm.KommClientSpieler;
 import de.botsnscouts.comm.KommException;
-import de.botsnscouts.util.*;
-import org.apache.log4j.Category;
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Card;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.KrimsKrams;
+import de.botsnscouts.util.Location;
 
 /** AutoBot implements the computer-controlled robots.
  */

@@ -1,13 +1,27 @@
 package de.botsnscouts.gui;
 
-import de.botsnscouts.widgets.OptionPane;
-import de.botsnscouts.widgets.ColoredComponent;
-import de.botsnscouts.widgets.TJLabel;
+import java.awt.AlphaComposite;
+import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.Timer;
+
 import org.apache.log4j.Category;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import de.botsnscouts.widgets.ColoredComponent;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.TJLabel;
 
 public class ChatLine extends ColoredComponent implements ActionListener, ComponentListener, KeyListener  {
     static final Category CAT = Category.getInstance(ChatLine.class);

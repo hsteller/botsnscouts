@@ -25,7 +25,6 @@
  
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
 /**
  * all methods a view for the human player must implement
  * @author Lukasz Pekacki 

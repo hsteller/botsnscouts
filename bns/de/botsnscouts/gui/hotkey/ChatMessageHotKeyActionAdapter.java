@@ -2,7 +2,7 @@ package de.botsnscouts.gui.hotkey;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 public class ChatMessageHotKeyActionAdapter extends HotKeyAction {
 

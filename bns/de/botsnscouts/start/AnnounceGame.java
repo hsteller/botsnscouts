@@ -1,13 +1,18 @@
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.Conf;
-import de.botsnscouts.util.InvalidInputException;
-import org.apache.log4j.Category;
-
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.Socket;
 
 import nanoxml.XMLElement;
+
+import org.apache.log4j.Category;
+
+import de.botsnscouts.util.Conf;
+import de.botsnscouts.util.InvalidInputException;
 
 /**  Announce the new game at a meta server.
  * @author Miriam Busch - <miriam.busch@codimi.de>

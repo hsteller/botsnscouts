@@ -1,13 +1,13 @@
 package de.botsnscouts.util;
 
-import de.botsnscouts.gui.BoardView;
-import de.botsnscouts.board.FlagException;
-import de.botsnscouts.BotsNScouts;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.PropertyConfigurator;
+
+import de.botsnscouts.BotsNScouts;
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.gui.BoardView;
 
 /**
  * Create a png image from a rra board file.

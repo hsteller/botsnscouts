@@ -25,9 +25,20 @@
 
 package de.botsnscouts.widgets;
 
-import javax.swing.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonModel;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.border.Border;
-import java.awt.*;
 
 /**
  * Semi Transparent button with nice effects.

@@ -1,14 +1,14 @@
 package de.botsnscouts.gui.hotkey;
 
-import de.botsnscouts.util.Conf;
-import de.botsnscouts.util.Message;
-
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
 
 import javax.swing.KeyStroke;
 
 import org.apache.log4j.Category;
+
+import de.botsnscouts.util.Conf;
+import de.botsnscouts.util.Message;
 
 
 /** Defines lots of constants that are important for hotkey management

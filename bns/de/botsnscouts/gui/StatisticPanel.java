@@ -25,15 +25,23 @@
 
 package de.botsnscouts.gui;
 
-import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import javax.swing.*;
+import java.awt.event.ActionListener;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import de.botsnscouts.util.BotVis;
-import de.botsnscouts.util.StatsList;
-import de.botsnscouts.util.Stats;
 import de.botsnscouts.util.Message;
+import de.botsnscouts.util.Stats;
+import de.botsnscouts.util.StatsList;
 import de.botsnscouts.widgets.TJLabel;
 
 

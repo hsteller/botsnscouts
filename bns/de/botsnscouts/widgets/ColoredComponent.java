@@ -1,7 +1,9 @@
 package de.botsnscouts.widgets;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JComponent;
 
 public class ColoredComponent extends JComponent {
 

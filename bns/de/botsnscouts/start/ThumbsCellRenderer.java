@@ -25,18 +25,18 @@
  
 package de.botsnscouts.start;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.event.*;
-import javax.swing.*;
-import java.awt.image.*;
-import java.awt.geom.*;
-import javax.swing.border.*;
-import java.net.*;
-import javax.swing.filechooser.FileFilter;
-import java.util.*;
-import java.io.*;
-import de.botsnscouts.util.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 
 class ThumbsCellRenderer extends JPanel implements ListCellRenderer {
 

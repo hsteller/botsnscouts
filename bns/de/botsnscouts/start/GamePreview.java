@@ -1,21 +1,29 @@
 package de.botsnscouts.start;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Vector;
+
+import javax.swing.BoxLayout;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import nanoxml.XMLElement;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.*;
-import java.net.Socket;
-import java.io.*;
+import org.apache.log4j.Category;
 
 import de.botsnscouts.util.Conf;
-import de.botsnscouts.widgets.TJTextField;
 import de.botsnscouts.widgets.TJLabel;
-import org.apache.log4j.Category;
 
 /*
   *******************************************************************

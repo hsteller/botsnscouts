@@ -25,9 +25,18 @@
 
 package de.botsnscouts.start;
 
-import java.io.*;
-import java.util.*;
-import org.apache.log4j.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Properties;
+
+import org.apache.log4j.Category;
+
 import de.botsnscouts.BotsNScouts;
 
 class GameFieldLoader{

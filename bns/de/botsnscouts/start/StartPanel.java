@@ -25,18 +25,42 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.*;
-import de.botsnscouts.gui.OkComponent;
-import org.apache.log4j.Category;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Paint;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import org.apache.log4j.Category;
+
+import de.botsnscouts.gui.OkComponent;
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.KrimsKrams;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.ColoredComponent;
+import de.botsnscouts.widgets.TJButton;
+import de.botsnscouts.widgets.TJCheckBox;
+import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJPanel;
+import de.botsnscouts.widgets.TJTextField;
 
 /**
  * The panel that includes the Really-start-game-button.

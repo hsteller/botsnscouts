@@ -6,9 +6,9 @@
 
 package de.botsnscouts.autobot;
 
-import de.botsnscouts.util.Bot;
 import de.botsnscouts.board.Board;
 import de.botsnscouts.board.Floor;
+import de.botsnscouts.util.Bot;
 
 public abstract class DistanceCalculator {
 

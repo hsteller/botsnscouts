@@ -25,13 +25,13 @@
  
 package de.botsnscouts.util;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.image.*;
-
-import com.sixlegs.image.png.PngImage;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.io.IOException;
 
 import org.apache.log4j.Category;
+
+import com.sixlegs.image.png.PngImage;
 
 abstract class ImageSet {
     static final Category CAT = Category.getInstance( ImageSet.class );

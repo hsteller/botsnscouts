@@ -25,8 +25,9 @@
 
 package de.botsnscouts.server;
 
+import java.util.Iterator;
 import java.util.Random;
-import java.util.*;
+import java.util.Vector;
 
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Global;

@@ -1,10 +1,14 @@
 package de.botsnscouts.meta;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.Socket;
+
 import nanoxml.XMLElement;
 import nanoxml.XMLParseException;
-
-import java.net.Socket;
-import java.io.*;
 
 /*
   *******************************************************************

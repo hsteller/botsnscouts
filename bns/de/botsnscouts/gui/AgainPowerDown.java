@@ -25,17 +25,22 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.TJPanel;
-import de.botsnscouts.widgets.OptionPane;
-import de.botsnscouts.widgets.GreenTheme;
-import de.botsnscouts.widgets.TJLabel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.plaf.metal.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JWindow;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJPanel;
 /**
  * ask the user for the direction
  * @author Lukasz Pekacki

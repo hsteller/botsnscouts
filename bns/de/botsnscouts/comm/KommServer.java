@@ -22,17 +22,22 @@
 
 package de.botsnscouts.comm;
 
-import de.botsnscouts.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 import org.apache.log4j.Category;
 
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Encoder;
+import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Status;
+
 /*
  * STAND 20.7.99 2:55 ; sendFeldinhalt fehlt noch; getestet: - warte
- * sendRobStatus /** Oberklasse für SERVER-Kommunikation <BR> Enthält Objekte
+ * sendRobStatus /** Oberklasse fï¿½r SERVER-Kommunikation <BR> Enthï¿½lt Objekte
  * und Methoden, die sowohl zur Kommunikation mit Spielern als auch zur
- * Kommunikation mit Ausgabekanälen benutzt werden können @author Hendrik <BR>
+ * Kommunikation mit Ausgabekanï¿½len benutzt werden kï¿½nnen @author Hendrik <BR>
  *  
  */
 public class KommServer {
@@ -62,9 +67,9 @@ public class KommServer {
 
     /**
      * Warte dient zum 'Horchen' am Kommunikationskanal und Warten auf beliebige
-     * Kommunikation von Client-Seite. Warte parst den über den BufferedReader
+     * Kommunikation von Client-Seite. Warte parst den ï¿½ber den BufferedReader
      * hereinkommenden String und liefert ein Objekt der Klasse ServerAntwort
-     * zurück, über das abgefragt werden kann, was für eine Art Kommunikation
+     * zurï¿½ck, ï¿½ber das abgefragt werden kann, was fï¿½r eine Art Kommunikation
      * vorliegt und welche Informationen mitgesandt wurden.
      * 
      * @return Das Antwortobjekt mit den Daten
@@ -134,12 +139,12 @@ public class KommServer {
                 error = true;
                 errormsg = "Weniger als zwei Zeichen im String";
                 // zwei dummys, damit der Compiler nicht behauptet, st und nd
-                // würden (unter Umstaenden) nicht initialisiert werden
+                // wï¿½rden (unter Umstaenden) nicht initialisiert werden
                 st = '~';
                 nd = '~';
             }
             /*
-             * abfangen des einzigen Falls, für den der String nicht mindestens
+             * abfangen des einzigen Falls, fï¿½r den der String nicht mindestens
              * drei Zeichen lang ist
              */
             if (st == 'O') {
@@ -158,7 +163,7 @@ public class KommServer {
                     rd = Character.toUpperCase(input.charAt(2));
                 }
                 catch (StringIndexOutOfBoundsException x) {
-                    // exception dürfte nicht auftreten..
+                    // exception dï¿½rfte nicht auftreten..
                     rd = '~'; // wg. Compiler (s.o.)
                     errormsg = "String kuerzer als zwei Zeichen und nicht gleich \"OK\"";
                     error = true;
@@ -182,7 +187,7 @@ public class KommServer {
                             break;
                         }
                         back.typ = ServerAntwort.GIBROBOTERPOS;
-                        back.name = URLDecoder.decode(input.substring(klammeraufpos + 1, klammerzupos));
+                        back.name = Encoder.commDecode(input.substring(klammeraufpos + 1, klammerzupos));
                         // System.out.println ("SRO-test");
 
                     }
@@ -251,7 +256,7 @@ public class KommServer {
                                 break;
                             }
                             back.typ = ServerAntwort.GIBROBSTATUS;
-                            back.name = URLDecoder.decode(input.substring(klammeraufpos + 1, klammerzupos));
+                            back.name = Encoder.decode(input.substring(klammeraufpos + 1, klammerzupos));
                         }
                         else {
                             error = true;
@@ -350,7 +355,7 @@ public class KommServer {
                                                                                                       // zwei
                                                                                                       // Karten
                                                                                                       // verstanden
-                                                                                                      // würden
+                                                                                                      // wï¿½rden
                                 for (int i = 0; i < karten.length(); i++) {
                                     if (Character.isDigit(karten.charAt(i))) {
                                         try {
@@ -389,7 +394,7 @@ public class KommServer {
                                      * persoenlichen Komm-Objekte unseres
                                      * Servers eigentlich ueberfluessig
                                      */
-                                    back.name = URLDecoder.decode(new String(input.substring(klammerauf1 + 1, komma1)));
+                                    back.name = Encoder.decode(new String(input.substring(klammerauf1 + 1, komma1)));
                                     // Auslesen des Power-Down-Booleans
                                     String deaktiviert = new String(input.substring(kommaletzt + 1, klammerzu2));
                                     try {
@@ -454,7 +459,7 @@ public class KommServer {
                                                                                                               // zwei
                                                                                                               // Karten
                                                                                                               // verstanden
-                                                                                                              // würden
+                                                                                                              // wï¿½rden
                                         for (int i = 0; i < regStr.length(); i++) {
                                             if (Character.isDigit(regStr.charAt(i))) {
                                                 try {
@@ -492,7 +497,7 @@ public class KommServer {
                                          * persoenlichen Komm-Objekte unseres
                                          * Servers eigentlich ueberfluessig
                                          */
-                                        back.name = URLDecoder.decode(new String(input
+                                        back.name = Encoder.decode(new String(input
                                                         .substring(klammerauf + 1, komma1)));
                                         back.typ = ServerAntwort.REPARATUR;
                                     }
@@ -524,7 +529,7 @@ public class KommServer {
                                 if ((komma1 != -1) && (klammerauf != -1) && (klammerzu != -1)) {
                                     try {
                                         String richtstr = input.substring(komma1 + 1, klammerzu);
-                                        back.name = URLDecoder.decode(input.substring(klammerauf + 1, komma1));
+                                        back.name = Encoder.decode(input.substring(klammerauf + 1, komma1));
                                         back.typ = ServerAntwort.AUSRICHTUNG;
                                         /*
                                          * Es koennte eine Exception kommen,
@@ -574,7 +579,7 @@ public class KommServer {
                                     int klammerzu = input.lastIndexOf(')');
                                     int komma1 = input.indexOf(',');
                                     if ((komma1 != -1) && (klammerauf != -1) && (klammerzu != -1)) {
-                                        back.name = URLDecoder.decode(input.substring(klammerauf + 1, komma1));
+                                        back.name = Encoder.decode(input.substring(klammerauf + 1, komma1));
                                         back.typ = ServerAntwort.REAKTIVIERUNG;
                                         try {
                                             char stayPDown = Character.toUpperCase(input.substring(komma1 + 1,
@@ -659,7 +664,7 @@ public class KommServer {
                         back.msg = new String[sto.countTokens()];
                         int i = 0;
                         while (sto.hasMoreTokens()) {
-                            back.msg[i] = URLDecoder.decode(sto.nextToken());
+                            back.msg[i] = Encoder.decode(sto.nextToken());
                             i++;
                         }
                         break;
@@ -708,12 +713,12 @@ public class KommServer {
     } // wait2
 
     /**
-     * Dient dazu, einem Client mitzuteilen, daß er vom Spiel ausgeschlossen
-     * wurde. Bekommt den Grund als String übergeben, am besten schon in der
+     * Dient dazu, einem Client mitzuteilen, daï¿½ er vom Spiel ausgeschlossen
+     * wurde. Bekommt den Grund als String ï¿½bergeben, am besten schon in der
      * laut Protokoll vorgesehenen Syntax.
      * 
      * @param grund
-     *                     Der String mit der Begründung des Aussschlusses (in
+     *                     Der String mit der Begrï¿½ndung des Aussschlusses (in
      *                     'richtiger' syntax)
      * @exception KommException
      *                           wird geworfen, falls beim Senden ein Fehler (z.B.
@@ -729,7 +734,7 @@ public class KommServer {
     }
 
     /**
-     * Zur Bestätigung der Anmeldung.
+     * Zur Bestï¿½tigung der Anmeldung.
      * 
      * @param ok
      *                     'true', falls die Anmeldung erfolgreich war, ansonsten 'false'
@@ -812,7 +817,7 @@ public class KommServer {
     }
 
     /**
-     * Zur Antwort auf Info-Request 'gibFahnenPos'. Erhält die Fahnenpositionen
+     * Zur Antwort auf Info-Request 'gibFahnenPos'. Erhï¿½lt die Fahnenpositionen
      * als ein geordnetes Feld-Array, d.h. die Position der ersten Fahne steht
      * an erster Stelle, die Position der zweiten Fahne an zweiter Stelle usw..
      * 
@@ -834,7 +839,7 @@ public class KommServer {
     }
 
     /**
-     * Zur Antwort auf Info-Request 'gibNamen'. Erhält ein String-Array mit den
+     * Zur Antwort auf Info-Request 'gibNamen'. Erhï¿½lt ein String-Array mit den
      * Namen der Mitspieler
      * 
      * @exception KommException
@@ -847,7 +852,7 @@ public class KommServer {
         try {
             String raus = "(";
             for (int i = 0; i < namen.length; i++)
-                raus += URLEncoder.encode(namen[i]) + ",";
+                raus += Encoder.commEncode(namen[i]) + ",";
             raus += ")";
             // System.err.println("SERVER: sende Namen: "+raus);
             out.println(raus);
@@ -869,7 +874,7 @@ public class KommServer {
                 if (namen[i] == null)
                     raus += "0,";
                 else
-                    raus += URLEncoder.encode(namen[i]) + ",";
+                    raus += Encoder.commEncode(namen[i]) + ",";
             }
             raus += ")";
             // System.err.println("SERVER: sende Namen: "+raus);
@@ -881,7 +886,7 @@ public class KommServer {
     }
 
     /**
-     * Zur Antwort auf Info-Request 'gibRoboterPos'. Erhält den Location des
+     * Zur Antwort auf Info-Request 'gibRoboterPos'. Erhï¿½lt den Location des
      * Roboters, der gesucht wurde.
      * 
      * @exception KommException
@@ -915,7 +920,7 @@ public class KommServer {
     
     
     /**
-     * Alternative zur Antwort auf Info-Request 'gibRoboterPos'. Erhält die
+     * Alternative zur Antwort auf Info-Request 'gibRoboterPos'. Erhï¿½lt die
      * koordinaten als Integers
      * 
      * @exception KommException
@@ -935,8 +940,8 @@ public class KommServer {
     }
 
     /**
-     * Zur Antwort auf Info-Request 'gibRobStatus'. Erhält ein Bot-Objekt mit
-     * den 'Daten' des gewünschten Roboters.
+     * Zur Antwort auf Info-Request 'gibRobStatus'. Erhï¿½lt ein Bot-Objekt mit
+     * den 'Daten' des gewï¿½nschten Roboters.
      * 
      * @exception KommException
      *                           wird geworfen, falls beim Senden ein Fehler (z.B.
@@ -1000,7 +1005,7 @@ public class KommServer {
     }
 
     /**
-     * Für die Protokollerweiterung: Wurde der Status eines entfernten Roboters
+     * Fï¿½r die Protokollerweiterung: Wurde der Status eines entfernten Roboters
      * abgefragt, wird vom Server sendRobStatus() aufgerufen.
      * 
      * @exception KommException
@@ -1018,12 +1023,12 @@ public class KommServer {
 
     /**
      * Zur Antwort auf Info-Request 'gibSpielstand'. Boolean 'laeuft' gibt an,
-     * ob das Spiel noch läuft oder schon beendet ist (true = Spiel läuft,
+     * ob das Spiel noch lï¿½uft oder schon beendet ist (true = Spiel lï¿½uft,
      * false=Spiel beendet). ANMERKUNG: Das 'laeuft' ein Boolean-Objekt und kein
-     * boolean ist, war nur ein Tippfehler; ist jetzt aber nicht mehr zu ändern.
-     * Falls das Spiel beendet ist, enthält das Array die Namen der Spieler,
+     * boolean ist, war nur ein Tippfehler; ist jetzt aber nicht mehr zu ï¿½ndern.
+     * Falls das Spiel beendet ist, enthï¿½lt das Array die Namen der Spieler,
      * wobei der des Gewinners an erster Stelle steht Falls nicht, wird 'null'
-     * anstelle des Arrays übergeben.
+     * anstelle des Arrays ï¿½bergeben.
      * 
      * @exception KommException
      *                           wird geworfen, falls beim Senden ein Fehler (z.B.
@@ -1042,7 +1047,7 @@ public class KommServer {
             if (endplazierung != null)
                 for (int i = 0; i < endplazierung.length; i++)
                     if (endplazierung[i] != null)
-                        raus += URLEncoder.encode(endplazierung[i]) + ",";
+                        raus += Encoder.commEncode(endplazierung[i]) + ",";
                     else
                         raus += endplazierung[i] + ",";
             raus += ")";
@@ -1056,7 +1061,7 @@ public class KommServer {
     }
 
     /**
-     * Zur Antwort auf die Abfrage des Timeouts.Erhält als Argument die Dauer
+     * Zur Antwort auf die Abfrage des Timeouts.Erhï¿½lt als Argument die Dauer
      * des TimeOut in Sekunden.
      * 
      * @exception KommException
@@ -1075,10 +1080,10 @@ public class KommServer {
     }
 
     /**
-     * Zur Antwort auf Info-Request 'gibAuswertungsstatus'. Erhält für jeden Bot
+     * Zur Antwort auf Info-Request 'gibAuswertungsstatus'. Erhï¿½lt fï¿½r jeden Bot
      * ein Status-Objekt, das den Namen des Roboters, die in der laufenden Runde
      * bereits ausgewerteten Register und die aktuelle Phase der Auswertung
-     * enthält.
+     * enthï¿½lt.
      * 
      * @exception KommException
      *                           wird geworfen, falls beim Senden ein Fehler (z.B.
@@ -1102,7 +1107,7 @@ public class KommServer {
             //  System.err.println ("raus"+raus);
 
             for (int i = 0; i < robbis.length; i++) {
-                raus += "(" + URLEncoder.encode(robbis[i].robName) + ",";
+                raus += "(" + Encoder.commEncode(robbis[i].robName) + ","; 
                 //  System.err.println ("raus aeussere For: "+raus);
                 if (robbis[i].register != null) {
                     for (int j = 0; j < (robbis[i].register.length); j++) {
@@ -1123,7 +1128,7 @@ public class KommServer {
     }
 
     /*
-     * Zur Benachrichtigung der Spieler, dass das Spiel anfängt. (true=ok,
+     * Zur Benachrichtigung der Spieler, dass das Spiel anfï¿½ngt. (true=ok,
      * false=error) @exception KommException wird geworfen, falls beim Senden
      * ein Fehler (z.B. IOException) auftrat public boolean spielstart() throws
      * KommException{ out.println ("NTS"); try{ String a = in.readLine(); if
@@ -1136,8 +1141,8 @@ public class KommServer {
      */
 
     /**
-     * Zur Benachrichtigung der Spieler, dass das Spiel anfängt. Ob ein ok
-     * zurückkkommt, kann mithilfe der Warte-Methode bestimmt werden (Fall
+     * Zur Benachrichtigung der Spieler, dass das Spiel anfï¿½ngt. Ob ein ok
+     * zurï¿½ckkkommt, kann mithilfe der Warte-Methode bestimmt werden (Fall
      * ServerAntwort.typ = AENDERUNGFERTIG).
      * 
      * @exception KommException
@@ -1169,9 +1174,9 @@ public class KommServer {
     //  public void sendFeldinhalt (de.botsnscouts.old.Feld f) throws
     // KommException{}
     //     /**Zur Antwort auf Info-Request 'gibFeldinhalt'.
-    //    * erhält ein Objekt des Typs Feld, das dem Feld an der gewünschten Stelle
+    //    * erhï¿½lt ein Objekt des Typs Feld, das dem Feld an der gewï¿½nschten Stelle
     // entspricht
-    //    * Feld enthält den Bodeninhalt und die Wandgeräte.
+    //    * Feld enthï¿½lt den Bodeninhalt und die Wandgerï¿½te.
     //  @exception KommException wird geworfen, falls beim Senden ein Fehler
     // (z.B. IOException) auftrat
     //    */
@@ -1266,10 +1271,10 @@ public class KommServer {
     //    else
     //      return "W";
     //   }
-    //   /** Hilfsmethode, die für ein abbiegendes Fliessband das ´woher´
+    //   /** Hilfsmethode, die fï¿½r ein abbiegendes Fliessband das ï¿½woherï¿½
     // ermittelt.
-    //     Dieses müsste irgendwie mithilfe der Richtung und der Drehrichtung
-    // möglich sein
+    //     Dieses mï¿½sste irgendwie mithilfe der Richtung und der Drehrichtung
+    // mï¿½glich sein
     //     */
     //   private static String fromDirection (int richtung, int art) {
     //     // art=2 => Linksdrehung; art=3 => rechtsdrehung
@@ -1285,7 +1290,7 @@ public class KommServer {
     //     return getRichtung(from);
     //   }
     //   /** Hilfsmethode, die einen <Bodeninhalt>-String laut "Protokolle und
-    // Datenformate" zurückgibt.
+    // Datenformate" zurï¿½ckgibt.
     //     typ und spez sind der Typ und die Spezifikationszahl (siehe Klasse Feld)
     // des Boden(feldes)
     //    */
@@ -1376,9 +1381,9 @@ public class KommServer {
     //     return boden;
     //   }
 
-    //   /** Hilfsmethode für sendFeldInhalt, die das durch elem und spez
-    // definierte Wandgerät (siehe Klasse Feld) in Form eines Strings laut
-    // "Protokolle und Datenformate" zurückgibt.
+    //   /** Hilfsmethode fï¿½r sendFeldInhalt, die das durch elem und spez
+    // definierte Wandgerï¿½t (siehe Klasse Feld) in Form eines Strings laut
+    // "Protokolle und Datenformate" zurï¿½ckgibt.
     //    */
     //   private static String wandgeraet (int elem, int spez) throws
     // KommException{

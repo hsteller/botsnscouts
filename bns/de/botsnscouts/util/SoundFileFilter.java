@@ -25,7 +25,8 @@
  
 package de.botsnscouts.util;
 
-import java.io.*;
+import java.io.File;
+import java.io.FilenameFilter;
 
 public class SoundFileFilter implements FilenameFilter{
 

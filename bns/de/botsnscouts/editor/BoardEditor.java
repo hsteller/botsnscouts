@@ -26,32 +26,49 @@
 package de.botsnscouts.editor;
 
 
-import de.botsnscouts.BotsNScouts;
-import de.botsnscouts.widgets.GreenTheme;
-import de.botsnscouts.autobot.AdvDistanceCalculator;
-import de.botsnscouts.autobot.DistanceCalculator;
-import de.botsnscouts.board.FlagException;
-import de.botsnscouts.board.Board;
-import de.botsnscouts.util.*;
-import org.apache.log4j.Category;
-import org.apache.log4j.PropertyConfigurator;
-
-import javax.swing.*;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.Locale;
-import java.io.*;
+
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import org.apache.log4j.Category;
+import org.apache.log4j.PropertyConfigurator;
+
+import de.botsnscouts.BotsNScouts;
+import de.botsnscouts.autobot.AdvDistanceCalculator;
+import de.botsnscouts.autobot.DistanceCalculator;
+import de.botsnscouts.board.Board;
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.util.Conf;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.ImageMan;
+import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.GreenTheme;
 
 public class BoardEditor extends JFrame implements WindowListener, ActionListener {
     // enno:
     // 1. ImageMan wird verwendet (damit die Bilder nicht einmal von
     //     BoardEditor und einmal vom LeftPanel/BoardView geladen werden
     // 2. BoardEditor reagiert nur noch auf die linke Maustaste (die anderen
-    //    sind irgendwann mal fürs Scrollen zuständig - s. BoardView)
+    //    sind irgendwann mal fï¿½rs Scrollen zustï¿½ndig - s. BoardView)
     //    das Scrollen funkt. im Editor und der Vorschau bereits, im Spiel noch nicht ..
     //    warum, weiss ich noch nicht
 

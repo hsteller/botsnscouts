@@ -25,12 +25,22 @@
 
 package de.botsnscouts.server;
 
-import java.io.*;
-import java.net.*;
-import de.botsnscouts.util.*;
-import de.botsnscouts.comm.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.SocketException;
 
 import org.apache.log4j.Category;
+
+import de.botsnscouts.comm.KommException;
+import de.botsnscouts.comm.KommServerAusgabe;
+import de.botsnscouts.comm.KommServerRoboter;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.Global;
 
 /**
  * Handhabt eine Connection nebenlaeufig. modified for 2.0 by Dirk

@@ -25,11 +25,16 @@
 
 package de.botsnscouts.gui;
 
+import java.awt.GridLayout;
+import java.awt.Image;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.ImageMan;
-
-import javax.swing.*;
-import java.awt.*;
 
 
 public class RobotCard extends JPanel {

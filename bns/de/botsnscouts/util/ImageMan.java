@@ -25,16 +25,18 @@
 
 package de.botsnscouts.util;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.image.*;
-
-import de.botsnscouts.BotsNScouts;
-import javax.swing.ImageIcon;
+import java.awt.Button;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Toolkit;
+import java.io.IOException;
 import java.net.URL;
 
+import javax.swing.ImageIcon;
+
 import org.apache.log4j.Category;
-import com.sixlegs.image.png.PngImage;
+
+import de.botsnscouts.BotsNScouts;
 
 
 public class ImageMan {
@@ -175,7 +177,7 @@ public class ImageMan {
     //////////////////////////////////////////////////////////////////////
 
     // Abfrage der Images ... ACHTUNG: die Referenzen in den
-    // zurückgegebenen Arrays sind erst gültig, wenn finishLoading()
+    // zurï¿½ckgegebenen Arrays sind erst gï¿½ltig, wenn finishLoading()
     // erfolgreich aufgerufen wurde
     public static Image[] getImages(int id) {
 	if( !imagesLoading )

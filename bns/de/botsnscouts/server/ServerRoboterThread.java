@@ -22,10 +22,18 @@
 
 package de.botsnscouts.server;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.comm.*;
-
 import org.apache.log4j.Category;
+
+import de.botsnscouts.comm.KommException;
+import de.botsnscouts.comm.KommFutschException;
+import de.botsnscouts.comm.KommServerRoboter;
+import de.botsnscouts.comm.MessageID;
+import de.botsnscouts.comm.OtherConstants;
+import de.botsnscouts.comm.ServerAntwort;
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.Location;
 
 public class ServerRoboterThread extends BNSThread implements Waitable {
     static final Category CAT = Category.getInstance(ServerRoboterThread.class);

@@ -25,7 +25,10 @@
 
 package de.botsnscouts.comm;
 
-import de.botsnscouts.util.*;
+import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Card;
+import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Status;
 
 public class ClientAntwort implements Comparable {
     /**

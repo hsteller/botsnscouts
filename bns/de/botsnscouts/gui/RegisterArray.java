@@ -25,16 +25,20 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.TJPanel;
-import de.botsnscouts.widgets.GreenTheme;
-
-import javax.swing.*;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
+import javax.swing.JWindow;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import de.botsnscouts.util.Card;
+import de.botsnscouts.util.Global;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.TJPanel;
 
 /**
  * where the registers are displayed in a column

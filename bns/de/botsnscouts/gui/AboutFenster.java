@@ -25,17 +25,21 @@
  
 package de.botsnscouts.gui;
 
-import de.botsnscouts.BotsNScouts;
-import de.botsnscouts.widgets.TJButton;
-import de.botsnscouts.util.Message;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.border.EmptyBorder;
+
+import de.botsnscouts.BotsNScouts;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.TJButton;
 
 
 public class AboutFenster extends JFrame{

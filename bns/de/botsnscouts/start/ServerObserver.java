@@ -25,12 +25,17 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.BNSThread;
-import org.apache.log4j.Category;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import org.apache.log4j.Category;
+
+import de.botsnscouts.util.BNSThread;
 
 /**
  * Observe the game start procedure.

@@ -25,11 +25,14 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.gui.*;
-import de.botsnscouts.util.*;
-import de.botsnscouts.autobot.*;
-import de.botsnscouts.server.Server;
 import org.apache.log4j.Category;
+
+import de.botsnscouts.autobot.AutoBot;
+import de.botsnscouts.gui.Ausgabe;
+import de.botsnscouts.gui.HumanPlayer;
+import de.botsnscouts.server.Server;
+import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.util.KrimsKrams;
 
 // launches human player, output ...
 

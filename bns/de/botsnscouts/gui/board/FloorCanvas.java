@@ -9,7 +9,6 @@ package de.botsnscouts.gui.board;
 
 import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -92,7 +91,7 @@ public class FloorCanvas extends Canvas implements DrawingConstants, Scalable{
         // XXX HS paintHighlight(dbg); -> nach Topcanvas
         
         dbg.scale(dScale, dScale);
-     // XXX HS  dbg.setComposite(AC_SRC); -> noch nötig?
+     // XXX HS  dbg.setComposite(AC_SRC); -> noch nï¿½tig?
      //   paintScout(dbg); -> BotCanvas/TopCanvas
     //    paintRobos(dbg); -> BotCanvas
         
@@ -107,7 +106,7 @@ public class FloorCanvas extends Canvas implements DrawingConstants, Scalable{
         Graphics2D g = (Graphics2D) g2;
         int sizeX = board.getSizeX();
         int sizeY = board.getSizeY();
-     // XXX HS noch nötig?   g.setComposite(AC_SRC_OVER);
+     // XXX HS noch nï¿½tig?   g.setComposite(AC_SRC_OVER);
         // Grenzen des zu zeichnenden Bereichs berechnen:
         Rectangle clip = g.getClipBounds();
         int x0 = clip.x / 64 + 1;

@@ -25,11 +25,13 @@
  
 package de.botsnscouts.comm;
 
-import de.botsnscouts.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+
+import de.botsnscouts.util.Card;
 // STAND: 2.7.99. 15:40 ; fertig
 /**
- *Klasse für die Kommunikation des Servers mit Spielern
+ *Klasse fï¿½r die Kommunikation des Servers mit Spielern
  *@author Hendrik
 */
 
@@ -40,7 +42,7 @@ public class KommServerRoboter extends KommServer {
   }
 
   /** Zur Aufforderung an den Spieler, seinen Zug zu machen.
-   * Erhält als Argument seine Karten. Server muss sie sich merken, da später als Antwort lediglich übermittelt wird, die wievielte ausgeteilte Card in einem Register liegt.
+   * Erhï¿½lt als Argument seine Karten. Server muss sie sich merken, da spï¿½ter als Antwort lediglich ï¿½bermittelt wird, die wievielte ausgeteilte Card in einem Register liegt.
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
    */
   public void zugabgabe (Card [] k)  throws KommException{
@@ -59,7 +61,7 @@ public class KommServerRoboter extends KommServer {
     }
   }
   
-  /**Diese Methode dient der Benachrichtigung des Roboters von seiner Zerstörung.
+  /**Diese Methode dient der Benachrichtigung des Roboters von seiner Zerstï¿½rung.
 	@exception KommException wird geworfen, wenn beim Senden ein
 Fehler auftritt  
    */ 
@@ -71,7 +73,7 @@ Fehler auftritt
       throw new KommException ("zerstoert: Ecxception beim Schreiben");
     }
     /*
-      // Dieser Teil war für die Originalversion der Methode gedacht,die einen int liefern sollte
+      // Dieser Teil war fï¿½r die Originalversion der Methode gedacht,die einen int liefern sollte
       try {
       ServerAntwort xyz= wait2( in.readLine());
       if (xyz.typ==xyz.AUSRICHTUNG)
@@ -86,7 +88,7 @@ Fehler auftritt
   }
     
   /** 'reaktivierung' ist die Anfrage an einen 'power-down'-Bot, ob er wieder mitmachen will.
-   *  Falls er wieder dabei sein will, ist der Rückgabewert true, sonst false.
+   *  Falls er wieder dabei sein will, ist der Rï¿½ckgabewert true, sonst false.
    *  Bei falscher Antwort wird eine Exception geworfen.
 @exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.
    */
@@ -111,7 +113,7 @@ Fehler auftritt
     */
    
   }
-         /** 'regReparatur' ist zum Herausfinden da, welche(s) Register ein Bot repariert haben will und erhält als Argument die Registeranzahl, die der Bot reparieren darf. Es werden die Nummern der Register zurückgeliefert, die der Bot reparieren möchte.
+         /** 'regReparatur' ist zum Herausfinden da, welche(s) Register ein Bot repariert haben will und erhï¿½lt als Argument die Registeranzahl, die der Bot reparieren darf. Es werden die Nummern der Register zurï¿½ckgeliefert, die der Bot reparieren mï¿½chte.
  Bei falscher Antwort wird eine Exception geworfen.
 
 @exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.*/
@@ -138,7 +140,7 @@ Fehler auftritt
   } 
 
   /*     
-  Zur Benachrichtigung der Spieler, dass das Spiel anfängt.
+  Zur Benachrichtigung der Spieler, dass das Spiel anfï¿½ngt.
    (true=ok, false=error)
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
   

@@ -25,14 +25,16 @@
 
 package de.botsnscouts.gui;
 
-import  de.botsnscouts.util.*;
-import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.net.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.event.ActionListener;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JToggleButton;
+
+import de.botsnscouts.util.ImageMan;
+import de.botsnscouts.util.Message;
 
     /**
      * KlugscheisserLatte, die im oben rechts in der Infoleiste dargestellt ist

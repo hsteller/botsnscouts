@@ -25,9 +25,10 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.Message;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 
-import javax.swing.*;
+import de.botsnscouts.util.Message;
 
 class RoboBox extends JComboBox {
     private boolean withEgal;

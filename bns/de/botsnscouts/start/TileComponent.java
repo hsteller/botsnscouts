@@ -25,15 +25,23 @@
  
 package de.botsnscouts.start;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.awt.image.*;
-import java.awt.geom.*;
-import javax.swing.border.*;
-import java.net.*;
-import java.io.*;
-import de.botsnscouts.util.*;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
+
+import javax.swing.JComponent;
+
+import de.botsnscouts.util.Location;
 
 public class TileComponent extends JComponent implements  MouseListener, MouseMotionListener{
 

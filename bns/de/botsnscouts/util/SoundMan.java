@@ -27,9 +27,10 @@ package de.botsnscouts.util;
 
 import java.applet.Applet;
 import java.applet.AudioClip;
-import de.botsnscouts.BotsNScouts;
 
-import org.apache.log4j.*;
+import org.apache.log4j.Category;
+
+import de.botsnscouts.BotsNScouts;
 
 /**
  * SoundMan configures, loads and plays the sounds To add a new sound, simply

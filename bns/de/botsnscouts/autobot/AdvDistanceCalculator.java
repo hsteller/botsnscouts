@@ -6,14 +6,15 @@
 
 package de.botsnscouts.autobot;
 
-import de.botsnscouts.board.Board;
-import de.botsnscouts.board.Floor;
-import de.botsnscouts.util.Location;
-import de.botsnscouts.util.Directions;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Category;
 
-import java.util.Map;
-import java.util.HashMap;
+import de.botsnscouts.board.Board;
+import de.botsnscouts.board.Floor;
+import de.botsnscouts.util.Directions;
+import de.botsnscouts.util.Location;
 
 public class AdvDistanceCalculator extends DistanceCalculator {
     static final Category CAT=Category.getInstance(AdvDistanceCalculator.class);

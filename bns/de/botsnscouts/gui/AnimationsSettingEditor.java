@@ -25,7 +25,6 @@ import javax.swing.JTextField;
 import org.apache.log4j.Category;
 
 import de.botsnscouts.util.Message;
-import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJButton;
 import de.botsnscouts.widgets.TJLabel;
 
