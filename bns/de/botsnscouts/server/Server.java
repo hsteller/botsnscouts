@@ -587,8 +587,10 @@ public class Server extends Thread implements ModusConstants, ServerOutputThread
 
 	CAT.debug("anmeldung()");
 	boolean spielgestartet=anmeldung();
-	if (!spielgestartet)
+	if (!spielgestartet){
+	    messageThread.interrupt();
 	    return;
+	}
 
 	CAT.debug("setzeStartPunkt()");
 	setzeStartPunkt();
