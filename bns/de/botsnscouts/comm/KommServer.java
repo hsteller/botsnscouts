@@ -28,6 +28,8 @@ package de.botsnscouts.comm;
 import de.botsnscouts.util.*;
 import java.io.*;
 import java.net.*;
+
+import org.apache.log4j.Category;
 /* STAND 20.7.99 2:55 ; sendFeldinhalt fehlt noch;
    getestet: - warte
               sendRobStatus
@@ -38,6 +40,7 @@ Oberklasse für SERVER-Kommunikation <BR>
 
 */
 public class KommServer {
+  static Category CAT = Category.getInstance(KommServer.class);
   static final boolean LOG_RECEIVE = false;
   static final boolean LOG_SEND    = false;
 
@@ -842,15 +845,16 @@ public class KommServer {
       }
       if (endplazierung != null)
           for (int i=0;i<endplazierung.length;i++)
-            if (raus!=null)
-		raus+=URLEncoder.encode(endplazierung[i])+",";
-	    else
-		raus+=endplazierung[i]+",";      
-          
-          raus +=")";       
-          out.println (raus);
+               if (endplazierung[i] != null)
+                 raus+=URLEncoder.encode(endplazierung[i])+",";
+               else
+                 raus+=endplazierung[i]+",";
+      raus +=")";
+
+      out.println (raus);
     }
     catch (Exception gibtsnicht) {
+      CAT.error(gibtsnicht.getMessage(), gibtsnicht);
       throw new KommException ("Exception bei spielstand-Uebermittlung");
     }
   }
