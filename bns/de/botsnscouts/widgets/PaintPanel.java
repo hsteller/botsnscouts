@@ -27,7 +27,7 @@ package de.botsnscouts.widgets;
 
 import javax.swing.*;
 import java.awt.*;
-import de.botsnscouts.gui.ColoredComponent;
+
 import de.botsnscouts.widgets.OptionPane;
 
 public class PaintPanel extends JPanel {

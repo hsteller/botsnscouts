@@ -25,8 +25,8 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.gui.ColoredComponent;
-import de.botsnscouts.gui.ColoredPanel;
+import de.botsnscouts.widgets.ColoredComponent;
+import de.botsnscouts.widgets.ColoredPanel;
 import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Message;

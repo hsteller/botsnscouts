@@ -26,7 +26,7 @@ public class DoingStuffPanel extends JPanel{
 
 	setLayout(new BorderLayout());
 
-        JComponent comp = new de.botsnscouts.gui.ColoredComponent();
+        JComponent comp = new de.botsnscouts.widgets.ColoredComponent();
         comp.setLayout( new BorderLayout() );
         JPanel pl = new JPanel();
         pl.setOpaque(false);
@@ -72,7 +72,7 @@ public class DoingStuffPanel extends JPanel{
 	g2d.fillRect(0,0, d.width, d.height);
     }
 
-    private class FourRobs extends de.botsnscouts.gui.ColoredComponent{
+    private class FourRobs extends de.botsnscouts.widgets.ColoredComponent{
 	private Rob[] robs;
 	public FourRobs(){
 	    robs=new Rob[4];

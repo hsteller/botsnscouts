@@ -37,6 +37,7 @@ import java.util.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.gui.*;
 import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.ColoredPanel;
 
 
 class PlayersPanel extends ColoredPanel{

@@ -25,7 +25,7 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.gui.ColoredComponent;
+import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJPanel;
@@ -105,7 +105,7 @@ public class StartPanel extends JPanel {
     }
 
     JComponent getLocalComponent() {
-        JComponent panel = new de.botsnscouts.gui.ColoredComponent();
+        JComponent panel = new de.botsnscouts.widgets.ColoredComponent();
 
         panel.setOpaque(false);
         String[] farben = {Message.say("Start", "mFarbeEgal"), Message.say("Start", "mFarbeGruen"), Message.say("Start", "mFarbeGelb"), Message.say("Start", "mFarbeRot"), Message.say("Start", "mFarbeBlau"), Message.say("Start", "mFarbeMagenta"), Message.say("Start", "mFarbeOrange"), Message.say("Start", "mFarbeGrau"), Message.say("Start", "mFarbeDunkelMagenta")};

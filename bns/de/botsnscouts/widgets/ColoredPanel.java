@@ -1,4 +1,4 @@
-package de.botsnscouts.gui;
+package de.botsnscouts.widgets;
 
 import java.awt.*;
 import javax.swing.JPanel;

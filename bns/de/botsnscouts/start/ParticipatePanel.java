@@ -25,7 +25,7 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.gui.ColoredComponent;
+import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TransparentButton;

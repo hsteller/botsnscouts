@@ -29,6 +29,9 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 
+/**
+ * Semi Transparent button with nice effects.
+ */
 public class TransparentButton extends JButton {
     static Border gap  = BorderFactory.createEmptyBorder(6,6,6,6);
     static Border line = BorderFactory.createLineBorder(Color.black);

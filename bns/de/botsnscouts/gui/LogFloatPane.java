@@ -5,7 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 import java.util.List;
-import de.botsnscouts.gui.ColoredComponent;
+import de.botsnscouts.widgets.ColoredComponent;
 
 public class LogFloatPane extends ColoredComponent implements ComponentListener {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( ColoredComponent.class.getName() );

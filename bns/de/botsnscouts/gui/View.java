@@ -27,6 +27,7 @@ package de.botsnscouts.gui;
 
 import de.botsnscouts.gui.hotkey.*;
 import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.ColoredComponent;
 import org.apache.log4j.Category;
 
 import javax.swing.*;
