@@ -36,6 +36,8 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import de.botsnscouts.gui.hotkey.*;
+
 import org.apache.log4j.Category;
 
 public class AusgabeView extends JPanel implements AusgabeViewInterface {
@@ -55,6 +57,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
     private JComponent northPanel = new PaintPanel( OptionPane.getBackgroundPaint(this) );
 
+    private HotKeyMan keyMan = new HotKeyMan();
+    private ZoomMenu zoomMenu;
+
     // settings for Zoom-Menu
     protected static final int MIN_ZOOM = 40;
     protected static final int DEFAULT_ZOOM = 100; // selects the RadioButton to
@@ -63,6 +68,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
                                                    // will be always 100
     protected static final int MAX_ZOOM = 150;
     protected static final int ZOOM_STEP = 10;
+
+    private static final int MIN_ZOOM_SCALE = MIN_ZOOM/10;
+    private static final int MAX_ZOOM_SCALE = MAX_ZOOM/10;
 
     // sound-menu
     private boolean soundOn = false;
@@ -77,6 +85,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     public AusgabeView() {
         super();
         this.initMenus();
+        this.initSharedHotKeys();
     }
 
     public AusgabeView(BoardView sa, Bot[] robots, Ausgabe aus) {
@@ -151,6 +160,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	add(gameBoardScrollPane,BorderLayout.CENTER);
 	gameBoardView = gameBoardScrollPane.getViewport();
         this.initMenus();
+        this.initSharedHotKeys();
 
     }
 
@@ -340,7 +350,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	 // null means CANCEL
         ausgabe.quit(keepWatching);
 	// Since this does not work properly by now, we do:
-	System.exit(0);
+	//System.exit(0);
      }
     }
 
@@ -376,7 +386,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 
       menus.add(new FileMenu());
-      menus.add(new ZoomMenu());
+
+      zoomMenu = new ZoomMenu();
+      menus.add(zoomMenu);
       menus.add(trackMenu);
       menus.add(optionsMenu);
       menus.add(new HelpMenu());
@@ -406,22 +418,64 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       }
     }
 
+    private int actualScale = DEFAULT_ZOOM;
+    private void zoom (int iScale) {
+         if (MAX_ZOOM<iScale || MIN_ZOOM>iScale ) {
+            CAT.debug("zoom: scale out of range: "+iScale);
+            return;
+         }
+         final double sc = iScale / 100.0;
+         final int tmpScale = iScale;
+	    SwingUtilities.invokeLater( new Runnable() {
+		    public void run() {
+			 gameBoardCanvas.setScale( sc );
+		         actualScale = tmpScale;
+                          zoomMenu.select(actualScale);
+                    }
+		});
+
+    }
+
+    private void zoomIn() {
+        CAT.debug("zooming in");
+        zoom (actualScale+ZOOM_STEP);
+    }
+
+    private void zoomOut(){
+        CAT.debug("zooming out");
+        zoom (actualScale-ZOOM_STEP);
+    }
+
+
 
     private class ZoomMenu extends JMenu implements ActionListener {
-	ZoomMenu() {
+        private ButtonModel [] zoomItemModels = new ButtonModel [MAX_ZOOM_SCALE-MIN_ZOOM_SCALE+1];
+        ButtonGroup group;
+        ZoomMenu() {
 	    super("Zoom");
-	    ButtonGroup group = new ButtonGroup();
+
+            group = new ButtonGroup();
 	    JRadioButtonMenuItem item = null;
-	    for(int d = MIN_ZOOM; d <= MAX_ZOOM; d += ZOOM_STEP ) {
+	    int count = 0;
+            for(int d = MIN_ZOOM; d <= MAX_ZOOM; d += ZOOM_STEP ) {
 		item = new JRadioButtonMenuItem( "" + d + "%" );
 		item.setActionCommand("" + d);
 		item.addActionListener( this );
 		super.add( item );
 		group.add( item );
+                zoomItemModels[count++] = item.getModel();
                 if (d==DEFAULT_ZOOM)
                   group.setSelected( item.getModel(), true );
 	    }
+
 	}
+
+        public void select (int scale) {
+          if (CAT.isDebugEnabled())
+            CAT.debug("selecting zoom="+scale+"%");
+          group.setSelected(zoomItemModels[(scale-MIN_ZOOM)/ZOOM_STEP], true);
+        }
+
         public void actionPerformed(ActionEvent e) {
 	    int iScale;
 	    try {
@@ -431,12 +485,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	        iScale = 10;
 		Global.debug(this, "bad zommmenu action command. using default 100%");
 	    }
-	    final double sc = iScale / 100.0;
-	    SwingUtilities.invokeLater( new Runnable() {
-		    public void run() {
-			 gameBoardCanvas.setScale( sc );
-		    }
-		});
+	    zoom (iScale);
+
 	}
   }
 
@@ -610,6 +660,31 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     public JComponent getBoardView() {
         return gameBoardView;
     }
+
+    public HotKeyMan getHotKeyManager() {
+      return keyMan;
+    }
+
+    private void initSharedHotKeys() {
+      CAT.debug("initSharedHotKeys()");
+      HotKeyAction zoomIn = new HotKeyActionAdapter() {
+        public void execute(){
+          zoomIn();
+        }
+      };
+      keyMan.setHotKey(HotKeyConf.HOTKEY_ZOOM_IN, zoomIn);
+
+       HotKeyAction zoomOut = new HotKeyActionAdapter() {
+        public void execute(){
+          zoomOut();
+        }
+      };
+      keyMan.setHotKey(HotKeyConf.HOTKEY_ZOOM_OUT, zoomOut);
+      if (CAT.isDebugEnabled())
+        CAT.debug(keyMan.dump());
+
+    }
+
 
 }
 

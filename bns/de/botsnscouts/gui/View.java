@@ -26,13 +26,16 @@
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
+import de.botsnscouts.gui.hotkey.*;
+
 import java.awt.*;
 import java.io.*;
 import java.awt.event.*;
 import java.awt.image.*;
-
 import javax.swing.*;
 import javax.swing.border.*;
+import java.util.HashMap;
+
 
 import org.apache.log4j.Category;
 
@@ -46,6 +49,9 @@ public class View extends JFrame {
 
     private ChatPane chatpane;
     private JMenuBar menus;
+
+    private HotKeyMan keyMan = new HotKeyMan();
+
     JSplitPane sp;
 
     AusgabeView ausgabeView;
@@ -63,6 +69,7 @@ public class View extends JFrame {
 	content.add(av, BorderLayout.CENTER);
         content.add(av.getNorthPanel(), BorderLayout.NORTH);
         this.setContentPane( content );
+        initHotKeys();
 	makeVisible();
     }
 
@@ -76,19 +83,98 @@ public class View extends JFrame {
         sp.setRightComponent(hv);
         sp.setOneTouchExpandable(true);
         sp.setOpaque(false);
-
+        // not AusgabeView yet :(
+        // => will call initHotKeys in addAusgabeView()
+        //initHotKeys();
 	this.getContentPane().add(sp, BorderLayout.CENTER);
     }
 
-/*
-    public void shutup() {
-	System.exit(0);
 
+
+  /** Create hotkeys that will be enabled if this is a GUI of a
+   *  participating player.
+   *  (Only players should be able to chat)
+   */
+
+  private void initPlayerOnlyHotKeys(){
+    CAT.debug("initPlayerOnlyHotKeys()");
+     String [] preparedChatMessages = HotKeyConf.MSGS;
+      for (int i=0;i<HotKeyConf.MSGS.length;i++) {
+        CAT.debug("creating Hotkey for: "+preparedChatMessages [i]);
+        String s = HotKeyConf.getOptinalValue(preparedChatMessages[i]);
+          HotKeyAction act = new ChatMessageHotKeyActionAdapter(new JTextField(s)){
+          public void execute() {
+            humanView.sendChatMessage(getOptionalValue());
+          }
+        };
+
+        keyMan.setHotKey(preparedChatMessages [i], act);
+
+      }
+     if (CAT.isDebugEnabled())
+        CAT.debug(keyMan.dump());
+  }
+
+
+  /** Note: the hotkey for showing the chatline is initialized in makeVisible()
+  *       because the chatline is created there and the hotkey's HotKeyAction.execute();
+  *       needs a reference of the chatline.
+  *       Hotkeys that will be used by both players and spectators will be defined
+  *       in AusgabeView
+  */
+    private void initHotKeys() {
+        CAT.debug("initHotKeys()");
+        keyMan = ausgabeView.getHotKeyManager();
+        if (humanView != null) {
+            initPlayerOnlyHotKeys();
+        }
+        CAT.debug("adding Keylistener");
+
+        // !! IBM's JDK1.3 KeyEvent is buggy/crap, but this this trial&error approach
+        // of mixing keyCode/KeyChar seems to work for the beginning !!
+        this.addKeyListener(new KeyAdapter() {
+              public void keyTyped(KeyEvent e) {
+                 if (CAT.isDebugEnabled()) {
+                  CAT.debug("KEYTyped!");
+                  dumpEvent(e);
+                 }
+                  keyMan.invoke(e.getKeyChar());
+              }
+              public void keyPressed(KeyEvent e){
+                 if (CAT.isDebugEnabled()) {
+                   CAT.debug("KEYPressed!");
+                   dumpEvent(e);
+                 }
+                 keyMan.invoke(e.getKeyCode());
+              }
+              public void dumpEvent(KeyEvent e) {
+               CAT.debug(" keychar: "+e.getKeyChar()+"\nkeycode: "+e.getKeyCode()
+                          +"\nnumValue: "+Character.getNumericValue(e.getKeyChar()));
+
+                int mods = e.getModifiers();
+                String ms = e.getKeyModifiersText(mods);
+                CAT.debug("mods="+mods+"\tmodString="+ms);
+                CAT.debug("keyText="+e.getKeyText(e.getKeyCode()));
+                CAT.debug("ID="+e.getID());
+                CAT.debug("paramString="+e.paramString());
+                CAT.debug("consumed?"+e.isConsumed());
+                CAT.debug("actionKey?"+e.isActionKey());
+                KeyStroke stroke = KeyStroke.getKeyStrokeForEvent(e);
+                CAT.debug("stroke stuff: ");
+                CAT.debug("\t"+stroke.getKeyChar());
+                CAT.debug("\t"+stroke.getKeyCode());
+                CAT.debug("\tchar#:"+Character.getNumericValue(stroke.getKeyChar()));
+                CAT.debug("STROKE="+stroke.toString());
+
+
+              }
+              public void keyReleased(KeyEvent e) {}
+          });
     }
 
-*/
 
     synchronized private void initView() {
+
 	// Fenstergr”ÿe auf Vollbild setzen
 	Toolkit tk=Toolkit.getDefaultToolkit();
 	this.setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);
@@ -162,28 +248,37 @@ public class View extends JFrame {
 
         if (humanView!=null) {
           final ChatLine cp = new ChatLine( ausgabeView, humanView.getHumanPlayer() );
+
+
+           HotKeyAction  act = new HotKeyActionAdapter() {
+            public void execute(){
+               if( humanView == null )
+                 return;
+               cp.setVisible( true );
+               cp.text.requestFocus();
+
+            }
+          };
+          // this strange way of creating a hotkey for "enter" is needed because
+          // of the crappy IBM KeyEvent..
+          HotKey k = new HotKey(HotKeyConf.HOTKEY_SHOW_CHATLINE,
+                                new Integer(HotKeyConf.SHOW_CHATLINE),
+                                act);
+          keyMan.setHotKey(k);
+
           cp.setSize( cp.getPreferredSize() );
           cp.setLocation( p.x + 2, p.y + 2 );
           cp.setVisible( false );
 
-          this.addKeyListener(new KeyAdapter() {
-              public void keyTyped(KeyEvent e) {
-                  if( e.getKeyChar() == KeyEvent.VK_ENTER ) {
-                      if( humanView == null ) return;
-                        cp.setVisible( true );
-                        cp.text.requestFocus();
-                        //cp.requestFocus();
-                  }
 
-              }
-              public void keyPressed(KeyEvent e) {}
-              public void keyReleased(KeyEvent e) {}
-          });
           this.getLayeredPane().add( cp, JLayeredPane.MODAL_LAYER );
         }
 	this.validate();
 
     }
+
+
+
 
     public LogFloatPane logFloatPane;
 
@@ -202,6 +297,7 @@ public class View extends JFrame {
           this.addMenuBar();
         }
         if (humanView!=null){
+          initHotKeys();
           Toolkit tk = Toolkit.getDefaultToolkit();
           int w = tk.getScreenSize().width-8;
           int h = tk.getScreenSize().height-8;
