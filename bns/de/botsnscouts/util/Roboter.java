@@ -125,6 +125,32 @@ public class Roboter {
 	}
     }
 
+    /** setzt in diesen Roboter die fuer eine Simulation nötigen Daten
+     *  diese werden aus dem übergebenen Robbi kopiert. 
+     *  (ausrichtung, position, schaden, leben, Zielflagge, Archivpon, aktiv)
+     */
+    public void copyRob( Roboter r ) {
+	ausrichtung = r.ausrichtung;
+	pos.set(r.pos);
+	schaden = r.schaden;
+	naechsteFlagge = r.naechsteFlagge;
+	archivX = r.archivX;
+	archivY = r.archivY;
+	virtuell = r.virtuell;
+	leben = r.leben;
+	aktiviert = r.aktiviert;
+	for(int i=0;i < zug.length;i++) 
+	    zug[i] = r.zug[i];
+	for(int i=0;i < gesperrteRegister.length; i++) {
+	    gesperrteRegister[i]=r.gesperrteRegister[i];
+	}
+	for (int i=0; i < karten.length; i++){
+	    karten[i] = r.karten[i];
+	}
+    }
+	
+    
+
     /** liefert Zahl der zu erhaltenden Karten */
     public int anzKarten() {
 	return ANZKARTEN - schaden;

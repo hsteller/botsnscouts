@@ -282,7 +282,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 
 
     public void trackRob (String rName) {
-
+	
 	    JViewport jV= mP.getViewport();
 	    
 	    //	    Global.debug(this,"Versuche, Robi zu tracken: "+rName);
@@ -309,11 +309,14 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
     public void scrollFlag (int nr) {
 	JViewport view= mP.getViewport();
 	Global.debug(this,"Scrolle zur Flagge: "+nr);
-	int x = flagsPosition[nr-1].x*64;
-	int y = spielFeld.getHeight()-(flagsPosition[nr-1].y*64);
-	//trackPos(x,y);
+	//	int x = flagsPosition[nr-1].x*64;
+	//	int y = spielFeld.getHeight()-(flagsPosition[nr-1].y*64);
+	int x = flagsPosition[nr-1].x;
+	int y = flagsPosition[nr-1].y;
 
- /******************************************************************/
+	trackPos(x,y);
+
+ /******************************************************************
 	Dimension sz = view.getExtentSize();
 	int w2 = sz.width/2;
 	int h2 = sz.height/2;
@@ -331,7 +334,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	if ((view.getViewPosition().x != x1) || (view.getViewPosition().y != y1))  {
 	    view.setViewPosition(new Point(x1, y1));
 	}
-/************************************************************************/
+************************************************************************/
 
 
     }
@@ -370,6 +373,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	    else y1 = jV.getViewPosition().y;
 	
 	    jV.setViewPosition(new Point(x1, y1));
+	    spielFeld.highlight(robix, robiy);
     }
 
 
@@ -515,6 +519,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	    int mods = e.getModifiers();
 	    // mouse button 3: scroll to  clicked rob
 	    if( (mods & MouseEvent.BUTTON3_MASK) != 0 ) {
+		System.out.println("robbifinder" + r.getName());
 		trackRob( r.getName() );
 		return;
 	    } 
@@ -1238,7 +1243,6 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
       		// Fuege das Spielfeld ein
 		//		mP.add(spielFeld);
 		mP.setViewportView(spielFeld);
-		mP.getViewport().setBackingStoreEnabled(true);
 		spielFeld.setScrollPane(mP);
 		mP.validate();
 		kCA.spielstart(); // Bestaetigung an den Server senden

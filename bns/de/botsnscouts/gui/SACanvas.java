@@ -93,6 +93,7 @@ public class SACanvas extends JComponent {
     private Roboter[] robos;
     private Roboter vorschauRob;
     private Color[] robocolor2; 
+    private Ort lastScoutPos = new Ort();
 
     public static final Color GREEN  = new Color(4,156,52);
     public static final Color YELLOW = new Color(251,253,4);
@@ -114,6 +115,9 @@ public class SACanvas extends JComponent {
     private double dScale = 1.0;
     boolean rescaled = true;
 
+    double scaledFeldSize; // FELDSIZE * Skalierung
+    Ort highlightPos = new Ort(0,0);
+
     ClickListener myClickListener;
 
 
@@ -124,11 +128,18 @@ public class SACanvas extends JComponent {
     public void setScale( double scale ) {
 	// adapt this Component to the scaling factor
 	dScale = scale;
-	x = (int)(sf.getSizeX() * dScale * FELDSIZE);
-	y = (int)(sf.getSizeY() * dScale * FELDSIZE);
+	scaledFeldSize = (dScale * FELDSIZE);
+	x = (int)(sf.getSizeX() * scaledFeldSize );
+	y = (int)(sf.getSizeY() * scaledFeldSize );
 	rescaled = true;
 	System.err.println("dim : " + x + " " + y );
 	setSize(x,y);
+	
+	// the preComputed-BoardImage is no longer valid
+	preBoard = null; 
+
+
+	//invalidate();
     }
 
 
@@ -227,11 +238,10 @@ public class SACanvas extends JComponent {
     Point calcKachelPos(int mx, int my) {
 	int sfh = sf.getSizeY();
 	int sfw = sf.getSizeX();
-	double scaledSize = FELDSIZE * getScale();
 	
 	Point p = new Point();
-	p.x = 1 + (int) (mx / scaledSize );
-	p.y = sfh - (int) (my / scaledSize );
+	p.x = 1 + (int) (mx / scaledFeldSize );
+	p.y = sfh - (int) (my / scaledFeldSize );
 
 	// sicherstellen, dass 1 <= p.x <= sfw
 	// und  1 <= p.y <= sfy
@@ -617,20 +627,44 @@ public class SACanvas extends JComponent {
 	    return false;
     }
 
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-    protected void vorschau(int phasen, Roboter[] vorschauRobArray){
+    protected void vorschau(int phasen, Roboter simRob){
 	if (phasen==0){
+	    //scoutOn = true; // flag for repaint: yes, paint scout!
 	    vorschauRob=null;
-	    repaint();
+	    deleteScout();
+	    //repaint();
 	    return;
 	}
 
-	for (int i=1;i< phasen+1;i++)
-	    sf.doPhase(i, vorschauRobArray);
-	vorschauRob = vorschauRobArray[0];
+	Roboter[] robs = new Roboter[1];
+	robs[0] = simRob;
+	for (int i=1;i< phasen+1;i++) {
+	    //sf.doPhase(phasen, simRob);
+	    sf.doPhase(phasen, robs);
+	}
+	//vorschauRob = vorschauRobArray[0];
+	vorschauRob = simRob;
+	showScout( simRob.getPos() );
 
-	repaint();
+	//repaint();
+
+    }
+
+    protected void vorschau(int phasen, Roboter[] vorschauRobArray){
+	System.out.println("XXX: Simulating for " + vorschauRobArray[0] );
+	if (phasen==0){
+	    vorschauRob=null;
+	    deleteScout();
+	    //repaint();
+	    return;
+	}
+
+	for (int i=1;i< phasen+1;i++) {
+	    sf.doPhase(i, vorschauRobArray);
+	}
+	vorschauRob = vorschauRobArray[0];
+	showScout( vorschauRob.getPos() );
+	//repaint();
 
     }
 
@@ -951,6 +985,68 @@ public class SACanvas extends JComponent {
 	}
     }
     
+    /** Berechnet zu einem Ort das Rechteck, das die Kachel umschliesst */
+    void ort2Rect(Ort ort, Rectangle dest) {
+	ort2Rect(ort.x, ort.y, dest);
+    }
+
+    void ort2Rect(int x, int y, Rectangle dest) {
+	dest.x = (int) ((x - 1) * scaledFeldSize);
+	dest.y = (int) ((sf.getSizeY() - y) * scaledFeldSize);
+	dest.width  = (int)scaledFeldSize;
+	dest.height = (int)scaledFeldSize;
+    }
+
+    Rectangle rc = new Rectangle(); 
+    // for internal use. see repaintOrt()
+    
+    /** Triggert ein Neuzeichnen des Feldes mit den übergebenen
+     *  Koordinaten. Nützlich um einzelne Felder neuzeichnen zu lassen
+     */
+
+    void repaintOrt(Ort ort) {
+	ort2Rect(ort, rc);
+	repaint( 1, rc.x, rc.y, rc.width, rc.height );
+    }
+	
+    void repaintOrt(int x, int y) {
+	ort2Rect(x, y, rc);
+	repaint( 1, rc.x, rc.y, rc.width, rc.height );
+    }
+
+    void unhighlight() {
+	highlightPos.x = 0;
+	highlightPos.y = 0;
+	repaint();
+    }
+
+    void highlight(int x, int y) {
+	System.out.println("highlighting 1 " + x + " " + y);
+	highlightPos.x = x;	
+	highlightPos.y = y;
+	
+	Timer t = new Timer(5000, new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    unhighlight();
+		}
+	    });
+
+	t.setRepeats(false);
+	t.start();
+	repaintOrt(x,y);
+    }
+	
+    
+    private void showScout(Ort ort) {
+	deleteScout();
+	repaintOrt( ort );
+	lastScoutPos.set( ort );
+    }
+
+    private void deleteScout() {
+	repaintOrt( lastScoutPos );
+    }
+
     protected void paintScout( Graphics g ) {
 	Graphics2D g2d = (Graphics2D) g;
 	if( vorschauRob == null )
@@ -1000,22 +1096,51 @@ public class SACanvas extends JComponent {
 	}
     }
 
-    private void createOffscreenImage() {
-	// XXX vielleicht besser das skalieren erst beim reinkopieren 
-	dbi = createImage(x,y);
-	g_off = (Graphics2D)dbi.getGraphics();
-	g_off.setFont(new Font(g_off.getFont().getName(),g_off.getFont().getStyle(),8));
-	g_off.setClip(0,0,x,y);
-	g_off.scale( dScale, dScale );
+    private void paintHighlight(Graphics2D g) {
+	//	if( highlightPos.x != 0 ) {
+	    System.out.println("XXX: highlighting " + highlightPos );
+	    Rectangle rc = new Rectangle();
+	    ort2Rect(highlightPos, rc);
+	    g.setColor( Color.red );
+	    g.setStroke( new BasicStroke(4) );
+	    g.drawOval( rc.x, rc.y, rc.width, rc.height );
+	    
+	    AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
+	    g.setComposite(ac);
+	    g.fillOval( rc.x, rc.y, rc.width, rc.height );
+
+	    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+	    //}
     }
 
+//     private void createOffscreenImage() {
+// 	// XXX vielleicht besser das skalieren erst beim reinkopieren 
+// 	dbi = createImage(x,y);
+// 	g_off = (Graphics2D)dbi.getGraphics();
+// 	g_off.setFont(new Font(g_off.getFont().getName(),g_off.getFont().getStyle(),8));
+// 	g_off.setClip(0,0,x,y);
+// 	g_off.scale( dScale, dScale );
+//     }
     Graphics2D g_off;
-    Rectangle rcVis = new Rectangle();
+    
+    
+    BufferedImage preBoard = null;
+
+    /** ein Image des Spielfeldes anlegen, ohne aktive Elemente */
+    private void createBoardImage() {
+	preBoard = new BufferedImage(x,y, BufferedImage.TYPE_BYTE_INDEXED);
+	g_off = (Graphics2D)preBoard.getGraphics();
+	g_off.setClip(0,0,x,y);
+	g_off.scale( dScale, dScale );
+	paintUnbuffered( g_off );
+	g_off.dispose();
+    }
+
+
+
     public void paintComponent(Graphics g) {
-	//computeVisibleRect( rcVis );
-	//	System.out.println("REPAINT SACANVAS" + g.getClipBounds());
-	// System.out.println("VISIBLE RECT    " + rcVis );
 	/*
+	  // the old-offscreen-image code
 	if(dbi == null || rescaled ) {
 	    createOffscreenImage();
 	    rescaled = false;
@@ -1025,12 +1150,22 @@ public class SACanvas extends JComponent {
 	//dbg.setClip( clip );
 	*/
 
+	// Blit the board (it's already scaled)
+	if( preBoard == null ) {
+	    createBoardImage();
+	}
+	g.drawImage(preBoard, 0, 0, this);
+
+	// draw the active elements (robos)
 	Graphics2D dbg = (Graphics2D) g;
+	paintHighlight( dbg );
+
 	dbg.scale( dScale, dScale );
-	paintSpielfeldBoden( dbg );
-	paintLaserStrahlen( dbg );
-	paintWaende( dbg );
-	paintFlaggen( dbg );
+	//paintSpielfeldBoden( dbg );
+	//paintLaserStrahlen( dbg );
+	//paintWaende( dbg );
+	//paintFlaggen( dbg );
+
 	paintScout( dbg );
 	paintRobos( dbg );
 	/*
@@ -1050,7 +1185,6 @@ public class SACanvas extends JComponent {
 	paintWaende( dbg );
 	paintFlaggen( dbg );
 	paintScout( dbg );
-	paintRobos( dbg );
     }
 
     protected void finalize() {
@@ -1095,8 +1229,8 @@ public class SACanvas extends JComponent {
 
     private void ersetzeSpielfeld(SpielfeldSim sfs){
 	sf = sfs;
-	x = (int) (sf.getSizeX() * FELDSIZE * dScale);
-	y = (int) (sf.getSizeY() * FELDSIZE * dScale);
+	x = (int) (sf.getSizeX() * scaledFeldSize);
+	y = (int) (sf.getSizeY() * scaledFeldSize);
 	setSize(x,y);
     }
 

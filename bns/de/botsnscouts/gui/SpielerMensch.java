@@ -243,15 +243,18 @@ public class SpielerMensch extends Thread {
 
 
 
+    private Roboter simRob = Roboter.getNewInstance("dummy");
+    // damit wir nicht immer für jede Simulation einen neuen Robby brauchen
 
     /**
      * Setzt den Scout für das Feld, das den gelegten Karten entspricht
      **/
+    Roboter[] doPhaseRob = new Roboter[1];
     private void doScout() {
 	if (scoutAktiv) {
 	    // ------- Scout tanzen lassen
-	    Roboter[] doPhaseRob = new Roboter[1];
-	    doPhaseRob[0] = Roboter.getNewInstance("blafasel");
+
+	    //doPhaseRob[0] = Roboter.getNewInstance("blafasel");
 	    doPhaseRob[0] = Roboter.getCopy(f.statusLine.sC[myRobIndex].r);
 	    doPhaseRob[0].zeige_Roboter();
 	    int moeglichePhasen = 0;
@@ -377,7 +380,13 @@ public class SpielerMensch extends Thread {
 		    if(klugAktiv) fragKlug();
 		    // Absende-Button anzeigen/verstecken
 		    boolean alleBelegt = true;
-		    for (int j = 0; j < 5; j++) if (uI.register[j].status == FREI) {alleBelegt = false; break;}
+		    for (int j = 0; j < 5; j++) {
+			if (uI.register[j].status == FREI) {
+			    alleBelegt = false; 
+			    break;
+			}
+		    }
+
 		    if (alleBelegt) {
 			uI.uP.absenden.setVisible(true);
 		    }
@@ -564,7 +573,8 @@ public class SpielerMensch extends Thread {
 	/**
 	 * Hat der Benutzer diese Karte in ein Register gelegt, dann wir diese Methode aufgerufen
 	 * Sie "dreht" die Karte auf den Ruecken und markiert sie als "gelegt".
-	 */	public void umdrehen() {
+	 */	
+	public void umdrehen() {
 	     img = RUECK;
 	     //	     prio = 0;
 	     if (klugScheisser) klugScheisser=false;
@@ -574,7 +584,8 @@ public class SpielerMensch extends Thread {
 
 	/**
 	 * Wurden Karten < 9 ausgeteilt, dann wir diese Methode aufgerufen
-	 */  public void sperren() {
+	 */  
+	public void sperren() {
 	     born = RUECK;
 	     bornprio = 0;
 	     img = RUECK;
