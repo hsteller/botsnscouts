@@ -3,36 +3,45 @@ package de.botsnscouts.server;
 import de.botsnscouts.util.*;
 import de.botsnscouts.comm.*;
 
-public class ServerRoboterThread extends Thread
+public class ServerRoboterThread extends Thread implements Waitable
 {
-    Integer modus;
-    int m;             // Modus während der Auswertung einer Antwort
-    boolean fertig;
+    //Integer modus;
+    int mode;
+    //boolean fertig;
     
     private Server server;
     private ServerAntwort ans;
-    protected KommServerRoboter komm;
+    private KommServerRoboter komm;
     protected Roboter rob;
 
     private boolean ende;
     
     public ServerRoboterThread(Roboter r,Server s,KommServerRoboter k)
         {
+	    super(r.getName());
             rob=r;
             server=s;
-	    modus = new Integer(s.NIX);
+	    mode = s.NIX;
 	    komm=k;
         }
 
-    private void notifyServer(){
+    synchronized void setMode(int i){
+	mode=i;
+    }
+    
+  /*    private void notifyServer(){
 	d("notifyServer()");
 	fertig=true;
 	if (server.alleRoboterFertig(true))
 	    synchronized(server){
-		d(this+" server.notify() in modus "+modus);
+		d(this+" server.notify() in mode "+mode);
 		server.notify();
 	    }
-    }	
+	    }*/
+
+    private void notifyServer(){
+	server.notifyDone(this);
+    }
 
     public void run()
         {
@@ -41,9 +50,9 @@ public class ServerRoboterThread extends Thread
             while((!ende)&&(!isInterrupted())){
                 try{
                     ans=komm.warte();
-		    d("Got a "+ans.getTyp());
-                    synchronized(modus){
-                        int m=modus.intValue();
+                    synchronized(this){
+			d("Got a "+ans.getTyp());
+                        int m=mode;
                         switch(ans.typ){
                             case ServerAntwort.PROGRAMMIERUNG:
                                 if (m!=server.PROGRAMMIERUNG){
@@ -241,4 +250,26 @@ public class ServerRoboterThread extends Thread
         {
             Global.debug(this," for "+rob.getName()+": "+s);
         }
+
+    // Delegation methods to comm object
+
+    synchronized void deleteMe(String reason) throws KommException{
+	komm.entfernen(reason);
+    }
+    synchronized void startGame() throws KommException{
+	komm.spielstart();
+    }
+    synchronized void killed() throws KommException{
+	komm.zerstoert();
+    }
+    synchronized void makeYourMove() throws KommException{
+	komm.zugabgabe(rob.getKarten());
+    }
+    synchronized void reEntry() throws KommException{
+	komm.reaktivierung();
+    }
+    synchronized void registerRepair(int nr) throws KommException{
+	komm.regReparatur(nr);
+    }
 } // class
+

@@ -3,30 +3,32 @@ package de.botsnscouts.server;
 import de.botsnscouts.comm.*;
 import de.botsnscouts.util.*;
 
-class ServerAusgabeThread extends Thread
+class ServerAusgabeThread extends Thread implements Waitable
 {
-    Server server;
-    KommServerAusgabe komm;
+    private Server server;
+    private KommServerAusgabe komm;
     private boolean ende;
-    Integer modus;
-    boolean fertig;
-    float version;
+    private int mode;
+    //boolean fertig;
+    private float version;
+
+    synchronized void setMode(int i){
+	mode=i;
+    }
+
+    synchronized void setVersion(float v){
+	version=v;
+    }
 
     public ServerAusgabeThread(KommServerAusgabe ksa, Server s)
         {
             server=s;
             komm=ksa;
-            modus=new Integer(s.KEINEFRAGEN); // sicher ist sicher
+            mode=s.KEINEFRAGEN; // sicher ist sicher
         }
 
     private void notifyServer(){
-	fertig = true;
-	if (server.alleAusgabenFertig()){
-	    synchronized(server){
-		d("ServerAusgabenThread macht notify() bei Aenderungenfertig");
-		server.notify();
-	    }
-	}
+	server.notifyDone(this);
     }
 
     public void run()
@@ -36,8 +38,8 @@ class ServerAusgabeThread extends Thread
           outer: while((!ende)&&(!isInterrupted())){
               try{
                   ans=komm.warte();
-                  synchronized(modus){
-                      int m=modus.intValue();
+                  synchronized(this){
+                      int m=mode;
                       if (m==server.KEINEFRAGEN){ // dumm gelaufen...
 			  if (ans.typ!=ans.ABMELDUNG){
 			      d("Keine Fragen erlaubt. Ausgabe entstoepseln."+this);
@@ -132,10 +134,27 @@ class ServerAusgabeThread extends Thread
                   ende=true;
               }
           } //"Endlos"schleife
+	    d("Ende meiner run-Methode erreicht.");
         } // run()
 
     private void d(String s)
         {
             Global.debug(this,s);
         }
+
+    // comm delegation
+    synchronized void notifyChange(String[] s) throws KommException{
+	komm.aenderung(s);
+    }
+    synchronized void deleteMe(String reason) throws KommException{
+	komm.entfernen(reason);
+    }
+    synchronized void startGame() throws KommException{
+	komm.spielstart();
+    }
+    synchronized void endGame() throws java.io.IOException{
+	komm.in.close();
+	komm.out.close();
+    }
+
 }

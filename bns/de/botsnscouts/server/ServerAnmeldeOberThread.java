@@ -18,6 +18,7 @@ class ServerAnmeldeOberThread extends Thread
 
     public ServerAnmeldeOberThread(Server s)
     {
+        super("ServerAnmObThread");
 	server=s;
 	roboterAnmeldung=Boolean.TRUE;
 	anzSpieler=new Integer(0);

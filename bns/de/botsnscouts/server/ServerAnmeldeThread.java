@@ -10,7 +10,7 @@ import de.botsnscouts.comm.*;
  * modified for 2.0 by Dirk
  */
 
-public class ServerAnmeldeThread extends java.lang.Thread{
+public class ServerAnmeldeThread extends Thread{
 
     private Server server;
     private Socket socket;
@@ -23,6 +23,7 @@ public class ServerAnmeldeThread extends java.lang.Thread{
     private static final int AUSGABEV2=3;
 
     public ServerAnmeldeThread(Server se,Socket so,ServerAnmeldeOberThread saot){
+        super("ServerAnmeldeThread");
 	server=se;
 	socket=so;
 	oberThread=saot;
@@ -149,9 +150,9 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 	    ServerAusgabeThread neu = new ServerAusgabeThread(ksa, server);
 
 	    if (clienttype==AUSGABEV2)
-		neu.version=2;
+		neu.setVersion(2);
 	    else
-		neu.version=1;
+		neu.setVersion(1);
 
 	    synchronized (oberThread.namen){
 		if (oberThread.isLegalName(clientname)){
