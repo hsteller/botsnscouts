@@ -7,8 +7,8 @@
 
 	<center>
       <h1>Bots'n'Scouts Screenshots!</h1>
-	<h2>Fresh from V0.8pre, which is
-ready and recommended for download. </center>
+	</center>
+The screenshots are taken from version 0.8pre.<br>
       Click on an image to get an enlarged version.
       <p>
       <p>
