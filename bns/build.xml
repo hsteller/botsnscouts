@@ -1,0 +1,67 @@
+<!-- This is an ant build file. See: "http://jakarta.apache.org/ant"-->
+<project name="BotsNScouts" default="compile">
+
+  <!-- Global properties for this build -->
+  <property name="src" value="."/>
+  <property name="build" value="${basedir}/classes"/>
+  <property name="maindir" value="de/botsnscouts"/>
+  <property name="dist"  value="dist"/>
+  <property name="jars"  value="lib/log4j.jar:lib/sixlegs.jar"/>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <echo message="OS: ${os.name}"/>
+    <echo message="Basedir: ${basedir}"/>
+    <mkdir dir="${build}/${maindir}"/>
+    <exec executable="ln" os="Unix,Linux">
+	    <arg line="-s ${basedir}/${maindir}/sounds ${build}/${maindir}" />
+     </exec>
+    <exec executable="ln" os="Unix,Linux">
+	    <arg line="-s ${basedir}/${maindir}/images ${build}/${maindir}" />
+     </exec>
+    <exec executable="ln" os="Unix,Linux">
+	    <arg line="-s ${basedir}/${maindir}/conf ${build}/${maindir}" />
+     </exec>
+  </target>
+
+  <target name="compile" depends="init">
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${build}" 
+	   excludes="de/botsnscouts/old/**,de/botsnscouts/test/**"
+	   classpath="${jars}:${build}"
+	   />
+  </target>
+
+  <target name="run" depends="compile">
+     <java classname="de.botsnscouts.BotsNScouts"
+	   classpath="${jars}:${build}"
+	   />
+  </target>
+
+  <target name="dist" depends="compile">
+    <!-- To be changed for out needs. -->
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}/lib"/>
+
+    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+    <jar jarfile="${dist}/lib/MyProject-${DSTAMP}.jar" basedir="${build}"/>
+  </target>
+
+  <target name="clean">
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <!-- Delete the links first because delete does the wrong thing! -->
+    <exec executable="rm" os="Unix,Linux">
+	    <arg line="${build}/${maindir}/sounds" />
+     </exec>
+    <exec executable="rm" os="Unix,Linux">
+	    <arg line="${build}/${maindir}/images" />
+     </exec>
+    <exec executable="rm" os="Unix,Linux">
+	    <arg line="${build}/${maindir}/conf" />
+     </exec>
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>
