@@ -160,27 +160,29 @@ public class View extends JFrame {
         logFloatPane.setExpanded( false );
         this.getLayeredPane().add( logFloatPane, JLayeredPane.MODAL_LAYER );
 
-        final ChatLine cp = new ChatLine( ausgabeView, humanView.getHumanPlayer() );
-        cp.setSize( cp.getPreferredSize() );
-        cp.setLocation( p.x + 2, p.y + 2 );
-        cp.setVisible( false );
+        if (humanView!=null) {
+          final ChatLine cp = new ChatLine( ausgabeView, humanView.getHumanPlayer() );
+          cp.setSize( cp.getPreferredSize() );
+          cp.setLocation( p.x + 2, p.y + 2 );
+          cp.setVisible( false );
 
-        this.addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
-                if( e.getKeyChar() == KeyEvent.VK_ENTER ) {
-                    if( humanView == null ) return;
-                      cp.setVisible( true );
-                      cp.text.requestFocus();
-                      //cp.requestFocus();
-                }
+          this.addKeyListener(new KeyAdapter() {
+              public void keyTyped(KeyEvent e) {
+                  if( e.getKeyChar() == KeyEvent.VK_ENTER ) {
+                      if( humanView == null ) return;
+                        cp.setVisible( true );
+                        cp.text.requestFocus();
+                        //cp.requestFocus();
+                  }
 
-            }
-            public void keyPressed(KeyEvent e) {}
-            public void keyReleased(KeyEvent e) {}
-        });
-        this.getLayeredPane().add( cp, JLayeredPane.MODAL_LAYER );
-
+              }
+              public void keyPressed(KeyEvent e) {}
+              public void keyReleased(KeyEvent e) {}
+          });
+          this.getLayeredPane().add( cp, JLayeredPane.MODAL_LAYER );
+        }
 	this.validate();
+
     }
 
     public LogFloatPane logFloatPane;
