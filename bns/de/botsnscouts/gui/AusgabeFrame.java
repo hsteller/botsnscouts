@@ -739,7 +739,8 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 		this.setVisible(true);
 	    }
 	}
-	public void finalize(){
+	public void finalize() throws Throwable{
+	    super.finalize();
 	    this.dispose();
 	}
 

@@ -1185,7 +1185,8 @@ public class SACanvas extends JComponent {
 	paintScout( dbg );
     }
 
-    protected void finalize() {
+    protected void finalize() throws Throwable {
+      	super.finalize();
 	g_off.dispose();
     }
 

@@ -18,8 +18,8 @@ import javax.swing.plaf.metal.*;
  */
 public class HumanPlayer extends Thread {
 
-    protected static int MODE_PROGRAM = 0;
-    protected static int MODE_OTHER = 1;
+    protected final static int MODE_PROGRAM = 0;
+    protected final static int MODE_OTHER = 1;
 
     protected int mode=MODE_OTHER;
     private HumanView humanView;
