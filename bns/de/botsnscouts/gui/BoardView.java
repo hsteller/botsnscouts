@@ -683,7 +683,7 @@ public class BoardView extends JComponent {
         
         synchronized (this) {
             try {
-                wait(delay);  
+                wait(delay/2);  
             } catch (InterruptedException ie) {
                 CAT.error("BoardView.paint: wait interrupted");
             }
@@ -701,7 +701,13 @@ public class BoardView extends JComponent {
                 } catch (InterruptedException ie) {
                     CAT.error("BoardView.paint: wait interrupted");
                 }
+                
                 //   }
+            }
+            try {
+                wait(delay/2);  
+            } catch (InterruptedException ie) {
+                CAT.error("BoardView.paint: wait interrupted");
             }
         }
 
@@ -941,18 +947,15 @@ public class BoardView extends JComponent {
             Graphics2D g2 = (Graphics2D) getGraphics();
             g2.scale(dScale, dScale);
             paintActiveBordLaser(g2, c, tmp_laenge);
-/*  synchronized(this){
-		try {
-		    wait (1);
-		}
-		catch (InterruptedException ie){
-		    System.err.println ("BoardView.doBordLaser: wait interrupted");
-		}
 
-		}*/
         }
         // activeBordLasers=false; // now paint the non-animated
         repaint();              // lasers again
+        try {
+            wait(delay);  
+        } catch (InterruptedException ie) {
+            CAT.error("BoardView.doBordLaser: wait interrupted");
+        }
     }
 
     private boolean turner(int x, int y, int r) {
@@ -1280,7 +1283,9 @@ public class BoardView extends JComponent {
      */
     private void paintWall(Graphics g, int xpos, int ypos, int actx, int acty) {
         // paint wall in the north, if any
-        if (sf.nw(xpos, ypos).isExisting()) {
+       // Graphics2D g2 = (Graphics2D)g;
+        
+    	if (sf.nw(xpos, ypos).isExisting()) {
             // is there a boardlaser to paint at this wall?
             if (sf.nw(xpos, ypos).getSouthDeviceType() == Wall.TYPE_LASER) {
                 g.drawImage(diverseCrop[15], actx, acty + 5, 64, 64, this);
@@ -1523,6 +1528,7 @@ public class BoardView extends JComponent {
         if ((floor.isBelt()) && (floor.getInfo() > 0)) // restore possible Crusher
             paintCrusher(g2d, floor, actx, acty);
         // TODO: only repaint the stuff on the field we want to paint
+        g2d.setComposite(AC_SRC_OVER);
         paintWall(g2d, xpos, ypos, actx, acty);
         paintFlaggen(g2d);
     }
