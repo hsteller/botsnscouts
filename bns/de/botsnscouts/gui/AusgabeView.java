@@ -21,6 +21,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private SACanvas  spielFeld;
     private Ausgabe   ausgabe;
     private Hashtable robotStatus = new Hashtable(8);
+    private Hashtable robotCardStatus = new Hashtable(8);
     private StatusLog statusLog = new StatusLog();
 
 
@@ -35,6 +36,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	ausgabe = aus;
 	spielFeld=sa;
 	JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	JPanel robotsCardContainer = new JPanel(new GridLayout(8,1));
 
 	setLayout(new BorderLayout());
 
@@ -47,9 +49,14 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 		});
 	    robotsStatusContainer.add(r);
 	    robotStatus.put(robots[i].getName(),r);
+
+	    RobotCard rc= new RobotCard(robots[i]);
+	    robotsCardContainer.add(rc);
+	    robotCardStatus.put(robots[i].getName(),rc);
 	}
 	add(robotsStatusContainer,BorderLayout.NORTH);
-	
+//	add(robotsCardContainer,BorderLayout.EAST);
+
 
 	// create status log
 	add(statusLog,BorderLayout.SOUTH);
@@ -93,6 +100,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	spielFeld.ersetzeRobos(r);
 	for (int i = 0; i < r.length; i++) {
 	    ((RobotStatus) robotStatus.get(r[i].getName())).updateRobot(r[i]);
+	    ((RobotCard) robotCardStatus.get(r[i].getName())).updateRobot(r[i]);
+	    // RobCards aktualisieren TODO
 	}
     }
 
