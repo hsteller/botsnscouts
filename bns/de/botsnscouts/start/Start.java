@@ -173,7 +173,7 @@ public class Start extends JFrame implements WindowListener{
 		    anzKS=Integer.parseInt(argv[3]);
 		    for (int i=0;i<anzKS;i++){
 			fassade.kuenstlicheSpielerStarten(100);
-		    Global.debug("Künstlichen Spieler gestartet");
+		    Global.debug("Knstlichen Spieler gestartet");
 		    }
 		}catch(NumberFormatException e){
 		}
