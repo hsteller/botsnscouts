@@ -753,7 +753,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                     alleN[i++] = ((ServerRoboterThread) e.next()).rob.getName();
             }
             CAT.debug("716 release rthreads");
-            //notifyViews(alleN); // HS: HIERHIERHIER initiale Ausrichtungen
+            notifyViews(alleN); // HS: HIERHIERHIER initiale Ausrichtungen
             sendMsg(MessageID.INITIAL_FACINGS, alleN);
             
             // Loop for all turns.
