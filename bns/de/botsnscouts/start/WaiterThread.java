@@ -9,6 +9,8 @@ public class WaiterThread extends Thread{
     boolean meldung=true;
     boolean beendemich=false;
 
+    boolean waitServer=false;
+
     public WaiterThread(Start par){
 	parent=par;
     }
@@ -84,6 +86,11 @@ public class WaiterThread extends Thread{
     public void reset(){
 	ksanz=0;
 	ks=new Thread[100];
+	waitServer=false;
+    }
+
+    public void setServer(){
+	waitServer=true;
     }
 
     public void beende(){
