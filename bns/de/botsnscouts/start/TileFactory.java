@@ -128,16 +128,3 @@ public class TileFactory extends Thread{
 }
 
 
-class RRAFilter implements FilenameFilter{
-
-    public RRAFilter(){}
-
-    public boolean accept(File dir, String name){
-	try{
-	    // endsWith(".rra") ???
-	    boolean isRRA=name.toLowerCase().endsWith(".rra");
-	    return isRRA;
-	} catch(Throwable t){return false;}
-    }
-
-}
