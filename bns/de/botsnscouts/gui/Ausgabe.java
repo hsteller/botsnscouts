@@ -95,29 +95,35 @@ public class Ausgabe extends Thread {
 		for (int i=0;i<tmpstr.length;i++)
 		    tmpstr[i]=kommAntwort.namen[i+1];
 
-		if (!(kommAntwort.namen[0].substring(0,5).equals("mAusw"))) {
-		    d("kommAntowrtnamen[0] ist: "+kommAntwort.namen[0]+ "tmpstr ist: "+tmpstr[0]);
-		    showActionMessage(Message.say("MSG",kommAntwort.namen[0],tmpstr));
+                String msgId = kommAntwort.namen[0];
+		if (!(msgId.substring(0,5).equals("mAusw"))) {
+                    if (CAT.isDebugEnabled())
+		      CAT.debug("kommAntowrtnamen[0] ist: "+msgId+ "tmpstr ist: "+tmpstr[0]);
+		    showActionMessage(Message.say("MSG",msgId,tmpstr));
 		}
 
-		if (kommAntwort.namen[0].equals("mRobLaser")){
+		if (msgId.equals("mRobLaser")){ // robots shooting
 		    Roboter r1=null;
 		    Roboter r2=null;
 		    try {
-			r1=kommClient.getRobStatus(kommAntwort.namen[1]);// schiessender Roboter
+			r1=kommClient.getRobStatus(kommAntwort.namen[1]);// firing robot
 		    }
 		    catch (KommException k) {
 			k.printStackTrace();
 		    }
 		    try {
-			r2=kommClient.getRobStatus(kommAntwort.namen[2]);// getroffener Roboter
+			r2=kommClient.getRobStatus(kommAntwort.namen[2]);// robot hit
 		    }
 		    catch (KommException k) {
 			k.printStackTrace();
 		    }
 		    ausgabeView.showRobLaser(r1, r2);
 		}
-		else if (kommAntwort.namen[0].equals("mBoardLaser")){
+                else if (msgId.equals("mGrubenopfer")) {// robot fell into a pit
+                    SoundMan.playPitFallSound();
+                }
+
+		else if (msgId.equals("mBoardLaser")){ //boardlaser shooting
 		    Roboter r1=null;
 		    Ort r1Pos = null;
 		    // get damaged Roboter
@@ -139,29 +145,34 @@ public class Ausgabe extends Thread {
 			facing     = Integer.parseInt(kommAntwort.namen[5]);
        		    }
 		    catch (NumberFormatException nfe) {
-			System.err.println("Ausgabe: BoardLaser: NumberFormatException:");
-			nfe.printStackTrace();
+			CAT.error("Ausgabe: BoardLaser: NumberFormatException:");
+			CAT.error(nfe);
+                        nfe.printStackTrace();
 		    }
 		    if ((laserPos!=null)&&(facing>=0)&&(r1Pos!=null)&&(strength>=0))
 			ausgabeView.showBoardLaser(laserPos, facing, strength, r1Pos);
 		    else {
-			System.err.println("Ausgabe: unable to calculate Laseranimation: ");
-			System.err.println("laserPos: "+laserPos);
-			System.err.println("facing: "+facing);
-			System.err.println("r1Pos: "+r1Pos);
-			System.err.println("strength: "+strength);
+                        if (CAT.isDebugEnabled()){
+			  CAT.error("Ausgabe: unable to calculate Laseranimation: ");
+			  CAT.debug("laserPos: "+laserPos);
+			  CAT.debug("facing: "+facing);
+			  CAT.debug("r1Pos: "+r1Pos);
+			  CAT.debug("strength: "+strength);
+                        }
 		    }
 		}
 
 		try{
 		    kommClient.acknowledgeMsg();
 		} catch (KommFutschException ke) {
-		    System.err.println("ke2: "+ke.getMessage());
-		    return;
+		    CAT.error("ke2: "+ke.getMessage());
+		    CAT.error(ke);
+                    return;
 		}
 		catch (KommException kE) {
-		    System.err.println(kE.getMessage());
-		    return;
+		    CAT.error(kE.getMessage());
+		    CAT.error(kE);
+                    return;
 		}
 
 		break;
