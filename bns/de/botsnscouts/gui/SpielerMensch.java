@@ -150,7 +150,7 @@ public class SpielerMensch extends Thread {
 	f.statusLine.schlaf.add(klugscheisserLatte);
 	f.statusLine.schlaf.add(new ScoutVertiefung(this));
 	f.statusLine.add(f.statusLine.schlaf);
-	f.setVisible(true);
+	// f.setVisible(true);
     }
 
     // -----------  Klassenmethoden  -----------
