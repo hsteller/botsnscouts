@@ -35,9 +35,16 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     protected static final int MAX_ZOOM = 150;
     protected static final int ZOOM_STEP = 10;
 
-    // settings for options-menu
-        // sound-menu
-        private boolean soundOn = false;
+    // sound-menu
+    private boolean soundOn = false;
+
+    // speed-menu
+    protected final int SLOW = 2000;
+    protected final int MEDIUM = 200;
+    protected final int FAST = 0;
+
+    protected int speed=MEDIUM;
+
 
 
 
@@ -241,6 +248,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
        OptionsMenu () {
         super(Message.say("AusgabeFrame","mOptions"));
         add(new ZoomMenu());
+        add(new SpeedMenu());
         add(new SoundMenu());
        }
     }
@@ -280,19 +288,61 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
   private class SoundMenu extends JMenu {
      SoundMenu () {
-        super ((Message.say("AusgabeFrame","mSound")));
-	JCheckBoxMenuItem soundBox = new JCheckBoxMenuItem(Message.say("AusgabeFrame","mSoundOn"), soundOn);
+        super ((Message.say("AusgabeView","mSound")));
+	JCheckBoxMenuItem soundBox = new JCheckBoxMenuItem(Message.say("AusgabeView","mSoundOn"), soundOn);
 	soundBox.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e){
 		    soundOn = !soundOn;
 		    spielFeld.setSoundActive(soundOn);
+                    String status = Message.say("AusgabeView","mSoundChange")+" ";
+                    if (soundOn)
+                      status = Message.say("AusgabeView","mSoundOn");
+                    else
+                      status = Message.say("AusgabeView","mSoundOff");
 		}
 	    });
 	add(soundBox);
      }
   }
 
+  private class SpeedMenu extends JMenu implements ActionListener {
+    JRadioButtonMenuItem lSpeed;
+    JRadioButtonMenuItem mSpeed;
+    JRadioButtonMenuItem hSpeed;
+      SpeedMenu () {
+        super(Message.say("AusgabeFrame","mSpeed"));
+	ButtonGroup speedGroup = new ButtonGroup();
+	lSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mSlow"),false);
+	mSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mMiddle"),true);
+        hSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mFast"),false);
+        lSpeed.addActionListener(this);
+	mSpeed.addActionListener(this);
+        hSpeed.addActionListener(this);
+        speedGroup.add(lSpeed);
+        speedGroup.add(mSpeed);
+        speedGroup.add(hSpeed);
+        this.add(lSpeed);
+        this.add(mSpeed);
+	this.add(hSpeed);
+      }
 
+      public void actionPerformed(ActionEvent e) {
+	    if (e.getSource() == lSpeed) {
+		speed=SLOW;
+		showActionMessage(Message.say("AusgabeFrame","gAufLang"));
+	    }
+	    else if (e.getSource() == mSpeed) {
+		speed=MEDIUM;
+                showActionMessage(Message.say("AusgabeFrame","gAufMitt"));
+            }
+	    else {
+		speed=FAST;
+	        showActionMessage(Message.say("AusgabeFrame","gAufUn"));
+	    }
+	}
+
+
+   }
    private class HelpMenu extends JMenu {
       HelpMenu () {
         super (Message.say("AusgabeFrame","mHelpMenuName"));

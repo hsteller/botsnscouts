@@ -24,25 +24,8 @@ public class View extends JFrame {
     AusgabeView ausgabeView;
     HumanView humanView;
 
-
-    protected final int LANGSAM = 2000;
-    protected final int MITTEL = 200;
-    protected final int UNGEBREMST = 0;
     protected final boolean NURAUSGABE = true;
     protected final boolean MENSCHAUSGABE = false;
-
-
-
-    private boolean soundOn=false;
-
-
-    JMenuItem lSpeed;
-    JMenuItem mSpeed;
-    JMenuItem hSpeed;
-    int speed = MITTEL;
-
-
-
 
     public View() {
 	setTitle(Message.say("AusgabeFrame","gameName"));
