@@ -169,13 +169,14 @@ private int x=800,y=600,x1=500,y1=100;
     
     public static void main(String[] argv){
 	String lang="english";
+	boolean deb=Boolean.getBoolean("debug");
 	if (argv.length>=1){
 	    if (argv[0].equals("english")||argv[0].equals("deutsch")){
 		lang=argv[0];
 	    }
 	}
 	Message.setLanguage(lang);
-	Global.verbose=false;
+	Global.verbose=deb;
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
 	new KachelEditor();
     }
@@ -255,14 +256,13 @@ class LeftPanel extends SACanvas implements MouseListener{
     public void mouseClicked(MouseEvent e){
 	// Enno: nur linke maustaste bearbeiten  
 	int mods = e.getModifiers();
-	if( (mods & MouseEvent.BUTTON1_MASK) == 0 ) 
-	    return;
-	
+ 	if( (mods & MouseEvent.BUTTON1_MASK) == 0 ) 
+ 	    return;
 	par.spfX=e.getX()/64;
 	par.spfY=e.getY()/64;
 	int vWInd=(e.getX()+32)/64;
 	int hWInd=(e.getY()+32)/64;
-	//System.out.println(par.spfX+","+par.spfY);
+	Global.debug(this,"(x,y):typ=="+par.spfX+","+par.spfY+":"+par.indx);
 	if(par.indx==54){//pusher nach west
 	    new PhaseDialog(par,Message.say("KachelEditor","mPusher"),true);
 	    par.spf.vWand[par.spfX+1][11-par.spfY].da=true;
@@ -343,6 +343,7 @@ class LeftPanel extends SACanvas implements MouseListener{
 	else{ //fliessband etc.
 	    par.spf.boden[par.spfX+1][12-par.spfY].typ =par.elemTyp[par.indx];
 	    par.spf.boden[par.spfX+1][12-par.spfY].spez=par.elemSpez[par.indx];
+	    Global.debug(this,"hab' ich");
 	}
 	repaint();
     }
@@ -539,7 +540,6 @@ class DPanel extends JPanel implements MouseListener,ActionListener{
 		   }*/
 	    } 
 
-	    Global.debug(this,"Laden geclicked, starte LadenDialog");
 	    //new LadenDialog(par,Message.say("KachelEditor","mKachelSave"),true);
 	    
 	}
