@@ -1,17 +1,21 @@
 package de.botsnscouts.board;
 
 import java.awt.*; 
-import java.awt.image.*; 
 import java.awt.event.*;
+import java.awt.image.*; 
 import java.io.*;
 import java.net.*;
+import java.util.Locale;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.metal.*;
-import de.botsnscouts.util.*;
-import de.botsnscouts.gui.*;
+
+import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.board.*;
+import de.botsnscouts.gui.*;
+import de.botsnscouts.util.*;
+import org.apache.log4j.*;
 
 public class KachelEditor extends JFrame implements WindowListener, ActionListener,MouseListener{
     // enno:
@@ -21,6 +25,8 @@ public class KachelEditor extends JFrame implements WindowListener, ActionListen
     //    sind irgendwann mal fürs Scrollen zuständig - s. SACanvas)
     //    das Scrollen funkt. im Editor und der Vorschau bereits, im Spiel noch nicht ..
     //    warum, weiss ich noch nicht
+
+    public static final Category CAT = Category.getInstance( KachelEditor.class );
 
 protected LeftPanel sac = null;
 protected DPanel dp=null;
@@ -91,9 +97,6 @@ private int x=800,y=600,x1=500,y1=100;
 	setSize(dim.width,dim.height-70);
 	setLocation(0,25);
 	setVisible(true);
-
-	show();
-
     }//ende konstruktor
 
     private boolean loadImg(){
@@ -167,18 +170,39 @@ private int x=800,y=600,x1=500,y1=100;
     public void windowDeiconified(WindowEvent e) {}
     public void windowActivated(WindowEvent e)   {}
     
-    public static void main(String[] argv){
-	String lang="english";
-	boolean deb=Boolean.getBoolean("debug");
-	if (argv.length>=1){
-	    if (argv[0].equals("english")||argv[0].equals("deutsch")){
-		lang=argv[0];
+    public static void main(String[] argv) throws Throwable{
+	try {
+	    PropertyConfigurator.configure(BotsNScouts.class.getResource("conf/log4j.conf"));
+	    
+	    Locale myLocale=null;
+	    String loc=Conf.getProperty("language.isSet");
+	    if (loc != null){
+		myLocale=new Locale(Conf.getProperty("language.lang"),Conf.getProperty("language.country"));
+	    }else{
+		Locale[] list=Message.getLocales();
+		String[] locals=new String[list.length];
+		for (int i=0;i<locals.length;i++){
+		    locals[i]=list[i].getDisplayLanguage();
+		}
+		int sel=JOptionPane.showOptionDialog(null,"Please select your Language","Language selection",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,locals,locals[0]);
+		if (sel==JOptionPane.CLOSED_OPTION){
+		    myLocale=new Locale("en","US");
+		}else{
+		    myLocale=list[sel];
+		    Conf.setProperty("language.isSet","yes");
+		    Conf.setProperty("language.lang",myLocale.getLanguage());
+		    Conf.setProperty("language.country",myLocale.getCountry());
+		    Conf.saveProperties();
+		}
 	    }
-	}
-	Message.setLanguage(lang);
-	Global.verbose=deb;
-	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
-	new KachelEditor();
+	    Message.setLanguage(myLocale);
+
+	    MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
+	    new KachelEditor();
+	} catch( Throwable t ) {
+	    CAT.fatal("Exception:", t);
+	    throw t;
+	}	    
     }
 
 }//end class KachelEditor
