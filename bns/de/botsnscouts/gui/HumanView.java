@@ -164,6 +164,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
     public void showMessageToPlayer(String s) {
 	userInfo.setInfo(s);
 	panelSwitcher.show(switcherPanel,"userInfo");
+	this.requestFocus();
     }
 
     /**
@@ -177,6 +178,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	    CAT.debug("All Registes locked!");
 	    cards.activateButton();
 	}
+	this.requestFocus();
     }
 
 
@@ -185,6 +187,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
      */
     public void showPowerDown() {
 	showMessageToPlayer(Message.say("SpielerMensch","istPowerDown"));
+	this.requestFocus();
     }
 
 
@@ -193,6 +196,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
      */
     public void showGetDirection() {
 	panelSwitcher.show(switcherPanel,"getDirection");
+	this.requestFocus();
     }
 
     /**
@@ -200,6 +204,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
      */
     public void showRePowerDown() {
 	panelSwitcher.show(switcherPanel,"againPowerDown");
+	this.requestFocus();
     }
 
     /**
@@ -210,6 +215,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	registers.updateRegisters(robRegs);
 	repairRegisters.setChoises(registers.getRegisterViewArray(), repairNumber);
 	panelSwitcher.show(switcherPanel,"repairRegisters");
+	this.requestFocus();
     }
 
 
