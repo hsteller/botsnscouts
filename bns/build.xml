@@ -93,6 +93,58 @@
          <include name="**/*.sh" />
        </fileset>
     </chmod>
+    <antcall target="zipOnLin" />
+    <available property="noNeedToZip" file="${dist}/botsnscouts-${DSTAMP}.zip" />
+    <antcall target="zip_builtin" />
+  </target>
+
+  <target name="zipOnLin" depends="init,dist-bin,dist-src">
+  <!-- Zips up the stuff using /usr/bin/zip, which preserves the
+       executable bits and still yields windows-usable files     -->
+     <exec executable="ln" os="Unix,Linux" >
+	<arg line="-s binary ${dist}/botsnscouts-${bns.ver}" />
+     </exec>
+     <exec executable="zip" os="Unix,Linux" dir="${dist}">
+	<arg line="-q -r botsnscouts-${DSTAMP}.zip botsnscouts-${bns.ver}" />
+     </exec>
+     <exec executable="rm" os="Unix,Linux" >
+	<arg line="-rf ${dist}/botsnscouts-${bns.ver}" />
+     </exec>
+
+     <exec executable="ln" os="Unix,Linux" >
+	<arg line="-s source ${dist}/botsnscouts-${bns.ver}" />
+     </exec>
+     <exec executable="zip" os="Unix,Linux" dir="${dist}">
+	<arg line="-q -r botsnscouts-${DSTAMP}-src.zip botsnscouts-${bns.ver}" />
+     </exec>
+     <exec executable="cp" os="Unix,Linux" >
+	<arg line="-r ${src}/de ${dist}/source/" />
+     </exec>
+     <exec executable="zip" os="Unix,Linux" dir="${dist}">
+	<arg line="-q -r botsnscouts-${DSTAMP}-srconly.zip botsnscouts-${bns.ver} -x botsnscouts-${bns.ver}/classes/*" />
+     </exec>
+     <exec executable="rm" os="Unix,Linux" >
+	<arg line="-rf ${dist}/botsnscouts-${bns.ver}" />
+     </exec>
+
+     <exec executable="mkdir" os="Unix,Linux" >
+	<arg line="${dist}/botsnscouts-${bns.ver}" />
+     </exec>
+     <exec executable="ln" os="Unix,Linux" >
+	<arg line="-s ${doc} ${dist}/botsnscouts-${bns.ver}/javadoc" />
+     </exec>
+     <exec executable="zip" os="Unix,Linux" dir="${dist}">
+	<arg line="-q -r botsnscouts-${DSTAMP}-src.zip botsnscouts-${bns.ver}" />
+     </exec>
+     <exec executable="rm" os="Unix,Linux" >
+	<arg line="-rf ${dist}/botsnscouts-${bns.ver}" />
+     </exec>
+  </target>
+
+  <target name="zip_builtin" unless="noNeedToZip">
+    <echo message="Warning! I can build zipfiles on this system, however,"/>
+    <echo message="they will lose the executable bits and thus will be"/>
+    <echo message="very hard to use on UNIX-Systems."/>
     <zip zipfile="${dist}/botsnscouts-${DSTAMP}.zip">
        <zipfileset dir="${dist}/binary" prefix="botsnscouts-${bns.ver}" />
     </zip>
