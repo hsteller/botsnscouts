@@ -80,9 +80,17 @@ public class SACanvas extends JComponent {
     // koennte wegoptimiert werden
     private LaserDef actuallaser;
 
-    private AudioClip [] mLaserWav = new AudioClip[2];
-    public boolean soundActive;
+    private AudioClip [] mLaserWav;
+    /** YOU MUST NOT USE THIS VARIABLE DIRECTLY.
+	use isSoundActive() instead.
+    */
+    private boolean soundActive;
+    
+    private boolean soundsLoaded=false;
     private int laserWavCount;
+    private static final String SOUND_DIR="sounds";
+    private static SoundFileFilter soundFilter = new SoundFileFilter();
+ 
 
     private Image dbi;
     private Image[] cbeltCrop,ebeltCrop,diverseCrop,robosCrop,scoutCrop;//,robosCrop2;
@@ -198,8 +206,52 @@ public class SACanvas extends JComponent {
 
 
 
+    private void loadSounds() {
+	if (soundsLoaded)
+	    return;
+	Thread t = new Thread () {
+		public void run() {
+		    Global.debug("Initializing sounds..");
+		    File f = new File (SOUND_DIR);
+		    if (f!=null && f.exists() && f.isDirectory()){
+			String [] list = f.list(soundFilter);
+			URL u = null;
+			AudioClip a = null;
+			Vector v = new Vector();
+			String s = null;
+			for (int i=0;i<list.length;i++){
+			    s = list [i];
+			    Global.debug(this, "Trying to load sound: "+s);
+			    u = BotsNScouts.class.getResource(s);
+			    a = Applet.newAudioClip(u);
+			    if (a!=null)
+				v.add(a);
+			}
+			
+			int l = v.size();
+			mLaserWav = new AudioClip [l];
+			for (int i=0;i<l;i++)
+			    mLaserWav[i] = (AudioClip) v.elementAt(i);
+			soundsLoaded=true;
+			Global.debug("Sounds loaded!");
+		    }
+		    else {
+			System.err.println ("Error!: Unable to load sounds from "+SOUND_DIR);
+		    }
+		}
+	    };
+	t.start();
+    }
+    
+    public boolean isSoundActive() {
+	return soundsLoaded && soundActive;
+    }
+    
+    public void setSoundActive(boolean on) {
+	soundActive = on;
+    }
+
     private void init(SpielfeldSim sf_neu, Color [] robColors) {
-	soundActive=Boolean.getBoolean("sound");
 	//robocolor2=robColors;
 	//	drawRobLaser=false;
 	//drawBordLaser=false;
@@ -208,16 +260,7 @@ public class SACanvas extends JComponent {
 	sf=sf_neu;
 	//x=(sf.boden.length-2)*64;
 	//y=(sf.boden[0].length-2)*64;
-	if (soundActive) {
-	    laserWavCount=0;
-	    String s ="sounds/laserhit.wav";
-	    URL u = BotsNScouts.class.getResource(s);
-	    mLaserWav [0] = Applet.newAudioClip(u);
-	    s="sounds/laser2.wav";
-	    u = BotsNScouts.class.getResource(s);
-	    mLaserWav [1] = Applet.newAudioClip(u);
-
-	}
+	loadSounds();
 	setDoubleBuffered( true );
 	setScale( dScale ); // does setSize()
 	//setSize(x,y);
@@ -346,6 +389,7 @@ public class SACanvas extends JComponent {
     /////////////////////////////////////////////////////////////////////
 
 
+
     /**
        @param sourceRob Die Position des schiessenden Roboters
        @param targetRob Die Positon des getroffenen Roboters
@@ -359,7 +403,7 @@ public class SACanvas extends JComponent {
 	laenge*=64;
 
 	Color c = getRobColor(sourceRob.getName());
-	if (soundActive) {
+	if (isSoundActive()) {
 	    mLaserWav[laserWavCount%(mLaserWav.length)].play();
 	    synchronized(this){
 		try {
@@ -387,7 +431,7 @@ public class SACanvas extends JComponent {
 	     }
 	}
 	// drawRobLaser=false;
-	if (soundActive) {
+	if (isSoundActive()) {
 	    synchronized(this){
 		try {
 		    wait (200);
