@@ -99,7 +99,6 @@ public class SoundMan {
     private static boolean soundsEnabled;
 
   static {
-    CAT.setPriority(Priority.DEBUG);
     String tmp=Conf.getProperty("sound.active");
     if (tmp==null)
 	soundsEnabled=true;
