@@ -171,18 +171,10 @@ public class Start extends JFrame implements WindowListener{
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
 
 	//language conf
-	Properties locProp=new Properties();
 	Locale myLocale=null;
-	try{
-	    FileInputStream istream=new FileInputStream("language.conf");
-	    locProp.load(istream);
-	}catch(FileNotFoundException e){
-	    locProp.setProperty("isSet","no");
-	}catch(IOException e){
-	    locProp.setProperty("isSet","no");
-	}
-	if (locProp.getProperty("isSet").equals("yes")){
-	    myLocale=new Locale(locProp.getProperty("language"),locProp.getProperty("country"));
+	String loc=Conf.getProperty("language.isSet");
+	if (loc != null){
+	    myLocale=new Locale(Conf.getProperty("language.lang"),Conf.getProperty("language.country"));
 	}else{
 	    Locale[] list=Message.getLocales();
 	    String[] locals=new String[list.length];
@@ -194,16 +186,10 @@ public class Start extends JFrame implements WindowListener{
 		myLocale=new Locale("en","US");
 	    }else{
 		myLocale=list[sel];
-		locProp.setProperty("isSet","yes");
-		locProp.setProperty("language",myLocale.getLanguage());
-		locProp.setProperty("country",myLocale.getCountry());
-		try{
-		    File file=new File("language.conf");
-		    OutputStream ostream=new FileOutputStream(file);
-		    locProp.store(ostream,null);
-		}catch(IOException e){
-		    System.err.println(e);
-		}
+		Conf.setProperty("language.isSet","yes");
+		Conf.setProperty("language.lang",myLocale.getLanguage());
+		Conf.setProperty("language.country",myLocale.getCountry());
+		Conf.saveProperties();
 	    }
 	}
 

@@ -30,12 +30,9 @@ public class Message{
 	    language="en";
 	    country="US";
 	}
-	Locale myLocale=new Locale(language,country);
-	messages=ResourceBundle.getBundle("de/botsnscouts/conf/MessagesBundle",myLocale);
-	
-	formatter = new MessageFormat("");
-	formatter.setLocale(myLocale);
-    } // Ende setLanguage
+	setLanguage(new Locale(language,country));
+    }
+
     /**
      * Sprache mit setLanguage waehlen
      */
@@ -44,19 +41,14 @@ public class Message{
 	messages=ResourceBundle.getBundle("de/botsnscouts/conf/MessagesBundle",myLocale);
 	formatter = new MessageFormat("");
 	formatter.setLocale(myLocale);
-    } // Ende setLanguage
+    } 
     
-    //gibt alle vorhandene Localisierungen
     public static Locale[] getLocales() {
 	Properties locProp=new Properties();
 	Locale[] list=null;
 	try{
-	    FileInputStream istream=new FileInputStream("de/botsnscouts/conf/locales");
+	    InputStream istream = de.botsnscouts.BotsNScouts.class.getResourceAsStream("conf/locales");
 	    locProp.load(istream);
-	}catch(FileNotFoundException e){
-	    list = new Locale[1];
-	    list[0]=new Locale("en","US");
-	    return list;
 	}catch(IOException e){
 	    list = new Locale[1];
 	    list[0]=new Locale("en","US");
