@@ -116,6 +116,10 @@ public class Floor implements FloorConstants {
         return spec;
     }
 
+    public int getBeltSpeed() {
+        return isExpressBelt()?2:1;
+    }
+
     public boolean isPit() {
         return type == FL_PIT;
     }

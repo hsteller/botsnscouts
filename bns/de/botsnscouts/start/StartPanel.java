@@ -211,7 +211,8 @@ public class StartPanel extends JPanel{
 	gc.insets = insets;
 	gc.gridx = GridBagConstraints.RELATIVE;
 	gc.gridy++;
-	gc.gridwidth = 1; gc.gridheight = 1;
+	gc.gridwidth = 1;
+        gc.gridheight = 1;
 	gc.fill =  GridBagConstraints.NONE;
 	gc.anchor = GridBagConstraints.WEST;
 	panel.add( lb, gc );
@@ -227,25 +228,32 @@ public class StartPanel extends JPanel{
 	gc.fill =  GridBagConstraints.BOTH;
 	panel.add(intel,gc);
 
-	// Label schlau
-	gc.anchor = GridBagConstraints.EAST;
+        gc.anchor = GridBagConstraints.EAST;
 	lb = new TJLabel(Message.say("Start", "mDumm"), JLabel.RIGHT);
 	gc.fill =  GridBagConstraints.HORIZONTAL;
 	panel.add( lb, gc );
+
+        final JCheckBox beltAware = new JCheckBox(Message.say("Start","beltAware"));
+        beltAware.setOpaque(false);
+        beltAware.setToolTipText(Message.say("Start","beltTooltip"));
+        gc.gridy++;
+        gc.gridx=0;
+        gc.gridwidth=1;
+        gc.anchor = GridBagConstraints.WEST;
+        panel.add(beltAware, gc);
 
         JButton startAB=new TransparentButton(Message.say("Start","mKSStarten"));
 	startAB.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
                     CAT.debug("intel ist jetzt "+intel.getValue());
-		    parent.addKS(parent.fassade.kuenstlicheSpielerStarten(intel.getValue()));
+		    parent.addKS(parent.fassade.kuenstlicheSpielerStarten(intel.getValue(),beltAware.getModel().isSelected()));
 		}});
 
-	gc.gridy++;
-	gc.gridx = 0;
+	gc.gridx = 4;
 	gc.gridwidth = 1;
-	gc.anchor = GridBagConstraints.CENTER;
+	gc.anchor = GridBagConstraints.EAST;
 	gc.fill =  GridBagConstraints.CENTER;
-	gc.insets = new Insets(0,0,0,0);
+	gc.insets = noInsets;
 	panel.add(startAB, gc);
 	panel.setBorder( new CompoundBorder( new EtchedBorder(8),
 					     new EmptyBorder(10, 10, 10, 10)) );

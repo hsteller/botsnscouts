@@ -61,10 +61,13 @@ public class Launcher{
     }
 
     // launch autobots
-    public Thread  kuenstlicheSpielerStarten(String ip, int port, boolean local, int iq, KommSpPr com){
+    public Thread  kuenstlicheSpielerStarten(String ip, int port, boolean local, int iq, KommSpPr com) {
+        return kuenstlicheSpielerStarten(ip, port, local, iq, false, com);
+    }
+    public Thread  kuenstlicheSpielerStarten(String ip, int port, boolean local, int iq, boolean beltAware, KommSpPr com){
 	if (local){
 	    Thread ks;
-	    ks = new AutoBot(ip,port,iq);
+	    ks = new AutoBot(ip,port,iq, beltAware);
 	    if(ks!=null){
 		ks.start();
 		ks.setPriority(java.lang.Thread.MIN_PRIORITY);

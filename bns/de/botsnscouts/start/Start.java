@@ -341,7 +341,7 @@ public class Start extends JFrame implements WindowListener{
 		try{
 		    anzKS=Integer.parseInt(argv[3]);
 		    for (int i=0;i<anzKS;i++){
-			fassade.kuenstlicheSpielerStarten(100);
+			fassade.kuenstlicheSpielerStarten(40, true);
 		    CAT.debug("Künstlichen Spieler gestartet");
 		    }
 		}catch(NumberFormatException e){

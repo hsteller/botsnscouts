@@ -316,8 +316,8 @@ public class Facade{
     }
 
     // startet Künstliche Spieler local mit default parametern
-    public Thread  kuenstlicheSpielerStarten(int iq){
-	return launcher.kuenstlicheSpielerStarten(DIP, DPORT, true, iq, com);
+    public Thread  kuenstlicheSpielerStarten(int iq, boolean beltAware){
+	return launcher.kuenstlicheSpielerStarten(DIP, DPORT, true, iq, beltAware, com);
     }
 
     // launch the game

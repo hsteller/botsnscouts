@@ -94,4 +94,15 @@ public abstract class DistanceCalculator {
         return board.floor(x, y);
     }
 
+    /* final so it may be inlined */
+    final int rotateright(int facing) {
+        return (facing+1)%4;
+    }
+    final int rotateleft(int facing) {
+        facing --;
+        if (facing<0)
+            facing=3;
+        return facing;
+    }
+
 }

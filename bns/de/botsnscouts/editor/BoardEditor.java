@@ -36,6 +36,7 @@ import javax.swing.plaf.metal.*;
 import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.autobot.SimpleDistanceCalculator;
 import de.botsnscouts.autobot.DistanceCalculator;
+import de.botsnscouts.autobot.AdvDistanceCalculator;
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.util.*;
@@ -231,7 +232,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
         if (dp.advancedFeaturesEnabled()){
             CAT.debug("setting flag to "+x+", "+y);
             board.setFlags(new Location[] { new Location(x, y)} );
-            calc=SimpleDistanceCalculator.getInstance(board);
+            calc=AdvDistanceCalculator.getInstance(board);
             calc.preCalculate();
             boardView.setCalc(calc);
             repaint();

@@ -38,20 +38,24 @@ import org.apache.log4j.Category;
  */
 public class AutoBot extends BNSThread {
 
-    static final Category cat = Category.getInstance(AutoBot.class);
+    static final Category CAT = Category.getInstance(AutoBot.class);
 
     public AutoBot(String ip, int port) {
         this(ip, port, 0);
     }
 
+    public AutoBot(String ip, int port, int malus) {
+        this(ip, port, malus, false);
+    }
     /**
      * This constructor also gets a playing strength: the higher malus
      * is, the worse the 'bot will be. 0 is best, therefore.
      */
-    public AutoBot(String i, int p, int malus) {
+    public AutoBot(String i, int p, int malus, boolean beltAware) {
         ip = i;
         port = p;
         this.malus = malus;
+        this.beltAware=beltAware;
         realname = KrimsKrams.randomName();
         super.setName("AutoBot:" + realname);
     }
@@ -59,13 +63,15 @@ public class AutoBot extends BNSThread {
     String ip;
     int port;
     int malus;
+    boolean beltAware;
 
     final String realname;
+    DistanceCalculator calc;
     SearchRecursively wirbel;
     String fieldAsString;
     Location[] flags;
 
-    Bot myBot = Bot.getNewInstance("OrgRobbi");
+    Bot myBot = Bot.getNewInstance("AutoBotRobbi");
     KommClientSpieler myComm = new KommClientSpieler();
     ClientAntwort answer = new ClientAntwort();
 
@@ -81,7 +87,7 @@ public class AutoBot extends BNSThread {
         try {
             myComm.anmelden(ip, port, realname);
         } catch (KommException e) {
-            cat.error("Could not connect", e);
+            CAT.error("Could not connect", e);
             return;
         }
 
@@ -91,37 +97,44 @@ public class AutoBot extends BNSThread {
                 myComm.spielstart();
             }
         } catch (KommException e) {
-            cat.error("Didn't get game start signal", e);
+            CAT.error("Didn't get game start signal", e);
             return;
         }
         gameRunning = true;
 
         while (gameRunning) {
-            cat.debug("Waiting...");
+            CAT.debug("Waiting...");
             try {
                 answer = myComm.warte();
             } catch (KommException kE) {
-                cat.error("Got an exception while waiting", kE);
+                CAT.error("Got an exception while waiting", kE);
                 return;
             }
 
-            cat.debug("Got an answer, type: " + answer.getTyp());
+            CAT.debug("Got an answer, type: " + answer.getTyp());
 
             switch (answer.typ) {
                 case (ClientAntwort.ZERSTOERUNG):
                     if (myMap == null) {
                         initField();
-                        wirbel = new SearchRecursively(myMap, malus);
+                        if (beltAware){
+                            calc=AdvDistanceCalculator.getInstance(myMap);
+                            CAT.debug("got adv dist calc");
+                        } else {
+                            calc=SimpleDistanceCalculator.getInstance(myMap);
+                            CAT.debug("got simple dist calc");
+                        }
+                        wirbel = new SearchRecursively(myMap, malus, calc);
                         myMap.setDebug(false);
                     }
                     updateBot();
 
-                    cat.debug("handling destroyed request...");
+                    CAT.debug("handling destroyed request...");
                     handleDestroyedRequest();
                     break;
 
                 case (ClientAntwort.REPARATUR):
-                    cat.debug("handling repair request...");
+                    CAT.debug("handling repair request...");
                     updateBot();
                     handleRepairRequest(answer.zahl);
                     break;
@@ -129,7 +142,7 @@ public class AutoBot extends BNSThread {
                 case (ClientAntwort.MACHEZUG):
                     boolean powerdown = false;
                     for (int i = 0; i < answer.karten.length; i++)
-                        cat.debug("Card " + i + " is " + answer.karten[i].getprio() + "|" + answer.karten[i].getaktion());
+                        CAT.debug("Card " + i + " is " + answer.karten[i].getprio() + "|" + answer.karten[i].getaktion());
                     updateBot();
                     Bot simRob = Bot.getCopy(myBot);  // Kopieren fuer spaetere Powerdown-Simulationen
 
@@ -196,17 +209,17 @@ public class AutoBot extends BNSThread {
                     break;
 
                 case (ClientAntwort.ENTFERNUNG):
-                    cat.info("Was removed! Reason:" + answer.str + "\nSending ack.");
+                    CAT.info("Was removed! Reason:" + answer.str + "\nSending ack.");
                     gameRunning = false;
                     myComm.bestaetigung();
                     break;
 
                 default:
-                    cat.warn("Illegal msg from server. Type:" + answer.getTyp());
+                    CAT.warn("Illegal msg from server. Type:" + answer.getTyp());
                     break;
             }     //Ende switch
         }         //Ende while
-        cat.debug("End of run()...");
+        CAT.debug("End of run()...");
     }
 
 
@@ -217,7 +230,7 @@ public class AutoBot extends BNSThread {
         try {
             myBot = myComm.getRobStatus(realname);
         } catch (KommException e) {
-            cat.error("Could not update myself", e);
+            CAT.error("Could not update myself", e);
         }
         return myBot;
     }
@@ -228,7 +241,7 @@ public class AutoBot extends BNSThread {
      * ausserdem die Entfernungsberechnung in DistanceCalculator auf
      */
     public void initField() {
-        cat.debug("initializing field...");
+        CAT.debug("initializing field...");
         int dimx, dimy;
         Location dimension;
 
@@ -245,17 +258,17 @@ public class AutoBot extends BNSThread {
             try {
                 myMap = SimBoard.getInstance(dimx, dimy, fieldAsString, flags);
             } catch (FlagException fe) {
-                cat.warn("Flag on pit", fe);
+                CAT.warn("Flag on pit", fe);
             } catch (FormatException e) {
-                cat.error("Malformed field", e);
+                CAT.error("Malformed field", e);
             }
         } catch (KommException e) {
-            cat.error("Did not get a field", e);
+            CAT.error("Did not get a field", e);
         }
     }
 
     public void handleRepairRequest(int reparatur) {
-        cat.debug("repairing "+reparatur+" registers.");
+        CAT.debug("repairing "+reparatur+" registers.");
         int[] regsToUnlock = new int[reparatur];
         int regsFound = 0;
         for (int i = 0; i < 5; i++) {
@@ -278,10 +291,10 @@ public class AutoBot extends BNSThread {
         int bestDistance = 9999;
         int newDistance;
 
-        cat.debug("Bot destroyed. Looking for new facing.");
+        CAT.debug("Bot destroyed. Looking for new facing.");
         for (int i = 0; i < 4; i++) {
             testRobbi.setFacing(i);
-            newDistance = SimpleDistanceCalculator.getInstance(myMap).getGoodness(testRobbi);
+            newDistance = calc.getGoodness(testRobbi);
             if (newDistance < bestDistance) {
                 bestDistance = newDistance;
                 direction = i;
