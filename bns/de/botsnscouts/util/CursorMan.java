@@ -7,7 +7,9 @@ import java.awt.image.*;
 
 public class CursorMan {
     public final static int 
-	CURSOR = 0;
+	CURSOR = 0,
+	BOTCENTER=1,
+	STATUSROBOTS = 2;
     
 	
 
@@ -15,6 +17,8 @@ public class CursorMan {
     
     final static ImageSet[] imgSetDescr = {
 	new ImageSet("images/cursor.gif",   5, 5 ),
+	new ImageSet("images/botcenter.gif",   5, 5 ),
+	new ImageSet("images/minibots.gif", 8, 1)
     }; 
 
     final static int IMGSETCOUNT = imgSetDescr.length;
