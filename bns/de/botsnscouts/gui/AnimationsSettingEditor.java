@@ -15,6 +15,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -49,19 +51,27 @@ public class AnimationsSettingEditor extends JFrame {
     private static JLabel labelLaserSoundBeforeAnimations= new JLabel(Message.say(msgSec,"laserSoundOffset"));
     private static JLabel labelLaserDelayPerStep= new TJLabel(Message.say(msgSec,"laserDelay"));
     private static JLabel labelLaserDelayAfterAnimation= new TJLabel(Message.say(msgSec,"laserPause"));
+    private static JLabel labelDelayBetweenActions = new TJLabel(Message.say(msgSec,"actionDelay"));
     
     private JLabel labelHeading  = new JLabel(Message.say(msgSec, "heading"), JLabel.CENTER);
     private JButton applyButton   = new TJButton(Message.say(msgSec,"apply"), 16);
     private JButton saveButton    = new TJButton(Message.say(msgSec,"save"),16);
     private JButton cancelButton = new TJButton(Message.say(msgSec, "cancel"),16);
 
+    /** checked=enabled*/
+    private JCheckBox toggleMovementAnimation = new JCheckBox();
+    private JLabel labelEnableAnimation = new TJLabel(Message.say(msgSec,"enableAnimations"));
+    private  JComponent [] movementWidgets;
+    
+    
     private static final int CONFIG_COUNT = 3;
     
     /** If you change this array you also have to change #EditorPanel.textFields  so that this Labelarray still
      *  matches the Textfieldarray of EditorPanel (both arrays must have the same order). */
     private static final JLabel [] SETTING_NAMES = new JLabel[]{
                     labelMoveOffset, labelMoveDelay, labelTurnSteps, labelTurnDelayPerStep,
-                    labelLaserSoundBeforeAnimations, labelLaserDelayPerStep, labelLaserDelayAfterAnimation
+                    labelLaserSoundBeforeAnimations, labelLaserDelayPerStep, labelLaserDelayAfterAnimation,
+                    labelDelayBetweenActions
                     };
     private static final int NUM_OF_SETTINGS = SETTING_NAMES.length;
     private EditorPanel [] editors = new EditorPanel[CONFIG_COUNT];
@@ -71,6 +81,20 @@ public class AnimationsSettingEditor extends JFrame {
         editors [0] = new EditorPanel(slow, labelSpeedSlow);
         editors [1] = new EditorPanel(medium, labelSpeedMedium);
         editors [2] = new EditorPanel(fast, labelSpeedFast);        
+        int numOfMovementWidgets = CONFIG_COUNT*4+4;
+        movementWidgets = new JComponent[numOfMovementWidgets];
+        int counter = 0;
+        movementWidgets[counter++]=labelMoveDelay;
+        movementWidgets[counter++]=labelMoveOffset;
+        movementWidgets[counter++]=labelTurnDelayPerStep;
+        movementWidgets[counter++]=labelTurnSteps;        
+        for (int i=0;i<CONFIG_COUNT;i++){
+            movementWidgets[counter++] = editors[i].animationDelayMoveRob;
+            movementWidgets[counter++] = editors[i].animationDelayTurnRob;
+            movementWidgets[counter++] = editors[i].animationOffsetMoveRob;
+            movementWidgets[counter++] = editors[i].animationStepsTurnRob;
+        }       
+        toggleMovementAnimation.setSelected(AnimationConfig.areMovementAnimationsEnabled());
         layoutStuff();
         initListeners();
     }
@@ -84,18 +108,28 @@ public class AnimationsSettingEditor extends JFrame {
         JLabel empty = new JLabel();
        
         GridBagConstraints cons = new GridBagConstraints();
-        // first row with column headlines
-        cons.gridy=0;
-        cons.gridx=0;
-        cons.insets = new Insets(5,5,0,5);
-        textfieldPanel.add(empty, cons);       
-        for (int i=0;i<CONFIG_COUNT;i++){
-            cons.gridx=i+1;
-            textfieldPanel.add(editors[i].configName, cons);
-        }
+        cons.insets = new Insets(7,5,10,5);
        cons.anchor = GridBagConstraints.WEST;
-        for (int row=0;row<NUM_OF_SETTINGS;row++){
-            cons.gridy=row+1;
+       
+       cons.gridy=0;
+       cons.gridx=0;
+       textfieldPanel.add(labelEnableAnimation, cons);
+       cons.gridx++;
+       textfieldPanel.add(toggleMovementAnimation, cons);
+       // first row with column headlines
+       cons.gridy++;
+       cons.gridx=0;
+       cons.insets = new Insets(5,5,0,5);
+       cons.anchor = GridBagConstraints.CENTER;
+       textfieldPanel.add(empty, cons);       
+       for (int i=0;i<CONFIG_COUNT;i++){
+           cons.gridx=i+1;
+           textfieldPanel.add(editors[i].configName, cons);
+       }
+       // rows with textfields
+       cons.anchor = GridBagConstraints.WEST;
+       for (int row=0;row<NUM_OF_SETTINGS;row++){
+            cons.gridy=row+2;
             cons.gridx=0;
             textfieldPanel.add(SETTING_NAMES[row], cons);
             cons.fill = GridBagConstraints.HORIZONTAL;
@@ -153,7 +187,19 @@ public class AnimationsSettingEditor extends JFrame {
                 AnimationsSettingEditor.this.setVisible(false);
             }
         });
-        
+        toggleMovementAnimation.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                  boolean newSetting = toggleMovementAnimation.isSelected();              
+                   toggleMovementAnimation.setSelected(newSetting);
+                   int max = movementWidgets.length;
+                   for (int i=0;i<max;i++){
+                       movementWidgets[i].setEnabled(newSetting);
+                   }
+                   // to be consistent, this has to be done if s.o. clicks "apply"
+                   //AnimationConfig.setMovementAnimationsEnabled(true);
+               }
+            
+        });
         this.addWindowListener(new WindowAdapter(){
             public void windowClosing(WindowEvent e) {
                AnimationsSettingEditor.this.setVisible(false);
@@ -186,6 +232,7 @@ public class AnimationsSettingEditor extends JFrame {
         private JTextField laserDelayBetweenStartOfSoundAndAnimation; 
         private JTextField laserDelayPerAnimationStep;
         private JTextField  laserDelayAfterEndOfAnimation; 
+        private JTextField delayBetweenActions;
         
         private JLabel configName = new JLabel("unknown");
 
@@ -214,13 +261,14 @@ public class AnimationsSettingEditor extends JFrame {
             laserDelayBetweenStartOfSoundAndAnimation= new JTextField(""+conf.getLaserDelayBetweenStartOfSoundAndAnimation(), 6);
             laserDelayPerAnimationStep = new JTextField(""+conf.getLaserDelayPerAnimationStep(), 6);
             laserDelayAfterEndOfAnimation= new JTextField(""+conf.getLaserDelayAfterEndOfAnimation(), 6);
-            
+            delayBetweenActions = new JTextField(""+conf.getDelayBetweenActions(), 6);
             // If you change this array you also have to change #AnimationSettingsEditor.SETTING_NAMES because
             // this JTextField-Array has to match the JLabel-Array SETTING_NAMES.         
             
             textFields =  new JTextField[] {
                             animationOffsetMoveRob, animationDelayMoveRob, animationStepsTurnRob, animationDelayTurnRob,
-                            laserDelayBetweenStartOfSoundAndAnimation, laserDelayPerAnimationStep, laserDelayAfterEndOfAnimation
+                            laserDelayBetweenStartOfSoundAndAnimation, laserDelayPerAnimationStep, laserDelayAfterEndOfAnimation,
+                            delayBetweenActions
             };
         }
     
@@ -279,6 +327,12 @@ public class AnimationsSettingEditor extends JFrame {
                             								config.getLaserDelayAfterEndOfAnimation());       
             config.setLaserDelayAfterEndOfAnimation(laserWait);
         
+            int actionDelay = getIntValue(delayBetweenActions, 0, 5000,
+                            				config.getDelayBetweenActions());
+            config.setDelayBetweenActions(actionDelay);
+            
+            AnimationConfig.setMovementAnimationsEnabled(toggleMovementAnimation.isSelected());
+            
         }
         
         protected void saveValues(){

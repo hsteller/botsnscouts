@@ -21,6 +21,7 @@ import javax.swing.JViewport;
 import org.apache.log4j.Category;
 
 import de.botsnscouts.board.SimBoard;
+import de.botsnscouts.gui.AnimationConfig;
 import de.botsnscouts.gui.Ausgabe;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Location;
@@ -75,7 +76,7 @@ public class BotCanvas extends Canvas implements DrawingConstants, Scalable{
         // animateRobMove() gets informed earlier, so overwriting the positions
         // would reset the robot back to a position he has already left
         else {
-            if (Ausgabe.IS_ROB_MOVE_ANIMATION_ENABLED) {
+            if (AnimationConfig.areMovementAnimationsEnabled()) {
                 for (int i = 0; i < robos.length; i++) // saving my internal robot positions
                     internalPositionHash.put(robos[i].getName(), robos[i].getPos());
                 robos = robos_neu; // updating all robots

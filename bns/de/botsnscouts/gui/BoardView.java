@@ -353,7 +353,7 @@ public class BoardView extends JLayeredPane {
         // animateRobMove()/animateRobTurn() gets informed earlier, so overwriting the positions/facings
         // would reset a robot back to a position/facing he has already left
         else {
-            if (Ausgabe.IS_ROB_MOVE_ANIMATION_ENABLED) {
+            if (AnimationConfig.areMovementAnimationsEnabled()) {
                 int count = robos!=null?robos.length:0;
                 for (int i = 0; i < count; i++) // saving my internal robot values
                     internalBotHash.put(robos[i].getName(), robos[i]);
@@ -386,13 +386,15 @@ public class BoardView extends JLayeredPane {
                     }
 
                 }
+                repaint();                
             } else { // no animation
                 robos = robos_neu;
+                repaint();
+                waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), null);
             }
         }
 
-        repaint();
-
+        
 
     }
     
@@ -480,11 +482,9 @@ public class BoardView extends JLayeredPane {
                      myg.drawImage(imgRob, 0,feldSize+yoffset, feldSize, feldSize, this); // paint the image                                                                                        
                     // myg.scale(dScale, dScale);
                      g2.drawImage(tmpImage, xposScaled, yposScaled, feldSize, clipLength,this);
-                   try {
-                         Thread.currentThread().sleep(animationDelayMoveRob);
-                    } catch (InterruptedException ie) {
-                        CAT.warn("BoardView.paint: wait int moveRobNorth interrupted");
-                    }
+                  
+                        waitSomeTime(animationDelayMoveRob, null);
+                  
                    
                 }
                 tmpImage.setData(blank);   
@@ -524,11 +524,7 @@ public class BoardView extends JLayeredPane {
                      tmpImage.setData(blankWithBots);                                   
                      myg.drawImage(imgRob, 0,yoffset, feldSize,feldSize, this); // paint the image                                                                                        
                      g2.drawImage(tmpImage, xpos64, ypos64, feldSize, clipLength,this);
-                   try {
-                         Thread.currentThread().sleep(animationDelayMoveRob);
-                    } catch (InterruptedException ie) {
-                        CAT.warn("BoardView.paint: wait int moveRobNorth interrupted");
-                    }
+                     waitSomeTime(animationDelayMoveRob, null);
                    
                 }
                 tmpImage.setData(blank);            
@@ -566,11 +562,7 @@ public class BoardView extends JLayeredPane {
                 tmpImage.setData(blankWithBots);                                   
                  myg.drawImage(imgRob, xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
                  g2.drawImage(tmpImage, xpos64, ypos64, clipLength, feldSize,this);
-               try {
-                     Thread.currentThread().sleep(animationDelayMoveRob);
-                } catch (InterruptedException ie) {
-                    CAT.warn("BoardView.paint: wait int moveRobWest interrupted");
-                }
+                 waitSomeTime(animationDelayMoveRob, null);
                
             }
             tmpImage.setData(blank);            
@@ -607,11 +599,7 @@ public class BoardView extends JLayeredPane {
                     tmpImage.setData(blankWithBots);                                   
                      myg.drawImage(imgRob, feldSize+xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
                      g2.drawImage(tmpImage, xpos64, ypos64, clipLength, feldSize,this);
-                   try {
-                         Thread.currentThread().sleep(animationDelayMoveRob);
-                    } catch (InterruptedException ie) {
-                        CAT.warn("BoardView.paint: wait int moveRobWest interrupted");
-                    }
+                     waitSomeTime(animationDelayMoveRob, null);
                    
                 }
                 tmpImage.setData(blank);            
@@ -620,10 +608,15 @@ public class BoardView extends JLayeredPane {
     
     
     protected synchronized void animateRobUTurn(Bot rob) {
+        if (!AnimationConfig.areMovementAnimationsEnabled()){
+            return;
+        }
+            
         Bot internal = getBotByName(rob.getName());
         turnRobot(internal, 180, 2* currentAnimationConfig.getAnimationStepsTurnRob(), true);
         internal.turnClockwise();
         internal.turnClockwise();
+        waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), null);
     }
     
     private Bot getBotByName (String botName){
@@ -640,6 +633,9 @@ public class BoardView extends JLayeredPane {
     
     /** @param direction either BOT_TURN_CLOCKWISE or BOT_TURN_COUNTER_CLOCKWISE in MessageID*/
     protected synchronized void animateRobTurn(Bot rob, int direction) {
+        if (!AnimationConfig.areMovementAnimationsEnabled()){            
+            return;
+        }
         try {
 	        Bot internal = getBotByName(rob.getName());
 	       
@@ -660,7 +656,7 @@ public class BoardView extends JLayeredPane {
         catch ( RasterFormatException fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore){
             CAT.error(fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore);
         }
-       
+        waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), null);
          
     }
     
@@ -701,19 +697,12 @@ public class BoardView extends JLayeredPane {
             int animationStepsTurnRob =currentAnimationConfig.getAnimationStepsTurnRob();
             int animationDelayTurnRob = currentAnimationConfig.getAnimationDelayTurnRob();
              for (int step = 0; step<animationStepsTurnRob;step++) {
-
                  	 backgroundImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
                      backgroundWithBots.rotate(rotateTheta,halfSize, halfSize); // rotating the robot pic further   
                      backgroundWithBots.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);                  
                      // paint the offscreen image on the screen:
-                     mainGraphics.drawImage(backgroundImage, xposScaled, yposScaled, feldSize, clipLength,this);
-                
-                     try {
-                         Thread.currentThread().sleep(animationDelayTurnRob);
-                    } catch (InterruptedException ie) {
-                        CAT.warn("BoardView.paint: wait in turnRobot  interrupted");
-                    }
-                   
+                     mainGraphics.drawImage(backgroundImage, xposScaled, yposScaled, feldSize, clipLength,this);                
+                     waitSomeTime(animationDelayTurnRob, null);                   
                 }
                 backgroundImage.setData(blank);
                 mainGraphics.setComposite(oldComposite);
@@ -789,6 +778,7 @@ public class BoardView extends JLayeredPane {
         catch ( RasterFormatException fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore){
             CAT.error(fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore);
         }
+        waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), null);
     }
 
 
@@ -815,11 +805,8 @@ public class BoardView extends JLayeredPane {
         
         SoundMan.playSound(BotVis.getBotLaserSoundByName(name));
         synchronized (this) {
-            try {
-                Thread.sleep(currentAnimationConfig.getLaserDelayBetweenStartOfSoundAndAnimation());  
-            } catch (InterruptedException ie) {
-                CAT.error("BoardView.paint: wait interrupted");
-            }
+            waitSomeTime(currentAnimationConfig.getLaserDelayBetweenStartOfSoundAndAnimation(),null);
+           
             		
             
             Graphics2D g2 = (Graphics2D) getGraphics();
@@ -837,34 +824,22 @@ public class BoardView extends JLayeredPane {
                 paintActiveRobLaser(g2, source, laserFacing,tmp_laenge, robColor);
                 tmp_laenge+=step;
                 //     synchronized(this){
-                try {
-                   Thread.sleep(delayPerStep);
-                } catch (InterruptedException ie) {
-                    CAT.error("BoardView.paint: wait interrupted");
-                }
-                
+                waitSomeTime(delayPerStep, null);
+               
                 //   }
             }
             repaint();
-            try {
-                Thread.sleep(currentAnimationConfig.getLaserDelayAfterEndOfAnimation());  
-            } catch (InterruptedException ie) {
-                CAT.error("BoardView.paint: wait interrupted");
-            }
+            waitSomeTime(currentAnimationConfig.getLaserDelayAfterEndOfAnimation(), null);
         }
 
         // drawRobLaser=false;
         if (SoundMan.isSoundActive()) {
             // SoundMan.playSound(SoundMan.BUMM);
             synchronized (this) {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException ie) {
-                    CAT.error("BoardView.paint: wait interrupted");
-                }
+               waitSomeTime(200, null);
             }
         }
-       
+       waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), null);
 
 
     }
@@ -1092,13 +1067,11 @@ public class BoardView extends JLayeredPane {
         }
         // activeBordLasers=false; // now paint the non-animated
         repaint();              // lasers again
-        try {
+       
             synchronized (this){
-                Thread.sleep(currentAnimationConfig.getLaserDelayAfterEndOfAnimation());  
+                waitSomeTime(currentAnimationConfig.getLaserDelayAfterEndOfAnimation(), null);  
             }
-         } catch (InterruptedException ie) {
-            CAT.error("BoardView.doBordLaser: wait interrupted");
-        }
+        
     }
 
     private boolean turner(int x, int y, int r) {
@@ -1930,5 +1903,19 @@ public class BoardView extends JLayeredPane {
         return sac.getThumb(size);
     }
 
+    private void waitSomeTime(int ms, Object lock){
+        // if (lock != null){
+        // 		synchronized (lock) {
+        //           wait/sleep
+        //      }
+       // }               
+        try {
+            Thread.sleep(ms);
+        }
+        catch (InterruptedException ie){
+            CAT.error("Interrupted while waiting: "+ie.getMessage(), ie);
+        }        
+    }
+    
 }
 

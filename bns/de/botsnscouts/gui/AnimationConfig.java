@@ -22,8 +22,8 @@ public class AnimationConfig {
     public static final String ANIMATION_MEDIUM="animationsSettingsMedium";
     public static final String ANIMATION_FAST="animationSettingsFast";
     
-    private static AnimationConfig singletonConfig=null;
-    
+    private static boolean areMovementAnimationsEnabled=true;
+    private static final String PROP_NAME_ANIMATIONSENABLED = "areMovementAnimationsEnabled";
     private String configName;
     
     public AnimationConfig(String name, boolean tryToLoadFromProperties){
@@ -32,17 +32,7 @@ public class AnimationConfig {
             loadFromProperties();
         }
     }
-    /*
-    public static AnimationConfig getGlobalAnimationConfig(){
-        if (singletonConfig == null)
-            singletonConfig = new AnimationConfig(ANIMATION_MEDIUM, true);
-        return singletonConfig;
-    }
     
-    public static void setGlobalAnimationConfig(AnimationConfig ac){
-        singletonConfig = ac;
-    }
-    */
     /**
      * Number of pixels a robot will be moved in a single animation step. 
      * Has to be between 1 and scaledFieldSize 
@@ -72,7 +62,8 @@ public class AnimationConfig {
      */
     private int laserDelayAfterEndOfAnimation = 1000; 
     
-    
+    /** Will be used everytime something has happend in BoardView*/
+    private int delayBetweenActions = 1000;
     
     public void setAnimationOffsetMoveRob(int animationOffsetMoveRob) {
         this.animationOffsetMoveRob = animationOffsetMoveRob;
@@ -143,19 +134,24 @@ public class AnimationConfig {
         saveString.append(animationDelayTurnRob).append('+');
         saveString.append(laserDelayBetweenStartOfSoundAndAnimation).append('+');
         saveString.append(laserDelayAfterEndOfAnimation).append('+');
-        saveString.append(laserDelayPerAnimationStep);
+        saveString.append(laserDelayPerAnimationStep).append('+');
+        saveString.append(delayBetweenActions);
         String s = saveString.toString();
         CAT.debug("saving for "+configName+":  "+s);
         Conf.setProperty(configName, s);
+        Conf.setProperty(PROP_NAME_ANIMATIONSENABLED, ""+areMovementAnimationsEnabled);
         Conf.saveProperties();
     }
     
     
     public void loadFromProperties(){
+        String animationsEnabled = Conf.getProperty(PROP_NAME_ANIMATIONSENABLED);
+        areMovementAnimationsEnabled = animationsEnabled != null && animationsEnabled.equals("true");
+                           
         String saveString = Conf.getProperty(configName);
         CAT.debug("loading for "+configName+":  "+saveString);
         if (saveString != null && saveString.length()>0){
-            	int [] values = new int [7]; 
+            	int [] values = new int [8]; 
             	try {
 	                StringTokenizer st = new StringTokenizer(saveString,"+");               
 	                values[0] = Integer.parseInt(st.nextToken());
@@ -165,6 +161,7 @@ public class AnimationConfig {
 	                values[4] = Integer.parseInt(st.nextToken());
 	                values[5] = Integer.parseInt(st.nextToken());
 	                values[6] = Integer.parseInt(st.nextToken());
+	                values[7] = Integer.parseInt(st.nextToken());
             	}
             	catch (Exception e){
             	    CAT.error("Exception loading the animation settings for: "+configName);
@@ -178,9 +175,32 @@ public class AnimationConfig {
                 animationDelayTurnRob=values[3];
                 laserDelayBetweenStartOfSoundAndAnimation=values[4];
                 laserDelayAfterEndOfAnimation=values[5];
-                laserDelayPerAnimationStep=values[6];            	
+                laserDelayPerAnimationStep=values[6];          
+                delayBetweenActions = values[7];
         }
         
+    }
+
+    /**
+     * @param delayBetweenActions The delayBetweenActions to set.
+     */
+    public void setDelayBetweenActions(int delayBetweenActions) {
+        this.delayBetweenActions = delayBetweenActions;
+    }
+
+    /**
+     * @return Returns the delayBetweenActions.
+     */
+    public int getDelayBetweenActions() {
+        return delayBetweenActions;
+    }
+    
+    public static void setMovementAnimationsEnabled(boolean isEnabled){
+        areMovementAnimationsEnabled = isEnabled;
+    }
+    
+    public static boolean areMovementAnimationsEnabled(){
+        return areMovementAnimationsEnabled;
     }
     
     

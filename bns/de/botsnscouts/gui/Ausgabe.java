@@ -102,7 +102,7 @@ public class Ausgabe extends BNSThread {
      * Turns animation of robot movement on or off;
      * visibility is public (not private), because the GUI (BoardView) needs to know about that, too.
      */
-    public static final boolean IS_ROB_MOVE_ANIMATION_ENABLED = new Boolean(System.getProperty("enableRobMoveAnimation", "true")).booleanValue();
+  //  public static final boolean IS_ROB_MOVE_ANIMATION_ENABLED = new Boolean(System.getProperty("enableRobMoveAnimation", "true")).booleanValue();
 
     /**
      * Start a new Ausgabe with a View. It will start displaying Message 1.
@@ -1117,7 +1117,7 @@ public class Ausgabe extends BNSThread {
         sequencer.addActionMapping(MessageID.BOT_MOVE,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {
-                        if (IS_ROB_MOVE_ANIMATION_ENABLED)
+                        if (AnimationConfig.areMovementAnimationsEnabled())
                             comMsgHandleRobotMove(msgData);
                     }
                 });
@@ -1125,7 +1125,7 @@ public class Ausgabe extends BNSThread {
         sequencer.addActionMapping(MessageID.BOT_TURN,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {
-                        if (IS_ROB_MOVE_ANIMATION_ENABLED)
+                        if (AnimationConfig.areMovementAnimationsEnabled())
                             comMsgHandleRobotTurn(msgData);
                     }
                 });
@@ -1133,7 +1133,7 @@ public class Ausgabe extends BNSThread {
 
                         new AbstractMessageAction() {
                             public void invoke(ClientAntwort msgData) {
-                                if (IS_ROB_MOVE_ANIMATION_ENABLED)
+                                if (AnimationConfig.areMovementAnimationsEnabled())
                                     comMsgHandleRobotUTurn(msgData);
                             }
                         });
