@@ -269,7 +269,7 @@ public Vector getLasers(){
     }
   private void doRobBew(int phase,BoardRoboter[] robbis)
     {
-      d("doRobBew called.");
+      //d("doRobBew called.");
       boolean[] bewegt=new boolean[robbis.length];
       int todo=robbis.length;
       for (int i=0;i<robbis.length;i++)
@@ -285,7 +285,7 @@ public Vector getLasers(){
 	    highest=robbis[i].getZug()[phase-1].getprio();
 	    highrob=i;
 	  }
-	d("doRobBew: next is "+robbis[highrob].getName()+"; prio="+highest);
+	//d("doRobBew: next is "+robbis[highrob].getName()+"; prio="+highest);
 	moveRob(robbis,highrob,robbis[highrob].getZug()[phase-1].getaktion());
 	bewegt[highrob]=true;
 	benachrichtige(robbis);
@@ -295,7 +295,7 @@ public Vector getLasers(){
     }
   private void moveRob(BoardRoboter[] robbis,int rob,String aktion)
     {
-      d("MoveRob: "+robbis[rob].getName()+"; aktion="+aktion);
+      //d("MoveRob: "+robbis[rob].getName()+"; aktion="+aktion);
 
       if (aktion.equals("M1")){
 	moveRobOne(robbis,rob,robbis[rob].getAusrichtung(),true);
@@ -340,12 +340,12 @@ public Vector getLasers(){
 
       // kaputte Robbis ignorieren
       if (robbis[rob].getSchaden() >= 10){
-	d("moveRobOne: Ignoriere, da kaputt");
+	//d("moveRobOne: Ignoriere, da kaputt");
 	return false;
       }
 
       // first, check for Wall
-      d("MoveRobOne called. Nr. "+robbis[rob].getName()+"; dir="+direction+"; schubsen: "+(schubsen?"ja":"nein"));
+      //d("MoveRobOne called. Nr. "+robbis[rob].getName()+"; dir="+direction+"; schubsen: "+(schubsen?"ja":"nein"));
       switch(direction){
       case NORD:
 	if (nw(robbis[rob].getX(),robbis[rob].getY()).da)
@@ -364,7 +364,7 @@ public Vector getLasers(){
 	  return(false);
 	break;
       } //switch
-      d("No wall. Entering schubsen-choice");
+      //d("No wall. Entering schubsen-choice");
 
       if (schubsen){
 	// second, do a "virtual" move to be able to collision-check
@@ -385,20 +385,20 @@ public Vector getLasers(){
 	  break;
 	} //switch
 
-	d("schubsen. now collision-checking...");
+	//d("schubsen. now collision-checking...");
 	//third, check for collision with other robbis
 	for (int i=0;i<robbis.length;i++)
 	  if ((i!=rob)&&(robbis[i].getX()==xx)&&(robbis[i].getY()==yy)&&(!robbis[i].istVirtuell())&&(!robbis[rob].istVirtuell())) 
 	    if (!moveRobOne(robbis,i,direction,true)) return(false);	    
 	      
-	d("Now moving.");
+	//d("Now moving.");
 	//fourth, commit the change if we reach this point
 	robbis[rob].setPos(xx,yy);
 	//in that case, the robot has actually moved a square
 	bewegt[rob]=true;
       } //if schubsen
       else {
-	d("no schubsen. doing changes");
+	//d("no schubsen. doing changes");
 	switch(direction) {
 	case NORD:
 	  robbis[rob].yy= robbis[rob].getY() + 1;
@@ -447,7 +447,7 @@ public Vector getLasers(){
    */
   private void vernichteRoboter(BoardRoboter thorsten)
     {
-      d("vernichteRoboter: "+thorsten.getName());
+      //d("vernichteRoboter: "+thorsten.getName());
       thorsten.setSchaden(10);
       thorsten.setVirtuell();
       thorsten.setInvalidPos();
@@ -457,7 +457,7 @@ public Vector getLasers(){
 
   private void dreheRoboter(BoardRoboter robbi, int drehR)
     { 
-      d("dreheRoboter called. "+robbi.getName()+" nach "+drehR);
+      //d("dreheRoboter called. "+robbi.getName()+" nach "+drehR);
       // drehR = DrehRichtung
       switch (drehR) {
       case DUHRZ:
@@ -472,7 +472,7 @@ public Vector getLasers(){
     }
   private void dreheRoboterGedacht(BoardRoboter robbi, int drehR)
     { 
-      d("dreheRoboterGedacht called. robbi="+robbi.getName()+"; drehR="+drehR);
+      //d("dreheRoboterGedacht called. robbi="+robbi.getName()+"; drehR="+drehR);
       // veraendert die gedachte Ausrichtung
       // drehR = DrehRichtung
       switch (drehR) {
@@ -489,7 +489,7 @@ public Vector getLasers(){
 
   private void doExprFl(int phase,BoardRoboter[] robbis)
     {
-      d("doExprFl called");
+      //d("doExprFl called");
       // ExpressFliessband
       gedachteWerteInitialisieren(robbis);
       for (int i=0;i<robbis.length;i++)
@@ -501,7 +501,7 @@ public Vector getLasers(){
 
   private void doFl(int phase,BoardRoboter[] robbis)
     {
-      d("doFliessband called");
+      //d("doFliessband called");
       // Fliessband (normal)
       gedachteWerteInitialisieren(robbis);
       for (int i=0;i<robbis.length;i++)
@@ -517,7 +517,7 @@ public Vector getLasers(){
 
   private void ausfuehrenFliessband(BoardRoboter[] robbis,int rob,int typ)
     {
-      d("ausfuehrenFliessband called. rob="+rob+"; typ="+typ);
+      //d("ausfuehrenFliessband called. rob="+rob+"; typ="+typ);
       switch (typ%10) {
       case FNORD:
 	if (!moveRobOne(robbis,rob,NORD,false)) return; // Abbruch falls vor die Wand gelaufen
@@ -556,7 +556,7 @@ public Vector getLasers(){
    */
   private void doPushers(int phase,BoardRoboter[] robbis)
     {
-      d("doPushers called.");
+      //d("doPushers called.");
       gedachteWerteInitialisieren(robbis);
       for (int i=0;i<robbis.length;i++){
 	if (robbis[i].getSchaden()>=10)
@@ -612,7 +612,7 @@ public Vector getLasers(){
    */
   private void doDrehEl(int phase,BoardRoboter[] robbis)
     {
-      d("doDrehEl called.");
+      //d("doDrehEl called.");
       
       for (int i=0;i<robbis.length;i++)
 	if (bo(robbis[i].getX(),robbis[i].getY()).typ==BDDREHEL){
@@ -626,7 +626,7 @@ public Vector getLasers(){
    */
   private void doCrushers(int phase,BoardRoboter[] robbis)
     {
-      d("doCrushers called.");
+      //d("doCrushers called.");
       
       for (int i=0;i<robbis.length;i++) {
 	  if ((bo(robbis[i].getX(),robbis[i].getY()).typ>=100)&&((bo(robbis[i].getX(),robbis[i].getY()).spez)>0)&&(isCrusherActive(bo(robbis[i].getX(),robbis[i].getY()).spez,phase)))
@@ -639,7 +639,7 @@ public Vector getLasers(){
    */
   private void doLasers(int phase,BoardRoboter[] robbis)
     {
-      d("doLasers called.");
+      //d("doLasers called.");
       
       // die Board-Laser
       for (Enumeration e = lasers.elements() ; e.hasMoreElements() ;) {
@@ -658,7 +658,7 @@ public Vector getLasers(){
 		      tmp[2]=""+l.x;
 		      tmp[3]=""+l.y;
 		      tmp[4]=""+l.facing;
-		      d("Boardlasertreffer auf "+robbis[j].getName());
+		      //d("Boardlasertreffer auf "+robbis[j].getName());
 		      actualStats = stats.getStats (robbis[j].getName());
 		      actualStats.incDamageByBoard();
 		      
@@ -801,27 +801,27 @@ public Vector getLasers(){
 
   private void doArchivUpdate(int phase,BoardRoboter[] robbis)
     {
-      d("doArchivUpdate called.");
+      //d("doArchivUpdate called.");
       
       for (int i=0;i<robbis.length;i++) {
 	
 	if ((bo(robbis[i].getX(),robbis[i].getY()).typ)==BDREPA) {
 	    robbis[i].setArchiv(robbis[i].getPos());
 	    bewegt[i]=true;
-	    d(robbis[i].getName()+" ist auf einem Reperaturfeld. Archivpos updated");
+	    //d(robbis[i].getName()+" ist auf einem Reperaturfeld. Archivpos updated");
 	}
 	for (int j=0;j<flaggen.length;j++)
 	  if ((robbis[i].getX()==flaggen[j].x)&&(robbis[i].getY()==flaggen[j].y)){
 	      robbis[i].touchArchiv();
 	      bewegt[i]=true;
-	      d(robbis[i].getName()+" ist auf einer Flagge (R1). Archivpos updated");
+	      //d(robbis[i].getName()+" ist auf einer Flagge (R1). Archivpos updated");
 	  }
       }      
     } // doArchivUpdate
 
   private void doFlaggenUpdate(int phase,BoardRoboter[] robbis)
     { 
-      d("doFlaggenUpdate called.");
+      //d("doFlaggenUpdate called.");
       
       for (int i=0;i<robbis.length;i++) {
 	if (robbis[i].getNaechsteFlagge()==flaggen.length+1)
@@ -829,7 +829,7 @@ public Vector getLasers(){
 	if ((robbis[i].getX()==flaggen[robbis[i].getNaechsteFlagge()-1].x)&&(robbis[i].getY()==flaggen[robbis[i].getNaechsteFlagge()-1].y)) {
 	    robbis[i].incNaechsteFlagge();
 	  bewegt[i]=true;
-	  d(robbis[i].getName()+" hat naechste Flagge erreicht.");
+	  //d(robbis[i].getName()+" hat naechste Flagge erreicht.");
 	  ausgabenMsgString2("mNextFlag",robbis[i].getName(),""+(robbis[i].getNaechsteFlagge()-1));
 	}
 	
@@ -842,14 +842,14 @@ public Vector getLasers(){
    */
   private void doRepairs(int phase,BoardRoboter[] robbis)
     {
-      d("doRepairs called.");
+      //d("doRepairs called.");
       
       for (int i=0;i<robbis.length;i++) {
 	if ((bo(robbis[i].getX(),robbis[i].getY()).typ)==BDREPA) {
 	  boolean msg=robbis[i].getSchaden()>0;
 	  robbis[i].decrSchaden(bo(robbis[i].getX(),robbis[i].getY()).spez);
 	  bewegt[i]=true;
-	  d(robbis[i].getName()+" repariert wegen Repa-Feld.");
+	  //d(robbis[i].getName()+" repariert wegen Repa-Feld.");
 	  if (msg)
 	      ausgabenMsgString2("mRepFeld",robbis[i].getName(),""+bo(robbis[i].getX(),robbis[i].getY()).spez);
 	}
@@ -859,7 +859,7 @@ public Vector getLasers(){
 	    boolean msg=robbis[i].getSchaden()>0;
 	    robbis[i].decrSchaden(1);
 	    bewegt[i]=true;
-	    d(robbis[i].getName()+" repariert wegen Flagge.");
+	    //d(robbis[i].getName()+" repariert wegen Flagge.");
 	    if (msg)
 		ausgabenMsgString("mRepFlag",robbis[i].getName());
 	  }
@@ -891,7 +891,7 @@ public Vector getLasers(){
 	  if (cont) continue;  // naechsten Roboter bearbeiten
 	  if (robbis[a].getSchaden()<10) {
 		    robbis[a].setVirtuell(false);     // wenn er nicht zerstoert ist: entvirtualisieren durchführen
-		    d("Entvirtualisiere Roboter "+robbis[a].getName());
+		    //d("Entvirtualisiere Roboter "+robbis[a].getName());
 		    bewegt[a]=true;
 		  }
 	} // if
@@ -900,7 +900,7 @@ public Vector getLasers(){
 	if (robbis[0].getSchaden()<10) 
 	  {
 	      robbis[0].setVirtuell(false);
-	  d("Entvirtualisiere einzelnen Roboter "+robbis[0].getName());
+	  //d("Entvirtualisiere einzelnen Roboter "+robbis[0].getName());
 	  bewegt[0]=true;
 	  }
     } // entvirtualisiere ende
@@ -911,7 +911,7 @@ public Vector getLasers(){
    */
   private void registerSperren(BoardRoboter robbi)
     {
-      d("registerSperren called mit "+robbi.getName());
+      //d("registerSperren called mit "+robbi.getName());
 
       if (robbi.getSchaden()>=10) {
 	vernichteRoboter(robbi);
@@ -922,7 +922,7 @@ public Vector getLasers(){
 	  if (robbi.getGesperrteRegister()[i]==null) {
 	      if (robbi.getZug()[i] != null){
 		  robbi.sperreReg(i);
-		  d("Sperre Register "+i);
+		  //d("Sperre Register "+i);
 	      }
 	      return;
 	  }

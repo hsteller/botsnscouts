@@ -207,9 +207,9 @@ public class SpielfeldKS extends SpielfeldSim  {
 		    wert=""+entftab[m][x][y];
 		    laenge=wert.length();
 		    for (int i=0;i<(5-laenge);i++)  {
-			Global.debug(" ");
+			//Global.debug(" ");
 		    } 
-		    Global.debug(""+entftab[m][x][y]);
+		    //Global.debug(""+entftab[m][x][y]);
 		}
 	    }
 	}      
