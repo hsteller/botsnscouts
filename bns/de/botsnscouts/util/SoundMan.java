@@ -122,26 +122,13 @@ public class SoundMan {
 	try {
 
 	    if (soundsLoaded && soundsEnabled){
-                System.out.println("spiele..");
-		sounds[sound].play();
-	    }
-            System.out.println("gespielt?");
+      		sounds[sound].play();
+            }
 	}catch (ArrayIndexOutOfBoundsException ex){
 	    CAT.error("Invalid sound constant chosen.");
 	}
     }
-/*
-  public static synchronized void playNextLaserSound(){
-      try {
-        System.out.println("loaded?"+soundsLoaded);
-      System.out.println("enabled?"+soundsEnabled);
-	  playSound(laserSounds[actualLaserSound]);
-	  actualLaserSound = ++actualLaserSound%laserSounds.length;
-      } catch(ArrayIndexOutOfBoundsException ex){
-	  CAT.error("Invalid laser sound constant chosen.");
-      }
-  }
-*/
+
   public static synchronized void playPitFallSound() {
       playSound(PIT);
   }
@@ -170,16 +157,11 @@ public class SoundMan {
 
 
   public static synchronized void loadSounds() {
-      System.out.println("loaded?"+soundsLoaded);
-      System.out.println("enabled?"+soundsEnabled);
-
-      if (soundsLoaded || (!soundsEnabled)){
-
+      if (soundsLoaded || (!soundsEnabled))
           return;
-      }
+
 	Thread t = new BNSThread () {
 		public void run() {
-                  System.out.println("*************************************");
                   try {
 
 		    SoundMan.CAT.debug("Initializing sounds..");
