@@ -10,16 +10,18 @@ import de.botsnscouts.util.*;
 
 public class Tile extends SpielfeldSim{
 
-    Image img;
+  public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Tile.class);
+
+    public static int THUMBNAIL_SIZE = 180;
+
     String kName;
     int rotat;
 
     //create new tile
-    public Tile(String name, String field, int GR) throws FormatException, FlaggenException{
+    public Tile(String name, String field) throws FormatException, FlaggenException{
 	super(12,12,field,null);
 	kName=name;
 	rotat=0;
-	img=SACanvas.createThumb(this,GR);
     }
 
     //create rotated tile
@@ -31,6 +33,10 @@ public class Tile extends SpielfeldSim{
     }
 
     public Image getImage(){
+	if (img==null){
+	    CAT.debug("creating image on-demand.");
+	    img=SACanvas.createThumb(this,THUMBNAIL_SIZE);
+	}
 	return img;
     }
 

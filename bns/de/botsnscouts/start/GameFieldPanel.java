@@ -119,9 +119,6 @@ public class GameFieldPanel extends JPanel{
 	inner.setLayout(lay);
 	inner.setOpaque(false);
 
-	//erzeuge Chooser
-	makeChooser();
-
 	String[] far={Message.say("Start","mFarbeEgal"),Message.say("Start","mFarbeGruen"),Message.say("Start","mFarbeGelb"),Message.say("Start","mFarbeRot"),Message.say("Start","mFarbeBlau"),Message.say("Start","mFarbeMagenta"),Message.say("Start","mFarbeOrange"),Message.say("Start","mFarbeGrau"),Message.say("Start","mFarbeDunkelMagenta")};
 	Font font=new Font("Sans", Font.BOLD, 12);
 
@@ -143,6 +140,7 @@ public class GameFieldPanel extends JPanel{
 	save.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    Properties spfProp=parent.fassade.getSpfProp();
+		    makeChooser();
 		    chooser.rescanCurrentDirectory();
 		    int returnVal = chooser.showSaveDialog(parent);
 		    if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -259,6 +257,10 @@ public class GameFieldPanel extends JPanel{
     }
 
     private void makeChooser() {
+	// Initialize only if it doesn't exist yet
+	if (chooser != null)
+	    return;
+
 	chooser = new JFileChooser("kacheln");
 	FileFilter filter = new FileFilter() {
 		public boolean accept(File file) {

@@ -15,7 +15,6 @@ public class Facade{
     private Launcher launcher;
     private KommSpPr com;
     private TileFactory tileFactory;
-    private int thumbGR;
 
     private static final String DIP;//="127.0.0.1";
     private static final int DPORT;//=8077;
@@ -42,19 +41,11 @@ public class Facade{
 ////////////////////////////////////////
     // instanziiert alle benötigten Klassen
     public Facade(){
-	this(180);
-    }
-    public Facade(int gr){
-	thumbGR=gr;
-	tileFactory = new TileFactory(thumbGR);
+	tileFactory = new TileFactory();
 	//tileFactory.start();
 	tileRaster = new TileRaster(tileFactory);
 	launcher = new Launcher();
 	com=new KommSpPr();
-    }
-
-    public int getThumbGR(){
-	return thumbGR;
     }
 
    //*TileRaster*//

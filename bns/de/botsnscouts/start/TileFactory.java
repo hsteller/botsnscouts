@@ -14,13 +14,11 @@ public class TileFactory {
     public static final Category CAT = Category.getInstance( TileFactory.class );
 
     private Hashtable tileTab;
-    private int thGR;
     boolean fertig = false;
     Object lock=new Object();
 
 
-    public TileFactory(int gr){
-	thGR=gr;
+    public TileFactory(){
 	tileTab=new Hashtable();
     }
 
@@ -97,7 +95,7 @@ public class TileFactory {
 	//erzeige Tile mit der Tilestring
 	Tile kach=null;
 	try{
-	    kach = new Tile(name,str.toString(), thGR);
+	    kach = new Tile(name,str.toString());
 	    Tile[] kachAr=new Tile[4];
 	    kachAr[0]=kach;//Die Tile mit Drehung 0 wird initialisiert
 	    tileTab.put(name, kachAr);
@@ -151,6 +149,7 @@ public class TileFactory {
         synchronized( worker ) {
             if( workerStarted ) return;
             worker.start();
+	    worker.setPriority(Thread.MIN_PRIORITY);
             workerStarted = true;
         }
     }
