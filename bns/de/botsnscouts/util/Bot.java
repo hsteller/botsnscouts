@@ -25,6 +25,8 @@
 
 package de.botsnscouts.util;
 
+import org.apache.log4j.Category;
+
 /**
  * Represents one robot.
  * @author Miriam (zumindest nach Refactoring...)
@@ -35,11 +37,13 @@ public class Bot {
     final static int NUM_CARDS = 9;
     final static int NUM_REG = 5;
 
+   // private static Category CAT = Category.getInstance(Bot.class);
+    
     protected final static Location inPit = new Location(0,0);
 
     /** Factory method for new robots. */
     public static Bot getNewInstance(String name) {
-	return new de.botsnscouts.board.BoardBot(name);
+        return new de.botsnscouts.board.BoardBot(name);
     }
 
     /** Factory can clone, too. This should not be
@@ -442,10 +446,7 @@ public class Bot {
 	this.pos.set(0,0);
     }
 
-    /** Turns bot to given direction. */
-    public void turnTo(int richtung){
-	setFacing(richtung);
-    }
+
     
     public void turnClockwise(){
        this.facing =((facing + 1) % 4);               
@@ -460,7 +461,9 @@ public class Bot {
     }
     
     public void setFacing(int neu) {
-	this.facing = neu;
+        
+        this.facing = neu;
+      
     }
 
     public void incNextFlag() {
