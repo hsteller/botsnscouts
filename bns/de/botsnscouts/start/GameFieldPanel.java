@@ -35,10 +35,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.io.File;
 import java.util.Properties;
 
@@ -242,17 +239,20 @@ public class GameFieldPanel extends JPanel {
                 announceGame.setAnnounce(announce.isSelected());
             }
         });
-        metaServer.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    announceGame.parse(((JTextField) e.getSource()).getText());
-                } catch (InvalidInputException ex) {
-                    CAT.debug(ex.getMessage());
-                    //TODO: beep
-                    metaServer.setText(announceGame.getServerString());
+        metaServer.addFocusListener(
+                new FocusAdapter() {
+                    public void focusLost(FocusEvent event) {
+                        try {
+                            announceGame.parse(metaServer.getText());
+                        } catch (InvalidInputException ex) {
+                            CAT.info(ex.getMessage());
+                            //TODO: beep
+                            metaServer.setText(announceGame.getServerString());
+                        }
+                    }
                 }
-            }
-        });
+        );
+
 
         spielfelder.setFont(font);
         save.setFont(font);
@@ -284,11 +284,11 @@ public class GameFieldPanel extends JPanel {
         inner.add(new TJLabel(Message.say("Start", "mFarbe")), gc);
         inner.add(colors, gc);
 
-        /*    not yet functional
+
         inner.add(allowWisenheimer, gc);
         inner.add(allowScout, gc);
         inner.add(announce, gc);
-        inner.add(metaServer, gc);    */
+        inner.add(metaServer, gc);
 
         gc.fill = GridBagConstraints.HORIZONTAL;
 

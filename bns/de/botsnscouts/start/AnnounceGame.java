@@ -71,9 +71,9 @@ class AnnounceGame {
 
     /**
      *  Trying to set a new server name and port from a string.
-     * TODO: This is broken.
      */
     void parse(String s) throws InvalidInputException {
+        CAT.debug("Parsing "+s);
         try {
             for (int i=0; i < s.length(); i++) {
                 if (s.charAt(i)==':') {
