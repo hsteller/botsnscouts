@@ -1,40 +1,51 @@
 package de.botsnscouts.util;
 
 import java.util.Vector;
+import java.util.Iterator;
 import java.util.Arrays;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import org.apache.log4j.Category;
 
 /**@author Hendrik
    Container class for Stats objects.
  */
-public class StatsList {
+public class StatsList implements ActionListener{
+    static Category CAT = Category.getInstance(StatsList.class);
+
     // perhaps additional a Hashtable ?!
     private Stats[] robots;
-  
+
+    private Vector listeners = new Vector();
 
 
     /** Creates a new list with length 0*/
     public StatsList () {
 	robots = new Stats[0];
     }
-    /** Creates a new StatsList containing the Stats-objects 
+    /** Creates a new StatsList containing copies of the Stats-objects
 	in stats.
 	@param stats A vector containing Stats-objects.
     */
     public StatsList(Vector stats) {
 	this.robots = new Stats [stats.size()];
-	for (int i=0;i<stats.size();i++) 
+	for (int i=0;i<stats.size();i++){
 	    robots [i] = (Stats) stats.elementAt(i);
+            robots [i].addActionListener(this);
+        }
     }
 
     /** Creates a new StatsList.
-	For every name in 'namen' a Stats-object will be created.
+	For every name in 'namen' a default Stats-object will be created.
 	@param namen An Array of robotnames.
     */
     public StatsList (String [] namen) {
 	robots = new Stats[namen.length];
 	for (int i=0;i<namen.length;i++) {
 	    robots [i]=new Stats(namen[i]);
+            robots [i].addActionListener(this);
 	}
     }
 
@@ -44,6 +55,7 @@ public class StatsList {
 	null, if no robot calles <code>name</code> was found.
     */
     public Stats getStats (String name) {
+    // we have max. eight robots, so the simple for-loop will be efficient enough
 	for (int i=0;i<robots.length;i++)
 	    if (robots[i].getName().equals(name))
 		return robots[i];
@@ -56,26 +68,39 @@ public class StatsList {
     public void update (Stats neu) {
 	for (int i=0;i<robots.length;i++)
 	    if (robots[i].getName().equals(neu.getName())){
+                robots[i].removeActionListener(this);
 		robots [i]=neu;
+                robots [i].addActionListener(this);
 		break;
 	    }
-	
+        fireActionEvent();
     }
 
     /** Sets the StatsList to <code>sl</code>
 	@param sl The new contents of the StatsList
     */
     public void update (StatsList sl) {
-	this.robots=sl.getStats();
+	this.changeStatsArray(sl);
+        fireActionEvent();
     }
+
     /** Gets all Stats that are saved in the StatsList
 	@return The Stats of the StatsList*/
     public Stats [] getStats() {
 	return this.robots;
     }
-    
+
+
+    public int size(){
+      if (robots==null)
+        return 0;
+      else
+        return robots.length;
+    }
+
+
     /**
-       @return A (newline seperated) String describing the lists content (unsorted) 
+       @return A (newline seperated) String describing the lists content (unsorted)
     */
     public String toString () {
 	StringBuffer back= new StringBuffer();
@@ -83,8 +108,8 @@ public class StatsList {
 	    back.append(robots[i].toString()+"\n");
 	return back.toString();
     }
-    
-    /** 
+
+    /**
 	Creates a special formatted/sorted String for sending the robot's stats
 	to the clients.
 	@return A sorted String (decreasing order) of the list's contents (Stats objects),
@@ -102,14 +127,65 @@ public class StatsList {
 	back.append(")");
 	return back.toString();
     }
-    
+
+    public Stats[] getStatsSorted() {
+      sort();
+      return robots;
+    }
+
     /**
-       Sorts the list in decreasing order
+       Sorts the list in descending order
     */
-    private void sort(){
+    public void sort(){
 	Arrays.sort(robots);
     }
- 
+
+    public void addActionListener(ActionListener al) {
+
+      if (al!=null && !listeners.contains(al)){
+        listeners.add(al);
+          CAT.debug("a listener was registered that wants to be informed about statistics");
+      }
+    }
+
+    public void removeActionListener(ActionListener al){
+      if (listeners.removeElement(al))
+        CAT.debug("a listener was removed");
+      else {
+        CAT.debug("tried to remove a non existent listener..");
+      }
+    }
+
+    private void fireActionEvent() {
+      CAT.debug("some stats have changed; firing actionEvent..");
+      ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,"");
+      Iterator it = listeners.iterator();
+      while (it.hasNext()){
+        ActionListener l = (ActionListener) it.next();
+        l.actionPerformed(e);
+      }
+    }
+
+    public void actionPerformed(ActionEvent e){
+      CAT.debug("underlying stats have changed..");
+      fireActionEvent();
+    }
+
+    private void changeStatsArray(StatsList sl) {
+      changeStatsArray(sl.getStats());
+    }
+
+    private void changeStatsArray(Stats [] neu){
+      CAT.debug("replacing entire internal stats array");
+      for (int i=0;i<robots.length;i++){
+        robots[i].removeActionListener(this);
+      }
+      robots = neu;
+      for (int i=0;i<robots.length;i++){
+        robots[i].addActionListener(this);
+      }
+    }
+
 }
-    
+
 
