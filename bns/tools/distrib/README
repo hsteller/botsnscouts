@@ -26,3 +26,21 @@ and start the game.
 Check <"http://botsnscouts.sourceforge.net"> for the latest.
 If you like to send us any comments or if you found any bugs, please e-mail us
 at botsnscouts-devel@lists.sf.net .
+
+
+Configuration of Language, Sounds...
+
+In the top-level Bots 'n' Scouts directory, a file called bns.config will
+be created on the first run of the game. In it, you can customize various
+things, some of which cannot be accessed through the GUI right now. The format
+of the file is ASCII text with simple key=value lines.
+
+Possible keys:
+language.isSet		(if not present, a dialog will pop up)
+language.lang		(en for English, de for German)
+language.country	(US for English, DE for German)
+sound.active		(true for on, false for off. Can be accessed through
+                         in-game menu.)
+server.IP		(IP-Nr or name of default gameserver)
+timeout			(Seconds that players have to return their programming)
+robot.name		(Default Name of the player)
