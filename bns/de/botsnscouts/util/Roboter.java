@@ -296,22 +296,6 @@ public class Roboter {
 	return (r.pos.equals(pos) && !r.istInGrube());
     }
 
-    /** 
-     * Compare wheather tow robs are 
-     * equal
-     */
-    public boolean sameState(Roboter r) {
-	return ( (sameName(r)) ||
-		 (samePos(r)) || 
-		 (r.getSchaden() == getSchaden()) ||
-		 (r.getNaechsteFlagge() == getNaechsteFlagge()) ||
-		 (r.getAusrichtung() == getAusrichtung()) ||
-		 (r.istVirtuell() == istVirtuell()) ||
-		 (r.istAktiviert() == istAktiviert())
-		 );
-    }
-
-
     /** Liefert die Anzahl der gesperrten Register
      * @author Miriam
      */
