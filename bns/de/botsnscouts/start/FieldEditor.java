@@ -188,8 +188,8 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
         okZur = new ColoredPanel();
         okZur.setLayout(new FlowLayout());
         okZur.setOpaque(false);
-        okZur.add(ok);
         okZur.add(zurueck);
+        okZur.add(ok);
         add(BorderLayout.SOUTH, okZur);
 
         fuerSpf = new JPanel();

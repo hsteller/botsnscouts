@@ -94,8 +94,8 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
 
         add(new TJLabel(Message.say("Start", "mFarbe"), Color.lightGray, true ));
         add(colors);
-        add(go);
         add(back);
+        add(go);
     }
 
     public void actionPerformed(ActionEvent e) {

@@ -2,7 +2,7 @@
  *******************************************************************
  *        Bots 'n' Scouts - Multi-Player networked Java game       *
  *                                                                 *
- * Copyright (C) 2001 scouties.                                    *
+ * Copyright (C) 2001-2004 scouties.                                    *
  * Contact botsnscouts-devel@sf.net                                *
  *******************************************************************
 
@@ -27,6 +27,7 @@ package de.botsnscouts.start;
 
 import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.*;
+import de.botsnscouts.gui.OkComponent;
 import org.apache.log4j.Category;
 
 import javax.swing.*;
@@ -51,9 +52,6 @@ public class StartPanel extends JPanel {
 
     private JLabel angem;
     private PlayersPanel playersComponent;
-    private JComponent okComponent;
-    private JComponent autobotComponent;
-    private JComponent localComponent;
 
     private ServerObserver listener;
 
@@ -74,9 +72,6 @@ public class StartPanel extends JPanel {
 
         angem = new TJLabel();
         playersComponent = new PlayersPanel(parent);
-        okComponent = getOkComponent();
-        autobotComponent = getABComponent();
-        localComponent = getLocalComponent();
         listener = new ServerObserver(playersComponent);
         listener.start();
 
@@ -86,7 +81,7 @@ public class StartPanel extends JPanel {
         //p.add( angem, BorderLayout.NORTH );
         p.add(playersComponent, BorderLayout.CENTER);
         add(BorderLayout.WEST, p);
-        add(BorderLayout.SOUTH, okComponent);
+        add(BorderLayout.SOUTH, getOkComponent());
         JPanel panel = new TJPanel();
 
         panel.setLayout(new GridBagLayout());
@@ -97,8 +92,8 @@ public class StartPanel extends JPanel {
         gc.gridy = GridBagConstraints.RELATIVE;
         gc.insets = new Insets(30, 30, 30, 30);
 
-        panel.add(autobotComponent, gc);
-        panel.add(localComponent, gc);
+        panel.add(getAutoBotComponent(), gc);
+        panel.add(getLocalComponent(), gc);
         add(BorderLayout.EAST, panel);
     }
 
@@ -188,7 +183,7 @@ public class StartPanel extends JPanel {
         return panel;
     }
 
-    private JComponent getABComponent() {
+    private JComponent getAutoBotComponent() {
         JComponent panel = new ColoredComponent();
         panel.setOpaque(false);
         Font font = new Font("Sans", Font.BOLD, 24);
@@ -314,19 +309,11 @@ public class StartPanel extends JPanel {
     }
 
     private JComponent getOkComponent() {
-        JComponent panel = new JPanel();
-        GridLayout lay = new GridLayout(1, 2);
-        lay.setHgap(50);
-        lay.setVgap(50);
-        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        panel.setLayout(lay);
-        panel.setOpaque(false);
+        OkComponent okComponent = new OkComponent( Message.say("Start", "mLos"),
+                                                   Message.say("Start", "mAbbrechen") );
 
-        JButton okBut = new TJButton(Message.say("Start", "mLos"));
-        JButton backBut = new TJButton(Message.say("Start", "mAbbrechen"));
-
-        okBut.addActionListener(new ActionListener() {
+        okComponent.addOkListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 CAT.debug("Start-button pressed.");
                 if (playersComponent.names.size() != 8) {
@@ -337,7 +324,7 @@ public class StartPanel extends JPanel {
                 }
             }
         });
-        backBut.addActionListener(new ActionListener() {
+        okComponent.addBackListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 parent.facade.killServer();
                 parent.resetWaiter();
@@ -347,9 +334,7 @@ public class StartPanel extends JPanel {
             }
         });
 
-        panel.add(okBut);
-        panel.add(backBut);
-        return panel;
+        return okComponent;
     }
 
     public void paint(Graphics g) {

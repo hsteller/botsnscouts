@@ -98,8 +98,8 @@ public class WatchPanel extends JPanel implements ActionListener, MouseListener 
         add(serv);
         //add(port);
         //add(prt);
-        add(go);
         add(back);
+        add(go);
 
     }
 

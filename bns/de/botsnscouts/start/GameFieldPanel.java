@@ -141,8 +141,8 @@ public class GameFieldPanel extends JPanel {
             }
         });
 
-        panel.add(okBut);
         panel.add(backBut);
+        panel.add(okBut);
         return panel;
     }
 
