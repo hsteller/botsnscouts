@@ -128,7 +128,9 @@ class StSpListener extends Thread{
 
     
     public void error(){
-	pw.println("error.");
+	if (pw!=null){
+	    pw.println("error.");
+	}
 	try{
 	    //   srv.close(); 
 	    clt.close();

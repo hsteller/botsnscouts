@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.plaf.metal.*;
 import java.util.*;
 import java.net.*;
+import java.io.*;
 import de.botsnscouts.util.*;
 
 
@@ -107,6 +108,7 @@ public class Start extends JFrame implements WindowListener{
 	}catch(IllegalThreadStateException e){
 	    System.err.println(Message.say("Start","eSpielEnde"));
 	}
+	nullen();
 //	dispose();
     }
 
@@ -136,15 +138,15 @@ public class Start extends JFrame implements WindowListener{
 	    startZuschauen=null;
 	}
 	if(startStart!=null){
-	    startStart.parent=null;
-	    startStart.anmeldung.parent=null;
-	    startStart.anmeldung=null;
+	    //startStart.parent=null;
+	    //startStart.anmeldung.parent=null;
+	    //startStart.anmeldung=null;
 	    startStart.unten.parent=null;
 	    startStart.unten=null;
 	    startStart.ks.parent=null;	    
 	    startStart.ks=null;	    
-	    startStart.listen=null;	    
-	    startStart=null;
+	    //startStart.listen=null;	    
+	    //startStart=null;
 	}
 	if(startSpielfeldEditor!=null){
 	    startSpielfeldEditor.parent=null;
@@ -159,18 +161,55 @@ public class Start extends JFrame implements WindowListener{
 
     public static void main(String[] argv){
 	Global.verbose=true;
-	String lang="english";
+	/*String lang="english";
 	if (argv.length>=1){
 	    if (argv[0].equals("english")||argv[0].equals("deutsch")){
 		lang=argv[0];
 	    }
-	}
-	try{
-	    Message.setLanguage(lang);
-	}catch(LanguageLoadException exc){
-	    System.err.println(exc+"kann nicht!");
-	}
+	    }*/
+
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
+
+	//language conf
+	Properties locProp=new Properties();
+	Locale myLocale=null;
+	try{
+	    FileInputStream istream=new FileInputStream("language.conf");
+	    locProp.load(istream);
+	}catch(FileNotFoundException e){
+	    myLocale=new Locale("en","US");
+	}catch(IOException e){
+	    myLocale=new Locale("en","US");
+	}
+	if (locProp.getProperty("isSet").equals("yes")){
+	    myLocale=new Locale(locProp.getProperty("language"),locProp.getProperty("country"));
+	}else{
+	    Locale[] list=Message.getLocales();
+	    String[] locals=new String[list.length];
+	    for (int i=0;i<locals.length;i++){
+		locals[i]=list[i].getDisplayLanguage();
+	    }
+	    int sel=JOptionPane.showOptionDialog(null,"Please select your Language","Language selection",JOptionPane.DEFAULT_OPTION,JOptionPane.QUESTION_MESSAGE,null,locals,locals[0]);
+	    if (sel==JOptionPane.CLOSED_OPTION){
+		myLocale=new Locale("en","US");
+	    }else{
+		myLocale=list[sel];
+		locProp.setProperty("isSet","yes");
+		locProp.setProperty("language",myLocale.getLanguage());
+		locProp.setProperty("country",myLocale.getCountry());
+		try{
+		    File file=new File("language.conf");
+		    OutputStream ostream=new FileOutputStream(file);
+		    locProp.store(ostream,null);
+		}catch(IOException e){
+		    System.err.println(e);
+		}
+	    }
+	}
+
+	Message.setLanguage(myLocale);
+	//ende language conf
+
 
 	if(argv.length>=4){
 	    try{
