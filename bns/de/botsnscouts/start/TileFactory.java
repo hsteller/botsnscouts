@@ -56,7 +56,7 @@ public class TileFactory {
     }
 
     boolean workerStarted = false;
-    Thread worker = new BNSThread("TileWorker") {
+    private Thread worker = new BNSThread("TileWorker") {
         public void run() {
 
             // Load those from bns.home/tiles
@@ -201,7 +201,7 @@ public class TileFactory {
         synchronized (worker) {
             if (workerStarted) return;
             worker.start();
-            worker.setPriority(Thread.MIN_PRIORITY); // FIXME hier gibts NullPoin
+          //  worker.setPriority(Thread.MIN_PRIORITY); // FIXME hier gibts NullPoin
             workerStarted = true;
         }
     }
