@@ -9,7 +9,9 @@ public class CursorMan {
     public final static int 
 	CURSOR = 0,
 	BOTCENTER=1,
-	STATUSROBOTS = 2;
+	STATUSROBOTS = 2,
+	DAMAGE = 3,
+	WINNER = 4;
     
 	
 
@@ -18,7 +20,9 @@ public class CursorMan {
     final static ImageSet[] imgSetDescr = {
 	new ImageSet("images/cursor.gif",   5, 5 ),
 	new ImageSet("images/botcenter.gif",   5, 5 ),
-	new ImageSet("images/minibots.gif", 8, 1)
+	new ImageSet("images/minibots.gif", 8, 1),
+	new ImageSet("images/damage.gif", 1, 1),
+	new ImageSet("images/winner.gif", 8, 8)
     }; 
 
     final static int IMGSETCOUNT = imgSetDescr.length;
