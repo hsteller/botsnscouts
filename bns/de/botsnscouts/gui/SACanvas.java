@@ -81,6 +81,9 @@ public class SACanvas extends JComponent {
 					Color.orange,//strength 2
 					Color.yellow };//strength 3
 
+    /** The color used for the background of active lasers. */
+    private final static Color sndLaserColor = new Color(255,255,155);
+
     /** To lookup the color of a robot; contains name->color mapping.*/
     private java.util.Hashtable nameToColorHash;
     private boolean gotColors;
@@ -324,6 +327,8 @@ public class SACanvas extends JComponent {
     */
 
     public void doRobLaser (Roboter sourceRob, Roboter targetRob ) {
+	if (CAT.isDebugEnabled())
+	    CAT.debug("doRobLaser: "+sourceRob.getName()+" -> "+targetRob.getName());
 	source = sourceRob.getPos();
 	target = targetRob.getPos();
 	laserFacing=sourceRob.getAusrichtung();
@@ -491,6 +496,8 @@ public class SACanvas extends JComponent {
     }
     private void paintActiveBordLaser (Graphics g, Color c,int actualLength) {
 
+	
+
 	Graphics2D g2d = (Graphics2D) g;
 	//AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
 	//	g2d.setComposite( ac );
@@ -505,7 +512,7 @@ public class SACanvas extends JComponent {
 	    lSourceX = tmp.x-(breite/2-1);
 	    lSourceY = tmp.y-actualLength+14;
 	    g2d.fillRect(lSourceX,lSourceY,breite,actualLength);
-	    g2d.setColor(new Color(255,255,155));
+	    g2d.setColor(sndLaserColor);
 	    g2d.drawRect(lSourceX,lSourceY,breite,actualLength);
 	    break;
 	}
@@ -513,7 +520,7 @@ public class SACanvas extends JComponent {
 	    lSourceX = tmp.x-17;
 	    lSourceY = tmp.y-(breite/2-1);;
 	    g2d.fillRect(lSourceX,lSourceY,actualLength,breite);
-	    g2d.setColor(new Color(255,255,155));
+	    g2d.setColor(sndLaserColor);
 	    g2d.drawRect(lSourceX,lSourceY,actualLength,breite);
 	    break;
 	}
@@ -521,7 +528,7 @@ public class SACanvas extends JComponent {
 	    lSourceX = tmp.x-(breite/2-1);
 	    lSourceY = tmp.y-15;
 	    g2d.fillRect(lSourceX,lSourceY,breite,actualLength);
-	    g2d.setColor(new Color(255,255,155));
+	    g2d.setColor(sndLaserColor);
 	    g2d.drawRect(lSourceX,lSourceY,breite,actualLength);
 	    break;
 	}
@@ -529,7 +536,7 @@ public class SACanvas extends JComponent {
 	    lSourceX = tmp.x-actualLength+17;
 	    lSourceY = tmp.y-(breite/2-1);
 	    g2d.fillRect(lSourceX,lSourceY,actualLength-2, breite);
-	    g2d.setColor(new Color(255,255,155));
+	    g2d.setColor(sndLaserColor);
 	    g2d.drawRect(lSourceX,lSourceY,actualLength-2, breite);
 	    break;
 	}
