@@ -27,6 +27,8 @@ package de.botsnscouts.board;
 
 import de.botsnscouts.server.Server;
 import de.botsnscouts.util.*;
+import de.botsnscouts.comm.MessageID;
+
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -70,6 +72,14 @@ public class SimBoard extends Board implements Directions {
     private Vector msgIdsQ = new Vector();
     private Vector msgArgsQ = new Vector();
 
+
+    private int seqNumber = 0;
+    private static final String MSG_NUM_STRING =de.botsnscouts.comm.OtherConstants.MESSAGE_NUMBER+"=";
+    private String getSeqNumberMessageString (){
+      return MSG_NUM_STRING+(++seqNumber);
+    }
+
+
     public Vector getLasers() {
         return lasers;
     }
@@ -98,8 +108,9 @@ public class SimBoard extends Board implements Directions {
             if (moved[i])
                 s[j++] = robbis[i].getName();
 
-        server.notifyViews(s);
         sendCollectedMsgs();
+        server.notifyViews(++seqNumber, s);
+
         bewegt2false();
     }
 
@@ -107,27 +118,52 @@ public class SimBoard extends Board implements Directions {
     /** Collects the messages which are sent later after NTC.
      Only has effect, if this is the server's board.
      */
-    public void ausgabenMsg(String id, String[] args) {
+
+    private void ausgabenMsgString(String id) {
         if (server != null) {
-            msgIdsQ.add(id);
-            msgArgsQ.add(args);
+            String[] tmp = new String[1];
+            tmp[0] = getSeqNumberMessageString();
+            ausgabenMsg(id, tmp, true);
+        }
+    }
+
+     public void ausgabenMsg(String id, String[] args){
+      ausgabenMsg(id, args, false);
+     }
+
+    public void ausgabenMsg(String id, String[] args, boolean argsHasSequenceNumber) {
+        if (server != null) {
+             msgIdsQ.add(id);
+            if (argsHasSequenceNumber) {
+              msgArgsQ.add(args);
+            }
+            else {
+              int l = args.length;
+              String [] newArgs = new String [l+1];
+              for (int i=0;i<l;i++)
+                newArgs[i] = args[i];
+              newArgs[l] = getSeqNumberMessageString();
+              msgArgsQ.add(newArgs);
+            }
         }
     }
 
     private void ausgabenMsgString(String id, String arg) {
         if (server != null) {
-            String[] tmp = new String[1];
+            String[] tmp = new String[2];
             tmp[0] = arg;
-            ausgabenMsg(id, tmp);
+            tmp[1] = getSeqNumberMessageString();
+            ausgabenMsg(id, tmp, true);
         }
     }
 
     private void ausgabenMsgString2(String id, String arg1, String arg2) {
         if (server != null) {
-            String[] tmp = new String[2];
+            String[] tmp = new String[3];
             tmp[0] = arg1;
             tmp[1] = arg2;
-            ausgabenMsg(id, tmp);
+            tmp[2] = getSeqNumberMessageString();
+            ausgabenMsg(id, tmp, true);
         }
     }
 
@@ -256,32 +292,42 @@ public class SimBoard extends Board implements Directions {
         moved = new boolean[bots.length];
         bewegt2false();
 
-        ausgabenMsg("mAuswRobBew", null);
+
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        ausgabenMsgString("mAuswRobBew");
         doRobBew(phase, bots);        // Bot bewegen sich entspr. ihrer Card
         // benachrichtige() nach jeder Bewegung
-
-        ausgabenMsg("mAuswExprFl", null);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        ausgabenMsgString("mAuswExprFl");
         doExpressBelts(phase, bots);        // Expressfliessbaender 1
         fireBotsChanged(bots);
-
-        ausgabenMsg("mAuswFl", null);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        ausgabenMsgString("mAuswFl");
         doBelts(phase, bots);            // Exprf 2, Fliessbaender 1
         fireBotsChanged(bots);
-
-        ausgabenMsg("mAuswPusher", null);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        ausgabenMsgString("mAuswPusher");
         doPushers(phase, bots);       // Schieber
         fireBotsChanged(bots);
-
-        ausgabenMsg("mAuswRot", null);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        ausgabenMsgString("mAuswRot", null);
         doRotatingGears(phase, bots);        // Rotating Gears
         fireBotsChanged(bots);
-
-        ausgabenMsg("mAuswCrushers", null);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        ausgabenMsgString("mAuswCrushers");
         doCrushers(phase, bots);      // Stampfer
         fireBotsChanged(bots);
-
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         doLasers(phase, bots);        // Lasers, board & robbi
         fireBotsChanged(bots);
+        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+
         doArchiveUpdate(phase, bots);  // Archivpointupdate
         fireBotsChanged(bots);
         doFlaggenUpdate(phase, bots);  // letzte besuchte Flaggenupdate

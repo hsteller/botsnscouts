@@ -68,6 +68,7 @@ public class HumanPlayer extends BNSThread {
 
 
 
+
     public HumanPlayer (String host, int port, String name) {
 	this(host,port,name,-1);
    }
@@ -119,7 +120,11 @@ public class HumanPlayer extends BNSThread {
 
 	    switch (commAnswer.typ) {
 	    case (ClientAntwort.MACHEZUG): {
-		mode=MODE_PROGRAM;
+               // synchronized (this) {
+                  mode=MODE_PROGRAM;
+
+               //   notifyAll();
+               // }
 		Global.debug(this,"I am requested to send cards");
 		// card
 		showMessage(Message.say("SpielerMensch","mwartereg"));
@@ -499,6 +504,19 @@ private void showMessage(String foo){
     }
 
     private void abmelden() {
+    /*  while (mode!=MODE_PROGRAM) {
+        CAT.debug("waiting for next turn to quit..");
+        try {
+          synchronized(this){
+            wait();
+          }
+        }
+        catch (InterruptedException ie){
+          CAT.error(ie.getMessage(), ie);
+        }
+
+      }
+      */
       comm.abmelden(name);
     }
 

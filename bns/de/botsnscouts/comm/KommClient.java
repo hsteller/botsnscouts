@@ -28,6 +28,8 @@ package de.botsnscouts.comm;
 import de.botsnscouts.util.*;
 import de.botsnscouts.server.KartenStapel;
 
+import org.apache.log4j.Category;
+
 import java.io.*;
 import java.util.*;
 import java.net.*;
@@ -40,6 +42,7 @@ import java.net.*;
 */
 
 public class KommClient {
+    static Category CAT = Category.getInstance(KommClient.class);
     static final boolean LOG_RECEIVE = true;
     static final boolean LOG_SEND    = true;
 
@@ -57,12 +60,9 @@ public class KommClient {
     /**
 	Needed for a maybe deprecated hotfix.
 	Saves the NTC-String sent at a wrong time.
-	Together with 'gotNTC' it represensts a kind of one-element-queue ;-)
+	Together with 'gotNTC' it represensts a kind of an one-element-queue ;-)
     */
     protected String strNTC;
-    /** The name of the client that owns this KommClient object.
-        For debugging purposes.
-    */
 
     /**
      * Used for communication with the server.
@@ -72,7 +72,11 @@ public class KommClient {
      */
     protected String encodedName = "";
 
+    /** The name of the client that owns this KommClient object.
+        For debugging purposes.
+    */
     protected String cn;
+
     /** For debugging purposes: if set to true,
 	a logfile "<clientname>'s.Kommlog" will be created,
 	saving all Strings the client sent or got.
@@ -92,7 +96,8 @@ public class KommClient {
 		debug2.close();
 	    }
 	    catch (IOException i) {
-		System.err.println ("Konstruktor: Fehler beim Erstellen des Log-writers");
+                CAT.error(i.getMessage(), i);
+		CAT.error ("Constructor: error creating logwriter");
 	    }
 	}
     }
@@ -108,24 +113,58 @@ public class KommClient {
 		debug = new PrintWriter(new BufferedWriter(new FileWriter((cn+"'s.Kommlog"), true)));
 	    }
 	    catch (IOException ioe) {
-		System.err.println ("senden: IOException beim Erstellen des Log-writers");
+                CAT.error(ioe.getMessage(), ioe);
+		CAT.error("sending: IOException creating logwriter");
 	    }
 	    if (debug!=null) {
-		debug.println ("Sende: "+s);
+		debug.println ("sending: "+s);
 		debug.close();
 	    }
 	}
 	try {
 	    if( LOG_SEND )
-              Global.debug(this, "CLIENT "+cn+" sendet: "+s);
+              Global.debug(this, "CLIENT "+cn+" sends: "+s);
 	    out.println (s);
 	}
 	catch (NullPointerException npe) {
-	    throw new KommFutschException ("NullPointerException bei Client-Senden");
+              CAT.error(npe.getMessage(), npe);
+	    throw new KommFutschException ("NullPointerException while client is sending");
 	}
 	catch (Exception e) {
-	    throw new KommFutschException ("Client-Senden: Exception-Message: "+e.getMessage());
+            CAT.error(e.getMessage(), e);
+	    throw new KommFutschException ("Exception sending: Exception-Message: "+e.getMessage());
 	}
+
+    }
+
+   class TmpParsedSeqNumMessage {
+      int messageNum;
+      String originalMessage;
+    }
+
+    private TmpParsedSeqNumMessage splitPossibleSeqNumAndMessage(String com) throws KommException{
+        TmpParsedSeqNumMessage back = new TmpParsedSeqNumMessage();
+       if (com.startsWith(OtherConstants.MESSAGE_NUMBER)){
+          int kommaPos = com.indexOf(','); // end of sequence-number-part
+          String seqString = com.substring(0, kommaPos); // contains the a String like "message_number=1234"
+          int splitAt = seqString.indexOf('=');
+          String onlyNumber = seqString.substring(splitAt+1);
+          try {
+            back.messageNum =Integer.parseInt(onlyNumber);
+          }
+          catch (NumberFormatException nfe){
+            CAT.error(nfe.getMessage(), nfe);
+            throw new KommException("failed to parse message sequence number");
+          }
+
+          back.originalMessage = com.substring(kommaPos+1);
+        }
+        else {
+            back.originalMessage = com;
+            back.messageNum = -1; // important to indicate that there was no sequence number
+                                  // in front of this message
+        }
+        return back;
 
     }
 
@@ -146,40 +185,44 @@ public class KommClient {
 		debug = new PrintWriter(new BufferedWriter(new FileWriter((cn+"'s.Kommlog"), true)));
 	    }
 	    catch (IOException ioe) {
-		System.err.println ("einlesen: IOException beim Erstellen des Log-writers");
+		CAT.error("einlesen: IOException creating logwriter");
 	    }
 	}
 	String back="";
 	try {
 	    back = in.readLine();
 	    if( LOG_RECEIVE )
-              Global.debug(this, "CLIENT(einlesen) "+cn+" erhaelt: "+back);
+              Global.debug(this, "CLIENT(einlesen) "+cn+" receives: "+back);
 	    if ((debug!=null)&&(log))
-		debug.println("einlesen erhielt: "+back);
+		debug.println("einlesen() received: "+back);
 	}
 	catch (IOException ioe) {
-	    throw new KommFutschException ("Einlesen: IOException augetreten; Message: "+ioe.getMessage());
+	    throw new KommFutschException ("Einlesen: IOException occurred; Message: "+ioe.getMessage());
 	}
 	//
 	if (back==null) {
 	    try {// if null, try again
 		back = in.readLine();
 		if ((debug!=null)&&(log))
-		    Global.debug(this,"einlesen (2.Versuch) erhielt: "+back);
+		    Global.debug(this,"einlesen (2nd try) received: "+back);
 
 		if (back==null)// read null the second time => no connection anymore => exception
-		    throw new KommFutschException("Einlesen: zweimal hintereinander null gelesen");
+		    throw new KommFutschException("Einlesen: read 'null' two times");
 
 	    }
 	    catch (IOException ioe2) {
-		throw new KommFutschException ("Einlesen: IOException beim 2ten Leseversuch (1ter = null)augetreten; Message: "+ioe2.getMessage());
+		throw new KommFutschException ("Einlesen: IOException while retrying to read; Message: "+ioe2.getMessage());
 	    }
 	}
 	// Tried two times to read the String
 
 
+        // removing possible sequence number part from back for testing for REN/NTC
+        TmpParsedSeqNumMessage tmp  = splitPossibleSeqNumAndMessage(back);
+        String test = tmp.originalMessage;
+
 	// Now checking whether the server removed the client
-	if ((back.length()>=3)&&(back.substring(0,3).equals("REN"))) {
+	if ((test.length()>=3)&&(test.substring(0,3).equals("REN"))) {
 	    ClientAntwort xyz= new ClientAntwort();
 	    try {
 		xyz=wait2(back);
@@ -188,12 +231,12 @@ public class KommClient {
 		throw new KommException ("einlesen: REN erhalten, aber der String \""+back+"\" verursachte in wait2 eine Exception;\n Message:"+e.getMessage());
 	    }
 	    if (xyz.typ==xyz.ENTFERNUNG)
-		throw new KommFutschException ("Der Client wurde entfernt;\n Grund: "+xyz.str);
+		throw new KommFutschException ("Client was removed;\n Reason: "+xyz.str);
 	}
 	// Hey, we made nothing wrong. The client is still alive :-)
 
 	// Now checking whether we got a bad timed NTC (notify change)
-	else if ((back.length()>=3)&&(back.substring(0,3).equals("NTC"))) {
+	else if ((test.length()>=3)&&(test.substring(0,3).equals("NTC"))) {
 
 	    gotNTC=true; // changing state; indicating that there is an NTC waiting
 	    //strNTC=new String(back); // saving the message of the server
@@ -279,9 +322,19 @@ public class KommClient {
      */
     ClientAntwort wait2 (String com) throws KommException {
 	Global.debug(this,"CLIENT: warte erhielt: "+com);
-	ClientAntwort back=new ClientAntwort();
+        ClientAntwort back=new ClientAntwort();
 	boolean error=false;
 	String errormesg="";
+        // <hack for synchronizing display stuff>
+        // checking whether there is a sequence number in front of the message
+        TmpParsedSeqNumMessage foo = splitPossibleSeqNumAndMessage(com);
+        com = foo.originalMessage;
+        back.messageSequenceNumber = foo.messageNum; // will be set to -1 if there
+                                                     // was no sequence number
+
+
+        // </hack for synchronizing display stuff>
+
 	if ((com.equals("ok")) || (com.equals("OK"))){
 	    back.typ=back.ANGEMELDET;
 	    back.ok = true;
@@ -339,12 +392,36 @@ public class KommClient {
 			int k1 = com.indexOf('(');
 			com = com.substring (k1+1,com.length()-1);
 			StringTokenizer sto= new StringTokenizer(com,",)");
-			back.namen= new String [sto.countTokens()];
+			String [] tmp = new String [sto.countTokens()];
 			int i=0;
 			while (sto.hasMoreTokens()){
-			    back.namen[i]= URLDecoder.decode(sto.nextToken());
+			    tmp[i]= URLDecoder.decode(sto.nextToken());
 			    i++;
 			}
+                        int lastElem = tmp.length-1;
+                        String seq = tmp[lastElem];
+                        if (seq.startsWith(OtherConstants.MESSAGE_NUMBER)) {
+                          int pos=seq.indexOf('=');
+                          try {
+                            back.messageSequenceNumber = Integer.parseInt(seq.substring(pos+1));
+                            back.namen = new String [lastElem]; // namen.length==tmp.length-1
+                            for (int j=0;j<lastElem;j++){
+                              back.namen[j] = tmp[j]; // copy everything but the sequenznumber
+                            }
+                          }
+                          catch (NumberFormatException nfe){
+                            CAT.error(nfe.getMessage(), nfe);
+                          }
+                        }
+                        else // no sequenznummber, use everything
+                          back.namen = tmp;
+                        if (CAT.isDebugEnabled()) {
+                           CAT.debug("MSG: "+back.messageSequenceNumber);
+                          for (int k=0;k<back.namen.length;k++){
+                            CAT.debug("arg"+k+"="+back.namen[k]);
+
+                          }
+                        }
 			break;
 		    }
 		    else if (nd=='R'){

@@ -333,10 +333,16 @@ public class BoardView extends JComponent {
 
 
     protected void ersetzeRobos(Bot[] robos_neu){
-	if (!gotColors) // jetzt bekomme ich zum erstenmal die Bot
-	    setRobColors(robos_neu);
-	robos=robos_neu;
-	repaint();
+         //allDone = false;
+         //synchronized (lock) {
+            if (!gotColors) // jetzt bekomme ich zum erstenmal die Bot
+                setRobColors(robos_neu);
+            robos=robos_neu;
+            repaint();
+        //    allDone = true;
+        //    lock.notifyAll();
+       // }
+
     }
 
 
@@ -351,6 +357,7 @@ public class BoardView extends JComponent {
     */
 
     public void doRobLaser (Bot sourceRob, Bot targetRob ) {
+       //  allDone = false;
 	if (CAT.isDebugEnabled())
 	    CAT.debug("doRobLaser: "+sourceRob.getName()+" -> "+targetRob.getName());
 	source = sourceRob.getPos();
@@ -370,38 +377,43 @@ public class BoardView extends JComponent {
 	  catch (InterruptedException ie){
 	    CAT.error("BoardView.paint: wait interrupted");
 	  }
+        //}
+
+        //synchronized (lock) {
+
+          for(int i=1; i<=FULL_LENGTH_INT; i++) {
+              int tmp_laenge=(int) ((((double)i)/FULL_LENGTH_DOUBLE)*laenge);
+              Graphics2D g2 = (Graphics2D) getGraphics();
+              g2.scale( dScale, dScale );
+              paintActiveRobLaser(g2, tmp_laenge, c);
+
+          //     synchronized(this){
+                   try {
+                       wait (1);
+                   }
+                   catch (InterruptedException ie){
+                       CAT.error ("BoardView.paint: wait interrupted");
+                   }
+            //   }
+          }
         }
 
+          // drawRobLaser=false;
+          if (SoundMan.isSoundActive()) {
+             // SoundMan.playSound(SoundMan.BUMM);
+              synchronized(this){
+                  try {
+                      wait (200);
+                  }
+                  catch (InterruptedException ie){
+                      CAT.error ("BoardView.paint: wait interrupted");
+                  }
+              }
+          }
+          repaint();
+         // allDone = true;
+         // lock.notifyAll();
 
-	for(int i=1; i<=FULL_LENGTH_INT; i++) {
-	    int tmp_laenge=(int) ((((double)i)/FULL_LENGTH_DOUBLE)*laenge);
-	    Graphics2D g2 = (Graphics2D) getGraphics();
-	    g2.scale( dScale, dScale );
-	    paintActiveRobLaser(g2, tmp_laenge, c);
-
-	     synchronized(this){
-		 try {
-		     wait (1);
-		 }
-		 catch (InterruptedException ie){
-		     CAT.error ("BoardView.paint: wait interrupted");
-		 }
-	     }
-	}
-
-	// drawRobLaser=false;
-	if (SoundMan.isSoundActive()) {
-           // SoundMan.playSound(SoundMan.BUMM);
-	    synchronized(this){
-		try {
-		    wait (200);
-		}
-		catch (InterruptedException ie){
-		    CAT.error ("BoardView.paint: wait interrupted");
-		}
-	    }
-	}
-	repaint();
 
 
     }
@@ -522,7 +534,7 @@ public class BoardView extends JComponent {
 	return laenge;
     }
     private void paintActiveBordLaser (Graphics g, Color c,int actualLength) {
-
+       // allDone = false;
 	Graphics2D g2d = (Graphics2D) g;
 	AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER/*, 0.5f*/);
 	g2d.setComposite( ac );
@@ -531,46 +543,48 @@ public class BoardView extends JComponent {
 	int breite=4; // Die Breite des Lasers, sollte gerade sein
 	int lSourceX=0;int lSourceY=0; // Anfangspunkt des Lasers in Pixeln,
 	Location tmp = mapC2PixelCenter(source.x, source.y);
-
-	switch (laserFacing) {
-	case NORTH : {
-	    lSourceX = tmp.x-(breite/2-1);
-	    lSourceY = tmp.y-actualLength+14;
-	    g2d.fillRect(lSourceX,lSourceY,breite,actualLength);
-	    g2d.setColor(sndLaserColor);
-	    g2d.drawRect(lSourceX,lSourceY,breite,actualLength);
-	    break;
-	}
-	case EAST : {
-	    lSourceX = tmp.x-17;
-	    lSourceY = tmp.y-(breite/2-1);;
-	    g2d.fillRect(lSourceX,lSourceY,actualLength,breite);
-	    g2d.setColor(sndLaserColor);
-	    g2d.drawRect(lSourceX,lSourceY,actualLength,breite);
-	    break;
-	}
-	case SOUTH : {
-	    lSourceX = tmp.x-(breite/2-1);
-	    lSourceY = tmp.y-15;
-	    g2d.fillRect(lSourceX,lSourceY,breite,actualLength);
-	    g2d.setColor(sndLaserColor);
-	    g2d.drawRect(lSourceX,lSourceY,breite,actualLength);
-	    break;
-	}
-	case WEST : {
-	    lSourceX = tmp.x-actualLength+17;
-	    lSourceY = tmp.y-(breite/2-1);
-	    g2d.fillRect(lSourceX,lSourceY,actualLength-2, breite);
-	    g2d.setColor(sndLaserColor);
-	    g2d.drawRect(lSourceX,lSourceY,actualLength-2, breite);
-	    break;
-	}
-	default : {
-	    CAT.error("BoardView.paintActiveRobLaser: ");
-	    CAT.error("Ungueltige Laserrichtung: "+laserFacing);
-	}
-	}// end switch facing
-
+       // synchronized (lock) {
+          switch (laserFacing) {
+          case NORTH : {
+              lSourceX = tmp.x-(breite/2-1);
+              lSourceY = tmp.y-actualLength+14;
+              g2d.fillRect(lSourceX,lSourceY,breite,actualLength);
+              g2d.setColor(sndLaserColor);
+              g2d.drawRect(lSourceX,lSourceY,breite,actualLength);
+              break;
+          }
+          case EAST : {
+              lSourceX = tmp.x-17;
+              lSourceY = tmp.y-(breite/2-1);;
+              g2d.fillRect(lSourceX,lSourceY,actualLength,breite);
+              g2d.setColor(sndLaserColor);
+              g2d.drawRect(lSourceX,lSourceY,actualLength,breite);
+              break;
+          }
+          case SOUTH : {
+              lSourceX = tmp.x-(breite/2-1);
+              lSourceY = tmp.y-15;
+              g2d.fillRect(lSourceX,lSourceY,breite,actualLength);
+              g2d.setColor(sndLaserColor);
+              g2d.drawRect(lSourceX,lSourceY,breite,actualLength);
+              break;
+          }
+          case WEST : {
+              lSourceX = tmp.x-actualLength+17;
+              lSourceY = tmp.y-(breite/2-1);
+              g2d.fillRect(lSourceX,lSourceY,actualLength-2, breite);
+              g2d.setColor(sndLaserColor);
+              g2d.drawRect(lSourceX,lSourceY,actualLength-2, breite);
+              break;
+          }
+          default : {
+              CAT.error("BoardView.paintActiveRobLaser: ");
+              CAT.error("Ungueltige Laserrichtung: "+laserFacing);
+          }
+          }// end switch facing
+       //   allDone = true;
+       //   lock.notifyAll();
+       // }
 	//g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
     }
 
@@ -1302,6 +1316,16 @@ public class BoardView extends JComponent {
     }
 
 
+    //private boolean allDone;
+
+    //protected boolean isReady() {
+    //  return allDone;
+    //}
+
+    //Object lock = new Object();
+   // protected Object getLockObj() {
+   //   return lock;
+   // }
 
 }
 

@@ -353,7 +353,11 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     * Tell all boards that "something has changed"
     * @param robotNames List of all robots whose state changed.
     */
+
     public void notifyViews(String[] robotNames){
+      notifyViews(-1, robotNames);
+    }
+    public void notifyViews(int msgNum, String[] robotNames){
 
         // PRE: currentThread ist der ServerThread
         //  ... aber wir pruefen das lieber nochmal :-)
@@ -388,7 +392,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		tmp.setMode(FRAGENERLAUBT);
 
 		try{
-		    tmp.notifyChange(robotNames);
+		    tmp.notifyChange(msgNum, robotNames);
 		}
 		catch (KommFutschException ex){
 		    new Fehlermeldung(Message.say("Server","eKommFutschA"));

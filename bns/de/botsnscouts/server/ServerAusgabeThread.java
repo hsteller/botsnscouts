@@ -196,8 +196,8 @@ class ServerAusgabeThread extends BNSThread implements Waitable
     }
 
     // comm delegation
-    synchronized void notifyChange(String[] s) throws KommException{
-	komm.aenderung(s);
+    synchronized void notifyChange(int msgId, String[] s) throws KommException{
+	komm.aenderung(msgId, s);
     }
     synchronized void deleteMe(String reason) throws KommException{
 	komm.entfernen(reason);

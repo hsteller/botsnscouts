@@ -47,9 +47,13 @@ import java.net.*;
 * Erhält die Namen als Argument.
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
 */
-   public void aenderung (String [] roboternamen)  throws KommException {
+   public void aenderung (int msgId, String [] roboternamen)  throws KommException {
      try {
-       String raus = "NTC(";
+       String raus;
+       if (msgId<0)
+          raus = "NTC(";
+       else
+          raus = OtherConstants.MESSAGE_NUMBER+"="+msgId+",NTC(";
        for (int i=0;i<roboternamen.length;i++)
 	 raus = raus + URLEncoder.encode(roboternamen[i])+",";
        raus +=")";
@@ -103,8 +107,12 @@ import java.net.*;
 	 if (namen!=null) {
 	     send+=",";
 	     for (int i=0;i<namen.length;i++) {
-		 send+=URLEncoder.encode(namen[i])+",";
-	     }
+                CAT.debug("appending: "+namen[i]);
+                 if (namen[i] != null)
+              	  send+=URLEncoder.encode(namen[i])+",";
+	         else
+                  send+="null,";
+             }
 	 }
 	 send+=")";
 

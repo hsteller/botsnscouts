@@ -233,6 +233,16 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      */
     public void showUpdatedRobots(Bot[] r){
 	gameBoardCanvas.ersetzeRobos(r);
+        //synchronized (gameBoardCanvas.getLockObj()) {
+        //  while (!gameBoardCanvas.isReady()) {
+        //    try{
+        //      wait();
+        //    }
+        //    catch (InterruptedException ie) {
+        //      CAT.error(ie.getMessage(), ie);
+        //    }
+        //  }
+       // }
 	for (int i = 0; i < r.length; i++) {
 	    ((RobotStatus) robotStatus.get(r[i].getName())).updateRobot(r[i]);
 	    ((RobotCard) robotCardStatus.get(r[i].getName())).updateRobot(r[i]);
@@ -295,13 +305,33 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      */
     public void showRobLaser(Bot von, Bot nach){
 	gameBoardCanvas.doRobLaser(von, nach);
+       // synchronized (gameBoardCanvas.getLockObj()){
+       //   while (!gameBoardCanvas.isReady()) {
+       //     try {
+       //       wait();
+       //     }
+       //     catch (InterruptedException ie) {
+       //       CAT.error(ie.getMessage(), ie);
+       //     }
+       //   }
+       // }
     }
 
     /**
      * board view is to paint bord laser activity
      */
     public void showBoardLaser(Location laserPos, int facing, int stregth, Location r1Pos){
-	gameBoardCanvas.doBordLaser(laserPos, facing, stregth, r1Pos,gameBoardView);
+       gameBoardCanvas.doBordLaser(laserPos, facing, stregth, r1Pos,gameBoardView);
+       //synchronized (gameBoardCanvas.getLockObj()) {
+       // while (!gameBoardCanvas.isReady()) {
+       //   try {
+       //     wait();
+       //   }
+       //   catch (InterruptedException ie) {
+       //     CAT.error(ie.getMessage(), ie);
+       //   }
+       // }
+       //}
     }
 
     /**

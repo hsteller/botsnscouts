@@ -11,10 +11,15 @@ public interface MessageID {
   public static final String CHAT            = "mChat";
   public static final String PROG_DONE       = "mProgReceived";
   public static final String LAST_PROG       = "mLastProg";
-
+  public static final String BOT_MOVE        = "mDoRobBew";
   public static final String AUSWERTUNG      = "mAusw";
 
   public static final String SOMEONE_QUIT    = "mAbmeldung";
   public static final String BOT_REMOVED     = "mHinr";
+
+  public static final String SIGNAL_ACTION_START = "mSignalStart";
+  public static final String SIGNAL_ACTION_STOP  = "mSignalStop";
+
+
 
 }
