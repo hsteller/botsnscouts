@@ -38,8 +38,8 @@ import java.net.*;
 
     static final Category CAT = Category.getInstance( KommServerAusgabe.class );
 
- public KommServerAusgabe (BufferedReader in, PrintWriter out) {
- super (in, out);
+ public KommServerAusgabe (BufferedReader in, PrintWriter out, String name) {
+ super (in, out, name);
  }
 
   /** Zur Benachrichtigung der Ausgabekanäle von Änderungen.

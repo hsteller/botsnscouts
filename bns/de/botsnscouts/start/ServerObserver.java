@@ -39,7 +39,7 @@ public class ServerObserver extends BNSThread {
     private static Category CAT = Category.getInstance(ServerObserver.class);
 
     private PlayersPanel playersPanel;
-    private WaiterThread waiter;
+    //private WaiterThread waiter;
 
     private ServerSocket srvSocket;
     private Socket socket;
@@ -61,7 +61,7 @@ public class ServerObserver extends BNSThread {
             try {
                 srvSocket = new ServerSocket(i);
                 playersPanel = r;
-                waiter = playersPanel.parent.wth;
+                //waiter = playersPanel.parent.wth;
                 gotit = true;
                 PORTNR = i;
             } catch (Exception e) {
@@ -139,10 +139,14 @@ public class ServerObserver extends BNSThread {
     }
 
     public void fireGameFinished() {
-        if (waiter != null) {
-            waiter.quitYourself();
-        } else {
-            CAT.debug("waiter was null");
+        if (playersPanel!=null && playersPanel.parent!=null ){                        
+	        WaiterThread waiter = playersPanel.parent.getWaiterThread();
+	        if (waiter != null) {
+	            waiter.quitYourself();
+	        } 
+	        else {
+	            CAT.debug("waiter was null");
+	        }
         }
         torun = false;
     }
@@ -162,31 +166,57 @@ public class ServerObserver extends BNSThread {
         playersPanel.newBotEntered(name, color);
     }
 
-    void closeSock() {
+   private  void closeSock() {
         try {
-            srvSocket.close();
-            torun = false;
-            socket.close();
-        } catch (Exception e) {
-            try {
-                if (socket != null) {
-                    socket.close();
-                }
-            } catch (IOException ex) {
-                CAT.error("while closing sockets", ex);
+            if (srvSocket != null)
+                srvSocket.close();
+            	srvSocket = null;
+        } 
+        catch (IOException ex) {
+            CAT.error("while closing srvSocket", ex);
+        }
+        torun = false;
+        try {
+            if (socket != null) {
+                socket.close();
+                socket = null;
             }
         }
+        catch (IOException ex) {
+                CAT.error("while closing socket", ex);
+            }
+            
+        
+    }
+    
+    public void shutdown(){
+        torun = false;
+        fireGameFinished();
+        closeSock();
     }
 
 
     private void error() {
-        if (out != null) {
+        /*if (out != null) {
             out.println("error.");
         }
         try {
-            socket.close();
+            if (socket != null) {
+                socket.close();
+            }
+            else {
+                CAT.warn ("in error(): socket was already null");
+            }
         } catch (IOException ex) {
             CAT.error("while closing sockets", ex);
+        }*/
+        try {
+            closeSock();
+           // playersPanel.parent.wth.stopAllWaitingThreads();
+            //playersPanel.parent.showLastShown();
+        }
+        catch (Exception e){
+            CAT.warn (e);
         }
     }
 }

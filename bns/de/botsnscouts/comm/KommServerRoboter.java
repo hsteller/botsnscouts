@@ -35,8 +35,8 @@ import java.io.*;
 
 public class KommServerRoboter extends KommServer {
 
-  public KommServerRoboter (BufferedReader in, PrintWriter out){
-  super (in, out);
+  public KommServerRoboter (BufferedReader in, PrintWriter out, String name){
+  super (in, out, name);
   }
 
   /** Zur Aufforderung an den Spieler, seinen Zug zu machen.

@@ -52,12 +52,14 @@ public class AutoBot extends BNSThread {
      * is, the worse the 'bot will be. 0 is best, therefore.
      */
     public AutoBot(String i, int p, int malus, boolean beltAware, String name) {
+        super("AutoBot:" + name);
+        realname = name;
         ip = i;
         port = p;
         this.malus = malus;
         this.beltAware=beltAware;
-        realname = name;
-        super.setName("AutoBot:" + realname);
+        
+        
     }
 
     String ip;
@@ -76,13 +78,13 @@ public class AutoBot extends BNSThread {
     ClientAntwort answer = new ClientAntwort();
 
     SimBoard myMap;
-
+    private boolean gameRunning;
     /**
      * run-Methode erzeugt zufaelligen Namen fuer den kuenstlichen Spieler, meldet ihn an
      * und wartet dann auf Nachrichten vom Server, die entsprechend beantwortet werden
      */
     public void run() {
-        boolean gameRunning;
+      try {
 
         try {
             myComm.anmelden(ip, port, realname);
@@ -107,7 +109,7 @@ public class AutoBot extends BNSThread {
             try {
                 answer = myComm.warte();
             } catch (KommException kE) {
-                CAT.error("Got an exception while waiting", kE);
+                CAT.error("Got an exception while waiting", kE);               
                 return;
             }
 
@@ -219,8 +221,13 @@ public class AutoBot extends BNSThread {
                     break;
             }     //Ende switch
         }         //Ende while
-        CAT.debug("End of run()...");
-    }
+      } // Ende of first "try" 
+      finally {
+        CAT.debug("End of run()...calling shutdown in case there is sime IO left to clean up..");
+        shutdown();
+        CAT.info("Autobot "+realname+" finished");
+      }
+     }
 
 
     /**
@@ -335,5 +342,25 @@ public class AutoBot extends BNSThread {
         spK = new AutoBot(host, sPort, malus);
 
         spK.start();
+    }
+    
+    public void shutdown() {
+        	CAT.debug("shutting down..");
+        	gameRunning = false;
+        	try {
+        	    CAT.debug("deregistering from server if still possible..");
+        	    myComm.abmelden(realname);
+        	}
+        	catch (Exception e){
+        	    CAT.debug("during deregister", e);
+        	}
+        	try {
+        	    CAT.debug("killing communication..");
+        	    myComm.shutdown();
+        	}
+        	catch (Exception e){
+        	    CAT.debug(e);
+        	}
+        
     }
 }

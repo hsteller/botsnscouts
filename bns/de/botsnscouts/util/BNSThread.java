@@ -25,7 +25,7 @@
  
 package de.botsnscouts.util;
 
-public class BNSThread extends Thread {
+public abstract class BNSThread extends Thread implements Shutdownable {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( BNSThread.class );
 
     private static int count =  0;
@@ -50,7 +50,7 @@ public class BNSThread extends Thread {
         count++;
     }
 
-    public BNSThread() {
+    private BNSThread() {
         this( "BNSThread-"+count );
     }
 
@@ -61,4 +61,11 @@ public class BNSThread extends Thread {
     public BNSThread(Runnable r, String name) {
         super( threadGroup, r, name );
     }
+    
+    public String toString(){
+        String s = super.toString();     
+        return s;
+    }
+    
+    public abstract void shutdown();
 }

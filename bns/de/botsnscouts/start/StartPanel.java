@@ -53,7 +53,7 @@ public class StartPanel extends JPanel {
     private JLabel angem;
     private PlayersPanel playersComponent;
 
-    private ServerObserver listener;
+ //   private ServerObserver listener;
 
     private JSlider intel;
     private JTextField name;
@@ -72,8 +72,7 @@ public class StartPanel extends JPanel {
 
         angem = new TJLabel();
         playersComponent = new PlayersPanel(parent);
-        listener = new ServerObserver(playersComponent);
-        listener.start();
+     //   recreateServerObeserver();
 
         angem.setFont(font);
         JPanel p = new JPanel(new BorderLayout());
@@ -97,10 +96,19 @@ public class StartPanel extends JPanel {
         add(BorderLayout.EAST, panel);
     }
 
-    ServerObserver getListener() {
+    /*protected void recreateServerObeserver() {
+        if (listener != null) {
+            listener.closeSock();
+        }
+        listener = new ServerObserver(playersComponent);
+        listener.start();
+    }
+    */
+    /*
+    ServerObserver getServerObserver() {
         return listener;
     }
-
+*/
     private JComponent getLocalComponent() {
         JComponent panel = new ColoredComponent();
 
@@ -161,7 +169,7 @@ public class StartPanel extends JPanel {
                 new Thread() {
                     public void run() {
                         CAT.debug("Button pressed. Going to register " + name.getText());
-                        Thread player = parent.facade.participateInAGameNoSplash(name.getText(), color.getSelectedIndex());
+                        BNSThread player = Facade.participateInAGameNoSplash(name.getText(), color.getSelectedIndex());
                         parent.addKS(player);
                         //Generate a new name for the (potential) next local player
                         name.setText(KrimsKrams.randomName());
@@ -288,7 +296,7 @@ public class StartPanel extends JPanel {
                 String name = botNameField.getText();
                 if (name == null || name.length() == 0)
                     name = KrimsKrams.randomName();
-                parent.addKS(parent.facade.startAutoBot(intel.getValue(),
+                parent.addKS(Facade.startAutoBot(intel.getValue(),
                         beltAware.getModel().isSelected(), name));
 
                 botNameField.setText(KrimsKrams.randomName());
@@ -326,15 +334,20 @@ public class StartPanel extends JPanel {
         });
         okComponent.addBackListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                parent.facade.killServer();
-                parent.resetWaiter();
-                listener.closeSock();
+                parent.reset();
+                
                 parent.showGameFieldPanel();
-                parent.startPanel = null;
+                //parent.startPanel = null;
+                
+              //  System.exit(0);
             }
         });
 
         return okComponent;
+    }
+    
+    public PlayersPanel getPlayersPanel() {
+        return playersComponent;
     }
 
     public void paint(Graphics g) {

@@ -40,10 +40,14 @@ public class Launcher {
     private Server server;
 
     // launches output
-    public Thread watchAGame(String ip, int port, boolean noSplash) {
-        Thread ret;
+    public static BNSThread watchAGame(String ip, int port, boolean noSplash) {
+        BNSThread ret;
         try {
-            ret = new BNSThread(new Ausgabe(ip, port, noSplash));
+            ret = new BNSThread(new Ausgabe(ip, port, noSplash)){
+                public void shutdown() {
+                    // TODO maybe kill the Ausgabe?
+                }
+            };
             ret.start();
         } catch (Exception exp) {
             return null;
@@ -52,8 +56,8 @@ public class Launcher {
     }
 
     // launches human player
-    public Thread participateInAGame(String ip, int port, String name, int farbe, boolean noSplash) {
-        Thread ret;
+    public static BNSThread participateInAGame(String ip, int port, String name, int farbe, boolean noSplash) {
+        BNSThread ret;
         try {
             if (CAT.isDebugEnabled()) CAT.debug("Trying to start human player...");
             ret = new HumanPlayer(ip, port, name, farbe, noSplash);
@@ -66,26 +70,27 @@ public class Launcher {
     }
 
     // launch autobots
-    public Thread startAutoBot(String ip, int port, int iq) {
+    public static BNSThread startAutoBot(String ip, int port, int iq) {
         return startAutoBot(ip, port, iq, false);
     }
 
-    public Thread startAutoBot(String ip, int port, int iq, boolean beltAware) {
+    public static BNSThread startAutoBot(String ip, int port, int iq, boolean beltAware) {
         return startAutoBot(ip, port, iq, beltAware, KrimsKrams.randomName());
     }
 
-    public Thread startAutoBot(String ip, int port, int iq, boolean beltAware,
+    public static BNSThread startAutoBot(String ip, int port, int iq, boolean beltAware,
                                       String botName) {
-        Thread ks;
+        BNSThread ks;
         ks = new AutoBot(ip, port, iq, beltAware, botName);
         ks.start();
         ks.setPriority(java.lang.Thread.MIN_PRIORITY);
         return ks;
     }
 
-    public void startGame(GameOptions options, ServerObserver listener) throws OneFlagException, NonContiguousMapException {
+    public Server startGame(GameOptions options, ServerObserver listener) throws OneFlagException, NonContiguousMapException {
        server = new Server(options, listener);
        server.start();
+       return server;
    }
 
 
@@ -95,7 +100,10 @@ public class Launcher {
 
     public void stopServer() {
         // Not nice, but this is the way it was done before...
-        server.interrupt();
+      
+        server.shutdown();              
+        server = null;
+        System.gc();
     }
 
 }

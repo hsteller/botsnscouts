@@ -366,7 +366,7 @@ public class HumanPlayer extends BNSThread {
 	        synchronized (comm){	            
 	            if (!cardsSent) {
 	                timeoutWatcher.cancel();
-	            
+	           
 	                comm.registerProg(name, sendProg, nextTurnPowerDown);
 	                cardsSent = true;
 	            }
@@ -396,15 +396,30 @@ public class HumanPlayer extends BNSThread {
 
     /** meldet den Spieler beim Server ab und beendet diesen Thread.
      */
-    protected void quit() {
+    public void shutdown() {
         if (CAT.isDebugEnabled()) {
             CAT.debug(name + "was called to quit");
             CAT.debug("sending quit to server..");
         }
-        comm.abmelden(name);
-        CAT.debug("setting condition for leaving the run()-method");
+        try {
+            comm.abmelden(name); // notify server
+        }
+        catch (Exception e){
+            CAT.warn("in shutdown", e);
+        }
+        try {
+            comm.shutdown(); // close socket and streams
+        }
+        catch (Exception e){
+            CAT.warn("in shutdown", e);
+        }
+            CAT.debug("setting condition for leaving the run()-method");
         gameOver = true;
-
+        CAT.debug("shutting down my output channel "); 
+        if (ausgabe != null ){
+            ausgabe.shutdown(); // will kill the view
+        }
+        view = null;
         //Dafuer sorgen, dass Thread aufhoert
         //System.exit(0);
     }
@@ -569,9 +584,7 @@ public class HumanPlayer extends BNSThread {
     }
 
     class EmergencyCardSubmitter extends TimerTask {
-        
-        
-        
+       
         public EmergencyCardSubmitter( ){
         }
 

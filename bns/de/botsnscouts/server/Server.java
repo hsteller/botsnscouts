@@ -39,7 +39,9 @@ import org.apache.log4j.Category;
 import java.util.Iterator;
 import java.util.Vector;
 
-public class Server extends BNSThread implements ModusConstants, ServerOutputThreadMaintainer, InfoRequestAnswerer, OKListener, ServerRobotThreadMaintainer, ThreadMaintainer {
+public class Server extends BNSThread implements ModusConstants,  ServerOutputThreadMaintainer,
+																		InfoRequestAnswerer, OKListener, ServerRobotThreadMaintainer,
+																		ThreadMaintainer, Shutdownable {
     private static final Category CAT = Category.getInstance(Server.class);
 
     // Vektoren
@@ -53,6 +55,11 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     private Vector graveyardThreads = new Vector();	// of ServerRoboterThread
     private Vector wonThreads = new Vector(); //of ServerRoboterThread
 
+    private Vector [] shutdownableCollections = new Vector []{
+                    ausgabeThreads, ausgabenEnterRequestedThreads, botThreads, curBotsThreads,
+                    destroyedBotsThreads, botEnterRequestedThreads, graveyardThreads, wonThreads
+    };
+    
     private RegistrationManager registrationManager;
     private MessageThread messageThread;
 
@@ -86,6 +93,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
      * This constructor is called once per Game by StartServer.
      */
     public Server(GameOptions options, ServerObserver listener) {
+        super("THE_SERVER");
         serverObserver = listener;
         this.options = options;
         try {
@@ -99,6 +107,10 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
         }
 
         CAT.debug("New server with these options: " + options);
+    }
+    
+    public ServerObserver getServerObserver(){
+        return serverObserver;
     }
 
     /**
@@ -625,8 +637,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             try {
                 wait();                       // supposed to be notified from startGame()
             } catch (InterruptedException e) {
-                CAT.debug("In der anmeldung interruptiert worden!");
-
+                CAT.debug("In der anmeldung interruptiert worden!"); 
                 return false;
             }
             //Spiel starts!
@@ -697,7 +708,8 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             CAT.debug("anmeldung()");
             boolean spielgestartet = anmeldung();
             if (!spielgestartet) {
-                messageThread.interrupt();
+                messageThread.interrupt();                
+                registrationManager.endRegistration();
                 return;
             }
 
@@ -1062,7 +1074,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                         }
                     }
                     CAT.debug("945 release aktRoboter");
-
+                    
                 } // End phase evaluation
 
                 /*  End-of-turn-evaluation:
@@ -1197,10 +1209,13 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             if (serverObserver != null) {
                 serverObserver.fireGameFinished();
             }
+            
         } catch (Throwable t) {
             CAT.fatal("Exception:", t);
         }
-        CAT.debug("Ende meiner run()-Methode erreicht!!!");
+        finally {
+            CAT.info("SERVER REACHED END OF RUN METHOD");
+        }
     }// run() ende
 
     private RobProgListener robProgListener = new RobProgListener();
@@ -1236,4 +1251,44 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             CAT.debug("1197 release server");
         }
     }
+    
+    public void shutdown() {
+ 
+        	if (messageThread != null){
+        	    messageThread.shutdown();
+        	}
+        	
+        	int count = shutdownableCollections.length;
+        	for (int i=0;i<count;i++){
+        	    Vector v = shutdownableCollections[i];
+        	    if (v != null) {
+        	        synchronized(v){
+        	            Iterator it = v.iterator();
+        	            while (it.hasNext()){
+        	                try {        	                    
+        	                    Shutdownable thread = (Shutdownable) it.next();
+        	                    CAT.debug("shutting down: "+thread);
+        	                    thread.shutdown();
+        	                }
+        	                catch (Exception e){
+        	                    CAT.error("error killing thread: "+e.getMessage(), e);
+        	                }
+        	            }
+        	        }
+        	    }
+        	}
+           	if (registrationManager != null) {
+        	    registrationManager.shutdown();
+        	}
+        	if (serverObserver != null){
+        	    serverObserver.shutdown();        	    
+        	}
+        	this.interrupt();
+    }
+    
+    public void interrupt() {
+        CAT.debug("SERVER GOT INTERRUPTED!");
+        super.interrupt();     
+    }
+    
 }// class Server ende

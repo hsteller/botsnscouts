@@ -27,6 +27,7 @@ package de.botsnscouts.start;
 
 import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.gui.Splash;
+import de.botsnscouts.server.Server;
 import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.GreenTheme;
@@ -55,7 +56,7 @@ public class Start extends JFrame implements WindowListener {
     private static String PARTICIPATE = "participate";
     private WatchPanel watchPanel;          //watch
     private static String WATCH = "watch";
-    protected StartPanel startPanel;                  //Screen with all information and start button
+    private StartPanel startPanel;                  //Screen with all information and start button
     private static String START = "start";
     private FieldEditor fieldEditor;
     private static String FIELD_EDITOR = "fieldedit";
@@ -63,7 +64,7 @@ public class Start extends JFrame implements WindowListener {
     private static String BUSY = "busy";
     private CardLayout layout = new CardLayout();
 
-    protected WaiterThread wth;
+    private WaiterThread wth;
 
     private Splash splash;
 
@@ -97,8 +98,18 @@ public class Start extends JFrame implements WindowListener {
         show();
     }
 
+    
+    private String lastShown = MAIN_MENU;
+    private String currentyShowing = MAIN_MENU;
     private void switchCard(String to) {
+       
         layout.show(getContentPane(), to);
+        lastShown = currentyShowing;
+        currentyShowing = to;
+    }
+    
+    protected void showLastShown(){
+        switchCard(lastShown);
     }
 
     protected void showBusy(String txt) {
@@ -178,15 +189,15 @@ public class Start extends JFrame implements WindowListener {
         System.exit(0);
     }
 
-    public void addKS(Thread k) {
+    public synchronized void addKS(BNSThread k) {
         wth.addThread(k);
     }
 
-    public void addServer() {
+    public synchronized void addServer() {
         wth.setServer();
     }
 
-    public void resetWaiter() {
+    public synchronized void resetWaiter() {
         wth.quitYourself();
         wth.reset();
         wth = new WaiterThread(this);
@@ -272,11 +283,13 @@ public class Start extends JFrame implements WindowListener {
         new Thread(new Runnable() {
             public void run() {
                 try {
+                    // HS_TODO 
                     if (startPanel == null) {
                         startPanel = new StartPanel(Start.this);
                         getContentPane().add(startPanel, START);
                     }
-                    facade.startGame(startPanel.getListener());//starte Spiel
+                    ServerObserver foo = new ServerObserver(startPanel.getPlayersPanel());
+                    Server server = facade.startGame(foo);//starte Spiel
                     addServer();
                     postServerStartTask.doIt();
 
@@ -331,6 +344,19 @@ public class Start extends JFrame implements WindowListener {
 
     }
 
+    protected WaiterThread getWaiterThread() {
+        return wth;
+    }
+    
+    public void reset() {
+        facade.killServer();
+        getContentPane().remove(startPanel);
+        startPanel = null;
+ //       startPanel.recreateServerObeserver();
+      //  getWaiterThread().stopAllWaitingThreads();
+        resetWaiter();
+        
+    }
 
     public static void main(String[] argv, Splash splash) {
         initBasics();
@@ -382,4 +408,5 @@ public class Start extends JFrame implements WindowListener {
         }
     }
 
+    
 }//class Start end

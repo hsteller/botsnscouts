@@ -109,6 +109,11 @@ class MessageThread extends de.botsnscouts.util.BNSThread
 	    de.botsnscouts.util.Global.debug("Interrupted. End of run().");
 	}
     }
+    
+    public void shutdown() {
+        
+        this.interrupt();
+    }
 
     /** Just a struct, really. */
     private class Msg{

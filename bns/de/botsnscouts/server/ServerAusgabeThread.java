@@ -54,6 +54,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 
     public ServerAusgabeThread(KommServerAusgabe ksa, OKListener okL, MOKListener mokl, InfoRequestAnswerer info, ServerOutputThreadMaintainer m)
     {
+        super(ksa.getName());
 	ok=okL;
 	mok=mokl;
 	this.info=info;
@@ -68,6 +69,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 
     public void run()
     {
+        CAT.debug ("SERVERAUSGABETHREAD STARTED");
         CAT.debug("Running...");
 	try{
             ende=false;
@@ -188,7 +190,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 	} catch( Throwable t ) {
 	    CAT.fatal("Exception:", t);
 	}
-	d("Ende meiner run-Methode erreicht.");
+	 CAT.debug ("SERVER AUSGABETHREAD REACHED END OF RUN");
     } // run()
 
     private void d(String s)
@@ -213,5 +215,17 @@ class ServerAusgabeThread extends BNSThread implements Waitable
     synchronized void sendMsg(String id, String[] args){
 	komm.message(id,args);
     }
-
+    
+    public void shutdown() {
+        try {
+            komm.entfernen(OtherConstants.REASON_SERVER_SHUTDOWN);
+            komm.out.close();
+            komm.in.close();
+        }
+        catch (Exception e){
+            CAT.warn("while sending shutdown notice to Output channel", e);
+        }
+        ende = true;
+        this.interrupt();        
+    }
 }

@@ -121,11 +121,13 @@ public class Ausgabe extends BNSThread {
     }
 
     private Ausgabe(String host, int port, boolean nosplash, boolean lateInit) {
+        super("someAusgabe");
         sequencer = new MessageSequencer(lateInit);
         this.nosplash = nosplash;
         this.host = host;
         this.port = port;
         name = KrimsKrams.randomName();
+       
         super.setName("Ausgabe[" + name + "]");
         showSplash(Message.say("AusgabeFrame", "msplashWarte"));
         kommClient = new KommClientAusgabe();
@@ -142,7 +144,7 @@ public class Ausgabe extends BNSThread {
         // ---- entering game  ---------
         while (!spielEnde) {
             try {
-// waiting for server messages
+                // waiting for server messages
                 kommAntwort = kommClient.warte();
             } catch (KommFutschException kE) {  // lost network communication with server
                 CAT.error("KE: " + kE.getMessage());
@@ -154,36 +156,37 @@ public class Ausgabe extends BNSThread {
             // what did the server send?
             switch (kommAntwort.typ) {
                 case (ClientAntwort.MESSAGE):
-                    { // (user information) messages about stuff that happend;
-                        // for advanced displaying, playing sounds at the right time
-                        comHandleMessages(kommAntwort);
-                        break;
-                    }
+                { // (user information) messages about stuff that happend;
+                    // for advanced displaying, playing sounds at the right time
+                    comHandleMessages(kommAntwort);
+                    break;
+                }
                 case (ClientAntwort.AENDERUNG):
-                    {// notify change; something happened (to a robot);
-                        try {
-                            comHandleNotifyChange(kommAntwort);
-                        } catch (KommFutschException ke) {
-                            CAT.error("ke2: " + ke.getMessage(), ke);
-                            return;
-                        } catch (KommException kE) {
-                            CAT.error(kE.getMessage(), kE);
-                            return;
-                        }
-                        break;
+                {// notify change; something happened (to a robot);
+                    try {
+                        comHandleNotifyChange(kommAntwort);
+                    } catch (KommFutschException ke) {
+                        CAT.error("ke2: " + ke.getMessage(), ke);
+                        return;
+                    } catch (KommException kE) {
+                        CAT.error(kE.getMessage(), kE);
+                        return;
                     }
-
+                    break;
+                }
+                
                 case (ClientAntwort.ENTFERNUNG):
-                    { // we were removed for some reason, i.e. game is over,
-                        // there was a timeout, we violated some protocol rule
-                        CAT.info("Game over.");
-                        comHandleWeWereRemoved(kommAntwort);
-                    }
+                { // we were removed for some reason, i.e. game is over,
+                    // there was a timeout, we violated some protocol rule
+                    CAT.info("Game over.");
+                    comHandleWeWereRemoved(kommAntwort);
+                }
             }
 
         }
         CAT.debug("Ausgabe reached end of its run method");
         //showActionMessage(Message.say("AusgabeFrame","spielende"));
+        shutdown();
         return;
     }
 
@@ -255,7 +258,13 @@ public class Ausgabe extends BNSThread {
             } catch (FlagException e) {
                 System.err.println(e.getMessage());
             }
-        } else {
+        } 
+        else if (kommAntwort.typ == ClientAntwort.ENTFERNUNG){
+            CAT.info("server removed me before the game started; reason="+kommAntwort.str);
+            CAT.info("I'm going to kill myself..");
+            shutdown();
+        }        
+        else {
             // Problem: the server sends garbage
             CAT.debug("server does not send a game start at game start... pfui!");
         }
@@ -444,6 +453,7 @@ public class Ausgabe extends BNSThread {
 
 
     private void abmelden() {
+        CAT.debug("deregistering from server..");
         /* while (mayNotLeave) {
            synchronized (this) {
              try {
@@ -455,17 +465,38 @@ public class Ausgabe extends BNSThread {
              }
            }
          }*/
-        CAT.debug("Ausgabe sets condition(s) for leaving its ru() method");
+        CAT.debug("Ausgabe sets condition(s) for leaving its run() method");
         quitByMyself = true;
         spielEnde = true;
         CAT.debug("Ausgabe deregisters from server");
         kommClient.abmelden(name);
     }
 
-    protected void quit(boolean keepWatching) {
-        abmelden();
-        CAT.debug("Ausgabe tells the view to propagate quitting..");
-        view.quitHumanPlayer(); // Tell the view to tell the HumanPlayer to quit, if there is any
+    protected void quit(boolean keepWatching, boolean quitHumanPlayer) {
+       
+        abmelden();        
+        if (quitHumanPlayer) {
+            CAT.debug("Ausgabe tells the view to propagate quitting..");
+            view.quitHumanPlayer(); // Tell the view to tell the HumanPlayer to quit, if there is any
+        }
+     }
+    
+    public void shutdown() {
+        CAT.debug("starting shutdown..");
+        quit(false, false);
+        try {
+            CAT.debug("killing communication..");
+            kommClient.shutdown();
+        }
+        catch (Exception ioe ){
+            CAT.warn("during communication shutdown", ioe);
+         }
+        CAT.debug("removing View");
+        view.setVisible(false);
+        view.dispose();
+        view = null;
+        CAT.debug("reached end of shutdown");
+       
     }
 
 

@@ -100,7 +100,7 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
 
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("go")) {
-            Thread smth = parent.facade.participateInAGame(hostName.getText(), port, robName.getText(),
+            BNSThread smth = parent.facade.participateInAGame(hostName.getText(), port, robName.getText(),
                     colors.getSelectedIndex());
             Global.debug(this, "SpielerMensch gestartet");
             parent.addKS(smth);

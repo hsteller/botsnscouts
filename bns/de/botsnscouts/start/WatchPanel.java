@@ -25,6 +25,7 @@
 
 package de.botsnscouts.start;
 
+import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.TJButton;
 import de.botsnscouts.widgets.TJLabel;
@@ -113,7 +114,7 @@ public class WatchPanel extends JPanel implements ActionListener, MouseListener 
             System.err.println("Must be a number!");
             return;
             }*/
-            Thread ausgabe = parent.facade.watchAGame(serv.getText(), portnr);
+            BNSThread ausgabe = Facade.watchAGame(serv.getText(), portnr);
             parent.addKS(ausgabe);
             parent.hide();
             parent.dispose();

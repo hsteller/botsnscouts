@@ -41,11 +41,13 @@ import java.net.*;
  *@author Hendrik
 */
 
-public class KommClient {
+public class KommClient implements Shutdownable{
     static Category CAT = Category.getInstance(KommClient.class);
     static final boolean LOG_RECEIVE = true;
     static final boolean LOG_SEND    = true;
 
+    private Socket socket;
+    
     /** The client reads  messages of the server using this BufferedReader
      */
     protected BufferedReader in;
@@ -651,25 +653,23 @@ public class KommClient {
 			    int klazu = com.lastIndexOf(')');
 			    String work = com.substring(klauf+1,klazu);
 			    if (work.length()<=2) {
-				if (work.equals("LL")) // lost all lives
-				    back.str="Alle Leben verloren";
-				else if (work.equals("TO"))
-				    back.str="Das TimeOut wurde ueberschritten"; // timeout
-				else if (work.equals("GO"))
-				    back.str="Das Spiel ist vorbei"; // game is over
-				else if (work.equals("RV"))
-				    back.str="Es trat eine Regelverletzung auf"; // rule violation
-				else if (work.equals("ZS"))
-				    back.str="Die Anmeldung erfolgte zu spaet"; // to late registered
-				else
-				    back.str="unbekannter Grund fuer Entfernung"; // unknown reason
+			        if (work.equals("LL")) // lost all lives
+			            back.str="Alle Leben verloren";
+			        else if (work.equals("TO"))
+			            back.str="Das TimeOut wurde ueberschritten"; // timeout
+			        else if (work.equals("GO"))
+			            back.str="Das Spiel ist vorbei"; // game is over
+			        else if (work.equals("RV"))
+			            back.str="Es trat eine Regelverletzung auf"; // rule violation
+			        else if (work.equals("ZS"))
+			            back.str="Die Anmeldung erfolgte zu spaet"; // to late registered
+			        else
+			            back.str="unbekannter Grund fuer Entfernung: \""+work+"\""; // unknown reason
 			    }
-
-
 			    else {
-				klauf = work.indexOf ('(');
-				work = work.substring (klauf+1,work.length()-1);
-				back.str=work;
+			        //klauf = work.indexOf ('(');
+			        // work = work.substring (klauf+1,work.length()-1);
+			        back.str=work;
 			    }
 			}
 			catch (Exception e) {
@@ -1371,12 +1371,39 @@ public class KommClient {
 	}
 	return back;
     }
+    
+    public void shutdown() {
+        if (socket != null) {
+            try {
+                socket.close();
+            }
+            catch (Exception ioe){
+                CAT.debug(ioe);
+            }
+        }
+        if (in != null) {
+            try {
+                in.close();
+            }
+            catch (Exception ioe){
+                CAT.debug(ioe);
+            }
+        }
+        if (out != null) {
+            try {
+                out.close();
+            }
+            catch (Exception ioe){
+                CAT.debug(ioe);
+            }
+        }
+    }
+    
     /** Finalizer closes the streams.
      */
     protected void finalize() throws Throwable {
       super.finalize();
-	  if (in != null) in.close();
-	  if(out != null) out.close();
+	  shutdown();
     }
 }
 

@@ -57,6 +57,10 @@ public class TileFactory {
 
     boolean workerStarted = false;
     private Thread worker = new BNSThread("TileWorker") {
+        public void shutdown(){
+            CAT.debug ("TileFactory's workerThread: empty shutdown() called");
+        }
+        
         public void run() {
 
             // Load those from bns.home/tiles

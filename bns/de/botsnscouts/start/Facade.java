@@ -26,6 +26,8 @@
 package de.botsnscouts.start;
 
 import de.botsnscouts.board.FlagException;
+import de.botsnscouts.server.Server;
+import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Location;
 
 import java.awt.*;
@@ -221,55 +223,55 @@ public class Facade {
     /**
      * Start a stand-alone Ausgabe.
      */
-    public Thread watchAGame(String ip, int port) {
-        return launcher.watchAGame(ip, port, false);
+    public static BNSThread watchAGame(String ip, int port) {
+        return Launcher.watchAGame(ip, port, false);
     }
 
-    public Thread watchAGame() {
-        return launcher.watchAGame(GameOptions.DHOST, GameOptions.DPORT, false);
+    public static BNSThread watchAGame() {
+        return Launcher.watchAGame(GameOptions.DHOST, GameOptions.DPORT, false);
     }
 
-    public Thread watchAGameNoSplash() {
-        return launcher.watchAGame(GameOptions.DHOST, GameOptions.DPORT, true);
+    public static BNSThread watchAGameNoSplash() {
+        return Launcher.watchAGame(GameOptions.DHOST, GameOptions.DPORT, true);
     }
 
     /**
      * Start a human player
      */
-    public Thread participateInAGame(String ip, int port, String name, int color) {
-        return launcher.participateInAGame(ip, port, name, color, false);
+    public static BNSThread participateInAGame(String ip, int port, String name, int color) {
+        return Launcher.participateInAGame(ip, port, name, color, false);
     }
 
-    public Thread participateInAGame(String ip, String name, int color) {
-        return launcher.participateInAGame(ip, GameOptions.DPORT, name, color, false);
+    public static BNSThread participateInAGame(String ip, String name, int color) {
+        return Launcher.participateInAGame(ip, GameOptions.DPORT, name, color, false);
     }
 
-    public Thread participateInAGame(String name, int color) {
-        return launcher.participateInAGame(GameOptions.DHOST, GameOptions.DPORT, name, color, false);
+    public static BNSThread participateInAGame(String name, int color) {
+        return Launcher.participateInAGame(GameOptions.DHOST, GameOptions.DPORT, name, color, false);
     }
 
-    public Thread participateInAGameNoSplash(String name, int color) {
-        return launcher.participateInAGame(GameOptions.DHOST, GameOptions.DPORT, name, color, true);
+    public static BNSThread participateInAGameNoSplash(String name, int color) {
+        return Launcher.participateInAGame(GameOptions.DHOST, GameOptions.DPORT, name, color, true);
     }
 
-    public Thread startAutoBot(String ip, int port, int iq) {
-        return launcher.startAutoBot(ip, port, iq);
+    public static BNSThread startAutoBot(String ip, int port, int iq) {
+        return Launcher.startAutoBot(ip, port, iq);
     }
 
-    public Thread startAutoBot(int iq, boolean beltAware) {
-        return launcher.startAutoBot(GameOptions.DHOST, GameOptions.DPORT, iq, beltAware);
+    public static BNSThread startAutoBot(int iq, boolean beltAware) {
+        return Launcher.startAutoBot(GameOptions.DHOST, GameOptions.DPORT, iq, beltAware);
     }
 
-    public Thread startAutoBot(int iq, boolean beltAware, String botName) {
-        return launcher.startAutoBot(GameOptions.DHOST, GameOptions.DPORT, iq, beltAware, botName);
+    public static BNSThread startAutoBot(int iq, boolean beltAware, String botName) {
+        return Launcher.startAutoBot(GameOptions.DHOST, GameOptions.DPORT, iq, beltAware, botName);
     }
 
-    public void startGame() throws OneFlagException, NonContiguousMapException {
-        startGame(null);
+    public Server startGame() throws OneFlagException, NonContiguousMapException {
+       return  startGame(null);
     }
 
-    public void startGame(ServerObserver listener) throws OneFlagException, NonContiguousMapException {
-        launcher.startGame(gameOptions, listener );
+    public Server startGame(ServerObserver listener) throws OneFlagException, NonContiguousMapException {
+        return launcher.startGame(gameOptions, listener );
     }
 
     public void gameStarts() {

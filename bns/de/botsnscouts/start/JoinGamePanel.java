@@ -1,6 +1,7 @@
 package de.botsnscouts.start;
 
 import de.botsnscouts.widgets.*;
+import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.util.Conf;
@@ -80,7 +81,7 @@ public class JoinGamePanel extends ColoredComponent {
 
         confirmPanel.addOkListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Thread smth = parent.facade.participateInAGame(hostName.getText(), port, robName.getText(),
+                BNSThread smth = Facade.participateInAGame(hostName.getText(), port, robName.getText(),
                         colors.getSelectedIndex());
                 Global.debug(this, "SpielerMensch gestartet");
                 parent.addKS(smth);

@@ -340,7 +340,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
             }
             else {
 	            int offset = 30;
-	            int delay = 5;
+	            int delay = 5; // TODO 
 	            if (newUpperLeft.x < currentUpperLeft.x) {
 	               currentUpperLeft =  scrollWest(currentUpperLeft, newUpperLeft, offset, delay);
 	            }
@@ -507,7 +507,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 		JOptionPane.QUESTION_MESSAGE)
 	                        == JOptionPane.OK_OPTION){
 	 // null means CANCEL
-        ausgabe.quit(keepWatching);
+	    boolean shutdownPossibleHumanPlayer = true;
+        ausgabe.quit(keepWatching, shutdownPossibleHumanPlayer);
      
 	// Since this does not work properly by now, we do:
 	//System.exit(0);

@@ -58,6 +58,7 @@ class ServerAnmeldeOberThread extends Thread {
 
     public void run() {
         try {
+            CAT.debug ("SERVER ANMELDEOBERTHREAD STARTED");
             try {
                 seso = new ServerSocket(server.getRegistrationPort());
             } catch (IOException e) {
@@ -96,6 +97,7 @@ class ServerAnmeldeOberThread extends Thread {
         } catch (Throwable t) {
             CAT.fatal("Exception:", t);
         }
+        CAT.debug ("SERVER ANMELDEOBERTHREAD REACHED END OF RUN");
     }
 
     /** Registriert Namen als benutzt - soll mit isLegalName() benutzt werden */

@@ -433,7 +433,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
     protected void quitHumanPlayer() {
         CAT.debug("HumanView asks the HumanPLayer to quit..");
-        human.quit();
+        human.shutdown();
     }
 
     private void d(String s) {

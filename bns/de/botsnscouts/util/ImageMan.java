@@ -135,12 +135,15 @@ public class ImageMan {
 
 	// start loading in a different thread
 	imageLoader = new BNSThread("imageLoader") {
+	    public void shutdown() {
+	        ImageMan.CAT.debug("ImageMan's empty shutdown() called");
+	    }
 	    public void run() {
 		try {
 		    ImageMan.CAT.debug("started loading and cropping of images in background");
 		    tracker.waitForAll();
 		    ImageMan.CAT.debug("images ready");
-		}catch(InterruptedException ie) { System.err.println( ie ); }
+		}catch(InterruptedException ie) { ImageMan.CAT.error( ie ); }
 	    }
 	};
 	imageLoader.start();

@@ -348,13 +348,12 @@ public class GameFieldPanel extends JPanel {
              */
             parent.showNewStartPanel(new Task() {
                 public void doIt() {
-
-                    if (participate.getSelectedObjects() != null) {
-                        Thread smth = parent.facade.participateInAGameNoSplash(nam.getText(), colors.getSelectedIndex());
+                    if (participate.getSelectedObjects() != null) {                       
+                        BNSThread smth = Facade.participateInAGameNoSplash(nam.getText(), colors.getSelectedIndex());
                         parent.addKS(smth);
                         Global.debug(this, "menschlichen spieler gestartet");
                     } else {//starte einen AusgabeFrame
-                        parent.addKS(parent.facade.watchAGameNoSplash());
+                        parent.addKS(Facade.watchAGameNoSplash());
                     }
                     // Announce game, if we shall do this.
                     try {

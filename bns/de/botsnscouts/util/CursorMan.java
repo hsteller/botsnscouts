@@ -83,7 +83,11 @@ public class CursorMan {
 	}
 
 	// start loading in a different thread
-	imageLoader = new BNSThread() {
+	imageLoader = new BNSThread("CursorMan") {
+	    public void shutdown(){
+	        CursorMan.CAT.debug("CursorMan's empty shutdown() called");
+	    }
+	    
 	    public void run() {
 		try {
 		    CursorMan.CAT.debug("started loading and cropping of images in background");

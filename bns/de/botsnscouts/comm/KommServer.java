@@ -42,9 +42,16 @@ public class KommServer {
 
     static final boolean LOG_SEND = false;
 
-    public KommServer(BufferedReader i, PrintWriter o) {
+    private String name = "someKommServer";
+    
+    public KommServer(BufferedReader i, PrintWriter o, String name) {
         in = i;
         out = o;
+        this.name = name;
+    }
+    
+    public String getName(){
+        return this.name;
     }
 
     /** BufferedReader */
@@ -1401,5 +1408,6 @@ public class KommServer {
     //    return back;
     //   }
 
+   
 }
 
