@@ -903,13 +903,29 @@ public class KommServer {
    
   } 
   
+ /** Finalizer, der die Streams zu macht.
+     * (Wird vom garbage collector aufgerufen.)
+     * @author Miriam
+     */
+    protected void finalize() throws IOException {
+	if (in != null) in.close();
+	if(out != null) out.close();
+    }
+  
+
+
+
+
+
+
+
+
+
+ 
     /**
-       DEPRECATED - has never beem used
+       DEPRECATED - has never been used
      */
     //  public void sendFeldinhalt (de.botsnscouts.old.Feld f)  throws KommException{}
-  
-       
-
 //     /**Zur Antwort auf Info-Request 'gibFeldinhalt'.
 //    * erhält ein Objekt des Typs Feld, das dem Feld an der gewünschten Stelle entspricht
 //    * Feld enthält den Bodeninhalt und die Wandgeräte.
@@ -1156,15 +1172,7 @@ public class KommServer {
 //    return back; 
 //   } 
 
-    /** Finalizer, der die Streams zu macht.
-     * (Wird vom garbage collector aufgerufen.)
-     * @author Miriam
-     */
-    protected void finalize() throws IOException {
-	if (in != null) in.close();
-	if(out != null) out.close();
-    }
-  
+   
 }
 
 
