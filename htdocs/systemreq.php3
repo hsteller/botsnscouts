@@ -1,3 +1,6 @@
+<HEAD>
+<TITLE>Bots'n'Scouts - System Requirements</TITLE>
+</HEAD>
 <?php include('bnsheader.pht');?>
 <H1>System Requirements</H1>
 </CENTER>
