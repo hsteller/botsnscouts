@@ -98,6 +98,10 @@ public class RobotStatus extends JPanel {
 	damage.setText(""+r.getSchaden());
     }
 
+    // HIRKS!!! damn!! How could he forget that!!!
+    // No wonder, that locating roobots does not work anymore
+    robot = r;
+
     }
 
     public void setWinnerNumber (int ranking) {
