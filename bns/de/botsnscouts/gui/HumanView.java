@@ -19,6 +19,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
     private CardLayout panelSwitcher = new CardLayout();
     private JPanel scoutNFriends = new JPanel();
     private RepairRegisters repairRegisters;
+    private CardArray cards;
     
     public HumanView() {
 	setLayout(panelSwitcher);
@@ -40,6 +41,17 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	    }
 	    });
 	
+	cards = new CardArray(new ActionListener(){
+		public void actionPerformed(ActionEvent cardKlick) {
+		    treatCardKlick((CardView) cardKlick.getSource());
+		}
+	    },
+			      new ActionListener(){
+				      public void actionPerformed(ActionEvent sendKlick) {
+					  treatSendCards();
+				      }
+				  }
+			      );
 	
     }
 
@@ -128,6 +140,16 @@ public class HumanView extends JPanel implements HumanViewInterface {
     private void sendRepairRegisters () {
 	ArrayList a = repairRegisters.getSelection();
 	// TODO
+    }
+
+
+    private void treatCardKlick (CardView cv) {
+	// TODO: if registers free then remove
+    }
+
+
+    private void treatSendCards () {
+	// TODO if registers full: send cards
     }
 
 }

@@ -13,12 +13,12 @@ import javax.swing.border.*;
     /**
      * gui-container that has a card
      */
-public class CardView extends JToggleButton {
-    ImageIcon cardFree = ImageMan.CardRUECK;
+public class RegisterView extends JButton {
+    ImageIcon registerFree = ImageMan.CardRLEER;
     ImageIcon cardImage;
     HumanCard h;
 
-    public CardView() {
+    public RegisterView() {
 	this(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 		    System.err.println("Pressed:"+ae.getActionCommand());
@@ -28,10 +28,10 @@ public class CardView extends JToggleButton {
 	setEnabled(true);
     }
 
-    public CardView (ActionListener al) {
+    public RegisterView (ActionListener al) {
 	setContentAreaFilled(false);
 	setBorder(null);
-	setIcon(cardFree);
+	setIcon(registerFree);
 	setEnabled(false);
 	addActionListener(al);
     }
@@ -39,7 +39,7 @@ public class CardView extends JToggleButton {
     public void reset() {
 	setSelected(false);
 	setEnabled(false);
-	setIcon(cardFree);
+	setIcon(registerFree);
 	h = null;
     }
 
@@ -56,7 +56,6 @@ public class CardView extends JToggleButton {
 	else if (ktyp.equals("UT")) cardImage = ImageMan.CardUT;
 	else System.err.println("CardView: the card is bad.");
 	setIcon(cardImage);
-	setSelectedIcon(cardFree);
 	setEnabled(true);
     }
 
@@ -73,9 +72,9 @@ public class CardView extends JToggleButton {
         JWindow f = new JWindow();
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
 
-        CardView c = new CardView();
+        RegisterView r = new RegisterView();
 
-	f.getContentPane().add(c);
+	f.getContentPane().add(r);
 	f.pack();
 	f.setLocation(100,100);
 	f.setVisible(true);
