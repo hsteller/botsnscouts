@@ -50,8 +50,18 @@ public class RepairRegisters extends JPanel implements ActionListener{
 
 	titel.setText(Message.say("SpielerMensch","mregwahl",repairPoints));
 	locked=new boolean[registers.size()];
+	RegisterView rv;
+	boolean lo;
+	String act;
+	int prio;
 	for(int i=0;i<registers.size();i++){
-	    add((RegisterView)registers.get(i));
+	    rv=(RegisterView)registers.get(i);
+	    lo=rv.locked();
+	    act=rv.getAction();
+	    prio=rv.getPrio();
+	    rv=new RegisterView(this);
+	    rv.setCard(new HumanCard(prio,act));
+	    add(rv);
 	    ((RegisterView)registers.get(i)).setActionCommand(""+i);
 	    locked[i]=((RegisterView)registers.get(i)).locked();
 	}

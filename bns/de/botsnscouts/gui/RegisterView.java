@@ -51,6 +51,14 @@ public class RegisterView extends JButton {
 	else return false;
     }
 
+    public String getAction(){
+	return h.getaktion();
+    }
+
+    public int getPrio(){
+	return h.getprio();
+    }
+
     public boolean free() {
 	if (h != null) {
 	return h.free();
