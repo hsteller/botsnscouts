@@ -7,7 +7,7 @@
   <property name="maindir" value="de/botsnscouts"/>
   <property name="dist" value="dist"/>
   <property name="doc" value="docs" />
-  <property name="jars" value="lib/log4j.jar:lib/sixlegs.jar"/>
+  <property name="jars" value="lib/log4j.jar:lib/sixlegs.jar:lib/jakarta-regexp-1.2.jar"/>
   <property name="bns.ver" value="0.8pre" />     
 
   <target name="init">
