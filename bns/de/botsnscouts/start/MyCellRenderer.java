@@ -26,13 +26,7 @@
 package de.botsnscouts.start;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import java.awt.image.*;
-import java.awt.geom.*;
-import javax.swing.border.*;
-import java.net.*;
-import de.botsnscouts.gui.*;
 import de.botsnscouts.util.*;
 
 public class MyCellRenderer extends JLabel implements ListCellRenderer {

@@ -25,15 +25,14 @@
 
 package de.botsnscouts.start;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.awt.image.*;
-import java.awt.geom.*;
-import javax.swing.border.*;
-import java.net.*;
-import de.botsnscouts.util.*;
 import de.botsnscouts.gui.ColoredComponent;
+import de.botsnscouts.util.*;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class ParticipatePanel extends ColoredComponent implements  ActionListener{
 

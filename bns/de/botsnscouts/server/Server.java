@@ -873,7 +873,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		for (int i=0; i<gesperrteKarten.size(); i++)
 		    cards[i] = (Card )gesperrteKarten.get(i);
 
-		KartenStapel stapel = new KartenStapel(cards);
+		Deck stapel = new Deck(cards);
 		d("Neuer Stapel: "+stapel);
 		Vector activeThisRound = new Vector();
 		for(Iterator e=aktRoboter.iterator();e.hasNext();) {
@@ -881,7 +881,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    if (tmp.rob.isActivated()) {
 			activeThisRound.addElement(tmp);
                         //Karten geben und dabei *beruecksichtigen*, wie viele der Bot kriegt!
-			tmp.rob.setCards(stapel.gibKarte(tmp.rob.cardsToGive()));
+			tmp.rob.setCards(stapel.handOutCards(tmp.rob.cardsToGive()));
 		    }
 		}
 		if (activeThisRound.size() > 0) {

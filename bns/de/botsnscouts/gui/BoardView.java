@@ -83,8 +83,6 @@ public class BoardView extends JComponent {
     protected static final int WEST = Directions.WEST;
 
 
-    private JScrollPane myScrollPane;
-
     /** size (length and width) of one little field in pixels*/
     protected static final int FELDSIZE = 64;
 
@@ -218,7 +216,6 @@ public class BoardView extends JComponent {
         // the preComputed-BoardImage is no longer valid
         preBoard = null;
 
-
         //invalidate();
     }
 
@@ -243,9 +240,9 @@ public class BoardView extends JComponent {
     }
 
 
-    void setScrollPane(JScrollPane j) {
-        myScrollPane = j;
-    }
+    //void setScrollPane(JScrollPane j) {
+    //    myScrollPane = j;
+    //}
 
     Point calcKachelPos(int mx, int my) {
         int sfh = sf.getSizeY();

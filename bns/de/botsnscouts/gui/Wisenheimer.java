@@ -75,7 +75,7 @@ public class Wisenheimer{
 	// gelegte Karten in das enstprechende gesperrte Register des Robis packen
 	for (int l = 0; l<registers.size();l++) {
 	    if ((registers.get(l) != null)&&(!((HumanCard)registers.get(l)).free())) {
-		simRob.lockRegister(l,  KartenStapel.get(((HumanCard)registers.get(l)).getprio(),((HumanCard)registers.get(l)).getaktion()));
+		simRob.lockRegister(l,  Deck.get(((HumanCard)registers.get(l)).getprio()));
 	    }
 	}
 	// gesperrte Register in simRob.zug schreiben

@@ -35,7 +35,7 @@ package de.botsnscouts.autobot;
 
 import de.botsnscouts.board.BoardBot;
 import de.botsnscouts.board.SimBoard;
-import de.botsnscouts.server.KartenStapel;
+import de.botsnscouts.server.Deck;
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Bot;
 
@@ -50,11 +50,11 @@ public class SearchRecursively {
     private int bestScore;
     private int malus;
 
-    private static final Card[] malusCards = {KartenStapel.getRefCard("RL"),
-                                               KartenStapel.getRefCard("M1"),
-                                               KartenStapel.getRefCard("M2"),
-                                               KartenStapel.getRefCard("M3"),
-                                               KartenStapel.getRefCard("BU")};
+    private static final Card[] malusCards = {Deck.getRefCard("RL"),
+                                               Deck.getRefCard("M1"),
+                                               Deck.getRefCard("M2"),
+                                               Deck.getRefCard("M3"),
+                                               Deck.getRefCard("BU")};
     private static final int[] mali = {25, 15, 15, 15, 10};
     private static final int maliSum = 80;
 

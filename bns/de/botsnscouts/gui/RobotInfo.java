@@ -1,18 +1,14 @@
 package de.botsnscouts.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
-import de.botsnscouts.util.ImageMan;
-import de.botsnscouts.util.CursorMan;
 import de.botsnscouts.util.*;
 
-
-import javax.swing.border.*;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Vector;
 
 public class RobotInfo extends JComponent  implements RobotStatus, ActionListener {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( RobotInfo.class );
@@ -316,7 +312,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         }
     }
     public void actionPerformed(ActionEvent parm1) {
-        /**@todo: Implement this java.awt.event.MouseListener method*/
+        /**todo: Implement this java.awt.event.MouseListener method*/
         Object src = parm1.getSource();
         if( src == diskButton1 )
             fireDiskClicked( new RobotInfoEvent( this ) );

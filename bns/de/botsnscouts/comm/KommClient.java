@@ -26,7 +26,7 @@
 package de.botsnscouts.comm;
 
 import de.botsnscouts.util.*;
-import de.botsnscouts.server.KartenStapel;
+import de.botsnscouts.server.Deck;
 
 import org.apache.log4j.Category;
 
@@ -443,7 +443,7 @@ public class KommClient {
 					String pri=work.substring(komma+1);
 					try {
 					    int prio=Integer.parseInt(pri);
-					    karten1 [count]= KartenStapel.get(prio, art);
+					    karten1 [count]= Deck.get(prio);
 					}
 					catch (NumberFormatException nme) {
 					    error=true;
@@ -1250,7 +1250,7 @@ public class KommClient {
 			throw new KommException ("NumberFormatException bei KC.getStatusRegs; Message: "+nfe.getMessage());
 		    }
 
-		    back.register[i]= KartenStapel.get(p, akt);
+		    back.register[i]= Deck.get(p);
 		    i++;
 		    in = in.substring(klazu+1);
 		    // System.out.println ("Beende While-Loop mit: "+in);
@@ -1301,7 +1301,7 @@ public class KommClient {
 		catch (NumberFormatException nf2) {
 		    throw new KommException ("getRegister: NumberFormatException bei Parsen der Kartenprioritaet: Message: "+nf2.getMessage());
 		}
-		back [register-1]=KartenStapel.get(prioritaet,kartenaktion); // Card eingeteilt
+		back [register-1]=Deck.get(prioritaet); // Card eingeteilt
 		//jetzt String aktualisieren:
 
 		active=active.substring(klzu+3); // "1,PK(M1,123))(" abschneiden    KLZU+1

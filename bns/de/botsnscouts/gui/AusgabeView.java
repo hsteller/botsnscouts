@@ -156,7 +156,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	gameBoardScrollPane.getVerticalScrollBar().setUnitIncrement(64);
 	gameBoardScrollPane.setViewportView(gameBoardCanvas);
         gameBoardScrollPane.setBorder( BorderFactory.createEmptyBorder(5,5,5,5) );
-	gameBoardCanvas.setScrollPane(gameBoardScrollPane);
+	//.setScrollPane(gameBoardScrollPane);
 	add(gameBoardScrollPane,BorderLayout.CENTER);
 	gameBoardView = gameBoardScrollPane.getViewport();
         this.initMenus();

@@ -25,14 +25,16 @@
  
 package de.botsnscouts.start;
 
-import java.awt.*;
-import java.awt.event.*;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.util.TransparentButton;
+
 import javax.swing.*;
-import java.awt.image.*;
-import java.awt.geom.*;
-import javax.swing.border.*;
-import java.net.*;
-import de.botsnscouts.util.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class WatchPanel extends JPanel implements  ActionListener, MouseListener{
 

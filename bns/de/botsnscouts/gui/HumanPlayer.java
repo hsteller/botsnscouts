@@ -31,7 +31,7 @@ import  de.botsnscouts.util.*;
 import  de.botsnscouts.comm.*;
 import  de.botsnscouts.autobot.*;
 import  de.botsnscouts.board.*;
-import  de.botsnscouts.server.KartenStapel;
+import  de.botsnscouts.server.Deck;
 
 import org.apache.log4j.Category;
 
