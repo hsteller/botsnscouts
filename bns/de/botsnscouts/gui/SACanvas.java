@@ -27,7 +27,7 @@ import de.botsnscouts.*;
  * 3. Code insgesamt lesbarer strukturiert (noch nicht ganz beendet)
  * 4. makePixelArray in eigene Methode ausgelagert
  * 5. lokale Variablen eingeführt ...
- 
+
  * 6. Verwaltung und Speicherung der Bilder ausgelagert in
  *    Klasse ImageMan (kann so dann auch vom KachelEditor verwendet werden)
  *    bilder werden dann nur einmal pro JVM geladen, und zwar bei Programm-
@@ -53,8 +53,8 @@ public class SACanvas extends JComponent {
 
     /** Anzahl der Schritte in denen der Laser gezeichnet wird.
      */
-    private static final int FULL_LENGTH_INT=30; 
-    /** Anzahl der Schritte in denen der Laser gezeichnet wird. 
+    private static final int FULL_LENGTH_INT=30;
+    /** Anzahl der Schritte in denen der Laser gezeichnet wird.
      */
     private static final double FULL_LENGTH_DOUBLE=30.0;
 
@@ -65,10 +65,10 @@ public class SACanvas extends JComponent {
     private Ort source;
     private Ort target;
     private int laserFacing;
-    private boolean activeBordLasers; 
-    
+    private boolean activeBordLasers;
+
     // Farben fuer die Laser; Staerken von 1 bis 3
-    static final Color[] laserColor = { Color.red.brighter(), 
+    static final Color[] laserColor = { Color.red.brighter(),
 					Color.orange,
 					Color.yellow };
 
@@ -88,11 +88,11 @@ public class SACanvas extends JComponent {
     private Image[] cbeltCrop,ebeltCrop,diverseCrop,robosCrop,scoutCrop,robosCrop2;
 
     private int x,y;
-   
-   
+
+
     private Roboter[] robos;
     private Roboter vorschauRob;
-    private Color[] robocolor2; 
+    private Color[] robocolor2;
     private Ort lastScoutPos = new Ort();
 
     public static final Color GREEN  = new Color(4,156,52);
@@ -110,7 +110,7 @@ public class SACanvas extends JComponent {
     /** Die Farben der Roboter*/
     public static final Color [] robocolor = {GREEN,YELLOW,RED,BLUE,ROSA,ORANGE,GRAY,VIOLET};
 
-    
+
     SpielfeldSim sf;
     private double dScale = 1.0;
     boolean rescaled = true;
@@ -134,9 +134,9 @@ public class SACanvas extends JComponent {
 	rescaled = true;
 	System.err.println("dim : " + x + " " + y );
 	setSize(x,y);
-	
+
 	// the preComputed-BoardImage is no longer valid
-	preBoard = null; 
+	preBoard = null;
 
 
 	//invalidate();
@@ -150,7 +150,8 @@ public class SACanvas extends JComponent {
 
     public SACanvas(SpielfeldSim sf_neu, Color [] robColors){
 	init( sf_neu, robColors );
-	
+        // jetzt: robocolor2 == robColors
+
 	robosCrop2 = new Image[32];
 
 	// umkopieren der Roboterbilder
@@ -168,15 +169,15 @@ public class SACanvas extends JComponent {
 	    else if (robocolor2[i].equals(RED)) {
 		for (int j=0;j<4;j++)
 		    robosCrop2[4*i+j]=robosCrop[j+8];
-	    } 
+	    }
 	    else if (robocolor2[i].equals(BLUE)) {
 		for (int j=0;j<4;j++)
 		    robosCrop2[4*i+j]=robosCrop[j+12];
-	    } 
+	    }
 	    else if (robocolor2[i].equals(ROSA)){
 		for (int j=0;j<4;j++)
 		    robosCrop2[4*i+j]=robosCrop[j+16];
-	    } 
+	    }
 	    else if (robocolor2[i].equals(ORANGE)) {
 		for (int j=0;j<4;j++)
 		    robosCrop2[4*i+j]=robosCrop[j+20];
@@ -184,17 +185,17 @@ public class SACanvas extends JComponent {
 	    else if (robocolor2[i].equals(GRAY)) {
 		for (int j=0;j<4;j++)
 		    robosCrop2[4*i+j]=robosCrop[j+24];
-	    } 
+	    }
    	    else if (robocolor2[i].equals(VIOLET)) {
 		for (int j=0;j<4;j++)
 		    robosCrop2[4*i+j]=robosCrop[j+28];
-	    } 
+	    }
 	}
 	mouseInit();
     }
 
 
-    
+
     private void init(SpielfeldSim sf_neu, Color [] robColors) {
 	soundActive=Boolean.getBoolean("sound");
 	robocolor2=robColors;
@@ -207,19 +208,19 @@ public class SACanvas extends JComponent {
 	//y=(sf.boden[0].length-2)*64;
 	if (soundActive) {
 	    laserWavCount=0;
-	    String s ="sounds/laserhit.wav"; 
+	    String s ="sounds/laserhit.wav";
 	    URL u = BotsNScouts.class.getResource(s);
 	    mLaserWav [0] = Applet.newAudioClip(u);
 	    s="sounds/laser2.wav";
 	    u = BotsNScouts.class.getResource(s);
 	    mLaserWav [1] = Applet.newAudioClip(u);
-	    
+
 	}
 	setDoubleBuffered( true );
 	setScale( dScale ); // does setSize()
 	//setSize(x,y);
 
-	
+
 	ImageMan.finishLoading();
 
 	ebeltCrop   = ImageMan.getImages( ImageMan.EBELTS );
@@ -238,14 +239,14 @@ public class SACanvas extends JComponent {
     Point calcKachelPos(int mx, int my) {
 	int sfh = sf.getSizeY();
 	int sfw = sf.getSizeX();
-	
+
 	Point p = new Point();
 	p.x = 1 + (int) (mx / scaledFeldSize );
 	p.y = sfh - (int) (my / scaledFeldSize );
 
 	// sicherstellen, dass 1 <= p.x <= sfw
 	// und  1 <= p.y <= sfy
-	
+
 	p.x = Math.min( Math.max(1, p.x), sfw );
 	p.y = Math.min( Math.max(1, p.y), sfh );
 	return p;
@@ -257,7 +258,7 @@ public class SACanvas extends JComponent {
 	myClickListener = listener;
     }
 
-    
+
     void mouseInit() {
 	addMouseListener( new MouseAdapter() {
 	    public void mouseClicked(MouseEvent me) {
@@ -268,25 +269,25 @@ public class SACanvas extends JComponent {
 
 		/*
 		int mods = me.getModifiers();
-	 	if( (mods & MouseEvent.BUTTON3_MASK) == 0 ) 
+	 	if( (mods & MouseEvent.BUTTON3_MASK) == 0 )
 		     return;
 
 		Dimension sz = myScrollPane.getViewport().getExtentSize();
 		int w2 = sz.width/2;
 		int h2 = sz.height/2;
-		
+
 		//make sure we dont want to scoll 'out' to
 		// the left and top
 		int x1 = Math.max( me.getX() - w2 , 0);
 		int y1 = Math.max( me.getY() - h2 , 0);
-		
+
 		// ... and right and bottom
 		x1 = Math.min( x1, x - sz.width );
 		y1 = Math.min( y1, y - sz.height );
-		
+
 		myScrollPane.getViewport().setViewPosition(new Point(x1, y1));
 		*/
-    
+
 	    }
 	});
     }
@@ -305,13 +306,13 @@ public class SACanvas extends JComponent {
 
     /** Create "name->color" - Hashtable*/
     private void setRobColors (Roboter[] robs) {
-	gotColors=true; 
+	gotColors=true;
 	nameToColorHash = new java.util.Hashtable();
-	for (int i=0;i<robs.length;i++) 
+	for (int i=0;i<robs.length;i++)
 	    if (robs[i]==null)
 		break;
-	    else 
-		nameToColorHash.put (robs[i].getName(), robocolor2[i]);
+	    else
+		nameToColorHash.put (robs[i].getName(), robocolor[robs[i].getBotVis()]);
     }
     /** Lookup the Robot's color (by name)
 	@param name The Robot's name
@@ -329,14 +330,14 @@ public class SACanvas extends JComponent {
 
 
     protected void ersetzeRobos(Roboter[] robos_neu){
-	
+
 	if (!gotColors) // jetzt bekomme ich zum erstenmal die Roboter
 	    setRobColors(robos_neu);
-	    
+
 
 	robos=robos_neu;
 	repaint();
-	
+
     }
 
 
@@ -352,7 +353,7 @@ public class SACanvas extends JComponent {
 	source = sourceRob.getPos();
 	target = targetRob.getPos();
 	laserFacing=sourceRob.getAusrichtung();
-	int laenge = calculateLaserLength(source, target, laserFacing); 
+	int laenge = calculateLaserLength(source, target, laserFacing);
 	laenge*=64;
 
 	Color c = getRobColor(sourceRob.getName());
@@ -372,8 +373,8 @@ public class SACanvas extends JComponent {
 	    int tmp_laenge=(int) ((((double)i)/FULL_LENGTH_DOUBLE)*laenge);
 	    Graphics2D g2 = (Graphics2D) getGraphics();
 	    g2.scale( dScale, dScale );
-	    paintActiveRobLaser(g2, tmp_laenge, c);	
-		    
+	    paintActiveRobLaser(g2, tmp_laenge, c);
+
 	     synchronized(this){
 		 try {
 		     wait (1);
@@ -396,15 +397,15 @@ public class SACanvas extends JComponent {
 	    ++laserWavCount;
 	}
 	repaint();
-	    
-	
+
+
     }
 
     /** Berechnet die (Java-)Pixel-Koordinaten der linken oberen Ecke eines Bord-Feldes.
 	Gibt die x- und y-Pixelwerte der linken oberen Ecke des Feldes
 	mit der Position (x,y) auf dem Spielplan zurueck.
-	@param x Die X-Koordinate des Feldes 
-	@param y Die Y-Koordinate des Feldes 
+	@param x Die X-Koordinate des Feldes
+	@param y Die Y-Koordinate des Feldes
 	@return Die Position der linken oberen Ecke des Feldes als Java-Pixelwerte zum Zeichnen.
     */
 	private Ort mapC2PixelNorthWest (int x, int y) {
@@ -416,7 +417,7 @@ public class SACanvas extends JComponent {
     /** Berechnet die (Java-)Pixelwerte fuer den Mittelpunkt des Feldes.
 	Genauer: Den Punkt (31,31) auf dem 64x64 grossen Feld mit Koordinaten
 	zwischen 0 und 63.
-    */ 
+    */
     private Ort mapC2PixelCenter (int x, int y) {
 	Ort pixel=mapC2PixelNorthWest(x,y);
 	pixel.x+=31;
@@ -426,7 +427,7 @@ public class SACanvas extends JComponent {
 
     private void paintActiveRobLaser(Graphics g, int actualLength, Color c) {
 	// Laser sollen immer von Source nach Target gezeichnet werden
-	
+
 	int breite=4; // Die Breite des Lasers, sollte gerade sein
 	int lSourceX=0;int lSourceY=0; // Anfangspunkt des Lasers in Pixeln,
 	Ort tmp = mapC2PixelCenter(source.x, source.y); /* Mitte (Punkt (31,31) auf Feld
@@ -434,14 +435,14 @@ public class SACanvas extends JComponent {
 							   also einem 64x64 grossen Feld
 
 							*/
-	
+
 	Graphics2D g2d = (Graphics2D) g;
 	AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
 	g2d.setComposite( ac );
 	g2d.setColor(c);
 	switch (laserFacing) {
 	case NORTH : {
-	    lSourceX = tmp.x-(breite/2-1); 
+	    lSourceX = tmp.x-(breite/2-1);
 	    lSourceY = tmp.y-actualLength;
 	    g2d.fillRect(lSourceX,lSourceY,breite,actualLength);
 	    break;
@@ -467,25 +468,25 @@ public class SACanvas extends JComponent {
 	default : {
 	    System.err.println("SACanvas.paintActiveRobLaser: ");
 	    System.err.println("Ungueltige Laserrichtung: "+laserFacing);
-	}	
+	}
 	}// end switch facing
 	g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
     }
-    
+
 
 
     /**
        Berechnet die Laenge eines Lasers (in Feldern) zwischen zwei Robotern.
-       Bsp: Schiesst ein Roboter an Position (2,2) auf einen Roboter an 
+       Bsp: Schiesst ein Roboter an Position (2,2) auf einen Roboter an
        Position (5,2), so wird 3 zurueckgegeben
-       (=> multipliziert man den Rueckgabewert mit 64, so erhaelt man die 
+       (=> multipliziert man den Rueckgabewert mit 64, so erhaelt man die
        zu zeichnende Laserlaenge in Pixeln).
        @param source Das Startfeld des Lasers
        @param target Das Feld des Ziels
        @param facing Die Richtung, in die der Laser schiesst (0=NORTH, 1=EAST, 2=SOUTH, 3=WEST)
-                           
+
        @return Die Anzahl der Felder, ueber die der Laser geht (inklusive Startfeld).
-       
+
     */
     private int calculateLaserLength(Ort source, Ort target, int facing){
 
@@ -511,24 +512,24 @@ public class SACanvas extends JComponent {
 	default: {
 	    System.err.println("SACanvas.calculateLaserLength(): ungueltige Laserrichtung: "+laserFacing);
 	}
-	}	
+	}
 	//System.err.println("calculate Length: ("+source.x+","+source.y+")-"+facing+"->("+target.x+","+target.y+") ist "+laenge+" lang");
 	return laenge;
     }
     private void paintActiveBordLaser (Graphics g, Color c,int actualLength) {
-		
+
 	Graphics2D g2d = (Graphics2D) g;
 	//AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
 	//	g2d.setComposite( ac );
 	g2d.setColor(c);
-	
+
 	int breite=4; // Die Breite des Lasers, sollte gerade sein
 	int lSourceX=0;int lSourceY=0; // Anfangspunkt des Lasers in Pixeln,
-	Ort tmp = mapC2PixelCenter(source.x, source.y); 
-	
+	Ort tmp = mapC2PixelCenter(source.x, source.y);
+
 	switch (laserFacing) {
 	case NORTH : {
-	    lSourceX = tmp.x-(breite/2-1); 
+	    lSourceX = tmp.x-(breite/2-1);
 	    lSourceY = tmp.y-actualLength+14;
 	    g2d.fillRect(lSourceX,lSourceY,breite,actualLength);
 	    g2d.setColor(new Color(255,255,155));
@@ -562,39 +563,39 @@ public class SACanvas extends JComponent {
 	default : {
 	    System.err.println("SACanvas.paintActiveRobLaser: ");
 	    System.err.println("Ungueltige Laserrichtung: "+laserFacing);
-	}	
+	}
 	}// end switch facing
-	
+
 	//g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
     }
-    
+
     /**
        @param laserPos Die Koordinaten des schiessenden BordLasers
        @param laserDir Die Ausrichtung des Lasers
        @param targetRob Die Koordinaten des getroffenen Roboters
-       @param surrounding Das ScrollPane in dem der Canvas dargestellt wird 
+       @param surrounding Das ScrollPane in dem der Canvas dargestellt wird
     */
     protected void doBordLaser(Ort laserPos, int laserDir,int strength, Ort targetRob,  JViewport surrounding) {
 	// init laser values
 	source=laserPos;
 	target=targetRob;
 	laserFacing=laserDir;
-       	int laenge = calculateLaserLength(source, target, laserFacing); 
+       	int laenge = calculateLaserLength(source, target, laserFacing);
 	laenge=laenge*64+17;
-	Color c =laserColor[strength-1]; 
-	
+	Color c =laserColor[strength-1];
+
 	// get viewable area
 	//	Point upperLeftCorner = surrounding.getViewPosition();
 	//  Dimension size = surrounding.getExtentSize();
 
 	// Graphics g = getGraphics();
 	//g.setClip(upperLeftCorner.x,upperLeftCorner.y,size.width,size.height);
-	//activeBordLasers=true; // non-animated lasers will 
+	//activeBordLasers=true; // non-animated lasers will
 	//paint(g);              // be deleted now
-	
+
 	// paint lasers step by step
 	for(int i=1; i<=FULL_LENGTH_INT; i++) {
-	    int tmp_laenge=(int) ((((double)i)/FULL_LENGTH_DOUBLE)*laenge);    		    
+	    int tmp_laenge=(int) ((((double)i)/FULL_LENGTH_DOUBLE)*laenge);
 	    Graphics2D g2 = (Graphics2D) getGraphics();
 	    g2.scale( dScale, dScale );
 	    paintActiveBordLaser(g2, c, tmp_laenge);
@@ -605,19 +606,19 @@ public class SACanvas extends JComponent {
 		catch (InterruptedException ie){
 		    System.err.println ("SACanvas.doBordLaser: wait interrupted");
 		}
-		
+
 		}*/
 	}
 	// activeBordLasers=false; // now paint the non-animated
 	 repaint();              // lasers again
     }
 
-   
+
 
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-	
+
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private boolean abbieger(int x, int y, int r){
@@ -671,7 +672,7 @@ public class SACanvas extends JComponent {
     private void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty) {
 	Boden boden = sf.bo(xpos, ypos);
 	switch (boden.typ){
-	    
+
 	case (Spielfeld.BDGRUBE):
 	    g.drawImage(diverseCrop[3],actx,acty,64,64,this);
 	    break;
@@ -682,7 +683,7 @@ public class SACanvas extends JComponent {
 	    if (boden.spez==0)
 		g.drawImage(diverseCrop[2],actx,acty,64,64,this);
 	    else
-		g.drawImage(diverseCrop[1],actx,acty,64,64,this);		
+		g.drawImage(diverseCrop[1],actx,acty,64,64,this);
 	    break;
 	case (Spielfeld.BDREPA):
 	    if (boden.spez==1)
@@ -690,19 +691,19 @@ public class SACanvas extends JComponent {
 	    else
 		g.drawImage(diverseCrop[5],actx,acty,64,64,this);
 	    break;
-	    
+
 	    // ------------------- normale Fliessbaender -------------------------
-	    
+
 	case (Spielfeld.FN1):g.drawImage(cbeltCrop[14],actx,acty,64,64,this);break;
 	case (Spielfeld.FO1):g.drawImage(cbeltCrop[19],actx,acty,64,64,this);break;
 	case (Spielfeld.FW1):g.drawImage(cbeltCrop[9],actx,acty,64,64,this);	break;
 	case (Spielfeld.FS1):g.drawImage(cbeltCrop[4],actx,acty,64,64,this);	break;
-	    
+
 	case (Spielfeld.NVW1): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
 	    g.drawImage(cbeltCrop[15],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[6],actx,acty,64,64,this);break;
 	case (Spielfeld.NVO1): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
-	    g.drawImage(cbeltCrop[18],actx,acty,64,64,this);						
+	    g.drawImage(cbeltCrop[18],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[7],actx,acty,64,64,this);break;
 	case (Spielfeld.SVW1): if (abbieger(xpos,ypos+1,Spielfeld.SUED))
 	    g.drawImage(cbeltCrop[13],actx,acty,64,64,this);
@@ -722,24 +723,24 @@ public class SACanvas extends JComponent {
 	case (Spielfeld.WVS1):if (abbieger(xpos+1,ypos,Spielfeld.WEST))
 			  g.drawImage(cbeltCrop[11],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[1],actx,acty,64,64,this);break;
-	
+
 	case (Spielfeld.NVWO1):g.drawImage(cbeltCrop[22],actx,acty,64,64,this);break;
 	case (Spielfeld.SVWO1):g.drawImage(cbeltCrop[20],actx,acty,64,64,this);break;
 	case (Spielfeld.OVNS1):g.drawImage(cbeltCrop[23],actx,acty,64,64,this);break;
 	case (Spielfeld.WVNS1):g.drawImage(cbeltCrop[21],actx,acty,64,64,this);break;
-	    
+
 	    // ------------------------ Expressfliessbaender ---------------------
-	    
+
 	case (Spielfeld.FN2):g.drawImage(ebeltCrop[14],actx,acty,64,64,this);break;
 	case (Spielfeld.FO2):g.drawImage(ebeltCrop[19],actx,acty,64,64,this);break;
 	case (Spielfeld.FW2):g.drawImage(ebeltCrop[9],actx,acty,64,64,this);	break;
-	case (Spielfeld.FS2):g.drawImage(ebeltCrop[4],actx,acty,64,64,this);	break;				
-	    
+	case (Spielfeld.FS2):g.drawImage(ebeltCrop[4],actx,acty,64,64,this);	break;
+
 	case (Spielfeld.NVW2): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
 	    g.drawImage(ebeltCrop[16],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[6],actx,acty,64,64,this);break;
 	case (Spielfeld.NVO2): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
-	    g.drawImage(ebeltCrop[17],actx,acty,64,64,this);						
+	    g.drawImage(ebeltCrop[17],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[7],actx,acty,64,64,this);break;
 	case (Spielfeld.SVW2): if (abbieger(xpos,ypos+1,Spielfeld.SUED))
 	    g.drawImage(ebeltCrop[13],actx,acty,64,64,this);
@@ -759,22 +760,22 @@ public class SACanvas extends JComponent {
 	case (Spielfeld.WVS2):if (abbieger(xpos+1,ypos,Spielfeld.WEST))
 			  g.drawImage(ebeltCrop[11],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[1],actx,acty,64,64,this);break;
-	
-	
+
+
 	case (Spielfeld.NVWO2):g.drawImage(ebeltCrop[22],actx,acty,64,64,this);break;
 	case (Spielfeld.SVWO2):g.drawImage(ebeltCrop[20],actx,acty,64,64,this);break;
 	case (Spielfeld.OVNS2):g.drawImage(ebeltCrop[23],actx,acty,64,64,this);break;
 	case (Spielfeld.WVNS2):g.drawImage(ebeltCrop[21],actx,acty,64,64,this);break;
-		
-		
+
+
 	default:
 	}
     }
 
     private static final int[] crushlb_x = { 20, 30, 30, 30, 40 };
     private static final int[] crushlb_y = { 35, 25, 35, 45, 35 };
-    private void paintCrusher(Graphics g, Boden boden, 
-		      int actx, int acty) 
+    private void paintCrusher(Graphics g, Boden boden,
+		      int actx, int acty)
     {
 	g.drawImage(diverseCrop[10],actx,acty,64,64,this);
 	g.setColor(Color.white);
@@ -799,7 +800,7 @@ public class SACanvas extends JComponent {
 	y1 = Math.min(y1, sf.getSizeY() );
 
 	for(int hori=x0; hori <= x1; hori++) {
-	    for(int vert = y0; vert <= y1; vert++) { 
+	    for(int vert = y0; vert <= y1; vert++) {
 		int actx = (hori-1) * 64;
 		int acty = (vert-1) * 64;
 		int xpos = hori;
@@ -814,20 +815,20 @@ public class SACanvas extends JComponent {
     }
 
 
-   
+
 
     /** Hier werden die normalen Spielfeldlaser gezeichnet
      */
    private  void paintLaserStrahlen( Graphics g ) {
        Graphics2D dbg = (Graphics2D) g;
        AlphaComposite ac=null;
-       //	if (activeBordLasers) 
+       //	if (activeBordLasers)
        // ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f);
-       //else 
+       //else
        ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
        dbg.setComposite( ac );
-       
-	
+
+
        for (Enumeration e = sf.getLasers().elements(); e.hasMoreElements();){
 	   actuallaser = ((LaserDef) e.nextElement());
 	   int lx = actuallaser.x-1;
@@ -835,7 +836,7 @@ public class SACanvas extends JComponent {
 	   int lf = actuallaser.facing;
 	   int ll = actuallaser.length;
 	   int ls = actuallaser.strength;
-	   
+
 	   switch ( ls ) {
 	    case 1:
 		dbg.setColor(Color.red.brighter());
@@ -847,7 +848,7 @@ public class SACanvas extends JComponent {
 	       dbg.setColor(Color.yellow);
 	       break;
 	   }
-	   
+
 	   switch ( lf ) {
 	   case 0:
 	       dbg.fillRect(lx*64+30,(ly-ll+1)*64,4,ll*64);
@@ -865,7 +866,7 @@ public class SACanvas extends JComponent {
        }
        dbg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
    }
-    
+
 
 
     private void paintWaende( Graphics g ) {
@@ -880,12 +881,12 @@ public class SACanvas extends JComponent {
 
 	// Zeichnen
 	for(int hori=x0; hori <= x1; hori++) {
-	    for(int vert = y0; vert <= y1; vert++) { 
+	    for(int vert = y0; vert <= y1; vert++) {
 		int actx = hori*64-64;
 		int acty = vert*64-64;
 		int xpos = hori;
 		int ypos = sf.getSizeY()-vert+1;
-	       
+
 		// Nordwand
 		if (sf.nw(xpos,ypos).da){
 		    if (sf.nw(xpos,ypos).wandEl[1]==1){
@@ -904,7 +905,7 @@ public class SACanvas extends JComponent {
 			} //for
 
 		    }
-		    g.drawImage(diverseCrop[13],actx,acty-6,64,64,this);								
+		    g.drawImage(diverseCrop[13],actx,acty-6,64,64,this);
 		}
 
 		// Südwand
@@ -943,11 +944,11 @@ public class SACanvas extends JComponent {
 				g.drawString( ""+phasecount, actx+37, stry+4 );
 			    }
 			} //for
-					
+
 		    }
 		    g.drawImage(diverseCrop[12],actx+57,acty,64,64,this);
 		}
-		
+
 		// Westwand
 		if (sf.ww(xpos,ypos).da){
 		    if (sf.ww(xpos,ypos).wandEl[1]==1){
@@ -964,12 +965,12 @@ public class SACanvas extends JComponent {
 				g.drawString( ""+phasecount, actx+24, stry+4 );
 			    }
 			} //for
-					
+
 		    }
 		    g.drawImage(diverseCrop[12],actx-7,acty,64,64,this);
 		}
 	    }
-	}			
+	}
     }
 
     private void paintFlaggen( Graphics g ) {
@@ -983,7 +984,7 @@ public class SACanvas extends JComponent {
 	    }
 	}
     }
-    
+
     /** Berechnet zu einem Ort das Rechteck, das die Kachel umschliesst */
     void ort2Rect(Ort ort, Rectangle dest) {
 	ort2Rect(ort.x, ort.y, dest);
@@ -996,9 +997,9 @@ public class SACanvas extends JComponent {
 	dest.height = (int)scaledFeldSize;
     }
 
-    Rectangle rc = new Rectangle(); 
+    Rectangle rc = new Rectangle();
     // for internal use. see repaintOrt()
-    
+
     /** Triggert ein Neuzeichnen des Feldes mit den übergebenen
      *  Koordinaten. Nützlich um einzelne Felder neuzeichnen zu lassen
      */
@@ -1007,7 +1008,7 @@ public class SACanvas extends JComponent {
 	ort2Rect(ort, rc);
 	repaint( 1, rc.x, rc.y, rc.width, rc.height );
     }
-	
+
     void repaintOrt(int x, int y) {
 	ort2Rect(x, y, rc);
 	repaint( 1, rc.x, rc.y, rc.width, rc.height );
@@ -1021,9 +1022,9 @@ public class SACanvas extends JComponent {
 
     void highlight(int x, int y) {
 	System.out.println("highlighting 1 " + x + " " + y);
-	highlightPos.x = x;	
+	highlightPos.x = x;
 	highlightPos.y = y;
-	
+
 	javax.swing.Timer t = new javax.swing.Timer(5000, new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
 		    unhighlight();
@@ -1034,8 +1035,8 @@ public class SACanvas extends JComponent {
 	t.start();
 	repaintOrt(x,y);
     }
-	
-    
+
+
     private void showScout(Ort ort) {
 	deleteScout();
 	repaintOrt( ort );
@@ -1064,18 +1065,20 @@ public class SACanvas extends JComponent {
 
     private void paintRobos( Graphics g ) {
 	Graphics2D g2d = (Graphics2D) g;
-	if (robos!=null){	
+	if (robos!=null){
 	    for (int robocount=0;robocount<robos.length;robocount++){
-		if((robos[robocount].getSchaden()<10)&&
-		   (robos[robocount].getLeben() > 0)) {
-		    int xpos = robos[robocount].getX()-1;
-		    int ypos = sf.getSizeY()-robos[robocount].getY();
+                Roboter robot = robos[robocount];
+		if((robot.getSchaden()<10)&&
+		   (robot.getLeben() > 0)) {
+		    int xpos = robot.getX()-1;
+		    int ypos = sf.getSizeY()-robot.getY();
 		    int xpos64 = xpos*64;
 		    int ypos64 = ypos*64;
 		    int actx = xpos64-64;
 		    int acty = ypos64-64;
-		    Image imgRob = robosCrop2[robos[robocount].getAusrichtung()+robocount*4];
-		    boolean virtuell = robos[robocount].istVirtuell();
+                    int botVis = robot.getBotVis();
+		    Image imgRob = robosCrop[robot.getAusrichtung()+botVis*4];
+		    boolean virtuell = robot.istVirtuell();
 
 		    if( imgRob != null ) {
 			if( virtuell ) {
@@ -1086,11 +1089,11 @@ public class SACanvas extends JComponent {
 			if( virtuell ) {
 			    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
 			}
-			String beschriftung = "" + robos[robocount].getName();
-			g2d.setColor( robocolor2[robocount] );
+			String beschriftung = "" + robot.getName();
+			g2d.setColor( robocolor[botVis] );
 			g2d.drawString(beschriftung,xpos64,ypos64+8+robocount*8);
 		    }
-		}	
+		}
 	    }
 	}
     }
@@ -1102,7 +1105,7 @@ public class SACanvas extends JComponent {
 	    g.setColor( Color.red );
 	    g.setStroke( new BasicStroke(4) );
 	    g.drawOval( rc.x, rc.y, rc.width, rc.height );
-	    
+
 	    AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
 	    g.setComposite(ac);
 	    g.fillOval( rc.x, rc.y, rc.width, rc.height );
@@ -1112,7 +1115,7 @@ public class SACanvas extends JComponent {
     }
 
 //     private void createOffscreenImage() {
-// 	// XXX vielleicht besser das skalieren erst beim reinkopieren 
+// 	// XXX vielleicht besser das skalieren erst beim reinkopieren
 // 	dbi = createImage(x,y);
 // 	g_off = (Graphics2D)dbi.getGraphics();
 // 	g_off.setFont(new Font(g_off.getFont().getName(),g_off.getFont().getStyle(),8));
@@ -1120,8 +1123,8 @@ public class SACanvas extends JComponent {
 // 	g_off.scale( dScale, dScale );
 //     }
     Graphics2D g_off;
-    
-    
+
+
     BufferedImage preBoard = null;
 
     /** ein Image des Spielfeldes anlegen, ohne aktive Elemente */
@@ -1168,7 +1171,7 @@ public class SACanvas extends JComponent {
 	paintRobos( dbg );
 	/*
 	Rectangle rc = g.getClipBounds();
-	int x0 = rc.x, 
+	int x0 = rc.x,
 	    y0 = rc.y,
 	    x1 = rc.x + rc.width,
 	    y1 = rc.y + rc.height;
@@ -1197,26 +1200,26 @@ public class SACanvas extends JComponent {
     public Image getThumb(int size) {
 	/*
 	BufferedImage bi = new BufferedImage(x, y, BufferedImage.TYPE_INT_RGB);
-	
+
 	Graphics2D g2 = bi.createGraphics();
 	g2.setClip(0,0,x,y);
 	//paint( g_off );
-	
+
 
 	paintUnbuffered( g2 );
 	g2.dispose();
 
-	AffineTransformOp atop = 
+	AffineTransformOp atop =
 	    new AffineTransformOp(AffineTransform.getScaleInstance(((float)size)/x, ((float)size)/y), AffineTransformOp.TYPE_BILINEAR);
 	BufferedImage thumb = atop.filter( bi, null );
-							   
+
 	//Image thumb=createImage(new FilteredImageSource(dbi.getSource(), new AreaAveragingScaleFilter(size, size)));
 	g2.dispose();
 	return thumb;
 	*/
 
 	BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
-	
+
 	Graphics2D g2 = bi.createGraphics();
 	g2.setClip(0,0,size,size);
 	g2.scale( ((double) size) / x, ((double) size) / y );
@@ -1236,7 +1239,7 @@ public class SACanvas extends JComponent {
     private static SACanvas sac = null;
     public static Image createThumb(SpielfeldSim sim, int size) {
 	if( sac == null ) {
-	    sac = new SACanvas(sim); 
+	    sac = new SACanvas(sim);
 	} else {
 	    sac.ersetzeSpielfeld( sim );
 	}

@@ -21,7 +21,7 @@ public class RobotStatus extends JPanel {
     JLabel damage;
     JLabel track;
     JPanel roboInfo;
-    Image robotImage[];
+//    Image robotImage[];
     Image flagge = CursorMan.getImages(CursorMan.CURSOR)[0];
     ImageIcon botcenterImage = ImageMan.getPNGImageIcon(ImageMan.ROBOCENTER);
     ImageIcon damageImage = ImageMan.getPNGImageIcon(ImageMan.BOTDAMAGE);
@@ -80,7 +80,7 @@ public class RobotStatus extends JPanel {
     public Dimension getMinimumSize() {
 	return new Dimension(xsize,ysize);
     }
-    
+
     public Dimension getPreferredSize() {
 	return new Dimension(xsize,ysize);
     }
@@ -109,14 +109,14 @@ public class RobotStatus extends JPanel {
     private void d(String s){
 	Global.debug(this, s);
 }
-    
+
 
     public static void main (String args[]) {
 	Message.setLanguage("deutsch");
         JWindow f = new JWindow();
 	JPanel pa = new JPanel(new GridLayout(1,4));
 	for (int i=0; i < 4; i++) pa.add(new RobotStatus());
-					 
+
 	f.getContentPane().add(pa);
 	f.pack();
 	f.setVisible(true);
