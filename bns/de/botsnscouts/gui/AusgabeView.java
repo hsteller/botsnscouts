@@ -23,6 +23,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private Hashtable robotStatus = new Hashtable(8);
     private Hashtable robotCardStatus = new Hashtable(8);
     private StatusLog statusLog = new StatusLog();
+    private JMenu optTrack = new JMenu("Track");
+
+
 
 
     /** @args SpielerMensch spielerref ist Referenz auf umgebenden
@@ -56,6 +59,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 					    );
 	    robotsStatusContainer.add(r);
 	    robotStatus.put(robots[i].getName(),r);
+
+            // add entry to track menu
+            JMenuItem trackItem = new JMenuItem( r.getName() );
+            trackItem.addActionListener( new HumanPlayer.RoboTrackListener(robots[i]) );
+    	    optTrack.add(trackItem);
 
 	    RobotCard rc= new RobotCard(robots[i]);
 	    robotsCardContainer.add(rc);
@@ -197,6 +205,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	Global.debug(this, s);
     }
 
+    JMenu getTrackMenu() {
+      return optTrack;
+    }
 
 }
 

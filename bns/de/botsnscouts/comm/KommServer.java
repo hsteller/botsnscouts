@@ -2,23 +2,26 @@ package de.botsnscouts.comm;
 
 import de.botsnscouts.util.*;
 import java.io.*;
-/* STAND 20.7.99 2:55 ; sendFeldinhalt fehlt noch; 
+/* STAND 20.7.99 2:55 ; sendFeldinhalt fehlt noch;
    getestet: - warte
               sendRobStatus
 /**
 Oberklasse für SERVER-Kommunikation <BR>
-* Enthält Objekte und Methoden, die sowohl zur Kommunikation mit Spielern als auch zur Kommunikation mit Ausgabekanälen benutzt werden können 
+* Enthält Objekte und Methoden, die sowohl zur Kommunikation mit Spielern als auch zur Kommunikation mit Ausgabekanälen benutzt werden können
  *@author Hendrik<BR>
- 
+
 */
 public class KommServer {
+  static final boolean LOG_RECEIVE = false;
+  static final boolean LOG_SEND    = false;
+
   public KommServer(BufferedReader i, PrintWriter o) {
     in=i;
     out=o;
   }
   /** BufferedReader*/
   public BufferedReader in;
-  /** PrintWriter*/ 
+  /** PrintWriter*/
   public PrintWriter out;
 
   /** Warte dient zum 'Horchen' am Kommunikationskanal und Warten auf beliebige Kommunikation von Client-Seite.
@@ -32,21 +35,21 @@ public class KommServer {
       // System.err.println("SERVER: warte erhielt: "+s);
       if (s==null) {
 	try {
-	  s=in.readLine();	  
+	  s=in.readLine();
 	  if (s==null)
 	    throw new KommException ("KS.warte: Zweimal null gelesen; vielleicht haengt der Client?!");
 	}
 	catch (Exception ex) {
-	  throw new KommException ("Exception (Message:"+ex.getMessage()+")bei KommServer.warte(vorher 'null' gelesen)"); 
+	  throw new KommException ("Exception (Message:"+ex.getMessage()+")bei KommServer.warte(vorher 'null' gelesen)");
 	}
       }
       if (s!=null)
 	return wait2(s);
-      else 
+      else
 	throw new KommException ("Ks.warte hat null gelesen");
-     
+
     }
-    catch (IOException ie) 
+    catch (IOException ie)
       {
 	throw new KommException ("Es trat eine IOException beim Aufruf von wait2 auf");
       }
@@ -64,13 +67,13 @@ public class KommServer {
       /* try wegen IndexOutOfBoundsExceptions, die entstehen, wenn in einem String verkehrt geklammert wurde (z.B. ")xyz(" statt "(xyz)");
 	 leider zu spaet aufgefallen, um exakte Fehlerstelle (bearbeitete Kommunikationsart) ohne grossen Aufwand ausgeben zu koennen.
 	 Dazu waeren noch viel mehr try/catch-Statements noetig, da diese Exceptions bei jedem Aufruf von "substring" oder "charAt" auftreten koennen.
-       */ 
+       */
     try {
       st=Character.toUpperCase(input.charAt(0));
       nd=Character.toUpperCase(input.charAt(1));
     }
     catch(StringIndexOutOfBoundsException x) {
-      // Exception kann wegen min. Laenge der Strings (=2 Zeichen) nicht auftreten 
+      // Exception kann wegen min. Laenge der Strings (=2 Zeichen) nicht auftreten
       error=true;
       errormsg="Weniger als zwei Zeichen im String";
       // zwei dummys, damit der Compiler nicht behauptet, st und nd würden (unter Umstaenden) nicht initialisiert werden
@@ -86,7 +89,7 @@ public class KommServer {
       }
       else {
 	error=true;
-	errormsg="erster Buchstabe='O', zweiter B. != 'K'"; 
+	errormsg="erster Buchstabe='O', zweiter B. != 'K'";
       }
     }
     else {
@@ -100,17 +103,17 @@ public class KommServer {
 	errormsg="String kuerzer als zwei Zeichen und nicht gleich \"OK\"";
 	error=true;
       }
-    
+
 
       switch (st) {
-      
+
       case 'S': {
 	if ((nd=='R') && (rd=='O')) {
 	  //input: "SRO(Robbi Nummer 1)"
 	  int klammeraufpos = input.indexOf('(');
 	  int klammerzupos = input.lastIndexOf(')');
 	  if (klammeraufpos==-1) {
-	    errormsg="SRO->keine '(' gefunden"; 
+	    errormsg="SRO->keine '(' gefunden";
 	    error=true;
 	    break;
 	  }
@@ -122,8 +125,8 @@ public class KommServer {
 	  back.typ=back.GIBROBOTERPOS;
 	  back.name=input.substring (klammeraufpos+1,klammerzupos);
 	 // System.out.println ("SRO-test");
-	 
-	}	
+
+	}
 	else if ((nd=='F')&& (rd=='I')) {
 	  // input: "SFI(37,123)" !!FALSCH!! -> SFI((37,123))
 	  int x=-1;
@@ -131,18 +134,18 @@ public class KommServer {
 	  int klammeraufpos=input.indexOf('(');
 	  if (klammeraufpos==-1) {
 	    error=true;
-	    errormsg="SFI->keine '(' gefunden"; 
+	    errormsg="SFI->keine '(' gefunden";
 	    break;
 	  }
 	  int klammerzupos=input.lastIndexOf(')');
 	  if (klammerzupos==-1) {
-	    error=true; 
-	    errormsg="SFI->keine ')' gefunden"; 
+	    error=true;
+	    errormsg="SFI->keine ')' gefunden";
 	    break;
 	  }
 	  int kommapos=input.indexOf(',');
 	  if (kommapos==-1) {
-	    errormsg="SFI->kein Komma gefunden"; 
+	    errormsg="SFI->kein Komma gefunden";
 	    error=true;
 	    break;
 	  }
@@ -158,33 +161,33 @@ public class KommServer {
 	  //  System.out.println("SFI-Ende");
 	  }
 	  catch (NumberFormatException xy){
-	    errormsg="SFI(x,y) ->  x oder y keine Zahl oder ein Zeichen keine Ziffer, z.B. Space"; 
+	    errormsg="SFI(x,y) ->  x oder y keine Zahl oder ein Zeichen keine Ziffer, z.B. Space";
 	    error=true;
 	    return null;
 	  }
 	}
-	else { 
+	else {
 	  errormsg = "String beginnt mit S, danach ungueltig";
 	  error=true;
 	}
 	//System.out.println("DEBUG");
 	break;
       }
-    
-      case 'G': {   
+
+      case 'G': {
 	if (nd=='R') {
 	  if (rd=='S'){
 	    //input "GRS(Robbis name)"
 	    int klammeraufpos = input.indexOf('(');
 	    int klammerzupos = input.lastIndexOf(')');
 	    if (klammeraufpos==-1) {
-	      errormsg="GRS->keine '(' gefunden"; 
+	      errormsg="GRS->keine '(' gefunden";
 	      error=true;
 	      break;
 	    }
 	    if (klammerzupos==-1) {
 	      error=true;
-	      errormsg="GRS->keine ')' gefunden"; 
+	      errormsg="GRS->keine ')' gefunden";
 	      break;
 	    }
 	    back.typ=back.GIBROBSTATUS;
@@ -216,7 +219,7 @@ public class KommServer {
 	      back.typ=back.STATS;
 	  }
 	  else {
-	    errormsg="GS->danach nichts aus ['A','N','D','S','F','T'] gefunden"; 
+	    errormsg="GS->danach nichts aus ['A','N','D','S','F','T'] gefunden";
 	    error=true;
 	    break;
 	  }
@@ -225,7 +228,7 @@ public class KommServer {
 	  if (rd=='L')
 	    back.typ=back.GIBFAHNENPOS;
 	  else {
-	    errormsg="GF-> danach kein 'L' gefunden"; 
+	    errormsg="GF-> danach kein 'L' gefunden";
 	    error=true;
 	    break;
 	  }
@@ -248,7 +251,7 @@ public class KommServer {
 	    break;
 	  }
 	}
-      
+
 	break;
       }
       case 'T': {
@@ -261,7 +264,7 @@ public class KommServer {
 	    int klammerzu1=input.lastIndexOf(')', klammerzu2-1);
 	    int kommaletzt=input.lastIndexOf(',');
 	    int komma1=input.lastIndexOf(',',klammerauf2-1);
-	  
+
 	    if ((klammerauf1!=-1)&&(klammerauf2!=-1)&&(klammerzu1!=-1)&&(klammerzu2!=-1)&&(klammerzu2!=-1)&&(komma1!=-1)&&(kommaletzt!=-1)) {
 	      // Auslesen der Karten
 	      String karten=new String (input.substring(klammerauf2+1,klammerzu1));
@@ -288,11 +291,11 @@ public class KommServer {
 		  }
 		  catch (ArrayIndexOutOfBoundsException falsche_Rueckgabe) {
 		    error = true;
-		    errormsg="Falsche Kartenrueckgabe, wahrscheinlich zu viele Karten"; 
+		    errormsg="Falsche Kartenrueckgabe, wahrscheinlich zu viele Karten";
 		    break;
 		  }
 		}
-		else 
+		else
 		  istLetztesZeichenZiffer=false;
 	      }
 	      if (!error) {
@@ -300,9 +303,9 @@ public class KommServer {
 		back.register=new int [zaehler];
 		for (int i=0;i<zaehler;i++)
 		  back.register[i]=kart [i];
-		
-		
-		/* Auslesen des Namens; aufgrund der persoenlichen Komm-Objekte unseres Servers eigentlich ueberfluessig */ 
+
+
+		/* Auslesen des Namens; aufgrund der persoenlichen Komm-Objekte unseres Servers eigentlich ueberfluessig */
 		back.name=new String(input.substring(klammerauf1+1,komma1));
 		// Auslesen des Power-Down-Booleans
 		String deaktiviert=new String (input.substring(kommaletzt+1,klammerzu2));
@@ -314,12 +317,12 @@ public class KommServer {
 		    back.ok=true;
 		  else {
 		    error=true;
-		    errormsg="Kartenrueckgabe: falscher Bool (nicht f/t) fuer powerdown zurueckgegeben"; 
+		    errormsg="Kartenrueckgabe: falscher Bool (nicht f/t) fuer powerdown zurueckgegeben";
 		  }
 		}
 		catch (java.lang.Exception kein_bool) {
 		  error=true;
-		  errormsg="Kartenrueckgabe: vermutlich kein Bool fuer powerdown zurueckgegeben (d.h. letztes Zeichen in der Klammer nicht t oder f) "; 
+		  errormsg="Kartenrueckgabe: vermutlich kein Bool fuer powerdown zurueckgegeben (d.h. letztes Zeichen in der Klammer nicht t oder f) ";
 		}
 		// setzen des Typs
 		back.typ=back.PROGRAMMIERUNG;
@@ -367,22 +370,22 @@ public class KommServer {
 		    }
 		    catch (ArrayIndexOutOfBoundsException falsche_Rueckgabe) {
 		      error = true;
-		      errormsg="Falsche Registeranzahl, wahrscheinlich zu viele Register-Nummern"; 
+		      errormsg="Falsche Registeranzahl, wahrscheinlich zu viele Register-Nummern";
 		      break;
 		    }
 		  }
-		  else 
-		    istLetztesZeichenZiffer=false; 
+		  else
+		    istLetztesZeichenZiffer=false;
 		}
 	      	// Registernummern zuweisen
 		back.register=new int [zaehler];
 		for (int i=0;i<zaehler;i++)
 		  back.register[i]=regs [i];
-		
-		
-		/* Auslesen des Namens; aufgrund der persoenlichen Komm-Objekte unseres Servers eigentlich ueberfluessig */ 
+
+
+		/* Auslesen des Namens; aufgrund der persoenlichen Komm-Objekte unseres Servers eigentlich ueberfluessig */
 		back.name=new String(input.substring(klammerauf+1,komma1));
-		back.typ=back.REPARATUR; 
+		back.typ=back.REPARATUR;
 	      }
 	      catch (StringIndexOutOfBoundsException xe) {
 		error = true;
@@ -394,7 +397,7 @@ public class KommServer {
 	      errormsg="TRR - Falscher String";
 	      break;
 	    }
-	   
+
 	  }
 	  else {
 	    error=true;
@@ -418,7 +421,7 @@ public class KommServer {
 		   TESTERGEBNIS:  SIE KOMMT AUCH!
 		   */
 		char richtung=Character.toUpperCase(richtstr.trim().charAt(0));
-		
+
 		if (richtung=='N')
 		  back.wohin=0;
 		else if (richtung=='S')
@@ -448,7 +451,7 @@ public class KommServer {
 	  }
 	}
 	else if (nd=='B') { //FEHLT FEHLT FEHLT gleich nicht mehr
-	  if (rd=='D') { 
+	  if (rd=='D') {
 	    //TBD(<Name>,<Bool>)
 	    int klammerauf=input.indexOf('(');
 	    int klammerzu=input.lastIndexOf(')');
@@ -461,7 +464,7 @@ public class KommServer {
 	      /* Die Rueckgabewerte sind invertiert, d.h., wenn der Spieler f
 		 zurueckgibt, wird ok auf true gesetzt und nicht auf false.
 		 Gibt der Spieler t zurueck, wird ok auf false gesetzt.
-		 Dieses geschieht aufgrund der Definition der Rueckgabewerte von 
+		 Dieses geschieht aufgrund der Definition der Rueckgabewerte von
 		 KommServerRoboter.reaktivierung():
 		 Dort wird nicht zurueckgegeben, ob der Spieler deaktiviert bleiben
 		 moechte, sondern ob er wieder aktiviert werden moechte.
@@ -478,7 +481,7 @@ public class KommServer {
 	      catch (Exception abc) {
 		error=true;
 		errormsg="TBD -> Vermutlich kein Bool an der richtigen Stelle";
-	      } 
+	      }
 	    }
 	    else {
 	      error=true;
@@ -503,7 +506,7 @@ public class KommServer {
 	  int klammerzupos = input.lastIndexOf(')');
 	  if (klammeraufpos==-1) {
 	    error=true;
-	    errormsg="RLE -> keine '('"; 
+	    errormsg="RLE -> keine '('";
 	    break;
 	  }
 	  if (klammerzupos==-1) {
@@ -540,9 +543,9 @@ public class KommServer {
 	errormsg="Default: kein gueltiger String(-anfang)";
       }
       } // switch
-    } 
+    }
     } /* try wegen IndexOutOfBoundsExceptions; leider zu spaet aufgefallen, um exakte Fehlerstelle (bearbeitete Kommunikationsart) ausgeben zu koennen.
-       */ 
+       */
     catch (StringIndexOutOfBoundsException falsche_Klammerung_vermutlich) {
       error = true;
       errormsg = "Beim Parsen trat eine StringIndexOutOfBoundsException auf.\nVermutlich wegen einer falschen Klammerung der Art ' )xyz( '";
@@ -553,7 +556,7 @@ public class KommServer {
       throw new KommException(errormsg);
   } // wait2
 
- 
+
   /** Dient dazu, einem Client mitzuteilen, daß er vom Spiel ausgeschlossen wurde.
    * Bekommt den Grund als String übergeben, am besten schon in der laut Protokoll vorgesehenen Syntax.
    @param grund Der String mit der Begründung des Aussschlusses (in 'richtiger' syntax)
@@ -568,7 +571,7 @@ public class KommServer {
   }
   }
   /** Zur Bestätigung der Anmeldung.
-   * 
+   *
    @param ok 'true', falls die Anmeldung erfolgreich war, ansonsten 'false'
    @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
    */
@@ -577,7 +580,7 @@ public class KommServer {
       String raus="";  // ueberfluessig, aber zum Testen hilfreich
       if (ok==true)
 	raus="ok";
-      else 
+      else
 	raus="error";
       out.println (raus);
     }
@@ -606,7 +609,7 @@ public class KommServer {
      out.println (raus);
    }
    catch (Exception gibt_keine_aber_server_will_es_lieber_so) {
-     throw new KommException ("Exception wegen Fehler bei sendeSpielfelddim"); 
+     throw new KommException ("Exception wegen Fehler bei sendeSpielfelddim");
    }
   }
   /** Zur Antwort auf Info-Request 'gibSpielfeld'.
@@ -619,27 +622,27 @@ public class KommServer {
     int punkt = raus.lastIndexOf('.');
     if (punkt==-1)
       throw new KommException ("sendSpielfeld: Spielfeld nicht durch Punkt terminiert!");
-    raus=raus.substring(0,punkt+1); 
+    raus=raus.substring(0,punkt+1);
     out.println (raus);
   }
    catch (Exception gibt_keine_aber_server_will_es_lieber_so) {
-     throw new KommException ("Exception wegen Fehler bei sendSpielfeld"); 
+     throw new KommException ("Exception wegen Fehler bei sendSpielfeld");
    }
   }
   /** Zur Antwort auf Info-Request 'gibFahnenPos'.
    * Erhält die Fahnenpositionen als ein geordnetes Feld-Array, d.h. die Position der ersten Fahne steht an erster Stelle, die Position der zweiten Fahne an zweiter Stelle usw..
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
-   */ 
+   */
   public void sendFahnenpos (Ort [] fahnen) throws KommException {
     try {
       String raus="";
-      for (int i=0;i<fahnen.length;i++) 
+      for (int i=0;i<fahnen.length;i++)
 	raus+="("+fahnen[i].x+","+fahnen[i].y+")";
       out.println (raus);
-      
+
     }
     catch (Exception gibt_keine_aber_server_will_es_lieber_so) {
-      throw new KommException ("Exception wegen Fehler bei sendFahnenPos");  
+      throw new KommException ("Exception wegen Fehler bei sendFahnenPos");
     }
   }
   /** Zur Antwort auf Info-Request 'gibNamen'.
@@ -662,8 +665,8 @@ public class KommServer {
     }
   }
 
-    /** Neue Methode, die fuer die Uebermittelung der Farben der Spieler 
-	zustaendig ist. 
+    /** Neue Methode, die fuer die Uebermittelung der Farben der Spieler
+	zustaendig ist.
 	Das Array enthaelt die Namen der Spieler an speziellen Positionen.
 	Alle anderen Elemente sind null.
     */
@@ -683,14 +686,14 @@ public class KommServer {
 	catch (Exception youNeverKnow) {
 	    throw new KommException ("Exception bei sendFarben");
 	}
-    }	
-    
+    }
+
 
 
 
 
   /** Zur Antwort auf Info-Request 'gibRoboterPos'.
-   * Erhält den Ort des Roboters, der gesucht wurde. 
+   * Erhält den Ort des Roboters, der gesucht wurde.
 @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
    */
   public void sendRobpos (Ort ort) throws KommException {
@@ -704,7 +707,7 @@ public class KommServer {
   }
 
   /** Alternative zur Antwort auf Info-Request 'gibRoboterPos'.
-   * Erhält die koordinaten als Integers 
+   * Erhält die koordinaten als Integers
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat*/
   public void sendRobpos (int x, int y)  throws KommException{
     // 2.7.99
@@ -715,7 +718,7 @@ public class KommServer {
      catch (Exception youNeverKnow) {
        throw new KommException ("Exception bei sendRobPos(int,int)");
     }
-  
+
   }
 
 
@@ -724,13 +727,13 @@ public class KommServer {
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
    */
   public void sendRobStatus (Roboter r)  throws KommException{
-  
+
    try {
      String raus="RS(";
      switch (r.getAusrichtung()) {
      case 0 : {
        raus=raus +"N,";
-       break;  
+       break;
      }
      case 1 : {
        raus=raus +"E,";
@@ -756,8 +759,8 @@ public class KommServer {
        for (int i=0;i<5;i++) {
 	 if (r.getGesperrteRegister(i)!=null)
 	   raus = raus+"("+(i+1)+","+"PK("+r.getGesperrteRegister(i).getaktion()+","+r.getGesperrteRegister(i).getprio()+")"+")";
-       
-	   
+
+
        }
      }
      raus=raus+"),"; // Gespregister
@@ -769,24 +772,24 @@ public class KommServer {
        raus+="t,";
      else
        raus+="f,";
-     
-     
+
+
      raus +=")"; // Komma wegen RSreserviert (Optionskarten) schon gesetzt
      out.println(raus);
    }
    catch (Exception e) {
      throw new KommException ("Exception bei SendRobStatus");
    }
-  } 
+  }
 
   /** Für die Protokollerweiterung: Wurde der Status eines entfernten Roboters abgefragt, wird vom Server sendRobStatus() aufgerufen.
- @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat*/ 
+ @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat*/
   public void sendRobStatus ()  throws KommException{
     try {
       out.println ("RSE");
     }
     catch (Exception sinnlos) {
-      throw new KommException ("Exception bei sendRobStatus"); 
+      throw new KommException ("Exception bei sendRobStatus");
     }
   }
 
@@ -797,7 +800,7 @@ public class KommServer {
    * Falls nicht, wird 'null' anstelle des Arrays übergeben.
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
    */
-   
+
   public void spielstand (Boolean laeuft, String [] endplazierung) throws KommException {
     // 2.7.99
     try {
@@ -810,7 +813,7 @@ public class KommServer {
       for (int i=0;i<endplazierung.length;i++)
 	  raus+=endplazierung[i]+",";
       raus +=")";
-      
+
       out.println (raus);
     }
     catch (Exception gibtsnicht) {
@@ -818,7 +821,7 @@ public class KommServer {
     }
   }
   /** Zur Antwort auf die Abfrage des Timeouts.Erhält als Argument die Dauer des TimeOut in Sekunden.
- @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat*/ 
+ @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat*/
   public void sendTimeOut (int sekunden)  throws KommException{
     try {
       // 2.7.99
@@ -829,12 +832,12 @@ public class KommServer {
       throw new KommException ("Exception bei sendTimeOut aufgetreten");
     }
   }
- 
-  
+
+
   /**Zur Antwort auf Info-Request 'gibAuswertungsstatus'.
    * Erhält für jeden Roboter ein Status-Objekt, das den Namen des Roboters, die in der laufenden Runde bereits ausgewerteten Register und die aktuelle Phase der Auswertung enthält.
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
-   */ 
+   */
   public void spielStatus (Status [] robbis) throws KommException {
     // 2.7.99
     try {
@@ -848,10 +851,10 @@ public class KommServer {
       if (robbis[0].aktPhase==0) {
 	out.println("SA()");
 	return;
-      } 
+      }
       String raus="SA("+robbis[0].aktPhase+",";
       //  System.err.println ("raus"+raus);
-      
+
       for (int i=0;i<robbis.length;i++){
 	raus+="("+robbis[i].robName+",";
 	//  System.err.println ("raus aeussere For: "+raus);
@@ -861,7 +864,7 @@ public class KommServer {
 	    //     System.err.println ("raus innere  For: "+raus);
           }
 	}
-	raus+=")"; 
+	raus+=")";
       }
       raus+=")";
       // System.err.println ("raus fertig: "+raus);
@@ -875,37 +878,37 @@ public class KommServer {
   Zur Benachrichtigung der Spieler, dass das Spiel anfängt.
    (true=ok, false=error)
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
-  public boolean spielstart() throws KommException{ 
-    out.println ("NTS"); 
-    try{ 
+  public boolean spielstart() throws KommException{
+    out.println ("NTS");
+    try{
       String a = in.readLine();
       if ((a.equals("ok"))||(a.equals("OK")))
-	return true; 
+	return true;
       else if ((a.equals("error"))||(a.equals("ERROR")))
 	return false;
-      else 
-	throw new KommException ("Fehler bei der Antwort auf spielstart: "+a); 
+      else
+	throw new KommException ("Fehler bei der Antwort auf spielstart: "+a);
     }
     catch (IOException ioe) {
       throw new KommException ("IOException bei spielstart");
     }
-    
+
   }
   */
-  
+
   /** Zur Benachrichtigung der Spieler, dass das Spiel anfängt.
    Ob ein ok zurückkkommt, kann mithilfe der Warte-Methode bestimmt werden (Fall ServerAntwort.typ = AENDERUNGFERTIG).
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat*/
    public void spielstart() throws KommException{
-    try { 
+    try {
       out.println ("NTS");
-    }  
-   catch (Exception ioe) { 
+    }
+   catch (Exception ioe) {
       throw new KommException ("Exception bei spielstart (KommServerAusgabe); Message: "+ioe.getMessage());
-    }  
-   
-  } 
-  
+    }
+
+  }
+
  /** Finalizer, der die Streams zu macht.
      * (Wird vom garbage collector aufgerufen.)
      * @author Miriam
@@ -915,7 +918,6 @@ public class KommServer {
 	if (in != null) in.close();
 	if(out != null) out.close();
     }
-  
 
 
 
@@ -925,7 +927,8 @@ public class KommServer {
 
 
 
- 
+
+
     /**
        DEPRECATED - has never been used
      */
@@ -934,24 +937,24 @@ public class KommServer {
 //    * erhält ein Objekt des Typs Feld, das dem Feld an der gewünschten Stelle entspricht
 //    * Feld enthält den Bodeninhalt und die Wandgeräte.
 //  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
-//    */ 
+//    */
 //   public void sendFeldinhalt (Feld f)  throws KommException{
-//     // IST NOCH NICHT FERTIG    
+//     // IST NOCH NICHT FERTIG
 // try {
-//       String raus="(";    
+//       String raus="(";
 //       String boden = "";
 //       String wandLinks="";
 //       String wandRechts="";
 //       String wandUnten="";
-//       String wandOben="";      
-      
+//       String wandOben="";
+
 
 //       // DIE WAENDE:
 //       // obere Wand:
 //       if (f.o_exist) { // gibt es eine Wamd ?
 // 	String oben = wandgeraet (f.o_WandEl2,f.o_WandEl2Spez);
 // 	String unten =  wandgeraet (f.o_WandEl1, f.o_WandEl1Spez);
-	
+
 // 	if (oben.length()>1) // gibt es ueberhaupt ein Wandgeraet?
 // 	  oben = "["+oben;
 // 	if (unten.length()>1) // gibt es ueberhaupt ein Wandgeraet?
@@ -961,69 +964,69 @@ public class KommServer {
 //       else {
 // 	wandOben="_"; // keine Wand
 //       }
-     
+
 //       // rechte Wand:
 //       if (f.r_exist) {
 // 	String links = wandgeraet (f.r_WandEl1, f.r_WandEl1Spez);
 // 	String rechts = wandgeraet (f.r_WandEl2, f.r_WandEl2Spez);
-       	
+
 // 	if (links.length()>1) // gibt es ueberhaupt ein Wandgeraet?
 // 	  links = "["+links;
 // 	if (rechts.length()>1) // gibt es ueberhaupt ein Wandgeraet?
 // 	  rechts = rechts + "]";
-	
+
 // 	wandRechts = links+"#"+rechts;
 //       }
 //       else {
 // 	wandRechts="_";
 //       }
-      
+
 //       // untere Wand:
 //       if (f.u_exist) {
 // 	String oben = wandgeraet (f.u_WandEl1, f.u_WandEl1Spez);
 // 	String unten = wandgeraet (f.u_WandEl2, f.u_WandEl2Spez);
-	
+
 // 	if (oben.length()>1) // gibt es ueberhaupt ein Wandgeraet?
 // 	  oben = "["+oben;
 // 	if (unten.length()>1) // gibt es ueberhaupt ein Wandgeraet?
 // 	  unten = unten + "]";
-	
+
 // 	wandUnten = oben+"#"+unten;
 //       }
 //       else {
 // 	wandUnten="_";
 //       }
-      
+
 //       // linke Wand
 //       if (f.l_exist) {
 // 	String links = wandgeraet (f.l_WandEl2, f.l_WandEl2Spez);
 // 	String rechts = wandgeraet (f.l_WandEl1 ,f.l_WandEl1Spez );
-	
+
 // 	if (links.length()>1) // gibt es ueberhaupt ein Wandgeraet?
 // 	  links = "["+links;
 // 	if (rechts.length()>1) // gibt es ueberhaupt ein Wandgeraet?
 // 	   rechts = rechts + "]";
-	
-// 	wandLinks = links+"#"+rechts;	
+
+// 	wandLinks = links+"#"+rechts;
 //       }
 //       else {
 // 	wandLinks="_";
 //       }
 //       // Die vier Waende wurden erstellt
-      
+
 //       // jetzt folgt DER BODEN:
-      
+
 //       boden = bodeninhalt(f.bodenTyp, f.bodenSpez);
-      
-//       // raus zuEnde basteln 
-//       raus+=boden+","+wandOben+wandRechts+wandUnten+wandLinks;       
+
+//       // raus zuEnde basteln
+//       raus+=boden+","+wandOben+wandRechts+wandUnten+wandLinks;
 //       raus+=")";
 //       out.println (raus);
 //     }
 //     catch (Exception e) {
-//       throw new KommException ("sendFeldinhalt fuehrte zu einer Exception:"+e.getMessage()); 
+//       throw new KommException ("sendFeldinhalt fuehrte zu einer Exception:"+e.getMessage());
 //     }
-    
+
 //   }
 //   /** liefert die Richtung (N,E,S,W) zurueck, die vom Wert x beschrieben wird(zwischen 0 und 3); die Methode haette sich vor zwei Wochen schon eher gelohnt :-)
 //    */
@@ -1035,12 +1038,12 @@ public class KommServer {
 //      return "E";
 //    else if (x==2)
 //      return "S";
-//    else 
-//      return "W";    
+//    else
+//      return "W";
 //   }
 
-//   /** Hilfsmethode, die für ein abbiegendes Fliessband das ´woher´ ermittelt. 
-//     Dieses müsste irgendwie mithilfe der Richtung und der Drehrichtung möglich sein 
+//   /** Hilfsmethode, die für ein abbiegendes Fliessband das ´woher´ ermittelt.
+//     Dieses müsste irgendwie mithilfe der Richtung und der Drehrichtung möglich sein
 //     */
 //   private static String fromDirection (int richtung, int art) {
 //     // art=2 => Linksdrehung; art=3 => rechtsdrehung
@@ -1053,8 +1056,8 @@ public class KommServer {
 //       from++;
 //       from%=4;
 //     }
-    
-//     return getRichtung(from);      
+
+//     return getRichtung(from);
 //   }
 
 //   /** Hilfsmethode, die einen <Bodeninhalt>-String laut "Protokolle und Datenformate" zurückgibt.
@@ -1072,7 +1075,7 @@ public class KommServer {
 //       int tempo=typ/100; // hunderter-Stelle
 //       int richtung=typ%10; // einer-Stelle
 //       int art =(typ/10)%10; // zehner-Stelle
-     
+
 //       	boden = "F(";
 // 	boden+=getRichtung(richtung)+","+tempo+",";
 //       if (art==0) { // band geradeaus
@@ -1091,10 +1094,10 @@ public class KommServer {
 //       */
 //       else if (art==2) { // linkskurve
 // 	boden+="(("+fromDirection(richtung, art)+","+"D(L)))"; // dreher nach links
-	
-//       } 
+
+//       }
 //       else if (art==3) { // rechtskurve
-// 	boden+="(("+fromDirection(richtung, art)+","+"D(R)))"; // dreher nach rechts	
+// 	boden+="(("+fromDirection(richtung, art)+","+"D(R)))"; // dreher nach rechts
 //       }
 //       else if (art==5) { // einbiegen aus zwei Richtungen => zwei Dreher, aus jeder Richtung einer
 // 	boden+="(("+fromDirection(richtung, 2)+","+"D(L))"; // erster Dreher
@@ -1103,7 +1106,7 @@ public class KommServer {
 //       else {
 // 	throw new KommException ("sendeFeldInhalt: kein gueltiger Bodeninhalt");
 //       }
-      
+
 //       if (crusher) {
 // 	boden+="(";
 // 	for (int i=1;i<6;i++) {
@@ -1114,8 +1117,8 @@ public class KommServer {
 //       }
 //       else //kein Crusher
 // 	boden+="())"; // kein Crusher, Fliessband zu
-      
-//       return boden;  
+
+//       return boden;
 //     } // Ende Fall Fliessband
 //     else {
 //       switch (typ) {
@@ -1135,7 +1138,7 @@ public class KommServer {
 // 	boden ="D(";
 // 	if (spez==Feld.DUHRZ)
 // 	  boden+="R";
-// 	else 
+// 	else
 // 	  boden+="L";
 // 	boden+=")";
 // 	break;
@@ -1173,10 +1176,10 @@ public class KommServer {
 //     }
 //     default: throw new KommException ("SFI-Antwort: Weder 'Laser', 'Pusher' noch 'kein' Wandelement");
 //     }
-//    return back; 
-//   } 
+//    return back;
+//   }
 
-   
+
 }
 
 

@@ -10,11 +10,14 @@ import java.net.*;
 
 /** The parent class for all clientside communication.
     Very 'advanced' parsing of Strings.
- *@author Hendrik  
+ *@author Hendrik
 */
 
 public class KommClient {
-    /** The client reads  messages of the server using this BufferedReader 
+    static final boolean LOG_RECEIVE = false;
+    static final boolean LOG_SEND    = false;
+
+    /** The client reads  messages of the server using this BufferedReader
      */
     protected BufferedReader in;
     /** The client sends messages to the server using this PrintWriter
@@ -25,24 +28,24 @@ public class KommClient {
 	at an unexpected time (while waiting for a request's response).
     */
     protected boolean gotNTC;
-    /** 
+    /**
 	Needed for a maybe deprecated hotfix.
 	Saves the NTC-String sent at a wrong time.
 	Together with 'gotNTC' it represensts a kind of one-element-queue ;-)
-    */ 
+    */
     protected String strNTC;
     /** The name of the client that owns this KommClient object.
 	For debugging purposes.
     */
     protected String cn;
     /** For debugging purposes: if set to true,
-	a logfile "<clientname>'s.Kommlog" will be created, 
+	a logfile "<clientname>'s.Kommlog" will be created,
 	saving all Strings the client sent or got.
 	Can be changed in source code only => For activating/deactivating you'll have to
 	recompile this class.
     */
     protected final boolean log=false;
-    
+
     public KommClient (){
 	gotNTC=false;
 	strNTC="";
@@ -58,19 +61,19 @@ public class KommClient {
 	    }
 	}
     }
-    
+
     /** This method sents a String to the server.
 	@param s The String to be sent.
     */
     protected  void senden (String s) throws KommFutschException {
 	PrintWriter debug=null;
 	if (log) {
-	
+
 	    try {
 		debug = new PrintWriter(new BufferedWriter(new FileWriter((cn+"'s.Kommlog"), true)));
 	    }
 	    catch (IOException ioe) {
-		System.err.println ("senden: IOException beim Erstellen des Log-writers");  
+		System.err.println ("senden: IOException beim Erstellen des Log-writers");
 	    }
 	    if (debug!=null) {
 		debug.println ("Sende: "+s);
@@ -78,7 +81,7 @@ public class KommClient {
 	    }
 	}
 	try {
-	    Global.debug(this, "CLIENT "+cn+" sendet: "+s);
+	    if( LOG_SEND ) Global.debug(this, "CLIENT "+cn+" sendet: "+s);
 	    out.println (s);
 	}
 	catch (NullPointerException npe) {
@@ -87,10 +90,10 @@ public class KommClient {
 	catch (Exception e) {
 	    throw new KommFutschException ("Client-Senden: Exception-Message: "+e.getMessage());
 	}
-    
+
     }
-    
-    /** 
+
+    /**
 	This method reads messages sent by the server, if a special request has been sent
 	(i.e. used in all non-void get-Methods).
 	It is to be used instead of 'warte' (or 'wait2').
@@ -102,42 +105,42 @@ public class KommClient {
     protected String einlesen() throws KommFutschException, KommException{
 	PrintWriter debug=null;
 	if (log) {
-	    
+
 	    try {
 		debug = new PrintWriter(new BufferedWriter(new FileWriter((cn+"'s.Kommlog"), true)));
 	    }
 	    catch (IOException ioe) {
-		System.err.println ("einlesen: IOException beim Erstellen des Log-writers"); 
+		System.err.println ("einlesen: IOException beim Erstellen des Log-writers");
 	    }
 	}
 	String back="";
 	try {
 	    back = in.readLine();
-	    Global.debug(this, "CLIENT(einlesen) "+cn+" erhaelt: "+back);
+	    if( LOG_RECEIVE ) Global.debug(this, "CLIENT(einlesen) "+cn+" erhaelt: "+back);
 	    if ((debug!=null)&&(log))
 		debug.println("einlesen erhielt: "+back);
 	}
 	catch (IOException ioe) {
-	    throw new KommFutschException ("Einlesen: IOException augetreten; Message: "+ioe.getMessage()); 
+	    throw new KommFutschException ("Einlesen: IOException augetreten; Message: "+ioe.getMessage());
 	}
-	// 
+	//
 	if (back==null) {
 	    try {// if null, try again
 		back = in.readLine();
 		if ((debug!=null)&&(log))
 		    Global.debug(this,"einlesen (2.Versuch) erhielt: "+back);
-		
+
 		if (back==null)// read null the second time => no connection anymore => exception
 		    throw new KommFutschException("Einlesen: zweimal hintereinander null gelesen");
-		
+
 	    }
 	    catch (IOException ioe2) {
-		throw new KommFutschException ("Einlesen: IOException beim 2ten Leseversuch (1ter = null)augetreten; Message: "+ioe2.getMessage()); 
-	    } 
+		throw new KommFutschException ("Einlesen: IOException beim 2ten Leseversuch (1ter = null)augetreten; Message: "+ioe2.getMessage());
+	    }
 	}
 	// Tried two times to read the String
-	
-	
+
+
 	// Now checking whether the server removed the client
 	if ((back.length()>=3)&&(back.substring(0,3).equals("REN"))) {
 	    ClientAntwort xyz= new ClientAntwort();
@@ -151,20 +154,20 @@ public class KommClient {
 		throw new KommFutschException ("Der Client wurde entfernt;\n Grund: "+xyz.str);
 	}
 	// Hey, we made nothing wrong. The client is still alive :-)
-	
+
 	// Now checking whether we got a bad timed NTC (notify change)
 	else if ((back.length()>=3)&&(back.substring(0,3).equals("NTC"))) {
-	    
+
 	    gotNTC=true; // changing state; indicating that there is an NTC waiting
 	    strNTC=new String(back); // saving the message of the server
-	    
+
 	    // now we will read the answer we are waiting for
-	    back = einlesen(); 
+	    back = einlesen();
 	    if ((debug!=null)&&(log))
 		debug.close();
 	    return back;
 	}
-	else { 
+	else {
 	    if ((debug!=null)&&(log))
 		debug.close();
 	    return back;
@@ -172,19 +175,19 @@ public class KommClient {
 	if ((debug!=null)&&(log))
 	    debug.close();
 	return back; // statement shouldn't be reached, but you (I) never know.
-	
+
     }
 
 
     /** The main method of this class. It waits for messages sent from the server.
 	@exception KommException Any error parsing a server-message (including most
-	exceptions) will end up in throwing a KommException   
+	exceptions) will end up in throwing a KommException
     */
     public ClientAntwort warte () throws KommFutschException, KommException {
 	String rein;
 	/*   try {
 	     rein = in.readLine();
-	     } 
+	     }
 	     catch (IOException ioe) {
 	     throw new KommException ("IOException bei KommClient.warte");
 	     }
@@ -197,7 +200,7 @@ public class KommClient {
 		debug = new PrintWriter(new BufferedWriter(new FileWriter((cn+"'s.Kommlog"), true)));
 	    }
 	    catch (IOException ioe) {
-		System.err.println ("IOException beim Erstellen des Log-writers (warte)"); 
+		System.err.println ("IOException beim Erstellen des Log-writers (warte)");
 	    }
 	}
 	/* if (debug!=null) {
@@ -221,7 +224,7 @@ public class KommClient {
 	    return wait2(rein);
 	}
 	else {// we have an old NTC waiting for being processed
-	    
+
 	    gotNTC=false;
 	    if ((debug!=null)&&(log)) {
 		debug.println("baearbeite altes NTC: "+strNTC);
@@ -230,7 +233,7 @@ public class KommClient {
 	    return wait2(strNTC);
 	}
     }
-    
+
     /** This method does all the String parsing.
      */
     ClientAntwort wait2 (String com) throws KommException {
@@ -239,7 +242,7 @@ public class KommClient {
 	boolean error=false;
 	String errormesg="";
 	if ((com.equals("ok")) || (com.equals("OK"))){
-	    back.typ=back.ANGEMELDET; 
+	    back.typ=back.ANGEMELDET;
 	    back.ok = true;
 	}
 	else if ((com.equals("error")) || (com.equals("ERROR"))){
@@ -251,8 +254,8 @@ public class KommClient {
 	    if (com.length()>=3) {
 		char st = com.charAt(0);
 		char nd = com.charAt(1);
-	  
-	  
+
+
 		char rd = com.charAt(2);
 		switch (st){
 		case 'T': {
@@ -273,15 +276,15 @@ public class KommClient {
 				errormesg="TO-> NumberFormatException beim Parsen des TimeOuts";
 			    }
 			    break;
-	      
-	      
+
+
 			}
 			catch (Exception e) {
 			    error= true;
 			    errormesg="Exception bei KC.wait2.TO; Message:"+e.getMessage();
 			    break;
 			}
-	      
+
 		    }
 		    else  {
 			error =true;
@@ -312,7 +315,7 @@ public class KommClient {
 				    int klammerletzt=com.lastIndexOf(')');
 				    com=com.substring (klammerauf+1);
 				    int count=0;
-		 
+
 				    while (com.length()>1) {
 					int klauf=com.indexOf('(');
 					int klzu=com.indexOf(')');
@@ -336,7 +339,7 @@ public class KommClient {
 				    // now there should be 'count' cards in karten1
 				    back.typ=back.MACHEZUG;
 				    back.karten=new Karte [count];
-			      
+
 				    for (int i=0; i<count;i++)
 					back.karten[i]=karten1[i];
 				    break;
@@ -351,7 +354,7 @@ public class KommClient {
 				errormesg="Exception bei KC.wait2.MRP; Message:"+e.getMessage();
 				break;
 			    }
-			    break; 
+			    break;
 			}
 			else if (rd=='R') {
 			    try {
@@ -379,7 +382,7 @@ public class KommClient {
 			    errormesg="KC.wait2: MR->danach kein P oder R";
 			    break;
 			}
-		  
+
 		    }
 		    else if (nd=='N') {
 			if (rd=='R') {
@@ -392,7 +395,7 @@ public class KommClient {
 			    break;
 			}
 		    }
-		    else if (nd=='B') { 
+		    else if (nd=='B') {
 			if (rd=='D') {
 			    back.typ=back.REAKTIVIERUNG;
 			    break;
@@ -408,14 +411,14 @@ public class KommClient {
 			errormesg="KC.wait2: M -> dann nicht R,N,B";
 			break;
 		    }
-	      
+
 		}
 		case 'N': {
 		    if (nd=='T') {
 			if (rd=='S'){
 			    back.typ=back.SPIELSTART;
 			    back.ok=true;
-		      
+
 			}
 			else if (rd=='C'){
 			    try {
@@ -432,12 +435,12 @@ public class KommClient {
 			else{
 			    error=true;
 			    errormesg="KC.wait2:NT -> dann kein S oder C danach";
-			} 
-	          
+			}
+
 		    }
 		    else {
 			error=true;
-			errormesg="KC.wait2:N -> dann kein T danach"; 
+			errormesg="KC.wait2:N -> dann kein T danach";
 		    }
 		    break;
 		}
@@ -469,17 +472,17 @@ public class KommClient {
 			    back.typ=back.SPIELSTATUS;
 			    if (com.length()<=4)
 				back.ok=false; // => no phase processing
-			    else { 
+			    else {
 				back.ok=true; // => phase processing
 				int klauf=com.indexOf('('); // no we are behind 'SA'
 				int phase=0; // init
 				try {
-				    phase=Integer.parseInt(com.substring (klauf+1,klauf+2));// parsing phase-number     
+				    phase=Integer.parseInt(com.substring (klauf+1,klauf+2));// parsing phase-number
 				}
 				catch (NumberFormatException nfe) {
 				    throw new KommException ("NumberFormatException bei getSpielstatus (Parsen der Registerphase); Message: "+nfe.getMessage());
 				}
-				int komma = com.indexOf(','); 
+				int komma = com.indexOf(',');
 				com=com.substring(komma+1); // now there are only names left
 				Status [] stats = new Status [8]; // 8=maximum number of players
 				int bloed = klazu2(com);
@@ -490,16 +493,16 @@ public class KommClient {
 				    int bloed2 = klazu2(com);
 				    if (bloed2!=-1) {
 					com=com.substring(bloed2);
-				    }	
+				    }
 				    zaehler++;
-				    bloed = klazu2(com);		    
+				    bloed = klazu2(com);
 				}
 				zaehler++;
 				stats [zaehler-1] = getStatusRegs(splitFirstRob(com));
 				Status [] back2 = new Status [zaehler];
-			  
+
 				for (int i=0;i<back2.length;i++){
-				    back2 [i] = stats [i];		  
+				    back2 [i] = stats [i];
 				    back2 [i].aktPhase =phase;
 				}
 				back.stati = back2;
@@ -519,7 +522,7 @@ public class KommClient {
 
 		    break;
 		}
-		case 'R': { 
+		case 'R': {
 		    if ((nd=='E') && (rd=='N')) { // REN == robot has been removed
 			try {
 			    back.typ=back.ENTFERNUNG;
@@ -540,8 +543,8 @@ public class KommClient {
 				else
 				    back.str="unbekannter Grund fuer Entfernung"; // unknown reason
 			    }
-	    
-		      
+
+
 			    else {
 				klauf = work.indexOf ('(');
 				work = work.substring (klauf+1,work.length()-1);
@@ -553,9 +556,9 @@ public class KommClient {
 			    System.err.println("KommClient: "+errormesg);
 			    error=true;
 			    break;
-		      
+
 			}
-		  
+
 			//break;
 		    }
 		    else {
@@ -565,33 +568,33 @@ public class KommClient {
 		    }
 		    break;
 		}
-	  
-	  
+
+
 		}
 	    }
 	    else {
 		error=true;
 		errormesg="KommClient.warte: String.length<3 && String!=('ok'||'TO')";
 	    }
-      
+
 	}
 	if (!error)
 	    return back;
 	else {
 	    throw new KommException ("Fehler bei kommClient-warte:\n"+errormesg);
 	}
-	
+
     }
     /** This method is used to tell the server that the client wants to quit
 	@param name The name of the client
     */
     public void abmelden (String name) {
 	String back="RLE("+name+")";
-	
+
 	if(out!=null) out.println (back);
     }
     /** This method registers a client.
-	Never used directly. Use child's method instead. 
+	Never used directly. Use child's method instead.
 	@param ipnr IP of the server
 	@param portnt Ip-port of the server
 	@param clientName The name of the client
@@ -600,23 +603,23 @@ public class KommClient {
     */
     protected boolean anmelden (String ipnr, int portnr, String clientName, String kuerzel)throws KommException{
 	cn = clientName;
-	try{ 
-	    Socket socAnmeldung=new Socket(ipnr, portnr); 
-	    in = new BufferedReader(new InputStreamReader(socAnmeldung.getInputStream())); 
-	    out= new PrintWriter(new OutputStreamWriter(socAnmeldung.getOutputStream()),true); 
+	try{
+	    Socket socAnmeldung=new Socket(ipnr, portnr);
+	    in = new BufferedReader(new InputStreamReader(socAnmeldung.getInputStream()));
+	    out= new PrintWriter(new OutputStreamWriter(socAnmeldung.getOutputStream()),true);
 	    if (in==null)
 		System.err.println("KommClient: in ist null (anmelden)");
 	    if (out==null)
-		System.err.println("KommClient: out ist null (anmelden)"); 
+		System.err.println("KommClient: out ist null (anmelden)");
 	    String raus = kuerzel+"("+clientName+")";
 	    // out.println(raus);
 	    this.senden(raus);
 	}
-	catch(UnknownHostException e){ 
-	    System.err.println("Anmeldung: Der angegebene Server wurde nicht gefunden"); 
+	catch(UnknownHostException e){
+	    System.err.println("Anmeldung: Der angegebene Server wurde nicht gefunden");
 	    // evtl. stattdessen eine Exception
-	    return false; 
-	} 
+	    return false;
+	}
 	catch (java.io.IOException fehler) {
 	    throw new KommException ("IOException bei der Anmeldung");
 	}
@@ -635,10 +638,10 @@ public class KommClient {
 	catch (IOException fehler_beim_Lesen_vom_BufferedReader) {
 	    throw new KommException ("Fehler bei der Anmeldung: IOexception beim Lesen");
 	}
-		
-	  
-    } 
-  
+
+
+    }
+
     /** Info-Request, asking for the positions of all flags.
 	@return An array of 'Orts' (equal to Java's 'Point').
 	They are ordered according to the flags' numbers.
@@ -658,7 +661,7 @@ public class KommClient {
 	    pos = rein.indexOf(',',start);
 	    if (pos!=-1)
 		zaehler++;
-	    start=pos+1;	
+	    start=pos+1;
 	}// postcondition: zaehler == number of flags (Orts)
 	Ort [] back;
 	rein+="**"; // dummy to avoid Exceptions
@@ -672,7 +675,7 @@ public class KommClient {
 		int xk=Integer.parseInt(x); //  x-coordinate
 		int yk=Integer.parseInt(y); //  y-coordinate
 		back [myI]=new Ort(xk, yk);
-		rein=rein.substring(klammerzu+1);// remove parsed Point (Ort) 
+		rein=rein.substring(klammerzu+1);// remove parsed Point (Ort)
 	    }
 	}
 	// A lot of errors might happen.. :
@@ -691,16 +694,16 @@ public class KommClient {
 	return back;
     }
 
- 
+
     /** This method asks the server for the position of the robot named 'name'
 	@param name The robot's name
 	@return The robot's coordinates
 	@exception KommException ..if an error occurs
     */
     public Ort getRobPos (String name) throws KommException {
-	return this.fetchOrt(name, true); 
+	return this.fetchOrt(name, true);
     }
-  
+
     /** This method asks the server for the size of the board.
 	@return An Ort containing the bords Dimensions.
 	@exception KommException ..if an error occurs
@@ -723,11 +726,11 @@ public class KommClient {
 	    while (rein.lastIndexOf('.')==-1){
 		rein=this.einlesen();
 		back+=rein; // concat parts
-		if (rein.lastIndexOf('.')==-1) // make sure that no line break is following the dot 
+		if (rein.lastIndexOf('.')==-1) // make sure that no line break is following the dot
 		    back+="\n";
 	    }
-	
-      
+
+
 	}
 	catch (Exception sonstige) {
 	    throw new KommException ("Exception bei getSpielfeld; Message: "+sonstige.getMessage());
@@ -744,7 +747,7 @@ public class KommClient {
 	this.senden("GSN");
 	String rein = this.einlesen();
 	return this.getNamen2(rein);
-    
+
     }
 
     /** Supporting method for parsing a list of names..
@@ -757,14 +760,14 @@ public class KommClient {
 	    int pos=0;
 	    int zaehler=0;
 	    int start=0;
-	    while (pos!=-1) { 
+	    while (pos!=-1) {
 		pos = rein.indexOf(',',start);
 		if (pos!=-1)
 		    zaehler++;
-		start=pos+1;	
-	    }// now : zaehler==number of names == number of ',' 
-     
-      
+		start=pos+1;
+	    }// now : zaehler==number of names == number of ','
+
+
 	    raus = new String [zaehler];
 	    rein = rein.substring (1); // remove '('
 	    for (int i=0;i<zaehler;i++) {
@@ -803,10 +806,10 @@ public class KommClient {
 	String com ="";
 	Roboter robot=Roboter.getNewInstance(name);
         String raus ="GRS("+name+")";
-	this.senden(raus); 
+	this.senden(raus);
 	//Server sends "RS(Richtung(N,O..), Ort(1,1), LFlag, LArchF, Schaden, VLeben, GespRegister, Aktiv, Virtuell, RSreserveiert)"
 	/*try{
-	  com=in.readLine(); 
+	  com=in.readLine();
 	  // System.out.println ("GETROBSTATUS: gelesener String: "+com);
 	  }
 	  catch(IOException ioe){
@@ -851,7 +854,7 @@ public class KommClient {
 		throw new KommException ("getRobStatus: (L-Flag-Parsen) NumberFormatException(Message: "+nfe2.getMessage());
 	    }
 	    com=com.substring(kommapos+1); // LFlag und Komma entfernen
-      
+
 	    kommapos=com.indexOf(',');
 	    klazupos=com.indexOf(')');
 	    xk=com.substring(1,kommapos); // Archiv - Ort
@@ -863,7 +866,7 @@ public class KommClient {
 		throw new KommException ("getRobStatus: NumberFormatException (Archiv-Parsen)(Message: "+nfe3.getMessage());
 	    }
 	    com=com.substring(klazupos+2); // "(x,y)," entfernen
-      
+
 	    kommapos=com.indexOf(',');
 	    String schaden = com.substring(0,kommapos);
 	    try {
@@ -872,10 +875,10 @@ public class KommClient {
 	    catch (NumberFormatException nfe4) {
 		throw new KommException ("getRobStatus: NumberFormatException (Schaden-Parsen)(Message: "+nfe4.getMessage());
 	    }
-      
+
 	    com =com.substring(kommapos+1);// schaden und Komma entfernen
-      
-      
+
+
 	    kommapos=com.indexOf(',');
 	    String vLeben = com.substring(0,kommapos);
 	    try {
@@ -885,23 +888,23 @@ public class KommClient {
 		throw new KommException ("getRobStatus: NumberFormatException (Leben-Parsen)(Message: "+nfe5.getMessage());
 	    }
 	    com =com.substring(kommapos+1,com.length()-1);// vLeben und Komma entfernen; sowie die abschliessende Klammer (zu)
-      
+
 	    String cards = new String(com.substring(0,com.lastIndexOf(')')));
-      
-	    // das muesste jetzt der String mit den Karten sein 
+
+	    // das muesste jetzt der String mit den Karten sein
 	    // z.B.: "((1,PK(M1,123))(2,PK(M2,456)))"
 	    // oder "((,))"
-      
+
 	    robot.sperreRegister(getRegister(cards));
 	    // Kartenstring und letzte Klammer entfernen:
 	    com=com.substring(com.lastIndexOf(')'));
 	    klazupos=com.lastIndexOf(')'); // das muesste jetzt die letzte Klammer des Karten-Teilstrings sein
 	    com=com.substring(klazupos+1); // Karten-Teilstring entfernen
-      
+
 	    // com sieht jetzt entweder "<Bool>,<Bool>" oder ",<Bool>,<Bool>" aus
 	    if (com.charAt(0)==',')
 		com=com.substring(1); // eventuelles Komma vor erstem Boolean entfernen
-      
+
 	    // JETZT sieht com mit Sicherheit so aus "<bool>,<bool>"
 	    kommapos = com.indexOf(',');
 	    char aktiv = com.charAt(0);
@@ -914,19 +917,19 @@ public class KommClient {
 		robot.setVirtuell(true);
 	    else
 		robot.setVirtuell(false);
-      
-      
+
+
 	    //return robot;
 	}
 	return robot;
     }
 
     /**
-     * Info-Request zur Abfrage des Spielstandes. 
-     * Falls das Spiel beendet wurde, enth&auml;lt das String-Array die Namen der Spieler, 
-     * wobei der Name des Gewinners an erster Stelle steht. L&auml;uft das Spiel noch, 
-     * wird null zur&uuml;ckgegeben. 
-     * @exception KommException Tritt beim Parsen ein Fehler auf 
+     * Info-Request zur Abfrage des Spielstandes.
+     * Falls das Spiel beendet wurde, enth&auml;lt das String-Array die Namen der Spieler,
+     * wobei der Name des Gewinners an erster Stelle steht. L&auml;uft das Spiel noch,
+     * wird null zur&uuml;ckgegeben.
+     * @exception KommException Tritt beim Parsen ein Fehler auf
      * (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.
      */
     public String [] getSpielstand () throws KommException{
@@ -942,12 +945,12 @@ public class KommClient {
 	*/
 	String rein = this.einlesen();
 	xyz=wait2(rein);
-    
+
 	if (xyz.typ==xyz.SPIELSTAND) {
 	    /*
 	      if (xyz.ok==true)
 	      return null;
-	      else 
+	      else
 	      return xyz.namen;
 	    */
 	    return xyz.namen;
@@ -955,9 +958,9 @@ public class KommClient {
 	else if (xyz.typ==0) {
 	    throw new KommException ("getSpielstand: keine gueltige Antwort");
 	}
-	else 
+	else
 	throw new KommException ("getSpielstand: Antwortobjekt vom falschen Typ zurueckgegeben; Typ: "+xyz.typ);
-    
+
     }
     /** Info-Request zur Abfrage des sogenannten Spielstatus.
 	Sie gibt f&uuml;r jeden Roboter ein Statusobjekt zur&uuml;ck, das dessen Namen, seine bisher ausgewerteten Registerinhalte und die aktuelle Auswertungsphase als Attribute besitzt.
@@ -977,18 +980,18 @@ public class KommClient {
 	if (xyz.typ==xyz.SPIELSTATUS){
 	    if (xyz.ok=false)
 		return null;
-	    else 
+	    else
 		return xyz.stati;
 	}
 	else if (xyz.typ!=0)
 	throw new KommException ("Falsche Antwort bei getSpielStatus: habe ClientAntwort vom Typ "+xyz.typ+" erhalten");
-	else 
+	else
 	throw new KommException ("Ungueltigen String bei getSpielstatus erhalten");
-    
-			       
-      
+
+
+
     }
-  
+
 
     /** Request zur Abfrage des Timeouts. Rueckgabewert: Timeout in Sekunden
 	@exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.*/
@@ -997,7 +1000,7 @@ public class KommClient {
 	String com="";
 	// try {
 	this.senden("GTO");
-	//com=in.readLine();    
+	//com=in.readLine();
 	/* }
 	   catch (IOException ioe) {
 	   throw new KommException ("IOException bei getTimeOut (lesen von 'in')");
@@ -1006,20 +1009,20 @@ public class KommClient {
 	xyz=wait2(com);
 	if (xyz.typ==xyz.TIMEOUT)
 	    return xyz.zahl;
-	else 
+	else
 	    throw new KommException ("getTimeOut: falsche Antwort(Typ: "+xyz.typ+")");
     }
     /** Antwort auf spielstart*/
     public void spielstart ()  {
 	try {
 	    this.senden ("ok");
-	}    
+	}
 	catch (KommFutschException k) {
 	    System.err.println ("Fehler bei spielstart: Exception beim Senden des ok\nMessage: "+k.getMessage());
 	}
     }
 
-    /** Bestaetigung auf irgendwas vom Server, was Bestaetigt werden muss. */ 
+    /** Bestaetigung auf irgendwas vom Server, was Bestaetigt werden muss. */
     public void bestaetigung ()  {
 	this.spielstart();
     }
@@ -1039,16 +1042,16 @@ public class KommClient {
 	    else { // nicht RobPos => nordostecke gefragt
 		method="gibSpielfeldDim";
 		this.senden ("GSD");
-	
+
 	    }
 	    String rein = this.einlesen();
 	    //String rein = in.readLine();
 	    // rein= "(x,y)"
 	    int komma=rein.indexOf (',');
 	    int klammerzu=rein.indexOf(')');
-      
+
 	    back.x = Integer.parseInt(rein.substring(1,komma));
-	    back.y = Integer.parseInt(rein.substring(1+komma, klammerzu));     
+	    back.y = Integer.parseInt(rein.substring(1+komma, klammerzu));
 	}
 	catch (StringIndexOutOfBoundsException sioob){
 	    throw new KommException (method+" warf StringIndexOutOfBoundsException(Inhalt:"+sioob.getMessage()+"); Ursache: vermutlich falsch aufgebaute Antwort vom Server");
@@ -1078,7 +1081,7 @@ public class KommClient {
 	String in2 = new String (in);
 	int kpos = in2.indexOf(',');
 	int ks = 0; // Anzahl kommas = Anzahl Karten
-    
+
 	while (kpos != -1) {// Karten zaehlen
 	    ks++;
 	    in2 = in2.substring(kpos+1);
@@ -1103,7 +1106,7 @@ public class KommClient {
 		    catch (NumberFormatException nfe) {
 			throw new KommException ("NumberFormatException bei KC.getStatusRegs; Message: "+nfe.getMessage());
 		    }
-	  
+
 		    back.register[i]= KartenStapel.get(p, akt);
 		    i++;
 		    in = in.substring(klazu+1);
@@ -1111,7 +1114,7 @@ public class KommClient {
 		}
 	    }
 	}
-	return back; 
+	return back;
     }
 
     private static Karte [] getRegister (String str)throws KommException {
@@ -1130,7 +1133,7 @@ public class KommClient {
 
 		int register=0;
 		try {
-	 
+
 		    register = Integer.parseInt(active.substring(0,1));
 		}
 		catch (NumberFormatException nf) {
@@ -1148,20 +1151,20 @@ public class KommClient {
 
 		int prioritaet=0;
 		try {
-	 
+
 		    prioritaet=Integer.parseInt(active.substring(komma+1,klzu));// KLZU-2
-	 
+
 		}
 		catch (NumberFormatException nf2) {
 		    throw new KommException ("getRegister: NumberFormatException bei Parsen der Kartenprioritaet: Message: "+nf2.getMessage());
-		}			 
+		}
 		back [register-1]=KartenStapel.get(prioritaet,kartenaktion); // Karte eingeteilt
 		//jetzt String aktualisieren:
 
 		active=active.substring(klzu+3); // "1,PK(M1,123))(" abschneiden    KLZU+1
 
 	    }
-     
+
 	    return back;
 	}
     }
@@ -1174,19 +1177,19 @@ public class KommClient {
 	int klazu=comLocal.indexOf (')');
 	int raus=klazu+1;
 	while (klazu!=-1) {
-     
+
 	    if (comLocal.charAt(klazu+1)=='(')
 		return raus;
 	    comLocal = comLocal.substring (klazu+1);
 	    klazu = comLocal.indexOf(')');
 	    raus+=klazu+1;
-      
-	}   
+
+	}
 	return -1;
     }
     /** Hilfsmethode fuer GetRobStatus-Antwort.
 	Liefert den String zurueck, der den ersten Roboter betrifft:
-	Bekommt die Methode "(name1,PK(M1,123))(name2,))" uebergeben,so gibt sie 
+	Bekommt die Methode "(name1,PK(M1,123))(name2,))" uebergeben,so gibt sie
 	"(name1,PK(M1,123))" zurueck.
 	Der uebergebene String wird nicht veraendert.
     */
@@ -1195,11 +1198,11 @@ public class KommClient {
 	String back="";
 	if (trennPos!=-1){
 	    back=com.substring(0,trennPos);
-     
+
 	}
 	else {
 	    back=com;
-    
+
 	}
 	return back;
     }

@@ -426,6 +426,7 @@ public class HumanPlayer extends Thread {
 	ausgabe.start();
 	ChatPane chatpane=new ChatPane(this);
 	view.addChatPane(chatpane);
+        initMenus( view, ausgabe.getAusgabeView().getTrackMenu() );
     }
 
     JMenuItem lSpeed;
@@ -434,7 +435,7 @@ public class HumanPlayer extends Thread {
     int speed = MITTEL;
 
 
-    private void initMenus(JFrame frame) {
+    private void initMenus(JFrame frame, JMenu trackMenu) {
 
 	// Menüleiste einfügen
 	JMenuBar hauptMenu = new JMenuBar();
@@ -469,8 +470,8 @@ public class HumanPlayer extends Thread {
 	JMenu scrollFlag = new JMenu (Message.say("AusgabeFrame","mflagMenu"));
 	optionenMenu.add(scrollFlag);
 
-	JMenu optTrack = new JMenu((Message.say("AusgabeFrame","mRoboTrack")));
-	optionenMenu.add(optTrack);
+	//JMenu optTrack = new JMenu((Message.say("AusgabeFrame","mRoboTrack")));
+	optionenMenu.add(trackMenu);
 
 	hauptMenu.add(optionenMenu);
 	hauptMenu.add( new ZoomMenu() );
@@ -487,6 +488,7 @@ public class HumanPlayer extends Thread {
 
 	view.setJMenuBar(hauptMenu);
     }
+
 
     private class SpeedMenuListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
@@ -562,15 +564,15 @@ public class HumanPlayer extends Thread {
     }
 
 
-    class RoboTrackListener implements ActionListener {
+    static class RoboTrackListener implements ActionListener {
 	Roboter r;
 	RoboTrackListener(Roboter r) {
 	    this.r = r;
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    ausgabe.setTracking( r.getName() );
-	    ausgabe.trackRob( r.getName() );
+//	    ausgabe.setTracking( r.getName() );
+//	    ausgabe.trackRob( r.getName() );
 	}
     }
 
