@@ -296,10 +296,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 		    spielFeld.setSoundActive(soundOn);
                     String status = Message.say("AusgabeView","mSoundChange")+" ";
                     if (soundOn)
-                      status = Message.say("AusgabeView","mSoundOn");
+                      status += Message.say("AusgabeView","mSoundOn");
                     else
-                      status = Message.say("AusgabeView","mSoundOff");
-		}
+                      status += Message.say("AusgabeView","mSoundOff");
+                    showActionMessage(status);
+                }
 	    });
 	add(soundBox);
      }
