@@ -13,7 +13,6 @@ import java.text.*;
 
 public class Message{
     
-    
     private static String language = "empty"; 
     private static String country="empty";
     
@@ -77,6 +76,15 @@ public class Message{
 	return localeFilter;
     }
 
+    private static String getString(String id){
+	try{
+	    return messages.getString(id);
+	} catch (MissingResourceException e){
+	    System.err.println("Could not find resource for "+id);
+	    return id;   // so the program doesn't crash and we at least see *something*
+	}
+    }
+
     /**
      * Umsetzen von Meldungs-IDs in Strings.
      * Der erste Parameter ist die Sektion (String),
@@ -97,31 +105,31 @@ public class Message{
     }
     
     public static String say(String callerSection,String id,Object[] params){
-	formatter.applyPattern(messages.getString(callerSection+"."+id));
+	formatter.applyPattern(getString(callerSection+"."+id));
 	return formatter.format(params);
     }
     
     public static String say(String callerSection,String id){ 
-	return messages.getString(callerSection+"."+id);
+	return getString(callerSection+"."+id);
     }
     public static String say(String callerSection,String id,String P1){ // Parameter String
-	Global.debug(Message.class,"Messages ist: "+messages+ "formatter : "+formatter);
-	formatter.applyPattern(messages.getString(callerSection+"."+id));
+	//Global.debug(Message.class,"Messages ist: "+messages+ "formatter : "+formatter);
+	formatter.applyPattern(getString(callerSection+"."+id));
 	Object[] params={P1};
 	return formatter.format(params);
     }
     public static String say(String callerSection,String id,String P1,String P2){  // Parameter String String
-	formatter.applyPattern(messages.getString(callerSection+"."+id));
+	formatter.applyPattern(getString(callerSection+"."+id));
 	Object[] params={P1,P2};
 	return formatter.format(params);
     }
     public static String say(String callerSection,String id,String P1,String P2,String P3){ // Parameter String String String
-	formatter.applyPattern(messages.getString(callerSection+"."+id));
+	formatter.applyPattern(getString(callerSection+"."+id));
 	Object[] params={P1,P2,P3};
 	return formatter.format(params);
     }
     public static String say(String callerSection,String id,String P1,String P2,String P3,String P4){ // Parameter S S S S
-	formatter.applyPattern(messages.getString(callerSection+"."+id));
+	formatter.applyPattern(getString(callerSection+"."+id));
 	Object[] params={P1,P2,P3,P4};
 	return formatter.format(params);
     }
@@ -208,6 +216,7 @@ public class Message{
     
 } // Ende Klasse "Message"
 
+
 class LocaleFilter implements FilenameFilter{
     public LocaleFilter(){}
     public boolean accept(File dir, String name){
@@ -217,4 +226,5 @@ class LocaleFilter implements FilenameFilter{
 	    return ok;
 	} catch(Throwable t){return false;}
     }
-}
+}    
+
