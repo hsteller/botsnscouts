@@ -5,7 +5,7 @@ import de.botsnscouts.util.*;
 
 import org.apache.log4j.Category;
 
-class ServerAusgabeThread extends Thread implements Waitable
+class ServerAusgabeThread extends BNSThread implements Waitable
 {
     static final Category CAT = Category.getInstance( ServerAusgabeThread.class );
 

@@ -324,6 +324,6 @@ public class Facade{
     }
 
     public void prepareTiles() {
-        //tileFactory.prepareTiles();
+        tileFactory.prepareTiles();
     }
 }

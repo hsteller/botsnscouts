@@ -17,7 +17,7 @@ import org.apache.log4j.Category;
  * view logic
  * @author Lukasz Pekacki
  */
-public class Ausgabe extends Thread {
+public class Ausgabe extends BNSThread {
     static Category CAT = Category.getInstance(Ausgabe.class);
 
     // for communication with server
@@ -68,7 +68,7 @@ public class Ausgabe extends Thread {
 	this.host = host;
 	this.port = port;
 	name = KrimsKrams.randomName();
-
+        super.setName("Ausgabe["+name+"]");
 	showSplash(Message.say("AusgabeFrame","msplashWarte"));
 	kommClient = new KommClientAusgabe();
 

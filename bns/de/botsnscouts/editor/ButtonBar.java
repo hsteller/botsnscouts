@@ -24,7 +24,7 @@ class ButtonBar extends JPanel implements ActionListener{
     private JButton feldClear=null;
     private JButton exit=null;
     private JButton export=null;
-    protected BoardEditor par=null;
+    protected BoardEditor editor=null;
     JFileChooser chooser;
     FileFilter rraFilter = new FileFilter() {
             public boolean accept(File file) {
@@ -56,7 +56,7 @@ class ButtonBar extends JPanel implements ActionListener{
 
 
     public ButtonBar(BoardEditor p){
-	par=p;
+	editor=p;
 	setLayout( new BorderLayout() );
 	JToolBar tb = new JToolBar();
 	//	setLayout(new GridLayout(1,3));
@@ -115,18 +115,18 @@ class ButtonBar extends JPanel implements ActionListener{
 	mi.setActionCommand("Beenden");
 	jm.add( mi );
 	jb.add( jm );
-	par.setJMenuBar( jb );
+	editor.setJMenuBar( jb );
 	makeChooser();
 
     }
 
 
     public void doExport() {
-        BufferedImage bi = par.getBufferedImage();
+        BufferedImage bi = editor.getBufferedImage();
         byte[] pngBytes = (new PngEncoder(bi)).pngEncode();
         chooser.setFileFilter( pngFilter );
         chooser.rescanCurrentDirectory();
-        int returnVal = chooser.showSaveDialog(par);
+        int returnVal = chooser.showSaveDialog(editor);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
             String filename = file.getName();
@@ -167,15 +167,15 @@ class ButtonBar extends JPanel implements ActionListener{
     public void actionPerformed(ActionEvent e){
 	if(e.getActionCommand().compareTo("Speichern") == 0){
 	    CAT.debug("Speichern geclicked, gete String");
-	    String tmp=par.spf.getComputedString();
+	    String tmp=editor.board.getComputedString();
 	    CAT.debug( "String bekommen:\n"+tmp);
-	    par.spfString=tmp;
+	    editor.spfString=tmp;
 	    CAT.debug( "Starte FileDialog");
 
-	    //	    new NameDialog(par,Message.say("BoardEditor","mKachelSave"),true);
+	    //	    new NameDialog(editor,Message.say("BoardEditor","mKachelSave"),true);
             chooser.setFileFilter(rraFilter);
 	    chooser.rescanCurrentDirectory();
-	    int returnVal = chooser.showSaveDialog(par);
+	    int returnVal = chooser.showSaveDialog(editor);
 	    if(returnVal == JFileChooser.APPROVE_OPTION) {
 		File file = chooser.getSelectedFile();
 		String filename = file.getName();
@@ -206,7 +206,7 @@ class ButtonBar extends JPanel implements ActionListener{
 		    CAT.debug("FileOutputStream opened");
 		    PrintWriter pw=new PrintWriter(fop);
 		    CAT.debug("PrintWriter opened");
-		    pw.println(par.spfString);
+		    pw.println(editor.spfString);
 		    CAT.debug("String in File written");
 		    pw.close();
 		    CAT.debug("File closed");
@@ -216,17 +216,17 @@ class ButtonBar extends JPanel implements ActionListener{
 	    }
 	}
 	else if(e.getActionCommand().compareTo("Beenden") == 0){
-	    par.dispose();
+	    editor.dispose();
 	    System.exit(0);
 	}
 	else if(e.getActionCommand().compareTo("Clear") == 0){
 	    CAT.debug("Clearing field");
-	    par.initSpF();
-	    par.sp.getViewport().setView(par.sac);
+	    editor.initSpF();
+	    editor.sp.getViewport().setView(editor.sac);
 	}
 	else if(e.getActionCommand().compareTo("Laden") == 0){
 	    chooser.rescanCurrentDirectory();
-	    int returnVal = chooser.showOpenDialog(par);
+	    int returnVal = chooser.showOpenDialog(editor);
 	    if(returnVal == JFileChooser.APPROVE_OPTION) {
 		File file = chooser.getSelectedFile();
 		String name = file.getName();
@@ -239,7 +239,7 @@ class ButtonBar extends JPanel implements ActionListener{
 		    return;
 		}
 
-		String save=par.spfString;
+		String save=editor.spfString;
 		try{
 		    FileInputStream istream=new FileInputStream( file );
 		    //FileInputStream istream=new FileInputStream("kacheln" + File.separator + name);
@@ -250,33 +250,33 @@ class ButtonBar extends JPanel implements ActionListener{
 		    while((tmp=kachReader.readLine())!=null)
 			str.append(tmp+"\n");
 		    //CAT.debug(str.toString());
-		    par.spfString=str.toString();
+		    editor.spfString=str.toString();
 		    //Leo's Code
-		    par.spf=new SpielfeldSim(12,12,par.spfString,null);
+		    editor.board=new EditableBoard(12,12,editor.spfString,null);
 		    CAT.debug( "Spielfeld erzeugt");
 
-		    par.sp.remove(par.sac);
+		    editor.sp.remove(editor.sac);
 		    CAT.debug( "sac removed");
-		    par.sac=new BoardPanel(par.spf,par);
+		    editor.sac=new BoardPanel(editor.board,editor);
 		    CAT.debug( "sac neu erzeugt");
-		    par.sp.getViewport().setView(par.sac);
+		    editor.sp.getViewport().setView(editor.sac);
 
 		    CAT.debug( "sac added");
 		}catch(FormatException ex){
 		    System.err.println(Message.say("BoardEditor","eDatNotEx")+ex);
-		    par.spfString=save;
+		    editor.spfString=save;
 		}catch(FlaggenException ex){
 		    System.err.println(Message.say("BoardEditor","eDatNotEx")+ex);
-		    par.spfString=save;
+		    editor.spfString=save;
 		}catch(IOException ex){
 		    System.err.println(Message.say("BoardEditor","eDateiErr")+ex);
-		    par.spfString=save;
+		    editor.spfString=save;
 		}/*catch(Exception ex){
 		   System.err.println(Message.say("BoardEditor","eDatNotEx")+ex);
 		   }*/
 	    }
 
-	    //new LadenDialog(par,Message.say("BoardEditor","mKachelSave"),true);
+	    //new LadenDialog(editor,Message.say("BoardEditor","mKachelSave"),true);
 
 	}
     }

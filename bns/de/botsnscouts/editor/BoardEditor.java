@@ -34,7 +34,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
     protected JPanel but;
     protected JToggleButton[] buttons;
     protected ButtonGroup felder;
-    protected SpielfeldSim spf=null;
+    protected EditableBoard board=null;
 
     protected int elemX=0,elemY=0,indx=0;
     protected int spfX=0,spfY=0;
@@ -125,7 +125,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 	String gr1="____________\n";
 	String gr2="_B_B_B_B_B_B_B_B_B_B_B_B_\n";
 	try{
-	    spf=new SpielfeldSim(12,12,new String(gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1),null);
+	    board=new EditableBoard(12,12,new String(gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1+gr2+gr1),null);
 	}
 	catch(FormatException e){
 	    System.err.println("Oups!"+e);
@@ -135,7 +135,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 	    System.err.println("Oups!"+ex);
 	    return false;
 	}
-	sac=new BoardPanel(spf,this);
+	sac=new BoardPanel(board,this);
 	return true;
     }
 

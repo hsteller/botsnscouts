@@ -14,7 +14,7 @@ import de.botsnscouts.server.KartenStapel;
 import java.util.Arrays;
 
 public class Permu {
-
+    static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( Permu.class );
     private SpielfeldKS sf;
     private Karte[] bestZug;
     private int bestScore;
@@ -107,6 +107,7 @@ public class Permu {
 	    Karte katemp = ka[i];
 	    ka[i] = null; // play that card
             tmp[recursionLevel].initFrom( r );
+
 	    int j = 0;
 	    while (tmp[recursionLevel].getZug(j) != null) j++;
 	    tmp[recursionLevel].setZug(j, katemp);

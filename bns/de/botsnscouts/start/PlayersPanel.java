@@ -72,7 +72,7 @@ class PlayersPanel extends JPanel{
 	CellRenderer() {
 	    size=new Dimension(200,48);
 	}
-	
+
 	public Component getListCellRendererComponent
 	    (
 	     JList list,
@@ -81,8 +81,8 @@ class PlayersPanel extends JPanel{
 	     boolean isSelected,      // is the cell selected
 	     boolean cellHasFocus)    // the list and the cell have the focus
 	{
-	    String name = (String) value; 
-	 
+	    String name = (String) value;
+
 	    setText( name );
 	    int farbe = ((Integer)map.get( name )).intValue();
 	    setIcon( MyCellRenderer.robIcons[farbe] );

@@ -102,7 +102,7 @@ public class Start extends JFrame implements WindowListener{
     }
 
     public void beenden(){
-	Global.debug(this,"beenden() wurde aufgerufen");
+	CAT.debug("beenden() wurde aufgerufen");
 	try{
 	    if(!wth.isAlive()){
 		wth.start();
@@ -110,7 +110,11 @@ public class Start extends JFrame implements WindowListener{
 	}catch(IllegalThreadStateException e){
 	    System.err.println(Message.say("Start","eSpielEnde"));
 	}
+        CAT.debug( "disposing start frame");
+        dispose();
+        CAT.debug( this );
     }
+
 
 
     public static void main(String[] argv){

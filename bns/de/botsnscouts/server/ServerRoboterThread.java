@@ -5,12 +5,12 @@ import de.botsnscouts.comm.*;
 
 import org.apache.log4j.Category;
 
-public class ServerRoboterThread extends Thread implements Waitable
+public class ServerRoboterThread extends BNSThread implements Waitable
 {
     static final Category CAT = Category.getInstance( ServerRoboterThread.class );
 
     int mode;
-    
+
     private OKListener okListener;
     private InfoRequestAnswerer info;
     private ServerRobotThreadMaintainer robMaint;
@@ -19,7 +19,7 @@ public class ServerRoboterThread extends Thread implements Waitable
     protected Roboter rob;
 
     private boolean ende;
-    
+
     public ServerRoboterThread(Roboter r, OKListener ok, InfoRequestAnswerer inf, ServerRobotThreadMaintainer maint,KommServerRoboter k)
     {
 	super(r.getName());
@@ -34,7 +34,7 @@ public class ServerRoboterThread extends Thread implements Waitable
     synchronized void setMode(int i){
 	mode=i;
     }
-    
+
     private void notifyServer(){
 	okListener.notifyDone(this);
     }
@@ -60,16 +60,16 @@ public class ServerRoboterThread extends Thread implements Waitable
 			    }
 
 			    rob.setNaechsteRundeDeaktiviert(ans.ok); // PowerDown?
-                                
+
 			    d("Setze Programmierung um.");
 			    rob.program(ans.register);
 			    d("Programmierung umgesetzt. Roboter:");
 			    rob.zeige_Roboter();
-                                
+
 			    notifyServer();
 
 			    break;
-                            
+
 			case ServerAntwort.AUSRICHTUNG:
 			    if ((m!=Server.INITAUSR)&&(m!=Server.ZERSTOERT_SYNC)&&(m!=Server.ZERSTOERT_ASYNC)){
 				d("RV: habe Ausrichtung im Modus"+m+"erhalten; und tschuess");
@@ -84,12 +84,12 @@ public class ServerRoboterThread extends Thread implements Waitable
 
 				if (m==Server.ZERSTOERT_SYNC)
 				    notifyServer();
-					
+
 			    } else { // INITAUSRICHTUNG
 				notifyServer();
 			    }
 			    break;
-                                
+
 			case ServerAntwort.REAKTIVIERUNG:
 			    if (m!=Server.POWERUP){
 				d("RV: habe Reaktivierung im Modus "+m+" erhalten; und tschuess");
@@ -97,33 +97,33 @@ public class ServerRoboterThread extends Thread implements Waitable
 				ende=true;
 				break;
 			    }
-                                
+
 			    rob.setAktiviert(ans.ok);
-                                
+
 			    notifyServer();
 			    break;
-                                
-			case ServerAntwort.REPARATUR: 
+
+			case ServerAntwort.REPARATUR:
 			    if (m!=Server.ENTSPERREN){
 				d("RV: habe Reperatur im Modus "+m+" erhalten; und tschuess");
 				robMaint.deleteRob(this,"RV");
 				ende=true;
 				break;
 			    }
-                                
+
 			    for (int i=0;i<ans.register.length;i++)
 				rob.entsperreReg(ans.register[i]-1);
-                                
+
 			    notifyServer();
 
 			    break;
-                                
+
 			case ServerAntwort.ABMELDUNG:
 			    d("Abmeldung. Modus: "+m);
 			    ende=true;
 			    robMaint.deleteRob(this,"LL");
 			    break;
-                            
+
 			case ServerAntwort.AENDERUNGFERTIG:
 			    if ((m!=Server.SPIELSTART)&&(m!=Server.SPIELENDE)){
 				d("RV: habe OK im Modus "+m+" erhalten; und tschuess");
@@ -135,22 +135,22 @@ public class ServerRoboterThread extends Thread implements Waitable
 			    notifyServer();
 			    break;
 
-			case ServerAntwort.GIBSPIELFELDDIM: 
+			case ServerAntwort.GIBSPIELFELDDIM:
 			    komm.sendSpielfeldDim(info.getFieldSizeX(),info.getFieldSizeY());
 			    break;
-                            
+
 			case ServerAntwort.GIBSPIELFELD:
 			    komm.sendSpielfeld(info.getFieldString());
 			    break;
-                            
+
 			case ServerAntwort.GIBFAHNENPOS:
 			    komm.sendFahnenpos(info.getFlags());
 			    break;
-                            
+
 			case ServerAntwort.GIBNAMEN:
 			    komm.sendNamen(info.getNames());
 			    break;
-                            
+
 			case ServerAntwort.GIBROBOTERPOS:
 			    if ((m==Server.SPIELSTART)||(m==Server.SPIELENDE)||(m==Server.NIX)){
 				d("RV: habe GibRoboterPos im Modus "+m+" erhalten; und tschuess");
@@ -176,9 +176,9 @@ public class ServerRoboterThread extends Thread implements Waitable
 				robMaint.deleteRob(this,"RV");
 				ende=true;
 			    }
-                    
+
 			    break;
-                            
+
 			case ServerAntwort.GIBROBSTATUS:
                             if ((m==Server.SPIELSTART)||(m==Server.SPIELENDE)||(m==Server.NIX)){
 				d("RV: habe GibRobStatus im Modus "+m+" erhalten; und tschuess");
@@ -192,13 +192,13 @@ public class ServerRoboterThread extends Thread implements Waitable
 				ende=true;
 				return;
 			    }
-                            
+
 			    Roboter r;
 			    r = info.getRobStatus(ans.name);
 			    if(r.getName().compareTo("")!=0){
 				komm.sendRobStatus(r);
-			    }else{ 
-				komm.sendRobStatus(); 
+			    }else{
+				komm.sendRobStatus();
 			    }
 			    break;
 
@@ -208,15 +208,15 @@ public class ServerRoboterThread extends Thread implements Waitable
 			    }else
 				komm.spielstand(new Boolean(false), info.getStanding());
 			    break;
-                            
+
 			case ServerAntwort.GIBAUSWERTUNGSSTATUS:
 			    komm.spielStatus(info.getEvalStatus());
 			    break;
-                            
+
 			case ServerAntwort.GIBTIMEOUT:
-			    komm.sendTimeOut(robMaint.getTurnTimeout()/1000); 
+			    komm.sendTimeOut(robMaint.getTurnTimeout()/1000);
 			    break;
-			case ServerAntwort.GIBFARBEN:	
+			case ServerAntwort.GIBFARBEN:
 			    komm.sendFarben(info.getNamesByColor());
 			    break;
 			case ServerAntwort.MESSAGE:
@@ -242,7 +242,7 @@ public class ServerRoboterThread extends Thread implements Waitable
 	    CAT.fatal("Exception:", t);
 	}
 	d("Ende meiner run()-methode erreicht.");
-    } // run() 
+    } // run()
 
     private void d(String s)
     {

@@ -754,7 +754,7 @@ public class SACanvas extends JComponent {
 	g.drawImage(diverseCrop[10],actx,acty,64,64,this);
 	g.setColor(Color.white);
 	for (int phasecount=1;phasecount<=5;phasecount++){
-	    if (sf.isCrusherActive(boden.spez,phasecount)){
+	    if (boden.isCrusherActive(phasecount)){
 		int strx = actx + crushlb_x[phasecount-1];
 		int stry = acty + crushlb_y[phasecount-1];
 		g.drawString("" + phasecount,strx,stry);
@@ -862,15 +862,15 @@ public class SACanvas extends JComponent {
 		int ypos = sf.getSizeY()-vert+1;
 
 		// Nordwand
-		if (sf.nw(xpos,ypos).da){
-		    if (sf.nw(xpos,ypos).wandEl1()==1){
+		if (sf.nw(xpos,ypos).isExisting()){
+		    if (sf.nw(xpos,ypos).getSouthDeviceType()==Wall.TYPE_LASER){
 			g.drawImage(diverseCrop[15],actx,acty+5,64,64,this);
 		    }
-		    if (sf.nw(xpos,ypos).wandEl1()==2){
+		    if (sf.nw(xpos,ypos).getSouthDeviceType()==Wall.TYPE_PUSHER){
 			g.drawImage(diverseCrop[7],actx-1,acty+5,64,64,this);
 			// ------------Beschriftung --------------------
 			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.isPusherActive(sf.nw(xpos,ypos).spez1(),phasecount)){
+			    if (sf.nw(xpos,ypos).isSouthPusherActive(phasecount)){
 				int strx = actx + 10*phasecount;
 				g.setColor( (phasecount % 2) == 0 ?
 					    Color.black : Color.yellow );
@@ -883,15 +883,15 @@ public class SACanvas extends JComponent {
 		}
 
 		// S\uFFFDdwand
-		if (sf.sw(xpos,ypos).da){
-		    if (sf.sw(xpos,ypos).wandEl0()==1){
+		if (sf.sw(xpos,ypos).isExisting()){
+		    if (sf.sw(xpos,ypos).getNorthDeviceType()==Wall.TYPE_LASER){
 			g.drawImage(diverseCrop[17],actx,acty-5,64,64,this);
 		    }
-		    if (sf.sw(xpos,ypos).wandEl0()==2){
+		    if (sf.sw(xpos,ypos).getNorthDeviceType()==Wall.TYPE_PUSHER){
 			g.drawImage(diverseCrop[8],actx,acty-5,64,64,this);
 			// ------------Beschriftung --------------------
 			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.isPusherActive(sf.sw(xpos,ypos).spez0(),phasecount)){
+			    if (sf.sw(xpos,ypos).isNorthPusherActive(phasecount)){
 				int strx = actx + 10 * phasecount;
 				g.setColor( (phasecount % 2) == 0 ?
 					    Color.black : Color.yellow );
@@ -903,15 +903,15 @@ public class SACanvas extends JComponent {
 		}
 
 		// Ostwand
-		if (sf.ow(xpos,ypos).da){
-		    if (sf.ow(xpos,ypos).wandEl0()==1){
+		if (sf.ow(xpos,ypos).isExisting()){
+		    if (sf.ow(xpos,ypos).getWestDeviceType()==Wall.TYPE_LASER){
 			g.drawImage(diverseCrop[14],actx-6,acty,64,64,this);
 		    }
-		    if (sf.ow(xpos,ypos).wandEl0()==2){
+		    if (sf.ow(xpos,ypos).getWestDeviceType()==Wall.TYPE_PUSHER){
 			g.drawImage(diverseCrop[6],actx-6,acty,64,64,this);
 			// ------------Beschriftung --------------------
 			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.isPusherActive(sf.ow(xpos,ypos).spez0(),phasecount)){
+			    if (sf.ew(xpos,ypos).isWestPusherActive(phasecount)){
 				int stry = acty + 10 * phasecount;
 				g.setColor( (phasecount % 2) == 0 ?
 					    Color.black : Color.yellow );
@@ -924,15 +924,15 @@ public class SACanvas extends JComponent {
 		}
 
 		// Westwand
-		if (sf.ww(xpos,ypos).da){
-		    if (sf.ww(xpos,ypos).wandEl1()==1){
+		if (sf.ww(xpos,ypos).isExisting()){
+		    if (sf.ww(xpos,ypos).getEastDeviceType()==Wall.TYPE_LASER){
 			g.drawImage(diverseCrop[16],actx+5,acty,64,64,this);
 		    }
-		    if (sf.ww(xpos,ypos).wandEl1()==2){
+		    if (sf.ww(xpos,ypos).getEastDeviceType()==Wall.TYPE_PUSHER){
 			g.drawImage(diverseCrop[9],actx+4,acty,64,64,this);
 			// ------------Beschriftung --------------------
 			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.isPusherActive(sf.ww(xpos,ypos).spez1(),phasecount)){
+			    if (sf.ww(xpos,ypos).isEastPusherActive(phasecount)){
 				int stry = acty + 10 * phasecount;
 				g.setColor( (phasecount % 2) == 0 ?
 					    Color.black : Color.yellow );

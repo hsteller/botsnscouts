@@ -49,16 +49,6 @@ public class ImageMan {
     public final static  ImageIcon CardUT = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/ut.gif")));
     public final static  ImageIcon CardRLEER = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/register-leer.gif")));
 
-//    public final static String[] PngImages = {
-//	"images/robocenter.png",
-//	"images/lock.png",
-//	"images/boom.png"
-//    };
-//
-//    public static Image[] PNGImages = new Image[PngImages.length];
-//    public static ImageIcon[] PNGImageIcons = new ImageIcon[PngImages.length];
-
-
     final static ImageSet[] imgSetDescr = {
 	ImageSet.getInstance("images/cbelts.gif",   24, 5 ),
 	ImageSet.getInstance("images/ebelts.gif",   24, 5 ),
@@ -113,17 +103,9 @@ public class ImageMan {
           }
 	}
 
-//	for (int i=0; i < PngImages.length; i++) {
-//	        try {
-//		    PngImage png = new PngImage(c.getResource(PngImages[i]));
-//		    PNGImages[i] = tk.createImage(png);
-//		} catch (IOException e) {
-//		    e.printStackTrace();
-//		}
-//	}
 
 	// start loading in a different thread
-	imageLoader = new Thread() {
+	imageLoader = new BNSThread("imageLoader") {
 	    public void run() {
 		try {
 		    System.err.println("started loading and cropping of images in background");

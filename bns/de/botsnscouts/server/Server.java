@@ -9,7 +9,7 @@ import de.botsnscouts.util.*;
 
 import org.apache.log4j.Category;
 
-public class Server extends Thread implements ModusConstants, ServerOutputThreadMaintainer,
+public class Server extends BNSThread implements ModusConstants, ServerOutputThreadMaintainer,
     InfoRequestAnswerer, OKListener, ServerRobotThreadMaintainer, ThreadMaintainer {
     static final Category CAT = Category.getInstance( Server.class );
 
@@ -361,7 +361,7 @@ public class Server extends Thread implements ModusConstants, ServerOutputThread
 	// allow possibly generated messages to be sent
 	// synchronizes laser-fire-animations.
 	messageThread.blockUntilQEmpty();
-	Thread.yield();                 
+	Thread.yield();
     }
 
     // Private methods needed by run()

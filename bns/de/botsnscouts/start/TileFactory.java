@@ -25,7 +25,7 @@ public class TileFactory {
     }
 
     boolean workerStarted = false;
-    Thread worker = new Thread("TileWorker") {
+    Thread worker = new BNSThread("TileWorker") {
         public void run(){
 
             // Load those from bns.home/tiles
@@ -158,6 +158,12 @@ public class TileFactory {
 
     public void forgetTiles() {
         tileTab.clear();
+    }
+
+    public static void main(String args[]) {
+        Message.setLanguage( new Locale("DE","de") );
+        org.apache.log4j.BasicConfigurator.configure();
+        (new TileFactory(150)).checkLadeStatus();
     }
 }
 

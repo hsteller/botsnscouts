@@ -50,11 +50,11 @@ public class SoundMan {
   public static synchronized void loadSounds() {
 	if (soundsLoaded)
 	    return;
-	Thread t = new Thread () {
+	Thread t = new BNSThread () {
 		public void run() {
                   try {
 
-		    CAT.debug("Initializing sounds..");
+		    SoundMan.CAT.debug("Initializing sounds..");
 	            soundsLoaded=false;
 
                     pitSound = loadSound("sounds/pit.wav");
@@ -63,23 +63,23 @@ public class SoundMan {
 
                     boolean error = false;
 		    if (laserSounds [0] == null) {
-			CAT.warn("laserhit.wav not located :-(");
+			SoundMan.CAT.warn("laserhit.wav not located :-(");
 			error=true;
 		    }
 		    if (laserSounds [1] == null){
-			CAT.warn("laser2.wav not located :-(");
+			SoundMan.CAT.warn("laser2.wav not located :-(");
 			error = true;
 		    }
 		    if (error)
-			CAT.error("Failed to load sounds; sounds deactivated");
+			SoundMan.CAT.error("Failed to load sounds; sounds deactivated");
 		    else{
-			CAT.debug("Sounds loaded!");
+			SoundMan.CAT.debug("Sounds loaded!");
 			soundsLoaded=true;
 		    }
                  }
                  catch (Throwable t) {
-                    CAT.error("Error occured while loading sounds");
-                    CAT.error("sounds deactivated for safety..");
+                    SoundMan.CAT.error("Error occured while loading sounds");
+                    SoundMan.CAT.error("sounds deactivated for safety..");
                     soundsLoaded=false;
                  }
 		}

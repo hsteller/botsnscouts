@@ -58,7 +58,7 @@ public class CursorMan {
 	}
 
 	// start loading in a different thread
-	imageLoader = new Thread() {
+	imageLoader = new BNSThread() {
 	    public void run() {
 		try {
 		    System.err.println("started loading and cropping of images in background");

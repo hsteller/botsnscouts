@@ -106,11 +106,12 @@ public Vector getLasers(){
 	}
     }
 
+
     private void sendCollectedMsgs(){
 	if (server != null){
 	    while (msgIdsQ.size() > 0){
 		server.sendMsg((String )msgIdsQ.remove(0),(String[] )msgArgsQ.remove(0));
-	    }	    
+	    }
 	}
     }
 
@@ -139,33 +140,33 @@ public Vector getLasers(){
       lasers=new Vector();
       for (int x=1;x<=sizeX;x++)
 	for(int y=1;y<=sizeY;y++){
-	  Wand w=nw(x,y);
-	  //d("x="+x+"; y="+y+";w: "+w.wandEl[0]+"|"+w.spez0()+(w.da?"#":"_")+w.wandEl[1]+"|"+w.spez1());
-	  if (w.da&&(w.wandEl1()==Wand.WLASER)){  // Laser nach S
+	  Wall w=nw(x,y);
+	  //d("x="+x+"; y="+y+";w: "+w.wandEl[0]+"|"+w.getElemSpecialNW()+(w.isExisting()?"#":"_")+w.wandEl[1]+"|"+w.getElemSpecialSE());
+	  if (w.isExisting()&&(w.getSouthDeviceType()==Wall.TYPE_LASER)){  // Laser nach S
 	      //d("LaserSued");
 	    int length=findLLength(x,y,LSUED);
-	    LaserDef neu=new LaserDef(x,y,LSUED,w.spez1(),length);
+	    LaserDef neu=new LaserDef(x,y,LSUED,w.getSouthDeviceInfo(),length);
 	    lasers.addElement(neu);
 	  }
 	  w=ow(x,y);
-	  if (w.da&&(w.wandEl0()==Wand.WLASER)){  // Laser nach W
+	  if (w.isExisting()&&(w.getWestDeviceType()==Wall.TYPE_LASER)){  // Laser nach W
 	      //d("LaserWest");
 	    int length=findLLength(x,y,LWEST);
-	    LaserDef neu=new LaserDef(x,y,LWEST,w.spez0(),length);
+	    LaserDef neu=new LaserDef(x,y,LWEST,w.getWestDeviceInfo(),length);
 	    lasers.addElement(neu);
 	  }
 	  w=sw(x,y);
-	  if (w.da&&(w.wandEl0()==Wand.WLASER)){ // Laser nach N
+	  if (w.isExisting()&&(w.getNorthDeviceType()==Wall.TYPE_LASER)){ // Laser nach N
 	      //d("LaserNord");
 	    int length=findLLength(x,y,LNORD);
-	    LaserDef neu=new LaserDef(x,y,LNORD,w.spez0(),length);
+	    LaserDef neu=new LaserDef(x,y,LNORD,w.getNorthDeviceInfo(),length);
 	    lasers.addElement(neu);
 	  }
 	  w=ww(x,y);
-	  if (w.da&&(w.wandEl1()==Wand.WLASER)){ // Laser nach O
+	  if (w.isExisting()&&(w.getEastDeviceType()==Wall.TYPE_LASER)){ // Laser nach O
 	      //d("LaserOst");
 	    int length=findLLength(x,y,LOST);
-	    LaserDef neu=new LaserDef(x,y,LOST,w.spez1(),length);
+	    LaserDef neu=new LaserDef(x,y,LOST,w.getEastDeviceInfo(),length);
 	    lasers.addElement(neu);
 	  }
 	}
@@ -178,16 +179,16 @@ public Vector getLasers(){
       // d("findLLength: x="+x+"; y="+y+"; r="+richtung);
       int l=0;
       if (richtung==LOST)
-	while((x+l<=sizeX)&&(!ow(x+l,y).da))
+	while((x+l<=sizeX)&&(!ow(x+l,y).isExisting()))
 	  l++;
       if (richtung==LWEST)
-	while((x-l>0)&&(!ww(x-l,y).da))
+	while((x-l>0)&&(!ww(x-l,y).isExisting()))
 	  l++;
       if (richtung==LNORD)
-	while((y+l<=sizeY)&&(!nw(x,y+l).da))
+	while((y+l<=sizeY)&&(!nw(x,y+l).isExisting()))
 	  l++;
       if (richtung==LSUED)
-	while((y-l>0)&&(!sw(x,y-l).da))
+	while((y-l>0)&&(!sw(x,y-l).isExisting()))
 	  l++;
       return l+1;
     }
@@ -361,19 +362,19 @@ public Vector getLasers(){
       //d("MoveRobOne called. Nr. "+robbis[rob].getName()+"; dir="+direction+"; schubsen: "+(schubsen?"ja":"nein"));
       switch(direction){
       case NORD:
-	if (nw(robbis[rob].getX(),robbis[rob].getY()).da)
+	if (nw(robbis[rob].getX(),robbis[rob].getY()).isExisting())
 	  return(false);
 	break;
       case OST:
-	if (ow(robbis[rob].getX(),robbis[rob].getY()).da)
+	if (ow(robbis[rob].getX(),robbis[rob].getY()).isExisting())
 	  return(false);
 	break;
       case SUED:
-	if (sw(robbis[rob].getX(),robbis[rob].getY()).da)
+	if (sw(robbis[rob].getX(),robbis[rob].getY()).isExisting())
 	  return(false);
 	break;
       case WEST:
-	if (ww(robbis[rob].getX(),robbis[rob].getY()).da)
+	if (ww(robbis[rob].getX(),robbis[rob].getY()).isExisting())
 	  return(false);
 	break;
       } //switch
@@ -533,7 +534,7 @@ public Vector getLasers(){
       //d("ausfuehrenFliessband called. rob="+rob+"; typ="+typ);
       switch (typ%10) {
       case FNORD:
-	if (!moveRobOne(robbis,rob,NORD,false)) return; // Abbruch falls vor die Wand gelaufen
+	if (!moveRobOne(robbis,rob,NORD,false)) return; // Abbruch falls vor die Wall gelaufen
 	break;
       case FOST:
 	if (!moveRobOne(robbis,rob,OST,false)) return;
@@ -575,13 +576,15 @@ public Vector getLasers(){
 	if (robbis[i].getSchaden()>=10)
 	  continue;
 	Roboter r=robbis[i];
-	if((nw(r.getX(),r.getY()).wandEl1()==Wand.WPUSHER)&&(isCrusherActive(nw(r.getX(),r.getY()).spez1(),phase)))
+        int x = r.getX();
+        int y = r.getY();
+	if( nw(x,y).isSouthPusherActive(phase) )
 	  moveRobOne(robbis,i,SUED,false);
-	if((sw(r.getX(),r.getY()).wandEl0()==Wand.WPUSHER)&&(isCrusherActive(sw(r.getX(),r.getY()).spez0(),phase)))
+	if( sw(x,y).isNorthPusherActive(phase) )
 	  moveRobOne(robbis,i,NORD,false);
-	if((ow(r.getX(),r.getY()).wandEl0()==Wand.WPUSHER)&&(isCrusherActive(ow(r.getX(),r.getY()).spez0(),phase)))
+	if( ow(x,y).isWestPusherActive(phase) )
 	  moveRobOne(robbis,i,WEST,false);
-	if((ww(r.getX(),r.getY()).wandEl1()==Wand.WPUSHER)&&(isCrusherActive(ww(r.getX(),r.getY()).spez1(),phase)))
+	if( ww(x,y).isEastPusherActive(phase) )
 	  moveRobOne(robbis,i,OST,false);
       } //for
       checkGrubenOpfer(robbis, true);
@@ -642,7 +645,8 @@ public Vector getLasers(){
       //d("doCrushers called.");
 
       for (int i=0;i<robbis.length;i++) {
-	  if ((bo(robbis[i].getX(),robbis[i].getY()).typ>=100)&&((bo(robbis[i].getX(),robbis[i].getY()).spez)>0)&&(isCrusherActive(bo(robbis[i].getX(),robbis[i].getY()).spez,phase)))
+          Boden floor = bo(robbis[i].getX(), robbis[i].getY());
+	  if (floor.isCrusherActive(phase))
               vernichteRoboter(robbis[i]);
       }
     } // doCrushers
@@ -729,10 +733,10 @@ public Vector getLasers(){
       int y=robbis[rob].getY();
       switch (robbis[rob].getAusrichtung()){
       case OST:
-	  if (ow(x,y).da)
+	  if (ow(x,y).isExisting())
 	      continue aussen2;
 	  x++;  // Start auf Folgefeld
-	while((x<=sizeX)&&(!ww(x,y).da)){
+	while((x<=sizeX)&&(!ww(x,y).isExisting())){
 	  for (int j=0;j<robbis.length;j++)
 	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].istVirtuell())){ // Treffer
 		robbis[j].incSchaden();
@@ -755,10 +759,10 @@ public Vector getLasers(){
 	}
 	break;
       case WEST:
-	  if (ww(x,y).da)
+	  if (ww(x,y).isExisting())
 	      continue aussen2;
 	x--;
-	while((x>0)&&(!ow(x,y).da)){
+	while((x>0)&&(!ow(x,y).isExisting())){
 	  for (int j=0;j<robbis.length;j++)
 	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].istVirtuell())){ //Treffer
 	      robbis[j].incSchaden();
@@ -773,10 +777,10 @@ public Vector getLasers(){
 	}
 	break;
       case NORD:
-	  if (nw(x,y).da)
+	  if (nw(x,y).isExisting())
 	      continue aussen2;
 	y++;
-	while((y<=sizeY)&&(!sw(x,y).da)){
+	while((y<=sizeY)&&(!sw(x,y).isExisting())){
 	  for (int j=0;j<robbis.length;j++)
 	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].istVirtuell())){ //Treffer
 		robbis[j].incSchaden();
@@ -791,10 +795,10 @@ public Vector getLasers(){
 	}
 	break;
       case SUED:
-	  if (sw(x,y).da)
+	  if (sw(x,y).isExisting())
 	      continue aussen2;
 	y--;
-	while((y>0)&&(!nw(x,y).da)){
+	while((y>0)&&(!nw(x,y).isExisting())){
 	  for (int j=0;j<robbis.length;j++)
 	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].istVirtuell())){ //Treffer
 		robbis[j].incSchaden();

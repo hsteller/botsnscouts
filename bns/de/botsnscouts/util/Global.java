@@ -73,5 +73,4 @@ public class Global {
 		//System.out.println("Unbekannt: "+s);
 	} // ende debug
 
-
 } // ende Klasse

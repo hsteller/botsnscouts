@@ -19,7 +19,7 @@ import javax.swing.plaf.metal.*;
  * logic for the human player
  * @author Lukasz Pekacki
  */
-public class HumanPlayer extends Thread {
+public class HumanPlayer extends BNSThread {
     static Category CAT = Category.getInstance(HumanPlayer.class);
 
 
@@ -53,6 +53,7 @@ public class HumanPlayer extends Thread {
 	this (host, port, name, color, false);
     }
     public HumanPlayer(String host, int port, String name, int color, boolean nosplash) {
+        super("HP:"+name);
         this.host = host;
 	this.port = port;
 	this.name = name;
@@ -140,7 +141,7 @@ public class HumanPlayer extends Thread {
 		humanView.showGetDirection();
 		Global.debug(this,"Habe einee Zerst˜rung bekommen.");
 		showMessage(Message.say("SpielerMensch","roboauffeld"));
-		   // --- Spielfeld fÅr den Klugscheisser holen
+		   // --- Spielfeld f\uFFFDr den Klugscheisser holen
 		if (intelliBoard==null) {
 		    initIntelligentBoard();
 		    wisenheimer = new Wisenheimer(intelliBoard);

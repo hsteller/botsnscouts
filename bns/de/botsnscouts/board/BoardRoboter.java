@@ -5,7 +5,7 @@ package de.botsnscouts.board;
 import de.botsnscouts.util.Roboter;
 
 public class BoardRoboter extends Roboter {
-
+    static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( BoardRoboter.class );
     public BoardRoboter() { super(""); };
 
     public BoardRoboter(String name) {
@@ -44,6 +44,11 @@ public class BoardRoboter extends Roboter {
     /** Temporaere Ausrichtung. Spielfeld-Intern. */
     protected int aa;
 
+    public void dumpZug() {
+        for(int i=0; i<zug.length; i++) {
+            CAT.debug( "dumpZug: " + i + " " + zug[i] );
+        }
+    }
 
 
 }

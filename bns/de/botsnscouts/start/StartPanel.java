@@ -63,7 +63,7 @@ public class StartPanel extends JPanel{
 	gc.gridx = 0;
 	gc.gridy = GridBagConstraints.RELATIVE;
 	gc.insets = new Insets(30, 30, 30, 30);
-	
+
 	panel.add(autobotPanel, gc);
 	panel.add(localPanel, gc);
 	add(BorderLayout.EAST,panel);
@@ -131,7 +131,7 @@ public class StartPanel extends JPanel{
 		    parent.addKS(player);
 		    name.setText(KrimsKrams.randomName());
 		}});
-	
+
 	gc.gridx = 0;
 	gc.gridwidth = 1;
 	gc.gridy++;
@@ -154,7 +154,7 @@ public class StartPanel extends JPanel{
 	GridBagConstraints gc = new GridBagConstraints();
 	Insets noInsets = new Insets(0,0,0,0);
 	Insets insets = new Insets(0,0,20,0);
-	
+
 	JLabel label = new TJLabel(Message.say("Start", "mStartKS"));
 	gc.gridwidth = GridBagConstraints.REMAINDER;
 	gc.gridy = 1;
@@ -173,7 +173,7 @@ public class StartPanel extends JPanel{
 
 	JLabel lb = new TJLabel(Message.say("Start", "mDumm"), JLabel.LEFT);
 	gc.insets = insets;
-	gc.gridx = GridBagConstraints.RELATIVE;     
+	gc.gridx = GridBagConstraints.RELATIVE;
 	gc.gridy++;
 	gc.gridwidth = 1; gc.gridheight = 1;
 	gc.fill =  GridBagConstraints.NONE;
@@ -230,13 +230,13 @@ public class StartPanel extends JPanel{
 		    if(playersPanel.names.size()!=8){
 			parent.fassade.spielGehtLos();
 			parent.hide();
-			parent.beenden();
+			//parent.beenden(); // will be done in playerspanel
 		    }
 		}});
 	backBut.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    parent.fassade.killServer();
-		    parent.resetWaiter();  
+		    parent.resetWaiter();
 		    listen.closeSock();
 		    parent.current=parent.gameFieldPanel;
 		    parent.startPanel=null;

@@ -6,7 +6,7 @@ import de.botsnscouts.util.*;
 
 /** SpielerKuenstlich implementiert den kuenstlichen Spieler
  */
-public class SpielerKuenstlich extends Thread {
+public class SpielerKuenstlich extends BNSThread {
 
         /**
          * Konstruktor erhaelt IP-Adresse und Portnummer
@@ -22,13 +22,15 @@ public class SpielerKuenstlich extends Thread {
             ip=i;
             port=p;
             malus=m;
+            realname = KrimsKrams.randomName();
+            super.setName("KS:" + realname);
         }
 
     String ip;
     int port;
     int malus;
 
-    String realname;
+    final String realname;
     Permu wirbel;
     String spielfeldstring;
     Ort [] fahnen;
@@ -49,7 +51,7 @@ public class SpielerKuenstlich extends Thread {
             boolean spielLaeuft;
 
             try{
-                realname=KrimsKrams.randomName();
+                //realname=KrimsKrams.randomName();
                 meinKomm.anmelden(ip, port,realname);
             }catch(KommException e){
                 d("Anmelden gescheitert"+e);

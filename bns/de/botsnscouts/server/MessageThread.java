@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Category;
 
-class MessageThread extends Thread
+class MessageThread extends de.botsnscouts.util.BNSThread
     implements MOKListener{
 
     static final Category CAT = Category.getInstance( MessageThread.class );
@@ -32,7 +32,7 @@ class MessageThread extends Thread
 	msgQ.addMsg(id,args);
     }
 
-    /** Blocks calling thread until all waiting messages are send. 
+    /** Blocks calling thread until all waiting messages are send.
      *  (Sometimes message-sending needs to be synchronized with game-logic,
      *  so clearing the queue may be triggered by another thread.)
      *  CAUTION: Problem is not really fixed by now: We wait until the
@@ -53,7 +53,7 @@ class MessageThread extends Thread
     private void sendMsg(Msg msg){
 	Vector v=server.getActiveOutputs();
 	// Synchronization between MessageThread and ServerThread: whenever one of
-	// them wishes to communicate with the Outputs, it synchronizes on the 
+	// them wishes to communicate with the Outputs, it synchronizes on the
 	// Vector that contains them all.
 	CAT.debug("Sending msg: "+msg.id);
 	synchronized(v){
@@ -113,7 +113,7 @@ class MessageThread extends Thread
 	    msg.id=(String)ids.remove(0);
 	    msg.args=(String[])argss.remove(0);
 	    notifyAll();
-	    return msg;	    
+	    return msg;
 	}
 	public synchronized void blockUntilQEmpty() throws InterruptedException{
 	    while (ids.size()>0){
@@ -121,5 +121,5 @@ class MessageThread extends Thread
 	    }
 	}
     }
-    
+
 }

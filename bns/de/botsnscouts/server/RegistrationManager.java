@@ -25,7 +25,7 @@ class RegistrationManager implements Runnable
     ServerSocket seso;
     Set names = new HashSet();
     int anzSpieler = 0;
-    Thread workingThread = new Thread( this, "RegMan" );
+    Thread workingThread = new BNSThread( this, "RegMan" );
 
 
     public RegistrationManager(Server s)
