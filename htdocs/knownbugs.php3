@@ -6,17 +6,16 @@
 <CENTER>
 <H1>Known Bugs and other things to do</H1>
 </CENTER>
-If you find bugs in our prerelease, please reproduce them and then <a href="mailto:botsnscouts-devel@lists.sf.net">mail us</A> a description and search a file named botsnscouts.log and attach it to your mail.<BR>
-Since this is a Pre-Release we do some logging to make it easier to find bugs if you report them.
-You may safely delete the file botsnscouts.log.
-<H2>Known Bugs in V0.8pre:</H2>
+We prefer to be told about bugs and problems via the <a href="http://sourceforge.net/tracker/?group_id=3883&atid=103883">bug tracking system</A> at Sourceforge.<P>
+You may tell your wishes for future releases to the <A HREF="http://sourceforge.net/tracker/?atid=353883&group_id=3883&func=browse">Feature Tracker</A>.
+<P>
+But you may use classical <a href="mailto:botsnscouts-devel@lists.sf.net">e-mail</a> as well.<BR>
+<H2>Known Bugs in 0.8.*</H2>
 <UL>
-<LI>Starting local players hangs the game! Fixed in V0.8pre2.
-<LI>On real multi-user operating systems you cannot save tiles if you haven't installed Bots'n'Scouts yourself. (Will be fixed in  in V0.8)
+<LI>On real multi-user operating systems you cannot save tiles if you haven't installed Bots'n'Scouts yourself.
 <LI>Layout still is nicer with higher monitor resolution. 800 x 600 causes some minor problems.
 <LI>Disconnecting during a game may cause problems
 <LI>The limitation to a maximum of 6 flags and 8 players applies to V0.8pre, too.
-<LI> We still haven't written FAQ yet.
 </UL>
 <P>
 <H2>There are more things to do...</H2>
