@@ -80,6 +80,10 @@ public class View extends JFrame {
     public void addAusgabeView(AusgabeView av) {
 	getContentPane().add(av, BorderLayout.CENTER);
     }
+
+    public void addChatPane(ChatPane cp){
+	getContentPane().add(cp, BorderLayout.SOUTH);
+    }
 }
 
 

@@ -342,6 +342,15 @@ public class HumanPlayer extends Thread {
 	comm.respReparatur(name,repa);
 	showMessage(Message.say("SpielerMensch","sendregrep"));
     }
+
+    /** Schickt eine ChatMessage von mir an den Server */
+    protected void sendMessage(String msg){
+	d("sende: "+msg);
+	String[] tmp=new String[2];
+	tmp[0]=name;
+	tmp[1]=msg;
+	comm.message("mChat",tmp);
+    }
     
     protected Roboter getRob() {
 	return ausgabe.getRob(name);
@@ -401,10 +410,12 @@ public class HumanPlayer extends Thread {
 
     private void initView() {
 	humanView = new HumanView(this);
-	view=new View(humanView);
-	ausgabe = new Ausgabe(host, port, nosplash, this, view);
+	view=new View(humanView);          // adds the humanView to the JFrame
+	ausgabe = new Ausgabe(host, port, nosplash, this, view);   //adds the AusgabeView to the JFrame
 	ausgabe.initialize();
 	ausgabe.start();
+	ChatPane chatpane=new ChatPane(this);
+	view.addChatPane(chatpane);
     }
 
 
