@@ -25,19 +25,21 @@
 
 package de.botsnscouts.gui;
 
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.comm.*;
 import de.botsnscouts.util.*;
-
-import de.botsnscouts.board.*;
-import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.net.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.border.*;
 import org.apache.log4j.Category;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
 
 
 public class Ausgabe extends BNSThread {
@@ -271,7 +273,7 @@ public class Ausgabe extends BNSThread {
        boardDimension = new Dimension(boardDim.x,boardDim.y);
        flags = kommClient.getFahnenPos();
 
-       Color[] robotsDefaultColor = BoardView.robocolor;
+       Color[] robotsDefaultColor = BoardView.ROBOCOLOR;
        Color[] robotsNewColor = new Color[8];
 
        int[] colorMap = new int[8];
@@ -407,7 +409,7 @@ public class Ausgabe extends BNSThread {
     }
 
     public void setTracking( String name ) {
-      /** @todo: track the given robot permanently */
+      /* TODO: track the given robot permanently */
     }
 
 
@@ -744,7 +746,7 @@ public class Ausgabe extends BNSThread {
       Bot targetBot =(Bot )robots.get(targetName);
       // if it was killed and a notify changed was already received,
       // robots was not updated => targetBot.getDamage is <10
-      Bot newTargetBot = (Bot) getBotDataFromServer(targetName);
+      Bot newTargetBot = getBotDataFromServer(targetName);
       Location pos = newTargetBot.getPos();
       boolean targetDestroyed = newTargetBot.getDamage()>=10 ||
                                 (pos.x==0 && pos.y==0);

@@ -27,7 +27,7 @@ package de.botsnscouts.board;
 
 /**
  * The map of the game
- * @author: Dirk Materlik
+ * @author Dirk Materlik
  * Id: $Id$
  */
 

@@ -25,27 +25,29 @@
 
 package de.botsnscouts.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.io.*;
-import java.util.*;
-import java.util.zip.*;
-import java.net.*;
-import java.applet.*;
-import java.awt.geom.*;
-import javax.swing.*;
-
-import org.apache.log4j.Category;
-
 import de.botsnscouts.board.*;
 import de.botsnscouts.util.*;
+import org.apache.log4j.Category;
 
-import de.botsnscouts.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.io.File;
+import java.io.IOException;
+import java.io.FileOutputStream;
+
+import com.keypoint.PngEncoder;
+
 /**
  * Board-Ausgabe-Canvas ist das Objekt, das der Ausgabe und dem menschlichen Spieler das Board grafisch darstellt und verwaltet
- * @author urspr\uFFFDnglich Daniel Holtz
- * @version Verbesserung von 1.0
+ * @author some time ago Daniel Holtz
+ * @version improvement of 1.0
 
  * changes: enno v1.23
  * 1. beim painten wird nur noch der teil ins sichtbare kopiert, der auch
@@ -114,8 +116,6 @@ public class BoardView extends JComponent {
     private java.util.Hashtable nameToColorHash;
     private boolean gotColors;
 
-
-    private Image dbi;
     /** some board elements..*/
     private Image[] cbeltCrop,ebeltCrop,diverseCrop,robosCrop,scoutCrop;
 
@@ -143,10 +143,8 @@ public class BoardView extends JComponent {
     public static final Color VIOLET = BotVis.VIOLET;
     public static final Color GREEN  = BotVis.GREEN;
 
-
-    //  public static final Color[] robocolor = { Color.green, Color.yellow, Color.red,Color.blue, Color.magenta, Color.orange, Color.gray, Color.magenta.darker()};
-    /** Die Farben der Bot*/
-    public static final Color [] robocolor = {GREEN,YELLOW,RED,BLUE,ROSA,ORANGE,GRAY,VIOLET};
+    /** Colors of the robots. */
+    public static final Color [] ROBOCOLOR = {GREEN,YELLOW,RED,BLUE,ROSA,ORANGE,GRAY,VIOLET};
 
     /** gameboard object;
      *  stores the information about the board we are playing on;
@@ -170,7 +168,7 @@ public class BoardView extends JComponent {
      *  Has to be between 1 and FELDSIZE.
      *  => Number of steps a one-field-move is drawn = FELDSIZE/MOVE_ROB_ANIMATION_OFFSET
      *
-     *   @todo I guess that this must not be final and needs to be scaled so that it works
+     *   TODO: I guess that this must not be final and needs to be scaled so that it works
      *    with different zoomlevels
      */
     private static final int MOVE_ROB_ANIMATION_OFFSET=4;
@@ -208,22 +206,16 @@ public class BoardView extends JComponent {
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     public BoardView(SimBoard sf_neu){
-	init( sf_neu, robocolor );
+	init( sf_neu, ROBOCOLOR );
     }
 
-    public BoardView(SimBoard sf_neu, Color [] robColors){
+    public BoardView(SimBoard sf_neu, Color[] robColors){
 	init( sf_neu, robColors );
 	mouseInit();
     }
 
 
-
-
-
-
-
-
-    private void init(SimBoard sf_neu, Color [] robColors) {
+    private void init(SimBoard sf_neu, Color[] robColors) {
 	activeBordLasers=false;
 	gotColors=false;
 	sf=sf_neu;
@@ -324,7 +316,7 @@ public class BoardView extends JComponent {
 	    if (robs[i]==null)
 		break;
 	    else
-		nameToColorHash.put (robs[i].getName(), robocolor[robs[i].getBotVis()]);
+		nameToColorHash.put (robs[i].getName(), ROBOCOLOR[robs[i].getBotVis()]);
     }
 
 
@@ -1113,110 +1105,6 @@ public class BoardView extends JComponent {
         Location l = new Location(xpos, ypos);
         Image img = (Image) floorElementHash.get(l);
         g.drawImage(img,actx,acty,width,height,this);
-
-
-        /*
-        Floor floor = sf.floor(xpos, ypos);
-	switch ( floor.getType() ){
-
-	case (Board.FL_PIT):
-	    g.drawImage(diverseCrop[3],actx,acty,width,height,this);
-	    break;
-	case (Board.FL_NORMAL):
-		g.drawImage(diverseCrop[24+((xpos*ypos*19)%17)%4],actx,acty,width,height,this);
-	    break;
-	case (Board.FL_ROTGEAR):
-	    if (floor.getInfo()==0)
-		g.drawImage(diverseCrop[2],actx,acty,width,height, this);
-	    else
-		g.drawImage(diverseCrop[1],actx,acty,width,height,this);
-	    break;
-	case (Board.FL_REPAIR):
-	    if (floor.getInfo()==1)
-		g.drawImage(diverseCrop[4],actx,acty,width,height,this);
-	    else
-		g.drawImage(diverseCrop[5],actx,acty,width,height,this);
-	    break;
-
-	    // ------------------- normale Fliessbaender -------------------------
-
-	case (Board.FN1):g.drawImage(cbeltCrop[14],actx,acty,width,height,this);break;
-	case (Board.FE1):g.drawImage(cbeltCrop[19],actx,acty,width,height,this);break;
-	case (Board.FW1):g.drawImage(cbeltCrop[9],actx,acty,width,height,this);	break;
-	case (Board.FS1):g.drawImage(cbeltCrop[4],actx,acty,width,height,this);	break;
-
-	case (Board.NFW1): if (abbieger(xpos,ypos-1,Board.NORD))
-	    g.drawImage(cbeltCrop[15],actx,acty,width,height,this);
-	else g.drawImage(cbeltCrop[6],actx,acty,width,height,this);break;
-	case (Board.NFE1): if (abbieger(xpos,ypos-1,Board.NORD))
-	    g.drawImage(cbeltCrop[18],actx,acty,width,height,this);
-	else g.drawImage(cbeltCrop[7],actx,acty,width,height,this);break;
-	case (Board.SFW1): if (abbieger(xpos,ypos+1,Board.SUED))
-	    g.drawImage(cbeltCrop[13],actx,acty,width,height,this);
-	else g.drawImage(cbeltCrop[3],actx,acty,width,height,this);break;
-	case (Board.SFE1):if (abbieger(xpos,ypos+1,Board.SUED))
-			  g.drawImage(cbeltCrop[10],actx,acty,width,height,this);
-	else g.drawImage(cbeltCrop[0],actx,acty,width,height,this);break;
-	case (Board.EFN1):if (abbieger(xpos-1,ypos,Board.OST))
-			  g.drawImage(cbeltCrop[16],actx,acty,width,height,this);
-	else g.drawImage(cbeltCrop[5],actx,acty,width,height,this);break;
-	case (Board.EFS1):if (abbieger(xpos-1,ypos,Board.OST))
-			  g.drawImage(cbeltCrop[12],actx,acty,width,height,this);
-	else g.drawImage(cbeltCrop[2],actx,acty,width,height,this);break;
-	case (Board.WFN1):if (abbieger(xpos+1,ypos,Board.WEST))
-			  g.drawImage(cbeltCrop[17],actx,acty,width,height,this);
-	else g.drawImage(cbeltCrop[8],actx,acty,width,height,this);break;
-	case (Board.WFS1):if (abbieger(xpos+1,ypos,Board.WEST))
-			  g.drawImage(cbeltCrop[11],actx,acty,width,height,this);
-	else g.drawImage(cbeltCrop[1],actx,acty,width,height,this);break;
-
-	case (Board.NFEW1):g.drawImage(cbeltCrop[22],actx,acty,width,height,this);break;
-	case (Board.SFWE1):g.drawImage(cbeltCrop[20],actx,acty,width,height,this);break;
-	case (Board.EFNS1):g.drawImage(cbeltCrop[23],actx,acty,width,height,this);break;
-	case (Board.WFNS1):g.drawImage(cbeltCrop[21],actx,acty,width,height,this);break;
-
-	    // ------------------------ Expressfliessbaender ---------------------
-
-	case (Board.FN2):g.drawImage(ebeltCrop[14],actx,acty,width,height,this);break;
-	case (Board.FE2):g.drawImage(ebeltCrop[19],actx,acty,width,height,this);break;
-	case (Board.FW2):g.drawImage(ebeltCrop[9],actx,acty,width,height,this);break;
-	case (Board.FS2):g.drawImage(ebeltCrop[4],actx,acty,width,height,this);break;
-
-	case (Board.NFW2): if (abbieger(xpos,ypos-1,Board.NORD))
-	    g.drawImage(ebeltCrop[16],actx,acty,width,height,this);
-	else g.drawImage(ebeltCrop[6],actx,acty,width,height,this);break;
-	case (Board.NFE2): if (abbieger(xpos,ypos-1,Board.NORD))
-	    g.drawImage(ebeltCrop[17],actx,acty,width,height,this);
-	else g.drawImage(ebeltCrop[7],actx,acty,width,height,this);break;
-	case (Board.SFW2): if (abbieger(xpos,ypos+1,Board.SUED))
-	    g.drawImage(ebeltCrop[13],actx,acty,width,height,this);
-	else g.drawImage(ebeltCrop[3],actx,acty,width,height,this);break;
-	case (Board.SFE2):if (abbieger(xpos,ypos+1,Board.SUED))
-			  g.drawImage(ebeltCrop[10],actx,acty,width,height,this);
-	else g.drawImage(ebeltCrop[0],actx,acty,width,height,this);break;
-	case (Board.EFN2):if (abbieger(xpos-1,ypos,Board.OST))
-			  g.drawImage(ebeltCrop[15],actx,acty,width,height,this);
-	else g.drawImage(ebeltCrop[5],actx,acty,width,height,this);break;
-	case (Board.EFS2):if (abbieger(xpos-1,ypos,Board.OST))
-			  g.drawImage(ebeltCrop[12],actx,acty,width,height,this);
-	else g.drawImage(ebeltCrop[2],actx,acty,width,height,this);break;
-	case (Board.WFN2):if (abbieger(xpos+1,ypos,Board.WEST))
-			  g.drawImage(ebeltCrop[18],actx,acty,width,height,this);
-	else g.drawImage(ebeltCrop[8],actx,acty,width,height,this);break;
-	case (Board.WFS2):if (abbieger(xpos+1,ypos,Board.WEST))
-			  g.drawImage(ebeltCrop[11],actx,acty,width,height,this);
-	else g.drawImage(ebeltCrop[1],actx,acty,width,height,this);break;
-
-
-	case (Board.NFWE2):g.drawImage(ebeltCrop[22],actx,acty,width,height,this);break;
-	case (Board.SFWO2):g.drawImage(ebeltCrop[20],actx,acty,width,height,this);break;
-	case (Board.EFNS2):g.drawImage(ebeltCrop[23],actx,acty,width,height,this);break;
-	case (Board.WFNS2):g.drawImage(ebeltCrop[21],actx,acty,width,height,this);break;
-
-
-	default:
-	}
-        */
     }
 
     // for painting crushers
@@ -1565,7 +1453,7 @@ public class BoardView extends JComponent {
       paintFeldBoden(g2d,xpos,ypos, actx, acty);
       if ((floor.isBelt() ) && (floor.getInfo()>0)) // restore possible Crusher
 		    paintCrusher( g2d, floor, actx, acty);
-      // @todo: only repaint the stuff on the field we want to paint
+      // TODO: only repaint the stuff on the field we want to paint
       paintWall(g2d, xpos, ypos, actx, acty);
       paintFlaggen(g2d);
     }
@@ -1619,7 +1507,7 @@ public class BoardView extends JComponent {
 	    g2d.setComposite(AC_SRC);
 	  }
 	  String beschriftung = "" + robot.getName();
-	  g2d.setColor( robocolor[botVis] );
+	  g2d.setColor( ROBOCOLOR[botVis] );
 	  g2d.drawString(beschriftung,xpos64,ypos64+8+robocount*8);
       }
     }
@@ -1699,12 +1587,7 @@ public class BoardView extends JComponent {
 
     BufferedImage preBoard = null;
 
-    /** ein Image des Spielfeldes anlegen, ohne aktive Elemente */
-    private void prepareBoardImage() {
-	preBoard = getBoardImage();
-    }
-
-    public BufferedImage getBoardImage() {
+    private BufferedImage getBoardImage() {
 	//preBoard = new BufferedImage(x,y, BufferedImage.TYPE_BYTE_INDEXED);
         BufferedImage bi = new BufferedImage(x,y, BufferedImage.TYPE_INT_RGB);
 	g_off = (Graphics2D)bi.getGraphics();
@@ -1715,13 +1598,24 @@ public class BoardView extends JComponent {
         return bi;
     }
 
+    /**
+     * Dump this BoardView as a png image file.
+     * @param file The file name to dump the image to.
+     * @throws IOException is thrown if the file cannot be created.
+     */
+    public void dumpPngImage(File file) throws IOException {
+        FileOutputStream fop=new FileOutputStream(file);
+        fop.write((new PngEncoder(getBoardImage())).pngEncode());
+        fop.flush();
+        fop.close();
+    }
 
     public void paintComponent(Graphics g) {
 
 	// Blit the board (it's already scaled)
 	if( preBoard == null ) {
-	    prepareBoardImage();
-	}
+        preBoard = getBoardImage();
+    }
 	g.drawImage(preBoard, 0, 0, this);
 
 	// draw the active elements (robos)

@@ -25,20 +25,20 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
-
-
-import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.border.*;
-
 import de.botsnscouts.gui.hotkey.*;
-
+import de.botsnscouts.util.*;
 import org.apache.log4j.Category;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
 
 public class AusgabeView extends JPanel implements AusgabeViewInterface {
     static Category CAT = Category.getInstance(AusgabeView.class);
@@ -52,7 +52,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private Ausgabe   ausgabe;
     private Hashtable robotStatus = new Hashtable(8);
     private Hashtable robotCardStatus = new Hashtable(8);
-    private StatusLog statusLog;
+
     private JMenuBar menus = new JMenuBar();
 
     private JComponent northPanel = new PaintPanel( OptionPane.getBackgroundPaint(this) );

@@ -25,20 +25,17 @@
  
 package de.botsnscouts.editor;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.*;
-import java.io.*;
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.Message;
+import org.apache.log4j.Category;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-
-import de.botsnscouts.board.SimBoard;
-import de.botsnscouts.board.FlagException;
-import de.botsnscouts.util.Message;
-import de.botsnscouts.util.FormatException;
-
-import org.apache.log4j.Category;
-import com.keypoint.PngEncoder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
 
 
 class ButtonBar extends JPanel implements ActionListener{
@@ -158,8 +155,6 @@ class ButtonBar extends JPanel implements ActionListener{
     }
 
     public void doExport() {
-        BufferedImage bi = editor.getBufferedImage();
-        byte[] pngBytes = (new PngEncoder(bi)).pngEncode();
         chooser.setFileFilter( pngFilter );
         chooser.rescanCurrentDirectory();
         int returnVal = chooser.showSaveDialog(editor);
@@ -189,11 +184,7 @@ class ButtonBar extends JPanel implements ActionListener{
             //File to=new File("kacheln/"+name.getText()+".rra");
             CAT.debug("File opened");
             try{
-                FileOutputStream fop=new FileOutputStream(file);
-                fop.write(pngBytes);
-                fop.flush();
-                fop.close();
-                CAT.debug("File closed");
+                editor.dumpPngImage(file);
             }catch(IOException i){
                 System.err.println(Message.say("BoardEditor","mDateiErr") + file + i);
             }

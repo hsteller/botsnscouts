@@ -25,18 +25,14 @@
  
 package de.botsnscouts.editor;
 
-import java.awt.*;
-import java.awt.event.*;
-
+import de.botsnscouts.autobot.DistanceCalculator;
 import de.botsnscouts.board.SimBoard;
-import de.botsnscouts.board.Wall;
 import de.botsnscouts.gui.BoardView;
-import de.botsnscouts.util.Message;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Directions;
-import de.botsnscouts.autobot.SimpleDistanceCalculator;
-import de.botsnscouts.autobot.DistanceCalculator;
 import org.apache.log4j.Category;
+
+import java.awt.*;
 
 
 class EditorBoardView extends BoardView{

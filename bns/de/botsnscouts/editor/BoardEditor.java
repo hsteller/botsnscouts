@@ -26,21 +26,24 @@
 package de.botsnscouts.editor;
 
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.event.*;
-import java.util.Locale;
-import javax.swing.*;
-import javax.swing.plaf.metal.*;
-
 import de.botsnscouts.BotsNScouts;
-import de.botsnscouts.autobot.SimpleDistanceCalculator;
-import de.botsnscouts.autobot.DistanceCalculator;
 import de.botsnscouts.autobot.AdvDistanceCalculator;
-import de.botsnscouts.board.SimBoard;
+import de.botsnscouts.autobot.DistanceCalculator;
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.util.*;
-import org.apache.log4j.*;
+import org.apache.log4j.Category;
+import org.apache.log4j.PropertyConfigurator;
+
+import javax.swing.*;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.Locale;
+import java.io.File;
+import java.io.IOException;
 
 public class BoardEditor extends JFrame implements WindowListener, ActionListener {
     // enno:
@@ -223,9 +226,10 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 	}
     }
 
-    BufferedImage getBufferedImage() {
-        return boardView.getBoardImage();
+    void dumpPngImage(File file) throws IOException {
+        boardView.dumpPngImage(file);
     }
+
 
     DistanceCalculator calc;
     public void setFlag(int x, int y) {
