@@ -423,6 +423,7 @@ public class Server extends Thread implements ModusConstants, ServerOutputThread
 	while (it.hasNext()){
 	    ServerRoboterThread tmp=(ServerRoboterThread)it.next();
 	    d("!!!ServerRoboterThread "+tmp.rob.getName()+" rauswerfen wegen Timeout!!!");
+	    it.remove();
 	    deleteRob(tmp,"TO");
 	}
     }
