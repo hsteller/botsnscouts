@@ -26,6 +26,7 @@
 package de.botsnscouts.util;
 
 import org.apache.log4j.*;
+
 import java.util.*;
 import java.io.*;
 
@@ -34,128 +35,133 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 /** Used to access configuration that users may change */
-public class Conf{
-    public static final Category CAT = Category.getInstance( de.botsnscouts.BotsNScouts.class );
+public class Conf {
+    public static final Category CAT = Category.getInstance(de.botsnscouts.BotsNScouts.class);
 
-    private static final String CONFNAME="bns.config";
+    private static final String CONFNAME = "bns.config";
     private static final String bnsHome;
     private static Properties properties;
     private static final char MULTIPLE_PROP_SEPARATOR = ',';
 
+    static {
+        // Set bnsHome: if it's explicitly set, we take that
+        String s = System.getProperty("bns.home");
+        if (s == null) // probably windows, use current working dir
+            s = System.getProperty("user.dir");
+        bnsHome = s;
+        CAT.debug("bnsHome: " + bnsHome);
+
+        // Set the properties: a) the default one
+        properties = new Properties();
+        try {
+            InputStream in = de.botsnscouts.BotsNScouts.class.getResourceAsStream("conf/" + CONFNAME);
+            if (in == null) {
+                CAT.fatal("default bns.config not found.");
+                throw new RuntimeException("default bns.config not found");
+            }
+            properties.load(in);
+            CAT.debug("defautl bns.config loaded.");
+        } catch (IOException e) {
+            CAT.fatal("default bns.config not found.");
+            throw new RuntimeException("default bns.config not found");
+        }
+        // b) a user-defined one overrides that
+        try {
+            Properties p = new Properties(properties);
+            p.load(new FileInputStream(bnsHome + System.getProperty("file.separator") + CONFNAME));
+            properties = p;
+            CAT.debug("user-defined bns.config loaded.");
+        } catch (IOException e) {
+            CAT.debug("no user-defined bns.config found.");
+        }
+        // c) System-wide properties override that -- see getProperty
+    }
 
     /**
      * Used to access the bns installation directory.
      * @return a <code>String</code> value representing the absolute path there.
      */
-    public static String getBnsHome(){
-	return bnsHome;
+    public static String getBnsHome() {
+        return bnsHome;
     }
 
-    public static String getDefaultRobName(){
-	String n=Conf.getProperty("robot.name");   // Set in bns.config?
-	if (n==null || n.equals(""))
-	    n=Conf.getProperty("user.name");	      // System property
-	if (n==null || n.equals(""))
-	    n=KrimsKrams.randomName();	      // KrimsKrams-Random
-	return n.substring(0,1).toUpperCase()+n.substring(1,n.length());
+    public static String getDefaultRobName() {
+        String n = Conf.getProperty("robot.name");   // Set in bns.config?
+        if (n == null || n.equals(""))
+            n = Conf.getProperty("user.name");	      // System property
+        if (n == null || n.equals(""))
+            n = KrimsKrams.randomName();	      // KrimsKrams-Random
+        return n.substring(0, 1).toUpperCase() + n.substring(1, n.length());
     }
 
-    public static String getProperty(String key){
-	String data=System.getProperty(key);
-	if (data==null)
-	    data=properties.getProperty(key);
+    public static String getProperty(String key) {
+        String data = System.getProperty(key);
+        if (data == null)
+            data = properties.getProperty(key);
         if (data != null)
-          return URLDecoder.decode(data);
-	return data;
+            return URLDecoder.decode(data);
+        return data;
     }
 
-    public static String [] getMultipleProperty (String key) {
-      String data=System.getProperty(key);
-	if (data==null)
-	    data=properties.getProperty(key);
-      String [] back = null;
-      if (data != null) {
-          if (data.indexOf(MULTIPLE_PROP_SEPARATOR)>-1) {
-            StringTokenizer st = new StringTokenizer(data, ""+MULTIPLE_PROP_SEPARATOR);
-            back = new String [st.countTokens()];
-            for (int i=0;i<back.length;i++) {
-              back[i] = URLDecoder.decode(st.nextToken());
+    public static String[] getMultipleProperty(String key) {
+        String data = System.getProperty(key);
+        if (data == null)
+            data = properties.getProperty(key);
+        String[] back = null;
+        if (data != null) {
+            if (data.indexOf(MULTIPLE_PROP_SEPARATOR) > -1) {
+                StringTokenizer st = new StringTokenizer(data, "" + MULTIPLE_PROP_SEPARATOR);
+                back = new String[st.countTokens()];
+                for (int i = 0; i < back.length; i++) {
+                    back[i] = URLDecoder.decode(st.nextToken());
+                }
+            } else {
+                back = new String[]{URLDecoder.decode(data)};
             }
-          }
-          else {
-            back = new String [] {URLDecoder.decode(data)};
-          }
-      }
-      return back;
+        }
+        return back;
     }
 
-    public static int getIntProperty(String key){
-	String data=getProperty(key);
-	int ret=-1;
-	try{
-	    ret=Integer.parseInt(data);
-	}catch(Exception e){}
-	return ret;
+    public static int getIntProperty(String key) {
+        String data = getProperty(key);
+        int ret = -1;
+        try {
+            ret = Integer.parseInt(data);
+        } catch (Exception e) {
+        }
+        return ret;
     }
 
-    public static void setProperty(String key, String data){
-	properties.setProperty(key, URLEncoder.encode(data));
+    public static void setProperty(String key, String data) {
+        properties.setProperty(key, URLEncoder.encode(data));
     }
 
-    public static void setMultipleProperty (String key, String [] values) {
-      if (values == null || values.length<1) {
-        properties.setProperty(key, "");
-        return;
-      }
-      StringBuffer sb = new StringBuffer();
-      sb.append(URLEncoder.encode(values[0]));
-      for (int i=1;i<values.length;i++){
-        sb.append(MULTIPLE_PROP_SEPARATOR).append(values[i]);
-      }
-      properties.setProperty(key, sb.toString());
+    public static void setMultipleProperty(String key, String[] values) {
+        if (values == null || values.length < 1) {
+            properties.setProperty(key, "");
+            return;
+        }
+        StringBuffer sb = new StringBuffer();
+        sb.append(URLEncoder.encode(values[0]));
+        for (int i = 1; i < values.length; i++) {
+            sb.append(MULTIPLE_PROP_SEPARATOR).append(values[i]);
+        }
+        properties.setProperty(key, sb.toString());
     }
 
-    public static void saveProperties(){
-	try{
-	    File file=new File(bnsHome+System.getProperty("file.separator")+CONFNAME);
-	    OutputStream ostream=new FileOutputStream(file);
-	    properties.store(ostream,null);
-	}catch(IOException e){
-	    CAT.info("Save of user-defined bns.config failed.");
-	}
+    public static void saveProperties() {
+        try {
+            File file = new File(bnsHome + System.getProperty("file.separator") + CONFNAME);
+            OutputStream ostream = new FileOutputStream(file);
+            properties.store(ostream, null);
+        } catch (IOException e) {
+            CAT.info("Save of user-defined bns.config failed.");
+        }
     }
 
-    static {
-	// Set bnsHome: if it's explicitly set, we take that
-	String s=System.getProperty("bns.home");
-	if (s==null) // probably windows, use current working dir
-	       s=System.getProperty("user.dir");
-	bnsHome=s;
-	CAT.debug("bnsHome: "+bnsHome);
-
-	// Set the properties: a) the default one
-	properties=new Properties();
-	try{
-	    InputStream in = de.botsnscouts.BotsNScouts.class.getResourceAsStream("conf/"+CONFNAME);
-	    if (in == null){
-		CAT.fatal("default bns.config not found.");
-		throw new RuntimeException("default bns.config not found");
-	    }
-	    properties.load(in);
-	    CAT.debug("defautl bns.config loaded.");
-	}catch (IOException e){
-	    CAT.fatal("default bns.config not found.");
-	    throw new RuntimeException("default bns.config not found");
-	}
-	// b) a user-defined one overrides that
-	try{
-	    Properties p=new Properties(properties);
-	    p.load(new FileInputStream(bnsHome+System.getProperty("file.separator")+CONFNAME));
-	    properties=p;
-	    CAT.debug("user-defined bns.config loaded.");
-	}catch(IOException e){
-	    CAT.debug("no user-defined bns.config found.");
-	}
-	// c) System-wide properties override that -- see getProperty
+    //TODO
+    public static String getDefaultMetaServer() {
+        return "Not yet implemented.";
     }
+
 }

@@ -72,6 +72,10 @@ public class GameFieldPanel extends JPanel {
     JCheckBox allowWisenheimer;
     JCheckBox allowScout;
 
+    /** Announce the game at a meta server? */
+    JCheckBox announceGame;
+    JTextField metaServer;
+
     public GameFieldPanel(Start par) {
         parent = par;
         parent.setTitle(Message.say("Start", "mSpielStarten"));
@@ -221,6 +225,21 @@ public class GameFieldPanel extends JPanel {
         allowScout = new JCheckBox(Message.say("Start", "mAllowScout"), true);
         allowWisenheimer = new JCheckBox(Message.say("Start", "mAllowWisenheimer"), true);
 
+        boolean defaultAnnounceGame = false;
+        announceGame = new JCheckBox(Message.say("Start", "mAnnounceMetaServer"),
+                defaultAnnounceGame);
+        announceGame.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        metaServer.setEnabled(announceGame.isSelected());
+                        metaServer.setEditable(announceGame.isSelected());
+                    }
+        }
+
+        );
+        metaServer = new JTextField(Conf.getDefaultMetaServer());
+        metaServer.setEnabled(defaultAnnounceGame);
+
         spielfeld.setFont(font);
         spielfelder.setFont(font);
         save.setFont(font);
@@ -231,13 +250,16 @@ public class GameFieldPanel extends JPanel {
         mitspielen.setFont(font);
         allowWisenheimer.setFont(font);
         allowScout.setFont(font);
+        announceGame.setFont(font);
+        metaServer.setFont(font);
 
         spielfelder.setEnabled(true);
         spielfelder.setOpaque(false);
         mitspielen.setOpaque(false);
         allowWisenheimer.setOpaque(false);
         allowScout.setOpaque(false);
-
+        announceGame.setOpaque(false);
+        metaServer.setOpaque(false);
 
         mitspielen.addChangeListener(new ChangeListener() {
             //changeListener Methode
@@ -269,6 +291,8 @@ public class GameFieldPanel extends JPanel {
         inner.add(allowWisenheimer, gc);
         //gc.fill = GridBagConstraints.NONE;
         inner.add(allowScout, gc);
+        inner.add(announceGame, gc);
+        inner.add(metaServer, gc);
         gc.fill = GridBagConstraints.HORIZONTAL;
 
         panel.add(inner);
