@@ -80,7 +80,7 @@
   <target name="compile" depends="init">
     <!-- Compile the java code from ${src} into ${build} -->
     <javac srcdir="${src}" includes="${maindir}/**/*.java" 
-     destdir="${build}">
+     destdir="${build}" deprecation="on">
       <classpath>
          <fileset dir="${jars}" includes="*.jar" />
       </classpath>	      
