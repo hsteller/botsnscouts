@@ -63,7 +63,7 @@ public class Ausgabe extends BNSThread {
 
     // game constants
     private Dimension boardDimension;
-    private Location[] flags;
+  //  private Location[] flags;
 
     private String host, name;
     private int port;
@@ -211,7 +211,10 @@ public class Ausgabe extends BNSThread {
 
                 // some magic for setting the robot colors
                 Color[] robotsNewColor = initRobotColors(playerColorHash, playerColors);
-
+                
+                // getting the flags
+                Location [] flags = kommClient.getFahnenPos();
+                
                 // Initializing the robots an applying the colors to their visualization
                 for (int i = 0; i < playerNames.length; i++) {
                     d("Hole Roboterstatus von: " + playerNames[i]);
@@ -223,7 +226,7 @@ public class Ausgabe extends BNSThread {
                 }
 
 
-                initBoard(robotsNewColor);
+                initBoard(robotsNewColor, flags);
 
 
                 if (view == null) {
@@ -241,7 +244,7 @@ public class Ausgabe extends BNSThread {
                 // send OK to server
                 kommClient.spielstart();
 // set the viewport to the first flag
-                scrollFlag(1);
+                ausgabeView.showFlag(1);
 
             } catch (KommException kE) {
                 CAT.error("Ausgabe: Beim Versuch, die Bot zu holen, erhalte ich: " +
@@ -270,7 +273,7 @@ public class Ausgabe extends BNSThread {
 
         Location boardDim = kommClient.getSpielfeldDim();
         boardDimension = new Dimension(boardDim.x, boardDim.y);
-        flags = kommClient.getFahnenPos();
+        
 
         Color[] robotsDefaultColor = BoardView.ROBOCOLOR;
         Color[] robotsNewColor = new Color[8];
@@ -289,7 +292,7 @@ public class Ausgabe extends BNSThread {
         return robotsNewColor;
     }
 
-    private void initBoard(Color[] robotsNewColor) throws KommException, FormatException, FlagException {
+    private void initBoard(Color[] robotsNewColor, Location [] flags) throws KommException, FormatException, FlagException {
         SimBoard sim = new SimBoard(boardDimension.width,
                 boardDimension.height,
                 kommClient.getSpielfeld(),
@@ -405,34 +408,13 @@ public class Ausgabe extends BNSThread {
     }
 
 
-    /**
-     * Zentriert den Robi und folgt ihm.
-     */
-    public void trackRob(String rName) {
-        Bot r = (Bot) robots.get(rName);
-        trackPos(r.getX(), r.getY());
-    }
 
-    public void setTracking(String name) {
-        /* TODO: track the given robot permanently */
-    }
+    
 
+    
 
-    /**
-     * Zentriert die angegebenen Flagge
-     */
-    public void scrollFlag(int nr) {
-        if (nr > 0 && nr <= flags.length) {
-            trackPos(flags[(nr - 1)].getX(), flags[(nr - 1)].getY());
-        }
-    }
-
-    public void trackPos(int x, int y) {
-        ausgabeView.showPos(x, y);
-    }
-
-    public void trackPos(int x, int y, boolean highlight) {
-        ausgabeView.showPos(x, y, highlight);
+    private void showPos(int x, int y, boolean highlight, boolean scrollStepWise) {
+        ausgabeView.showPos(x, y, highlight, scrollStepWise);
     }
 
     public AusgabeView getAusgabeView() {
@@ -557,30 +539,6 @@ public class Ausgabe extends BNSThread {
     }
 
 
-    /**
-     * returns true if the state of the robot <code>robotNew</code>
-     * has changed from alive to dead or dead to alive.
-     */
-    /*private boolean hasCrossedAcheron (Bot robotNew) {
-      Bot old = (Bot) robots.get(robotNew.getName());
-      int oldD = old.getDamage();
-      int newD = robotNew.getDamage();
-      if (CAT.isDebugEnabled()) {
-        CAT.debug("checking whether "+robotNew.getName()+" has crossed the border "
-                  +"between life and death:");
-        CAT.debug("old damagepoints: "+oldD+"\tnew damage points: "+newD);
-
-      }
-      if (oldD>9 && newD<10)
-        return true;
-      else if (newD>9 && oldD<10)
-        return true;
-      else
-        return false;
-
-    }
-  */
-    
     private Bot [] getBotsDataFromServer(String [] botNames)throws KommException{
         return getBotsDataFromServer(botNames,0);
     }
@@ -792,7 +750,7 @@ public class Ausgabe extends BNSThread {
 
             // paint animation and play sounds
             CAT.debug("LASER: " + sourceBot.getName() + " -------------> " + targetBot.getName());
-            ausgabeView.showRobLaser(sourceBot, targetBot);
+            ausgabeView.animateRobLaser(sourceBot, targetBot);
 
             // now some management of a dirty hack to synchronize laser painting and
             // removing the killed robots from the display..
@@ -803,59 +761,6 @@ public class Ausgabe extends BNSThread {
         }
     }
 
-    /**
-     * Has to be called if we receive a message about a bot being destroyed.
-     * As far as I know this is may concern messages for the following events:
-     * a) bot fell into pit       [done]
-     * b) bot shot another bot    [done]
-     * c) boardlaser shot a bot   [done]
-     * d) bot was crushed         [done]
-     * e) (???) robot removed from game (???) [--]
-     */
-    /*private void updateLaserAnimationHackMessageStuff(Bot bot, boolean botIsUpdated){
-
-      // did we already get a notify change for this destruction?
-      if (laserHack.receivedDeathNotification(bot)) {
-          // reset state for next destruction
-          laserHack.resetDeathState(bot);
-          try {
-            // updating the gui, because comHandleNotifyChange() skipped the updating
-            // of this robot as it noticed that the bot was killed but no message
-            // about the destruction of the bot was found;
-            // => now it's up to this method to care for removing the destroyed bot
-            //    from the board (or, in general, update it) , because NOW we can be
-            //    sure that all animations (laser shooting!) were shown using the last
-            //    valid board position of the bot
-            String botname = bot.getName();
-            Bot newBot;
-            if (botIsUpdated)
-              newBot = bot;
-            else
-              newBot = getBotDataFromServer(botname);
-            robots.put(botname, newBot);
-            updateBoardView();
-          }
-          catch (KommException ke){
-            CAT.error(ke.getMessage(), ke);
-          }
-       }
-       else { // if we do not yet have a notify change about this destruction,
-              // we will save the information that we got a message about it and
-              // have shown all animation we wanted to show.
-              // This will give a hint to comHandleNotifyChange() that it can
-              // update (remove) the destroyed robot.
-        if (CAT.isDebugEnabled()) {
-          CAT.debug("LASER HACK ACTIVATED the other way around:");
-          CAT.debug("got message about destruction of a bot before notify change");
-          CAT.debug("=> will indicate to notify change handler method that it is"
-                    +" allowed to update the bot, because all possible animations"
-                    +" about this event have been shown");
-        }
-        laserHack.setDeathReasonArrived(bot);
-       }
-
-    }
-    */
     private void comMsgHandleChat(ClientAntwort kommAntwort) {
         SoundMan.playSound(SoundMan.MESSAGE);
     }
@@ -913,7 +818,7 @@ public class Ausgabe extends BNSThread {
         }
         // if enough information,  show laser animation
         if ((laserPos != null) && (facing >= 0) && (targetPos != null) && (strength >= 0)) {
-            ausgabeView.showBoardLaser(laserPos, facing, strength, targetPos);
+            ausgabeView.animateBoardLaser(laserPos, facing, strength, targetPos);
         } else {
             if (CAT.isDebugEnabled()) {
                 CAT.error("Ausgabe: unable to calculate Laseranimation: ");
@@ -923,15 +828,7 @@ public class Ausgabe extends BNSThread {
                 CAT.debug("strength: " + strength);
             }
         }
-        // if (targetKilled) {
-        //   updateLaserAnimationHackMessageStuff(newTargetBot, true);
-        //}
-        //  }
-        //  catch (KommException ke) { // if that happens, crappy robot data and animations
-        //                             // aren't our biggest problems..
-        //   CAT.error(ke.getMessage(), ke);
-        //  }
-
+      
 
     }
 
@@ -939,8 +836,6 @@ public class Ausgabe extends BNSThread {
     private void comMsgHandleRobotCrushed(ClientAntwort kommAntwort) {
         String botName = kommAntwort.namen[1];
         Bot bot = (Bot) robots.get(botName);
-        //updateLaserAnimationHackMessageStuff(bot, false);
-        CAT.debug("XXXXXXXXXXXXXXXXXXXgotCrush");
         ausgabeView.animateBotCrushed(bot);
     }
 

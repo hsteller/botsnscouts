@@ -39,6 +39,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.InterruptedIOException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -77,25 +78,39 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private static final int MIN_ZOOM_SCALE = MIN_ZOOM/10;
     private static final int MAX_ZOOM_SCALE = MAX_ZOOM/10;
 
+    /** Scroll to the active robot*/
+    private static final int TRACKMODE_BOT = 1;
+    /** Scroll to whereever something happens*/
+    private static final int TRACKMODE_ACTION = 2;
+    /** Don't scroll automatically*/
+    private static final int TRACKMODE_NOTHING=3;
+    /** Indicates if and where to scroll the viewport if something happens*/
+    private int currentTrackMode = TRACKMODE_NOTHING;
+    /**  If currentTrackMode is set to TRACKMODE_BOT, we will try to scroll to this bot's position 
+     *  everytime something happens to him.*/
+    private Bot botToTrack;
+    
     // sound-menu
     private boolean soundOn = false;
 
-    // speed-menu
-
-    private  AnimationConfig speedSettingSlow;
-    private  AnimationConfig speedSettingMedium;
-    private  AnimationConfig speedSettingFast;
+    // Options for the speed-menu
+    private AnimationConfig speedSettingSlow;
+    private AnimationConfig speedSettingMedium;
+    private AnimationConfig speedSettingFast;
     
+    private AnimationConfig currentSpeedConfig; 
+    
+    /** Editor for SpeedMenu actions*/
     private AnimationsSettingEditor speedSettingEditor;
     
- 
+    private Location [] flags;
+    
     public AusgabeView(BoardView sa, Bot[] robots, Ausgabe aus) {
 		ausgabe = aus;
 		gameBoardCanvas = sa;
 		//        statusLog = new StatusLog(aus.getView());
 
-		JPanel robotsStatusContainer = new JPanel(new FlowLayout(
-				FlowLayout.LEFT));
+		JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		robotsStatusContainer.setOpaque(false);
 		//        Box robotsStatusContainer = new Box(BoxLayout.X_AXIS) {
 		//            public void paint(Graphics g) {
@@ -105,7 +120,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 		//            }
 		//        };
 		JPanel robotsCardContainer = new JPanel(new GridLayout(8, 1));
-		int flagCount = sa.sf.getFlags().length;
+		flags = sa.sf.getFlags();
+		int flagCount = flags.length;
 
 		setLayout(new BorderLayout());
 
@@ -115,19 +131,20 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 			RobotInfo r = new RobotInfo(robots[i], flagCount);
 			r.addRobotInfoListener(new RobotInfoListener() {
 				public void robotClicked(RobotInfoEvent rie) {
-					CAT.debug("tracking rob: " + robotName);
-					ausgabe.trackRob(robotName);
+				    Bot robot = ((RobotInfo) rie.getSource()).getRobot();
+					showPos(robot.getX(), robot.getY(),true, false);
+					
 				}
 
 				public void flagClicked(RobotInfoEvent rie) {
 					RobotInfo ri = (RobotInfo) rie.getSource();
-					ausgabe.scrollFlag(ri.getRobot().getNextFlag());
+					showFlag(ri.getRobot().getNextFlag());
 				}
 
 				public void diskClicked(RobotInfoEvent rie) {
 					Bot robot = ((RobotInfo) rie.getSource()).getRobot();
-					ausgabe.trackPos(robot.getArchiveX(), robot.getArchiveY(),
-							true);
+					showPos(robot.getArchiveX(), robot.getArchiveY(),
+							true, false);
 				}
 			});
 			robotsStatusContainer.add(r);
@@ -261,6 +278,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      * Shows the new Positions of the Robots
      */
     public void showUpdatedRobots(Bot[] r){
+        checkAndDoTracking();
 		gameBoardCanvas.ersetzeRobos(r);        	
 		updateRobotStatusDisplay(r);		
     }
@@ -284,101 +302,166 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         gameBoardCanvas.scrollRectToVisible( r );
     }
 
-    public void showPos(int robix, int robiy ) {
-        showPos(robix, robiy, true);
+ /*   public void showPos2(int robix, int robiy, boolean scrollStepwise ) {
+        showPos(robix, robiy, true, scrollStepwise);
     }
-
-    public void showPos(int robix, int robiy, boolean highlight) {
-        Point p = gameBoardCanvas.ort2Point( robix, robiy, new Point());
-//	int x = robix*gameBoardCanvas.getScaledFeld;
-//	int y = gameBoardCanvas.getHeight()-(robiy*64);
-        int x = p.x;
-        int y = p.y;
-
-	Dimension sz = gameBoardView.getExtentSize();
-	int w2 = sz.width/2;
-	int h2 = sz.height/2;
-
-
-	// make sure we dont want to scoll 'out' to
-	// the left and top
-	int x1 = Math.max( x - w2 , 0);
-	int y1 = Math.max( y - h2 , 0);
-
-	// soll ich \uFFFDberhaupt scrollen?
-	// in X-Richtung
-	if ((x < ( (gameBoardView.getViewPosition().x)+10 ) ) ||
-	    x > ( (gameBoardView.getViewPosition().x+sz.width)-10 )) {
-	    x1 = Math.min( x1, (gameBoardCanvas.getWidth() - sz.width) );
-	}
-	else x1 = gameBoardView.getViewPosition().x;
-
-	// in Y-Richtung
-	if ((y < ( gameBoardView.getViewPosition().y +10) ) ||
-	    y > ( (gameBoardView.getViewPosition().y+sz.height)-10 )) {
-	    y1 = Math.min( y1, (gameBoardCanvas.getHeight() - sz.height) );
-	}
-	else y1 = gameBoardView.getViewPosition().y;
-
-	gameBoardView.setViewPosition(new Point(x1, y1));
-        if( highlight ) this.gameBoardCanvas.highlight(robix, robiy);
+*/
+    public void showPos(int robix, int robiy, boolean highlight, boolean scrollStepWise) {
+        showPos(robix, robiy, highlight, scrollStepWise, 200); 
     }
-
-
+    
+    public void showPos(int robix, int robiy, boolean highlight, boolean scrollStepWise, int tolerance) {
+       
+        Point newCenter = gameBoardCanvas.ort2Point( robix, robiy);
+        Point newUpperLeft = new Point();
+        Dimension visibleSize = gameBoardView.getExtentSize();
+        Dimension totalSize = gameBoardView.getViewSize();
+        Point currentUpperLeft = gameBoardView.getViewPosition();
+        int maxX = totalSize.width-visibleSize.width;
+        int maxY = totalSize.height-visibleSize.height;
+        int preferredUpperLeftX = newCenter.x - visibleSize.width/2;
+        int preferredUpperLeftY = newCenter.y - visibleSize.height/2;
+                                    
+        newUpperLeft.x = Math.min(maxX,preferredUpperLeftX); // don't scroll too far to the right
+        newUpperLeft.y = Math.min(maxY, preferredUpperLeftY); // don't scroll too far down
+        // in case newUpperLeft has now negative coordinates, we rather scroll
+        // too far right ( down) than too  far left (up): 
+        newUpperLeft.x = Math.max(0, newUpperLeft.x);
+        newUpperLeft.y = Math.max(0, newUpperLeft.y);
+        
+        int tol =tolerance;
+        boolean doWeScroll = Math.abs(preferredUpperLeftX-currentUpperLeft.x)>tol
+                                          || Math.abs(preferredUpperLeftY-currentUpperLeft.y)>tol
+                                          || !gameBoardView.getViewRect().contains(newCenter);
+        
+        if (doWeScroll) {                        
+            if (!scrollStepWise) {
+                gameBoardView.setViewPosition(newUpperLeft);
+            }
+            else {
+	            int offset = 30;
+	            int delay = 5;
+	            if (newUpperLeft.x < currentUpperLeft.x) {
+	               currentUpperLeft =  scrollWest(currentUpperLeft, newUpperLeft, offset, delay);
+	            }
+	            else if (newUpperLeft.x > currentUpperLeft.x) {
+	                currentUpperLeft = scrollEast(currentUpperLeft, newUpperLeft, offset, delay);
+	            }
+	            
+	            if (newUpperLeft.y < currentUpperLeft.y) {
+	                currentUpperLeft = scrollNorth(currentUpperLeft, newUpperLeft, offset, delay);
+	            }
+	            else if (newUpperLeft.y > currentUpperLeft.y) {
+	                currentUpperLeft = scrollSouth(currentUpperLeft, newUpperLeft, offset, delay);
+	            }
+            }
+            waitSomeTime(300, this); // TODO 
+        }
+        
+        if( highlight ) {
+            this.gameBoardCanvas.highlight(robix, robiy);
+        }
+    }
+    
+    private Point scrollWest (Point cur, Point pref, int diff, int delay){
+        int stop = pref.x+diff;
+        while (stop< cur.x) {
+            cur.x-=diff;
+            gameBoardView.setViewPosition(cur);
+            waitSomeTime(delay, this);
+        }
+        cur.x = pref.x;
+        gameBoardView.setViewPosition(cur);
+        waitSomeTime(delay, this);
+        return cur;
+    }
+    
+    private Point scrollEast (Point cur, Point pref, int diff, int delay){
+        int stop = pref.x-diff;
+        while (stop>cur.x) {
+            cur.x+=diff;
+            gameBoardView.setViewPosition(cur);            
+            waitSomeTime(delay, this);
+        }
+        cur.x = pref.x;
+        gameBoardView.setViewPosition(cur);
+        waitSomeTime(delay, this);
+        return cur;
+    }
+    private Point scrollSouth (Point cur, Point pref, int diff, int delay){
+        int stop = pref.y-diff;
+        while (stop>cur.y) {
+            cur.y+=diff;
+            gameBoardView.setViewPosition(cur);
+            waitSomeTime(delay, this);
+        }
+        cur.y = pref.y;
+        gameBoardView.setViewPosition(cur);
+        waitSomeTime(delay, this);
+        return cur;
+    }
+    private  Point scrollNorth (Point cur, Point pref, int diff,int delay){
+        int stop = pref.y+diff;
+        while (stop< cur.y) {
+            cur.y-=diff;
+            gameBoardView.setViewPosition(cur);
+            waitSomeTime(delay, this);
+        }
+        cur.y = pref.y;
+        gameBoardView.setViewPosition(cur);
+        waitSomeTime(delay, this);
+        return cur;
+    }
+   
     /**
      * board view is to paint robolaser activity
      */
-    public void showRobLaser(Bot von, Bot nach){
-	gameBoardCanvas.doRobLaser(von, nach);
-       // synchronized (gameBoardCanvas.getLockObj()){
-       //   while (!gameBoardCanvas.isReady()) {
-       //     try {
-       //       wait();
-       //     }
-       //     catch (InterruptedException ie) {
-       //       CAT.error(ie.getMessage(), ie);
-       //     }
-       //   }
-       // }
+    public void animateRobLaser(Bot von, Bot nach){
+        checkAndDoTracking(von.getPos());
+        gameBoardCanvas.doRobLaser(von, nach);       
     }
 
     /**
      * board view is to paint bord laser activity
      */
-    protected void showBoardLaser(Location laserPos, int facing, int stregth, Location r1Pos){
+    protected void animateBoardLaser(Location laserPos, int facing, int stregth, Location r1Pos){
+        checkAndDoTracking(laserPos);
        gameBoardCanvas.doBordLaser(laserPos, facing, stregth, r1Pos,gameBoardView);
     }
 
     /** bord view is to animate robot movement*/
     protected void animateRobMove(Bot rob, int direction){
+        checkAndDoTracking(rob.getPos());
         gameBoardCanvas.animateRobMove(rob, direction);
     }
     /** bord view is to animate robot movement*/
     protected void animateRobTurn(Bot rob, int direction){
+        checkAndDoTracking(rob.getPos());
         gameBoardCanvas.animateRobTurn(rob, direction);
     }
     /** bord view is to animate robot movement*/
     protected void animateRobUTurn(Bot rob){
+        checkAndDoTracking(rob.getPos());
         gameBoardCanvas.animateRobUTurn(rob);
     }
     
     /** bord view is to animate robot pitfall*/
     protected void animatePitFall(Bot rob){
+        checkAndDoTracking(rob.getPos());
         gameBoardCanvas.animatePitFall(rob);
     }
     
     /** bord view is to animate robot pitfall*/
     protected void animateBotCrushed(Bot rob){
+        checkAndDoTracking(rob.getPos());
         gameBoardCanvas.animateBotCrushed(rob);
     }
     
     protected void setInitialFacings(Bot [] botsWithUpdatedFacing){
+       // no tracking needed (yet)
         gameBoardCanvas.updateFacings(botsWithUpdatedFacing);
     }
 
-    //protected int getDelay() {
-    //  return speed;
-    //}
 
     /**
      *  shows the winner state of the game in the mids of the game
@@ -446,11 +529,13 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 
     private void initMenus() {
-      JMenu trackMenu = new JMenu(Message.say("AusgabeView", "trackMenu"));
-      if (gameBoardCanvas!=null)
-        trackMenu.add(new ShowFlagMenu(gameBoardCanvas.getFlags()));
-      trackMenu.add(new ShowRobMenu());
-
+      JMenu locateMenu = new JMenu(Message.say("AusgabeView", "locateMenu"));
+      if (gameBoardCanvas!=null) {
+        locateMenu.add(new ShowFlagMenu(gameBoardCanvas.getFlags()));
+      }
+      locateMenu.add(new ShowRobMenu());
+    //  locateMenu.add(new TrackMenu());
+      
       JMenuItem stats = new JMenuItem(Message.say("AusgabeView", "stats"));
       stats.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e){
@@ -477,7 +562,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
       zoomMenu = new ZoomMenu();
       menus.add(zoomMenu);
-      menus.add(trackMenu);
+      menus.add(locateMenu);
+      menus.add(new TrackMenu());
       menus.add(optionsMenu);
       menus.add(new HelpMenu());
     }
@@ -538,53 +624,130 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     }
 
     private void setAnimationSpeed(AnimationConfig conf){
+        currentSpeedConfig = conf;
        Conf.setProperty(PROPERTY_DEFAULT_SPEED, conf.getConfigName());
        Conf.saveProperties();
        gameBoardCanvas.setAnimationSettings(conf);
     }
 
     private class ZoomMenu extends JMenu implements ActionListener {
-        private ButtonModel [] zoomItemModels = new ButtonModel [MAX_ZOOM_SCALE-MIN_ZOOM_SCALE+1];
+        private ButtonModel[] zoomItemModels = new ButtonModel[MAX_ZOOM_SCALE - MIN_ZOOM_SCALE + 1];
+
         ButtonGroup group;
+
         ZoomMenu() {
-	    super("Zoom");
+            super("Zoom");
 
             group = new ButtonGroup();
-	    JRadioButtonMenuItem item = null;
-	    int count = 0;
-            for(int d = MIN_ZOOM; d <= MAX_ZOOM; d += ZOOM_STEP ) {
-		item = new JRadioButtonMenuItem( "" + d + "%" );
-		item.setActionCommand("" + d);
-		item.addActionListener( this );
-		super.add( item );
-		group.add( item );
+            JRadioButtonMenuItem item = null;
+            int count = 0;
+            for (int d = MIN_ZOOM; d <= MAX_ZOOM; d += ZOOM_STEP) {
+                item = new JRadioButtonMenuItem("" + d + "%");
+                item.setActionCommand("" + d);
+                item.addActionListener(this);
+                super.add(item);
+                group.add(item);
                 zoomItemModels[count++] = item.getModel();
-                if (d==DEFAULT_ZOOM)
-                  group.setSelected( item.getModel(), true );
-	    }
+                if (d == DEFAULT_ZOOM) {
+                    item.setSelected(true);
+                    group.setSelected(item.getModel(), true);
+                }
+            }
+        }
 
-	}
-
-        public void select (int scale) {
-          if (CAT.isDebugEnabled())
-            CAT.debug("selecting zoom="+scale+"%");
-          group.setSelected(zoomItemModels[(scale-MIN_ZOOM)/ZOOM_STEP], true);
+        public void select(int scale) {
+            if (CAT.isDebugEnabled())
+                CAT.debug("selecting zoom=" + scale + "%");
+            group.setSelected(zoomItemModels[(scale - MIN_ZOOM) / ZOOM_STEP], true);
         }
 
         public void actionPerformed(ActionEvent e) {
-	    int iScale;
-	    try {
-		String s = e.getActionCommand();
-	        iScale = Integer.parseInt( s );
-	    } catch( NumberFormatException ne ) {
-	        iScale = 10;
-		Global.debug(this, "bad zommmenu action command. using default 100%");
-	    }
-	    zoom (iScale);
+            int iScale;
+            try {
+                String s = e.getActionCommand();
+                iScale = Integer.parseInt(s);
+            }
+            catch (NumberFormatException ne) {
+                iScale = 10;
+                Global.debug(this, "bad zommmenu action command. using default 100%");
+            }
+            zoom(iScale);
+        }
 
-	}
-  }
+    }
 
+    private class TrackMenu extends JMenu{
+    
+        JRadioButtonMenuItem trackNothingButton = new JRadioButtonMenuItem(Message.say("AusgabeView","trackNothing"));
+        JRadioButtonMenuItem trackAction = new JRadioButtonMenuItem(Message.say("AusgabeView","trackAction"));
+        JMenu trackBot = new JMenu(Message.say("AusgabeView","trackBot"));
+        ButtonGroup trackButtons = new ButtonGroup();
+        
+        public TrackMenu() {
+            super(Message.say("AusgabeView", "trackMenu"));
+            createAndAddBotRadioButtons();
+            addOtherButtons();
+            trackNothingButton.setSelected(true);
+            currentTrackMode = TRACKMODE_NOTHING;           
+            
+            this.add(trackNothingButton);
+            this.add(trackAction);
+            this.add(trackBot);
+        }
+        
+  
+        private void addOtherButtons() {
+            trackButtons.add(trackAction);
+            trackButtons.add(trackNothingButton);
+            trackNothingButton.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e){
+                    trackNothingButton.setSelected(true);
+                    AusgabeView.this.currentTrackMode = TRACKMODE_NOTHING;
+                }
+            });
+            trackAction.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e){
+                    trackAction.setSelected(true);
+                    AusgabeView.this.currentTrackMode = TRACKMODE_ACTION;
+                }
+            });
+        }
+        
+        private void createAndAddBotRadioButtons() {
+            if (robotStatus!=null){              
+                      Enumeration e = robotStatus.elements();
+                       int i=0;
+                      while (e.hasMoreElements()){
+                        RobotStatus rs = (RobotStatus) e.nextElement();
+                        Bot robot = rs.getRobot();        
+                        
+                        ImageIcon image = new ImageIcon(BotVis.getRobotImages()[robot.getBotVis()]);
+                        final String name = robot.getName();                            
+                        final JRadioButtonMenuItem botItem = new JRadioButtonMenuItem(name,image);
+                        trackBot.add(botItem);
+                        trackButtons.add(botItem);
+                     //   final ButtonModel itemModel = botItem.getModel();
+                     //   buttons[i++]= botItem;
+                      //  trackItemModels[i] = itemModel;                                                    
+                        botItem.addActionListener(new ActionListener(){
+                            public void actionPerformed(ActionEvent e){
+                               AusgabeView myView = AusgabeView.this;
+                               RobotStatus stat  = (RobotStatus)  myView.robotStatus.get(name);
+                               myView.botToTrack = stat.getRobot();
+                               myView.currentTrackMode = TRACKMODE_BOT;
+                               botItem.setSelected(true);
+                         //      trackButtons.setSelected(itemModel, true);
+                            }
+                        });
+                      }
+                    }
+                    else {
+                      CAT.debug("robotstatus was null! Failed to create TrackMenu items");                      
+                    }
+        }
+    }
+    
+    
   private class SoundMenu extends JMenu {
      SoundMenu () {
         super ((Message.say("AusgabeView","mSound")));
@@ -636,7 +799,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
       public void actionPerformed(ActionEvent e) {
 	    String message = null;
-      	AnimationConfig neu;
+      	
 	 
       	if (e.getSource()==customizeButton){    
       	  if (speedSettingEditor.getState() == JFrame.ICONIFIED) {
@@ -648,19 +811,19 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       	}
       	else {
 	      	if (e.getSource() == lSpeed) {
-				neu = speedSettingSlow;
+				currentSpeedConfig = speedSettingSlow;
 				message = "gAufLang";	
 		    }
 	      	else if (e.getSource() == hSpeed){
-	    		neu = speedSettingFast;
+	      	  currentSpeedConfig = speedSettingFast;
 	    		message = "gAufUn";    	
 	    	}
 		    else  {
-				neu = speedSettingMedium;
+		        currentSpeedConfig = speedSettingMedium;
 				message = "gAufMitt";              
 	        }
 	      	
-		    setAnimationSpeed(neu);
+		    setAnimationSpeed(currentSpeedConfig);
 	      	showActionMessage(Message.say("AusgabeFrame",message));
       	}
 	}
@@ -717,7 +880,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         public void actionPerformed(ActionEvent e){
           if (CAT.isDebugEnabled())
             CAT.debug("Showing Pos at x:"+xpos+" y:"+ypos);
-          showPos(xpos, ypos);
+          showPos(xpos, ypos, true, false);
         }
     }
 
@@ -767,7 +930,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
               CAT.debug("Showing popup instead of robot, because robot is not on board..");
           }
           else {
-            showPos(x, y);
+            showPos(x, y, true, false);
           }
         }
     }
@@ -800,8 +963,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         for (int i = 0; i < num; i++) {           
             final Location pos = flags[i];
             HotKeyAction showFlagAction = new HotKeyAction() {              
-                public void actionPerformed(ActionEvent ae) {
-                    showPos(pos.getX(), pos.getY());
+                public void actionPerformed(ActionEvent ae) {                 
+                    showPos(pos.getX(), pos.getY(), true, false);
                 }
             };
             String keynameForFlagX = HotKeyConf.HOTKEY_SHOW_FLAG_X[i];
@@ -831,9 +994,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	     });
 	    hotKeyFrame.pack();	  
     }
-    
-    //private HotKeyEditorPanel keyEdit;
-    //private boolean shown = false;
+
     private void showEditHotKeys() {
       if (hotKeyFrame == null) {
           CAT.error("HotkeyFrame is still NULL! "+
@@ -848,26 +1009,67 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       hotKeyFrame.toFront();
       hotKeyFrame.setVisible(true);
       hotKeyFrame.show();
-      //
-      //if (keyEdit == null) {
-      //  keyEdit = new HotKeyEditorPanel(keyMan);
-      //  keyEdit.setOpaque(false);
-      //}
-      //View v = ausgabe.getView();
-      //
-      //if (shown){
-      //  v.getLayeredPane().remove(keyEdit);
-      //  shown = false;
-      //}
-      //else{
-      //   v.getLayeredPane().add(keyEdit, JLayeredPane.MODAL_LAYER);
-      //   shown = true;
-      //}
-
+  
 
 
     }
 
+   
+    
+    
+    private void checkAndDoTracking(){
+        checkAndDoTracking(null);
+    }
+   
+    
+    private void checkAndDoTracking(Location actionPosForActionTracking){
+        
+        
+        
+       if (currentTrackMode == TRACKMODE_BOT){
+           
+           if (botToTrack == null) {
+                CAT.error("the bot to track was null!");
+            }
+            else {
+                int x = botToTrack.getX();
+                int y =  botToTrack.getY();
+                if ( botToTrack.isInPit()){ 
+                    x = botToTrack.getArchiveX();
+                    y = botToTrack.getArchiveY();
+                }
+                showPos(x,y, false, true, 0); // 0==scroll everytime
+            }
+        }
+       else if (currentTrackMode == TRACKMODE_ACTION && actionPosForActionTracking != null){
+           showPos(actionPosForActionTracking.x, actionPosForActionTracking.y, false, true);
+           //waitSomeTime(500);
+           
+       }
+       else {
+           // TRACKMODE_NOTHING or unknown => do nothing
+       }
+        
+    }
+    
+    private void waitSomeTime(int ms, Object lock){
+       synchronized(lock) {
+           try {
+               lock.wait(ms);
+           }
+           catch (InterruptedException ie){
+               CAT.error(ie);
+           }
+       }
+    }
+    /**
+    * Zentriert die angegebenen Flagge
+    */
+   public void showFlag(int nr) {
+       if (nr > 0 && nr <= flags.length) {
+           showPos(flags[(nr - 1)].getX(), flags[(nr - 1)].getY(), true, false);
+       }
+   }
 }
 
 

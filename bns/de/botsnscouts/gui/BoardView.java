@@ -391,7 +391,7 @@ public class BoardView extends JLayeredPane {
             } else { // no animation
                 robos = robos_neu;
                 repaint();
-                waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), null);
+                waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), this);
             }
         }
 
@@ -484,7 +484,7 @@ public class BoardView extends JLayeredPane {
                     // myg.scale(dScale, dScale);
                      g2.drawImage(tmpImage, xposScaled, yposScaled, feldSize, clipLength,this);
                   
-                        waitSomeTime(animationDelayMoveRob, null);
+                        waitSomeTime(animationDelayMoveRob,this);
                   
                    
                 }
@@ -525,7 +525,7 @@ public class BoardView extends JLayeredPane {
                      tmpImage.setData(blankWithBots);                                   
                      myg.drawImage(imgRob, 0,yoffset, feldSize,feldSize, this); // paint the image                                                                                        
                      g2.drawImage(tmpImage, xpos64, ypos64, feldSize, clipLength,this);
-                     waitSomeTime(animationDelayMoveRob, null);
+                     waitSomeTime(animationDelayMoveRob, this);
                    
                 }
                 tmpImage.setData(blank);            
@@ -563,7 +563,7 @@ public class BoardView extends JLayeredPane {
                 tmpImage.setData(blankWithBots);                                   
                  myg.drawImage(imgRob, xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
                  g2.drawImage(tmpImage, xpos64, ypos64, clipLength, feldSize,this);
-                 waitSomeTime(animationDelayMoveRob, null);
+                 waitSomeTime(animationDelayMoveRob, this);
                
             }
             tmpImage.setData(blank);            
@@ -600,7 +600,7 @@ public class BoardView extends JLayeredPane {
                     tmpImage.setData(blankWithBots);                                   
                      myg.drawImage(imgRob, feldSize+xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
                      g2.drawImage(tmpImage, xpos64, ypos64, clipLength, feldSize,this);
-                     waitSomeTime(animationDelayMoveRob, null);
+                     waitSomeTime(animationDelayMoveRob, this);
                    
                 }
                 tmpImage.setData(blank);            
@@ -617,7 +617,7 @@ public class BoardView extends JLayeredPane {
         turnRobot(internal, 180, 2* currentAnimationConfig.getAnimationStepsTurnRob(), true);
         internal.turnClockwise();
         internal.turnClockwise();
-        waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), null);
+        waitSomeTime(currentAnimationConfig.getDelayBetweenActions(),this);
     }
     
     private Bot getBotByName (String botName){
@@ -656,7 +656,7 @@ public class BoardView extends JLayeredPane {
         catch ( RasterFormatException fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore){
             CAT.error(fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore);
         }
-        waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), null);
+        waitSomeTime(currentAnimationConfig.getDelayBetweenActions(),this);
          
     }
     
@@ -702,7 +702,7 @@ public class BoardView extends JLayeredPane {
                      backgroundWithBots.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);                  
                      // paint the offscreen image on the screen:
                      mainGraphics.drawImage(backgroundImage, xposScaled, yposScaled, feldSize, clipLength,this);                
-                     waitSomeTime(animationDelayTurnRob, null);                   
+                     waitSomeTime(animationDelayTurnRob, this);                   
                 }
                 backgroundImage.setData(blank);
                 mainGraphics.setComposite(oldComposite);
@@ -729,7 +729,7 @@ public class BoardView extends JLayeredPane {
         }
 
         synchronized (this){
-            waitSomeTime(currentAnimationConfig.getLaserDelayAfterEndOfAnimation(), null);  
+            waitSomeTime(currentAnimationConfig.getLaserDelayAfterEndOfAnimation(), this);  
         }
     }
     
@@ -774,7 +774,7 @@ public class BoardView extends JLayeredPane {
                      // paint the offscreen image on the screen:
                      
                      mainGraphics.drawImage(backgroundImage, xposScaled, yposScaled, feldSize, clipLength,this);                
-                     waitSomeTime(100, null);                   
+                     waitSomeTime(100, this);            // TODO make delay configurable       
                 }
                 backgroundImage.setData(blank);
                 internal.setPos(pit); 
@@ -857,7 +857,7 @@ public class BoardView extends JLayeredPane {
         catch ( RasterFormatException fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore){
             CAT.error(fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore);
         }
-        waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), null);
+        waitSomeTime(currentAnimationConfig.getDelayBetweenActions(),this);
     }
 
 
@@ -884,7 +884,7 @@ public class BoardView extends JLayeredPane {
         
         SoundMan.playSound(BotVis.getBotLaserSoundByName(name));
         synchronized (this) {
-            waitSomeTime(currentAnimationConfig.getLaserDelayBetweenStartOfSoundAndAnimation(),null);
+            waitSomeTime(currentAnimationConfig.getLaserDelayBetweenStartOfSoundAndAnimation(),this);
            
             		
             
@@ -903,22 +903,22 @@ public class BoardView extends JLayeredPane {
                 paintActiveRobLaser(g2, source, laserFacing,tmp_laenge, robColor);
                 tmp_laenge+=step;
                 //     synchronized(this){
-                waitSomeTime(delayPerStep, null);
+                waitSomeTime(delayPerStep,this);
                
                 //   }
             }
             repaint();
-            waitSomeTime(currentAnimationConfig.getLaserDelayAfterEndOfAnimation(), null);
+            waitSomeTime(currentAnimationConfig.getLaserDelayAfterEndOfAnimation() ,this);
         }
 
         // drawRobLaser=false;
         if (SoundMan.isSoundActive()) {
             // SoundMan.playSound(SoundMan.BUMM);
             synchronized (this) {
-               waitSomeTime(200, null);
+               waitSomeTime(200, this);
             }
         }
-       waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), null);
+       waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), this);
 
 
     }
@@ -1148,7 +1148,7 @@ public class BoardView extends JLayeredPane {
         repaint();              // lasers again
        
             synchronized (this){
-                waitSomeTime(currentAnimationConfig.getLaserDelayAfterEndOfAnimation(), null);  
+                waitSomeTime(currentAnimationConfig.getLaserDelayAfterEndOfAnimation(), this);  
             }
         
     }
@@ -1648,9 +1648,17 @@ public class BoardView extends JLayeredPane {
 
     /** returns left upper point of square*/
     public Point ort2Point(int ortx, int orty, Point p) {
+        if (p==null){
+            p=new Point();
+        }            
         p.x = (int) ((ortx - 1) * scaledFeldSize);
         p.y = (int) ((sf.getSizeY() - orty) * scaledFeldSize);
         return p;
+    }
+    
+    /** returns left upper point of square*/
+    public Point ort2Point(int ortx, int orty) {
+        return  ort2Point(ortx, orty,null);
     }
 
 
@@ -1983,18 +1991,24 @@ public class BoardView extends JLayeredPane {
         return sac.getThumb(size);
     }
 
-    private void waitSomeTime(int ms, Object lock){
-        // if (lock != null){
-        // 		synchronized (lock) {
-        //           wait/sleep
-        //      }
-       // }               
+    private void waitSomeTime(int ms, Object lock){                              	
+            synchronized(lock) {
+                try {
+                    lock.wait(ms);
+                }
+                catch (InterruptedException ie){
+                    CAT.error(ie);
+                }
+            }
+         
+        /*
         try {
             Thread.sleep(ms);
         }
         catch (InterruptedException ie){
             CAT.error("Interrupted while waiting: "+ie.getMessage(), ie);
-        }        
+        }
+        */            
     }
     
 }

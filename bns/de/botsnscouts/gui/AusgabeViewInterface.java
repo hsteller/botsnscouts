@@ -42,7 +42,7 @@ public interface AusgabeViewInterface {
     /**
      *  Zentriert das Fenster auf die angegebene Position
      */
-    public void showPos (int x, int y);
+    public void showPos (int x, int y, boolean highlight, boolean scrollStepWise);
 
     /**
      *  shows the winner state of the game
