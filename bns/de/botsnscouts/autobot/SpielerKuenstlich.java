@@ -270,7 +270,6 @@ public class SpielerKuenstlich extends Thread {
         }
 
         // Antwort auf Zerstoert
-        // modifiziert von Gero - 1999-07-20
         /**
          * bestimmt und uebermittelt die beste Wiedereinsetzrichtung als Antwort auf Zerstörung und
          * bei Spielbeginn

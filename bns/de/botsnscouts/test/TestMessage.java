@@ -3,7 +3,7 @@ package de.botsnscouts.util;
 import java.io.*;
 
 /** Testklasse fuer Message.java
-    @author Gero */
+   */
 
 public class TestMessage
 {

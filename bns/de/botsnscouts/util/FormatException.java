@@ -2,7 +2,7 @@ package de.botsnscouts.util;
 
 /**
  * FormatException wird bei Abweichungen vom Spielfelddatenformat geworfen.
- * @author: Dirk Materlik, Gero Eggers
+ * @author: Dirk Materlik
  */
 
 public class FormatException extends Exception {

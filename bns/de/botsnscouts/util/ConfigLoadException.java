@@ -3,7 +3,7 @@ package de.botsnscouts.util;
 /**
  * ConfigLoadException wird bei Problemen beim Lesen von config.txt
  * oder fehlender config.txt geworfen.
- * @author: Gero Eggers
+ *
  */
 
 public class ConfigLoadException extends Exception {

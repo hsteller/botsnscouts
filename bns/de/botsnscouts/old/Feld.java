@@ -1,7 +1,7 @@
 package de.botsnscouts.start;
 
 /** Ein einzelnes Spielfeld.
- * @author: Dirk Materlik, Gero Eggers
+ * @author: Dirk Materlik
  */
 
 public class Feld

@@ -5,7 +5,7 @@ import java.io.*;
 import de.botsnscouts.util.*;
 
 /** Testklasse fuer SpielfeldSim
-    @author Gero */
+  */
 
 public class TestSfS
 {

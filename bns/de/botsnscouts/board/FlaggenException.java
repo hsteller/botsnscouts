@@ -2,7 +2,7 @@ package de.botsnscouts.board;
 
 /**
  * FlaggenException wird bei Abweichungen vom Spielfelddatenformat geworfen.
- * @author: Dirk Materlik, Gero Eggers
+ * @author: Dirk Materlik
  */
 
 public class FlaggenException extends Exception {

@@ -4,7 +4,7 @@ package de.botsnscouts.board;
  * Diese Klasse repraesentiert das Spielfeld. Sie soll von
  * Ausgabe, Spielern und Server verwendet werden (ggf.
  * extended).
- * @author: Dirk Materlik, Gero Eggers
+ * @author: Dirk Materlik
  */ 
 
 import de.botsnscouts.util.*;

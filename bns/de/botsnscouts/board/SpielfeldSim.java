@@ -8,7 +8,7 @@ import de.botsnscouts.util.*;
 import de.botsnscouts.server.Server;
 
 /** Das intelligente Spielfeld
- * @author: Dirk Materlik, Gero Eggers
+ * @author: Dirk Materlik
  */
 public class SpielfeldSim extends Spielfeld
 {
