@@ -34,13 +34,7 @@ public class CursorMan {
 	imagesLoading = true;
 
 	//Miriam: Bilder werden relativ zum Klassenpfad gesucht	
-	Class c;
-	try {
-	    c = Class.forName("de.spline.rr.ImageMan");
-	} catch(ClassNotFoundException e) {
-	    System.out.println( e );
-	    throw new RuntimeException("ImageMan nicht gefunden");
-	}
+	Class c = de.botsnscouts.BotsNScouts.class;
 
 	tracker = new MediaTracker(new Button());
 	Toolkit tk = Toolkit.getDefaultToolkit();

@@ -4,7 +4,9 @@ import java.io.*;
 import java.awt.*;
 import java.awt.image.*;
 
-
+import de.botsnscouts.BotsNScouts;
+import javax.swing.ImageIcon;
+import java.net.URL;
 
 
 public class ImageMan {
@@ -131,5 +133,10 @@ public class ImageMan {
 	try{
 	    imageLoader.join();
         }catch(InterruptedException ie) { System.err.println( ie ); }
+    }
+
+    public ImageIcon getIcon(String s) {
+	URL url = BotsNScouts.class.getResource( "images/" + s );
+	return new ImageIcon( url );
     }
 }
