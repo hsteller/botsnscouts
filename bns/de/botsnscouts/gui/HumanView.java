@@ -23,6 +23,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
     private CardArray cards;
     private RegisterArray registers;
     ScoutVertiefung scoutView;
+    KlugscheisserLatte wisenheimerView;
     private JPanel switcherPanel;
 
     public HumanView(HumanPlayer hp) {
@@ -51,7 +52,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	ZielfahneErreicht reachedEndDead = new ZielfahneErreicht(Message.say("SpielerMensch","mkilled"),true);
 	ZielfahneErreicht reachedEndWinner = new ZielfahneErreicht(Message.say("SpielerMensch","mflagreached"),false);
 
-	KlugscheisserLatte wisenheimerView = new KlugscheisserLatte(new ActionListener() {
+	wisenheimerView = new KlugscheisserLatte(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    if (( (KlugscheisserLatte) e.getSource()).selected()) {
 			//			d(this,"wisenheimer, wake up!");
@@ -303,7 +304,9 @@ public class HumanView extends JPanel implements HumanViewInterface {
     }
 
     private void klugscheisserClicked (boolean awake) {
-	
+	if (human.mode==HumanPlayer.MODE_PROGRAM){
+	    //int predCard = human.getPrediction(registers.getCards(),cards.getCards());
+	}
     }
 
     private void scoutClicked (boolean awake) {

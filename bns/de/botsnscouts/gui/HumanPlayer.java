@@ -18,6 +18,10 @@ import javax.swing.plaf.metal.*;
  */
 public class HumanPlayer extends Thread {
 
+    protected static int MODE_PROGRAM = 0;
+    protected static int MODE_OTHER = 1;
+
+    protected int mode=MODE_OTHER;
     private HumanView humanView;
     private Ausgabe ausgabe;
     private KommClientSpieler comm;
@@ -29,6 +33,7 @@ public class HumanPlayer extends Thread {
     private String host, name;
     private int port, myRobIndex, myColor, globalTimeout;
     private boolean gameOver = false, nosplash = false;
+    private Wisenheimer wisenheimer;
 
     public HumanPlayer (String host, int port, String name) {
 	this(host,port,name,-1);
@@ -80,6 +85,7 @@ public class HumanPlayer extends Thread {
 
 	    switch (commAnswer.typ) {
 	    case (commAnswer.MACHEZUG): {
+		mode=MODE_PROGRAM;
 		Global.debug(this,"I am requested to send cards");
 		// card 
 		showMessage(Message.say("SpielerMensch","mwartereg"));
@@ -138,13 +144,12 @@ public class HumanPlayer extends Thread {
 		humanView.showGetDirection();
 		Global.debug(this,"Habe einee Zerstörung bekommen.");
 		showMessage(Message.say("SpielerMensch","roboauffeld"));
-		/* TODO
 		   // --- Spielfeld für den Klugscheisser holen
-		   if (intelliBoard==null) {
-		   spielfeldkreieren();
-		   wirbel = new Permu(intelliBoard,0);
-		   }
-		*/
+		if (intelliBoard==null) {
+		    initIntelligentBoard();
+		    wisenheimer = new Wisenheimer(intelliBoard);
+		}
+
 	       	// ----- ask for timeout -------
 		if (globalTimeout ==0) {
 		    try {
@@ -287,6 +292,7 @@ public class HumanPlayer extends Thread {
     }
 
     protected void sendCards(ArrayList registerCards, boolean nextTurnPowerDown) {
+	mode=MODE_OTHER;
 	int sendProg[] = new int[registerCards.size()];
 	int index=0;
 	
