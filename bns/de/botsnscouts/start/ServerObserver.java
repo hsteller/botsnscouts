@@ -169,7 +169,9 @@ public class ServerObserver extends BNSThread {
             socket.close();
         } catch (Exception e) {
             try {
-                socket.close();
+                if (socket != null) {
+                    socket.close();
+                }
             } catch (IOException ex) {
                 CAT.error("while closing sockets", ex);
             }
