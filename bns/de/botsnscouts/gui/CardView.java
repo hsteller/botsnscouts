@@ -13,7 +13,7 @@ import javax.swing.border.*;
     /**
      * gui-container that has a card
      */
-public class CardView extends JToggleButton {
+public class CardView extends JButton {
     ImageIcon cardFree = ImageMan.CardRUECK;
     ImageIcon cardImage;
     HumanCard h;
@@ -41,6 +41,10 @@ public class CardView extends JToggleButton {
 	setEnabled(false);
 	setIcon(cardFree);
 	h = null;
+    }
+
+    public boolean locked() {
+	return h.locked();
     }
 
 

@@ -17,6 +17,7 @@ import javax.swing.border.*;
 public class View extends JFrame {
 
     AusgabeView ausgabeView;
+    HumanView humanView;
 
     public View() {
 	setTitle(Message.say("AusgabeFrame","gameName"));
@@ -25,24 +26,16 @@ public class View extends JFrame {
     public View(AusgabeView av) {
 	setTitle(Message.say("AusgabeFrame","gameName"));
 	ausgabeView=av;
-	// Fenstergröße auf Vollbild setzen
-	Toolkit tk=Toolkit.getDefaultToolkit();
-	setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);
-	setLocation(4,4);
+	initView();
+	getContentPane().add(av, BorderLayout.CENTER);
+	makeVisible();
+    }
 
-	// Fentster-Schließen behandeln
-	addWindowListener(new WindowAdapter() {
-		public void windowClosing(WindowEvent e){
-		    shutup();
-		}});
-
-
-	// Layout erzeugen
-	// setLayout(new FlowLayout());
-
-	getContentPane().add(av);
-	validate();
-	setVisible(true);
+    public View(HumanView hv) {
+	setTitle(Message.say("AusgabeFrame","gameName"));
+	humanView = hv;
+	initView();
+	getContentPane().add(hv, BorderLayout.EAST);
     }
 
 
@@ -64,7 +57,32 @@ public class View extends JFrame {
 	f.setVisible(true);
    }
 
+    private void initView() {
+	// Fenstergröße auf Vollbild setzen
+	Toolkit tk=Toolkit.getDefaultToolkit();
+	setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);
+	setLocation(4,4);
 
+	// Fentster-Schließen behandeln
+	addWindowListener(new WindowAdapter() {
+		public void windowClosing(WindowEvent e){
+		    shutup();
+		}});
+
+	// Layout erzeugen
+	setLayout(new BorderLayout());
+	
+    }
+
+    protected void makeVisible() {
+	validate();
+	setVisible(true);
+    }
+
+
+    public void addAusgabeView(AusgabeView av) {
+	getContentPane().add(av, BorderLayout.CENTER);
+    }
 }
 
 

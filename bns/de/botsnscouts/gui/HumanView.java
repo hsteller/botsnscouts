@@ -15,30 +15,31 @@ import javax.swing.border.*;
 
 public class HumanView extends JPanel implements HumanViewInterface {
     
-    private ArrayList registers = new ArrayList(5);
+    private HumanPlayer human;
     private CardLayout panelSwitcher = new CardLayout();
     private JPanel scoutNFriends = new JPanel();
     private RepairRegisters repairRegisters;
     private CardArray cards;
-    
+    private RegisterArray registers;
+
     public HumanView() {
 	setLayout(panelSwitcher);
 	GetDirection getDir = new GetDirection(new ActionListener(){
-	    public void actionPerformed(ActionEvent ae) {
-		sendDirection(Integer.parseInt(ae.getActionCommand()));
-	    }
+		public void actionPerformed(ActionEvent ae) {
+		    sendDirection(Integer.parseInt(ae.getActionCommand()));
+		}
 	    }
 					       );
 	AgainPowerDown againPowerDown = new AgainPowerDown(new ActionListener(){
-	    public void actionPerformed(ActionEvent ae) {
-		sendAgainPowerDown(ae.getActionCommand().equals("againpowerdown"));
+		public void actionPerformed(ActionEvent ae) {
+		    sendAgainPowerDown(ae.getActionCommand().equals("againpowerdown"));
+		}
 	    }
-	}
-					       );
+							   );
 	repairRegisters = new RepairRegisters(new ActionListener(){
-	    public void actionPerformed(ActionEvent ae) {
-		sendRepairRegisters();
-	    }
+		public void actionPerformed(ActionEvent ae) {
+		    sendRepairRegisters();
+		}
 	    });
 	
 	cards = new CardArray(new ActionListener(){
@@ -53,6 +54,24 @@ public class HumanView extends JPanel implements HumanViewInterface {
 				  }
 			      );
 	
+	registers = new RegisterArray(new ActionListener(){
+		public void actionPerformed(ActionEvent registerKlick) {
+		    treatRegisterKlick((RegisterView) registerKlick.getSource());
+		}
+	    }
+
+				     );
+	UserInfo userInfo = new UserInfo();
+
+	JPanel regsAndCards = new JPanel();
+
+	regsAndCards.add(registers);
+	regsAndCards.add(cards);
+	add(userInfo,"userInfo");
+	add(getDir,"getDirection");
+	add(againPowerDown,"againPowerDown");
+	add(repairRegisters,"repairRegisters");
+	add(regsAndCards,"regsAndCards");
     }
 
     /**
@@ -69,7 +88,9 @@ public class HumanView extends JPanel implements HumanViewInterface {
     /**
      * display the get direction request
      */
-    public void showGetDirection() {}
+    public void showGetDirection() {
+
+    }
 
     /**
      * display the power down again request
@@ -130,7 +151,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
 
     private void sendDirection (int d) {
-	// TODO
+	human.sendDirection(d);
     }
 
     private void sendAgainPowerDown (boolean again) {
@@ -144,12 +165,24 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
 
     private void treatCardKlick (CardView cv) {
-	// TODO: if registers free then remove
+	if ( ! registers.allOcupied() ) {
+	    registers.addCard(cv.getCard());
+	    cv.reset();
+	}
     }
 
 
     private void treatSendCards () {
-	// TODO if registers full: send cards
+	if ( registers.allOcupied()) {
+	    // SEND Cards
+	}
+    }
+
+    private void treatRegisterKlick (RegisterView rv) {
+	if ( ! rv.locked()) {
+	    cards.addCard(rv.getCard());
+	    rv.reset();
+	}
     }
 
 }

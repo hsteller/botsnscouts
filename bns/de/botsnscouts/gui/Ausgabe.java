@@ -18,11 +18,7 @@ import javax.swing.border.*;
  */
 public class Ausgabe extends Thread {
 
-
-    // -----------  Konstanten -----------
-
-    // -----------  Referenzen auf Objekte  -----------
-
+    private HumanPlayer human;
     private KommClientAusgabe kommClient;
     private ClientAntwort kommAntwort = new ClientAntwort();
     private AusgabeView ausgabeView;
@@ -51,6 +47,11 @@ public class Ausgabe extends Thread {
 	this (host,port,nosplash);
     }
 
+    public Ausgabe(String host, int port, boolean nosplash, HumanPlayer human, View v) {
+	this(host, port, nosplash);
+	this.human = human;
+	this.view =v;
+    }
 
     public Ausgabe(String host, int port, boolean nosplash) {
 	this.nosplash=nosplash;
@@ -137,7 +138,11 @@ public class Ausgabe extends Thread {
 		    
 
 		    ausgabeView = new AusgabeView(new SACanvas(sim,robotsNewColor),getRoboterArray());
+
+		    if (view == null) {
 		    view=new View(ausgabeView);
+		    }
+		    else view.makeVisible();
 		    removeSplash();
 
 		    // send OK to server
@@ -392,6 +397,10 @@ public class Ausgabe extends Thread {
 
     public void trackPos (int x, int y) {
 	ausgabeView.showPos(x,y);
+    }
+
+    public AusgabeView getAusgabeView() {
+	return ausgabeView;
     }
 
     private void d(String s){

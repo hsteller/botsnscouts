@@ -67,6 +67,9 @@ public class CardArray extends JPanel {
     }
 
 
+    public void addCard(HumanCard hc) {
+	//
+    }
 
 
     public void setCards(ArrayList cards) {	

@@ -10,6 +10,9 @@ import de.botsnscouts.util.*;
 */
 
 public class HumanCard implements Karte{ 
+    
+    private int prio;
+    private String action;
 
 
     //Attribute 
@@ -24,6 +27,12 @@ public class HumanCard implements Karte{
     }   
 
     public HumanCard (int prioritaet,String action){
+	prio = prioritaet;
+	this.action = action;
+    }
+
+    public HumanCard (Karte k) {
+	this (k.getprio(), k.getaktion());
     }
     
     public void setState (int newState) {
@@ -33,6 +42,10 @@ public class HumanCard implements Karte{
 
     public int getState () {
 	return state;
+    }
+
+    public boolean locked() {
+	return (state == LOCKED);
     }
 
 
