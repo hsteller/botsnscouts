@@ -18,18 +18,18 @@ import de.botsnscouts.util.*;
 import de.botsnscouts.*;
 /**
  * Spielfeld-Ausgabe-Canvas ist das Objekt, das der Ausgabe und dem menschlichen Spieler das Spielfeld grafisch darstellt und verwaltet
- * @author ursprünglich Daniel Holtz
+ * @author ursprnglich Daniel Holtz
  * @version Verbesserung von 1.0
 
  * changes: enno v1.23
  * 1. beim painten wird nur noch der teil ins sichtbare kopiert, der auch
  *   in gepaintet werden muss (hat aber nicht viel gebracht)
- * 2. Felder, die nicht wirklich neu gezeichnet werden müssen, werden nicht
+ * 2. Felder, die nicht wirklich neu gezeichnet werden mssen, werden nicht
  *    mehr betrachtet (bringt was!)
  * 3. Code insgesamt lesbarer strukturiert (noch nicht ganz beendet)
  * 4. makePixelArray in eigene Methode ausgelagert
- * 5. lokale Variablen eingeführt ...
-
+ * 5. lokale Variablen eingefhrt ...
+ *
  * 6. Verwaltung und Speicherung der Bilder ausgelagert in
  *    Klasse ImageMan (kann so dann auch vom KachelEditor verwendet werden)
  *    bilder werden dann nur einmal pro JVM geladen, und zwar bei Programm-
@@ -882,7 +882,7 @@ public class SACanvas extends JComponent {
 		    g.drawImage(diverseCrop[13],actx,acty-6,64,64,this);
 		}
 
-		// Südwand
+		// Sdwand
 		if (sf.sw(xpos,ypos).da){
 		    if (sf.sw(xpos,ypos).wandEl[0]==1){
 			g.drawImage(diverseCrop[17],actx,acty-5,64,64,this);
@@ -974,8 +974,8 @@ public class SACanvas extends JComponent {
     Rectangle rc = new Rectangle();
     // for internal use. see repaintOrt()
 
-    /** Triggert ein Neuzeichnen des Feldes mit den übergebenen
-     *  Koordinaten. Nützlich um einzelne Felder neuzeichnen zu lassen
+    /** Triggert ein Neuzeichnen des Feldes mit den bergebenen
+     *  Koordinaten. Ntzlich um einzelne Felder neuzeichnen zu lassen
      */
 
     void repaintOrt(Ort ort) {
