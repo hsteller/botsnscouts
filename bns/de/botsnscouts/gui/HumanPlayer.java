@@ -37,6 +37,8 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * logic for the human player
@@ -63,6 +65,10 @@ public class HumanPlayer extends BNSThread {
     private boolean gameOver = false, nosplash = false;
     private Wisenheimer wisenheimer;
 
+    private Timer timeoutWatcher;
+    private volatile boolean cardsSent;
+   private static final int bufferSecondsBeforeTimeout = 25;
+   private static final int bufferSecondsBeforeSendingCards = bufferSecondsBeforeTimeout-5;
 
     public HumanPlayer(String host, int port, String name) {
         this(host, port, name, -1);
@@ -116,8 +122,22 @@ public class HumanPlayer extends BNSThread {
             switch (commAnswer.typ) {
                 case (ClientAntwort.MACHEZUG):
                     {
-                        mode = MODE_PROGRAM;
-                        Global.debug(this, "I am requested to send cards");
+                    	mode = MODE_PROGRAM;
+                    	Global.debug(this, "I am requested to send cards");
+                    	if (timeoutWatcher != null){
+                    	    try {
+                    	        timeoutWatcher.cancel();
+                    	    }
+                    	    catch (Exception e){
+                    	        CAT.error("exception canceling the old timeout watcher", e);
+                    	    }
+                    	}                    	   
+                    	timeoutWatcher = new Timer();
+                    	synchronized(comm) {
+                    	    cardsSent = false;
+                    	    timeoutWatcher.schedule(new EmergencyCardSubmitter(), (globalTimeout-bufferSecondsBeforeTimeout)*1000);                    	    
+                    	}
+                    	
                         // card
                         showMessage(Message.say("SpielerMensch", "mwartereg"));
 
@@ -163,7 +183,7 @@ public class HumanPlayer extends BNSThread {
                 case (ClientAntwort.ZERSTOERUNG):
                     {
                         humanView.showGetDirection();
-                        Global.debug(this, "Habe einee Zerst”rung bekommen.");
+                        Global.debug(this, "Habe eine Zerstoerung bekommen.");
                         showMessage(Message.say("SpielerMensch", "roboauffeld"));
 // --- Board f\uFFFDr den Klugscheisser holen
                         if (intelliBoard == null) {
@@ -328,24 +348,34 @@ public class HumanPlayer extends BNSThread {
     }
 
     protected void sendCards(ArrayList registerCards, boolean nextTurnPowerDown) {
-        mode = MODE_OTHER;
-        int sendProg[] = new int[registerCards.size()];
-        int index = 0;
-
-        d("meine Registerkarten: " + registerCards);
-        d("die Karten, die der Server ausgeteilt hat:" + cards);
-
-
-        for (int i = 0; i < registerCards.size(); i++) {
-            for (int j = 0; j < cards.size(); j++) {
-                if (((HumanCard) registerCards.get(i)).equals((HumanCard) cards.get(j))) {
-                    sendProg[index] = (j + 1);
-                    index++;
-                    continue;
-                }
-            }
-        }
-        comm.registerProg(name, sendProg, nextTurnPowerDown);
+        
+      
+	        mode = MODE_OTHER;
+	        int sendProg[] = new int[registerCards.size()];
+	        int index = 0;
+	
+	        d("meine Registerkarten: " + registerCards);
+	        d("die Karten, die der Server ausgeteilt hat:" + cards);
+	
+	        
+	
+	        for (int i = 0; i < registerCards.size(); i++) {
+	            for (int j = 0; j < cards.size(); j++) {
+	                if (((HumanCard) registerCards.get(i)).equals((HumanCard) cards.get(j))) {
+	                    sendProg[index] = (j + 1);
+	                    index++;
+	                    continue;
+	                }
+	            }
+	        }
+	        synchronized (comm){	            
+	            if (!cardsSent) {
+	                timeoutWatcher.cancel();
+	            
+	                comm.registerProg(name, sendProg, nextTurnPowerDown);
+	                cardsSent = true;
+	            }
+	        }
     }
 
     private boolean registerAtServer() {
@@ -486,12 +516,12 @@ public class HumanPlayer extends BNSThread {
 
 
 
-
-
-
     private void showMessage(String foo) {
-    }
+        ausgabe.getAusgabeView().showActionMessage(foo);
+     }
 
+
+ 
 
     static class RoboTrackListener implements ActionListener {
         Bot r;
@@ -523,6 +553,46 @@ public class HumanPlayer extends BNSThread {
         comm.abmelden(name);
     }
 
+    class EmergencyCardSubmitter extends TimerTask {
+        
+        
+        
+        public EmergencyCardSubmitter( ){
+        }
+
+        public void run() {
+            showMessage(Message.say("HumanPlayer", "closeToTimeout", bufferSecondsBeforeSendingCards));
+            synchronized (this){
+                try {
+                    wait (bufferSecondsBeforeSendingCards*1000);
+                }
+                catch (InterruptedException ie){
+                    CAT.error("interrupted while giving user a last chance for sending cards himself", ie);
+                }
+            }
+            synchronized (comm) {
+                if (!cardsSent) {
+                    mode = MODE_OTHER;
+                    showMessage(Message.say("SpielerMensch","legalZug"));
+                    // TODO use wisenheimer instead of the first available cards..
+                    Bot rob = getRob();
+                
+                    int lockedRegisterCount =rob.countLockedRegisters();
+                
+                    int[] prog = new int[(5-lockedRegisterCount)];
+                    for (int i = 0; i < prog.length; i++) {
+                        prog[i] = (i+1);
+                    }
+                    comm.registerProg(name,prog,false);
+                    cardsSent = true;
+                   
+                    humanView.setDialogInSidebarActive(false); // hide cardpanel
+                    }                
+            }
+            
+        }
+        
+    }
 
     private void d(String s) {
         Global.debug(this, s);

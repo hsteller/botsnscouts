@@ -448,7 +448,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
         return dialogInSidebarActive;
     }
 
-    private synchronized void setDialogInSidebarActive(boolean dialogInSidebarActive) {
+    protected synchronized void setDialogInSidebarActive(boolean dialogInSidebarActive) {
         this.dialogInSidebarActive = dialogInSidebarActive;
         if (!dialogInSidebarActive) {
             userInfo.setInfo(Message.say("SpielerMensch", "mrelax"));
