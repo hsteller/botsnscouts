@@ -18,6 +18,8 @@ public class RegisterView extends JButton {
     ImageIcon cardImage;
     HumanCard h;
     int myX=0,myY=0;
+    private Font prioFont=new Font("SansSerif",Font.PLAIN,8);
+    private Color prioColor=Color.darkGray;
 
     public RegisterView() {
 	this(new ActionListener() {
@@ -108,6 +110,10 @@ public class RegisterView extends JButton {
 	if(locked()){
 	    g.drawImage(ImageMan.getPNGImage(ImageMan.REGLOCK),(myX-50)/2,(myY-50)-1,this);
 	}
+	g.setFont(prioFont);
+	g.setColor(prioColor);
+	//Miriam: priority is multiplies by ten because the cards look better then.
+	if (h!=null && (h.getprio()>0)) g.drawString(""+10*h.getprio(),26,22);
     }
 
     public static void main (String args[]) {

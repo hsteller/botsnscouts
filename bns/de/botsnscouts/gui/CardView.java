@@ -18,7 +18,8 @@ public class CardView extends JButton {
     ImageIcon cardImage;
     HumanCard h;
     private boolean wisenheimerPresent = false;
-
+    private Font prioFont=new Font("SansSerif",Font.PLAIN,8);
+    private Color prioColor=Color.darkGray;
     public CardView() {
 	this(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -91,6 +92,11 @@ public class CardView extends JButton {
     
     public void paintComponent(Graphics g){
 	super.paintComponent(g);
+	g.setFont(prioFont);
+	g.setColor(prioColor);
+	//Miriam: priority is multiplies by ten because the cards look better then.
+	if (h!=null&&(h.getState() == HumanCard.FREE) && (h.getprio()>0)) g.drawString(""+10*h.getprio(),28,22);
+
 	if (wisenheimerPresent) g.drawImage(Images.KSCHEISSER,25,42,this);
     }
     
