@@ -7,7 +7,7 @@ public interface OtherConstants {
     public static final String REASON_TIMEOUT        = "TO";
     public static final String REASON_RULE_VIOLATION = "RV";
 
-  // for sending a sequenz number in a message use MESSAGE_NUMBER=1234;
+  // for sending a sequence number in a message use MESSAGE_NUMBER=1234;
   // should be put into the last field if the message's String array
   // or appended in front of a notifychange in the form MESSAGE_NUMBER=1234,NTC(..)
   //                                     appended part: ^^^^^^^^^^^^^^^^^^^^

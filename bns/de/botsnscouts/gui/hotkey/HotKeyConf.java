@@ -15,7 +15,7 @@ public class HotKeyConf {
 
   static Category CAT = Category.getInstance(HotKeyConf.class);
 
-  /** Necessary because in IBM JDK1.3 getKeyText(VK_ENTER) will
+  /** Neccessary because in IBM JDK1.3 getKeyText(VK_ENTER) will
    *  return "Unknown keyCode: 0x0" or some similiar crap.
    *  Interesting: KeyEvent.paramString() will return "*,Enter" anyway..
    *                                ???
@@ -59,7 +59,7 @@ public class HotKeyConf {
   public static final String HOTKEY_SHOW_FLAG6 = "keyShowFlag6";
 
 
-  // Stuff used for ordering the keys in the keys in the HotKeyEditorpanel:
+  // Stuff used for ordering the keys in the HotKeyEditorpanel:
    public static final String [] GROUP_MESSAGES = {
                                          HOTKEY_MSG1,
                                          HOTKEY_MSG2,

@@ -280,8 +280,9 @@ public class Start extends JFrame implements WindowListener{
 
     }
 
-    public static void main(String[] argv, Splash splash){
-	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
+
+    protected static void initBasics() {
+      MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
 
         //load Sounds
         CAT.debug("starting soundman..");
@@ -314,23 +315,31 @@ public class Start extends JFrame implements WindowListener{
 	Message.setLanguage(myLocale);
 	//ende language conf
 
+    }
+
+
+
+    public static void main(String[] argv, Splash splash){
+
+        initBasics();
 
 	if(argv.length>=4){
 	    try{
-		String spielfeld=argv[1];
-		if (spielfeld.endsWith(".spf")){
-		    spielfeld=spielfeld.substring(0,spielfeld.length()-4);
-		}
-		CAT.debug("Board "+spielfeld);
-		GameFieldLoader loader=new GameFieldLoader();
-		Facade fassade=new Facade();
-		Properties prop = loader.getProperties(spielfeld);
-		CAT.debug("Properties "+prop);
-		fassade.loadSpfProp(prop);
-		CAT.debug("Spielfed loaded");
-		fassade.startGame();
-		CAT.debug("Server gestartet");
-		if (argv[2].equals("yes")){
+
+                String spielfeld = argv[1];
+                if (spielfeld.toLowerCase().endsWith(".spf")){
+                    spielfeld=spielfeld.substring(0,spielfeld.length()-4);
+                }
+                CAT.debug("Board "+spielfeld);
+                GameFieldLoader loader=new GameFieldLoader();
+                Facade fassade=new Facade();
+                Properties prop = loader.getProperties(spielfeld);
+                CAT.debug("Properties "+prop);
+                fassade.loadSpfProp(prop);
+                CAT.debug("Spielfed loaded");
+                fassade.startGame();
+                CAT.debug("Server gestartet");
+        	if (argv[2].equals("yes")){
 		    fassade.amSpielTeilnehmen(KrimsKrams.randomName(),0);
 		    CAT.debug("Menschlichen Spieler gestartet");
 		}else{

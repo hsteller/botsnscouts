@@ -583,7 +583,7 @@ public class Ausgabe extends BNSThread {
 
   private void comHandleNotifyChange (ClientAntwort kommAntwort) throws KommException {
 
-       // getting the names of the players that have some changed values
+       // getting the names of the players that have some values changed
           String[] playerNames = kommAntwort.namen;
           Bot [] tmp = new Bot[playerNames.length];
           for (int i=0; i < playerNames.length; i++) {
@@ -597,7 +597,7 @@ public class Ausgabe extends BNSThread {
           //    special purpose) to store the new robot values so that our
           //    HandlerAction can use them:
           kommAntwort.updatedBotsForNTC = tmp;
-          // now we have done enough so that is should work..
+          // now we have done enough so that it should work..
           sequencer.invoke(MessageID.NTC, kommAntwort);
 
         // --------- get other information from the server

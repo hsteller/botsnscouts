@@ -28,7 +28,7 @@ public class MessageSequencer {
     public synchronized void invoke(String useThisIDString, ClientAntwort messageData){
       int msgNum = messageData.messageSequenceNumber;
 
-      if (msgNum<0) { // message not numebered, invoking immediately
+      if (msgNum<0) { // message not numbered, invoking immediately
           String actionType;
           if ( useThisIDString == null )
               actionType = messageData.namen[0];
@@ -64,6 +64,10 @@ public class MessageSequencer {
         invoke(null, messageData);
     }
 
+    /** Invokes actions (ordered by their sequence number) until there is no
+     *  uninvoked action/message left or we detect that the next message in
+     *  the sequence is missing
+     */
     private void invokeAsLongAsPossible(){
         if (messages.isEmpty())
           return;
