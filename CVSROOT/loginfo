@@ -26,4 +26,4 @@
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
 CVSROOT $CVSROOT/CVSROOT/syncmail2 %{sVv} materlik-sourceforge@inf.fu-berlin.de busch@inf.fu-berlin.de
-#DEFAULT $CVSROOT/CVSROOT/syncmail2 %{sVv} botsnscouts-commits@lists.sf.net 
+DEFAULT $CVSROOT/CVSROOT/syncmail2 %{sVv} botsnscouts-commits@lists.sf.net 
