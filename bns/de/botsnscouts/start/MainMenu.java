@@ -37,8 +37,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-public class MainMenu extends JPanel implements  ActionListener{
-    static Category CAT = Category.getInstance( MainMenu.class.getName() );
+public class MainMenu extends JPanel implements ActionListener {
+    static Category CAT = Category.getInstance(MainMenu.class.getName());
 
     Paint paint;
     JButton gameBut;
@@ -50,92 +50,92 @@ public class MainMenu extends JPanel implements  ActionListener{
 
     Start parent;
 
-    public MainMenu(Start par){
-	parent=par;
-	parent.setTitle(Message.say("Start","mStartTitel"));
-	paint=parent.paint;
+    public MainMenu(Start par) {
+        parent = par;
+        parent.setTitle(Message.say("Start", "mStartTitel"));
+        paint = parent.paint;
 
-	GridLayout lay=new GridLayout(6,1);
-	lay.setHgap(170);
-	lay.setVgap(20);
-	//lay.setHgap(100);
-	//lay.setVgap(10);
-	JPanel buttons = new JPanel( lay );
-        setOpaque( false );
-	buttons.setOpaque( false );
-        buttons.setBackground( new java.awt.Color(60, 80, 60, 200) );
-	setLayout( new GridBagLayout() );
+        GridLayout lay = new GridLayout(6, 1);
+        lay.setHgap(170);
+        lay.setVgap(20);
+        //lay.setHgap(100);
+        //lay.setVgap(10);
+        JPanel buttons = new JPanel(lay);
+        setOpaque(false);
+        buttons.setOpaque(false);
+        buttons.setBackground(new java.awt.Color(60, 80, 60, 200));
+        setLayout(new GridBagLayout());
 
-	logo = new Logo();
+        logo = new Logo();
 
-	gameBut=OptionPane.getTransparentButton(Message.say("Start","mSpielStarten"));
-	partBut=OptionPane.getTransparentButton(Message.say("Start","mTeilnehmen"));
-	watchBut=OptionPane.getTransparentButton(Message.say("Start","mZuschauen"));
-	editBut=OptionPane.getTransparentButton(Message.say("Start","mEdit"));
-	endBut=new TransparentButton(Message.say("Start","mBeenden"));
+        gameBut = OptionPane.getTransparentButton(Message.say("Start", "mSpielStarten"));
+        partBut = OptionPane.getTransparentButton(Message.say("Start", "mTeilnehmen"));
+        watchBut = OptionPane.getTransparentButton(Message.say("Start", "mZuschauen"));
+        editBut = OptionPane.getTransparentButton(Message.say("Start", "mEdit"));
+        endBut = new TransparentButton(Message.say("Start", "mBeenden"));
 
-	gameBut.addActionListener(this);
-	partBut.addActionListener(this);
-	watchBut.addActionListener(this);
-	editBut.addActionListener(this);
-	endBut.addActionListener(this);
+        gameBut.addActionListener(this);
+        partBut.addActionListener(this);
+        watchBut.addActionListener(this);
+        editBut.addActionListener(this);
+        endBut.addActionListener(this);
 
-	gameBut.setActionCommand("gameBut");
-	partBut.setActionCommand("partBut");
-	watchBut.setActionCommand("watchBut");
-	editBut.setActionCommand("editBut");
-	endBut.setActionCommand("endBut");
+        gameBut.setActionCommand("gameBut");
+        partBut.setActionCommand("partBut");
+        watchBut.setActionCommand("watchBut");
+        editBut.setActionCommand("editBut");
+        endBut.setActionCommand("endBut");
 
-	buttons.add(gameBut);
-	buttons.add(partBut);
-	buttons.add(watchBut);
-	buttons.add(editBut);
-	buttons.add(endBut);
+        buttons.add(gameBut);
+        buttons.add(partBut);
+        buttons.add(watchBut);
+        buttons.add(editBut);
+        buttons.add(endBut);
 
-	GridBagConstraints con = new GridBagConstraints();
-	buttons.setBorder( new EmptyBorder(50, 20, 50, 20));
-	con.gridx = 0;
-	con.gridheight = 2;
-	con.weightx = 0.1;
-	con.weighty = 0.1;
-	add( logo, con );
-	con.gridheight = GridBagConstraints.REMAINDER;
-	con.fill = GridBagConstraints.VERTICAL;
-	con.insets = new Insets(50, 20, 50, 20);
-	con.anchor = GridBagConstraints.CENTER;
-	con.weighty = 0.2;
-	con.weightx = 0.0;
-	add( buttons, con );
+        GridBagConstraints con = new GridBagConstraints();
+        buttons.setBorder(new EmptyBorder(50, 20, 50, 20));
+        con.gridx = 0;
+        con.gridheight = 2;
+        con.weightx = 0.1;
+        con.weighty = 0.1;
+        add(logo, con);
+        con.gridheight = GridBagConstraints.REMAINDER;
+        con.fill = GridBagConstraints.VERTICAL;
+        con.insets = new Insets(50, 20, 50, 20);
+        con.anchor = GridBagConstraints.CENTER;
+        con.weighty = 0.2;
+        con.weightx = 0.0;
+        add(buttons, con);
     }
 
-    public void actionPerformed(ActionEvent e){
-	if(e.getActionCommand().equals("endBut")){
-	    parent.myclose();
-	}else if(e.getActionCommand().equals("gameBut")){
-	    parent.showGameFieldPanel();
-	}else if(e.getActionCommand().equals("partBut")){
-	    parent.showParticipatePanel();
-	}else if(e.getActionCommand().equals("watchBut")){
-	    parent.showWatchPanel();
-	} else if (e.getActionCommand().equals("editBut")){
-	  new de.botsnscouts.editor.BoardEditor();
-	}
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("endBut")) {
+            parent.myclose();
+        } else if (e.getActionCommand().equals("gameBut")) {
+            parent.showGameFieldPanel();
+        } else if (e.getActionCommand().equals("partBut")) {
+            parent.showParticipatePanel();
+        } else if (e.getActionCommand().equals("watchBut")) {
+            parent.showWatchPanel();
+        } else if (e.getActionCommand().equals("editBut")) {
+            new de.botsnscouts.editor.BoardEditor();
+        }
     }
 
-    public void unrollOverButs(){
-	gameBut.getModel().setRollover(false);
-	partBut.getModel().setRollover(false);
-	watchBut.getModel().setRollover(false);
-	endBut.getModel().setRollover(false);
-	editBut.getModel().setRollover(false);
+    public void unrollOverButs() {
+        gameBut.getModel().setRollover(false);
+        partBut.getModel().setRollover(false);
+        watchBut.getModel().setRollover(false);
+        endBut.getModel().setRollover(false);
+        editBut.getModel().setRollover(false);
     }
 
     public void paint(Graphics g) {
-	Graphics2D g2d = (Graphics2D) g;
-	Dimension d = getSize();
-	g2d.setPaint( paint );
-	g2d.fillRect(0,0, d.width, d.height);
-	paintChildren(g);
+        Graphics2D g2d = (Graphics2D) g;
+        Dimension d = getSize();
+        g2d.setPaint(paint);
+        g2d.fillRect(0, 0, d.width, d.height);
+        paintChildren(g);
     }
 
 

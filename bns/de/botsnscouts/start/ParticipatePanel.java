@@ -25,10 +25,8 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.OptionPane;
-import de.botsnscouts.widgets.TransparentButton;
+import de.botsnscouts.widgets.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -36,104 +34,88 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ParticipatePanel extends ColoredComponent implements  ActionListener{
-
-    JLabel server;
-    JLabel name;
-    JLabel farbe;
+/**
+ * The panel you get when you want to participate in a game hosted by someone else.
+ * You choose the server parameters and you player here and then you
+ * may press Go to register.
+ */
+public class ParticipatePanel extends ColoredComponent implements ActionListener {
 
     JTextField serv;
     JTextField nam;
     JComboBox farb;
 
-    TransparentButton go;
-    TransparentButton zurueck;
-
     Start parent;
 
     Paint paint;
 
-    Font font;
+    public ParticipatePanel(Start par) {
 
-    public ParticipatePanel(Start par){
-	parent=par;
-	parent.setTitle(Message.say("Start","mTeilnehmen"));
-	paint=parent.paint;
+        TransparentButton go;
+        TransparentButton back;
 
-	font=new Font("Sans", Font.BOLD, 24);
+        parent = par;
+        parent.setTitle(Message.say("Start", "mTeilnehmen"));
+        paint = parent.paint;
 
-	GridLayout lay;
-	lay=new GridLayout(4,2);
-	lay.setHgap(170);
-	lay.setVgap(80);
+        GridLayout lay;
+        lay = new GridLayout(4, 2);
+        lay.setHgap(170);
+        lay.setVgap(80);
 
-	setLayout(lay);
-	setBorder(BorderFactory.createCompoundBorder(
-            new EmptyBorder(150,150,150,150),
-            OptionPane.niceBorder
+        setLayout(lay);
+        setBorder(BorderFactory.createCompoundBorder(
+                new EmptyBorder(150, 150, 150, 150),
+                OptionPane.niceBorder
         ));
 
-	server=new JLabel(Message.say("Start","mServer"));
-	name=new JLabel(Message.say("Start","mName"));
-	farbe=new JLabel(Message.say("Start","mFarbe"));
-        serv=new JTextField(Message.say("Start","mServerInh"),JTextField.CENTER);
-        nam=new JTextField(Conf.getDefaultRobName(),JTextField.CENTER);
-	farb=new RoboBox( true ); farb.setOpaque(false);
-        go=new TransparentButton(Message.say("Start","mGoButton"));
-        zurueck=new TransparentButton(Message.say("Start","mZurueckButton"));
-
-	server.setFont(font);
-	name.setFont(font);
-	farbe.setFont(font);
-        serv.setFont(font);
-	nam.setFont(font);
-	farb.setFont(font);
-
-	serv.setOpaque(false);
-	nam.setOpaque(false);
-
-	server.setForeground(Color.lightGray);
-	name.setForeground(Color.lightGray);
-	farbe.setForeground(Color.lightGray);
+        serv = new TJTextField(Message.say("Start", "mServerInh"),
+                               JTextField.CENTER, true);
+        nam = new TJTextField(Conf.getDefaultRobName(), JTextField.CENTER, true);
+        farb = new RoboBox(true);
+        farb.setOpaque(false);
+        farb.setFont(new Font("Sans", Font.BOLD, 24));
+        go = new TransparentButton(Message.say("Start", "mGoButton"));
+        back = new TransparentButton(Message.say("Start", "mZurueckButton"));
 
         go.addActionListener(this);
-        zurueck.addActionListener(this);
+        back.addActionListener(this);
 
         go.setActionCommand("go");
-        zurueck.setActionCommand("zurueck");
+        back.setActionCommand("back");
 
-	add(server);
+        add(new TJLabel(Message.say("Start", "mServer"), Color.lightGray, true));
         add(serv);
-        add(name);
+        add(new TJLabel(Message.say("Start", "mName"), Color.lightGray, true ));
         add(nam);
 
-        add( farbe );
-        add( farb );
+        add(new TJLabel(Message.say("Start", "mFarbe"), Color.lightGray, true ));
+        add(farb);
         add(go);
-        add(zurueck);
+        add(back);
     }
 
-    public void actionPerformed(ActionEvent e){
-	if(e.getActionCommand().equals("go")){
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("go")) {
 
-	    Thread smth=parent.fassade.amSpielTeilnehmen(serv.getText(),nam.getText(),farb.getSelectedIndex());
-	    Global.debug(this,"SpielerMensch gestartet");
-	    parent.addKS(smth);
-	    parent.hide();
-	    parent.dispose();
-	    parent.beenden();
-	}else if(e.getActionCommand().equals("zurueck")){
-	    parent.showMainMenu();
-	}
+            Thread smth = parent.fassade.amSpielTeilnehmen(serv.getText(), nam.getText(), farb.getSelectedIndex());
+            Global.debug(this, "SpielerMensch gestartet");
+            parent.addKS(smth);
+            parent.hide();
+            parent.dispose();
+            parent.beenden();
+        } else if (e.getActionCommand().equals("back")) {
+            parent.showMainMenu();
+        }
 
     }
 
     public void paint(Graphics g) {
-	Graphics2D g2d = (Graphics2D) g;
-	Dimension d = getSize();
-	g2d.setPaint( paint );
-	g2d.fillRect(0,0, d.width, d.height);
-	paintChildren(g);
+        Graphics2D g2d = (Graphics2D) g;
+        Dimension d = getSize();
+        g2d.setPaint(paint);
+        g2d.fillRect(0, 0, d.width, d.height);
+        paintChildren(g);
     }
 
 }//class StartTeilZusch end

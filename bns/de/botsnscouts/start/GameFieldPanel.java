@@ -44,6 +44,11 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.Properties;
 
+/**
+ * You see this panel when you want to host a game.
+ * You choose the create the board and choose other game options
+ * and then start the server and others can register.
+ */
 public class GameFieldPanel extends JPanel {
     Paint paint;
     Start parent;
@@ -337,7 +342,7 @@ public class GameFieldPanel extends JPanel {
                 }
                 // Announce game, if we shall do this.
                 try {
-                    announceGame.announceGame();
+                    announceGame.announceGame(null); //TODO: We need the game options here
                 } catch (UnableToAnnounceGameException e) {
                     e.printStackTrace(); //TODO: give info
                 } catch (YouAreNotReachable youAreNotReachable) {

@@ -40,6 +40,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * The panel that includes the Really-start-game-button.
+ * You get this panel after you chose to host a game and have chosen the
+ * game options and thus started a server.
+ * Now you see who registers for your game.
+ */
 public class StartPanel extends JPanel {
 
     private static final Category CAT = Category.getInstance(StartPanel.class);
@@ -108,7 +114,6 @@ public class StartPanel extends JPanel {
         JComponent panel = new de.botsnscouts.widgets.ColoredComponent();
 
         panel.setOpaque(false);
-        String[] farben = {Message.say("Start", "mFarbeEgal"), Message.say("Start", "mFarbeGruen"), Message.say("Start", "mFarbeGelb"), Message.say("Start", "mFarbeRot"), Message.say("Start", "mFarbeBlau"), Message.say("Start", "mFarbeMagenta"), Message.say("Start", "mFarbeOrange"), Message.say("Start", "mFarbeGrau"), Message.say("Start", "mFarbeDunkelMagenta")};
 
         Font font = new Font("Sans", Font.BOLD, 24);
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));

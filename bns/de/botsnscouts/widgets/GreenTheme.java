@@ -46,9 +46,14 @@ public class GreenTheme extends DefaultMetalTheme {
 	private final ColorUIResource sec3 = new ColorUIResource( new Color(0,64,0) );
 
     private final static Font font = new Font("Sans", Font.BOLD, 12);
+    private final static Font bigFont = new Font("Sans", Font.BOLD, 24);
 
     static public Font getFont() {
         return font;
+    }
+
+    public static Font getBigFont() {
+        return bigFont;
     }
 
 	protected ColorUIResource getPrimary1() { return prim1; }
@@ -62,5 +67,6 @@ public class GreenTheme extends DefaultMetalTheme {
 	private final ColorUIResource white = new ColorUIResource( Color.black );
 	protected ColorUIResource getBlack() { return black; }
 	protected ColorUIResource getWhite() { return white; }
+
 }
 
