@@ -49,14 +49,24 @@ public class Message{
     
     //gibt alle vorhandene Localisierungen
     public static Locale[] getLocales() {
+	Properties locProp=new Properties();
 	Locale[] list=null;
-	File kd=new File("de/botsnscouts/conf");
-	String[] all = kd.list(getLocaleFilter());
-	if(all!=null){
-	    list=new Locale[all.length];
-	    for (int i=0;i<all.length;i++){
-		list[i]=new Locale(all[i].substring(15,17),all[i].substring(18,20));
-	    }
+	try{
+	    FileInputStream istream=new FileInputStream("de/botsnscouts/conf/locales");
+	    locProp.load(istream);
+	}catch(FileNotFoundException e){
+	    list = new Locale[1];
+	    list[0]=new Locale("en","US");
+	    return list;
+	}catch(IOException e){
+	    list = new Locale[1];
+	    list[0]=new Locale("en","US");
+	    return list;
+	}
+	int n=Integer.parseInt(locProp.getProperty("numOfLocales"));
+	list=new Locale[n];
+	for (int i=0;i<n;i++){
+	    list[i]=new Locale(locProp.getProperty("loc"+i+".language"),locProp.getProperty("loc"+i+".country"));
 	}
 	return list;
     }
