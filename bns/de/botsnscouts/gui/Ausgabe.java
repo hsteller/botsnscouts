@@ -374,7 +374,9 @@ public class Ausgabe extends BNSThread {
 		for (int i=0; i < playerNames.length; i++) {
 		    d("Hole Roboterstatus von: "+playerNames[i]);
 		    Roboter tempRob = kommClient.getRobStatus(playerNames[i]);
-		    tempRob.setBotVis(((Integer)playerColorHash.get(tempRob.getName())).intValue());
+                    String h_name = tempRob.getName();
+                    Integer h_int = (Integer)playerColorHash.get(h_name);
+		    tempRob.setBotVis(h_int.intValue());
 		    robots.put(playerNames[i], tempRob);
 		}
 
@@ -420,7 +422,7 @@ public class Ausgabe extends BNSThread {
                   }
                 }
                 catch (KommException ke) {
-                  CAT.error(ke);
+                  CAT.error(ke.getMessage(), ke);
                   CAT.error("KommException occured!");
                   CAT.error("Failed to initialize Statistics-Menu!!!");
                   CAT.error("!!YOU BETTER DO NOT CLICK ON THE STATISTICS MENU !!!");
