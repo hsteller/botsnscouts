@@ -1,17 +1,17 @@
 package de.botsnscouts.server;
 
-import java.io.*; 
-import java.net.*; 
+import java.io.*;
+import java.net.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.comm.*;
 
-/** 
+/**
  * Handhabt eine Connection nebenlaeufig.
  * modified for 2.0 by Dirk
- */ 
- 
-public class ServerAnmeldeThread extends java.lang.Thread{ 
-    
+ */
+
+public class ServerAnmeldeThread extends java.lang.Thread{
+
     private Server server;
     private Socket socket;
     private ServerAnmeldeOberThread oberThread;
@@ -40,39 +40,39 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 	boolean exception=false;
 
 	try{      // Globales Try fuer's String Einlesen und Parsen.
-	    d("out = new PrintWriter    ...");	    
-	    out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()),true); 
- 
-	    d("in  = new BufferedReader ...");	   
-	    in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
+	    d("out = new PrintWriter    ...");
+	    out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()),true);
 
-	    d("... verbunden!"); 
-	    d("schaue nach ob Client etwas geschickt hat."); 
+	    d("in  = new BufferedReader ...");
+	    in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+	    d("... verbunden!");
+	    d("schaue nach ob Client etwas geschickt hat.");
 
 	    String erhalten;
 	    socket.setSoTimeout(server.anmeldeto);
-	    erhalten = in.readLine(); 
-	    d("erhalten = "+erhalten); 
+	    erhalten = in.readLine();
+	    d("erhalten = "+erhalten);
 	    socket.setSoTimeout(0);
 
 	    int len=erhalten.length();
-        
-	    if(len < 6) 
-		{ 
-		    d("Zeichenkette kleiner 6, z.B. 'RGS(X)' min"); 
+
+	    if(len < 6)
+		{
+		    d("Zeichenkette kleiner 6, z.B. 'RGS(X)' min");
 		    throw new FormatException();
-		} 
-	
-	    if(erhalten.charAt(0) == 'R' && erhalten.charAt(1)=='G' && erhalten.charAt(2) == 'S') 
-		{ 
-		    d("Spieler"); 
-		    clienttype = SPIELER; 
-		} 
-	    else if(erhalten.charAt(0) == 'R' && erhalten.charAt(1)=='G' && erhalten.charAt(2)=='A') 
-		{ 
-		    d("Ausgabekanal"); 
-		    clienttype = AUSGABE; 
-		} 
+		}
+
+	    if(erhalten.charAt(0) == 'R' && erhalten.charAt(1)=='G' && erhalten.charAt(2) == 'S')
+		{
+		    d("Spieler");
+		    clienttype = SPIELER;
+		}
+	    else if(erhalten.charAt(0) == 'R' && erhalten.charAt(1)=='G' && erhalten.charAt(2)=='A')
+		{
+		    d("Ausgabekanal");
+		    clienttype = AUSGABE;
+		}
 	    else if(erhalten.charAt(0) == 'R' && erhalten.charAt(1)=='S' && erhalten.charAt(2)=='2')
 		{
 		    d("Spieler V2");
@@ -84,22 +84,22 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 		    clienttype=AUSGABEV2;
                 }
 	    else
-		{ 
-		    d("Falscher String"); 
+		{
+		    d("Falscher String");
 		    throw new FormatException();
-		} 
-        
-	    if(erhalten.charAt(3)=='(' && erhalten.charAt(len-1)==')') 
-		{ 
-		    for(int n = 4; n<(len-1); n++) 
-			clientname = clientname+erhalten.charAt(n); 
-		} 
-	    else 
-		{ 
+		}
+
+	    if(erhalten.charAt(3)=='(' && erhalten.charAt(len-1)==')')
+		{
+		    for(int n = 4; n<(len-1); n++)
+			clientname = clientname+erhalten.charAt(n);
+		}
+	    else
+		{
 		    d("Klammerung falsch.");
 		    throw new FormatException();
-		} 
-	
+		}
+
 	    // Farbe parsen
 	    int kommapos=clientname.indexOf(',');
 	    if ((clienttype==SPIELERV2)&&(kommapos!=-1)){
@@ -107,14 +107,14 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 		clientname=clientname.substring(0,clientname.length()-2);
 		d("farbe="+farbe+"; clientname="+clientname);
 	    }
-	    
-	    if(!nurLatein(clientname)) 
-		{ 
-		    d("Name darf nur aus <a-z,A-Z>+ bestehen"); 
+
+	    if(!nurLatein(clientname))
+		{
+		    d("Name darf nur aus <a-z,A-Z>+ bestehen");
 		    throw new FormatException();
-		} 
-	
-	    d("Parsen erfolgreich. Clientname = "+clientname); 
+		}
+
+	    d("Parsen erfolgreich. Clientname = "+clientname);
 	} catch (SocketException e){
 	    exception=true;
 	    d("SocketException ist aufgetreten.");
@@ -147,7 +147,7 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 		return;
 	    }
 	    ServerAusgabeThread neu = new ServerAusgabeThread(ksa, server);
-	    
+
 	    if (clienttype==AUSGABEV2)
 		neu.version=2;
 	    else
@@ -171,7 +171,7 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 	    }
 	    return;
 	}
-	
+
 	if((clienttype==SPIELER)||(clienttype==SPIELERV2)){
 	    // darf ein Spieler sich anmelden?
 	    d("Ein Spieler versucht sich an der Anmeldung.");
@@ -237,7 +237,7 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 
 			oberThread.anzSpieler=new Integer(oberThread.anzSpieler.intValue()+1);
 			d(""+oberThread.anzSpieler+". Roboter mit Name "+clientname+" erzeugt.");
-			
+
 			ServerRoboterThread neu=new ServerRoboterThread(h,server,komm);
 			server.addRoboterThread(neu);
 			d("ServerRoboterThread erzeugt und einsortiert.");
@@ -247,7 +247,7 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 			if (oberThread.anzSpieler.intValue()>=server.anzSpieler){ // alle da
 			    try {
 				sleep(5000);
-			    } 
+			    }
 			    catch(InterruptedException ex) {
 				d("InterruptedException "+ex);
 			    }
@@ -261,24 +261,24 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 	    } // synchronized oberThread.roboterAnmeldung
 	} //clienttype==spieler
     } //run
-    
-    private boolean nurLatein(String s) 
-    { 
-	if (s==null) 
-	    return false; 
-	else 
-            { 
-                int l=s.length(); 
-                String su=new String(s.toUpperCase()); 
-                for (int i=0;i<l;i++) 
-		    if ( (su.charAt(i)>'Z' )||( su.charAt(i)<'A') ) 
-			return false; 
-                return true; 
-            } 
-    } 
-    
-    
-    private void d(String a){ 
+
+    private boolean nurLatein(String s)
+    {
+	if (s==null)
+	    return false;
+	else
+            {
+                int l=s.length();
+                String su=new String(s.toUpperCase());
+                for (int i=0;i<l;i++)
+		    if ( (su.charAt(i)>'Z' )||( su.charAt(i)<'A') )
+			return false;
+                return true;
+            }
+    }
+
+
+    private void d(String a){
         Global.debug(this,a);
-    } 
-}	 
+    }
+}

@@ -262,6 +262,7 @@ public class Ausgabe extends Thread {
 			playerColorHash.put(playerColors[i],new Integer(i));
 		    }
 		}
+                BotVis.initBotVis( playerColorHash );
 
 		Ort boardDim = kommClient.getSpielfeldDim();
 		boardDimension = new Dimension(boardDim.x,boardDim.y);

@@ -29,7 +29,7 @@ public class Roboter {
      * gibt die Ausrichtung des Roboters auf dem Spielfeld an
      * N = 0; O = 1; S = 2; W = 3;
      */
-    protected int ausrichtung;		   
+    protected int ausrichtung;
     /**
      * gibt Position des Roboters auf dem Spielfeld an
      */
@@ -43,7 +43,7 @@ public class Roboter {
      * gibt die x-Koordinate auf dem Spielfeld an, auf dem der Roboter nach einer
      * Zerstörung wieder in das Spielfeld gesetzt wird.
      */
-    protected int archivX=1;			
+    protected int archivX=1;
     /**
      * gibt die y-Koordinate auf dem Spielfeld an, auf dem der Roboter nach einer
      * Zerstörung wieder in das Spielfeld gesetzt wird.
@@ -55,17 +55,17 @@ public class Roboter {
     protected boolean virtuell=true;
     /**
      * gibt die noch zur Verfügung stehenden Leben an
-     */	
+     */
     protected int leben=4;
     /**
      * enthaelt die Programmierung
      */
     protected Karte[] zug = new Karte[ANZREG];
     /**
-     * enthält die Karten der gesperrten Register 
+     * enthält die Karten der gesperrten Register
      * Invariant: gesperrteRegister[i] -> zug[i] ist gesperrt.
      */
-    protected boolean[] gesperrteRegister = new boolean[ANZREG];	
+    protected boolean[] gesperrteRegister = new boolean[ANZREG];
 
     /** Zugeteilte Karten */
     protected Karte[] karten = new Karte[ANZKARTEN];
@@ -83,7 +83,7 @@ public class Roboter {
      * Deaktiviert angemeldet fuer naechste Runde?
      */
     protected boolean nextTurnPowerDown;
-    
+
 
     /**
      * Visualisation id of the bot
@@ -109,8 +109,8 @@ public class Roboter {
 	aktiviert = true;
 	schaden = 0;
 	nextTurnPowerDown = false;
-    }	 
-	
+    }
+
     protected Roboter(Roboter r ) {
 	super();
 	name = r.name;
@@ -123,7 +123,7 @@ public class Roboter {
 	virtuell = r.virtuell;
 	leben = r.leben;
 	aktiviert = r.aktiviert;
-	for(int i=0;i < zug.length;i++) 
+	for(int i=0;i < zug.length;i++)
 	    zug[i] = r.zug[i];
 	for(int i=0;i < gesperrteRegister.length; i++) {
 	    gesperrteRegister[i]=r.gesperrteRegister[i];
@@ -134,7 +134,7 @@ public class Roboter {
     }
 
     /** setzt in diesen Roboter die fuer eine Simulation nötigen Daten
-     *  diese werden aus dem übergebenen Robbi kopiert. 
+     *  diese werden aus dem übergebenen Robbi kopiert.
      *  (ausrichtung, position, schaden, leben, Zielflagge, Archivpon, aktiv)
      */
     public void copyRob( Roboter r ) {
@@ -148,7 +148,7 @@ public class Roboter {
 	botVis = r.botVis;
 	leben = r.leben;
 	aktiviert = r.aktiviert;
-	for(int i=0;i < zug.length;i++) 
+	for(int i=0;i < zug.length;i++)
 	    zug[i] = r.zug[i];
 	for(int i=0;i < gesperrteRegister.length; i++) {
 	    gesperrteRegister[i]=r.gesperrteRegister[i];
@@ -157,14 +157,19 @@ public class Roboter {
 	    karten[i] = r.karten[i];
 	}
     }
-	
+
 
     /**
      * get the visualiation id of the bot
      * @see de.botsnscouts.util.BotVis
      */
     public int getBotVis() {
-	return botVis;
+      try {
+	return BotVis.getBotVisByName( name );
+      } catch( IllegalStateException ies ) {
+        Global.debug(this, "couldn't get my color from botvis");
+        return botVis;
+      }
     }
 
     /**
@@ -174,7 +179,6 @@ public class Roboter {
     public void setBotVis(int vis) {
 	botVis =vis;
     }
-    
 
     /** liefert Zahl der zu erhaltenden Karten */
     public int anzKarten() {
@@ -281,7 +285,7 @@ public class Roboter {
 	return karten;
     }
 
-    /** Liefert, ob zwei Roboter den gleichen Namen haben. 
+    /** Liefert, ob zwei Roboter den gleichen Namen haben.
      * (Dann sollten sie eigentlich gleich sein.)
      */
     public boolean sameName(Roboter r) {
@@ -306,7 +310,7 @@ public class Roboter {
 		c++;
 	return c;
     }
-	
+
     /** entsperrt alle Register */
     public void entsperreAlleRegs() {
 	for (int i=0; i<ANZREG; i++)
@@ -327,8 +331,8 @@ public class Roboter {
 	archivX = o.x;
 	archivY = o.y;
     }
-    
-    /** schickt den Roboter in eine Grube 
+
+    /** schickt den Roboter in eine Grube
      *  Wenn ein Roboter in eine Grube faellt, verliert er ein Leben,
      *  hat teporär Schaden 10 und die Position (0,0)
      */
@@ -421,13 +425,13 @@ public class Roboter {
     }
 
     /** Setzt den Roboter zurueck auf seine Archivposition
-     * @author Miriam  
+     * @author Miriam
      */
     public void zumArchiv() {
 	pos.set(archivX, archivY);
     }
 
-    /** Register n wird gesperrt und mit Karte k belegt. 
+    /** Register n wird gesperrt und mit Karte k belegt.
      *  deprecated Eigentlich hat man die entsprechende Karte ja bereits im letzten Zug drin!!!
      */
     public void sperreRegister(int i, Karte k){
@@ -436,7 +440,7 @@ public class Roboter {
     }
 
 
-    /** Register n wird gesperrt, 
+    /** Register n wird gesperrt,
      */
 
     public void sperreReg(int n){
@@ -447,7 +451,7 @@ public class Roboter {
     public void entsperreReg(int n){
 	gesperrteRegister[n] = false;
     }
-    
+
     /* to be eliminated: */
 
     public void sperreRegister(Karte[] karten) {
@@ -468,7 +472,7 @@ public class Roboter {
 
 
     /** Neue Karten werden vom Server zugeteilt.
-     *  
+     *
      *  Der Roboter bekommt nur so viele Karten, wie er bekommen soll.
      *  Wird mit null aufgefuellt.
      */
@@ -512,19 +516,19 @@ public class Roboter {
                 if (zug[i]!=null)
                     s+="["+zug[i].getprio()+"|"+zug[i].getaktion()+"] ";
                 else
-                    s+="#";		
-				
+                    s+="#";
+
             s+="\ngesperrteRegister: ";
             for(int i=0;i<5;i++)
                 if (gesperrteRegister[i])
                     s+="["+zug[i].getprio()+"|"+zug[i].getaktion()+"] ";
                 else
                     s+="#";
-						
+
             s+="\n";
             return s;
         }
-    
+
     public void zeige_Roboter()
         {
             Global.debug(this,this.toString());

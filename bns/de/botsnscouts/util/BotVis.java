@@ -1,6 +1,7 @@
 package de.botsnscouts.util;
 
 import java.awt.*;
+import java.util.Hashtable;
 
 /**
  * Holds the mapping of the color and the image of a robot
@@ -9,6 +10,19 @@ import java.awt.*;
  */
 
 public class BotVis {
+  private static Hashtable playerBotVisHash;
+  public static void initBotVis( Hashtable hash ) {
+    playerBotVisHash = hash;
+  }
+
+  public static int getBotVisByName( String name ) throws IllegalStateException {
+    if( playerBotVisHash == null )
+      throw new IllegalStateException( "BotVis not yet initialized!" );
+
+    return ((Integer)(playerBotVisHash.get( name ))).intValue();
+  }
+
+
 /*
 
     public static final Color GREEN  = new Color(4,156,52);
