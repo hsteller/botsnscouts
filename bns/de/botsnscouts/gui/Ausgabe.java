@@ -127,7 +127,7 @@ public class Ausgabe extends BNSThread {
 
                 // check the kind of message
                 String msgId = kommAntwort.namen[0];
-		if (!(msgId.substring(0,5).equals("mAusw"))) {
+		if (!(msgId.substring(0,5).equals(de.botsnscouts.comm.MessageID.AUSWERTUNG))) {
                     if (CAT.isDebugEnabled())
 		      CAT.debug("kommAntowrtnamen[0] ist: "+msgId+ "tmpstr ist: "+tmpstr[0]);
 		    // display the message in the statusbar
@@ -135,7 +135,7 @@ public class Ausgabe extends BNSThread {
 //                    view.chatFloatPane.addMessage( Message.say("MSG",msgId,tmpstr) );
 		}
 
-		if (msgId.equals("mRobLaser")){ // robots shooting
+		if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_LASER)){ // robots shooting
 		    CAT.debug("Got message telling "+kommAntwort.namen[1]+" shot "
 			      +kommAntwort.namen[2]+".");
 
@@ -154,17 +154,16 @@ public class Ausgabe extends BNSThread {
 		    ausgabeView.showRobLaser(r1, r2);
 		}
 
-                else if (msgId.equals("mGrubenopfer")) {// robot fell into a pit
+                else if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_IN_PIT)) {// robot fell into a pit
                     // play the sound for "robot fell into pit"
                     SoundMan.playSound(SoundMan.PIT);
                 }
 
-                else if (msgId.equals("mNextFlag")) {// robot fell into a pit
-                    // play the sound for "robot fell into pit"
+                else if (msgId.equals(de.botsnscouts.comm.MessageID.FLAG_REACHED)) {
                     SoundMan.playSound(SoundMan.FLAG_REACHED);
                 }
 
-		else if (msgId.equals("mBoardLaser")){ // boardlaser shooting
+		else if (msgId.equals(de.botsnscouts.comm.MessageID.BORD_LASER_SHOT)){ // boardlaser shooting
 
 		    // get damaged robot
 		    Roboter r1= (Roboter )robots.get(kommAntwort.namen[1]);
@@ -209,7 +208,11 @@ public class Ausgabe extends BNSThread {
                         }
 		    }
 		}
-                else if (msgId.equals("mKlugSchKlick")){
+                else if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_CRUSHED)){
+                  SoundMan.playSound(SoundMan.CRUSHED);
+                }
+
+                else if (msgId.equals(de.botsnscouts.comm.MessageID.WISE_USED)){
                     SoundMan.playSound(SoundMan.BOO);
                     Roboter r1= (Roboter )robots.get(kommAntwort.namen[1]);
                     Stats actualStats=stats.getStats(r1.getName());

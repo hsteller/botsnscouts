@@ -405,7 +405,7 @@ public class HumanPlayer extends BNSThread {
     /** Sends the wisenheimer-activated-msg */
     protected void sendWisenheimerMsg(){
 	String[] tmp={name};
-	sendMessage("mKlugSchKlick",tmp);
+	sendMessage(de.botsnscouts.comm.MessageID.WISE_USED,tmp);
     }
 
     protected Roboter getRob() {

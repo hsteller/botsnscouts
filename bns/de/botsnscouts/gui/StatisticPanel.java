@@ -47,8 +47,8 @@ public class StatisticPanel extends JPanel implements ActionListener {
     private static final JLabel [] COL_HEADINGS = {
       //new JLabel(""),// robot icon
       new JLabel(Message.say(MESSAGE_SECTION, "name"), SwingConstants.LEFT),// robot name
-      new JLabel(Message.say(MESSAGE_SECTION, "kills"), SwingConstants.CENTER),
       new JLabel(Message.say(MESSAGE_SECTION, "hits"), SwingConstants.CENTER),
+      new JLabel(Message.say(MESSAGE_SECTION, "kills"), SwingConstants.CENTER),
       new JLabel(Message.say(MESSAGE_SECTION, "damage_by_board"), SwingConstants.CENTER),
       new JLabel(Message.say(MESSAGE_SECTION, "damage_by_robots"), SwingConstants.CENTER),
       new JLabel(Message.say(MESSAGE_SECTION, "asked_wise"), SwingConstants.CENTER)
@@ -125,16 +125,15 @@ public class StatisticPanel extends JPanel implements ActionListener {
       String name = s.getName(); // will need the robot's name several times
       Color c = BotVis.getBotColorByName(name);
 
-     desc [row][0].setIcon(new ImageIcon(BotVis.getBotIconByName(name)));
-    //  desc [row] [0].setForeground(c);
-    //  desc [row] [0].setText("[img]");
+      desc [row][0].setIcon(new ImageIcon(BotVis.getBotIconByName(name)));
 
       desc [row] [1].setForeground(c);
       desc [row] [1].setText(s.getName());
       desc [row] [2].setForeground(c);
-      desc [row] [2].setText(s.getKills()+"");
+      desc [row] [2].setText(s.getHits()+"");
       desc [row] [3].setForeground(c);
-      desc [row] [3].setText(s.getHits()+"");
+      desc [row] [3].setText(s.getKills()+"");
+
 
       int foo =  s.getDamageByBoard();
       desc [row] [4].setForeground(c);
