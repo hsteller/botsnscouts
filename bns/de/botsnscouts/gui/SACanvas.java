@@ -796,7 +796,7 @@ public class SACanvas extends Component {
        for (Enumeration e = sf.getLasers().elements(); e.hasMoreElements();){
 	   actuallaser = ((LaserDef) e.nextElement());
 	   int lx = actuallaser.x-1;
-	   int ly = sf.boden[0].length-actuallaser.y-2;
+	   int ly = sf.getSizeY()-actuallaser.y;
 	   int lf = actuallaser.facing;
 	   int ll = actuallaser.length;
 	   int ls = actuallaser.strength;
@@ -840,8 +840,8 @@ public class SACanvas extends Component {
 	int y0 = clip.y / 64 + 1;
 	int x1 = (clip.x + clip.width - 1) / 64 + 1;
 	int y1 = (clip.y + clip.height - 1) / 64 + 1;
-	x1 = Math.min(x1, sf.boden.length-2);
-	y1 = Math.min(y1, sf.boden[0].length-2);
+	x1 = Math.min(x1, sf.getSizeX());
+	y1 = Math.min(y1, sf.getSizeY());
 
 	// Zeichnen
 	for(int hori=x0; hori <= x1; hori++) {
@@ -849,7 +849,7 @@ public class SACanvas extends Component {
 		int actx = hori*64-64;
 		int acty = vert*64-64;
 		int xpos = hori;
-		int ypos = sf.boden[0].length-vert-1;
+		int ypos = sf.getSizeY()-vert+1;
 	       
 		// Nordwand
 		if (sf.nw(xpos,ypos).da){
@@ -938,10 +938,11 @@ public class SACanvas extends Component {
     }
 
     private void paintFlaggen( Graphics g ) {
-	if(sf.flaggen!=null){
-	    for (int flaggencount = 0; flaggencount<sf.flaggen.length;flaggencount++){
-		int xflagge = sf.flaggen[flaggencount].x-1;
-		int yflagge = sf.boden[0].length-sf.flaggen[flaggencount].y-2;
+	if(sf.getFlaggen()!=null){
+	    Ort[] flaggen = sf.getFlaggen();
+	    for (int flaggencount = 0; flaggencount<flaggen.length;flaggencount++){
+		int xflagge = flaggen[flaggencount].x-1;
+		int yflagge = sf.getSizeY()-flaggen[flaggencount].y;
 		g.drawImage(diverseCrop[18+flaggencount],
 			    xflagge*64,yflagge*64,64,64,this);
 	    }
@@ -954,7 +955,7 @@ public class SACanvas extends Component {
 	    return;
 
     	    int xpos = vorschauRob.getX()-1;
-	    int ypos = sf.boden[0].length-vorschauRob.getY()-2;
+	    int ypos = sf.getSizeY()-vorschauRob.getY();
 	    int xpos64 = xpos*64;
 	    int ypos64 = ypos*64;
 	    // Scout
@@ -971,8 +972,7 @@ public class SACanvas extends Component {
 		if((robos[robocount].getSchaden()<10)&&
 		   (robos[robocount].getLeben() > 0)) {
 		    int xpos = robos[robocount].getX()-1;
-		    // ypos = robos[robocount].getY()-1;
-		    int ypos = sf.boden[0].length-robos[robocount].getY()-2;
+		    int ypos = sf.getSizeY()-robos[robocount].getY();
 		    int xpos64 = xpos*64;
 		    int ypos64 = ypos*64;
 		    int actx = xpos64-64;

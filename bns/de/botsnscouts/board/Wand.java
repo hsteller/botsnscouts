@@ -1,10 +1,10 @@
 package de.botsnscouts.board;
 
 public class Wand{
-    boolean da;
-    int[] wandEl;      // 0: links oder oben
+    public boolean da;
+    public int[] wandEl;      // 0: links oder oben
     //  1:rechts oder unten
-    int[] spez;      //   Laserstärke / Pusherphasen
+    public int[] spez;      //   Laserstärke / Pusherphasen
 
     Wand()
     {
