@@ -768,6 +768,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			ServerRoboterThread tmp = ((ServerRoboterThread )e.next());
 			aktRoboter.add(tmp);
 			toBeAsked.add(tmp);
+                        CAT.debug("Adding "+tmp.rob+" to toBeAsked 1");
 			namen[idx++]=tmp.rob.getName();
 		    }
 		    roboterEintrittsListe.removeAllElements();
@@ -786,7 +787,10 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                             robThread.rob.setNextTurnPoweredDown(false);
                             robThread.rob.setDamage(0);
                         } else {
-                            toBeAsked.add(robThread);
+                            if (!toBeAsked.contains(robThread)){
+                                toBeAsked.add(robThread);
+                                CAT.debug("Adding "+robThread.rob+" to toBeAsked 2");
+                            }
                         }
                     }
 		}
