@@ -174,6 +174,21 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
         return true;
     }
 
+    void dumpPngImage(File file) throws IOException {
+        boardView.dumpPngImage(file);
+    }
+
+    public void setFlag(int x, int y) {
+        if (dp.advancedFeaturesEnabled()) {
+            CAT.debug("setting flag to " + x + ", " + y);
+            board.setFlags(new Location[]{new Location(x, y)});
+            DistanceCalculator calc = AdvDistanceCalculator.getInstance(board);
+            calc.preCalculate();
+            boardView.setCalc(calc);
+            repaint();
+        }
+    }
+
     public void actionPerformed(ActionEvent e) {
         String a = e.getActionCommand();
         try {
@@ -242,21 +257,5 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
         }
     }
 
-    void dumpPngImage(File file) throws IOException {
-        boardView.dumpPngImage(file);
-    }
 
-
-    DistanceCalculator calc;
-
-    public void setFlag(int x, int y) {
-        if (dp.advancedFeaturesEnabled()) {
-            CAT.debug("setting flag to " + x + ", " + y);
-            board.setFlags(new Location[]{new Location(x, y)});
-            calc = AdvDistanceCalculator.getInstance(board);
-            calc.preCalculate();
-            boardView.setCalc(calc);
-            repaint();
-        }
-    }
 }//end class BoardEditor
