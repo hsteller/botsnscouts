@@ -837,7 +837,7 @@ public class BoardView extends JLayeredPane {
                 tmp_laenge+=step;
                 //     synchronized(this){
                 try {
-                    wait(1);
+                    wait(someDelay);
                 } catch (InterruptedException ie) {
                     CAT.error("BoardView.paint: wait interrupted");
                 }

@@ -37,18 +37,18 @@ public class AnimationConfig {
     private int animationStepsTurnRob = 45;
    
     /** Number of ms that the animation "sleeps" in each animation step*/
-    private int animationDelayTurnRob = 1;
+    private int animationDelayTurnRob = 5;
 
     /** Number of ms we sleep between starting to play the laser sound and starting to animate the shot*/
     private int laserDelayBetweenStartOfSoundAndAnimation=200; // delay/4 // TODO default value
     
     /** Number of ms to wait between drawing of two single steps during a laser shot animation*/
-    private int laserDelayPerAnimationStep = 1;
+    private int laserDelayPerAnimationStep = 10;
     
     /** Number of ms to wait after the shot animation was drawn (to let the sound catch up/ to create a delay between
      *  this shot and another following animation.
      */
-    private int laserDelayAfterEndOfAnimation = 500; // deleay/2 TODO default value
+    private int laserDelayAfterEndOfAnimation = 1000; // deleay/2 TODO default value
     
     
     
