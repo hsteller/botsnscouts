@@ -1,6 +1,6 @@
 package de.botsnscouts.start;
 
-import java.awt.*; 
+import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
 import java.io.*;
@@ -24,7 +24,7 @@ public class KommSpPr{
  private OutputStream to=null;
  private BufferedReader frSrv=null;
  private PrintWriter toSrv=null;
- private final int PORT=8888;
+ private final int PORT=23722;
 /**
 *   Bindet Instance an Socket.
 **/
@@ -188,7 +188,7 @@ public class KommSpPr{
   try{
       fr = tosrv.getInputStream();
       to = tosrv.getOutputStream();
-      
+
       frSrv = new BufferedReader(new InputStreamReader(fr));
       toSrv = new PrintWriter(new OutputStreamWriter(to), true);
   } catch(Exception e){
@@ -196,9 +196,9 @@ public class KommSpPr{
       //   System.err.println("Kann keine Streams öffnen!");
       return false;
   }
-  
+
   String tosr="SAB("+port+")\n";
-  
+
   try{
       if(frSrv.readLine().equals("StartServer ist bereit."))
 	  toSrv.println(tosr);
@@ -208,7 +208,7 @@ public class KommSpPr{
       //  System.err.println("Kann nicht zum Server schreiben!");
       return false;
   }
-  
+
   try{
       if(!frSrv.readLine().equals("OK.")){
 	  frSrv.close();
@@ -223,7 +223,7 @@ public class KommSpPr{
       //  System.err.println("Keine (richtige) Antwort vom Server!");
       return false;
   }
-  
+
   try{
       frSrv.close();
       toSrv.close();
@@ -235,10 +235,10 @@ public class KommSpPr{
       //  System.out.println("Kann Sockets nicht schließen");
 
   }
-  
+
   return true;
  }
-    
+
 
  public boolean game(String ip, int port){//spiel geht los
   try {

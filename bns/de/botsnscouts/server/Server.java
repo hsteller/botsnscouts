@@ -7,8 +7,11 @@ import de.botsnscouts.comm.*;
 import de.botsnscouts.start.*;
 import de.botsnscouts.util.*;
 
-public class Server extends Thread 
-    implements ServerRobotThreadMaintainer, ServerOutputThreadMaintainer, ThreadMaintainer, OKListener, InfoRequestAnswerer{
+import org.apache.log4j.Category;
+
+public class Server extends Thread implements ModusConstants, ServerOutputThreadMaintainer,
+    InfoRequestAnswerer, OKListener, ServerRobotThreadMaintainer, ThreadMaintainer {
+    static final Category CAT = Category.getInstance( Server.class );
 
     // Vektoren
     private Vector aThreads		= new Vector();	// ServerAusgabeThread
@@ -21,17 +24,18 @@ public class Server extends Thread
     private Vector roboterFriedhof	= new Vector();	// ServerRoboterThread (endgültig tote)
     private Vector gewinner               = new Vector(); //ServerRoboterThread (Letzte Fahne erreicht)
 
-    private ServerAnmeldeOberThread sAnmeldeThread;
+    private RegistrationManager registrationManager;
     private MessageThread messageThread;
-    
-    protected SpielfeldSim feld;	
-    private Ort[] flaggen;	
+
+    protected SpielfeldSim feld;
+    private Ort[] flaggen;
     protected int anzSpieler;
     protected int anmeldePort;
 
     protected String[] angemeldet = new String[8];
     protected StartServer startServer;
     private boolean gameover = false;
+    private boolean gameStarted = false;
     private int aktPhase=0; // enthaelt die Nummer der gerade auswertenden Phase. 0 wenn nicht ausgewertet wird
 
     // Timeouts
@@ -39,31 +43,18 @@ public class Server extends Thread
     private int kommto; //Für Dinge, die nur eine Reaktion erwarten, kein Nachdenken, z.B. Spielstart
     private final int rundenbeginnto = 60000; // Falls noch zerstoerte Roboter fehlen
     private final int ausgabennotifyto = 60000;
-    protected final int anmeldeto = 60000; // So lange wartet der ServerAnmeldeThread auf eine Aktion    
+    protected final int anmeldeto = 60000; // So lange wartet der ServerAnmeldeThread auf eine Aktion
 
     //Modi, ihre Bearbeitung und Synchronistaion
 
     private int modus; //Aktueller Bearbeitungsmodus, die Clients haben eigene.
-    private WaitingForSet waitablesImWaitingFor; 
-    
-    // um die Statistikdaten zu halten  
-    protected StatsList stats;
+    private WaitingForSet waitablesImWaitingFor;
 
+    // um die Statistikdaten zu halten
+    protected StatsList stats;
     // Modus-Konstanten
     // 1. Server / ServerRoboterThread
-    protected static final int SPIELSTART=0;
-    protected static final int INITAUSR=1;
-    protected static final int PROGRAMMIERUNG=2;
-    protected static final int POWERUP=3;
-    protected static final int ENTSPERREN=4;
-    protected static final int SPIELENDE=5;
-    protected static final int NIX=6;
-    protected static final int ALLGEMEIN=NIX;
-    protected static final int ZERSTOERT_ASYNC=7;
-    protected static final int ZERSTOERT_SYNC=8;
     // 2. ServerAusgabeThread
-    protected static final int FRAGENERLAUBT=10;
-    protected static final int KEINEFRAGEN=11;
 
     // Mandated by OKListener
 
@@ -72,12 +63,12 @@ public class Server extends Thread
     public void notifyDone(Waitable me){
 	waitablesImWaitingFor.removeAndNotify(me);
     }
-    
+
     // Methods needed for ServerRobotThreadMaintainer
 
     /** Entfernt den Thread, benachrichtigt den Spieler (dessen Kommverbindung moeglicherweise
      *  abgeschmiert ist!! -> nicht ewig warten), entfernt den Roboter aus aktiv, wiederein-
-     *  trittsliste oder friedhof 
+     *  trittsliste oder friedhof
      * @param t - der ServerRoboterThread des zu entfernenden Roboters
      * @param grund - "TO" wegen timeout oder "RV" wg. Regelverletzung oder....
      * @returns boolean, ob Hinrichtung erfolgreich war.
@@ -94,17 +85,17 @@ public class Server extends Thread
 	catch(KommException ex) {
 	    d("Roboter "+t.rob.getName()+" konnte nicht mehr von seiner Entfernung wg. "+grund+" benachrichtigt werden: "+ex);
 	}
-   
+
 	t.interrupt();     // Beende den Thread bei nächster Gelegenheit
 
 	String[] tmpstr=new String[1];
 	tmpstr[0]=t.rob.getName();
 	if (grund.equals("LL"))
-	    sendMsg("mHinrLL",tmpstr);	
+	    sendMsg("mHinrLL",tmpstr);
 	else if (grund.equals("TO"))
-	    sendMsg("mHinrTO",tmpstr);	
+	    sendMsg("mHinrTO",tmpstr);
 	else if (grund.equals("RV"))
-	    sendMsg("mHinrRV",tmpstr);	
+	    sendMsg("mHinrRV",tmpstr);
 
 	gameover = istSpielende();
     }
@@ -118,7 +109,7 @@ public class Server extends Thread
     }
 
     /** Schickt eine Nachricht an alle Ausgaben >= Version 2.0 */
-    public void sendMsg(String id,String s[]){
+    public void sendMsg(String id,String[] s){
 	messageThread.append(id,s);
     }
 
@@ -175,7 +166,7 @@ public class Server extends Thread
 	return color;
     }
 
-    
+
 
     // Methods mandated by interface InfoRequestAnswerer
 
@@ -210,12 +201,12 @@ public class Server extends Thread
 	    ServerRoboterThread srt=(ServerRoboterThread)it.next();
 	    if (srt.rob.getName().equals(name))
 		return srt.rob.getPos();
-	} 
+	}
 	return null;
     }
 
     public Roboter getRobStatus(String robotername){
-	// durchsucht die aktRoboter-, zerstoerteRoboter-, roboterEintrittsListe- 
+	// durchsucht die aktRoboter-, zerstoerteRoboter-, roboterEintrittsListe-
 	// und roboterFriedhof-Vector nach roboter mit dem name robotername und liefert
 	// eine kopie des entsprechenden roboters zurück, falls kein roboter mit
 	// dem name gefunden wird, wird null zurückgegeben
@@ -228,7 +219,7 @@ public class Server extends Thread
     }
 
     public boolean gameRunning(){
-	return !gameover;	
+	return !gameover;
     }
 
     public String[] getStanding(){
@@ -244,8 +235,8 @@ public class Server extends Thread
      * liefert eine Liste von Statusobjekten.Ein solcher Statusobjekt enthaelt de NAMEN DES Spielers
      * seine ausgespielten Karten und die Nummer der jetzige Phase.
      * @return Status[ ]
-     */  
-    public Status[] getEvalStatus(){ 
+     */
+    public Status[] getEvalStatus(){
 	synchronized(rThreads){
 	    Status[] s = new Status[rThreads.size()];
 	    for (int i=0;i<s.length;i++){
@@ -290,7 +281,7 @@ public class Server extends Thread
       	anzSpieler = anzahlmitspieler;
       	anmeldePort = anmeldeport;
       	zugto = zugabgabetimeout*1000;
-	startServer = sserver;	
+	startServer = sserver;
 	flaggen = Flaggen;
 
 	try{
@@ -310,24 +301,24 @@ public class Server extends Thread
     }
 
     // For the Board, to send the "something has changed"-message
-   
+
     public void ausgabenBenachrichtigen(String[] s){
 
         // PRE: currentThread ist der ServerThread
         //  ... aber wir pruefen das lieber nochmal :-)
-            
+
 	if (Thread.currentThread()!=this){
 	    d("sendMsgWennNoetig: DAS IST NICHT DER SERVERTHREAD HIER, sondern "+Thread.currentThread());
 	    throw new RuntimeException("nur der Serverthread darf Server.sendMsgWennNoetig aufrufen.");
 	}
-	
+
 	d("Größe der eintrittsliste: "+ausgabenEintrittsListe.size()+"; aThreads: "+aThreads.size());
 	setzeAusgaben();         // neue Ausgaben begrüßen
 	d("Größe der eintrittsliste: "+ausgabenEintrittsListe.size()+"; aThreads: "+aThreads.size());
 
 	synchronized(aThreads){
 	    waitablesImWaitingFor=new WaitingForSet(aThreads);
-	
+
 	    for (Iterator it=aThreads.iterator();it.hasNext();){
 		ServerAusgabeThread tmp=(ServerAusgabeThread)it.next();
 		if (!tmp.isAlive()){
@@ -335,9 +326,9 @@ public class Server extends Thread
 		    waitablesImWaitingFor.remove(tmp);
 		    continue;
 		}
-		
+
 		tmp.setMode(FRAGENERLAUBT);
-		
+
 		try{
 		    tmp.notifyChange(s);
 		}
@@ -349,13 +340,13 @@ public class Server extends Thread
 		}
 	    } //for
 	    d("Alle AusgabeThreads benachrichtigt und in den richtigen Modus versetzt.");
-	
+
 	    if (aThreads.size()==0)
 		return;              // die Muehe koennen wir uns dann auch gerade schenken...
-	
+
 	    d("Der Server wartet jetzt "+ausgabennotifyto+" Millisek. auf seine AusgabenThreads (aenderung()).");
 	    Iterator it=waitablesImWaitingFor.waitFor(ausgabennotifyto);
-	    
+
 	    while (it.hasNext())
 		deleteOutput((ServerAusgabeThread)it.next(),"TO");
 	}
@@ -383,15 +374,15 @@ public class Server extends Thread
 		sendMsg("mAbmeldung",s);
 	    }
 	}
-	
+
 	if (waitablesImWaitingFor.isEmpty())
 	    return;
-	
+
 	//Broadcast an die betroffenen Threads, Inhalt je nach Modus
 	synchronized (waitablesImWaitingFor){
 	    for (Iterator e=waitablesImWaitingFor.iterator();e.hasNext();) {
 		ServerRoboterThread srt = (ServerRoboterThread )e.next();
-	    
+
 		try{
 		    switch(modus) {
 		    case SPIELSTART:
@@ -414,8 +405,8 @@ public class Server extends Thread
 			srt.deleteMe("GO");
 			break;
 		    }
-		    
-		} 
+
+		}
 		catch (KommFutschException ex){
 		    new Fehlermeldung(Message.say("Server","eKommFutschR", srt.rob.getName()));
 		}
@@ -434,7 +425,7 @@ public class Server extends Thread
 	    d("!!!ServerRoboterThread "+tmp.rob.getName()+" rauswerfen wegen Timeout!!!");
 	    deleteRob(tmp,"TO");
 	}
-    }   
+    }
 
     /** Wartet -- je nach Modus -- eine bestimmte Zeit auf wiederkehrende
      *  ServerRoboterThreads oder eben bis alle ferig sind.
@@ -446,7 +437,7 @@ public class Server extends Thread
 
 	switch (modus) {
 	case SPIELSTART:
-	    to = kommto; 
+	    to = kommto;
             break;
 	case INITAUSR:
 	case PROGRAMMIERUNG:
@@ -465,7 +456,7 @@ public class Server extends Thread
 
 	d("Der Server wartet jetzt "+to+" Millisek. auf seine RoboterThreads ("+modus+").");
 	return waitablesImWaitingFor.waitFor(to);
-    }    
+    }
 
     /** Setzt Modus in ServerRoboterThreads um
      * @param Vector v Vektor der umzusetzenden ServerRoboterThreads
@@ -507,7 +498,7 @@ public class Server extends Thread
 		    tmp.start();
 		} //for
 		d("Alle ael-s benachrichtigt und in den richtigen Modus versetzt.");
-    
+
 		Iterator it = waitablesImWaitingFor.waitFor(ausgabennotifyto);
 
 		while (it.hasNext())
@@ -523,32 +514,29 @@ public class Server extends Thread
 		}
 	    } // synchronized ausgabenEL
 	} // sync aThreads
-    }    
-	
+    }
+
     // returns false if interrupted, true if all is ok
     private synchronized boolean anmeldung(){
-	sAnmeldeThread = new ServerAnmeldeOberThread(this);
-	sAnmeldeThread.start();
-	d("sAnmeldeThread gestartet");
+	registrationManager = new RegistrationManager(this);
+	registrationManager.beginRegistration();
+	CAT.debug("registrationManager gestartet");
 	if (isInterrupted())
 	    return false;
 	try{
-	    wait();                            // wird vom StartSpieler notified!
+	    wait();                       // supposed to be notified from startGame()
 	}catch(InterruptedException e){
-	    d("In der anmeldung interruptiert worden!");
-	    sAnmeldeThread.interrupt();
+	    CAT.debug("In der anmeldung interruptiert worden!");
+
 	    return false;
 	}
 	//Spiel geht los
 	startServer.spielGehtLos(this);
-	synchronized(sAnmeldeThread.roboterAnmeldung){
-	    sAnmeldeThread.roboterAnmeldung = Boolean.FALSE;
-	}
 	return true;
     }
 
     private void setzeStartPunkt(){
-	// setzen der x-, y-, archivX- und archivY-Koordinaten in den Robots auf 
+	// setzen der x-, y-, archivX- und archivY-Koordinaten in den Robots auf
 	// die Koordinaten der ersten Flagge
 	d("setze x und archivX in robots auf "+feld.getFlaggen()[0].getX());
 	d("setze y und archivY in robots auf "+feld.getFlaggen()[0].getY());
@@ -562,7 +550,7 @@ public class Server extends Thread
 	for(int i = 0; i < rThreads.size(); i++){
 	    ((ServerRoboterThread)(rThreads.elementAt(i))).start();
 	}
-	d("ServerRoboterThreads wurden gestartet");	
+	d("ServerRoboterThreads wurden gestartet");
     }
 
     /** Sind noch Roboter dabei?
@@ -579,11 +567,11 @@ public class Server extends Thread
     private boolean repariereGgf(ServerRoboterThread t) {
 	if (t.rob.gesperrteRegs()==0)
 	    return false;
-        if ((t.rob.gesperrteRegs()>0)&&(t.rob.getSchaden()<5)){ 
+        if ((t.rob.gesperrteRegs()>0)&&(t.rob.getSchaden()<5)){
 	    t.rob.entsperreAlleRegs();
 	    return false;
 	}
-	
+
         return (t.rob.getSchaden()-4 < t.rob.gesperrteRegs());
     }
 
@@ -592,18 +580,18 @@ public class Server extends Thread
     public void run(){
         setName("ServerThread");
 
-	d("MsgThreadStart");
+	CAT.debug("MsgThreadStart");
 	messageThread=new MessageThread(this, kommto);
 	messageThread.start();
-        
-	d("anmeldung()");
+
+	CAT.debug("anmeldung()");
 	boolean spielgestartet=anmeldung();
 	if (!spielgestartet)
 	    return;
 
-	d("setzeStartPunkt()");
-	setzeStartPunkt();  
-	d("roboterThreadStart()");
+	CAT.debug("setzeStartPunkt()");
+	setzeStartPunkt();
+	CAT.debug("roboterThreadStart()");
 	roboterThreadStart();
 	// warten auf NTS von Ausgabekanaelen und Robotern
 	// 1. Ausgaben NTSen und NTCen, damit Ort schonmal stimmt
@@ -618,9 +606,9 @@ public class Server extends Thread
 	//initialisiere Statistik
 	stats = new StatsList(alleN);
 	feld.initStats(stats);
-	
+
         ausgabenBenachrichtigen(alleN);
-        
+
 	// 2. Roboter
 	d("Spiel starten.");
 	modus = SPIELSTART;
@@ -644,7 +632,7 @@ public class Server extends Thread
                 alleN[i++]=((ServerRoboterThread)e.next()).rob.getName();
         }
         ausgabenBenachrichtigen(alleN);
-	
+
 	// Rundenschleife
 	gameover = false;
 	Vector gesperrteKarten = new Vector(); //Vektor von Karten
@@ -683,7 +671,7 @@ public class Server extends Thread
 		if (alleN.length > 0)
 		    ausgabenBenachrichtigen(alleN);
 	    }
-	    d("Es werden "+roboterEintrittsListe.size()+" nach ihrer Zerstörung wieder eingesetzt"); 
+	    d("Es werden "+roboterEintrittsListe.size()+" nach ihrer Zerstörung wieder eingesetzt");
 
 	    String[] namen;   // fuer notifyChange
 	    Vector toBeAsked = new Vector();
@@ -709,7 +697,7 @@ public class Server extends Thread
 			    break;
 			}
 		    }
-		    // oder noch ein anderer der wiedereinzusetzenden auch da steht 
+		    // oder noch ein anderer der wiedereinzusetzenden auch da steht
 		    if (!tmp.rob.istVirtuell()) {
 			for (Iterator f=roboterEintrittsListe.iterator();f.hasNext();) {
 			    Roboter anderer = ((ServerRoboterThread )f.next()).rob;
@@ -719,7 +707,7 @@ public class Server extends Thread
 			}
 		    }
 		}
-		
+
 		namen=new String[roboterEintrittsListe.size()];
 		int idx=0;
 		// Jetzt wirklich wieder einteten lassen
@@ -732,14 +720,14 @@ public class Server extends Thread
 		roboterEintrittsListe.removeAllElements();
 	    }
 
-	    ausgabenBenachrichtigen(namen);    
+	    ausgabenBenachrichtigen(namen);
 
 	    //PowerUp -- nach Zerstoert eingesetzte Roboter werden auch gefragt!
 	    // Sind bereits in vorheriger Liste in toBeAsked gesetzt worden
 
 	    for(Iterator e=aktRoboter.iterator();e.hasNext();) {
 		ServerRoboterThread tmp = ((ServerRoboterThread )e.next());
-		if (!tmp.rob.istAktiviert()) 
+		if (!tmp.rob.istAktiviert())
 		    toBeAsked.add(tmp);
 		else if (tmp.rob.isNaechsteRundeDeaktiviert()) {
 		    //Auschalten der, die letzte Mal PowerDown gesagt haben.
@@ -748,7 +736,7 @@ public class Server extends Thread
 		    tmp.rob.setNaechsteRundeDeaktiviert(false);
                     tmp.rob.setSchaden(0);
 		}
-		
+
 	    }
 	    if (toBeAsked.size() > 0) {
 		d("Ich frage "+toBeAsked.size()+" nach Powerup.");
@@ -776,13 +764,13 @@ public class Server extends Thread
 		    ServerRoboterThread srt=((ServerRoboterThread)it.next());
 		    if (!srt.rob.istAktiviert())
 			srt.rob.setSchaden(0);
-		}		    
+		}
 	    }
 
 	    // Karten an die Roboter verteilen die nicht zerstoert oder deaktiviert sind
 	    // warten auf die Karten der Roboter (Timeout)
 	    Karte[] cards = new Karte[gesperrteKarten.size()];
-	    for (int i=0; i<gesperrteKarten.size(); i++) 
+	    for (int i=0; i<gesperrteKarten.size(); i++)
 		cards[i] = (Karte )gesperrteKarten.get(i);
 
 	    KartenStapel stapel = new KartenStapel(cards);
@@ -804,8 +792,8 @@ public class Server extends Thread
 		waitablesImWaitingFor.addRemovalListener(robProgListener);
 		broadcastUndWarteAufRoboter();
 		d("Programmierung zurueckerhalten");
-	    }	    
-		
+	    }
+
 	    // Auswertung beginnt
 	    wechselModus(aktRoboter.iterator(),NIX);
 	    modus = NIX;
@@ -830,7 +818,7 @@ public class Server extends Thread
 		}
 		feld.doPhase(aktPhase,robs);
 
-		// Phase auswerten 
+		// Phase auswerten
 		synchronized(aktRoboter) {
 		    for (Iterator e=aktRoboter.listIterator(); e.hasNext();) {
 			ServerRoboterThread tmp = (ServerRoboterThread )e.next();
@@ -845,7 +833,7 @@ public class Server extends Thread
 			    tmpstr=new String[2];
 			    tmpstr[0]=tmp.rob.getName();
 			    tmpstr[1]=""+gewinner.size();
-			    sendMsg("mGewinn",tmpstr);	
+			    sendMsg("mGewinn",tmpstr);
 			    // ...........................
 			    try{
 				tmp.deleteMe("GO");
@@ -860,7 +848,7 @@ public class Server extends Thread
 			    namen=new String[1];
 			    namen[0]=tmp.rob.getName();
 			    ausgabenBenachrichtigen(namen);
-                            
+
 			    gameover = istSpielende();
 
 			}
@@ -875,7 +863,7 @@ public class Server extends Thread
 				//Register entsperren
 				tmp.rob.entsperreAlleRegs();
                                 tmp.rob.setNaechsteRundeDeaktiviert(false);
-                                
+
 				zerstoerteRoboter.addElement(tmp);
 				tmp.setMode(ZERSTOERT_ASYNC);
 				try {
@@ -899,16 +887,16 @@ public class Server extends Thread
 				}
 				gameover = istSpielende();
 			    }
-			    
+
 			    namen=new String[1];
 			    namen[0]=tmp.rob.getName();
 			    ausgabenBenachrichtigen(namen);
 			}
 		    }
 		}
-		
+
 	    } // Ende Phasenschleife
-	    
+
 	    // Rundenauswertung
 	    // Reparaturfelder/Fahnen auswerten und Powerdown setzen
 	    Vector repairing = new Vector();
@@ -952,7 +940,7 @@ public class Server extends Thread
 	   modus = SPIELENDE;
 	   rThreadsAufDieIchWarte = rThreads;
 	   wechselModus(rThreadsAufDieIchWarte, SPIELENDE);
-	   broadcastUndWarteAufRoboter();           
+	   broadcastUndWarteAufRoboter();
 	   }
 	   d("Alle Roboter sind vom Spielende benachrichtet worden.");
 
@@ -976,10 +964,10 @@ public class Server extends Thread
                     }
                 } //for
                 d("Alle AusgabeThreads vom Spielende benachrichtigt und in den richtigen Modus versetzt.");
-            
+
 		waitablesImWaitingFor = new WaitingForSet(aThreads);
 		waitablesImWaitingFor.waitFor(ausgabennotifyto);
-            
+
                 for (Iterator e=aThreads.iterator();e.hasNext();){
                     ServerAusgabeThread tmp=(ServerAusgabeThread)e.next();
                     try{
@@ -994,12 +982,12 @@ public class Server extends Thread
 
 	// AnmeldeThread killen
         try{
-            sAnmeldeThread.seso.close();
+            registrationManager.seso.close();
         }
         catch (java.io.IOException ex){
             d("IOException beim AnmeldeThreadKillen.");
         }
-        
+
 	// MessageThread killen
 	messageThread.interrupt();
 
@@ -1023,4 +1011,12 @@ public class Server extends Thread
 	}
     }
 
+    synchronized boolean isGameStarted() {
+        return gameStarted;
+    }
+
+    synchronized public void startGame() {
+      gameStarted = true;
+      notify();
+    }
 }// class Server ende

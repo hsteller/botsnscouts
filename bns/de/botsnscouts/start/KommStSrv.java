@@ -1,6 +1,6 @@
 package de.botsnscouts.start;
 
-import java.awt.*; 
+import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
 import java.io.*;
@@ -51,7 +51,7 @@ public class KommStSrv{
     private  OutputStream outp=null;
     private  PrintWriter pw=null;
 
-    private final int PORTNR=8888;
+    private final int PORTNR=23722;
     private String fromclt=null;
 
     public KommStSrv() throws Exception{
@@ -68,7 +68,7 @@ public class KommStSrv{
      * @return Positiver Integer <code>n</code> bedeutet neues Spiel
      mit <code>n</code> Mitspielern starten, * negativer Integer
      <code>-n</code> bedeutet <code>n</code> künstliche Spieler
-     Starten. */  
+     Starten. */
     public int listen(){
 
 

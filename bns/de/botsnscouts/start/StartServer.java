@@ -1,7 +1,7 @@
 package de.botsnscouts.start;
 
 import java.awt.*;
-import java.awt.event.*; 
+import java.awt.event.*;
 import java.net.*;
 import java.io.*;
 import de.botsnscouts.server.*;
@@ -19,11 +19,11 @@ public class StartServer extends Thread{
  private boolean lazy;
  private byte[] rd;
  private int spcnt=0;
- 
- private Object[] servArr=new Object[255]; 
- private int[] servPort=new int[255]; 
+
+ private Server[] servArr=new Server[255];
+ private int[] servPort=new int[255];
  private String[] cltIP=new String[255]; //IP des Klienten, der diesen Server startete
- private int[] cltPort=new int[255]; 
+ private int[] cltPort=new int[255];
  private int servNum=0;
 
 // private Server srv;
@@ -66,7 +66,13 @@ public class StartServer extends Thread{
 	if (servPort[i]==prt) break;
     if (i<255){
 	Global.debug("Server "+i);
-	synchronized((Server)servArr[i]){((Server)servArr[i]).notify();}
+        servArr[i].startGame();
+        /*
+	synchronized( servArr[i] )
+        {
+          servArr[i].notify();
+        }
+        */
 	Global.debug("Auf Port "+com.port+" geht's los!");
 	com.ok();
     }else{
@@ -116,7 +122,7 @@ public class StartServer extends Thread{
 		i=servNum;
 		servNum--;
 	    }
-	    
+
 	}
        com.servPorts(servNum,servPort);
        com.ok();
@@ -127,8 +133,8 @@ public class StartServer extends Thread{
 	   if (com.port==servPort[i]) exists=true;
        }
        if(!exists){
-           Global.debug(this,"Neues Spiel mit "+spcnt+" Mitspieler, Port "+com.port);           
-	   
+           Global.debug(this,"Neues Spiel mit "+spcnt+" Mitspieler, Port "+com.port);
+
 	   servArr[servNum++]=  new Server(spcnt,this,com.port,com.zugTimeout,com.feld,com.flags,com.feldX,com.feldY);
 	   ((Server)servArr[servNum-1]).start();
 	   servPort[servNum-1]=com.port;
@@ -138,24 +144,24 @@ public class StartServer extends Thread{
 	   com.ok();
        }
        else com.error();
-  
+
    }
   }
 
  }
 /**
-* 
+*
 **/
-    
+
     public void spielGehtLos(Server s){
  	int si=searchServ(s);
 // 	servArr[si]=null;
-	
+
 // 	int k=0;
 // 	for(int i=servNum-1;i>=0;i--)
 // 	    if ( servArr[i]==null)
 // 		k++;
-	
+
 // 	for(int z=0;z<k;z++)
 // 	    for (int i=0;i<servNum;i++){
 // 		if (servArr[i]==null){
@@ -173,13 +179,13 @@ public class StartServer extends Thread{
 // 		    i=servNum;
 // 		    servNum--;
 // 		}
-		
+
 // 	    }
 	//SpielGehtLos
 	if(!comPass.sendString("SGL\n",cltIP[si],cltPort[si]))
 	    System.err.println("StartServer: Kann nicht mit dem StartSpielerListener kommunizieren!(SGL)");
     }
-    
+
     public boolean neuerSpieler(String name, int farbe,ThreadMaintainer s){
 	if(!comPass.sendString("NSA\n"+name+"\n"+farbe,cltIP[searchServ((Server)s)],cltPort[searchServ((Server)s)])){
 	    System.err.println("StartServer: Kann nicht mit dem StartSpielerListener kommunizieren!(NSA)"+cltPort[searchServ((Server)s)]+" "+cltIP[searchServ((Server)s)]);
@@ -203,24 +209,24 @@ public class StartServer extends Thread{
 
     public boolean spielZuEnde(Server s){
 	boolean ret=false;
-	Global.debug(this,"sende SZE an:"+cltIP[searchServ(s)]+":"+cltPort[searchServ(s)]);	
+	Global.debug(this,"sende SZE an:"+cltIP[searchServ(s)]+":"+cltPort[searchServ(s)]);
 
 	if(!comPass.sendString("SZE\n",cltIP[searchServ(s)],cltPort[searchServ(s)])){
 	    System.err.println("StartServer: Kann nicht mit dem StartSpielerListener kommunizieren!(NSA)"+cltPort[searchServ(s)]+" "+cltIP[searchServ(s)]);
 	    ret=false;
 	}
 	else{
-	    Global.debug(this,"ok, SZE");	
+	    Global.debug(this,"ok, SZE");
 	    ret=true;
 	}
 	int si=searchServ(s);
 	servArr[si]=null;
-	
+
 	int k=0;
 	for(int i=servNum-1;i>=0;i--)
 	    if ( servArr[i]==null)
 		k++;
-	
+
 	for(int z=0;z<k;z++)
 	    for (int i=0;i<servNum;i++){
 		if (servArr[i]==null){
@@ -238,7 +244,7 @@ public class StartServer extends Thread{
 		    i=servNum;
 		    servNum--;
 		}
-		
+
 	    }
 	return ret;
     }
