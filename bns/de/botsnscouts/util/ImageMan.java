@@ -21,7 +21,8 @@ public class ImageMan {
 	SCHLAFPLATZ = 6,
 	SCHLAFSCOUT = 7,
 	KSCHLAF = 8,
-	KWACH = 9;
+        KWACH = 9,
+        WISENHEIMER_ACTIVE = 10;
 
     // PNG-IDs
     public final static int
@@ -63,6 +64,7 @@ public class ImageMan {
 	new ImageSet("images/schlafplatz.gif", 1, 1),
 	new ImageSet("images/klugschlaf.gif", 6, 6),
 	new ImageSet("images/klugwach.gif", 1, 1),
+	new ImageSet("images/kscheisser.gif", 1, 1),
     };
 
     final static int IMGSETCOUNT = imgSetDescr.length;

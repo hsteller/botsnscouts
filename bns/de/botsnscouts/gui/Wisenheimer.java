@@ -6,11 +6,13 @@ import  de.botsnscouts.autobot.*;
 import  de.botsnscouts.board.*;
 import  de.botsnscouts.server.*;
 
-/**
- * Wisenheimer
+/** Wisenheimer's logic
+ * 
  * 
  */
 public class Wisenheimer{
+
+    public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(SACanvas.class);
 
     private SpielfeldKS aiBoard;
     private Permu wirbel;
@@ -26,7 +28,7 @@ public class Wisenheimer{
 
     //berechnet den zug neu und gibt index der Karte zurück
     protected int getPrediction(ArrayList registers, ArrayList cards, Roboter robi){
-
+        CAT.debug("Wisenheimer.getPrediction() called.");
 	//teste ob alle register belegt sind
 	int t=0;
 	for (t=0;t<5;t++){
@@ -83,6 +85,7 @@ public class Wisenheimer{
     }
 
     private int getIndex(int nextprio,ArrayList robiCards){
+        CAT.debug("Wisenheimer.getIndex() called");
 	int ind=0;
 	for (int i=0; i<robiCards.size();i++){
 	    if (robiCards.get(i) != null) {
@@ -97,6 +100,7 @@ public class Wisenheimer{
 
     //gibt die nächste karte von dem berechneten zug
     public int getNextPrediction(ArrayList registers,ArrayList robiCards){
+        CAT.debug("Wisenheimer.getNextPrediction() called.");
 	//teste ob alle register belegt sind
 	int t=0;
 	for (t=0;t<5;t++){
