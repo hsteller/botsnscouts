@@ -189,7 +189,7 @@ public class Start extends JFrame implements WindowListener{
 	    for (int i=0;i<locals.length;i++){
 		locals[i]=list[i].getDisplayLanguage();
 	    }
-	    int sel=JOptionPane.showOptionDialog(null,"Please select your Language","Language selection",JOptionPane.DEFAULT_OPTION,JOptionPane.QUESTION_MESSAGE,null,locals,locals[0]);
+	    int sel=JOptionPane.showOptionDialog(null,"Please select your Language","Language selection",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,locals,locals[0]);
 	    if (sel==JOptionPane.CLOSED_OPTION){
 		myLocale=new Locale("en","US");
 	    }else{
