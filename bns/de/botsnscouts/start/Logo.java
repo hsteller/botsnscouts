@@ -7,7 +7,7 @@ import javax.swing.border.*;
 public class Logo extends JLabel {
     public Logo() {
 	super();
-	Icon icon = new ImageIcon(getClass().getResource("images/bnslogo.jpg"));
+	Icon icon = new ImageIcon(de.botsnscouts.BotsNScouts.class.getResource("images/bnslogo.jpg"));
 	setIcon( icon );
 	setBackground(Color.gray);
 	setBorder( new EtchedBorder(8) );
