@@ -45,72 +45,51 @@ public class Permu {
 	    }
 	}
 	if (j == 0){
-                //        System.err.println("Returne gültigen Zug");
             return bestZug;
         }
 	bestScore = 1000;
 	j=0;
-	while (r.getZug(j) != null) {  // kann nicht ueber r.zug.length gehen, s. 3 Z weiter oben
+	while (r.getZug(j) != null) {
 	    Roboter[] ra = new Roboter[1];
 	    ra[0] = r;
-                //System.err.println("skipping register #"+j);
 	    sf.doPhase(j+1,ra);
 	    j++;
 	}
 
-            // sortiere ka
-
-        //Karte[] so=new Karte[9];
         int len=0;
         while ((len<9)&&(ka[len]!=null))
             len++;
         Arrays.sort( ka, 0, len, Karte.INVERSE_PRIORITY_COMPARATOR );
 
-//        for (int i=0;i<len;i++){
-//            int highest=0;
-//            int highind=0;
-//            for (j=0;j<9;j++){
-//                if (ka[j]==null)
-//                    continue;
-//                if (ka[j].getprio()>highest){
-//                    highest=ka[j].getprio();
-//                    highind=j;
-//                }
-//            }
-//            so[i]=ka[highind];
-//            ka[highind]=null;
-//        }
-
-//	permut((BoardRoboter)r,so);
-	permut((BoardRoboter)r,ka);
+	permut((BoardRoboter)r,ka,0);
 	return bestZug;
     }
 
-    BoardRoboter tmp = new BoardRoboter();
-    private void permut(final BoardRoboter r, Karte[] ka) {
+    /** We need one temp per level of recursion, however we don't want to
+	create a new one on each call. */
+    private BoardRoboter[] tmp = { new BoardRoboter(), new BoardRoboter(),
+				   new BoardRoboter(), new BoardRoboter(),
+				   new BoardRoboter(), new BoardRoboter() };
+    private void permut(final BoardRoboter r, Karte[] ka, int recursionLevel) {
 	if (r.getSchaden() == 10) return;
 	int anzahl = 0;
 	for (int i = 0; i < 5; i++)
 	    if (r.getZug(i) != null) anzahl++;
-	if (anzahl == 5) {
-            // hier haben wir sowieso keine wahl
+	if (anzahl == 5) {   // end of recursion reached, 5 cards selected
             int diemalus=0;
 
-            // falls wir auf einem fliessband stehen, prüfen,
-            // ob wir nach der *ersten* phase des nächsten zuges
-            // sowieso sterben (dafür einfach jede möglichen kartentyp
-            // einmal an erster stelle simulieren
-            if (sf.bo(r.getX(),r.getY()).typ>=100){ // Fliessband
+	    // If we are standing on a conveyor belt, check what cards we need
+	    // to not die next phase
+            if (sf.bo(r.getX(),r.getY()).typ>=100){ // Belt
                 for (int i=0;i<zuege.length;i++){
-                    //BoardRoboter tmp = (BoardRoboter)Roboter.getCopy(r);
-                    tmp.initFrom(r);
-                    tmp.setZug(0,zuege[i]);
-                    sf.doPhase(1,tmp);
-                    if(tmp.getSchaden()==10) // wenn wir naechste Runde sterben ...
+                    tmp[recursionLevel].initFrom(r);
+                    tmp[recursionLevel].setZug(0,zuege[i]);
+                    sf.doPhase(1,tmp[recursionLevel]);
+                    if(tmp[recursionLevel].getSchaden()==10)
                         diemalus+=zuegemali[i];
                 }
                 if (diemalus==zuegemalisumme)
-                    return; // keine Chance ...
+                    return; // we die surely, discard this choice
             }
 
 	    int entf = sf.getBewertung(r,malus)+diemalus;
@@ -126,20 +105,18 @@ public class Permu {
 	    if (ka[i] == null)
                 continue;
 	    Karte katemp = ka[i];
-	    ka[i] = null; // ausspielen
-            tmp.initFrom( r );
+	    ka[i] = null; // play that card
+            tmp[recursionLevel].initFrom( r );
 	    int j = 0;
-	    while (tmp.getZug(j) != null) j++;
-	    tmp.setZug(j, katemp);
-	    while ((j < 5) && (tmp.getZug(j) != null)){
-		sf.doPhase(j+1,tmp);
+	    while (tmp[recursionLevel].getZug(j) != null) j++;
+	    tmp[recursionLevel].setZug(j, katemp);
+	    while ((j < 5) && (tmp[recursionLevel].getZug(j) != null)){
+		sf.doPhase(j+1,tmp[recursionLevel]);
 		j++;
 	    }
-	    permut(tmp,ka);
+	    permut(tmp[recursionLevel],ka,recursionLevel+1);
 	    ka[i] = katemp;
-
-                // Skip cards with identical action
-
+	    // Skip cards with identical action
             while ((i<8)&&((ka[i+1]==null)||(ka[i+1].getaktion().equals(katemp.getaktion()))))
                 i++;
 
