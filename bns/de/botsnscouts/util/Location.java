@@ -29,8 +29,9 @@ package de.botsnscouts.util;
  *  @author Hendrik<BR>
  */
 public class Location {
+    /**@todo SHOULD BE PRIVATE ->   REASON: HASHFUNCTION..*/
     public int x;
-    public int y;
+    public  int y;
 
     public Location() {
     }
@@ -38,6 +39,7 @@ public class Location {
     public Location(int a, int b) {
         x = a;
         y = b;
+        calcHash();
     }
 
     public Location(Location o) {
@@ -56,16 +58,33 @@ public class Location {
     public void set(int x, int y) {
         this.x = x;
         this.y = y;
+        calcHash();
     }
 
     public void set(Location o) {
         this.x = o.x;
         this.y = o.y;
+        calcHash();
+    }
+
+    public boolean equals (Object o){
+      return equals((Location)o);
     }
 
     public boolean equals(Location o) {
         return (this.x == o.x) && (this.y == o.y);
     }
+
+    int hash=0;
+    private void calcHash(){
+      hash = 100*x+y;
+    }
+
+
+    public int hashCode(){
+      return hash;
+    }
+
 
     public String toString() {
         String back = "(" + x + ", " + y + ")";
