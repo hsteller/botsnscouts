@@ -43,7 +43,7 @@ public class HotKey{
       if (key != null && HotKeyConf.isReserved(key.intValue()))
         throw new KeyReserved();
       this.keyCode = key;
-      HotKeyConf.setKeyCode(this);
+      HotKeyConf.setHotKey(this);
 
   }
 
@@ -59,7 +59,7 @@ public class HotKey{
     String [] values = action.getOptionalValues();
     this.action = action;
    // HotKeyConf.setOptionalValues(keyName, action.getOptionalValues());
-    HotKeyConf.setKeyCode(this);
+    HotKeyConf.setHotKey(this);
   }
 
   public String getName() {

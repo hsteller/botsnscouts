@@ -29,7 +29,7 @@ public class HotKeyMan {
         hotkeys.remove(k.getKeyCodeI());
         k.setKeyCode(newkeyCode);
         hotkeys.put(newkeyCode, k);
-        HotKeyConf.setKeyCode(k);
+        HotKeyConf.setHotKey(k);
       }
   }
 
@@ -77,6 +77,16 @@ public class HotKeyMan {
   public synchronized HotKey getHotKeyByName(String keyName) {
     return (HotKey) keysByName.get(keyName);
 
+  }
+
+  public synchronized void save() {
+      Iterator keys = keysByName.keySet().iterator();
+      while (keys.hasNext()){
+        String name = (String) keys.next();
+        HotKey key = (HotKey) keysByName.get(name);
+        HotKeyConf.setHotKey(key, false);
+      }
+      HotKeyConf.save();
   }
 
 

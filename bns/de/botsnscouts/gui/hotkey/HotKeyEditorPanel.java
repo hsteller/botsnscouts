@@ -58,8 +58,6 @@ public class HotKeyEditorPanel extends JPanel {
 
     this.setLayout(new GridBagLayout());
 
-//    this.setBorder(BorderFactory.createCompoundBorder());
-
     int startRow = 0;
     int startCol = 0;
     int lastLine = addHeader1(startRow, startCol);
@@ -236,7 +234,7 @@ public class HotKeyEditorPanel extends JPanel {
           try {
             Integer code = new Integer(hotKeyCode);
             HotKey old = keyman.getHotKey(code);
-            if (old == null || old.getName().equals(id)){// code is unused or the old code of hk
+            if (old == null || old.getName().equals(id)){// code is unused or the old code of id
               keyman.updateHotkeyCode(id, code); // update keycode->hotkey  and keyname->hotkey mapping in keyman
               HotKey hk = keyman.getHotKey(code);
               if (e.isActionKey())

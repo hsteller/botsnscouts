@@ -767,7 +767,12 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
             hotKeyFrame.getContentPane().add(new HotKeyEditorPanel(keyMan));
             hotKeyFrame.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e){
+                  CAT.debug("saving properties to save hotkey settings");
+                  keyMan.save(); // important, because changes done to
+                                        // chatmessages will not be saved by
+                                        // ChatMessageEditor or HotKeyEditorPanel
                   hotKeyFrame.setVisible(false);
+
                 }
             });
             hotKeyFrame.pack();

@@ -85,19 +85,27 @@ public class HotKeyConf {
   }
 
   protected static Integer getKeyCode(String keyName){
-     String s = Conf.getProperty(keyName+CODE_SUFFIX);
-     CAT.debug("loading code: name="+keyName+"\tvalue="+s);
-     if (s==null || s.trim().length()<1){
-      CAT.debug("returing null");
+     String [] s = Conf.getMultipleProperty(keyName+CODE_SUFFIX);
+     CAT.debug("loading code: name="+keyName);
+
+     if (s==null || s.length<1){
+      CAT.debug("no values, returing null");
       return null;
      }
-     s = s.trim();
+
+     String codeS = s[0];
+     if (codeS==null || codeS.length()==0){
+      CAT.warn ("code for "+keyName+" not found!");
+      return null;
+     }
+
+
      Integer back=null;
      try {
-        back = new Integer(Integer.parseInt(s));
+        back = new Integer(codeS);
      }
      catch (NumberFormatException ne){
-        char c = s.charAt(0);
+        char c = codeS.charAt(0);
         back = new Integer(c);
      }
      CAT.debug("returning for code: "+keyName+"\tvalue="+back.intValue());
@@ -106,28 +114,29 @@ public class HotKeyConf {
   }
 
 
-  protected static void setKeyCode (HotKey k){
+  protected static void setHotKey (HotKey k){
+    setHotKey(k, true);
+  }
+
+  protected static void setHotKey (HotKey k, boolean save){
    Integer code =  k.getKeyCodeI();
    if (code!=null && isReserved(code.intValue()))
       return;
    HotKeyAction act = k.getAction();
    String [] opts = act.getOptionalValues();
-   int size = (opts==null?0:opts.length);
-   String [] all = new String [size+1];
-   all[0] = (code==null?" ":code.toString());
-
-   for (int i=2;i<size;i++)
-      all[i] = opts[i-2];
-
-   Conf.setMultipleProperty(k.getName()+CODE_SUFFIX, all);
-   save();
+   String keyName = k.getName();
+   Conf.setProperty(keyName+CODE_SUFFIX, code.toString());
+   if (opts != null && opts.length>0)
+     Conf.setMultipleProperty(keyName+TEXT_SUFFIX, opts);
+   if (save)
+     save();
   }
 
   protected static String getDescription (String keyName) {
     return Message.say(MESSAGE_BUNDLE_SECTION, keyName);
   }
 
-  private static void save(){
+  protected static void save(){
     CAT.debug("saving new HotkeyConfiguration");
     Conf.saveProperties();
   }
