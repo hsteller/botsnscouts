@@ -349,9 +349,9 @@ public class HumanPlayer extends BNSThread {
 		anmeldungErfolg = comm.anmelden2(host,port,name,myColor);
 	    }
 	    catch (KommException kE) {
-		CAT.fatal(kE.getMessage());
+		CAT.warn(kE.getMessage());
 		versuche++;
-		try {Thread.sleep(1000);} catch (Exception e) {System.err.println(e.getMessage());}
+		try {Thread.sleep(1000);} catch (Exception e) {CAT.debug(e.getMessage());}
 	    }
 	}
 	return anmeldungErfolg;
@@ -361,9 +361,10 @@ public class HumanPlayer extends BNSThread {
     /** meldet den Spieler beim Server ab und beendet diesen Thread.
      */
     protected void quit() {
-        if (CAT.isDebugEnabled())
+        if (CAT.isDebugEnabled()) {
           CAT.debug(name+"was called to quit");
-	CAT.debug("sending quit to server..");
+      	  CAT.debug("sending quit to server..");
+        }
 	comm.abmelden(name);
         CAT.debug("setting condition for leaving the run()-method");
         gameOver=true;
