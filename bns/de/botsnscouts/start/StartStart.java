@@ -66,7 +66,7 @@ public class StartStart extends JPanel implements  ActionListener, MouseListener
 	panel.add(ms, gc);
 	add(BorderLayout.EAST,panel);
 
-	ImageIcon icon = ImageMan.getIcon(Message.say("STart","mBG"));
+	ImageIcon icon = ImageMan.getIcon(Message.say("Start","mBG"));
 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 	Graphics g = bgimg.getGraphics();
 	icon.paintIcon(this, g, 0,0);
