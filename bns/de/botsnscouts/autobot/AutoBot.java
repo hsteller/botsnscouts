@@ -281,7 +281,7 @@ public class AutoBot extends BNSThread {
         cat.debug("Bot destroyed. Looking for new facing.");
         for (int i = 0; i < 4; i++) {
             testRobbi.setFacing(i);
-            newDistance = DistanceCalculator.getInstance(myMap).getDistance(testRobbi);
+            newDistance = SimpleDistanceCalculator.getInstance(myMap).getDistance(testRobbi);
             if (newDistance < bestDistance) {
                 bestDistance = newDistance;
                 direction = i;

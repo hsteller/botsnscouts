@@ -60,7 +60,7 @@ public class SearchRecursively {
 
     public SearchRecursively(SimBoard s, int m) {
         sf = s;
-        calc = DistanceCalculator.getInstance(sf);
+        calc = SimpleDistanceCalculator.getInstance(sf);
         malus = m;
     }
 

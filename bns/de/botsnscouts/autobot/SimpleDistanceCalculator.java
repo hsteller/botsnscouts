@@ -44,13 +44,13 @@ import org.apache.log4j.Category;
  *  the next flag. Highly useful for the autobots and the wisenheimer.
  *  Id: $Id$
  */
-public class DistanceCalculator {
-    static final Category CAT=Category.getInstance(DistanceCalculator.class);
+public class SimpleDistanceCalculator implements DistanceCalculator {
+    static final Category CAT=Category.getInstance(SimpleDistanceCalculator.class);
 
     private int[][][] distances;
     private Board board;
 
-    private DistanceCalculator(Board board) {
+    private SimpleDistanceCalculator(Board board) {
         this.board=board;
         calculateDistances();
     }
@@ -262,10 +262,10 @@ public class DistanceCalculator {
      * of constructor. Guarantees only one DCB (which is reusable) is initialized
      * per vm.
      */
-    public static synchronized DistanceCalculator getInstance(Board board) {
+    public static synchronized SimpleDistanceCalculator getInstance(Board board) {
         if (uniqueInstances.get(board) == null)
-            uniqueInstances.put(board, new DistanceCalculator(board));
-        return (DistanceCalculator)uniqueInstances.get(board);
+            uniqueInstances.put(board, new SimpleDistanceCalculator(board));
+        return (SimpleDistanceCalculator)uniqueInstances.get(board);
     }
 
 }
