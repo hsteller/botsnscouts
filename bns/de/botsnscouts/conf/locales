@@ -1,0 +1,5 @@
+numOfLocales 	= 2
+loc0.language 	= en
+loc0.country 	= US
+loc1.language	= de
+loc1.country	= DE
