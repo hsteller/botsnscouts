@@ -180,12 +180,15 @@ public class BoardView extends JComponent {
     private static final int MOVE_ROB_ANIMATION_DELAY=5;
 
 
-
+    private static final AlphaComposite AC_SRC = AlphaComposite.getInstance(AlphaComposite.SRC);
+    private static final AlphaComposite AC_SRC_OVER = AlphaComposite.getInstance(AlphaComposite.SRC_OVER);
+    private static final AlphaComposite AC_SRC_OVER_05 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
+    private static final AlphaComposite AC_SRC_OVER_07 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
     public double getScale() {
 	return dScale;
     }
 
-    public void setScale( double scale ) {
+    public synchronized void setScale( double scale ) {
 	// adapt this Component to the scaling factor
 	dScale = scale;
 	scaledFeldSize = (dScale * FELDSIZE);
@@ -345,13 +348,13 @@ public class BoardView extends JComponent {
 
     protected void ersetzeRobos(Bot[] robos_neu){
 
-	if (!gotColors) { // jetzt bekomme ich zum erstenmal die Bot
+	if (!gotColors) { // this os the first time I get the robots
 	    setRobColors(robos_neu);
 	    robos=robos_neu;
 	}
 	// we dont want to overwrite the robots positions, because they
 	// have been updated in animateRobMove() before;
-	// animateRonMove() gets informed earlier, so overwriting the positions
+	// animateRobMove() gets informed earlier, so overwriting the positions
 	// would reset the robot back to a position he has already left
 	else {
           if (Ausgabe.enableRobMoveAnimation) {
@@ -361,8 +364,6 @@ public class BoardView extends JComponent {
 
             // replacing robot positions - if it was not destroyed -
 	    // with the positions we saved above
-
-
 	    for (int i=0;i<robos.length;i++) {
 		Bot r = robos[i];
 		Location tmp = (Location) internalPositionHash.get(r.getName());
@@ -425,28 +426,27 @@ public class BoardView extends JComponent {
     */
 
     private void moveRobNorth(Bot internal, int robocount){
-
+        //   int xpos = robot.getY()-1;
+    //   int ypos = sf.getSizeY()-robot.getY();
+    //   int xpos64 = xpos*64;
+    //   int ypos64 = ypos*64;
 
             synchronized (this){
                Graphics2D g2 = (Graphics2D) this.getGraphics();
-               AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC);
+               g2.scale(dScale, dScale);
+               AlphaComposite ac = AC_SRC;
                AlphaComposite ac2=null;
                if( internal.isVirtual() )
-                  ac2 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
+                  ac2 = AC_SRC_OVER_05;
                Image imgRob = robosCrop[internal.getFacing()+internal.getBotVis()*4];
-               int xpos = internal.getX()-1;
-               int ypos = sf.getSizeY()-internal.getY();
-               int xpos64 = xpos*64;
-               int ypos64 = ypos*64;
                int x1 = internal.getX();
                int y1 = internal.getY();
+               int xpos = x1-1;
+               int ypos = sf.getSizeY()-y1;
+               int xpos64 = xpos*64;
+               int ypos64 = ypos*64;
                int actx1 = xpos64;
                int acty1 = ypos64;
-             // direction specific:
-             //
-             //    paintFeldWithElements(g2d, x,y+1, actx, acty-64);
-             //  int xoffset=
-             //  int yoffset=
                int x2= x1;
                int y2= y1+1;
                int actx2= actx1;
@@ -469,7 +469,8 @@ public class BoardView extends JComponent {
       if (CAT.isDebugEnabled())
          CAT.debug("Move direction: SOUTH");
       if (MOVE_ROB_ANIMATION_DELAY>0){
-         Graphics2D g2 = (Graphics2D) this.getGraphics();
+          Graphics2D g2 = (Graphics2D) this.getGraphics();
+          g2.scale(dScale, dScale);
          synchronized (this){
             for (int offset=0;offset<=64;offset+=MOVE_ROB_ANIMATION_OFFSET){
                 // paintRobos(this.getGraphics(), internal);
@@ -480,9 +481,11 @@ public class BoardView extends JComponent {
          }
       }
       else {// paint without delay
+        Graphics2D g2 = (Graphics2D) this.getGraphics();
+        g2.scale(dScale, dScale);
         for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
          //  paintRobos(this.getGraphics(), internal);
-          paintRobot((Graphics2D)this.getGraphics(), internal, robocount,0,offset, true);
+          paintRobot(g2, internal, robocount,0,offset, true);
         }
       }
     }
@@ -492,6 +495,7 @@ public class BoardView extends JComponent {
       if (MOVE_ROB_ANIMATION_DELAY>0){
         synchronized (this){
            Graphics2D g2 = (Graphics2D) this.getGraphics();
+           g2.scale(dScale, dScale);
            for (int offset=0;offset<=64;offset+=MOVE_ROB_ANIMATION_OFFSET){
          //     paintRobos(this.getGraphics(), internal);
               paintRobot(g2, internal, robocount,offset,0, true);
@@ -501,9 +505,11 @@ public class BoardView extends JComponent {
         }
       }
       else {// paint without delay
+        Graphics2D g2 = (Graphics2D) this.getGraphics();
+        g2.scale(dScale, dScale);
         for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
         //  paintRobos(this.getGraphics(), internal);
-          paintRobot((Graphics2D)this.getGraphics(), internal, robocount,offset,0, true);
+          paintRobot(g2, internal, robocount,offset,0, true);
         }
       }
     }
@@ -513,6 +519,8 @@ public class BoardView extends JComponent {
       if (MOVE_ROB_ANIMATION_DELAY>0){
          synchronized (this){
            Graphics2D g2 = (Graphics2D) this.getGraphics();
+           g2.scale(dScale, dScale);
+
            for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
          //      paintRobos(this.getGraphics(), internal);
               paintRobot(g2, internal, robocount,offset,0, true);
@@ -522,9 +530,12 @@ public class BoardView extends JComponent {
          }
       }
       else { // paint without delay
+        Graphics2D g2 = (Graphics2D) this.getGraphics();
+        g2.scale(dScale, dScale);
+
         for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
     //     paintRobos(this.getGraphics(), internal);
-          paintRobot((Graphics2D)this.getGraphics(), internal, robocount,offset,0, true);
+          paintRobot(g2, internal, robocount,offset,0, true);
         }
       }
     }
@@ -695,7 +706,7 @@ public class BoardView extends JComponent {
 							*/
 
 	Graphics2D g2d = (Graphics2D) g;
-	AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
+	AlphaComposite ac = AC_SRC_OVER_05;
 	g2d.setComposite( ac );
 	g2d.setColor(c);
 	switch (laserFacing) {
@@ -728,7 +739,7 @@ public class BoardView extends JComponent {
 	    CAT.error("Ungueltige Laserrichtung: "+laserFacing);
 	}
 	}// end switch facing
-	g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+	g2d.setComposite(AC_SRC);
     }
 
 
@@ -777,7 +788,7 @@ public class BoardView extends JComponent {
     private void paintActiveBordLaser (Graphics g, Color c,int actualLength) {
 
 	Graphics2D g2d = (Graphics2D) g;
-	AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER/*, 0.5f*/);
+	AlphaComposite ac = AC_SRC_OVER;//, 0.5f
 	g2d.setComposite( ac );
 	g2d.setColor(c);
 
@@ -1166,11 +1177,11 @@ public class BoardView extends JComponent {
     // for painting crushers
     private static final int[] crushlb_x = { 20, 30, 30, 30, 40 };
     private static final int[] crushlb_y = { 35, 25, 35, 45, 35 };
-    private void paintCrusher(Graphics g2, Floor floor,
+    private void paintCrusher(Graphics2D g, Floor floor,
 		      int actx, int acty)
     {
-        Graphics2D g = (Graphics2D) g2;
-        g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+
+        g.setComposite( AC_SRC_OVER);
 	g.drawImage(diverseCrop[10],actx,acty,64,64,this);
 	g.setColor(Color.white);
 	for (int phasecount=1;phasecount<=5;phasecount++){
@@ -1186,7 +1197,7 @@ public class BoardView extends JComponent {
     private void paintSpielfeldBoden( Graphics g2 ) {
 
         Graphics2D g = (Graphics2D) g2;
-        g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+        g.setComposite(AC_SRC_OVER);
 	// Grenzen des zu zeichnenden Bereichs berechnen:
 	Rectangle clip = g.getClipBounds();
 	int x0 = clip.x / 64 + 1;
@@ -1221,7 +1232,7 @@ public class BoardView extends JComponent {
        //	if (activeBordLasers)
        // ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f);
        //else
-       ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
+       ac = AC_SRC_OVER_05;
        dbg.setComposite( ac );
 
        LaserDef actuallaser;
@@ -1260,7 +1271,7 @@ public class BoardView extends JComponent {
 	       break;
 	   }
        }
-       dbg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+       dbg.setComposite(AC_SRC);
    }
 
     /** Paints the wall(s) of a square field at position (xpos, ypos)
@@ -1357,7 +1368,7 @@ public class BoardView extends JComponent {
     private void paintWaende( Graphics g2) {
 
         Graphics2D g = (Graphics2D) g2;
-        g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+        g.setComposite( AC_SRC_OVER);
 
 
         // Grenzen des zu zeichnenden Bereichs berechnen:
@@ -1385,7 +1396,7 @@ public class BoardView extends JComponent {
     private void paintFlaggen( Graphics g2 ) {
 
         Graphics2D g = (Graphics2D) g2;
-        g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+        g.setComposite( AC_SRC_OVER);
 
         if(sf.getFlags()!=null){
 	    Location[] flaggen = sf.getFlags();
@@ -1497,10 +1508,10 @@ public class BoardView extends JComponent {
 	    int xpos64 = xpos*64;
 	    int ypos64 = ypos*64;
 	    // Scout
-	    AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
+	    AlphaComposite ac = AC_SRC_OVER_07;
 	    g2d.setComposite( ac );
 	    g.drawImage(scoutCrop[vorschauRob.getFacing()],xpos64,ypos64,64,64,this);
-	    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+	    g2d.setComposite(AC_SRC);
     }
 
 
@@ -1558,22 +1569,29 @@ public class BoardView extends JComponent {
                                            int x2, int y2, int actx2, int acty2,
                                            int xpos64, int ypos64,
                                            AlphaComposite ac, AlphaComposite ac2){
+      // erase the old robot image from the square of its original position by
+      // painting it again
       paintFeldWithElements(g2d, xpos, ypos, actx, acty);
+      // erase the old robot image from the square the robot is moving to
       paintFeldWithElements(g2d, x2, y2, actx2, acty2);
+
+
       if (ac2 != null) {// robot is virtual
-        g2d.setComposite(ac2);
-        g2d.drawImage(botImage,xpos64,ypos64,64,64,this);
-        g2d.setComposite(ac);
+        g2d.setComposite(ac2); // set the robot image to be half transparent
+        g2d.drawImage(botImage,xpos64,ypos64,64,64,this); // paint the image
+        g2d.setComposite(ac); // reset the transparency level as the next call
+                              // of this method will start with painting the
+                              // background again
       }
-      else
+      else // robot is not virtual
         g2d.drawImage(botImage,xpos64,ypos64,64,64,this);
+
       // for animating we will skip to paint the name of the bot
 
     }
 
       private void paintRobot(Graphics2D g2d, Bot robot, int robocount,
                             int xoffset, int yoffset, boolean eraseFloor){
-       g2d.scale(getScale(), getScale());
        int sfX = sf.getSizeX();
        int sfY = sf.getSizeY();
        int xpos = robot.getX()-1;
@@ -1613,12 +1631,12 @@ public class BoardView extends JComponent {
 
        if( imgRob != null ) {
           if( virtuell ) {
-	     AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
+	     AlphaComposite ac = AC_SRC_OVER_05;
 	     g2d.setComposite( ac );
 	  }
 	  g2d.drawImage(imgRob,xpos64,ypos64,64,64,this);
 	  if( virtuell ) {
-	    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+	    g2d.setComposite(AC_SRC);
 	  }
 	  String beschriftung = "" + robot.getName();
 	  g2d.setColor( robocolor[botVis] );
@@ -1731,7 +1749,7 @@ public class BoardView extends JComponent {
 	paintHighlight( dbg );
 
 	dbg.scale( dScale, dScale );
-        dbg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+        dbg.setComposite(AC_SRC);
 	paintScout( dbg );
 	paintRobos( dbg );
     }
