@@ -45,68 +45,86 @@ public class SACanvas extends JComponent {
 	void feldClicked( int x, int y, int modifiers );
     }
 
-    // directions
-    private static final int NORTH=0;
-    private static final int EAST=1;
-    private static final int SOUTH=2;
-    private static final int WEST=3;
+    /** Constant for direction/facing north*/
+    protected static final int NORTH=0;
+    /** Constant for direction/facing east*/
+    protected static final int EAST=1;
+    /** Constant for direction/facing south*/
+    protected static final int SOUTH=2;
+    /** Constant for direction/facing west*/
+    protected static final int WEST=3;
 
 
     private JScrollPane myScrollPane;
-    private static final int FELDSIZE = 64; // Grösse der Felder in Pixeln
 
-    /** Anzahl der Schritte in denen der Laser gezeichnet wird.
-     */
+   /** size (length and width) of one little field in pixels*/
+    private static final int FELDSIZE = 64;
+
+    /**Number of single steps a laser animation is drawn.*/
     private static final int FULL_LENGTH_INT=30;
-    /** Anzahl der Schritte in denen der Laser gezeichnet wird.
-     */
+
+    /**Number of single steps a laser animation is drawn.*/
     private static final double FULL_LENGTH_DOUBLE=30.0;
 
 
     // for painting active Lasers
-    // private boolean drawRobLaser;
-    //private boolean drawBordLaser;
+    /** position of firing robot*/
     private Ort source;
+    /**position of robot hit*/
     private Ort target;
+    /** facing (direction) of the laser, according to the directions above*/
     private int laserFacing;
     private boolean activeBordLasers;
 
-    // Farben fuer die Laser; Staerken von 1 bis 3
-    static final Color[] laserColor = { Color.red.brighter(),
-					Color.orange,
-					Color.yellow };
+    /** contains colors of the boardlasers, strength 1 to 3*/
+    static final Color[] laserColor = { Color.red.brighter(),//strength 1
+					Color.orange,//strength 2
+					Color.yellow };//strength 3
 
-    // Zum Nachschauen, welche Farbe ein Roboter hat (anhand der Roboternamen)
+    /** To lookup the color of a robot; contains name->color mapping.*/
     private java.util.Hashtable nameToColorHash;
     private boolean gotColors;
 
-    // Ueberbleibsel zum bestimmen der Laserfarbe fuer statische Laser;
-    // koennte wegoptimiert werden
-    private LaserDef actuallaser;
 
-    private AudioClip [] mLaserWav;
+
+    /** sounds for robotlasers*/
+    private static AudioClip [] laserSounds;
+
     /** YOU MUST NOT USE THIS VARIABLE DIRECTLY.
 	use isSoundActive() instead.
-    */
+        Used to check whether sounds should be played or not*/
     private boolean soundActive;
 
+    /** Do we have sounds to play?*/
     private boolean soundsLoaded=false;
+
+    /** Stores the position (in laserSounds) of the last played lasersound.*/
     private int laserWavCount;
-    private static final String SOUND_DIR="de/botsnscouts/sounds";
-    private static SoundFileFilter soundFilter = new SoundFileFilter();
+
+
+    /** where are the sounds, if we are not using getResource() to find out */
+    //  private static final String SOUND_DIR="de/botsnscouts/sounds";
+    /** used to select the file(types) we want*/
+    // private static SoundFileFilter soundFilter = new SoundFileFilter();
 
 
     private Image dbi;
+    /** some board elements..*/
     private Image[] cbeltCrop,ebeltCrop,diverseCrop,robosCrop,scoutCrop;//,robosCrop2;
 
     private int x,y;
 
-
+    /** Stores data of the robots.*/
     private Roboter[] robos;
+    /** This robot is used for calculations,
+     *  like making a suggestion for the next move.
+     */
     private Roboter vorschauRob;
-    //private Color[] robocolor2;
+
+    /** last position of our famous scout ;-) */
     private Ort lastScoutPos = new Ort();
 
+    // Let's define some colors, so that everybody uses the same..
     public static final Color GREEN  = new Color(4,156,52);
     public static final Color YELLOW = new Color(251,253,4);
     public static final Color RED    = new Color(252,2,4);
@@ -122,12 +140,19 @@ public class SACanvas extends JComponent {
     /** Die Farben der Roboter*/
     public static final Color [] robocolor = {GREEN,YELLOW,RED,BLUE,ROSA,ORANGE,GRAY,VIOLET};
 
-
+    /** gameboard object;
+     *  stores the information about the board we are playing on;
+     *  (where are the pits, where are lasers, and so on..)
+     */
     SpielfeldSim sf;
+
+    /** scale factor for zooming*/
     private double dScale = 1.0;
     boolean rescaled = true;
 
-    double scaledFeldSize; // FELDSIZE * Skalierung
+    double scaledFeldSize; // FELDSIZE * scale
+
+    /** position to highlight*/
     Ort highlightPos = new Ort(0,0);
 
     ClickListener myClickListener;
@@ -162,49 +187,6 @@ public class SACanvas extends JComponent {
 
     public SACanvas(SpielfeldSim sf_neu, Color [] robColors){
 	init( sf_neu, robColors );
-        // jetzt: robocolor2 == robColors
-
-        /*
-	robosCrop2 = new Image[32];
-
-	// umkopieren der Roboterbilder
-	for (int i=0;i<robocolor2.length;i++) {
-	    if (robocolor2[i]==null)
-		break;
-	    if (robocolor2[i].equals(GREEN)){
-		for (int j=0;j<4;j++)
-		    robosCrop2[4*i+j]=robosCrop[j];
-	    }
-	    else if (robocolor2[i].equals(YELLOW)) {
-		for (int j=0;j<4;j++)
-		    robosCrop2[4*i+j]=robosCrop[j+4];
-	    }
-	    else if (robocolor2[i].equals(RED)) {
-		for (int j=0;j<4;j++)
-		    robosCrop2[4*i+j]=robosCrop[j+8];
-	    }
-	    else if (robocolor2[i].equals(BLUE)) {
-		for (int j=0;j<4;j++)
-		    robosCrop2[4*i+j]=robosCrop[j+12];
-	    }
-	    else if (robocolor2[i].equals(ROSA)){
-		for (int j=0;j<4;j++)
-		    robosCrop2[4*i+j]=robosCrop[j+16];
-	    }
-	    else if (robocolor2[i].equals(ORANGE)) {
-		for (int j=0;j<4;j++)
-		    robosCrop2[4*i+j]=robosCrop[j+20];
-	    }
-	    else if (robocolor2[i].equals(GRAY)) {
-		for (int j=0;j<4;j++)
-		    robosCrop2[4*i+j]=robosCrop[j+24];
-	    }
-   	    else if (robocolor2[i].equals(VIOLET)) {
-		for (int j=0;j<4;j++)
-		    robosCrop2[4*i+j]=robosCrop[j+28];
-	    }
-	}
-        */
 	mouseInit();
     }
 
@@ -246,9 +228,9 @@ public class SACanvas extends JComponent {
 			}
 
 			int l = v.size();
-			mLaserWav = new AudioClip [l];
+			laserSounds = new AudioClip [l];
 			for (int i=0;i<l;i++)
-			    mLaserWav[i] = (AudioClip) v.elementAt(i);
+			    laserSounds[i] = (AudioClip) v.elementAt(i);
 			soundsLoaded=true;
 			CAT.debug("Sounds loaded!");
 		    }
@@ -257,20 +239,27 @@ public class SACanvas extends JComponent {
 		    }
 		    */
 		    // fuer Jars
-		    mLaserWav = new AudioClip[2];
-		    mLaserWav [0] = Applet.newAudioClip(BotsNScouts.class.getResource("sounds/laserhit.wav"));
-		    mLaserWav [1] = Applet.newAudioClip(BotsNScouts.class.getResource("sounds/laser2.wav"));
-		    boolean error = false;
-		    if (mLaserWav [0] == null) {
-			CAT.debug("laserhit.wav not located :-(");
+		    laserSounds = new AudioClip[2];
+                    CAT.debug("loading sounds/laserhit.wav..");
+		    laserSounds [0] = Applet.newAudioClip(BotsNScouts.class.getResource("sounds/laserhit.wav"));
+                    if (CAT.isDebugEnabled()){
+                      CAT.debug("..done");
+                      CAT.debug("loading sounds/laser2.wav..");
+                    }
+		    laserSounds [1] = Applet.newAudioClip(BotsNScouts.class.getResource("sounds/laser2.wav"));
+		    CAT.debug("..done");
+
+                    boolean error = false;
+		    if (laserSounds [0] == null) {
+			CAT.warn("laserhit.wav not located :-(");
 			error=true;
 		    }
-		    if (mLaserWav [1] == null){
-			CAT.debug("laser2.wav not located :-(");
+		    if (laserSounds [1] == null){
+			CAT.warn("laser2.wav not located :-(");
 			error = true;
 		    }
 		    if (error)
-			CAT.debug("Failed to load sounds; sounds deactivated");
+			CAT.error("Failed to load sounds; sounds deactivated");
 		    else{
 			CAT.debug("Sounds loaded!");
 			soundsLoaded=true;
@@ -397,6 +386,8 @@ public class SACanvas extends JComponent {
 	    else
 		nameToColorHash.put (robs[i].getName(), robocolor[robs[i].getBotVis()]);
     }
+
+
     /** Lookup the Robot's color (by name)
 	@param name The Robot's name
 	@return The Robot's color. If the name is unknown, Color.white will be returned,
@@ -412,15 +403,12 @@ public class SACanvas extends JComponent {
     }
 
 
-    protected void ersetzeRobos(Roboter[] robos_neu){
 
+    protected void ersetzeRobos(Roboter[] robos_neu){
 	if (!gotColors) // jetzt bekomme ich zum erstenmal die Roboter
 	    setRobColors(robos_neu);
-
-
 	robos=robos_neu;
 	repaint();
-
     }
 
 
@@ -429,8 +417,9 @@ public class SACanvas extends JComponent {
 
 
     /**
-       @param sourceRob Die Position des schiessenden Roboters
-       @param targetRob Die Positon des getroffenen Roboters
+     * Draws animated robot lasers.
+       @param sourceRob position of firing robot
+       @param targetRob position of the robot hit
     */
 
     public void doRobLaser (Roboter sourceRob, Roboter targetRob ) {
@@ -442,7 +431,7 @@ public class SACanvas extends JComponent {
 
 	Color c = getRobColor(sourceRob.getName());
 	if (isSoundActive()) {
-	    mLaserWav[laserWavCount%(mLaserWav.length)].play();
+	    laserSounds[laserWavCount%(laserSounds.length)].play();
 	    synchronized(this){
 		try {
 		    wait (50);
@@ -856,6 +845,7 @@ public class SACanvas extends JComponent {
 	}
     }
 
+    // for painting crushers
     private static final int[] crushlb_x = { 20, 30, 30, 30, 40 };
     private static final int[] crushlb_y = { 35, 25, 35, 45, 35 };
     private void paintCrusher(Graphics g, Boden boden,
@@ -872,6 +862,7 @@ public class SACanvas extends JComponent {
 	} //for
     }
 
+    /** paints the (back-)ground of the board*/
     private void paintSpielfeldBoden( Graphics g ) {
 
 	// Grenzen des zu zeichnenden Bereichs berechnen:
@@ -901,8 +892,7 @@ public class SACanvas extends JComponent {
 
 
 
-    /** Hier werden die normalen Spielfeldlaser gezeichnet
-     */
+    /** Paints the boardlaser-elements*/
    private  void paintLaserStrahlen( Graphics g ) {
        Graphics2D dbg = (Graphics2D) g;
        AlphaComposite ac=null;
@@ -912,7 +902,7 @@ public class SACanvas extends JComponent {
        ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
        dbg.setComposite( ac );
 
-
+       LaserDef actuallaser;
        for (Enumeration e = sf.getLasers().elements(); e.hasMoreElements();){
 	   actuallaser = ((LaserDef) e.nextElement());
 	   int lx = actuallaser.x-1;
@@ -1116,6 +1106,7 @@ public class SACanvas extends JComponent {
 	    });
 
 	t.setRepeats(false);
+        this.paintHighlight((Graphics2D)this.getGraphics());
 	t.start();
 	repaintOrt(x,y);
     }
@@ -1180,6 +1171,11 @@ public class SACanvas extends JComponent {
 		}
 	    }
 	}
+    }
+
+    protected Image getRobImage(Roboter robot, int facing){
+      int botVis = robot.getBotVis();
+      return robosCrop[facing+botVis*4];
     }
 
     private void paintHighlight(Graphics2D g) {
@@ -1262,6 +1258,11 @@ public class SACanvas extends JComponent {
 	paint(g);
     }
 
+    protected Ort [] getFlags() {
+      return sf.getFlaggen();
+    }
+
+
     public Image getThumb(int size) {
 	/*
 	BufferedImage bi = new BufferedImage(x, y, BufferedImage.TYPE_INT_RGB);
@@ -1301,6 +1302,9 @@ public class SACanvas extends JComponent {
 	setSize(x,y);
     }
 
+
+
+  // Little helper for getting thumbnails of the board
     private static SACanvas sac = null;
     public static Image createThumb(SpielfeldSim sim, int size) {
 	if( sac == null ) {
@@ -1310,6 +1314,8 @@ public class SACanvas extends JComponent {
 	}
 	return sac.getThumb(size);
     }
+
+
 
 }
 
