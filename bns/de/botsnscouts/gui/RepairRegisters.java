@@ -60,9 +60,19 @@ public class RepairRegisters extends JPanel implements ActionListener{
     }
 
     public ArrayList getSelection() {	
-	ArrayList lst=new ArrayList(5);
+	int cntr=0;
+	boolean[] torepair=new boolean[5];
 	for(int i=0;i<registers.size();i++){
-	    lst.add(new Boolean(((RegisterView)registers.get(i)).locked()));
+	    torepair[i]=locked[i]&&(!(((RegisterView)registers.get(i)).locked()));
+	    if(torepair[i]){
+		cntr++;
+	    }
+	}
+	ArrayList lst=new ArrayList(cntr);
+	for(int i=0;i<registers.size();i++){
+	    if(torepair[i]){
+		lst.add(new Integer(i));
+	    }
 	}
 	return lst;
     }
