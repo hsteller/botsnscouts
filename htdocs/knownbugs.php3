@@ -32,10 +32,10 @@ You want to join development? Mmhpf, there are some problems:
 <UL>
 <LI>There is a lot of cruft in the source code. A lot of pretty ugly spots. This project has quite some history now... </LI>
 <LI>The underlying protocols (network communication and board files) are crap.
-We do not understand them anymore nor do we wish to. We want to replace them...
+We do not understand them anymore nor do we wish to. We want to replace them...<BR>
  ... when we find the time.</LI>
 <LI>To make it even worse: You need a sound knowledge of German to read the source code. WE ARE SORRY. (To all young developers out there: Do never start coding and commenting in your native language unless it is not English! Even if you do not think of ever publishing it, it might happen. And you really have a hard time then, getting your code translated.)<BR>
-Well, in between the state of translation has improved. When you find a lot of German in the code this is a sign that it has not been touched a long time and is propably ugly anyway... 
+Well, in between the state of translation has improved. When you find a lot of German in the code this is a sign that it has not been touched a long time and is propably ugly anyway.
 </UL>
 But if you manage: Please use the 
 <A HREF="http://sourceforge.net/cvs/?group_id=3883">CVS version</A>
