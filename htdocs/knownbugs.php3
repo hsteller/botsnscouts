@@ -26,19 +26,21 @@ We still are currently working on:
 <LI>in the long term: option cards
 <LI>more cool features (know of any? <a href="mailto:botsnscouts-devel@lists.sorceforge.net">contact</a> us!)
 </UL>
-<H2>Known Bugs in V0.7.1: (Don't use it anymore!)</H2>
-<UL>
-<LI>There appear to be problems occuring only with JDK1.3! <BR>Try JDK1.2 or wait until we fixed it, sorry.  
-<LI>On real multi-user operating systems you cannot save tiles if you haven't installed Bots'n'Scouts yourself.
-<LI>Sometimes the scrollbars don't work. Try resizing the window or use the right mouse button to scroll.
-<LI>Layout is nicer with higher monitor resolution. 800 x 600 causes some minor problems.
-<LI>Adjust the size of the board and the number of auto-bots to the power of your computer. 
-<LI>Confirming "game over" at the end of the game _IMMEDIATELY_ stops everything,
-including the server. Don't confirm if the other players want to continue. 
-<LI>You may set only up to six flags and no more than eight players. The names must not contain anything but letters from 'A' to 'z', sorry.
-<LI>Linux: "fullscreen.sh" is experimental. Read README.fullscreen which comes with your distribution.
-<LI> We haven't written FAQ yet.
-</UL>
 <P>
+<H2>Development</H2>
+You want to join development? Mmhpf, there are some problems:
+<UL>
+<LI>There is a lot of cruft in the source code. A lot of pretty ugly spots. This project has quite some history now... </LI>
+<LI>The underlying protocols (network communication and board files) are crap.
+We do not understand them anymore nor do we wish to. We want to replace them...
+ ... when we find the time.</LI>
+<LI>To make it even worse: You need a sound knowledge of German to read the source code. WE ARE SORRY. (To all young developers out there: Do never start coding and commenting in your native language unless it is not English! Even if you do not think of ever publishing it, it might happen. And you really have a hard time then, getting your code translated.)<BR>
+Well, in between the state of translation has improved. When you find a lot of German in the code this is a sign that it has not been touched a long time and is propably ugly anyway... 
+</UL>
+But if you manage: Please use the 
+<A HREF="http://sourceforge.net/cvs/?group_id=3883">CVS version</A>
+for reading and hacking, and send us patches.<P>
+You want to use this project as an example in a university course? Uhhm, see above and read the source... <P>
+There is still hope, we continue to refactor and translate and optimze sometimes we might even add new features...
 </div>
 <?php include('bnsfooter.pht');?>
