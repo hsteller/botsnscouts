@@ -14,7 +14,7 @@ import javax.swing.border.*;
  */
 
 public class HumanView extends JPanel implements HumanViewInterface {
-    
+
     private HumanPlayer human;
     private CardLayout panelSwitcher = new CardLayout();
     private JPanel scoutNFriends = new JPanel();
@@ -83,7 +83,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 		    sendRepairRegisters();
 		}
 	    });
-	
+
 	cards = new CardArray(new ActionListener(){
 		public void actionPerformed(ActionEvent cardKlick) {
 		    treatCardKlick((CardView) cardKlick.getSource());
@@ -95,7 +95,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 				      }
 				  }
 			      );
-	
+
 	registers = new RegisterArray(new ActionListener(){
 		public void actionPerformed(ActionEvent registerKlick) {
 		    treatRegisterKlick((RegisterView) registerKlick.getSource());
@@ -140,7 +140,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	    d("All Registes locked!");
 	    cards.activateButton();
 	}
-	
+
     }
 
 
@@ -225,7 +225,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	    if (predCard==-1){
 		wisenheimerView.setSelected(false);
 	    }
-	    
+
 	}
 	cards.setWisenheimer(predCard);
     }
@@ -359,6 +359,8 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	    removeScout();
 	}
     }
+
+
 
     private void d(String s) {
 	Global.debug(this,s);

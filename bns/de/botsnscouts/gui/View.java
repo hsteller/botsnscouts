@@ -9,15 +9,40 @@ import java.awt.image.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import org.apache.log4j.Category;
+
 /**
  * Helferklasse, die die Komponenten auf dem Bildschirm plaziert
  * @author Lukasz Pekacki
  */
 
 public class View extends JFrame {
+    static Category CAT = Category.getInstance(View.class);
+
+    private JMenuBar menus;
 
     AusgabeView ausgabeView;
     HumanView humanView;
+
+
+    protected final int LANGSAM = 2000;
+    protected final int MITTEL = 200;
+    protected final int UNGEBREMST = 0;
+    protected final boolean NURAUSGABE = true;
+    protected final boolean MENSCHAUSGABE = false;
+
+
+
+    private boolean soundOn=false;
+
+
+    JMenuItem lSpeed;
+    JMenuItem mSpeed;
+    JMenuItem hSpeed;
+    int speed = MITTEL;
+
+
+
 
     public View() {
 	setTitle(Message.say("AusgabeFrame","gameName"));
@@ -68,22 +93,60 @@ public class View extends JFrame {
 
 	// Layout erzeugen
 	getContentPane().setLayout(new BorderLayout());
-	
+        addMenuBar();
+
+    }
+
+    private void addMenuBar(){
+      if (menus==null){
+        CAT.debug("menus==null; getting menus..");
+        if (ausgabeView!=null){
+           menus = ausgabeView.getMenuBar();
+           this.setJMenuBar(menus);
+           menus.setVisible(true);
+        }
+        else {
+          CAT.debug("unable to install MenuBar! No AusgabeView found!");
+        }
+      }
+      else {
+        CAT.debug("menus already loaded!\n Now setting them..");
+        this.setJMenuBar(menus);
+      }
+      CAT.debug("Leaving addMenubar");
     }
 
     protected void makeVisible() {
+        CAT.debug("makeVisible called");
+        addMenuBar();
+        if (CAT.isDebugEnabled())
+          CAT.debug("menubar is "+menus);
 	validate();
 	setVisible(true);
     }
 
 
     public void addAusgabeView(AusgabeView av) {
-	getContentPane().add(av, BorderLayout.CENTER);
+        CAT.debug("addAusgabeView called");
+	if (ausgabeView==null) {
+          CAT.debug("ausgabeView is null");
+          ausgabeView=av;
+          this.addMenuBar();
+        }
+        getContentPane().add(av, BorderLayout.CENTER);
+
     }
 
     public void addChatPane(ChatPane cp){
 	getContentPane().add(cp, BorderLayout.SOUTH);
     }
+
+
+
+
+
+
+
 }
 
 

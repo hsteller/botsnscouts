@@ -24,7 +24,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private Hashtable robotCardStatus = new Hashtable(8);
     private StatusLog statusLog = new StatusLog();
     private JMenu optTrack = new JMenu("Track");
-
+    private JMenuBar menus = new JMenuBar();
 
 
 
@@ -33,6 +33,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      *  null sonst.
      */
     public AusgabeView() {
+        super();
+        this.initMenus();
     }
 
     public AusgabeView(SACanvas sa, Roboter[] robots, Ausgabe aus) {
@@ -84,6 +86,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	spielFeld.setScrollPane(spielFeldScrollFenster);
 	add(spielFeldScrollFenster,BorderLayout.CENTER);
 	spielFeldView = spielFeldScrollFenster.getViewport();
+        this.initMenus();
 
     }
 
@@ -209,7 +212,73 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       return optTrack;
     }
 
-}
+    protected JMenuBar getMenuBar() {
+      return menus;
+    }
 
+
+    private void initMenus() {
+
+      menus.add(new HelpMenu());
+      menus.add(new ZoomMenu());
+
+
+    }
+
+
+    private class HelpMenu extends JMenu {
+      HelpMenu () {
+        super (Message.say("AusgabeFrame","mHelpMenuName"));
+        JMenuItem about = new JMenuItem(Message.say("AusgabeFrame","mAbout"));
+	about.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    new AboutFenster();
+		}
+	    });
+      }
+
+    }
+
+    private class ZoomMenu extends JMenu implements ActionListener {
+	ZoomMenu() {
+	    super("Zoom");
+	    ButtonGroup group = new ButtonGroup();
+	    JRadioButtonMenuItem item = null;
+	    for(int d = MIN_ZOOM; d <= MAX_ZOOM; d += ZOOM_STEP ) {
+		item = new JRadioButtonMenuItem( "" + d + "%" );
+		item.setActionCommand("" + d);
+		item.addActionListener( this );
+		super.add( item );
+		group.add( item );
+	    }
+	    if( item != null ) {
+		group.setSelected( item.getModel(), true );
+	    }
+	}
+        public void actionPerformed(ActionEvent e) {
+	    int iScale;
+	    try {
+		String s = e.getActionCommand();
+	        iScale = Integer.parseInt( s );
+	    } catch( NumberFormatException ne ) {
+	        iScale = 10;
+		Global.debug(this, "bad zommmenu action command. using default 100%");
+	    }
+	    final double sc = iScale / 100.0;
+	    SwingUtilities.invokeLater( new Runnable() {
+		    public void run() {
+			 spielFeld.setScale( sc );
+		    }
+		});
+	}
+  }
+
+    // Einstellungen fuers Zoom-Menu
+    protected static final int MIN_ZOOM = 40;
+    protected static final int MAX_ZOOM = 100;
+    protected static final int ZOOM_STEP = 10;
+
+
+}
 
 

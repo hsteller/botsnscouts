@@ -22,16 +22,7 @@ import javax.swing.plaf.metal.*;
 public class HumanPlayer extends Thread {
     static Category CAT = Category.getInstance(SACanvas.class);
 
-    protected final int LANGSAM = 2000;
-    protected final int MITTEL = 200;
-    protected final int UNGEBREMST = 0;
-    protected final boolean NURAUSGABE = true;
-    protected final boolean MENSCHAUSGABE = false;
 
-    // Einstellungen fuers Zoom-Menu
-    protected static final int MIN_ZOOM = 40;
-    protected static final int MAX_ZOOM = 100;
-    protected static final int ZOOM_STEP = 10;
 
     protected final static int MODE_PROGRAM = 0;
     protected final static int MODE_OTHER = 1;
@@ -50,7 +41,7 @@ public class HumanPlayer extends Thread {
     private boolean gameOver = false, nosplash = false;
     private Wisenheimer wisenheimer;
 
-    private boolean soundOn=false;
+
 
     public HumanPlayer (String host, int port, String name) {
 	this(host,port,name,-1);
@@ -392,15 +383,6 @@ public class HumanPlayer extends Thread {
 	return wisenheimer.getPrediction(registerList, cardList, ausgabe.getRob(name));
     }
 
-    /**
-     * Schreibt in die Statuszeile einen Text
-     */
-    private void showMessage(String s){
-	// Logframe instanziieren, falls nötig
-	ausgabe.showActionMessage(s);
-    }
-
-
     private void initIntelligentBoard()
     {
 	int dimx, dimy;
@@ -428,160 +410,25 @@ public class HumanPlayer extends Thread {
     private void initView() {
 	humanView = new HumanView(this);
 	view=new View(humanView);          // adds the humanView to the JFrame
-	ausgabe = new Ausgabe(host, port, nosplash, this, view);   //adds the AusgabeView to the JFrame
+	ausgabe = new Ausgabe(host, port, nosplash, view);   //adds the AusgabeView to the JFrame
 	ausgabe.initialize();
 	ausgabe.start();
 	ChatPane chatpane=new ChatPane(this);
 	view.addChatPane(chatpane);
-        initMenus( view, ausgabe.getAusgabeView().getTrackMenu() );
-    }
-
-    JMenuItem lSpeed;
-    JMenuItem mSpeed;
-    JMenuItem hSpeed;
-    int speed = MITTEL;
-
-
-    private void initMenus(JFrame frame, JMenu trackMenu) {
-
-	// Menüleiste einfügen
-	JMenuBar hauptMenu = new JMenuBar();
-	MenuBarListener mBL = new MenuBarListener();
-
-	JMenu dateiMenu = new JMenu(Message.say("AusgabeFrame","mFile"));
-	JMenuItem mBeenden = new JMenuItem((Message.say("AusgabeFrame","mFinish")));
-	mBeenden.addActionListener(mBL);
-	dateiMenu.add(mBeenden);
-	hauptMenu.add(dateiMenu);
-
-	JMenu optionenMenu = new JMenu((Message.say("AusgabeFrame","mOptions")));
-	JMenu optSpeed = new JMenu((Message.say("AusgabeFrame","mSpeed")));
-
-	JMenu soundMenu = new JMenu ((Message.say("AusgabeFrame","mSound")));
-	JCheckBoxMenuItem soundBox = new JCheckBoxMenuItem(Message.say("AusgabeFrame","mSoundOn"), soundOn);
-	soundBox.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e){
-		    soundOn = !soundOn;
-		    //soundBox.setSelected(soundOn);
-		    ausgabe.getAusgabeView().getSpielfeld().setSoundActive(soundOn);
-		    CAT.debug("Setting sound to "+soundOn);
-		}
-	    });
-	soundMenu.add(soundBox);
-	optionenMenu.add(soundMenu);
-	SpeedMenuListener speedListener= new SpeedMenuListener();
-
-	ButtonGroup speedGroup = new ButtonGroup();
-
-	lSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mSlow"),false);
-	lSpeed.addActionListener(speedListener);
-	speedGroup.add(lSpeed);
-	optSpeed.add(lSpeed);
-	mSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mMiddle"),true);
-	mSpeed.addActionListener(speedListener);
-	speedGroup.add(mSpeed);
-	optSpeed.add(mSpeed);
-	hSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mFast"),false);
-	hSpeed.addActionListener(speedListener);
-	optSpeed.add(hSpeed);
-	speedGroup.add(hSpeed);
-	optionenMenu.add(optSpeed);
-
-	JMenu scrollFlag = new JMenu (Message.say("AusgabeFrame","mflagMenu"));
-	optionenMenu.add(scrollFlag);
-
-	//JMenu optTrack = new JMenu((Message.say("AusgabeFrame","mRoboTrack")));
-	optionenMenu.add(trackMenu);
-
-	hauptMenu.add(optionenMenu);
-	hauptMenu.add( new ZoomMenu() );
-	JMenu help = new JMenu(Message.say("AusgabeFrame","mHelpMenuName"));
-	JMenuItem about = new JMenuItem(Message.say("AusgabeFrame","mAbout"));
-	about.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    new AboutFenster();
-		}
-	    });
-	help.add(about);
-	hauptMenu.add(help);
-
-
-	view.setJMenuBar(hauptMenu);
-    }
-
-
-    private class SpeedMenuListener implements ActionListener {
-	public void actionPerformed(ActionEvent e) {
-	    Global.debug(this,"Speed-Menu klicked");
-	    if (e.getSource() == lSpeed) {
-		speed=LANGSAM;
-		showMessage(Message.say("AusgabeFrame","gAufLang"));
-	    }
-	    else if (e.getSource() == mSpeed) {
-		speed=MITTEL;
-		showMessage(Message.say("AusgabeFrame","gAufMitt"));
-	    }
-	    else {
-		speed=UNGEBREMST;
-	        showMessage(Message.say("AusgabeFrame","gAufUn"));
-	    }
-
-	}
-    }
-
-
-    private class ZoomMenu extends JMenu implements ActionListener {
-	ZoomMenu() {
-	    super("Zoom");
-	    ButtonGroup group = new ButtonGroup();
-	    JRadioButtonMenuItem item = null;
-	    for(int d = MIN_ZOOM; d <= MAX_ZOOM; d += ZOOM_STEP ) {
-		item = new JRadioButtonMenuItem( "" + d + "%" );
-		item.setActionCommand("" + d);
-		item.addActionListener( this );
-		super.add( item );
-		group.add( item );
-	    }
-	    if( item != null ) {
-		group.setSelected( item.getModel(), true );
-	    }
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    int iScale;
-	    try {
-		String s = e.getActionCommand();
-	        iScale = Integer.parseInt( s );
-	    } catch( NumberFormatException ne ) {
-	        iScale = 10;
-		Global.debug(this, "bad zommmenu action command. using default 100%");
-	    }
-	    final double sc = iScale / 100.0;
-	    SwingUtilities.invokeLater( new Runnable() {
-		    public void run() {
-			ausgabe.getAusgabeView().getSpielfeld().setScale( sc );
-		    }
-		});
-	}
+        CAT.debug("calling addMenuBar()");
     }
 
 
 
 
-    /**
-     * Wartet auf einen Menuklick
-     */
-    private class MenuBarListener implements ActionListener {
 
-	public void actionPerformed (ActionEvent e) {
-	    String mPunkt = e.getActionCommand();
-	    if (mPunkt.equals(Message.say("AusgabeFrame","mFinish"))) {
-                comm.abmelden( name );
-                ausgabe.abmelden();
-		view.dispose();
-	    }
-	}
-    }
+
+
+
+
+
+private void showMessage(String foo){
+}
 
 
     static class RoboTrackListener implements ActionListener {
@@ -596,6 +443,9 @@ public class HumanPlayer extends Thread {
 	}
     }
 
+    private void abmelden() {
+      comm.abmelden(name);
+    }
 
 
     private void d(String s) {

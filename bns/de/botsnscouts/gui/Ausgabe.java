@@ -11,14 +11,16 @@ import java.net.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
+import org.apache.log4j.Category;
 
 /**
  * view logic
  * @author Lukasz Pekacki
  */
 public class Ausgabe extends Thread {
+    static Category CAT = Category.getInstance(Ausgabe.class);
 
-    private HumanPlayer human;
+   // private HumanPlayer human;
     private KommClientAusgabe kommClient;
     private ClientAntwort kommAntwort = new ClientAntwort();
     private AusgabeView ausgabeView;
@@ -48,9 +50,9 @@ public class Ausgabe extends Thread {
 	this (host,port,nosplash);
     }
 
-    public Ausgabe(String host, int port, boolean nosplash, HumanPlayer human, View v) {
+    public Ausgabe(String host, int port, boolean nosplash,/* HumanPlayer human,*/ View v) {
 	this(host, port, nosplash);
-	this.human = human;
+	//this.human = human;
 	this.view =v;
     }
 
@@ -314,9 +316,10 @@ public class Ausgabe extends Thread {
 		    view=new View(ausgabeView);
 		}
 		else {
-		    view.addAusgabeView(ausgabeView);
+                    view.addAusgabeView(ausgabeView);
 		    view.makeVisible();
-		}
+                }
+
 		removeSplash();
 
 		// send OK to server
@@ -475,6 +478,116 @@ public class Ausgabe extends Thread {
       kommClient.abmelden( name );
     }
 
+/*
+
+
+
+
+    }
+
+
+    private class MenuBarListener implements ActionListener {
+
+	public void actionPerformed (ActionEvent e) {
+	    String mPunkt = e.getActionCommand();
+	    if (mPunkt.equals(Message.say("AusgabeFrame","mFinish"))) {
+
+		dispose();
+	    }
+	}
+    }
+
+
+    private class SpeedMenuListener implements ActionListener {
+	public void actionPerformed(ActionEvent e) {
+	    Global.debug(this,"Speed-Menu klicked");
+	    if (e.getSource() == lSpeed) {
+		speed=LANGSAM;
+		showMessage(Message.say("AusgabeFrame","gAufLang"));
+	    }
+	    else if (e.getSource() == mSpeed) {
+		speed=MITTEL;
+                if (humanView!=null)
+                    ausgabe.showMessage(Message.say("AusgabeFrame","gAufMitt"));
+                if (ausgabeView!=null)
+		  ausgabeView.showMessage(Message.say("AusgabeFrame","gAufMitt"));
+
+            }
+	    else {
+		speed=UNGEBREMST;
+	        showMessage(Message.say("AusgabeFrame","gAufUn"));
+	    }
+
+	}
+    }
+
+     private void initMenus(JFrame frame, JMenu trackMenu) {
+
+	// Menüleiste einfügen
+	JMenuBar hauptMenu = new JMenuBar();
+	MenuBarListener mBL = new MenuBarListener();
+
+	JMenu dateiMenu = new JMenu(Message.say("AusgabeFrame","mFile"));
+	JMenuItem mBeenden = new JMenuItem((Message.say("AusgabeFrame","mFinish")));
+	mBeenden.addActionListener(mBL);
+	dateiMenu.add (mBeenden);
+	hauptMenu.add(dateiMenu);
+
+	JMenu optionenMenu = new JMenu((Message.say("AusgabeFrame","mOptions")));
+	JMenu optSpeed = new JMenu((Message.say("AusgabeFrame","mSpeed")));
+
+	JMenu soundMenu = new JMenu ((Message.say("AusgabeFrame","mSound")));
+	JCheckBoxMenuItem soundBox = new JCheckBoxMenuItem(Message.say("AusgabeFrame","mSoundOn"), soundOn);
+	soundBox.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e){
+		    soundOn = !soundOn;
+		    //soundBox.setSelected(soundOn);
+		    ausgabe.getAusgabeView().getSpielfeld().setSoundActive(soundOn);
+		    CAT.debug("Setting sound to "+soundOn);
+		}
+	    });
+	soundMenu.add(soundBox);
+	optionenMenu.add(soundMenu);
+	SpeedMenuListener speedListener= new SpeedMenuListener();
+
+	ButtonGroup speedGroup = new ButtonGroup();
+
+	lSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mSlow"),false);
+	lSpeed.addActionListener(speedListener);
+	speedGroup.add(lSpeed);
+	optSpeed.add(lSpeed);
+	mSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mMiddle"),true);
+	mSpeed.addActionListener(speedListener);
+	speedGroup.add(mSpeed);
+	optSpeed.add(mSpeed);
+	hSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mFast"),false);
+	hSpeed.addActionListener(speedListener);
+	optSpeed.add(hSpeed);
+	speedGroup.add(hSpeed);
+	optionenMenu.add(optSpeed);
+
+	JMenu scrollFlag = new JMenu (Message.say("AusgabeFrame","mflagMenu"));
+	optionenMenu.add(scrollFlag);
+
+	//JMenu optTrack = new JMenu((Message.say("AusgabeFrame","mRoboTrack")));
+	optionenMenu.add(trackMenu);
+
+	hauptMenu.add(optionenMenu);
+	hauptMenu.add( new ZoomMenu() );
+	JMenu help = new JMenu(Message.say("AusgabeFrame","mHelpMenuName"));
+	JMenuItem about = new JMenuItem(Message.say("AusgabeFrame","mAbout"));
+	about.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    new AboutFenster();
+		}
+	    });
+	help.add(about);
+	hauptMenu.add(help);
+
+
+	view.setJMenuBar(hauptMenu);
+    }
+*/
 }
 
 
