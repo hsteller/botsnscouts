@@ -43,14 +43,16 @@ If you don't understand this, don't worry and use "start.sh"
 Windows:
 
 There are batch files for starting up the game or the tile editor.
-These files are: "start.bat" to start the game and "tileeditor" to create 
+These files are: "start.bat" to start the game and "tileeditor.bat" to create 
 your own tiles.
+However, you should be able to just double-click on botsnscouts.jar to start
+the game.
 
 No real fullscreen mode, sorry.
 
-Note: You cannot link to these files and expect that to work. The location
+Note: You can link to these files and expect that to work. However, the location
 of the Bots'n'Scouts binaries is determined by the current working directory
-of the process. Create a .bat file like this instead:
+of the process. If the links don't work, try a .bat file like this instead:
 
 C:
 cd \path\to\botsnscouts

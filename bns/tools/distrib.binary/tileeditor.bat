@@ -1,0 +1,1 @@
+java -cp botsnscouts.jar de.botsnscouts.editor.BoardEditor
