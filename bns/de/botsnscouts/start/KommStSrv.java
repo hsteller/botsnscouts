@@ -57,7 +57,7 @@ public class KommStSrv{
     public int feldX,feldY;
     public int iq;
     /**
-     * Spielfeld laut Protokol
+     * Board laut Protokol
      **/
     public String feld;
     /**

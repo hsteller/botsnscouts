@@ -78,7 +78,7 @@ public class Launcher{
 	}
     }
 
-    public boolean startGame(KommSpPr com, TileRaster tileRaster, String ip, int port, int pnum, int timeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
+    public boolean startGame(KommSpPr com, TileRaster tileRaster, String ip, int port, int pnum, int timeOut, int lisPort) throws OneFlagException, NonContiguousMapException{
 	Location dim = tileRaster.getSpielfeldSize();
 	int[][] flags = tileRaster.getRFlaggen();
 	String field=tileRaster.getSpielfeld();

@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.board;
 
 /**
@@ -32,12 +32,14 @@ package de.botsnscouts.board;
  *@created    21. April 2001
  */
 
-import de.botsnscouts.util.*;
+import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.util.ParseUtils;
 
 import java.util.HashMap;
 
 public class Wall {
-    static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( Wall.class );
+    static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Wall.class);
     private boolean da;
 
     // NW = left or upper, SE = right or bottom
@@ -51,19 +53,19 @@ public class Wall {
     public final static int W_NORTH_OR_WEST = 0;
     public final static int W_SOUTH_OR_EAST = 1;
     public final static int W_NORTH = 0;
-    public final static int W_WEST  = 0;
+    public final static int W_WEST = 0;
     public final static int W_SOUTH = 1;
-    public final static int W_EAST  = 1;
+    public final static int W_EAST = 1;
 
 
     private static HashMap cache = new HashMap();
 
-    public static Wall getWall( String wallString ) throws FormatException {
-        Wall w = (Wall)cache.get( wallString );
-        if( w == null ) {
-            w = parseWall( wallString );
-            if( ! wallString.equals( w.toString() ) ) {
-                CAT.error( "assertion failed: " + wallString + " == " + w.toString(), new Exception() );
+    public static Wall getWall(String wallString) throws FormatException {
+        Wall w = (Wall) cache.get(wallString);
+        if (w == null) {
+            w = parseWall(wallString);
+            if (!wallString.equals(w.toString())) {
+                CAT.error("assertion failed: " + wallString + " == " + w.toString(), new Exception());
             }
             cache.put(wallString, w);
         }
@@ -74,9 +76,8 @@ public class Wall {
         try {
             StringBuffer sb = new StringBuffer(10);
             Wall.write(sb, nwType, nwInfo, seType, seInfo);
-            return Wall.getWall( sb.toString() );
-        }
-        catch (FormatException ex) {
+            return Wall.getWall(sb.toString());
+        } catch (FormatException ex) {
             CAT.fatal("getWall triggers after constructing string itself", ex);
             return null;
         }
@@ -85,8 +86,8 @@ public class Wall {
     public static Wall getNonExistingWall() {
         try {
             return Wall.getWall("_");
-        } catch( FormatException fe ) {
-            CAT.fatal( "'_' as wallstring triggers: ", fe );
+        } catch (FormatException fe) {
+            CAT.fatal("'_' as wallstring triggers: ", fe);
             return null;
         }
     }
@@ -94,50 +95,50 @@ public class Wall {
     public static Wall getEmptyWall() {
         try {
             return Wall.getWall("#");
-        } catch( FormatException fe ) {
-            CAT.fatal( "'_' as wallstring triggers: ", fe );
+        } catch (FormatException fe) {
+            CAT.fatal("'_' as wallstring triggers: ", fe);
             return null;
         }
     }
 
     public Wall getWithNWLaser(int strength) {
-        if( strength == 0 )
-            return Wall.getWall( NONE, 0, deviceTypeSE, deviceInfoSE );
+        if (strength == 0)
+            return Wall.getWall(NONE, 0, deviceTypeSE, deviceInfoSE);
         else
-            return Wall.getWall( TYPE_LASER, strength, deviceTypeSE, deviceInfoSE );
+            return Wall.getWall(TYPE_LASER, strength, deviceTypeSE, deviceInfoSE);
     }
 
     public Wall getWithSELaser(int strength) {
-        if( strength == 0 )
-            return Wall.getWall( deviceTypeNW, deviceInfoNW, NONE, 0 );
+        if (strength == 0)
+            return Wall.getWall(deviceTypeNW, deviceInfoNW, NONE, 0);
         else
-            return Wall.getWall( deviceTypeNW, deviceInfoNW, TYPE_LASER, strength );
+            return Wall.getWall(deviceTypeNW, deviceInfoNW, TYPE_LASER, strength);
     }
 
     public Wall getWithNWPusher(int phases) {
-        if( phases == 0 )
-            return Wall.getWall( NONE, 0, deviceTypeSE, deviceInfoSE );
+        if (phases == 0)
+            return Wall.getWall(NONE, 0, deviceTypeSE, deviceInfoSE);
         else
-            return Wall.getWall( TYPE_PUSHER, phases, deviceTypeSE, deviceInfoSE );
+            return Wall.getWall(TYPE_PUSHER, phases, deviceTypeSE, deviceInfoSE);
     }
 
     public Wall getWithSEPusher(int phases) {
-        if( phases == 0 )
-            return Wall.getWall( deviceTypeNW, deviceInfoNW, NONE, 0 );
+        if (phases == 0)
+            return Wall.getWall(deviceTypeNW, deviceInfoNW, NONE, 0);
         else
-            return Wall.getWall( deviceTypeNW, deviceInfoNW, TYPE_PUSHER, phases );
+            return Wall.getWall(deviceTypeNW, deviceInfoNW, TYPE_PUSHER, phases);
     }
 
     public Wall getWithNWDevice(Wall wall) {
-        return Wall.getWall( wall.deviceTypeNW, wall.deviceInfoNW, deviceTypeSE, deviceInfoSE );
+        return Wall.getWall(wall.deviceTypeNW, wall.deviceInfoNW, deviceTypeSE, deviceInfoSE);
     }
 
     public Wall getWithSEDevice(Wall wall) {
-        return Wall.getWall( deviceTypeNW, deviceInfoNW, wall.deviceTypeSE, wall.deviceInfoSE );
+        return Wall.getWall(deviceTypeNW, deviceInfoNW, wall.deviceTypeSE, wall.deviceInfoSE);
     }
 
     private void setPusher(int index, int phases) {
-        if(index == W_NORTH_OR_WEST) {
+        if (index == W_NORTH_OR_WEST) {
             deviceTypeNW = TYPE_PUSHER;
             deviceInfoNW = phases;
         } else {
@@ -147,7 +148,7 @@ public class Wall {
     }
 
     private void setLaser(int index, int strength) {
-        if(index == W_NORTH_OR_WEST) {
+        if (index == W_NORTH_OR_WEST) {
             deviceTypeNW = TYPE_LASER;
             deviceInfoNW = strength;
         } else {
@@ -167,12 +168,15 @@ public class Wall {
     public int getEastDeviceType() {
         return deviceTypeSE;
     }
+
     public int getNorthDeviceType() {
         return deviceTypeNW;
     }
+
     public int getWestDeviceType() {
         return deviceTypeNW;
     }
+
     public int getSouthDeviceType() {
         return deviceTypeSE;
     }
@@ -180,12 +184,15 @@ public class Wall {
     public int getEastDeviceInfo() {
         return deviceInfoSE;
     }
+
     public int getNorthDeviceInfo() {
         return deviceInfoNW;
     }
+
     public int getWestDeviceInfo() {
         return deviceInfoNW;
     }
+
     public int getSouthDeviceInfo() {
         return deviceInfoSE;
     }
@@ -206,47 +213,50 @@ public class Wall {
     public boolean isSouthPusherActive(int phase) {
         return deviceTypeSE == TYPE_PUSHER && Wall.checkPusherActivity(deviceInfoSE, phase);
     }
+
     public boolean isEastPusherActive(int phase) {
         return deviceTypeSE == TYPE_PUSHER && Wall.checkPusherActivity(deviceInfoSE, phase);
     }
+
     public boolean isNorthPusherActive(int phase) {
         return deviceTypeNW == TYPE_PUSHER && Wall.checkPusherActivity(deviceInfoNW, phase);
     }
+
     public boolean isWestPusherActive(int phase) {
         return deviceTypeNW == TYPE_PUSHER && Wall.checkPusherActivity(deviceInfoNW, phase);
     }
 
     public void write(StringBuffer s) {
-        if(deviceTypeNW != NONE) {
+        if (deviceTypeNW != NONE) {
             s.append('[');
             writeDevice(s, deviceTypeNW, deviceInfoNW);
         }
         s.append(da ? '#' : '_');
-        if(deviceTypeSE != NONE) {
+        if (deviceTypeSE != NONE) {
             writeDevice(s, deviceTypeSE, deviceInfoSE);
             s.append(']');
         }
     }
 
     private static void write(StringBuffer s, int nwType, int nwInfo, int seType, int seInfo) {
-        if(nwType != NONE) {
+        if (nwType != NONE) {
             s.append('[');
             writeDevice(s, nwType, nwInfo);
         }
         s.append('#');
-        if(seType != NONE) {
+        if (seType != NONE) {
             writeDevice(s, seType, seInfo);
             s.append(']');
         }
     }
 
     public void writeReversed(StringBuffer s) {
-        if(deviceTypeSE != NONE) {
+        if (deviceTypeSE != NONE) {
             s.append('[');
             writeDevice(s, deviceTypeSE, deviceInfoSE);
         }
         s.append(da ? '#' : '_');
-        if(deviceTypeNW != NONE) {
+        if (deviceTypeNW != NONE) {
             writeDevice(s, deviceTypeNW, deviceInfoNW);
             s.append(']');
         }
@@ -271,8 +281,8 @@ public class Wall {
                 break;
             case TYPE_PUSHER:
                 s.append("S(");
-                for(int i = 1; i < 6; i++) {
-                    if(Wall.checkPusherActivity(deviceInfo, i)) {
+                for (int i = 1; i < 6; i++) {
+                    if (Wall.checkPusherActivity(deviceInfo, i)) {
                         s.append(i);
                         s.append(',');
                     }
@@ -280,7 +290,7 @@ public class Wall {
                 s.append(')');
                 break;
             default:
-            // nothing;
+                // nothing;
         }
     }
 
@@ -293,30 +303,30 @@ public class Wall {
     private static Wall parseWall(String wallString) throws FormatException {
         Wall neu = new Wall();
         int strpos = 0;
-        if(ParseUtils.is(wallString, strpos, '#')) {
+        if (ParseUtils.is(wallString, strpos, '#')) {
             neu.da = true;
             strpos++;
-        } else if(ParseUtils.is(wallString, strpos, '_')) {
+        } else if (ParseUtils.is(wallString, strpos, '_')) {
             neu.da = false;
             return neu;
-        } else if(ParseUtils.is(wallString, strpos, '[')) {
+        } else if (ParseUtils.is(wallString, strpos, '[')) {
             strpos++;
             neu.da = true;
-            if(ParseUtils.is(wallString, strpos, 'L')) {
+            if (ParseUtils.is(wallString, strpos, 'L')) {
                 strpos = parseL(++strpos, wallString, neu, Wall.W_NORTH_OR_WEST);
-            } else if(ParseUtils.is(wallString, strpos, 'S')) {
+            } else if (ParseUtils.is(wallString, strpos, 'S')) {
                 strpos = parseS(++strpos, wallString, neu, Wall.W_NORTH_OR_WEST);
             }
             ParseUtils.assertTrue(wallString, strpos++, '#');
         } else {
             // "Fand keinen der erlaubten Chars '#_[' in Position "strpos"; da ist:"wallString.charAt(strpos)"
-            throw new FormatException(Message.say("Spielfeld", "xCharsNotFound", "#_[", strpos, "" + wallString.charAt(strpos)));
+            throw new FormatException(Message.say("Board", "xCharsNotFound", "#_[", strpos, "" + wallString.charAt(strpos)));
         }
-        if( strpos == wallString.length() ) return neu;
-        if(ParseUtils.is(wallString, strpos, 'L')) {
+        if (strpos == wallString.length()) return neu;
+        if (ParseUtils.is(wallString, strpos, 'L')) {
             strpos = parseL(++strpos, wallString, neu, Wall.W_SOUTH_OR_EAST);
             ParseUtils.assertTrue(wallString, strpos++, ']');
-        } else if(ParseUtils.is(wallString, strpos, 'S')) {
+        } else if (ParseUtils.is(wallString, strpos, 'S')) {
             strpos = parseS(++strpos, wallString, neu, Wall.W_SOUTH_OR_EAST);
             ParseUtils.assertTrue(wallString, strpos++, ']');
         }
@@ -326,7 +336,7 @@ public class Wall {
     private static int parseS(int pos, String s, Wall it, int index) throws FormatException {
         ParseUtils.assertTrue(s, pos++, '(');
         int tmp = 0;
-        while(!ParseUtils.is(s, pos, ')')) {
+        while (!ParseUtils.is(s, pos, ')')) {
             int digit = java.lang.Character.digit(s.charAt(pos++), 10);
             tmp += (int) java.lang.Math.pow(2, digit - 1);
             ParseUtils.assertTrue(s, pos++, ',');
@@ -344,29 +354,28 @@ public class Wall {
         return pos;
     }
 
-    static String extractWallDef(int pos,String kacheln) throws FormatException
-    {
-      // no wall?
-      int strpos = pos;
-      if(ParseUtils.is(kacheln,strpos,'_')) {
-        strpos++;
-      } else {
-          // read up to the '#'
-          while( kacheln.charAt(strpos) != '#' )
+    static String extractWallDef(int pos, String kacheln) throws FormatException {
+        // no wall?
+        int strpos = pos;
+        if (ParseUtils.is(kacheln, strpos, '_')) {
             strpos++;
-
-          // first char after '#'
-          strpos++;
-
-          if(ParseUtils.is(kacheln,strpos,'L') || ParseUtils.is(kacheln,strpos,'S')){ // device?
-              while( kacheln.charAt(strpos) != ']' )
+        } else {
+            // read up to the '#'
+            while (kacheln.charAt(strpos) != '#')
                 strpos++;
 
-              strpos++;
-          }
-      }
+            // first char after '#'
+            strpos++;
 
-      return kacheln.substring( pos, strpos );
+            if (ParseUtils.is(kacheln, strpos, 'L') || ParseUtils.is(kacheln, strpos, 'S')) { // device?
+                while (kacheln.charAt(strpos) != ']')
+                    strpos++;
+
+                strpos++;
+            }
+        }
+
+        return kacheln.substring(pos, strpos);
     }
 
 

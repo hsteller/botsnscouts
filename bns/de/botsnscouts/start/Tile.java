@@ -33,7 +33,7 @@ import de.botsnscouts.util.*;
 //saves image and name of tiles
 //gives rotated image
 
-public class Tile extends SpielfeldSim{
+public class Tile extends SimBoard{
 
   public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Tile.class);
 
@@ -43,7 +43,7 @@ public class Tile extends SpielfeldSim{
     int rotat;
 
     //create new tile
-    public Tile(String name, String field, int thumbnailsize) throws FormatException, FlaggenException{
+    public Tile(String name, String field, int thumbnailsize) throws FormatException, FlagException{
 	super(12,12,field,null);
 	this.thumbnailsize=thumbnailsize;
 	kName=name;
@@ -51,7 +51,7 @@ public class Tile extends SpielfeldSim{
     }
 
     //create rotated tile
-    public Tile(String name, String field, int rot, int thumbnailsize) throws FormatException, FlaggenException{
+    public Tile(String name, String field, int rot, int thumbnailsize) throws FormatException, FlagException{
 	this(name, field, thumbnailsize);
 	rotat=rot;
     }
@@ -74,11 +74,11 @@ public class Tile extends SpielfeldSim{
 
     //gibt um 90° gedrehtes Clone
     public Tile getGedreht(){
-	String gedrTile=get90GradGedreht();
+	String gedrTile=getTurnedLeft90Degrees();
 	Tile drTile = null;
 	try{
 	    drTile =new Tile(kName,gedrTile,(rotat+1)%4,thumbnailsize);
-	}catch(FlaggenException e){
+	}catch(FlagException e){
 	    System.err.println(e);
 	}catch(FormatException e){
 	    System.err.println(e);
@@ -89,12 +89,12 @@ public class Tile extends SpielfeldSim{
     //prüft ob Flagge(n) gültige Position hat(haben)
     public boolean testFlagge(Location[] fl){
 	String kach=getComputedString();
-	SpielfeldSim test;
+	SimBoard test;
 	try{
 	    // enno: habe checkflaggen protected gemacht
 	    checkFlaggen(fl);
-	    //test= new SpielfeldSim(12,12,kach,fl);
-	}catch(FlaggenException e){
+            //test= new SimBoard(12,12,kach,fl);
+	}catch(FlagException e){
 	    return false;
 	}
 	/*

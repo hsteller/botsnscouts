@@ -41,9 +41,9 @@ public class TileRaster{
     }
 
     //setzt übergebene Tile an Stelle (x,y)
-    public void setTile(int x, int y, int rot, String name) throws FlaggenVorhandenException{
+    public void setTile(int x, int y, int rot, String name) throws FlagPresentException{
 	if (sindFlaggen(x,y))
-	    throw new FlaggenVorhandenException();
+	    throw new FlagPresentException();
 	tiles[x][y]=tileFactory.getTile(name,rot);
     }
 
@@ -101,9 +101,9 @@ public class TileRaster{
 	flag[0]=new Location((x-1)%12+1,(y-1)%12+1);
 	String komment="";
 	try{
-	    Spielfeld tmpSpf=new Spielfeld(12,12,tiles[kx][ky].getComputedString(),flag);
+	    Board tmpSpf=new Board(12,12,tiles[kx][ky].getComputedString(),flag);
 	    komment=tmpSpf.getFlaggenProbleme();
-	}catch(FlaggenException e){
+	}catch(FlagException e){
 	    System.err.println(e);
 	}catch (FormatException e){
 	    System.err.println(e);
@@ -143,9 +143,9 @@ public class TileRaster{
     }
 
     // fügt eine Flagge hinzu 
-    public void addFlagge(int x,int y) throws FlaggenException{
+    public void addFlagge(int x,int y) throws FlagException{
 	if (!checkFlaggePos(x,y))
-	    throw new FlaggenException();
+	    throw new FlagException();
 	flaggen[flaggenN++]=new Location(x,y);
     }
 
@@ -179,14 +179,14 @@ public class TileRaster{
     }
 
     // versetzt eine Flagge 
-    public void moveFlagge(int nr, int x,int y) throws FlaggenException{
+    public void moveFlagge(int nr, int x,int y) throws FlagException{
 	if (!checkFlaggeMovePos(x,y))
-	    throw new FlaggenException();
+	    throw new FlagException();
 	flaggen[nr]=new Location(x,y);
     }
 
     // versetzt eine Flagge an der Position
-    public void moveFlagge(int ax,int ay, int x,int y) throws FlaggenException{
+    public void moveFlagge(int ax,int ay, int x,int y) throws FlagException{
 	for (int i=0;i<flaggenN;i++){
 	    if (flaggen[i].x==ax&&flaggen[i].y==ay){
 		moveFlagge(i,x,y);
@@ -205,7 +205,7 @@ public class TileRaster{
 	return FL;
     }
 
-    //gibt Tiles als 2-dim Array von Spielfeld zurück
+    //gibt Tiles als 2-dim Array von Board zurück
     public Tile[][] getTiles(){
 	return tiles;
     }
@@ -256,13 +256,13 @@ public class TileRaster{
 	return flags;
     }
 
-    //gibt das Spielfeld als ein String zurück
-    public String getSpielfeld() throws OneFlagException, NichtZusSpfException{
+    //gibt das Board als ein String zurück
+    public String getSpielfeld() throws OneFlagException, NonContiguousMapException{
 	checkSpielfeld();//teste
 	Location[] bounds= findBounds();
 	String GRUBENZWR="____________";
 	String GRUBENFLD="_G_G_G_G_G_G_G_G_G_G_G_G_";
-	StringBuffer out=new StringBuffer();//hier wird das Spielfeld aufgebaut
+	StringBuffer out=new StringBuffer();//hier wird das Board aufgebaut
 	String rechts=new String();
 	boolean links =false;
 	StringBuffer oben = new StringBuffer();
@@ -435,12 +435,12 @@ public class TileRaster{
 	return new Location((bounds[1].x-bounds[0].x+1)*12,(bounds[1].y-bounds[0].y+1)*12);
     }
     
-    //prüft ob Spielfeld gültig ist (plausibilitätstests)
-    public boolean checkSpielfeld() throws OneFlagException, NichtZusSpfException{
+    //prüft ob Board gültig ist (plausibilitätstests)
+    public boolean checkSpielfeld() throws OneFlagException, NonContiguousMapException{
 	//zu wenig Flaggen
 	if (flaggenN<2)
 	    throw new OneFlagException();
-	//das Spielfeld ist nicht zusammenhängend
+        //das Board ist nicht zusammenhängend
 	Location ftile=findFirstTile();
 	boolean[][] mark=new boolean[KX][KY];
 	for (int i=0;i<KX;i++)
@@ -450,7 +450,7 @@ public class TileRaster{
 	for (int i=0;i<KX;i++){
 	    for (int j=0;j<KY;j++){
 		if (tiles[i][j]!=null&&!mark[i][j]){
-		    throw new NichtZusSpfException();
+		    throw new NonContiguousMapException();
 		}
 	    }
 	}

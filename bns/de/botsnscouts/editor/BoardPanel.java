@@ -28,7 +28,7 @@ package de.botsnscouts.editor;
 import java.awt.*;
 import java.awt.event.*;
 
-import de.botsnscouts.board.SpielfeldSim;
+import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.board.Wall;
 import de.botsnscouts.gui.SACanvas;
 import de.botsnscouts.util.Message;
@@ -40,7 +40,7 @@ class BoardPanel extends SACanvas implements MouseListener{
 
     protected BoardEditor editor=null;
 
-    public BoardPanel(SpielfeldSim ss,BoardEditor p){
+    public BoardPanel(SimBoard ss,BoardEditor p){
 	super(ss);
 	editor=p;
 	addMouseListener(this);

@@ -39,14 +39,14 @@ public class Bot {
 
     /** Factory method for new robots. */
     public static Bot getNewInstance(String name) {
-	return new de.botsnscouts.board.BoardRoboter(name);
+	return new de.botsnscouts.board.BoardBot(name);
     }
 
     /** Factory can clone, too. This should not be
      * done, however. What's the point?
     */
     public static Bot getCopy(Bot r) {
-	return new de.botsnscouts.board.BoardRoboter(r);
+	return new de.botsnscouts.board.BoardBot(r);
     }
 
     public void fillCopy(Bot r) {

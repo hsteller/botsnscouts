@@ -39,14 +39,14 @@ public class Wisenheimer{
 
     public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Wisenheimer.class);
 
-    private SpielfeldKS aiBoard;
+    private DistanceCalculatingBoard aiBoard;
     private SearchRecursively wirbel;
     private Bot simRob = Bot.getNewInstance("dummy");
     // damit wir nicht immer für jede Simulation einen neuen Robby brauchen
     private int[] predict=new int[5];
     private int lastPredict;
 
-    public Wisenheimer (SpielfeldKS aiB) {
+    public Wisenheimer (DistanceCalculatingBoard aiB) {
 	aiBoard=aiB;
 	wirbel = new SearchRecursively(aiBoard,0);
     }

@@ -58,7 +58,7 @@ public class HumanPlayer extends BNSThread {
     private KommClientSpieler comm;
     private View view;
     private ClientAntwort commAnswer = new ClientAntwort();
-    private SpielfeldKS intelliBoard;
+    private DistanceCalculatingBoard intelliBoard;
 
     private ArrayList cards = new ArrayList(9);
     private String host, name;
@@ -167,7 +167,7 @@ public class HumanPlayer extends BNSThread {
 		humanView.showGetDirection();
 		Global.debug(this,"Habe einee Zerst”rung bekommen.");
 		showMessage(Message.say("SpielerMensch","roboauffeld"));
-		   // --- Spielfeld f\uFFFDr den Klugscheisser holen
+                // --- Board f\uFFFDr den Klugscheisser holen
 		if (intelliBoard==null) {
 		    initIntelligentBoard();
 		    wisenheimer = new Wisenheimer(intelliBoard);
@@ -443,7 +443,7 @@ public class HumanPlayer extends BNSThread {
 	    Location[] fahnen=comm.getFahnenPos();
 	    String spielfeldstring=comm.getSpielfeld();
 	    try{
-		intelliBoard = SpielfeldKS.getInstance(dimx,dimy,spielfeldstring,fahnen);
+		intelliBoard = DistanceCalculatingBoard.getInstance(dimx,dimy,spielfeldstring,fahnen);
 	    }
 
 	    catch(Exception e){

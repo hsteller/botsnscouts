@@ -39,14 +39,14 @@ public class ParseUtils {
     public static void assertTrue(String s, int pos, char c) throws FormatException {
         //d("assert: Erwarte "+c+" an Pos "+pos+" ;da ist "+s.charAt(pos));
         if(s.charAt(pos) != c) {
-            throw new FormatException(Message.say("Spielfeld", "xExpectedChar", c, pos));
+            throw new FormatException(Message.say("Board", "xExpectedChar", c, pos));
         }
         // "c" erwartet an Position "pos"
     }
 
     public static int assertws(String s, int pos) throws FormatException {
         if(!(java.lang.Character.isWhitespace(s.charAt(pos++)))) {
-            throw new FormatException(Message.say("Spielfeld", "xNoWhitespaceAtPos", (pos - 1)));
+            throw new FormatException(Message.say("Board", "xNoWhitespaceAtPos", (pos - 1)));
         }
         while(java.lang.Character.isWhitespace(s.charAt(pos))) {
             pos++;

@@ -646,7 +646,7 @@ public class KommServer {
    }
   }
   /** Zur Antwort auf Info-Request 'gibSpielfeld'.
-    @param spielfeld Das Spielfeld in Form eines Strings, der dem Protokoll entspricht
+    @param spielfeld Das Board in Form eines Strings, der dem Protokoll entspricht
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
     */
   public void sendSpielfeld (String spielfeld) throws KommException {
@@ -654,7 +654,7 @@ public class KommServer {
     String raus=spielfeld;
     int punkt = raus.lastIndexOf('.');
     if (punkt==-1)
-      throw new KommException ("sendSpielfeld: Spielfeld nicht durch Punkt terminiert!");
+      throw new KommException ("sendSpielfeld: Board nicht durch Punkt terminiert!");
     raus=raus.substring(0,punkt+1);
     out.println (raus);
   }

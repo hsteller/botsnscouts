@@ -27,7 +27,7 @@ package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
 /**
- * Diese Klasse erledigt die Ausgabe von Spielfeld und Status
+ * Diese Klasse erledigt die Ausgabe von Board und Status
  * @author Lukasz Pekacki
  */
 

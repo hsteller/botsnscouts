@@ -255,7 +255,7 @@ public class GameFieldPanel extends JPanel{
 	gc.fill = GridBagConstraints.HORIZONTAL;
 
 	panel.add(inner);
-    	//lade das erste gefundene Spielfeld ConfigurationtoLowerCase().
+        //lade das erste gefundene Board ConfigurationtoLowerCase().
 	Properties spfProp=null;
 	if (defSpf==null){
 	    spfProp=loader.getProperties(spielfeldAr[0]);

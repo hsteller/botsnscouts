@@ -32,8 +32,8 @@ import java.io.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
-import de.botsnscouts.board.SpielfeldSim;
-import de.botsnscouts.board.FlaggenException;
+import de.botsnscouts.board.SimBoard;
+import de.botsnscouts.board.FlagException;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.util.FormatException;
 
@@ -271,14 +271,14 @@ class ButtonBar extends JPanel implements ActionListener{
 		    BufferedReader kachReader =new BufferedReader(new InputStreamReader(istream));
 		    StringBuffer str=new StringBuffer();
 		    String tmp=null;
-		    //und lese Spielfeld aus
+                    //und lese Board aus
 		    while((tmp=kachReader.readLine())!=null)
 			str.append(tmp+"\n");
 		    //CAT.debug(str.toString());
 		    editor.spfString=str.toString();
 		    //Leo's Code
 		    editor.board=new EditableBoard(12,12,editor.spfString,null);
-		    CAT.debug( "Spielfeld erzeugt");
+		    CAT.debug( "Board erzeugt");
 
 		    editor.sp.remove(editor.sac);
 		    CAT.debug( "sac removed");
@@ -290,7 +290,7 @@ class ButtonBar extends JPanel implements ActionListener{
 		}catch(FormatException ex){
 		    System.err.println(Message.say("BoardEditor","eDatNotEx")+ex);
 		    editor.spfString=save;
-		}catch(FlaggenException ex){
+		}catch(FlagException ex){
 		    System.err.println(Message.say("BoardEditor","eDatNotEx")+ex);
 		    editor.spfString=save;
 		}catch(IOException ex){

@@ -52,7 +52,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     private RegistrationManager registrationManager;
     private MessageThread messageThread;
 
-    protected SpielfeldSim feld;
+    protected SimBoard feld;
     private Location[] flaggen;
     protected int anzSpieler;
     protected int anmeldePort;
@@ -213,11 +213,11 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     }
 
     public String getFieldString(){
-	return feld.getSpielfeldString();
+	return feld.getBoardAsString();
     }
 
     public Location[] getFlags(){
-	return feld.getFlaggen();
+	return feld.getFlags();
     }
 
     public String[] getNames(){
@@ -298,7 +298,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
      * @param anzahlmitspieler 	Anzahl der Mitspieler inklusive k~Anstliche Spieler
      * @param anmeldeport    	Portnummer auf dem sich die Spieler und Ausgabekan~Dle anmelden, defauls = 8000
      * @param zugabgabetimeout  	Dauer (Timeout) der R~Ackgabe der ausgew~Dhlten Karten der Spieler
-     * @param Spielfeld      	Komplettes Spielfeld in Stringform
+     * @param Board      	Komplettes Board in Stringform
      * @param Flaggen     		Flaggen in Stringform laut "Protokolle und Datenformate"
      * @param x        		erste Koordinate der Dimension des Spielfeldes
      * @param y        		zweite Koordinate der Dimension des Spielfeldes
@@ -319,11 +319,11 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	flaggen = Flaggen;
 
 	try{
-	    feld=new SpielfeldSim(x,y,Spielfeld,flaggen,this);
+	    feld=new SimBoard(x,y,Spielfeld,flaggen,this);
       	}catch (FormatException e){
 	    System.err.println("Fehler im Spielfeldstring.");
 	    System.exit(5);
-      	}catch (FlaggenException e){
+      	}catch (FlagException e){
 	    System.err.println("Fehler in den Flaggen.");
 	    System.exit(5);
       	}
@@ -582,10 +582,12 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     private void setzeStartPunkt(){
 	// setzen der x-, y-, archivX- und archivY-Koordinaten in den Robots auf
 	// die Koordinaten der ersten Flagge
-	d("setze x und archivX in robots auf "+feld.getFlaggen()[0].getX());
-	d("setze y und archivY in robots auf "+feld.getFlaggen()[0].getY());
+        if (feld == null)
+            CAT.error("feld ist null");
+	d("setze x und archivX in robots auf "+feld.getFlags()[0].getX());
+	d("setze y und archivY in robots auf "+feld.getFlags()[0].getY());
 	for(int i = 0; i < aktRoboter.size(); i++){
-	    ((ServerRoboterThread)(aktRoboter.elementAt(i))).rob.setPos(feld.getFlaggen()[0]);
+	    ((ServerRoboterThread)(aktRoboter.elementAt(i))).rob.setPos(feld.getFlags()[0]);
 	    ((ServerRoboterThread)(aktRoboter.elementAt(i))).rob.touchArchiv();
 	}
     }
@@ -871,7 +873,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			for (Iterator e=aktRoboter.listIterator(); e.hasNext();) {
 			    ServerRoboterThread tmp = (ServerRoboterThread )e.next();
 			    // Gewinner?
-			    if (tmp.rob.getNextFlag() == feld.getFlaggen().length+1) {
+			    if (tmp.rob.getNextFlag() == feld.getFlags().length+1) {
 				//raus aus aktiven Robos, in Gewinnerliste,
 				// vom Plan nehmen, ausgabenbenachrichtigen
 				tmp.setMode(SPIELENDE);

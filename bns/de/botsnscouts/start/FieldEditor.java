@@ -211,7 +211,7 @@ public class FieldEditor extends JPanel implements  ActionListener, TileClickLis
 	    }catch(OneFlagException ex){
 		JOptionPane.showMessageDialog(this,Message.say("Start","mZweiFlaggen"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
 
-	    }catch(NichtZusSpfException ex){
+	    }catch(NonContiguousMapException ex){
 		JOptionPane.showMessageDialog(this,Message.say("Start","mNichtZus"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
 
 	    }
@@ -268,7 +268,7 @@ public class FieldEditor extends JPanel implements  ActionListener, TileClickLis
 		}else{
 		    //System.err.println("You cannot place a flag here!");
 		}
-	    }catch (FlaggenException ex){
+	    }catch (FlagException ex){
 		System.err.println("You cannot place a flag here!");
 	    }
 
@@ -293,7 +293,7 @@ public class FieldEditor extends JPanel implements  ActionListener, TileClickLis
 		}
 		try{
 		    parent.fassade.moveFlagge(flaggeX,flaggeY,rx*12+fx,ry*12+fy);
-		}catch (FlaggenException ex){
+		}catch (FlagException ex){
 		    System.err.println("You cannot place a flag here!");
 		}
 		flaggeGewaehlt=false;
@@ -312,7 +312,7 @@ public class FieldEditor extends JPanel implements  ActionListener, TileClickLis
 	    try{
 		parent.fassade.delTile(rx,ry);
 		parent.fassade.setTile(rx,ry,0,tileInfos[currentTile].toString());
-	    }catch (FlaggenVorhandenException ex){
+	    }catch (FlagPresentException ex){
 		System.err.println("You cannot place here a field!");
 	    }
 	    spf.rasterChanged();

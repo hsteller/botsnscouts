@@ -92,8 +92,8 @@ public class Facade{
 	return tileRaster.getSpielfeldDim();
     }
 
-    // aktualisiert das Spielfeld
-    public void setTile(int x, int y, int rot, String tile) throws FlaggenVorhandenException{
+    // aktualisiert das Board
+    public void setTile(int x, int y, int rot, String tile) throws FlagPresentException{
 	// to be written......
 	//Global.debug(this,"setTile "+x+","+y+" "+tile);
 	tileRaster.setTile(x,y,rot,tile);
@@ -132,7 +132,7 @@ public class Facade{
     }
 
     // fügt eine Flagge hinzu
-    public void addFlagge(int x,int y) throws FlaggenException{
+    public void addFlagge(int x,int y) throws FlagException{
 	tileRaster.addFlagge(x,y);
     }
 
@@ -152,12 +152,12 @@ public class Facade{
     }
 
     // versetzt eine Flagge
-    public void moveFlagge(int nr, int x,int y) throws FlaggenException{
+    public void moveFlagge(int nr, int x,int y) throws FlagException{
 	tileRaster.moveFlagge(nr,x,y);
     }
 
     // versetzt eine Flagge
-    public void moveFlagge(int ax,int ay, int x,int y) throws FlaggenException{
+    public void moveFlagge(int ax,int ay, int x,int y) throws FlagException{
 	tileRaster.moveFlagge(ax,ay,x,y);
     }
 
@@ -166,7 +166,7 @@ public class Facade{
 	return tileRaster.getFlaggen();
     }
 
-    //gibt Tilen als 2-dim Array von Spielfeld zurück
+    //gibt Tilen als 2-dim Array von Board zurück
     public Tile[][] getTiles(){
 	return tileRaster.getTiles();
     }
@@ -186,12 +186,12 @@ public class Facade{
 	tileRaster=tileRasterSave;
     }
 
-    //prüft ob Spielfeld gültig ist (plausibilitätstests)
-    public boolean checkSpielfeld() throws OneFlagException, NichtZusSpfException{
+    //prüft ob Board gültig ist (plausibilitätstests)
+    public boolean checkSpielfeld() throws OneFlagException, NonContiguousMapException{
 	return tileRaster.checkSpielfeld();
     }
 
-    //gibt das aktuelle Spielfeld als Properties zurück
+    //gibt das aktuelle Board als Properties zurück
     public Properties getSpfProp(){
 	Properties spfProp=new Properties();
 	Tile[][] kach=getTiles();
@@ -213,7 +213,7 @@ public class Facade{
 	return spfProp;
     }
 
-    //lädt das durch Properties beschriebene Spielfeld
+    //lädt das durch Properties beschriebene Board
     public void loadSpfProp(Properties spfProp){
 	Location dim=getSpielfeldDim();
 	for (int i=0;i<dim.x;i++){
@@ -227,7 +227,7 @@ public class Facade{
 		    try{
 			//setze Tile
 			setTile(i,j,rot,name);
-		    }catch(FlaggenVorhandenException e){
+		    }catch(FlagPresentException e){
 		    }
 		    /*   try{
 			//lese Drehung aus
@@ -321,15 +321,15 @@ public class Facade{
     }
 
     // launch the game
-    public boolean startGame() throws OneFlagException, NichtZusSpfException{
+    public boolean startGame() throws OneFlagException, NonContiguousMapException{
 	return startGame(DIP, DPORT, DPLAYERS, DTO, LPORT);
     }
 
-    public boolean startGame(String ip, int port, int timeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
+    public boolean startGame(String ip, int port, int timeOut, int lisPort) throws OneFlagException, NonContiguousMapException{
 	return startGame(ip, port, DPLAYERS, timeOut, lisPort);
     }
 
-    public boolean startGame(String ip, int port, int pnum, int timeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
+    public boolean startGame(String ip, int port, int pnum, int timeOut, int lisPort) throws OneFlagException, NonContiguousMapException{
 	boolean ret;
 	ret=launcher.startGame(com, tileRaster, ip, port, pnum, timeOut, lisPort);
 	return ret;

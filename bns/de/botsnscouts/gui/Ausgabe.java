@@ -255,7 +255,7 @@ public class Ausgabe extends BNSThread {
 
 		    ausgabeView.showUpdatedRobots(getRoboterArray());
 
-                    // --------- Neue Bot-Position an Spielfeld senden ---------
+                    // --------- Neue Bot-Position an Board senden ---------
 		    try {
 			Thread.sleep(100);
 		    } // Verz÷gerung der Ausgabegeschwindigkeit
@@ -382,7 +382,7 @@ public class Ausgabe extends BNSThread {
 		}
 
 
-		SpielfeldSim sim = new SpielfeldSim(boardDimension.width,
+		SimBoard sim = new SimBoard(boardDimension.width,
 						    boardDimension.height,
 						    kommClient.getSpielfeld(),
 						    flags);
@@ -445,7 +445,7 @@ public class Ausgabe extends BNSThread {
 	    catch (FormatException e) {
 		System.err.println(e.getMessage());
 	    }
-	    catch (FlaggenException e){
+	    catch (FlagException e){
 		System.err.println(e.getMessage());
 	    }
 	}

@@ -94,7 +94,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 //            }
 //        };
 	JPanel robotsCardContainer = new JPanel(new GridLayout(8,1));
-        int flagCount = sa.sf.getFlaggen().length;
+        int flagCount = sa.sf.getFlags().length;
 
         setLayout(new BorderLayout());
 

@@ -43,7 +43,7 @@ import de.botsnscouts.util.*;
 
 import de.botsnscouts.*;
 /**
- * Spielfeld-Ausgabe-Canvas ist das Objekt, das der Ausgabe und dem menschlichen Spieler das Spielfeld grafisch darstellt und verwaltet
+ * Board-Ausgabe-Canvas ist das Objekt, das der Ausgabe und dem menschlichen Spieler das Board grafisch darstellt und verwaltet
  * @author urspr\uFFFDnglich Daniel Holtz
  * @version Verbesserung von 1.0
 
@@ -60,7 +60,7 @@ import de.botsnscouts.*;
  *    Klasse ImageMan (kann so dann auch vom KachelEditor verwendet werden)
  *    bilder werden dann nur einmal pro JVM geladen, und zwar bei Programm-
  *    start (StartSpieler) im Hintergrund. Der erste Spielfeldaufbau ist
- *    damit viel schneller, ebenso die Spielfeld-Vorschau
+ *    damit viel schneller, ebenso die Board-Vorschau
  */
 
 public class SACanvas extends JComponent {
@@ -156,7 +156,7 @@ public class SACanvas extends JComponent {
      *  stores the information about the board we are playing on;
      *  (where are the pits, where are lasers, and so on..)
      */
-    SpielfeldSim sf;
+    SimBoard sf;
 
     /** scale factor for zooming*/
     private double dScale = 1.0;
@@ -193,11 +193,11 @@ public class SACanvas extends JComponent {
 
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public SACanvas(SpielfeldSim sf_neu){
+    public SACanvas(SimBoard sf_neu){
 	init( sf_neu, robocolor );
     }
 
-    public SACanvas(SpielfeldSim sf_neu, Color [] robColors){
+    public SACanvas(SimBoard sf_neu, Color [] robColors){
 	init( sf_neu, robColors );
 	mouseInit();
     }
@@ -209,7 +209,7 @@ public class SACanvas extends JComponent {
 
 
 
-    private void init(SpielfeldSim sf_neu, Color [] robColors) {
+    private void init(SimBoard sf_neu, Color [] robColors) {
 	//robocolor2=robColors;
 	//	drawRobLaser=false;
 	//drawBordLaser=false;
@@ -631,7 +631,7 @@ public class SACanvas extends JComponent {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private boolean abbieger(int x, int y, int r){
-        Floor floor = sf.bo(x,y);
+        Floor floor = sf.floor(x,y);
 	return floor.isBelt() && (floor.getBeltDirection() == r);
     }
 
@@ -677,22 +677,22 @@ public class SACanvas extends JComponent {
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     private void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty) {
-	Floor floor = sf.bo(xpos, ypos);
+	Floor floor = sf.floor(xpos, ypos);
 	switch ( floor.getType() ){
 
-	case (Spielfeld.BDGRUBE):
+	case (Board.FL_PIT):
 	    g.drawImage(diverseCrop[3],actx,acty,64,64,this);
 	    break;
-	case (Spielfeld.BDNORMAL):
+	case (Board.FL_NORMAL):
 		g.drawImage(diverseCrop[24+((xpos*ypos*19)%17)%4],actx,acty,64,64,this);
 	    break;
-	case (Spielfeld.BDDREHEL):
+	case (Board.FL_ROTGEAR):
 	    if (floor.getInfo()==0)
 		g.drawImage(diverseCrop[2],actx,acty,64,64,this);
 	    else
 		g.drawImage(diverseCrop[1],actx,acty,64,64,this);
 	    break;
-	case (Spielfeld.BDREPA):
+	case (Board.FL_REPAIR):
 	    if (floor.getInfo()==1)
 		g.drawImage(diverseCrop[4],actx,acty,64,64,this);
 	    else
@@ -701,78 +701,78 @@ public class SACanvas extends JComponent {
 
 	    // ------------------- normale Fliessbaender -------------------------
 
-	case (Spielfeld.FN1):g.drawImage(cbeltCrop[14],actx,acty,64,64,this);break;
-	case (Spielfeld.FO1):g.drawImage(cbeltCrop[19],actx,acty,64,64,this);break;
-	case (Spielfeld.FW1):g.drawImage(cbeltCrop[9],actx,acty,64,64,this);	break;
-	case (Spielfeld.FS1):g.drawImage(cbeltCrop[4],actx,acty,64,64,this);	break;
+	case (Board.FN1):g.drawImage(cbeltCrop[14],actx,acty,64,64,this);break;
+	case (Board.FE1):g.drawImage(cbeltCrop[19],actx,acty,64,64,this);break;
+	case (Board.FW1):g.drawImage(cbeltCrop[9],actx,acty,64,64,this);	break;
+	case (Board.FS1):g.drawImage(cbeltCrop[4],actx,acty,64,64,this);	break;
 
-	case (Spielfeld.NVW1): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
+	case (Board.NFW1): if (abbieger(xpos,ypos-1,Board.NORD))
 	    g.drawImage(cbeltCrop[15],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[6],actx,acty,64,64,this);break;
-	case (Spielfeld.NVO1): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
+	case (Board.NFE1): if (abbieger(xpos,ypos-1,Board.NORD))
 	    g.drawImage(cbeltCrop[18],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[7],actx,acty,64,64,this);break;
-	case (Spielfeld.SVW1): if (abbieger(xpos,ypos+1,Spielfeld.SUED))
+	case (Board.SFW1): if (abbieger(xpos,ypos+1,Board.SUED))
 	    g.drawImage(cbeltCrop[13],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[3],actx,acty,64,64,this);break;
-	case (Spielfeld.SVO1):if (abbieger(xpos,ypos+1,Spielfeld.SUED))
+	case (Board.SFE1):if (abbieger(xpos,ypos+1,Board.SUED))
 			  g.drawImage(cbeltCrop[10],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[0],actx,acty,64,64,this);break;
-	case (Spielfeld.OVN1):if (abbieger(xpos-1,ypos,Spielfeld.OST))
+	case (Board.EFN1):if (abbieger(xpos-1,ypos,Board.OST))
 			  g.drawImage(cbeltCrop[16],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[5],actx,acty,64,64,this);break;
-	case (Spielfeld.OVS1):if (abbieger(xpos-1,ypos,Spielfeld.OST))
+	case (Board.EFS1):if (abbieger(xpos-1,ypos,Board.OST))
 			  g.drawImage(cbeltCrop[12],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[2],actx,acty,64,64,this);break;
-	case (Spielfeld.WVN1):if (abbieger(xpos+1,ypos,Spielfeld.WEST))
+	case (Board.WFN1):if (abbieger(xpos+1,ypos,Board.WEST))
 			  g.drawImage(cbeltCrop[17],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[8],actx,acty,64,64,this);break;
-	case (Spielfeld.WVS1):if (abbieger(xpos+1,ypos,Spielfeld.WEST))
+	case (Board.WFS1):if (abbieger(xpos+1,ypos,Board.WEST))
 			  g.drawImage(cbeltCrop[11],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[1],actx,acty,64,64,this);break;
 
-	case (Spielfeld.NVWO1):g.drawImage(cbeltCrop[22],actx,acty,64,64,this);break;
-	case (Spielfeld.SVWO1):g.drawImage(cbeltCrop[20],actx,acty,64,64,this);break;
-	case (Spielfeld.OVNS1):g.drawImage(cbeltCrop[23],actx,acty,64,64,this);break;
-	case (Spielfeld.WVNS1):g.drawImage(cbeltCrop[21],actx,acty,64,64,this);break;
+	case (Board.NFEW1):g.drawImage(cbeltCrop[22],actx,acty,64,64,this);break;
+	case (Board.SFWE1):g.drawImage(cbeltCrop[20],actx,acty,64,64,this);break;
+	case (Board.EFNS1):g.drawImage(cbeltCrop[23],actx,acty,64,64,this);break;
+	case (Board.WFNS1):g.drawImage(cbeltCrop[21],actx,acty,64,64,this);break;
 
 	    // ------------------------ Expressfliessbaender ---------------------
 
-	case (Spielfeld.FN2):g.drawImage(ebeltCrop[14],actx,acty,64,64,this);break;
-	case (Spielfeld.FO2):g.drawImage(ebeltCrop[19],actx,acty,64,64,this);break;
-	case (Spielfeld.FW2):g.drawImage(ebeltCrop[9],actx,acty,64,64,this);	break;
-	case (Spielfeld.FS2):g.drawImage(ebeltCrop[4],actx,acty,64,64,this);	break;
+	case (Board.FN2):g.drawImage(ebeltCrop[14],actx,acty,64,64,this);break;
+	case (Board.FE2):g.drawImage(ebeltCrop[19],actx,acty,64,64,this);break;
+	case (Board.FW2):g.drawImage(ebeltCrop[9],actx,acty,64,64,this);	break;
+	case (Board.FS2):g.drawImage(ebeltCrop[4],actx,acty,64,64,this);	break;
 
-	case (Spielfeld.NVW2): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
+	case (Board.NFW2): if (abbieger(xpos,ypos-1,Board.NORD))
 	    g.drawImage(ebeltCrop[16],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[6],actx,acty,64,64,this);break;
-	case (Spielfeld.NVO2): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
+	case (Board.NFE2): if (abbieger(xpos,ypos-1,Board.NORD))
 	    g.drawImage(ebeltCrop[17],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[7],actx,acty,64,64,this);break;
-	case (Spielfeld.SVW2): if (abbieger(xpos,ypos+1,Spielfeld.SUED))
+	case (Board.SFW2): if (abbieger(xpos,ypos+1,Board.SUED))
 	    g.drawImage(ebeltCrop[13],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[3],actx,acty,64,64,this);break;
-	case (Spielfeld.SVO2):if (abbieger(xpos,ypos+1,Spielfeld.SUED))
+	case (Board.SFE2):if (abbieger(xpos,ypos+1,Board.SUED))
 			  g.drawImage(ebeltCrop[10],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[0],actx,acty,64,64,this);break;
-	case (Spielfeld.OVN2):if (abbieger(xpos-1,ypos,Spielfeld.OST))
+	case (Board.EFN2):if (abbieger(xpos-1,ypos,Board.OST))
 			  g.drawImage(ebeltCrop[15],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[5],actx,acty,64,64,this);break;
-	case (Spielfeld.OVS2):if (abbieger(xpos-1,ypos,Spielfeld.OST))
+	case (Board.EFS2):if (abbieger(xpos-1,ypos,Board.OST))
 			  g.drawImage(ebeltCrop[12],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[2],actx,acty,64,64,this);break;
-	case (Spielfeld.WVN2):if (abbieger(xpos+1,ypos,Spielfeld.WEST))
+	case (Board.WFN2):if (abbieger(xpos+1,ypos,Board.WEST))
 			  g.drawImage(ebeltCrop[18],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[8],actx,acty,64,64,this);break;
-	case (Spielfeld.WVS2):if (abbieger(xpos+1,ypos,Spielfeld.WEST))
+	case (Board.WFS2):if (abbieger(xpos+1,ypos,Board.WEST))
 			  g.drawImage(ebeltCrop[11],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[1],actx,acty,64,64,this);break;
 
 
-	case (Spielfeld.NVWO2):g.drawImage(ebeltCrop[22],actx,acty,64,64,this);break;
-	case (Spielfeld.SVWO2):g.drawImage(ebeltCrop[20],actx,acty,64,64,this);break;
-	case (Spielfeld.OVNS2):g.drawImage(ebeltCrop[23],actx,acty,64,64,this);break;
-	case (Spielfeld.WVNS2):g.drawImage(ebeltCrop[21],actx,acty,64,64,this);break;
+	case (Board.NFWE2):g.drawImage(ebeltCrop[22],actx,acty,64,64,this);break;
+	case (Board.SFWO2):g.drawImage(ebeltCrop[20],actx,acty,64,64,this);break;
+	case (Board.EFNS2):g.drawImage(ebeltCrop[23],actx,acty,64,64,this);break;
+	case (Board.WFNS2):g.drawImage(ebeltCrop[21],actx,acty,64,64,this);break;
 
 
 	default:
@@ -814,7 +814,7 @@ public class SACanvas extends JComponent {
 		int acty = (vert-1) * 64;
 		int xpos = hori;
 		int ypos = sf.getSizeY() + 1 - vert;
-		Floor floor = sf.bo(xpos, ypos);
+		Floor floor = sf.floor(xpos, ypos);
 
 		paintFeldBoden( g, xpos, ypos, actx, acty );
 		if ((floor.isBelt() ) && (floor.getInfo()>0))
@@ -937,11 +937,11 @@ public class SACanvas extends JComponent {
 		}
 
 		// Ostwand
-		if (sf.ow(xpos,ypos).isExisting()){
-		    if (sf.ow(xpos,ypos).getWestDeviceType()==Wall.TYPE_LASER){
+		if (sf.ew(xpos,ypos).isExisting()){
+		    if (sf.ew(xpos,ypos).getWestDeviceType()==Wall.TYPE_LASER){
 			g.drawImage(diverseCrop[14],actx-6,acty,64,64,this);
 		    }
-		    if (sf.ow(xpos,ypos).getWestDeviceType()==Wall.TYPE_PUSHER){
+		    if (sf.ew(xpos,ypos).getWestDeviceType()==Wall.TYPE_PUSHER){
 			g.drawImage(diverseCrop[6],actx-6,acty,64,64,this);
 			// ------------Beschriftung --------------------
 			for (int phasecount=1;phasecount<=5;phasecount++){
@@ -982,8 +982,8 @@ public class SACanvas extends JComponent {
     }
 
     private void paintFlaggen( Graphics g ) {
-	if(sf.getFlaggen()!=null){
-	    Location[] flaggen = sf.getFlaggen();
+	if(sf.getFlags()!=null){
+	    Location[] flaggen = sf.getFlags();
 	    for (int flaggencount = 0; flaggencount<flaggen.length;flaggencount++){
 		int xflagge = flaggen[flaggencount].x-1;
 		int yflagge = sf.getSizeY()-flaggen[flaggencount].y;
@@ -1228,7 +1228,7 @@ public class SACanvas extends JComponent {
     }
 
     protected Location [] getFlags() {
-      return sf.getFlaggen();
+      return sf.getFlags();
     }
 
 
@@ -1264,7 +1264,7 @@ public class SACanvas extends JComponent {
 	return bi;
     }
 
-    private void ersetzeSpielfeld(SpielfeldSim sfs){
+    private void ersetzeSpielfeld(SimBoard sfs){
 	sf = sfs;
 	x = (int) (sf.getSizeX() * scaledFeldSize);
 	y = (int) (sf.getSizeY() * scaledFeldSize);
@@ -1275,7 +1275,7 @@ public class SACanvas extends JComponent {
 
   // Little helper for getting thumbnails of the board
     private static SACanvas sac = null;
-    public static Image createThumb(SpielfeldSim sim, int size) {
+    public static Image createThumb(SimBoard sim, int size) {
 	if( sac == null ) {
 	    sac = new SACanvas(sim);
 	} else {

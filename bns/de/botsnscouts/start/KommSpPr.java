@@ -64,7 +64,7 @@ public class KommSpPr{
 * @param     anz  Anzahl der Mitspieler
 * @param     anmTimeout  Anmeldetimeout in Sekunden
 * @param     zugTimeout  Zugabgabetimeout in Sekunden
-* @param     feld  Spielfeld laut Protokol
+* @param     feld  Board laut Protokol
 * @param     flagsX  Flagepositionen
 * @param     flagY  als Koordinaten
 * @return    <code>true</code>, falls das Spiel gestartet werden konnte, <code>false</code>, sonst

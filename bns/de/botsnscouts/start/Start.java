@@ -272,7 +272,7 @@ public class Start extends JFrame implements WindowListener{
 		    }catch(OneFlagException ex){
 			JOptionPane.showMessageDialog(Start.this,Message.say("Start","mZweiFlaggen"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
 
-		    }catch(NichtZusSpfException exc){
+		    }catch(NonContiguousMapException exc){
 			JOptionPane.showMessageDialog(Start.this,Message.say("Start","mNichtZus"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
 
 		    }
@@ -321,7 +321,7 @@ public class Start extends JFrame implements WindowListener{
 		if (spielfeld.endsWith(".spf")){
 		    spielfeld=spielfeld.substring(0,spielfeld.length()-4);
 		}
-		CAT.debug("Spielfeld "+spielfeld);
+		CAT.debug("Board "+spielfeld);
 		GameFieldLoader loader=new GameFieldLoader();
 		Facade fassade=new Facade();
 		Properties prop = loader.getProperties(spielfeld);

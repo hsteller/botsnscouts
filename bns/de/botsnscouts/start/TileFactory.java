@@ -115,7 +115,7 @@ public class TileFactory {
 	try{
 	    BufferedReader kachReader =new BufferedReader(new InputStreamReader(istream));
 	    String tmp=null;
-	    //und lese Spielfeld aus
+            //und lese Board aus
 	    while((tmp=kachReader.readLine())!=null)
 		str.append(tmp+"\n");
 
@@ -130,7 +130,7 @@ public class TileFactory {
 	    Tile[] kachAr=new Tile[4];
 	    kachAr[0]=kach;//Die Tile mit Drehung 0 wird initialisiert
 	    tileTab.put(name, kachAr);
-	}catch(FlaggenException e){
+	}catch(FlagException e){
 	    System.err.println(e);
 	}catch(FormatException e){
 	    System.err.println(e);

@@ -34,8 +34,8 @@ import javax.swing.*;
 import javax.swing.plaf.metal.*;
 
 import de.botsnscouts.BotsNScouts;
-import de.botsnscouts.board.SpielfeldSim;
-import de.botsnscouts.board.FlaggenException;
+import de.botsnscouts.board.SimBoard;
+import de.botsnscouts.board.FlagException;
 import de.botsnscouts.util.*;
 import org.apache.log4j.*;
 
@@ -156,7 +156,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 	    System.err.println("Oups!"+e);
 	    return false;
 	}
-	catch(FlaggenException ex){
+	catch(FlagException ex){
 	    System.err.println("Oups!"+ex);
 	    return false;
 	}
