@@ -18,8 +18,7 @@
 # X-Display that will be used
 ONDISPLAY=1 
 # where your java-VM is
-JAVAPATH=/usr/local/jdk1.2/bin 
-LANG=`cat language`
+JAVAPATH=/usr/local/jdk1.3/bin 
 # ----------- don't change anything from here on
-xinit -bg black -fg green -j -e sh -c "xsetroot -solid black; $JAVAPATH/java -jar botsnscouts.jar $LANG" -- :$ONDISPLAY  
+xinit -bg black -fg green -j -e sh -c "xsetroot -solid black; $JAVAPATH/java -jar botsnscouts.jar -- :$ONDISPLAY  
 

@@ -1,2 +1,2 @@
 #!/bin/sh
-java -jar botsnscouts.jar `cat language`
+java -Dbns.home=$PWD/`dirname $0` -jar botsnscouts.jar
