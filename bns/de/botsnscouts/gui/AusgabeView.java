@@ -545,8 +545,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
             RobotStatus rs = (RobotStatus) e.nextElement();
             Bot robot = rs.getRobot();
             CAT.debug( "Bot is: " + robot );
-            CAT.debug( "imgs is: " + OldRobotStatusImpl.robotImages );
-            JMenuItem rob = new JMenuItem(robot.getName(),new ImageIcon(OldRobotStatusImpl.robotImages[robot.getBotVis()]));
+            CAT.debug( "imgs is: " + BotVis.getRobotImages() );
+            JMenuItem rob = new JMenuItem(robot.getName(),new ImageIcon(BotVis.getRobotImages()[robot.getBotVis()]));
             rob.addActionListener(new ShowRobListener(rs));
             this.add(rob);
           }
@@ -573,7 +573,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
               String s = Message.say("AusgabeView", "robotNotOnBoard", robot.getName());
               JOptionPane.showMessageDialog(null,s, "Ooops!",JOptionPane.INFORMATION_MESSAGE,
-                                             new ImageIcon(OldRobotStatusImpl.robotImages[robot.getBotVis()]));
+                                             new ImageIcon(BotVis.getRobotImages()[robot.getBotVis()]));
               CAT.debug("Showing popup instead of robot, because robot is not on board..");
           }
           else {

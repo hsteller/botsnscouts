@@ -98,10 +98,6 @@ public class UserInfo extends TJPanel {
 	    ui.setInfo("Und jetzt der Proof, ob es auch ersetzen geht.");
 	}
 
-    private void d(String s) {
-	System.err.println(s);
-    }
-
 }
 
 
