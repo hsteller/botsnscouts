@@ -26,6 +26,8 @@
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
+
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
@@ -210,7 +212,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
     /**
      * display the register repair request
      */
-    public void showRegisterRepair(Karte[] robRegs, int repairNumber) {
+    public void showRegisterRepair(Card[] robRegs, int repairNumber) {
       CAT.debug("Show Register Repair");
 	registers.updateRegisters(robRegs);
 	repairRegisters.setChoises(registers.getRegisterViewArray(), repairNumber);
@@ -224,8 +226,8 @@ public class HumanView extends JPanel implements HumanViewInterface {
      */
     public void showUpdatedScout() {
 	if (scoutView.selected()) {
-	    Roboter[] doPhaseRob = new Roboter[1];
-	    doPhaseRob[0] = Roboter.getCopy(human.getRob());
+	    Bot[] doPhaseRob = new Bot[1];
+	    doPhaseRob[0] = Bot.getCopy(human.getRob());
 	    d("got a copy of my robot: " + doPhaseRob[0]);
 	    ArrayList alreadyChosen = registers.getAlreadyChosen();
 	    d("already chosen registers:"+alreadyChosen);
@@ -248,8 +250,8 @@ public class HumanView extends JPanel implements HumanViewInterface {
      * remove the scout
      */
     public void removeScout() {
-	    Roboter[] doPhaseRob = new Roboter[1];
-	    doPhaseRob[0] = Roboter.getCopy(human.getRob());
+	    Bot[] doPhaseRob = new Bot[1];
+	    doPhaseRob[0] = Bot.getCopy(human.getRob());
 	    doPhaseRob[0].zeige_Roboter();
 	    human.passUpdatedScout(0,doPhaseRob);
     }
@@ -307,7 +309,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
    // public void shutup() {}
 
 
-    protected void updateRegisters(Karte[] robRegs){
+    protected void updateRegisters(Card[] robRegs){
 	registers.updateRegisters(robRegs);
 	CAT.debug("Updating Registers...");
 	registers.resetAll();

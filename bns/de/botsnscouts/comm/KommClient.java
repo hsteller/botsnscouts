@@ -351,7 +351,7 @@ public class KommClient {
 			if (rd=='P') {
 			    try {
 				try {
-				    Karte [] karten1 = new Karte [9]; // max. number of cards
+				    Card [] karten1 = new Card [9]; // max. number of cards
 				    int klammerauf=com.indexOf('(');
 				    int klammerletzt=com.lastIndexOf(')');
 				    com=com.substring (klammerauf+1);
@@ -379,7 +379,7 @@ public class KommClient {
 				    }
 				    // now there should be 'count' cards in karten1
 				    back.typ=back.MACHEZUG;
-				    back.karten=new Karte [count];
+				    back.karten=new Card [count];
 
 				    for (int i=0; i<count;i++)
 					back.karten[i]=karten1[i];
@@ -702,7 +702,7 @@ public class KommClient {
 	They are ordered according to the flags' numbers.
 	@exception KommException ..if an error occurs
     */
-    public Ort [] getFahnenPos ()throws KommException {
+    public Location [] getFahnenPos ()throws KommException {
 	// Gets a String like  "(x,y)(a,b)(c,d)"
 	// out.println ("GFL");
 	this.senden("GFL");
@@ -718,10 +718,10 @@ public class KommClient {
 		zaehler++;
 	    start=pos+1;
 	}// postcondition: zaehler == number of flags (Orts)
-	Ort [] back;
+	Location [] back;
 	rein+="**"; // dummy to avoid Exceptions
 	try {
-	    back = new Ort [zaehler];
+	    back = new Location [zaehler];
 	    for (int myI=0;myI<zaehler;myI++){
 		int klammerzu = rein.indexOf(')');
 		int kommapos = rein.indexOf(',');
@@ -729,8 +729,8 @@ public class KommClient {
 		String y=rein.substring(kommapos+1,klammerzu); // String containing y-coordinate
 		int xk=Integer.parseInt(x); //  x-coordinate
 		int yk=Integer.parseInt(y); //  y-coordinate
-		back [myI]=new Ort(xk, yk);
-		rein=rein.substring(klammerzu+1);// remove parsed Point (Ort)
+		back [myI]=new Location(xk, yk);
+		rein=rein.substring(klammerzu+1);// remove parsed Point (Location)
 	    }
 	}
 	// A lot of errors might happen.. :
@@ -755,16 +755,16 @@ public class KommClient {
 	@return The robot's coordinates
 	@exception KommException ..if an error occurs
     */
-/*   public Ort getRobPos (String name) throws KommException {
+/*   public Location getRobPos (String name) throws KommException {
 	return this.fetchOrt(name, true);
     }
 */
     /** This method asks the server for the size of the board.
-	@return An Ort containing the bords Dimensions.
+	@return An Location containing the bords Dimensions.
 	@exception KommException ..if an error occurs
     */
 
-    public Ort getSpielfeldDim () throws KommException{
+    public Location getSpielfeldDim () throws KommException{
 	return this.fetchOrt("wirdIgnoriert", false);
     }
 
@@ -857,16 +857,16 @@ public class KommClient {
 	return back;
 
     }
-    /**Info-Request zur Abfrage des Status eines Roboters; gibt ein Roboter-objekt zur&uuml;ck, dass alle notwendigen Informationen enth&auml;lt.
-       Falls der Roboter entfernt wurde, wird Roboter.leben auf -1 gesetzt, die restlichen Attribute werden nicht gesetzt (d.h = null oder was_auch_immer).
+    /**Info-Request zur Abfrage des Status eines Roboters; gibt ein Bot-objekt zur&uuml;ck, dass alle notwendigen Informationen enth&auml;lt.
+       Falls der Bot entfernt wurde, wird Bot.leben auf -1 gesetzt, die restlichen Attribute werden nicht gesetzt (d.h = null oder was_auch_immer).
        @exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.
     */
-    public Roboter getRobStatus (String name) throws KommException {
+    public Bot getRobStatus (String name) throws KommException {
         String com ="";
-	Roboter robot=Roboter.getNewInstance(name);
+	Bot robot=Bot.getNewInstance(name);
         String raus ="GRS("+URLEncoder.encode(name)+")";
 	this.senden(raus);
-	//Server sends "RS(Richtung(N,O..), Ort(1,1), LFlag, LArchF, Schaden, VLeben, GespRegister, Aktiv, Virtuell, RSreserveiert)"
+        //Server sends "RS(Richtung(N,O..), Location(1,1), LFlag, LArchF, Schaden, VLeben, GespRegister, Aktiv, Virtuell, RSreserveiert)"
 	/*try{
 	  com=in.readLine();
 	  // System.out.println ("GETROBSTATUS: gelesener String: "+com);
@@ -901,13 +901,13 @@ public class KommClient {
 		robot.setPos(Integer.parseInt(xk), Integer.parseInt(yk));
 	    }
 	    catch (NumberFormatException nfe) {
-		throw new KommException ("getRobStatus: (Ort-Parsen) NumberFormatException(Message: "+nfe.getMessage());
+		throw new KommException ("getRobStatus: (Location-Parsen) NumberFormatException(Message: "+nfe.getMessage());
 	    }
 	    com=com.substring(klazupos+2); //(x,y), abschneiden
 	    kommapos=com.indexOf(',');
 	    String flagge = com.substring(0,kommapos);
 	    try {
-		robot.setNaechsteFlagge(Integer.parseInt(flagge)+1);// +1, weil unser Roboter die naechste und nicht die letzte Flagge haben will
+		robot.setNaechsteFlagge(Integer.parseInt(flagge)+1);// +1, weil unser Bot die naechste und nicht die letzte Flagge haben will
 	    }
 	    catch (NumberFormatException nfe2) {
 		throw new KommException ("getRobStatus: (L-Flag-Parsen) NumberFormatException(Message: "+nfe2.getMessage());
@@ -916,7 +916,7 @@ public class KommClient {
 
 	    kommapos=com.indexOf(',');
 	    klazupos=com.indexOf(')');
-	    xk=com.substring(1,kommapos); // Archiv - Ort
+	    xk=com.substring(1,kommapos); // Archiv - Location
 	    yk=com.substring(kommapos+1,klazupos);
 	    try {
 		robot.setArchiv(Integer.parseInt(xk),Integer.parseInt(yk));
@@ -1023,7 +1023,7 @@ public class KommClient {
 
     }
     /** Info-Request zur Abfrage des sogenannten Spielstatus.
-	Sie gibt f&uuml;r jeden Roboter ein Statusobjekt zur&uuml;ck, das dessen Namen, seine bisher ausgewerteten Registerinhalte und die aktuelle Auswertungsphase als Attribute besitzt.
+	Sie gibt f&uuml;r jeden Bot ein Statusobjekt zur&uuml;ck, das dessen Namen, seine bisher ausgewerteten Registerinhalte und die aktuelle Auswertungsphase als Attribute besitzt.
 	Falls gerade nicht ausgewertet wird, wird null zurückgegeben.
 	@exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.*/
     public Status [] getSpielstatus() throws KommException{
@@ -1089,14 +1089,14 @@ public class KommClient {
 
     // HELPER METHODS
 
-    // bearbeitet Anfragen nach einem Ort
+    // bearbeitet Anfragen nach einem Location
 
     /**Gets either the position of the robot (if RobPos==true)
      * or the dimensionj of the board (if RobPos== false)
      *
      * @param name WILL BE IGNORED */
-    private  Ort fetchOrt (String name, boolean RobPos) throws KommException{
-	Ort back= new Ort (-1,-1); // Initialisierung
+    private  Location fetchOrt (String name, boolean RobPos) throws KommException{
+	Location back= new Location (-1,-1); // Initialisierung
 	String method="noch fetchOrt";;
 	try {
 	    if (RobPos) { // getRobPos ?!
@@ -1154,7 +1154,7 @@ public class KommClient {
 	    kpos = in2.indexOf (',');
 	}
 	//System.out.println ("Karten: "+ks);
-	back.register= new Karte [ks];
+	back.register= new Card [ks];
 	int i=0;
 	while (in.length()>4) {
 	    // System.out.println ("While-Loop mit: "+in);
@@ -1183,8 +1183,8 @@ public class KommClient {
 	return back;
     }
 
-    private static Karte [] getRegister (String str)throws KommException {
-	Karte [] back = new Karte [5];
+    private static Card [] getRegister (String str)throws KommException {
+	Card [] back = new Card [5];
 	for (int i=0;i<5;i++)
 	back[i]=null;
 	// z.B.: "((1,PK(M1,123))(2,PK(M2,456)))"
@@ -1224,7 +1224,7 @@ public class KommClient {
 		catch (NumberFormatException nf2) {
 		    throw new KommException ("getRegister: NumberFormatException bei Parsen der Kartenprioritaet: Message: "+nf2.getMessage());
 		}
-		back [register-1]=KartenStapel.get(prioritaet,kartenaktion); // Karte eingeteilt
+		back [register-1]=KartenStapel.get(prioritaet,kartenaktion); // Card eingeteilt
 		//jetzt String aktualisieren:
 
 		active=active.substring(klzu+3); // "1,PK(M1,123))(" abschneiden    KLZU+1
@@ -1254,7 +1254,7 @@ public class KommClient {
 	return -1;
     }
     /** Hilfsmethode fuer GetRobStatus-Antwort.
-	Liefert den String zurueck, der den ersten Roboter betrifft:
+	Liefert den String zurueck, der den ersten Bot betrifft:
 	Bekommt die Methode "(name1,PK(M1,123))(name2,))" uebergeben,so gibt sie
 	"(name1,PK(M1,123))" zurueck.
 	Der uebergebene String wird nicht veraendert.

@@ -31,7 +31,7 @@ import de.botsnscouts.board.*;
 public class TileRaster{
     private int KX=3, KY=3, FL=6 ;
     private Tile tiles[][]=new Tile[KX][KY];
-    private Ort[] flaggen = new Ort[FL];
+    private Location[] flaggen = new Location[FL];
     private int flaggenN=0;
     private int[][] tileind = new int[KX][KY];
     private TileFactory tileFactory;
@@ -97,8 +97,8 @@ public class TileRaster{
     public String getFlaggeKomment(int x,int y){
 	int kx=(x-1)/12;
 	int ky=(y-1)/12;
-	Ort[] flag= new Ort[1];
-	flag[0]=new Ort((x-1)%12+1,(y-1)%12+1);
+	Location[] flag= new Location[1];
+	flag[0]=new Location((x-1)%12+1,(y-1)%12+1);
 	String komment="";
 	try{
 	    Spielfeld tmpSpf=new Spielfeld(12,12,tiles[kx][ky].getComputedString(),flag);
@@ -135,8 +135,8 @@ public class TileRaster{
 	    return false;
 	}
 	//prüfe Tileelement
-	Ort[] flag=new Ort[1];
-	flag[0]=new Ort((x-1)%12+1,(y-1)%12+1);
+	Location[] flag=new Location[1];
+	flag[0]=new Location((x-1)%12+1,(y-1)%12+1);
 
 	boolean testFl=tiles[kx][ky].testFlagge(flag);
 	return testFl;
@@ -146,7 +146,7 @@ public class TileRaster{
     public void addFlagge(int x,int y) throws FlaggenException{
 	if (!checkFlaggePos(x,y))
 	    throw new FlaggenException();
-	flaggen[flaggenN++]=new Ort(x,y);
+	flaggen[flaggenN++]=new Location(x,y);
     }
 
     // löscht eine Flagge
@@ -182,7 +182,7 @@ public class TileRaster{
     public void moveFlagge(int nr, int x,int y) throws FlaggenException{
 	if (!checkFlaggeMovePos(x,y))
 	    throw new FlaggenException();
-	flaggen[nr]=new Ort(x,y);
+	flaggen[nr]=new Location(x,y);
     }
 
     // versetzt eine Flagge an der Position
@@ -196,7 +196,7 @@ public class TileRaster{
     }
 
     //gibt die Flaggen zurück
-    public Ort[] getFlaggen(){
+    public Location[] getFlaggen(){
 	return flaggen;
     }
 
@@ -222,8 +222,8 @@ public class TileRaster{
     }
 
     //gibt Spielfeldgröße zurück
-    public Ort getSpielfeldDim(){
-	return new Ort(KX,KY);
+    public Location getSpielfeldDim(){
+	return new Location(KX,KY);
     }
 
     //gibt den "Clone" zurück
@@ -247,7 +247,7 @@ public class TileRaster{
 
     //gibt Flaggen mit evtl versetzten Koordinaten zurück
     public int[][] getRFlaggen(){
-	Ort[] bounds=findBounds();
+	Location[] bounds=findBounds();
 	int[][] flags=new int[2][flaggenN];
 	for (int i=0;i<flaggenN;i++){
 	    flags[0][i]=flaggen[i].x-bounds[0].x*12;
@@ -259,7 +259,7 @@ public class TileRaster{
     //gibt das Spielfeld als ein String zurück
     public String getSpielfeld() throws OneFlagException, NichtZusSpfException{
 	checkSpielfeld();//teste
-	Ort[] bounds= findBounds();
+	Location[] bounds= findBounds();
 	String GRUBENZWR="____________";
 	String GRUBENFLD="_G_G_G_G_G_G_G_G_G_G_G_G_";
 	StringBuffer out=new StringBuffer();//hier wird das Spielfeld aufgebaut
@@ -390,10 +390,10 @@ public class TileRaster{
     }
     
     //findet Grenzen des Spielfeldes
-    Ort[] findBounds(){
-	Ort[] bounds=new Ort[2];
-	bounds[0]=new Ort(0,0);
-	bounds[1]=new Ort(0,0);
+    Location[] findBounds(){
+	Location[] bounds=new Location[2];
+	bounds[0]=new Location(0,0);
+	bounds[1]=new Location(0,0);
 	x0: for (int i=0;i<KX;i++){
 	    for (int j=0;j<KY;j++){
 		if (tiles[i][j]!=null){
@@ -430,9 +430,9 @@ public class TileRaster{
     }
 
     //gibt Größe des Spielfeldes zurück
-    public Ort getSpielfeldSize(){
-	Ort[] bounds=findBounds();
-	return new Ort((bounds[1].x-bounds[0].x+1)*12,(bounds[1].y-bounds[0].y+1)*12);
+    public Location getSpielfeldSize(){
+	Location[] bounds=findBounds();
+	return new Location((bounds[1].x-bounds[0].x+1)*12,(bounds[1].y-bounds[0].y+1)*12);
     }
     
     //prüft ob Spielfeld gültig ist (plausibilitätstests)
@@ -441,7 +441,7 @@ public class TileRaster{
 	if (flaggenN<2)
 	    throw new OneFlagException();
 	//das Spielfeld ist nicht zusammenhängend
-	Ort ftile=findFirstTile();
+	Location ftile=findFirstTile();
 	boolean[][] mark=new boolean[KX][KY];
 	for (int i=0;i<KX;i++)
 	    for (int j=0;j<KY;mark[i][j]=false,j++);
@@ -458,37 +458,37 @@ public class TileRaster{
     }
 
     //findet die erste belegte Tile
-    Ort findFirstTile(){
+    Location findFirstTile(){
 	for (int i=0;i<KX;i++){
 	    for (int j=0;j<KY;j++){
 		if (tiles[i][j]!=null)
-		    return new Ort(i,j);
+		    return new Location(i,j);
 	    }
 	}
 	return null;
     }
 
     //markiert alle (mit der ersten) zusammenhängende Tiles
-    void markNachbarn(Ort tile, boolean[][] mark){
+    void markNachbarn(Location tile, boolean[][] mark){
 	//shau nach links
 	if (tile.x-1>=0&&tiles[tile.x-1][tile.y]!=null&&!mark[tile.x-1][tile.y]){
 	    mark[tile.x-1][tile.y]=true;
-	    markNachbarn(new Ort(tile.x-1,tile.y),mark);
+	    markNachbarn(new Location(tile.x-1,tile.y),mark);
 	}
 	//rechts
 	if (tile.x+1<KX&&tiles[tile.x+1][tile.y]!=null&&!mark[tile.x+1][tile.y]){
 	    mark[tile.x+1][tile.y]=true;
-	    markNachbarn(new Ort(tile.x+1,tile.y),mark);
+	    markNachbarn(new Location(tile.x+1,tile.y),mark);
 	}
 	//unten
 	if (tile.y-1>=0&&tiles[tile.x][tile.y-1]!=null&&!mark[tile.x][tile.y-1]){
 	    mark[tile.x][tile.y-1]=true;
-	    markNachbarn(new Ort(tile.x,tile.y-1),mark);
+	    markNachbarn(new Location(tile.x,tile.y-1),mark);
 	}
 	//oben
 	if (tile.y+1<KY&&tiles[tile.x][tile.y+1]!=null&&!mark[tile.x][tile.y+1]){
 	    mark[tile.x][tile.y+1]=true;
-	    markNachbarn(new Ort(tile.x,tile.y+1),mark);
+	    markNachbarn(new Location(tile.x,tile.y+1),mark);
 	}
     }
 

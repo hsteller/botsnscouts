@@ -26,11 +26,11 @@
 package de.botsnscouts.editor;
 
 import de.botsnscouts.board.*;
-import de.botsnscouts.util.Ort;
+import de.botsnscouts.util.Location;
 import de.botsnscouts.util.FormatException;
 
 class EditableBoard extends de.botsnscouts.board.SpielfeldSim {
-    EditableBoard(int x, int y, String kacheln, Ort[] flaggen) throws FormatException, FlaggenException {
+    EditableBoard(int x, int y, String kacheln, Location[] flaggen) throws FormatException, FlaggenException {
         super(x, y, kacheln, flaggen, null);
     }
 

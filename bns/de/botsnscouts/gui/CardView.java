@@ -133,7 +133,7 @@ public class CardView extends JButton {
 
     protected void setWisenheimer() {
 	wisenheimerPresent = true;
-	CAT.debug("lasse mich von einem Klugscheisser besetzten, ich habe die Karte: "+h);
+	CAT.debug("lasse mich von einem Klugscheisser besetzten, ich habe die Card: "+h);
 	repaint();
     }
 

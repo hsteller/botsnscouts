@@ -40,6 +40,7 @@ import org.apache.log4j.Category;
 
 import de.botsnscouts.board.*;
 import de.botsnscouts.util.*;
+
 import de.botsnscouts.*;
 /**
  * Spielfeld-Ausgabe-Canvas ist das Objekt, das der Ausgabe und dem menschlichen Spieler das Spielfeld grafisch darstellt und verwaltet
@@ -94,9 +95,9 @@ public class SACanvas extends JComponent {
 
     // for painting active Lasers
     /** position of firing robot*/
-    private Ort source;
+    private Location source;
     /**position of robot hit*/
-    private Ort target;
+    private Location target;
     /** facing (direction) of the laser, according to the directions above*/
     private int laserFacing;
     private boolean activeBordLasers;
@@ -126,14 +127,14 @@ public class SACanvas extends JComponent {
     private int x,y;
 
     /** Stores data of the robots.*/
-    private Roboter[] robos;
+    private Bot[] robos;
     /** This robot is used for calculations,
      *  like making a suggestion for the next move.
      */
-    private Roboter vorschauRob;
+    private Bot vorschauRob;
 
     /** last position of our famous scout ;-) */
-    private Ort lastScoutPos = new Ort();
+    private Location lastScoutPos = new Location();
 
     // Let's define some colors, so that everybody uses the same..
     public static final Color GREEN  = BotVis.GREEN;
@@ -148,7 +149,7 @@ public class SACanvas extends JComponent {
 
 
     //  public static final Color[] robocolor = { Color.green, Color.yellow, Color.red,Color.blue, Color.magenta, Color.orange, Color.gray, Color.magenta.darker()};
-    /** Die Farben der Roboter*/
+    /** Die Farben der Bot*/
     public static final Color [] robocolor = {GREEN,YELLOW,RED,BLUE,ROSA,ORANGE,GRAY,VIOLET};
 
     /** gameboard object;
@@ -164,7 +165,7 @@ public class SACanvas extends JComponent {
     double scaledFeldSize; // FELDSIZE * scale
 
     /** position to highlight*/
-    Ort highlightPos = new Ort(0,0);
+    Location highlightPos = new Location(0,0);
 
     ClickListener myClickListener;
 
@@ -306,7 +307,7 @@ public class SACanvas extends JComponent {
 
 
     /** Create "name->color" - Hashtable*/
-    private void setRobColors (Roboter[] robs) {
+    private void setRobColors (Bot[] robs) {
 	gotColors=true;
 	nameToColorHash = new java.util.Hashtable();
 	for (int i=0;i<robs.length;i++)
@@ -317,9 +318,9 @@ public class SACanvas extends JComponent {
     }
 
 
-    /** Lookup the Robot's color (by name)
-	@param name The Robot's name
-	@return The Robot's color. If the name is unknown, Color.white will be returned,
+    /** Lookup the Bot's color (by name)
+	@param name The Bot's name
+	@return The Bot's color. If the name is unknown, Color.white will be returned,
     */
     private Color getRobColor (String name){
 	Color foo=null;
@@ -333,8 +334,8 @@ public class SACanvas extends JComponent {
 
 
 
-    protected void ersetzeRobos(Roboter[] robos_neu){
-	if (!gotColors) // jetzt bekomme ich zum erstenmal die Roboter
+    protected void ersetzeRobos(Bot[] robos_neu){
+	if (!gotColors) // jetzt bekomme ich zum erstenmal die Bot
 	    setRobColors(robos_neu);
 	robos=robos_neu;
 	repaint();
@@ -351,12 +352,12 @@ public class SACanvas extends JComponent {
        @param targetRob position of the robot hit
     */
 
-    public void doRobLaser (Roboter sourceRob, Roboter targetRob ) {
+    public void doRobLaser (Bot sourceRob, Bot targetRob ) {
 	if (CAT.isDebugEnabled())
 	    CAT.debug("doRobLaser: "+sourceRob.getName()+" -> "+targetRob.getName());
 	source = sourceRob.getPos();
 	target = targetRob.getPos();
-	laserFacing=sourceRob.getAusrichtung();
+	laserFacing=sourceRob.getFacing();
 	int laenge = calculateLaserLength(source, target, laserFacing);
 	laenge*=64;
 
@@ -414,8 +415,8 @@ public class SACanvas extends JComponent {
 	@param y Die Y-Koordinate des Feldes
 	@return Die Position der linken oberen Ecke des Feldes als Java-Pixelwerte zum Zeichnen.
     */
-	private Ort mapC2PixelNorthWest (int x, int y) {
-	Ort pixel=new Ort();
+	private Location mapC2PixelNorthWest (int x, int y) {
+	Location pixel=new Location();
 	pixel.x=(x-1)*64;
 	pixel.y=(sf.getSizeY()-y)*64;
 	return pixel;
@@ -424,8 +425,8 @@ public class SACanvas extends JComponent {
 	Genauer: Den Punkt (31,31) auf dem 64x64 grossen Feld mit Koordinaten
 	zwischen 0 und 63.
     */
-    private Ort mapC2PixelCenter (int x, int y) {
-	Ort pixel=mapC2PixelNorthWest(x,y);
+    private Location mapC2PixelCenter (int x, int y) {
+	Location pixel=mapC2PixelNorthWest(x,y);
 	pixel.x+=31;
 	pixel.y+=31;
 	return pixel;
@@ -436,7 +437,7 @@ public class SACanvas extends JComponent {
 
 	int breite=4; // Die Breite des Lasers, sollte gerade sein
 	int lSourceX=0;int lSourceY=0; // Anfangspunkt des Lasers in Pixeln,
-	Ort tmp = mapC2PixelCenter(source.x, source.y); /* Mitte (Punkt (31,31) auf Feld
+	Location tmp = mapC2PixelCenter(source.x, source.y); /* Mitte (Punkt (31,31) auf Feld
 							   mit Punkten von 0 bis 63,
 							   also einem 64x64 grossen Feld
 
@@ -483,7 +484,7 @@ public class SACanvas extends JComponent {
 
     /**
        Berechnet die Laenge eines Lasers (in Feldern) zwischen zwei Robotern.
-       Bsp: Schiesst ein Roboter an Position (2,2) auf einen Roboter an
+       Bsp: Schiesst ein Bot an Position (2,2) auf einen Bot an
        Position (5,2), so wird 3 zurueckgegeben
        (=> multipliziert man den Rueckgabewert mit 64, so erhaelt man die
        zu zeichnende Laserlaenge in Pixeln).
@@ -494,7 +495,7 @@ public class SACanvas extends JComponent {
        @return Die Anzahl der Felder, ueber die der Laser geht (inklusive Startfeld).
 
     */
-    private int calculateLaserLength(Ort source, Ort target, int facing){
+    private int calculateLaserLength(Location source, Location target, int facing){
 
 	int laenge=0;
 	laserFacing=facing;
@@ -533,7 +534,7 @@ public class SACanvas extends JComponent {
 
 	int breite=4; // Die Breite des Lasers, sollte gerade sein
 	int lSourceX=0;int lSourceY=0; // Anfangspunkt des Lasers in Pixeln,
-	Ort tmp = mapC2PixelCenter(source.x, source.y);
+	Location tmp = mapC2PixelCenter(source.x, source.y);
 
 	switch (laserFacing) {
 	case NORTH : {
@@ -583,7 +584,7 @@ public class SACanvas extends JComponent {
        @param targetRob Die Koordinaten des getroffenen Roboters
        @param surrounding Das ScrollPane in dem der Canvas dargestellt wird
     */
-    protected void doBordLaser(Ort laserPos, int laserDir,int strength, Ort targetRob,  JViewport surrounding) {
+    protected void doBordLaser(Location laserPos, int laserDir,int strength, Location targetRob,  JViewport surrounding) {
 	// init laser values
 	source=laserPos;
 	target=targetRob;
@@ -634,7 +635,7 @@ public class SACanvas extends JComponent {
 	return floor.isBelt() && (floor.getBeltDirection() == r);
     }
 
-    protected void vorschau(int phasen, Roboter simRob){
+    protected void vorschau(int phasen, Bot simRob){
 	if (phasen==0){
 	    //scoutOn = true; // flag for repaint: yes, paint scout!
 	    vorschauRob=null;
@@ -643,7 +644,7 @@ public class SACanvas extends JComponent {
 	    return;
 	}
 
-	Roboter[] robs = new Roboter[1];
+	Bot[] robs = new Bot[1];
 	robs[0] = simRob;
 	for (int i=1;i< phasen+1;i++) {
 	    //sf.doPhase(phasen, simRob);
@@ -657,7 +658,7 @@ public class SACanvas extends JComponent {
 
     }
 
-    protected void vorschau(int phasen, Roboter[] vorschauRobArray){
+    protected void vorschau(int phasen, Bot[] vorschauRobArray){
 	if (phasen==0){
 	    vorschauRob=null;
 	    deleteScout();
@@ -982,7 +983,7 @@ public class SACanvas extends JComponent {
 
     private void paintFlaggen( Graphics g ) {
 	if(sf.getFlaggen()!=null){
-	    Ort[] flaggen = sf.getFlaggen();
+	    Location[] flaggen = sf.getFlaggen();
 	    for (int flaggencount = 0; flaggencount<flaggen.length;flaggencount++){
 		int xflagge = flaggen[flaggencount].x-1;
 		int yflagge = sf.getSizeY()-flaggen[flaggencount].y;
@@ -992,8 +993,8 @@ public class SACanvas extends JComponent {
 	}
     }
 
-    /** Berechnet zu einem Ort das Rechteck, das die Kachel umschliesst */
-    void ort2Rect(Ort ort, Rectangle dest) {
+    /** Berechnet zu einem Location das Rechteck, das die Kachel umschliesst */
+    void ort2Rect(Location ort, Rectangle dest) {
 	ort2Rect(ort.x, ort.y, dest);
     }
 
@@ -1004,13 +1005,13 @@ public class SACanvas extends JComponent {
 	dest.height = (int)scaledFeldSize;
     }
 
-    public Ort point2Ort( Point p, Ort ort ) {
+    public Location point2Ort( Point p, Location ort ) {
         ort.x = (int)(p.x / scaledFeldSize) + 1;
         ort.y = (int)((getHeight() - p.y) / scaledFeldSize) + 1;
         return ort;
     }
 
-    public Point ort2Point( Ort ort, Point p ) {
+    public Point ort2Point( Location ort, Point p ) {
         return ort2Point( ort.x, ort.y, p );
     }
 
@@ -1029,7 +1030,7 @@ public class SACanvas extends JComponent {
      *  Koordinaten. N\uFFFDtzlich um einzelne Felder neuzeichnen zu lassen
      */
 
-    void repaintOrt(Ort ort) {
+    void repaintOrt(Location ort) {
 	ort2Rect(ort, rc);
 	repaint( 1, rc.x, rc.y, rc.width, rc.height );
     }
@@ -1071,7 +1072,7 @@ public class SACanvas extends JComponent {
     }
 
 
-    private void showScout(Ort ort) {
+    private void showScout(Location ort) {
 	deleteScout();
 	repaintOrt( ort );
 	lastScoutPos.set( ort );
@@ -1093,7 +1094,7 @@ public class SACanvas extends JComponent {
 	    // Scout
 	    AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
 	    g2d.setComposite( ac );
-	    g.drawImage(scoutCrop[vorschauRob.getAusrichtung()],xpos64,ypos64,64,64,this);
+	    g.drawImage(scoutCrop[vorschauRob.getFacing()],xpos64,ypos64,64,64,this);
 	    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
     }
 
@@ -1101,9 +1102,9 @@ public class SACanvas extends JComponent {
 	Graphics2D g2d = (Graphics2D) g;
 	if (robos!=null){
 	    for (int robocount=0;robocount<robos.length;robocount++){
-                Roboter robot = robos[robocount];
-		if((robot.getSchaden()<10)&&
-		   (robot.getLeben() > 0)) {
+                Bot robot = robos[robocount];
+		if((robot.getDamage()<10)&&
+		   (robot.getLivesLeft() > 0)) {
 		    int xpos = robot.getX()-1;
 		    int ypos = sf.getSizeY()-robot.getY();
 		    int xpos64 = xpos*64;
@@ -1111,8 +1112,8 @@ public class SACanvas extends JComponent {
 		    int actx = xpos64-64;
 		    int acty = ypos64-64;
                     int botVis = robot.getBotVis();
-		    Image imgRob = robosCrop[robot.getAusrichtung()+botVis*4];
-		    boolean virtuell = robot.istVirtuell();
+		    Image imgRob = robosCrop[robot.getFacing()+botVis*4];
+		    boolean virtuell = robot.isVirtual();
 
 		    if( imgRob != null ) {
 			if( virtuell ) {
@@ -1132,7 +1133,7 @@ public class SACanvas extends JComponent {
 	}
     }
 
-    protected Image getRobImage(Roboter robot, int facing){
+    protected Image getRobImage(Bot robot, int facing){
       int botVis = robot.getBotVis();
       return robosCrop[facing+botVis*4];
     }
@@ -1226,7 +1227,7 @@ public class SACanvas extends JComponent {
 	paint(g);
     }
 
-    protected Ort [] getFlags() {
+    protected Location [] getFlags() {
       return sf.getFlaggen();
     }
 

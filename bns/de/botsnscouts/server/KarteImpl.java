@@ -25,14 +25,14 @@
  
 package de.botsnscouts.server;
 
-import de.botsnscouts.util.Karte;
+import de.botsnscouts.util.Card;
 
 /**
 * Implementation of the card interface.
 * Goal: Nobody produces Cards except the card desk.
 */
 
-public class KarteImpl extends Karte {
+public class KarteImpl extends Card {
 
 //    private int prio;
 //    private String aktion;
@@ -47,7 +47,7 @@ public class KarteImpl extends Karte {
 //
 //    /**
 //     *Liefert die Prioritaet zurueck
-//     *@return Prioritaet der Karte als Integer
+//     *@return Prioritaet der Card als Integer
 //     */
 //
 //    public int getprio(){

@@ -87,7 +87,7 @@ public class Tile extends SpielfeldSim{
     }
 
     //prüft ob Flagge(n) gültige Position hat(haben)
-    public boolean testFlagge(Ort[] fl){
+    public boolean testFlagge(Location[] fl){
 	String kach=getComputedString();
 	SpielfeldSim test;
 	try{

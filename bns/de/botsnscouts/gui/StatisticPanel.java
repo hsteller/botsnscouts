@@ -84,7 +84,7 @@ public class StatisticPanel extends JPanel implements ActionListener {
       this.setLayout(grid);
 
       // add colum titles
-      // "Robot" over the first two columns (robot name and icon)
+       // "Bot" over the first two columns (robot name and icon)
       COL_HEADINGS[0].setForeground(Color.white);
       COL_HEADINGS[0].setFont(new Font("Times", Font.BOLD, 16));
       this.add (COL_HEADINGS[0], new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,

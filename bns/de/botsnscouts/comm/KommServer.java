@@ -186,7 +186,7 @@ public class KommServer {
 	    x=Integer.parseInt(xs);
 	    y=Integer.parseInt(ys);
 	    back.typ=back.GIBFELDINHALT;
-	    back.ort=new Ort (x,y);
+	    back.ort=new Location (x,y);
 	  //  System.out.println("SFI-Ende");
 	  }
 	  catch (NumberFormatException xy){
@@ -627,7 +627,7 @@ public class KommServer {
     @param nordostecke  Die Koordinaten der Nordostecke des Spielfeldes in Form eines Ortes
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
     */
-  public void sendSpielfeldDim (Ort nordostecke) throws KommException  {
+  public void sendSpielfeldDim (Location nordostecke) throws KommException  {
     sendSpielfeldDim (nordostecke.x, nordostecke.y);
   }
   /** Alternative Antwort auf Info-Request 'gibSpielfeldDim'.
@@ -666,7 +666,7 @@ public class KommServer {
    * Erhält die Fahnenpositionen als ein geordnetes Feld-Array, d.h. die Position der ersten Fahne steht an erster Stelle, die Position der zweiten Fahne an zweiter Stelle usw..
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
    */
-  public void sendFahnenpos (Ort [] fahnen) throws KommException {
+  public void sendFahnenpos (Location [] fahnen) throws KommException {
     try {
       String raus="";
       for (int i=0;i<fahnen.length;i++)
@@ -726,16 +726,16 @@ public class KommServer {
 
 
   /** Zur Antwort auf Info-Request 'gibRoboterPos'.
-   * Erhält den Ort des Roboters, der gesucht wurde.
+   * Erhält den Location des Roboters, der gesucht wurde.
 @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
    */
-  public void sendRobpos (Ort ort) throws KommException {
+  public void sendRobpos (Location ort) throws KommException {
     // 2.7.99
     try {
       sendRobpos (ort.x, ort.y);
     }
      catch (Exception youNeverKnow) {
-      throw new KommException ("Exception bei sendRobPos(Ort)");
+      throw new KommException ("Exception bei sendRobPos(Location)");
     }
   }
 
@@ -756,14 +756,14 @@ public class KommServer {
 
 
   /**Zur Antwort auf Info-Request 'gibRobStatus'.
-   * Erhält ein Roboter-Objekt mit den 'Daten' des gewünschten Roboters.
+   * Erhält ein Bot-Objekt mit den 'Daten' des gewünschten Roboters.
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
    */
-  public void sendRobStatus (Roboter r)  throws KommException{
+  public void sendRobStatus (Bot r)  throws KommException{
 
    try {
      String raus="RS(";
-     switch (r.getAusrichtung()) {
+     switch (r.getFacing()) {
      case 0 : {
        raus=raus +"N,";
        break;
@@ -783,25 +783,25 @@ public class KommServer {
      default : throw new KommException ("SendRobStatus: Falsche Richtung");
      }
      raus=raus+"("+r.getX()+","+r.getY()+"),";
-     raus=raus+(r.getNaechsteFlagge()-1)+",";
-     raus=raus+"("+r.getArchivX()+","+r.getArchivY()+"),";
-     raus=raus+r.getSchaden()+",";
-     raus=raus+(3-r.getLeben() )+",";
+     raus=raus+(r.getNextFlag()-1)+",";
+     raus=raus+"("+r.getArchiveX()+","+r.getArchiveY()+"),";
+     raus=raus+r.getDamage()+",";
+     raus=raus+(3-r.getLivesLeft() )+",";
      raus=raus+"("; // Gerspregister
-     if (r.getGesperrteRegister()!=null) {
+     if (r.getLockedRegisters()!=null) {
        for (int i=0;i<5;i++) {
-	 if (r.getGesperrteRegister(i)!=null)
-	   raus = raus+"("+(i+1)+","+"PK("+r.getGesperrteRegister(i).getaktion()+","+r.getGesperrteRegister(i).getprio()+")"+")";
+	 if (r.getLockedRegister(i)!=null)
+	   raus = raus+"("+(i+1)+","+"PK("+r.getLockedRegister(i).getaktion()+","+r.getLockedRegister(i).getprio()+")"+")";
 
 
        }
      }
      raus=raus+"),"; // Gespregister
-     if (r.istAktiviert())
+     if (r.isActivated())
        raus+="t,";
      else
        raus+="f,";
-     if (r.istVirtuell())
+     if (r.isVirtual())
        raus+="t,";
      else
        raus+="f,";
@@ -873,7 +873,7 @@ public class KommServer {
 
 
   /**Zur Antwort auf Info-Request 'gibAuswertungsstatus'.
-   * Erhält für jeden Roboter ein Status-Objekt, das den Namen des Roboters, die in der laufenden Runde bereits ausgewerteten Register und die aktuelle Phase der Auswertung enthält.
+   * Erhält für jeden Bot ein Status-Objekt, das den Namen des Roboters, die in der laufenden Runde bereits ausgewerteten Register und die aktuelle Phase der Auswertung enthält.
  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
    */
   public void spielStatus (Status [] robbis) throws KommException {

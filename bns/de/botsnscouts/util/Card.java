@@ -33,27 +33,27 @@ package de.botsnscouts.util;
 
 import java.util.Comparator;
 
-public abstract class Karte  {
+public abstract class Card  {
     protected int prio;
     protected String action;
 
     public static final Comparator INVERSE_PRIORITY_COMPARATOR = new Comparator() {
         public int compare(Object o1, Object o2) {
-            int p1 = ((Karte)o1).getprio();
-            int p2 = ((Karte)o2).getprio();
+            int p1 = ((Card)o1).getprio();
+            int p2 = ((Card)o2).getprio();
             return (p2-p1);
         }
     };
 
     public static final Comparator PRIORITY_COMPARATOR = new Comparator() {
         public int compare(Object o1, Object o2) {
-            int p1 = ((Karte)o1).getprio();
-            int p2 = ((Karte)o2).getprio();
+            int p1 = ((Card)o1).getprio();
+            int p2 = ((Card)o2).getprio();
             return (p1-p2);
         }
     };
 
-    protected Karte( int prio, String action ) {
+    protected Card( int prio, String action ) {
         this.prio = prio;
         this.action = action;
     }
@@ -71,7 +71,7 @@ public abstract class Karte  {
     }
 
     public int compareTo(Object o){
-        Karte k2 = (Karte)o;
+        Card k2 = (Card)o;
         if (this.getprio() < k2.getprio() )
             return -1;
         else if (this.getprio() > k2.getprio() )
@@ -81,8 +81,8 @@ public abstract class Karte  {
     }
 
     public boolean equals(Object o) {
-        if( o instanceof Karte )
-            return getprio() == ((Karte)o).getprio();
+        if( o instanceof Card )
+            return getprio() == ((Card)o).getprio();
 
         return false;
     }

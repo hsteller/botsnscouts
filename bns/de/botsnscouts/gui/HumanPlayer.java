@@ -27,6 +27,7 @@ package de.botsnscouts.gui;
 
 import  de.botsnscouts.*;
 import  de.botsnscouts.util.*;
+
 import  de.botsnscouts.comm.*;
 import  de.botsnscouts.autobot.*;
 import  de.botsnscouts.board.*;
@@ -124,10 +125,10 @@ public class HumanPlayer extends BNSThread {
 		showMessage(Message.say("SpielerMensch","mwartereg"));
 
 		try{
-		    Roboter tempRob = comm.getRobStatus(name);
+		    Bot tempRob = comm.getRobStatus(name);
 		    d("rob has the following locked registers: ");
-			for (int i=0; i< tempRob.getGesperrteRegister().length; i++) d("index: "+i+" ist "+tempRob.getGesperrteRegister()[i]);
-		    humanView.updateRegisters(tempRob.getGesperrteRegister());
+			for (int i=0; i< tempRob.getLockedRegisters().length; i++) d("index: "+i+" ist "+tempRob.getLockedRegisters()[i]);
+		    humanView.updateRegisters(tempRob.getLockedRegisters());
 		}
 		catch (KommException kE) {
 		    System.err.println("SpielerMenschERROR: "+kE.getMessage());
@@ -199,9 +200,9 @@ public class HumanPlayer extends BNSThread {
 
 		   try {
 		       Global.debug(this,"Reparatur erhalten; ersuche, Status von "+name+"  zu erfragen...");
-		       Roboter tempRob = comm.getRobStatus(name);
+		       Bot tempRob = comm.getRobStatus(name);
 		       int repPoints = commAnswer.zahl;
-		       humanView.showRegisterRepair(tempRob.getGesperrteRegister(), repPoints);
+		       humanView.showRegisterRepair(tempRob.getLockedRegisters(), repPoints);
 		   }
 		   catch (KommException kE) {
 		       System.err.println("SpielerMensch: "+kE.getMessage());
@@ -375,7 +376,7 @@ public class HumanPlayer extends BNSThread {
 
 
 
-    protected void passUpdatedScout(int chosen, Roboter[] robs) {
+    protected void passUpdatedScout(int chosen, Bot[] robs) {
 	ausgabe.showScout(chosen,robs);
     }
 
@@ -408,7 +409,7 @@ public class HumanPlayer extends BNSThread {
 	sendMessage(de.botsnscouts.comm.MessageID.WISE_USED,tmp);
     }
 
-    protected Roboter getRob() {
+    protected Bot getRob() {
 	return ausgabe.getRob(name);
 
     }
@@ -434,12 +435,12 @@ public class HumanPlayer extends BNSThread {
     private void initIntelligentBoard()
     {
 	int dimx, dimy;
-	Ort dimension;
+	Location dimension;
 	try{
 	    dimension=comm.getSpielfeldDim();
 	    dimx=dimension.x;
 	    dimy=dimension.y;
-	    Ort[] fahnen=comm.getFahnenPos();
+	    Location[] fahnen=comm.getFahnenPos();
 	    String spielfeldstring=comm.getSpielfeld();
 	    try{
 		intelliBoard = SpielfeldKS.getInstance(dimx,dimy,spielfeldstring,fahnen);
@@ -486,8 +487,8 @@ private void showMessage(String foo){
 
 
     static class RoboTrackListener implements ActionListener {
-	Roboter r;
-	RoboTrackListener(Roboter r) {
+	Bot r;
+	RoboTrackListener(Bot r) {
 	    this.r = r;
 	}
 

@@ -25,11 +25,11 @@
  
 package de.botsnscouts.board;
 
-/** Roboter für das Spielfeld */
+/** Bot für das Spielfeld */
 
-import de.botsnscouts.util.Roboter;
+import de.botsnscouts.util.Bot;
 
-public class BoardRoboter extends Roboter {
+public class BoardRoboter extends Bot {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( BoardRoboter.class );
     public BoardRoboter() { super(""); };
 
@@ -37,7 +37,7 @@ public class BoardRoboter extends Roboter {
 	super(name);
     }
 
-    public BoardRoboter(Roboter r) {
+    public BoardRoboter(Bot r) {
 	super(r);
 	BoardRoboter rob = (BoardRoboter )r;
 	xx = rob.xx;
@@ -70,8 +70,8 @@ public class BoardRoboter extends Roboter {
     protected int aa;
 
     public void dumpZug() {
-        for(int i=0; i<zug.length; i++) {
-            CAT.debug( "dumpZug: " + i + " " + zug[i] );
+        for(int i=0; i<move.length; i++) {
+            CAT.debug( "dumpZug: " + i + " " + move[i] );
         }
     }
 

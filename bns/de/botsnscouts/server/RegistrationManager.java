@@ -196,7 +196,7 @@ class RegistrationManager implements Runnable
         farbe=server.allocateColor(farbe,clientName);
         CAT.debug("Farbe Nr. "+farbe+" zugeteilt.");
 
-        Roboter h=Roboter.getNewInstance(clientName);
+        Bot h=Bot.getNewInstance(clientName);
         h.setBotVis(farbe);
         KommServerRoboter komm = new KommServerRoboter(in,out);
         try{
@@ -209,7 +209,7 @@ class RegistrationManager implements Runnable
 
         anzSpieler++;
         if( CAT.isDebugEnabled() )
-          CAT.debug(""+anzSpieler+". Roboter mit Name "+clientName+" erzeugt.");
+          CAT.debug(""+anzSpieler+". Bot mit Name "+clientName+" erzeugt.");
 
         ServerRoboterThread neu=new ServerRoboterThread(h,server.getOKListener(),server.getInfoRequestAnswerer(),server.getRobThreadMaintainer(),komm);
         server.addRobotThread(neu);

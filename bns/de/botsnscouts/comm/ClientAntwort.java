@@ -29,10 +29,10 @@ public class ClientAntwort {
     /** Ermoeglicht die Abfrage der Kommunikationsart mittels der Konstanten dieser Klasse
      *@author Hendrik<BR>*/
     public int typ;
-    /** Container; enthaelt den Ort, der bei ROBOTERPOS oder SPIELFELDDIM zurueckgegeben wird.*/
-    public Ort ort;
+    /** Container; enthaelt den Location, der bei ROBOTERPOS oder SPIELFELDDIM zurueckgegeben wird.*/
+    public Location ort;
     /** Container; enthaelt die Positionen der Flaggen bei FAHNENPOS*/
-    public Ort [] positionen;
+    public Location [] positionen;
     /** Container; falls ein einzelner String geschickt wurde, ist er in str abgelegt, so zum Beispiel bei 'entfernung': dann steht der Entfernungsgrund in str*/
     public String str;
     /** Container; Falls mehrere Strings (Namen) geschickt wurden, sind diese in ´namen´ abgelegt (bei SPIELERNAMEN, SPIELSTAND) */
@@ -44,12 +44,12 @@ public class ClientAntwort {
 
 
     /** wohl doch nicht benoetigt*/
-    public Roboter roboter; 
+    public Bot roboter;
     /** Container; enthaelt die ausgeteilten Karten bei MACHEZUG*/
-    public Karte [] karten;
+    public Card [] karten;
     /** Container; wird gesetzt, falls ein bool geschickt wird*/
     public boolean ok;
-    /** Container; enthaelt bei SPIELSTATUS für jeden Roboter ein Statusobjekt*/
+    /** Container; enthaelt bei SPIELSTATUS für jeden Bot ein Statusobjekt*/
     public Status [] stati;
     /** Container ; enthaelt bei TIMEOUT das Timeout, bei REPARATUR die Registerzahl */
     public int zahl;

@@ -8,6 +8,7 @@ import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.CursorMan;
 import de.botsnscouts.util.*;
 
+
 import javax.swing.border.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,7 +27,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     JButton diskButton1 = new JButton();
     int viz;
     int ranking = 0;
-    Roboter robot;
+    Bot robot;
 
 
     static synchronized Image getImage(int nr) {
@@ -49,11 +50,11 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     static Image getDisk() { return getImage(2); }
     static Image getOffSwitch() { return getImage(3); }
 
-    RobotInfo(Roboter r, int flagCount ) {
+    RobotInfo(Bot r, int flagCount ) {
         this( r, flagCount, r.getBotVis() );
     }
 
-    RobotInfo(Roboter r, int flagCount, int viz) {
+    RobotInfo(Bot r, int flagCount, int viz) {
         this.robot = r;
         this.viz = viz;
         Icon big = new ImageIcon(roboImages[viz*4]);
@@ -160,7 +161,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
 
         if( isDead() )
             paintShade(g, darkShade);
-        else if( ranking == 0 && robot != null && !robot.istAktiviert() ) {
+        else if( ranking == 0 && robot != null && !robot.isActivated() ) {
             paintShade(g, shadeGray );
         }
         paintFrame( g );
@@ -188,15 +189,15 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         return getMinimumSize();
     }
 
-    public Roboter getRobot() {
+    public Bot getRobot() {
         return robot;
     }
-    public void updateRobot(Roboter r) {
+    public void updateRobot(Bot r) {
         robot = r;
-        damageBar1.setDamageValue(r.getSchaden());
-        flagBar2.setReachedFlag(r.getNaechsteFlagge()-1);
-        statusRobot1.setLifesLeft( r.getLeben() - 1);
-        setDead( r.getLeben() == 0 );
+        damageBar1.setDamageValue(r.getDamage());
+        flagBar2.setReachedFlag(r.getNextFlag()-1);
+        statusRobot1.setLifesLeft( r.getLivesLeft() - 1);
+        setDead( r.getLivesLeft() == 0 );
         repaint();
     }
 
@@ -212,7 +213,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         Box b = Box.createHorizontalBox();
         for(int i=0; i<6; i++) {
-            Roboter robot = Roboter.getNewInstance("TestRob " + i);
+            Bot robot = Bot.getNewInstance("TestRob " + i);
             robot.setAktiviert( i % 2 == 0 );
             final RobotInfo db = new RobotInfo( robot, 7, i);
             db.setWinnerNumber(i);

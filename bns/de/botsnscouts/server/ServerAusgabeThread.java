@@ -108,7 +108,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 			    break;
 
 			case ServerAntwort.GIBROBOTERPOS:
-			    Ort o=info.getRobPos(ans.name);
+			    Location o=info.getRobPos(ans.name);
 			    if (o!=null)
 				komm.sendRobpos(o);
 			    else{
@@ -118,7 +118,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 			    break;
 
 			case ServerAntwort.GIBROBSTATUS:
-			    Roboter r = info.getRobStatus(ans.name);
+			    Bot r = info.getRobStatus(ans.name);
 			    if(r != null){
 				komm.sendRobStatus(r);
 			    }else{

@@ -51,7 +51,7 @@ public class Scout {
     /**
      * Setzt den Scout für das Feld, das den gelegten Karten entspricht
      **/
-    Roboter[] doPhaseRob = new Roboter[1];
+    Bot[] doPhaseRob = new Bot[1];
 
 
 
@@ -60,11 +60,11 @@ public class Scout {
      * Setzt den Scout für das Feld, das den gelegten Karten entspricht
      **/
     private void removeScout() {
-	/*
-	// -------- entferne Scout 
-	Roboter[] doPhaseRob = new Roboter[1];
+/*
+	// -------- entferne Scout
+	Bot[] doPhaseRob = new Bot[1];
 
-	doPhaseRob[0] = Roboter.getCopy(f.statusLine.sC[myRobIndex].r);
+	doPhaseRob[0] = Bot.getCopy(f.statusLine.sC[myRobIndex].r);
 	doPhaseRob[0].zeige_Roboter();
 	int moeglichePhasen = 0;
 	f.spielFeld.vorschau(moeglichePhasen,doPhaseRob);

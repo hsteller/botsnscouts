@@ -88,7 +88,7 @@ public class Facade{
     }
 
     //gibt Spielfeldgröße zurück
-    public Ort getSpielfeldDim(){
+    public Location getSpielfeldDim(){
 	return tileRaster.getSpielfeldDim();
     }
 
@@ -162,7 +162,7 @@ public class Facade{
     }
 
     //gibt die Flaggen zurück
-    public Ort[] getFlaggen(){
+    public Location[] getFlaggen(){
 	return tileRaster.getFlaggen();
     }
 
@@ -203,7 +203,7 @@ public class Facade{
 		}
 	    }
 	}
-	Ort[] flag=getFlaggen();
+	Location[] flag=getFlaggen();
 	for (int i=0;i<flag.length;i++){
 	    if (flag[i]!=null){
 		spfProp.setProperty("flag"+i+"x",""+flag[i].x);
@@ -215,7 +215,7 @@ public class Facade{
 
     //lädt das durch Properties beschriebene Spielfeld
     public void loadSpfProp(Properties spfProp){
-	Ort dim=getSpielfeldDim();
+	Location dim=getSpielfeldDim();
 	for (int i=0;i<dim.x;i++){
 	    for (int j=0;j<dim.y;j++){
 		//lese tilename ein

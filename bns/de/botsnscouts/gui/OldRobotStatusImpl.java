@@ -26,6 +26,8 @@
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
+
+
 import javax.swing.plaf.metal.*;
 import java.awt.*;
 import java.io.*;
@@ -51,19 +53,19 @@ public class OldRobotStatusImpl extends JPanel implements RobotStatus {
     static final ImageIcon botcenterImage = ImageMan.getImageIcon(ImageMan.PNG_ROBOCENTER);
     static final ImageIcon damageImage = ImageMan.getImageIcon(ImageMan.PNG_BOTDAMAGE);
     static final Image[] robotImages = CursorMan.getImages(CursorMan.STATUSROBOTS);
-    Roboter robot;
+    Bot robot;
 
     public OldRobotStatusImpl () {
-	this(Roboter.getNewInstance("TestRob"),null,null);
+	this(Bot.getNewInstance("TestRob"),null,null);
     }
 
-    public OldRobotStatusImpl (Roboter r, MouseListener botCenter, MouseListener flagCenter) {
+    public OldRobotStatusImpl (Bot r, MouseListener botCenter, MouseListener flagCenter) {
 	robot = r;
 	name = new JLabel(r.getName());
-	flag = new JLabel(""+r.getNaechsteFlagge(),new ImageIcon(flagge),JLabel.LEFT);
-	lifes = new JLabel(""+r.getLeben(),new ImageIcon(robotImages[r.getBotVis()]),JLabel.RIGHT);
+	flag = new JLabel(""+r.getNextFlag(),new ImageIcon(flagge),JLabel.LEFT);
+	lifes = new JLabel(""+r.getLivesLeft(),new ImageIcon(robotImages[r.getBotVis()]),JLabel.RIGHT);
 	d("Visualisierung :"+r.getBotVis()+ " an "+r.getName()+" zugeteilt.");
-	damage = new JLabel(""+r.getSchaden(),damageImage,JLabel.LEFT);
+	damage = new JLabel(""+r.getDamage(),damageImage,JLabel.LEFT);
 	track = new JLabel("F",botcenterImage,JLabel.RIGHT);
 	Font labelFont = new Font("Dialog",Font.PLAIN,8);
 	Font nameFont = new Font("Dialog",Font.BOLD,10);
@@ -115,15 +117,15 @@ public class OldRobotStatusImpl extends JPanel implements RobotStatus {
 	return new Dimension(xsize,ysize);
     }
 
-    public void updateRobot(Roboter r) {
-    if (r.getLeben() != Integer.parseInt(lifes.getText())) {
-	lifes.setText(""+r.getLeben());
+    public void updateRobot(Bot r) {
+    if (r.getLivesLeft() != Integer.parseInt(lifes.getText())) {
+	lifes.setText(""+r.getLivesLeft());
     }
-    if (r.getNaechsteFlagge() != Integer.parseInt(flag.getText())) {
-	flag.setText(""+r.getNaechsteFlagge());
+    if (r.getNextFlag() != Integer.parseInt(flag.getText())) {
+	flag.setText(""+r.getNextFlag());
     }
-    if (r.getSchaden() != Integer.parseInt(damage.getText())) {
-	damage.setText(""+r.getSchaden());
+    if (r.getDamage() != Integer.parseInt(damage.getText())) {
+	damage.setText(""+r.getDamage());
     }
 
     robot = r;
@@ -155,7 +157,7 @@ public class OldRobotStatusImpl extends JPanel implements RobotStatus {
 	f.setVisible(true);
     }
 
-    public Roboter getRobot() {
+    public Bot getRobot() {
         return robot;
     }
 }

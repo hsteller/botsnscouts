@@ -37,12 +37,13 @@ import java.net.*;
 import java.io.*;
 import de.botsnscouts.util.*;
 
+
 public class RobotCard extends JPanel{
 
     private JLabel name;
     private JPanel cards;
 
-    public RobotCard(Roboter r){
+    public RobotCard(Bot r){
 	cards=new JPanel(new GridLayout(5,1));
 	setLayout(new GridLayout(1,2));
 	Image[] lll=ImageMan.getImages(r.getBotVis());
@@ -50,7 +51,7 @@ public class RobotCard extends JPanel{
     }
 
 
-    public void updateRobot(Roboter r){
+    public void updateRobot(Bot r){
 
     }
 

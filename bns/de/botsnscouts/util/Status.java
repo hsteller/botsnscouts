@@ -36,11 +36,11 @@ public class Status {
     /** Der Name des Roboters, zu dem der Status gehoert*/
     public String robName;
     /** Die Karten, die in den bisher ausgewerteten Registern liegen.(in der richtigen Reihenfolge*/
-    public Karte [] register;
+    public Card [] register;
   
  
     public Status () {}
-    public Status (int phase, String name, Karte [] karten){
+    public Status (int phase, String name, Card [] karten){
 	aktPhase=phase;
 	robName=name;
 	register=karten;
@@ -54,7 +54,7 @@ public class Status {
     }
     /** Formt fuer die toString-Methode ein Kartenarray in einen String um, der die Karten in der Form PK(aktion,proritaet) durch Kommata getrennt auflistet
      */
-    private static String cardsToString (Karte [] k){
+    private static String cardsToString (Card [] k){
 	String raus="";
 	for (int i=0;i<k.length;i++) {
 	    if (k[i]!=null)

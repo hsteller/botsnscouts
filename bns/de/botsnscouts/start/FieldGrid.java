@@ -46,7 +46,7 @@ class FieldGrid extends JPanel{
     FieldGrid(Start par){
 	parent=par;
 	fassade=par.fassade;
-	Ort spfDim=parent.fassade.getSpielfeldDim();
+	Location spfDim=parent.fassade.getSpielfeldDim();
 	GridLayout lay=new GridLayout(spfDim.y,spfDim.x);
 	lay.setHgap(0);
 	lay.setVgap(0);

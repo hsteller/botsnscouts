@@ -3,19 +3,19 @@ package de.botsnscouts.gui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import de.botsnscouts.util.Roboter;
+import de.botsnscouts.util.Bot;
 
 
 public class StatusRobot extends JButton {
     int lifesLeft;
     Icon bigBot, smallBot;
-    Roboter robot;
+    Bot robot;
 
     public StatusRobot( Icon bigBot, Icon smallBot ) {
         this( bigBot, smallBot, null );
     }
 
-    public StatusRobot( Icon bigBot, Icon smallBot, Roboter r ) {
+    public StatusRobot( Icon bigBot, Icon smallBot, Bot r ) {
         lifesLeft = 2;
         this.bigBot = bigBot;
         this.smallBot = smallBot;
@@ -44,7 +44,7 @@ public class StatusRobot extends JButton {
         Composite comp = g.getComposite();
         int w = bigBot.getIconWidth() - 22;
 
-        if( robot != null && !robot.istAktiviert() ) {
+        if( robot != null && !robot.isActivated() ) {
             g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
             ImageIcon icon = new ImageIcon( RobotInfo.getOffSwitch() );
             icon.paintIcon(this, g, w-8, 15);
@@ -55,7 +55,7 @@ public class StatusRobot extends JButton {
         bigBot.paintIcon(this, g, -10, -10);
         if( lifesLeft == 2 ) smallBot.paintIcon(this, g, w, 6);
         if( lifesLeft >= 1 ) smallBot.paintIcon(this, g, w, smallBot.getIconHeight()-3);
-        if( robot != null && !robot.istAktiviert() ) {
+        if( robot != null && !robot.isActivated() ) {
             g.setComposite( comp );
         }
     }

@@ -38,7 +38,7 @@ public class ServerAntwort {
     /** Container*/
     public String name;
     /** Container*/
-    public Ort ort;
+    public Location ort;
     /** Container*/
     public int wohin;
     /** Container*/

@@ -48,7 +48,7 @@ public class KommStSrvPass{
 
 
  public boolean sendString(String s, String ip,int PORT){
-     //     System.err.println("Sende Roboter und Farbe: "+s+" an "+ip+": "+PORT);//!!!!!!
+     //     System.err.println("Sende Bot und Farbe: "+s+" an "+ip+": "+PORT);//!!!!!!
   try {
 
    tosrv=new Socket(ip,PORT);

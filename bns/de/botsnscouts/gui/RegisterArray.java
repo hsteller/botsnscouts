@@ -141,7 +141,7 @@ public class RegisterArray extends TJPanel {
 	f.setVisible(true);
     }
 
-    protected void updateRegisters(Karte[] roboCards) {
+    protected void updateRegisters(Card[] roboCards) {
 	for (int i = 0; i < 5; i++) {
 	    if (roboCards[i] != null) {
 		((RegisterView)registerView.get(i)).setLocked(true);
@@ -205,7 +205,7 @@ public class RegisterArray extends TJPanel {
     public String toString() {
 	String s = "";
 	for (int i =0; i < registerView.size(); i++) {
-	    s+= "Reg: "+(i+1)+" hat Karte: "+((RegisterView)registerView.get(i)).getCard() + "\n";
+	    s+= "Reg: "+(i+1)+" hat Card: "+((RegisterView)registerView.get(i)).getCard() + "\n";
 	}
 	return s;
     }

@@ -41,7 +41,7 @@ public class Wisenheimer{
 
     private SpielfeldKS aiBoard;
     private SearchRecursively wirbel;
-    private Roboter simRob = Roboter.getNewInstance("dummy");
+    private Bot simRob = Bot.getNewInstance("dummy");
     // damit wir nicht immer für jede Simulation einen neuen Robby brauchen
     private int[] predict=new int[5];
     private int lastPredict;
@@ -51,8 +51,8 @@ public class Wisenheimer{
 	wirbel = new SearchRecursively(aiBoard,0);
     }
 
-    //berechnet den zug neu und gibt index der Karte zurück
-    protected int getPrediction(ArrayList registers, ArrayList cards, Roboter robi){
+    //berechnet den zug neu und gibt index der Card zurück
+    protected int getPrediction(ArrayList registers, ArrayList cards, Bot robi){
         CAT.debug("Wisenheimer.getPrediction() called.");
 	//teste ob alle register belegt sind
 	int t=0;
@@ -65,7 +65,7 @@ public class Wisenheimer{
 
 	simRob.copyRob(robi);
 
-	Karte[] simCards=new HumanCard[9];
+	Card[] simCards=new HumanCard[9];
 	// cards in simCards einlesen, gesperrte Karten werden nicht berücksichtigt
 	int j=0;
 	for (int i = 0; i < cards.size(); i++) {
@@ -81,10 +81,10 @@ public class Wisenheimer{
 	    }
 	}
 	// gesperrte Register in simRob.zug schreiben
-	for (int i = 0; i < simRob.getGesperrteRegister().length; i++){
-	    simRob.setZug(i, simRob.getGesperrteRegister(i));
+	for (int i = 0; i < simRob.getLockedRegisters().length; i++){
+	    simRob.setZug(i, simRob.getLockedRegister(i));
 	}
-	Karte[] vonPermut = wirbel.findBestMove(simCards, simRob);
+	Card[] vonPermut = wirbel.findBestMove(simCards, simRob);
 	for (int i=0;i<5;i++){
 	    predict[i]=vonPermut[i].getprio();
 	}

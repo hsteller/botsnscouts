@@ -27,6 +27,7 @@ package de.botsnscouts.gui;
 
 import de.botsnscouts.comm.*;
 import de.botsnscouts.util.*;
+
 import de.botsnscouts.board.*;
 import java.awt.*;
 import java.io.*;
@@ -60,7 +61,7 @@ public class Ausgabe extends BNSThread {
 
     // game constants
     private Dimension boardDimension;
-    private Ort[] flags;
+    private Location[] flags;
 
     private String host, name;
     private int port;
@@ -139,13 +140,13 @@ public class Ausgabe extends BNSThread {
 		    CAT.debug("Got message telling "+kommAntwort.namen[1]+" shot "
 			      +kommAntwort.namen[2]+".");
 
-		    Roboter r1 =(Roboter )robots.get(kommAntwort.namen[1]);
-		    Roboter r2 =(Roboter )robots.get(kommAntwort.namen[2]);
+		    Bot r1 =(Bot )robots.get(kommAntwort.namen[1]);
+		    Bot r2 =(Bot )robots.get(kommAntwort.namen[2]);
 
 		    // updating statistics
 		    Stats actualStats=stats.getStats(r1.getName());
 		    actualStats.incHits();
-		    if (r2.getSchaden()>=10) // was the robot r2(hit) killed ny r1?
+		    if (r2.getDamage()>=10) // was the robot r2(hit) killed ny r1?
 			actualStats.incKills();
 		    actualStats=stats.getStats(r2.getName());
 		    actualStats.incDamageByRobots();
@@ -170,8 +171,8 @@ public class Ausgabe extends BNSThread {
 		else if (msgId.equals(de.botsnscouts.comm.MessageID.BORD_LASER_SHOT)){ // boardlaser shooting
 
 		    // get damaged robot
-		    Roboter r1= (Roboter )robots.get(kommAntwort.namen[1]);
-		    Ort r1Pos = r1.getPos();
+		    Bot r1= (Bot )robots.get(kommAntwort.namen[1]);
+		    Location r1Pos = r1.getPos();
 
                     // updating statistics for the robot hit
                     Stats actualStats=stats.getStats(r1.getName());
@@ -179,7 +180,7 @@ public class Ausgabe extends BNSThread {
 
 		    // get the origin of the laser (position and other stuff
                     // needed for animation)
-		    Ort laserPos = new Ort(0,0);
+		    Location laserPos = new Location(0,0);
 		    int facing=-1;
 		    int strength=-1;
 		    try {
@@ -218,7 +219,7 @@ public class Ausgabe extends BNSThread {
 
                 else if (msgId.equals(de.botsnscouts.comm.MessageID.WISE_USED)){
                     SoundMan.playSound(SoundMan.BOO);
-                    Roboter r1= (Roboter )robots.get(kommAntwort.namen[1]);
+                    Bot r1= (Bot )robots.get(kommAntwort.namen[1]);
                     Stats actualStats=stats.getStats(r1.getName());
                     actualStats.incAskWisenheimer();
                 }
@@ -254,7 +255,7 @@ public class Ausgabe extends BNSThread {
 
 		    ausgabeView.showUpdatedRobots(getRoboterArray());
 
-		    // --------- Neue Roboter-Position an Spielfeld senden ---------
+                    // --------- Neue Bot-Position an Spielfeld senden ---------
 		    try {
 			Thread.sleep(100);
 		    } // Verz÷gerung der Ausgabegeschwindigkeit
@@ -350,7 +351,7 @@ public class Ausgabe extends BNSThread {
 		}
                 BotVis.initBotVis( playerColorHash );
 
-		Ort boardDim = kommClient.getSpielfeldDim();
+		Location boardDim = kommClient.getSpielfeldDim();
 		boardDimension = new Dimension(boardDim.x,boardDim.y);
 		flags = kommClient.getFahnenPos();
 		// !!HACK!!
@@ -373,7 +374,7 @@ public class Ausgabe extends BNSThread {
 
 		for (int i=0; i < playerNames.length; i++) {
 		    d("Hole Roboterstatus von: "+playerNames[i]);
-		    Roboter tempRob = kommClient.getRobStatus(playerNames[i]);
+		    Bot tempRob = kommClient.getRobStatus(playerNames[i]);
                     String h_name = tempRob.getName();
                     Integer h_int = (Integer)playerColorHash.get(h_name);
 		    tempRob.setBotVis(h_int.intValue());
@@ -394,7 +395,7 @@ public class Ausgabe extends BNSThread {
                     public void mouseReleased( MouseEvent me ) {
                         if( (me.getModifiers() & MouseEvent.BUTTON3_MASK) > 0) {
                             CAT.debug("mouse clicked in canvas " + me.getPoint() );
-                            Ort ort = new Ort();
+                            Location ort = new Location();
                             SACanvas brd = (SACanvas) me.getSource();
                             brd.point2Ort( me.getPoint(), ort );
                             CAT.debug("corresponding ort is: " + ort );
@@ -437,7 +438,7 @@ public class Ausgabe extends BNSThread {
 
 	    }
 	    catch (KommException kE) {
-		CAT.error("Ausgabe: Beim Versuch, die Roboter zu holen, erhalte ich: "+
+		CAT.error("Ausgabe: Beim Versuch, die Bot zu holen, erhalte ich: "+
 				   kE.getMessage());
 		return;
 	    }
@@ -468,12 +469,12 @@ public class Ausgabe extends BNSThread {
 	}
     }
 
-    protected Roboter getRob(String name){
-	return (Roboter) robots.get(name);
+    protected Bot getRob(String name){
+	return (Bot) robots.get(name);
     }
 
 
-    protected void showScout(int chosen, Roboter[] robs) {
+    protected void showScout(int chosen, Bot[] robs) {
 	ausgabeView.showScout(chosen,robs);
     }
 
@@ -504,12 +505,12 @@ public class Ausgabe extends BNSThread {
 
     }
 
-    private Roboter[] getRoboterArray(){
-	Roboter[] robs = new Roboter[robots.size()];
+    private Bot[] getRoboterArray(){
+	Bot[] robs = new Bot[robots.size()];
 	int i=0;
 	Iterator iter = robots.values().iterator();
 	while (iter.hasNext()) {
-	    robs[i] = (Roboter) iter.next();
+	    robs[i] = (Bot) iter.next();
 	    i++;
 	}
 	return robs;
@@ -552,7 +553,7 @@ public class Ausgabe extends BNSThread {
      * Zentriert den Robi und folgt ihm.
      */
     public void trackRob (String rName) {
-	Roboter r = (Roboter) robots.get(rName);
+	Bot r = (Bot) robots.get(rName);
 	trackPos(r.getX(), r.getY());
     }
 

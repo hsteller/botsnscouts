@@ -36,8 +36,8 @@ package de.botsnscouts.autobot;
 import de.botsnscouts.board.BoardRoboter;
 import de.botsnscouts.board.SpielfeldKS;
 import de.botsnscouts.server.KartenStapel;
-import de.botsnscouts.util.Karte;
-import de.botsnscouts.util.Roboter;
+import de.botsnscouts.util.Card;
+import de.botsnscouts.util.Bot;
 
 import java.util.Arrays;
 
@@ -45,11 +45,11 @@ public class SearchRecursively {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(SearchRecursively.class);
 
     private SpielfeldKS sf;
-    private Karte[] bestCards;
+    private Card[] bestCards;
     private int bestScore;
     private int malus;
 
-    private static final Karte[] malusCards = {KartenStapel.getRefCard("RL"),
+    private static final Card[] malusCards = {KartenStapel.getRefCard("RL"),
                                                KartenStapel.getRefCard("M1"),
                                                KartenStapel.getRefCard("M2"),
                                                KartenStapel.getRefCard("M3"),
@@ -62,14 +62,14 @@ public class SearchRecursively {
         malus = m;
     }
 
-    public Karte[] findBestMove(Karte[] ka, final Roboter r) {
+    public Card[] findBestMove(Card[] ka, final Bot r) {
         int j = 0;
-        bestCards = new Karte[5];
+        bestCards = new Card[5];
         for (int i = 0; i < 5; i++) {
-            if (r.getZug(i) == null) {
+            if (r.getMove(i) == null) {
                 bestCards[i] = ka[j++];
             } else {
-                bestCards[i] = r.getZug(i);
+                bestCards[i] = r.getMove(i);
             }
         }
         if (j == 0) {
@@ -77,8 +77,8 @@ public class SearchRecursively {
         }
         bestScore = 1000;
         j = 0;
-        while (r.getZug(j) != null) {
-            Roboter[] ra = new Roboter[1];
+        while (r.getMove(j) != null) {
+            Bot[] ra = new Bot[1];
             ra[0] = r;
             sf.doPhase(j + 1, ra);
             j++;
@@ -87,7 +87,7 @@ public class SearchRecursively {
         int len = 0;
         while ((len < 9) && (ka[len] != null))
             len++;
-        Arrays.sort(ka, 0, len, Karte.INVERSE_PRIORITY_COMPARATOR);
+        Arrays.sort(ka, 0, len, Card.INVERSE_PRIORITY_COMPARATOR);
 
         recurse((BoardRoboter) r, ka, 0);
         return bestCards;
@@ -99,11 +99,11 @@ public class SearchRecursively {
                                   new BoardRoboter(), new BoardRoboter(),
                                   new BoardRoboter(), new BoardRoboter()};
 
-    private void recurse(final BoardRoboter r, Karte[] ka, int recursionLevel) {
-        if (r.getSchaden() == 10) return;
+    private void recurse(final BoardRoboter r, Card[] ka, int recursionLevel) {
+        if (r.getDamage() == 10) return;
         int anzahl = 0;
         for (int i = 0; i < 5; i++)
-            if (r.getZug(i) != null) anzahl++;
+            if (r.getMove(i) != null) anzahl++;
         if (anzahl == 5) {   // end of recursion reached, 5 cards selected
             int diemalus = 0;
 
@@ -114,7 +114,7 @@ public class SearchRecursively {
                     tmp[recursionLevel].initFrom(r);
                     tmp[recursionLevel].setZug(0, malusCards[i]);
                     sf.doPhase(1, tmp[recursionLevel]);
-                    if (tmp[recursionLevel].getSchaden() == 10)
+                    if (tmp[recursionLevel].getDamage() == 10)
                         diemalus += mali[i];
                 }
                 if (diemalus == maliSum)
@@ -125,7 +125,7 @@ public class SearchRecursively {
             if (score <= bestScore) {
                 bestScore = score;
                 for (int i = 0; i < 5; i++)
-                    bestCards[i] = r.getZug(i);
+                    bestCards[i] = r.getMove(i);
             }
             return;
         }
@@ -133,14 +133,14 @@ public class SearchRecursively {
         for (int i = 0; i < 9; i++) {
             if (ka[i] == null)
                 continue;
-            Karte cardTemp = ka[i];
+            Card cardTemp = ka[i];
             ka[i] = null; // play that card
             tmp[recursionLevel].initFrom(r);
 
             int j = 0;
-            while (tmp[recursionLevel].getZug(j) != null) j++;
+            while (tmp[recursionLevel].getMove(j) != null) j++;
             tmp[recursionLevel].setZug(j, cardTemp);
-            while ((j < 5) && (tmp[recursionLevel].getZug(j) != null)) {
+            while ((j < 5) && (tmp[recursionLevel].getMove(j) != null)) {
                 sf.doPhase(j + 1, tmp[recursionLevel]);
                 j++;
             }

@@ -36,6 +36,7 @@ import javax.swing.border.*;
 
 
 import de.botsnscouts.util.*;
+
 /**
  * Fenster, das weitere Statusinfos anzeigt
  * @author Lukasz Pekacki
@@ -49,11 +50,11 @@ public class ExtendedRobStatus extends JFrame {
 
     
     public ExtendedRobStatus () {
-	this(Roboter.getNewInstance("DefaultRob"),100,100);
+	this(Bot.getNewInstance("DefaultRob"),100,100);
     }
     
 
-    public ExtendedRobStatus (Roboter r, int locationX, int locationY) {
+    public ExtendedRobStatus (Bot r, int locationX, int locationY) {
 	setTitle(Message.say("Ausgabe","statusVon")+r.getName());
 	setLocation(locationX,locationY);
 	setSize(xsize,ysize);
@@ -63,16 +64,16 @@ public class ExtendedRobStatus extends JFrame {
 	String gespReg = "[ ";
 	if (r.gesperrteRegs() > 0) { 
 	    for (int i = 0; i < r.gesperrteRegs(); i++) 
-		if (r.getGesperrteRegister(i) != null) {
-		    gespReg+= r.getGesperrteRegister()[i].getaktion() + " | ";
+		if (r.getLockedRegister(i) != null) {
+		    gespReg+= r.getLockedRegisters()[i].getaktion() + " | ";
 		}
 	    gespReg += "]";
 	}
 	// ---- gelegte Karten toString
 	String gelegtKarte = "[ ";
-	if (r.getZug() != null) {
-	    for (int i = 0; i < r.getZug().length; i++) 
-		if (r.getZug()[i] != null) gelegtKarte+= r.getZug()[i].getaktion() + " | ";
+	if (r.getMove() != null) {
+	    for (int i = 0; i < r.getMove().length; i++)
+		if (r.getMove()[i] != null) gelegtKarte+= r.getMove()[i].getaktion() + " | ";
 	    gelegtKarte += "]";
 	}
 	// ---- Label erzeugen
@@ -80,11 +81,11 @@ public class ExtendedRobStatus extends JFrame {
 	hauptPanel.add(gesperrt);
 	gelegt = new JLabel(Message.say("Ausgabe","gelKarte")+gelegtKarte);
 	hauptPanel.add(gelegt);
-	archivpos = new JLabel(Message.say("Ausgabe","archPos")+" x: "+r.getArchivX()+" y: "+r.getArchivY());
+	archivpos = new JLabel(Message.say("Ausgabe","archPos")+" x: "+r.getArchiveX()+" y: "+r.getArchiveY());
 	hauptPanel.add(archivpos);
-	aktiviert = new JLabel(Message.say("Ausgabe","aktiviert")+r.istAktiviert());
+	aktiviert = new JLabel(Message.say("Ausgabe","aktiviert")+r.isActivated());
 	hauptPanel.add(aktiviert);
-	virtuell = new JLabel(Message.say("Ausgabe","virtuell")+r.istVirtuell());
+	virtuell = new JLabel(Message.say("Ausgabe","virtuell")+r.isVirtual());
 	hauptPanel.add(virtuell);
 	pos = new JLabel(Message.say("Ausgabe","pos")+" x: "+r.getX()+" y: "+r.getY());
 	hauptPanel.add(pos);

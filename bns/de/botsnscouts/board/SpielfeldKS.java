@@ -41,7 +41,7 @@ public class SpielfeldKS extends SpielfeldSim {
     private static SpielfeldKS uniqueInstance;
 
 
-    private SpielfeldKS(int x, int y, String kacheln, Ort[] f) throws FormatException, FlaggenException {
+    private SpielfeldKS(int x, int y, String kacheln, Location[] f) throws FormatException, FlaggenException {
         super(x, y, kacheln, f);
         berechneEntfernung(x, y, f);
     }
@@ -53,19 +53,19 @@ public class SpielfeldKS extends SpielfeldSim {
     /*
      * Beruecksichtigt Entfernung, Flagge, Schaden, Reperatur, Spielstaerke
      */
-    public int getBewertung(Roboter robbi, int malus) {
+    public int getBewertung(Bot robbi, int malus) {
         // wenn dieser Weg zum Spielgewinn fuehrt -> tu das!
-        if(robbi.getNaechsteFlagge() == flaggen.length + 1) {
+        if(robbi.getNextFlag() == flaggen.length + 1) {
             return 0;
         }
         int entfernung = getEntfernung(robbi);
         // beruecksichtige Flaggenbesuch in einem Spielzug
-        entfernung += (8 - robbi.getNaechsteFlagge()) * 40;
+        entfernung += (8 - robbi.getNextFlag()) * 40;
         // Schaden beruecksichtigen
-        entfernung += (robbi.getSchaden()) * (5 - robbi.getLeben());
+        entfernung += (robbi.getDamage()) * (5 - robbi.getLivesLeft());
         // reparaturfeld ist gut
         if(bo(robbi.getX(), robbi.getY()).isRepairing() ) {
-            entfernung -= (robbi.getSchaden());
+            entfernung -= (robbi.getDamage());
         }
         // Spielstaerke einberechnen
         entfernung += (int) java.lang.Math.floor(java.lang.Math.random() * malus);
@@ -78,17 +78,17 @@ public class SpielfeldKS extends SpielfeldSim {
      *  getEntfernung liefert die Entfernung des Roboters zur nächsten Flagge
      *  und berücksichtigt dabei nötige Drehungen.
      *
-     *@param  robbi  der zu bewertende Roboter
+     *@param  robbi  der zu bewertende Bot
      *@return        die Entfernung.
      */
-    public int getEntfernung(Roboter robbi) {
-        if(robbi.getSchaden() == 10) {
+    public int getEntfernung(Bot robbi) {
+        if(robbi.getDamage() == 10) {
             return 1000;
         }
         int x = robbi.getX();
         int y = robbi.getY();
-        int m = robbi.getNaechsteFlagge() - 1;
-        int richt = robbi.getAusrichtung();
+        int m = robbi.getNextFlag() - 1;
+        int richt = robbi.getFacing();
 
         if(entftab[m][x][y] == 0) {
             return 0;
@@ -174,7 +174,7 @@ public class SpielfeldKS extends SpielfeldSim {
      *@param  sizeY   Description of Parameter
      *@param  fahnen  Description of Parameter
      */
-    private void berechneEntfernung(int sizeX, int sizeY, Ort fahnen[]) {
+    private void berechneEntfernung(int sizeX, int sizeY, Location fahnen[]) {
         entftab = new int[fahnen.length][][];
 
         for(int m = 0; m < fahnen.length; ++m) {
@@ -275,7 +275,7 @@ public class SpielfeldKS extends SpielfeldSim {
      *@exception  FormatException   Description of Exception
      *@exception  FlaggenException  Description of Exception
      */
-    public static synchronized SpielfeldKS getInstance(int x, int y, String kacheln, Ort[] flaggen) throws FormatException, FlaggenException {
+    public static synchronized SpielfeldKS getInstance(int x, int y, String kacheln, Location[] flaggen) throws FormatException, FlaggenException {
         if(uniqueInstance == null) {
             uniqueInstance = new SpielfeldKS(x, y, kacheln, flaggen);
         }

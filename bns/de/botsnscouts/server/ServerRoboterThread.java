@@ -41,11 +41,11 @@ public class ServerRoboterThread extends BNSThread implements Waitable
     private ServerRobotThreadMaintainer robMaint;
     private ServerAntwort ans;
     private KommServerRoboter komm;
-    protected Roboter rob;
+    protected Bot rob;
 
     private boolean ende;
 
-    public ServerRoboterThread(Roboter r, OKListener ok, InfoRequestAnswerer inf, ServerRobotThreadMaintainer maint,KommServerRoboter k)
+    public ServerRoboterThread(Bot r, OKListener ok, InfoRequestAnswerer inf, ServerRobotThreadMaintainer maint,KommServerRoboter k)
     {
 	super(r.getName());
 	rob=r;
@@ -84,11 +84,11 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 				return;
 			    }
 
-			    rob.setNaechsteRundeDeaktiviert(ans.ok); // PowerDown?
+			    rob.setNextTurnPoweredDown(ans.ok); // PowerDown?
 
 			    d("Setze Programmierung um.");
 			    rob.program(ans.register);
-			    d("Programmierung umgesetzt. Roboter:");
+			    d("Programmierung umgesetzt. Bot:");
 			    rob.zeige_Roboter();
 
 			    notifyServer();
@@ -192,7 +192,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 
 			    d("Gibroboterpos fuer "+ans.name+" erhalten.");
 
-			    Ort o=info.getRobPos(ans.name);
+			    Location o=info.getRobPos(ans.name);
 			    if (o!=null)
 				komm.sendRobpos(o);
 
@@ -218,7 +218,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable
 				return;
 			    }
 
-			    Roboter r;
+			    Bot r;
 			    r = info.getRobStatus(ans.name);
 			    if(r.getName().compareTo("")!=0){
 				komm.sendRobStatus(r);

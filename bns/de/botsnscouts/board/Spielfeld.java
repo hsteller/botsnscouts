@@ -59,7 +59,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
   protected Wall[][] hWall;    // horizontale Waende
 
   /** Die Flaggen */
-  protected Ort[] flaggen;      // 1:x-Koordinate, 2:y-Koordinate, int:Flagge Nr. n-1
+  protected Location[] flaggen;      // 1:x-Koordinate, 2:y-Koordinate, int:Flagge Nr. n-1
   protected String flaggenProbleme;  // falls Flaggen suboptimal plaziert sind
 
   /** Sicherungskopie des Spielfeldstrings */
@@ -171,7 +171,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
     @param kacheln Das Feld im f&uuml;r Netzkommunikation spezifizierten Format.
     @param f Die Flaggen als Orte.
     */
-  public Spielfeld(int x, int y, String kacheln, Ort[] f) throws FormatException, FlaggenException
+  public Spielfeld(int x, int y, String kacheln, Location[] f) throws FormatException, FlaggenException
     {
       CAT.debug("new Spielfeld called");
       sizeX=x;
@@ -222,7 +222,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
 	}
     }
 
-    protected void checkFlaggen(Ort[] f) throws FlaggenException
+    protected void checkFlaggen(Location[] f) throws FlaggenException
     {
       // prueft ob Flaggen regelkonform plaziert sind (sonst Exception)
       // und ob sie "gut" sind - sonst kann man die Probleme mit
@@ -349,7 +349,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
   /***** public Instanzenmethoden *****/
 
   /** @return Alle Flaggen die existieren in einem Array. */
-  public Ort[] getFlaggen()
+  public Location[] getFlaggen()
     {
       return flaggen;
     }

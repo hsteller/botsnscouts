@@ -53,7 +53,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     private MessageThread messageThread;
 
     protected SpielfeldSim feld;
-    private Ort[] flaggen;
+    private Location[] flaggen;
     protected int anzSpieler;
     protected int anmeldePort;
 
@@ -66,7 +66,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     // Timeouts
     protected int zugto;
     private int kommto; //Für Dinge, die nur eine Reaktion erwarten, kein Nachdenken, z.B. Spielstart
-    private final int rundenbeginnto = 60000; // Falls noch zerstoerte Roboter fehlen
+    private final int rundenbeginnto = 60000; // Falls noch zerstoerte Bot fehlen
     private final int ausgabennotifyto = 60000;
     protected final int anmeldeto = 60000; // So lange wartet der ServerAnmeldeThread auf eine Aktion
 
@@ -92,7 +92,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     // Methods needed for ServerRobotThreadMaintainer
 
     /** Entfernt den Thread, benachrichtigt den Spieler (dessen Kommverbindung moeglicherweise
-     *  abgeschmiert ist!! -> nicht ewig warten), entfernt den Roboter aus aktiv, wiederein-
+     *  abgeschmiert ist!! -> nicht ewig warten), entfernt den Bot aus aktiv, wiederein-
      *  trittsliste oder friedhof
      * @param t - der ServerRoboterThread des zu entfernenden Roboters
      * @param grund - "TO" wegen timeout oder "RV" wg. Regelverletzung oder....
@@ -108,7 +108,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	    new Fehlermeldung(Message.say("Server","eKommFutschR", t.rob.getName()));
 	}
 	catch(KommException ex) {
-	    d("Roboter "+t.rob.getName()+" konnte nicht mehr von seiner Entfernung wg. "+grund+" benachrichtigt werden: "+ex);
+	    d("Bot "+t.rob.getName()+" konnte nicht mehr von seiner Entfernung wg. "+grund+" benachrichtigt werden: "+ex);
 	}
 
 	t.interrupt();     // Beende den Thread bei nächster Gelegenheit
@@ -216,7 +216,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	return feld.getSpielfeldString();
     }
 
-    public Ort[] getFlags(){
+    public Location[] getFlags(){
 	return feld.getFlaggen();
     }
 
@@ -230,7 +230,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	return s;
     }
 
-    public Ort getRobPos(String name){
+    public Location getRobPos(String name){
 	for (Iterator it=rThreads.iterator();it.hasNext();){
 	    ServerRoboterThread srt=(ServerRoboterThread)it.next();
 	    if (srt.rob.getName().equals(name))
@@ -239,13 +239,13 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	return null;
     }
 
-    public Roboter getRobStatus(String robotername){
+    public Bot getRobStatus(String robotername){
 	// durchsucht die aktRoboter-, zerstoerteRoboter-, roboterEintrittsListe-
 	// und roboterFriedhof-Vector nach roboter mit dem name robotername und liefert
 	// eine kopie des entsprechenden roboters zurück, falls kein roboter mit
 	// dem name gefunden wird, wird null zurückgegeben
 	for(Iterator e = rThreads.iterator(); e.hasNext();) {
-	    Roboter r = ((ServerRoboterThread )e.next()).rob;
+	    Bot r = ((ServerRoboterThread )e.next()).rob;
 	    if (r.getName().equals(robotername))
 		return r;
 	}
@@ -278,9 +278,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		ServerRoboterThread tmp=(ServerRoboterThread)rThreads.elementAt(i);
 		s[i].aktPhase=aktPhase;
 		s[i].robName=tmp.rob.getName();
-		s[i].register=new Karte[aktPhase];
+		s[i].register=new Card[aktPhase];
 		for (int j=0;j<aktPhase;j++)
-		    s[i].register[j]=tmp.rob.getZug(j);
+		    s[i].register[j]=tmp.rob.getMove(j);
 	    }
 	    return s;
 	}
@@ -308,7 +308,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			int 		anmeldeport,
 			int 		zugabgabetimeout,
 			String 		Spielfeld,
-			Ort[] 		Flaggen,
+			Location[] 		Flaggen,
 			int 		x,
 			int 		y){
 	//Global.setVerbose(true);
@@ -400,7 +400,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     /** Modus in ServerRoboterThreads setzen und warten, bis sie zu Potte kommen.
      *  Wird bei allen Modi außer ZERSTÖRT benutzt.
      *  PRE: Attribute rThreadsAufDieIchWarte und modus sind korrekt belegt,
-     *       außerdem muessen die Roboter korrekt initialisiert sein,
+     *       außerdem muessen die Bot korrekt initialisiert sein,
      *       konkret: Bei Programmierungsmodus wird auf die Karten zugegriffen.
      *  POST: Der Modus wurde von unseren entsprechenden Threads bearbeitet
      */
@@ -442,7 +442,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			srt.reEntry();
 			break;
 		    case ENTSPERREN:
-			srt.registerRepair(srt.rob.gesperrteRegs()-srt.rob.getSchaden()+4);
+			srt.registerRepair(srt.rob.gesperrteRegs()-srt.rob.getDamage()+4);
 			break;
 		    case SPIELENDE:
 			srt.deleteMe("GO");
@@ -597,7 +597,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	d("ServerRoboterThreads wurden gestartet");
     }
 
-    /** Sind noch Roboter dabei?
+    /** Sind noch Bot dabei?
      */
     private boolean istSpielende() {
 	return (rThreads.size()==0) || ((aktRoboter.size() == 0)
@@ -611,12 +611,12 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     private boolean repariereGgf(ServerRoboterThread t) {
 	if (t.rob.gesperrteRegs()==0)
 	    return false;
-        if ((t.rob.gesperrteRegs()>0)&&(t.rob.getSchaden()<5)){
+        if ((t.rob.gesperrteRegs()>0)&&(t.rob.getDamage()<5)){
 	    t.rob.entsperreAlleRegs();
 	    return false;
 	}
 
-        return (t.rob.getSchaden()-4 < t.rob.gesperrteRegs());
+        return (t.rob.getDamage()-4 < t.rob.gesperrteRegs());
     }
 
     /** Die eigentliche Spielmethode!
@@ -641,7 +641,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	    CAT.debug("roboterThreadStart()");
 	    roboterThreadStart();
 	    // warten auf NTS von Ausgabekanaelen und Robotern
-	    // 1. Ausgaben NTSen und NTCen, damit Ort schonmal stimmt
+            // 1. Ausgaben NTSen und NTCen, damit Location schonmal stimmt
 	    // kreiere String[] mit allen Namen
 	    String[] alleN;
 	    synchronized(rThreads){
@@ -656,14 +656,14 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 	    ausgabenBenachrichtigen(alleN);
 
-	    // 2. Roboter
+            // 2. Bot
 	    d("Spiel starten.");
 	    modus = SPIELSTART;
 	    waitablesImWaitingFor = new WaitingForSet(rThreads);
 	    wechselModus(waitablesImWaitingFor.iterator(), SPIELSTART);
 	    broadcastUndWarteAufRoboter();
 	    d("Spiel ist gestartet.");
-	    // schicken des ersten MNR an alle Roboter ohne die Anzahl der Leben zu reduzieren
+            // schicken des ersten MNR an alle Bot ohne die Anzahl der Leben zu reduzieren
 	    d("Initiale Ausrichtung holen.");
 	    modus = INITAUSR;
 	    waitablesImWaitingFor = new WaitingForSet(aktRoboter);
@@ -689,14 +689,14 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		tmpstr[0]=""+iRunde;
 		sendMsg("mNeueRunde",tmpstr);
 
-		// Evtl. auf wiedereintretende Roboter warten
+                // Evtl. auf wiedereintretende Bot warten
 		for (Iterator iter=zerstoerteRoboter.iterator();iter.hasNext();)
 		  if (!(((ServerRoboterThread)iter.next()).isAlive()))
 		    iter.remove();
 
 		if (zerstoerteRoboter.size()>0) {
 
-		  d("Warte kurz auf zerstoerte Roboter.");
+		  d("Warte kurz auf zerstoerte Bot.");
 		  modus=ZERSTOERT_SYNC;
 
 		  tmpstr=new String[1];
@@ -724,9 +724,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		String[] namen;   // fuer notifyChange
 		Vector toBeAsked = new Vector();
 		synchronized(roboterEintrittsListe) {
-		    d("Lasse Roboter wieder eintreten.");
+		    d("Lasse Bot wieder eintreten.");
 		    for(Iterator e=roboterEintrittsListe.iterator();e.hasNext();) {
-			// Alle wiedereinzusetzenden Roboter auf ihre Archivpos setzen.
+                        // Alle wiedereinzusetzenden Bot auf ihre Archivpos setzen.
 			// In eigener while-Schleife, damit danach wiedereinsetzen korrekt geprueft
 			// wird!
 			ServerRoboterThread tmp = ((ServerRoboterThread )e.next());
@@ -739,16 +739,16 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			tmp.rob.setVirtuell(false);  //Default: Real einsetzen, ABER....
 			// Virtuell, wenn ein aktiver auch da steht
 			for (Iterator f=aktRoboter.iterator();f.hasNext();) {
-			    Roboter anderer = ((ServerRoboterThread )f.next()).rob;
+			    Bot anderer = ((ServerRoboterThread )f.next()).rob;
 			    if (tmp.rob.getX() == anderer.getX() && tmp.rob.getY() == anderer.getY()){
 				tmp.rob.setVirtuell();
 				break;
 			    }
 			}
 			// oder noch ein anderer der wiedereinzusetzenden auch da steht
-			if (!tmp.rob.istVirtuell()) {
+			if (!tmp.rob.isVirtual()) {
 			    for (Iterator f=roboterEintrittsListe.iterator();f.hasNext();) {
-				Roboter anderer = ((ServerRoboterThread )f.next()).rob;
+				Bot anderer = ((ServerRoboterThread )f.next()).rob;
 				if (anderer!=tmp.rob && anderer.getX() == tmp.rob.getX() && anderer.getY() == tmp.rob.getY()) {
 				    tmp.rob.setVirtuell();
 				}
@@ -770,18 +770,18 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 		ausgabenBenachrichtigen(namen);
 
-		//PowerUp -- nach Zerstoert eingesetzte Roboter werden auch gefragt!
+                //PowerUp -- nach Zerstoert eingesetzte Bot werden auch gefragt!
 		// Sind bereits in vorheriger Liste in toBeAsked gesetzt worden
 
 		for(Iterator e=aktRoboter.iterator();e.hasNext();) {
 		    ServerRoboterThread tmp = ((ServerRoboterThread )e.next());
-		    if (!tmp.rob.istAktiviert())
+		    if (!tmp.rob.isActivated())
 			toBeAsked.add(tmp);
-		    else if (tmp.rob.isNaechsteRundeDeaktiviert()) {
+		    else if (tmp.rob.isPoweredDownNextTurn()) {
 			//Auschalten der, die letzte Mal PowerDown gesagt haben.
 			d(tmp.rob.getName()+" ist naechste Runde ausgeschaltet.");
 			tmp.rob.setAktiviert(false);
-			tmp.rob.setNaechsteRundeDeaktiviert(false);
+			tmp.rob.setNextTurnPoweredDown(false);
 			tmp.rob.setSchaden(0);
 		    }
 
@@ -810,26 +810,26 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 		    for (Iterator it=toBeAsked.iterator();it.hasNext();){
 			ServerRoboterThread srt=((ServerRoboterThread)it.next());
-			if (!srt.rob.istAktiviert())
+			if (!srt.rob.isActivated())
 			    srt.rob.setSchaden(0);
 		    }
 		}
 
-		// Karten an die Roboter verteilen die nicht zerstoert oder deaktiviert sind
-		// warten auf die Karten der Roboter (Timeout)
-		Karte[] cards = new Karte[gesperrteKarten.size()];
+                // Karten an die Bot verteilen die nicht zerstoert oder deaktiviert sind
+                // warten auf die Karten der Bot (Timeout)
+		Card[] cards = new Card[gesperrteKarten.size()];
 		for (int i=0; i<gesperrteKarten.size(); i++)
-		    cards[i] = (Karte )gesperrteKarten.get(i);
+		    cards[i] = (Card )gesperrteKarten.get(i);
 
 		KartenStapel stapel = new KartenStapel(cards);
 		d("Neuer Stapel: "+stapel);
 		Vector activeThisRound = new Vector();
 		for(Iterator e=aktRoboter.iterator();e.hasNext();) {
 		    ServerRoboterThread tmp = ((ServerRoboterThread )e.next());
-		    if (tmp.rob.istAktiviert()) {
+		    if (tmp.rob.isActivated()) {
 			activeThisRound.addElement(tmp);
-			//Karten geben und dabei *beruecksichtigen*, wie viele der Roboter kriegt!
-			tmp.rob.setKarten(stapel.gibKarte(tmp.rob.anzKarten()));
+                        //Karten geben und dabei *beruecksichtigen*, wie viele der Bot kriegt!
+			tmp.rob.setKarten(stapel.gibKarte(tmp.rob.cardsToGive()));
 		    }
 		}
 		if (activeThisRound.size() > 0) {
@@ -849,10 +849,10 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		// Start der Phasenschleife
 		for (aktPhase=1; aktPhase!=0; aktPhase = (aktPhase+1)%6) {
 		    CAT.info("Evaluation phase "+aktPhase+", turn "+iRunde +" starts.");
-		    // Am Spiel beteiligte Roboter in Array kopieren (aus technischen Gruenden)
-		    Roboter[] robs;
+                    // Am Spiel beteiligte Bot in Array kopieren (aus technischen Gruenden)
+		    Bot[] robs;
 		    synchronized(aktRoboter) {
-			robs = new Roboter[aktRoboter.size()];
+			robs = new Bot[aktRoboter.size()];
 			int i=0;
 			for(Iterator e=aktRoboter.iterator(); e.hasNext(); i++) {
 			    robs[i] = ((ServerRoboterThread )e.next()).rob;
@@ -871,7 +871,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			for (Iterator e=aktRoboter.listIterator(); e.hasNext();) {
 			    ServerRoboterThread tmp = (ServerRoboterThread )e.next();
 			    // Gewinner?
-			    if (tmp.rob.getNaechsteFlagge() == feld.getFlaggen().length+1) {
+			    if (tmp.rob.getNextFlag() == feld.getFlaggen().length+1) {
 				//raus aus aktiven Robos, in Gewinnerliste,
 				// vom Plan nehmen, ausgabenbenachrichtigen
 				tmp.setMode(SPIELENDE);
@@ -887,7 +887,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 				    tmp.deleteMe("GO");
 				}
 				catch(KommException ex) {
-				    d("Roboter "+tmp.rob.getName()+" konnte nicht mehr von seiner Entfernung wg. GO(Gewinn) benachrichtigt werden: "+ex);
+				    d("Bot "+tmp.rob.getName()+" konnte nicht mehr von seiner Entfernung wg. GO(Gewinn) benachrichtigt werden: "+ex);
 				}
 
 				tmp.rob.setInvalidPos();
@@ -901,16 +901,16 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 			    }
 			    // Schaden > 9
-			    if (tmp.rob.getSchaden() > 9) {
+			    if (tmp.rob.getDamage() > 9) {
 				e.remove();  //aus aktRoboter
 				tmp.rob.decrLeben();
 
 				// Voellig tot?
-				if (tmp.rob.getLeben() > 0) {
+				if (tmp.rob.getLivesLeft() > 0) {
 				    tmp.rob.setSchaden(2);
 				    //Register entsperren
 				    tmp.rob.entsperreAlleRegs();
-				    tmp.rob.setNaechsteRundeDeaktiviert(false);
+				    tmp.rob.setNextTurnPoweredDown(false);
 
 				    zerstoerteRoboter.addElement(tmp);
 				    tmp.setMode(ZERSTOERT_ASYNC);
@@ -971,8 +971,8 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    for (Iterator e=rThreads.iterator();e.hasNext();){
 			ServerRoboterThread tmp=((ServerRoboterThread)e.next());
 			for (int i=0;i<5;i++)
-			    if (tmp.rob.getGesperrteRegister(i)!=null)
-				gesperrteKarten.addElement(tmp.rob.getGesperrteRegister(i));
+			    if (tmp.rob.getLockedRegister(i)!=null)
+				gesperrteKarten.addElement(tmp.rob.getLockedRegister(i));
 		    }
 		}
 		d("Habe "+gesperrteKarten.size()+" gesperrte Karten gefunden und gespeichert.");
@@ -981,8 +981,8 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 	    d("Das Spiel ist jetzt zu Ende. (Rundenschleife verlassen.)");
 
-	    /* Falls wir jemals ein anderes Ende haben wollen, muß man sich hier nochmal Gedanken
-	       machen (eines, bei dem nicht alle Roboter auf der letzten Flagge angekommen sind.
+/* Falls wir jemals ein anderes Ende haben wollen, muß man sich hier nochmal Gedanken
+	       machen (eines, bei dem nicht alle Bot auf der letzten Flagge angekommen sind.
 
 	       if (rThreads.size()>0){
 	       modus = SPIELENDE;
@@ -990,9 +990,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	       wechselModus(rThreadsAufDieIchWarte, SPIELENDE);
 	       broadcastUndWarteAufRoboter();
 	       }
-	       d("Alle Roboter sind vom Spielende benachrichtet worden.");
+	       d("Alle Bot sind vom Spielende benachrichtet worden.");
 
-	       d("Jetzt noch "+rThreads.size()+ "Roboter hinrichten!");
+	       d("Jetzt noch "+rThreads.size()+ "Bot hinrichten!");
 	       while (rThreads.size()>0){
 	       ServerRoboterThread tmp=(ServerRoboterThread)rThreads.elementAt(0);
 	       deleteRoby(tmp, "GO");

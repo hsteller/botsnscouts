@@ -26,6 +26,8 @@
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
+
+
 import java.awt.*;
 import java.io.*;
 import java.awt.event.*;
@@ -77,7 +79,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         this.initMenus();
     }
 
-    public AusgabeView(SACanvas sa, Roboter[] robots, Ausgabe aus) {
+    public AusgabeView(SACanvas sa, Bot[] robots, Ausgabe aus) {
 	ausgabe = aus;
 	gameBoardCanvas=sa;
 //        statusLog = new StatusLog(aus.getView());
@@ -107,11 +109,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
                         }
                         public void flagClicked(RobotInfoEvent rie) {
                             RobotInfo ri = (RobotInfo)rie.getSource();
-                            ausgabe.scrollFlag(ri.getRobot().getNaechsteFlagge());
+                            ausgabe.scrollFlag(ri.getRobot().getNextFlag());
                         }
                         public void diskClicked(RobotInfoEvent rie) {
-                            Roboter robot = ((RobotInfo)rie.getSource()).getRobot();
-                            ausgabe.trackPos(robot.getArchivX(), robot.getArchivY(), true);
+                            Bot robot = ((RobotInfo)rie.getSource()).getRobot();
+                            ausgabe.trackPos(robot.getArchiveX(), robot.getArchiveY(), true);
                         }
              });
 	    robotsStatusContainer.add(r);
@@ -187,14 +189,14 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     /**
      * Schreibt in die Statuszeile einen Text
      */
-    public void showRobStatus(Roboter r){
+    public void showRobStatus(Bot r){
     }
 
 
     /**
      * Shows the new Positions of the Robots
      */
-    public void showUpdatedRobots(Roboter[] r){
+    public void showUpdatedRobots(Bot[] r){
 	gameBoardCanvas.ersetzeRobos(r);
 	for (int i = 0; i < r.length; i++) {
 	    ((RobotStatus) robotStatus.get(r[i].getName())).updateRobot(r[i]);
@@ -256,14 +258,14 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     /**
      * board view is to paint robolaser activity
      */
-    public void showRobLaser(Roboter von, Roboter nach){
+    public void showRobLaser(Bot von, Bot nach){
 	gameBoardCanvas.doRobLaser(von, nach);
     }
 
     /**
      * board view is to paint bord laser activity
      */
-    public void showBoardLaser(Ort laserPos, int facing, int stregth, Ort r1Pos){
+    public void showBoardLaser(Location laserPos, int facing, int stregth, Location r1Pos){
 	gameBoardCanvas.doBordLaser(laserPos, facing, stregth, r1Pos,gameBoardView);
     }
 
@@ -290,7 +292,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	validate();
     }
 
-    protected void showScout(int chosen, Roboter[] robs) {
+    protected void showScout(int chosen, Bot[] robs) {
 	gameBoardCanvas.vorschau(chosen,robs);
     }
 
@@ -493,12 +495,12 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 
    private class ShowFlagMenu extends JMenu {
-      ShowFlagMenu(Ort [] flagPos) {
+      ShowFlagMenu(Location [] flagPos) {
         super(Message.say("AusgabeView", "flag"));
         init (flagPos);
       }
 
-      void init(Ort [] flags) {
+      void init(Location [] flags) {
         if (flags!=null){
           for (int i=0;i<flags.length;i++){
             JMenuItem flag = new JMenuItem(" #"+(i+1));
@@ -541,8 +543,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
          Enumeration e = robotStatus.elements();
          while (e.hasMoreElements()){
             RobotStatus rs = (RobotStatus) e.nextElement();
-            Roboter robot = rs.getRobot();
-            CAT.debug( "Robot is: " + robot );
+            Bot robot = rs.getRobot();
+            CAT.debug( "Bot is: " + robot );
             CAT.debug( "imgs is: " + OldRobotStatusImpl.robotImages );
             JMenuItem rob = new JMenuItem(robot.getName(),new ImageIcon(OldRobotStatusImpl.robotImages[robot.getBotVis()]));
             rob.addActionListener(new ShowRobListener(rs));
@@ -562,7 +564,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         }
 
         public void actionPerformed(ActionEvent e){
-          Roboter robot = rob.getRobot();
+          Bot robot = rob.getRobot();
           if (CAT.isDebugEnabled())
             CAT.debug("Showing robot \""+robot.getName()+"\" at x:"+robot.getX()+" y:"+robot.getY());
           int x = robot.getX();

@@ -44,7 +44,7 @@ public class TileComponent extends JComponent implements  MouseListener, MouseMo
     Paint paint;
     int W=150, H=150;
     int[] flagNum=new int[0];
-    Ort[] flagPos=new Ort[0];
+    Location[] flagPos=new Location[0];
 
     private boolean flagsChanged, tileChanged;
 
@@ -85,7 +85,7 @@ public class TileComponent extends JComponent implements  MouseListener, MouseMo
 	    tileImage=null;
 	}
 	//hole die Flaggen
-	Ort[] flag = fassade.getFlaggen();
+	Location[] flag = fassade.getFlaggen();
 	int counter=0;
 	flagsChanged=false;
 	for (int i=0;i<flag.length;i++){
@@ -97,13 +97,13 @@ public class TileComponent extends JComponent implements  MouseListener, MouseMo
 	flagsChanged=(flagsChanged||flagNum.length!=counter);
 	if (flagsChanged){
 	    flagNum=new int[counter];
-	    flagPos=new Ort[counter];
+	    flagPos=new Location[counter];
 	    if (counter!=0){
 		int j=0;
 		for (int i=0;i<flag.length;i++){
 		    if (flag[i]!=null&&(flag[i].x-1)/12==myX&&(flag[i].y-1)/12==myY){
 			flagNum[j]=i+1;
-			flagPos[j]=new Ort((flag[i].x-1)%12,(flag[i].y-1)%12);
+			flagPos[j]=new Location((flag[i].x-1)%12,(flag[i].y-1)%12);
 			j++;
 		    }
 		}

@@ -40,10 +40,10 @@ public class KommServerRoboter extends KommServer {
   }
 
   /** Zur Aufforderung an den Spieler, seinen Zug zu machen.
-   * Erhält als Argument seine Karten. Server muss sie sich merken, da später als Antwort lediglich übermittelt wird, die wievielte ausgeteilte Karte in einem Register liegt.
- @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat 
+   * Erhält als Argument seine Karten. Server muss sie sich merken, da später als Antwort lediglich übermittelt wird, die wievielte ausgeteilte Card in einem Register liegt.
+ @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
    */
-  public void zugabgabe (Karte [] k)  throws KommException{
+  public void zugabgabe (Card [] k)  throws KommException{
     try {
       String raus = "MRP(";
       for (int i=0;i<k.length;i++) {
@@ -85,9 +85,9 @@ Fehler auftritt
     */
   }
     
-  /** 'reaktivierung' ist die Anfrage an einen 'power-down'-Roboter, ob er wieder mitmachen will.
+  /** 'reaktivierung' ist die Anfrage an einen 'power-down'-Bot, ob er wieder mitmachen will.
    *  Falls er wieder dabei sein will, ist der Rückgabewert true, sonst false.
-   *  Bei falscher Antwort wird eine Exception geworfen. 
+   *  Bei falscher Antwort wird eine Exception geworfen.
 @exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.
    */
   public void reaktivierung () throws KommException {
@@ -111,9 +111,9 @@ Fehler auftritt
     */
    
   }
-         /** 'regReparatur' ist zum Herausfinden da, welche(s) Register ein Roboter repariert haben will und erhält als Argument die Registeranzahl, die der Roboter reparieren darf. Es werden die Nummern der Register zurückgeliefert, die der Roboter reparieren möchte.
+         /** 'regReparatur' ist zum Herausfinden da, welche(s) Register ein Bot repariert haben will und erhält als Argument die Registeranzahl, die der Bot reparieren darf. Es werden die Nummern der Register zurückgeliefert, die der Bot reparieren möchte.
  Bei falscher Antwort wird eine Exception geworfen.
-	  
+
 @exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.*/
   public void regReparatur (int Registeranzahl) throws KommException {
     try {

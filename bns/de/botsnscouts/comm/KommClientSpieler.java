@@ -58,7 +58,7 @@ NEW: Encodes the client name
     }
 
 
-  /** Antwort-Methode, die uebermittelt, wie der Roboter nach einer Zerstoerung
+  /** Antwort-Methode, die uebermittelt, wie der Bot nach einer Zerstoerung
    *  aufs Feld gesetzt werden soll.
    *  Sie erhaelt den Namen des Roboters und einen Integer fuer die Richtung (n=0, w=3, e=1, s=2)
    *
@@ -86,7 +86,7 @@ NEW: Encodes the client name
     }
   }
   /** Antwort-Methode, die uebermittelt,
-   *  welche kaputten Register der Roboter repariert haben moechte.
+   *  welche kaputten Register der Bot repariert haben moechte.
    *  Erhaelt als Argument die Nummern der gewuenschten Register.
    *  @param robName WILL BE IGNORED
    *
@@ -107,8 +107,8 @@ NEW: Encodes the client name
    *  Die Methode erhaelt als Argumente (abgesehen vom Namen) zum einen einen Boolean,
    *  der angibt, ob ein Power-Down fuer die naechste Runde geplant ist (ja=true),
    *  zum anderen ein int-Array, dass die Registerprogrammierung enthaelt
-   *  (z.B. wuerde {3,7,4,1,9} bedeuten, dass das erste Register die dritte ausgeteilte Karte enthaelt,
-   *  das zweite Register die siebte ausgeteilte Karte usw..).
+   *  (z.B. wuerde {3,7,4,1,9} bedeuten, dass das erste Register die dritte ausgeteilte Card enthaelt,
+   *  das zweite Register die siebte ausgeteilte Card usw..).
    *  Falls Register gesperrt sind, wird ein entsprechend kuerzeres Array uebergeben
    *  (siehe "Protokolle und Datenformate").
    *
@@ -133,9 +133,9 @@ NEW: Encodes the client name
   }
 
   /** Diese Methode dient zur Antwort auf die Frage,
-   *  ob der powerdown-Roboter deaktiviert bleiben will.
-   *  Abgesehen von seinem Namen übergibt der Roboter einen boolean;
-   *  ist dieser true, heisst das, dass der Roboter deaktiviert bleiben moechte.
+   *  ob der powerdown-Bot deaktiviert bleiben will.
+   *  Abgesehen von seinem Namen übergibt der Bot einen boolean;
+   *  ist dieser true, heisst das, dass der Bot deaktiviert bleiben moechte.
    *
    * @param name WILL BE IGNORED
 */

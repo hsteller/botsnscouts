@@ -54,7 +54,7 @@ public class SpielfeldSim extends Spielfeld
      und seinerseits die Ausgabekan&auml;le informiert. */
   protected Server server;
 
-  /* Enthaelt bewegte Roboter, um String[] erzeugen zu koennen */
+  /* Enthaelt bewegte Bot, um String[] erzeugen zu koennen */
   protected boolean[] bewegt;
 
     /** Contains the laser stats*/
@@ -153,7 +153,7 @@ public Vector getLasers(){
     @param al Ein Array von KommServerAusgabe-Objekten, die bei jeder &Auml;nderung benachrichtigt werden sollen.
     @see KommServerAusgabe
     */
-  public SpielfeldSim(int sx,int sy,String kacheln, Ort[] flaggen, Server s) throws FormatException, FlaggenException
+  public SpielfeldSim(int sx,int sy,String kacheln, Location[] flaggen, Server s) throws FormatException, FlaggenException
 
     {
       super(sx,sy,kacheln,flaggen);
@@ -222,7 +222,7 @@ public Vector getLasers(){
     @param kacheln Das Feld im f&uuml;r Netzkommunikation spezifizierten Format.
     @param flaggen Die Flaggen im f&uuml;r Netzkommunikation spezifizierten Format.
     */
-  public SpielfeldSim(int x,int y,String kacheln, Ort[] flaggen) throws FormatException, FlaggenException
+  public SpielfeldSim(int x,int y,String kacheln, Location[] flaggen) throws FormatException, FlaggenException
     {
       this(x,y,kacheln,flaggen,null);
     }
@@ -240,7 +240,7 @@ public Vector getLasers(){
     }
 
 
-    /** Führt eine Phase mit nur einem Roboter aus */
+    /** Führt eine Phase mit nur einem Bot aus */
     public void doPhase(int phase, BoardRoboter r){
         BoardRoboter[] br=new BoardRoboter[1];
 	br[0]=r;
@@ -250,11 +250,11 @@ public Vector getLasers(){
   /** F&uuml;hrt eine Phase aus. Falls mit Ausgabekanalkomm-Objekten
     initialisiert, werden diese von jeder &Auml;nderung benachrichtigt.
     Ergebnisr&uuml;ckgabe erfolgt durch &Auml;nderung der &uuml;bergebenen
-    Roboter.
+    Bot.
     @param phase Die zu simulierende Phase
-    @param robbis Die dabei zu beachtenden Roboter
+    @param robbis Die dabei zu beachtenden Bot
     */
-    public void doPhase(int phase, Roboter[] robbis){
+    public void doPhase(int phase, Bot[] robbis){
 	BoardRoboter[] b=new BoardRoboter[robbis.length];
 	for (int i=0;i<robbis.length;i++)
 	    b[i]=(BoardRoboter)robbis[i];
@@ -270,7 +270,7 @@ public Vector getLasers(){
       bewegt2false();
 
       ausgabenMsg("mAuswRobBew",null);
-      doRobBew(phase,robbis);        // Roboter bewegen sich entspr. ihrer Karte
+      doRobBew(phase,robbis);        // Bot bewegen sich entspr. ihrer Card
       // benachrichtige() nach jeder Bewegung
 
       ausgabenMsg("mAuswExprFl",null);
@@ -302,7 +302,7 @@ public Vector getLasers(){
       if (phase==5){                 // Ende Phase 5
 	doRepairs(phase,robbis);     // Reperaturfelder
 	benachrichtige(robbis);
-	entvirtualisiere(phase,robbis); // Roboter falls moeglich entvirtualisieren
+	entvirtualisiere(phase,robbis); // Bot falls moeglich entvirtualisieren
 	benachrichtige(robbis);
       }
     }
@@ -312,7 +312,7 @@ public Vector getLasers(){
       boolean[] bewegt=new boolean[robbis.length];
       int todo=robbis.length;
       for (int i=0;i<robbis.length;i++)
-	if (!robbis[i].istAktiviert() || (robbis[i].getSchaden()>=10)) {
+	if (!robbis[i].isActivated() || (robbis[i].getDamage()>=10)) {
 	  todo--;
 	  bewegt[i]=true;
 	}
@@ -320,12 +320,12 @@ public Vector getLasers(){
 	int highest=0;
 	int highrob=-1;
 	for (int i=0;i<robbis.length;i++)  // finde höchste Prio
-	  if((!bewegt[i])&&(robbis[i].getZug()[phase-1].getprio()>highest)){
-	    highest=robbis[i].getZug()[phase-1].getprio();
+	  if((!bewegt[i])&&(robbis[i].getMove()[phase-1].getprio()>highest)){
+	    highest=robbis[i].getMove()[phase-1].getprio();
 	    highrob=i;
 	  }
 	//d("doRobBew: next is "+robbis[highrob].getName()+"; prio="+highest);
-	moveRob(robbis,highrob,robbis[highrob].getZug()[phase-1].getaktion());
+	moveRob(robbis,highrob,robbis[highrob].getMove()[phase-1].getaktion());
 	bewegt[highrob]=true;
 	benachrichtige(robbis);
 
@@ -337,25 +337,25 @@ public Vector getLasers(){
       //d("MoveRob: "+robbis[rob].getName()+"; aktion="+aktion);
 
       if (aktion.equals("M1")){
-	moveRobOne(robbis,rob,robbis[rob].getAusrichtung(),true);
+	moveRobOne(robbis,rob,robbis[rob].getFacing(),true);
 	checkGrubenOpfer(robbis,false);
       }
       else if(aktion.equals("M2")){
-	moveRobOne(robbis,rob,robbis[rob].getAusrichtung(),true);
+	moveRobOne(robbis,rob,robbis[rob].getFacing(),true);
 	checkGrubenOpfer(robbis,false);
-	moveRobOne(robbis,rob,robbis[rob].getAusrichtung(),true);
+	moveRobOne(robbis,rob,robbis[rob].getFacing(),true);
 	checkGrubenOpfer(robbis,false);
       }
       else if(aktion.equals("M3")){
-	moveRobOne(robbis,rob,robbis[rob].getAusrichtung(),true);
+	moveRobOne(robbis,rob,robbis[rob].getFacing(),true);
 	checkGrubenOpfer(robbis,false);
-	moveRobOne(robbis,rob,robbis[rob].getAusrichtung(),true);
+	moveRobOne(robbis,rob,robbis[rob].getFacing(),true);
 	checkGrubenOpfer(robbis,false);
-	moveRobOne(robbis,rob,robbis[rob].getAusrichtung(),true);
+	moveRobOne(robbis,rob,robbis[rob].getFacing(),true);
 	checkGrubenOpfer(robbis,false);
       }
       else if(aktion.equals("BU")){  // Back Up
-	moveRobOne(robbis,rob,(robbis[rob].getAusrichtung()+2)%4,true);
+	moveRobOne(robbis,rob,(robbis[rob].getFacing()+2)%4,true);
 	checkGrubenOpfer(robbis,false);
       }
       else if(aktion.equals("RL")){  // Rotate Left
@@ -367,18 +367,18 @@ public Vector getLasers(){
 	bewegt[rob]=true;
       }
       else if(aktion.equals("UT")){  // U-Turn
-	robbis[rob].setAusrichtung((robbis[rob].getAusrichtung()+2)%4);
+	robbis[rob].setAusrichtung((robbis[rob].getFacing()+2)%4);
 	bewegt[rob]=true;
       }
       else
-	throw new RRdoPhaseException("Nicht erlaubte Karte '"+aktion+"' fuer Roboter "+robbis[rob].getName());
+	throw new RRdoPhaseException("Nicht erlaubte Card '"+aktion+"' fuer Bot "+robbis[rob].getName());
     }
   private boolean moveRobOne(BoardRoboter[] robbis,int rob,int direction, boolean schubsen)
     {
-      // Bewegt Roboter Nr. rob in direction wenn nix im Weg ist
+      // Bewegt Bot Nr. rob in direction wenn nix im Weg ist
 
       // kaputte Robbis ignorieren
-      if (robbis[rob].getSchaden() >= 10){
+      if (robbis[rob].getDamage() >= 10){
 	//d("moveRobOne: Ignoriere, da kaputt");
 	return false;
       }
@@ -427,7 +427,7 @@ public Vector getLasers(){
 	//d("schubsen. now collision-checking...");
 	//third, check for collision with other robbis
 	for (int i=0;i<robbis.length;i++)
-	  if ((i!=rob)&&(robbis[i].getX()==xx)&&(robbis[i].getY()==yy)&&(!robbis[i].istVirtuell())&&(!robbis[rob].istVirtuell()))
+	  if ((i!=rob)&&(robbis[i].getX()==xx)&&(robbis[i].getY()==yy)&&(!robbis[i].isVirtual())&&(!robbis[rob].isVirtual()))
 	    if (!moveRobOne(robbis,i,direction,true)) return(false);
 
 	//d("Now moving.");
@@ -469,12 +469,12 @@ public Vector getLasers(){
 	  //d("checkGrubenOpfer: rob="+robbis[rob].getName()+"; x="+robbis[rob].x+"; y="+robbis[rob].y+"; xx="+robbis[rob].xx+"; yy="+robbis[rob].yy+"; floor="+bo(robbis[rob].x,robbis[rob].y)+"floor-xxyy="+bo(robbis[rob].xx,robbis[rob].yy).typ+(xxyy?"virtuelle Koord":"reale Koord"));
 	if (!xxyy) {
 	    if (bo(robbis[rob].getX(),robbis[rob].getY()).isPit() ){
-		if (!robbis[rob].istInGrube())
+		if (!robbis[rob].isInPit())
 		    ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_IN_PIT,robbis[rob].getName());
 		vernichteRoboter(robbis[rob]);
 	    }
 	} else if (bo(robbis[rob].xx,robbis[rob].yy).isPit() ){
-	    if (!robbis[rob].istInGrube())
+	    if (!robbis[rob].isInPit())
 		ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_IN_PIT,robbis[rob].getName());
 	    vernichteRoboter(robbis[rob]);
 	}
@@ -482,7 +482,7 @@ public Vector getLasers(){
     }
 
   /**
-    Roboter auf zerstört setzen (Schaden=10, virtuell=true)
+    Bot auf zerstört setzen (Schaden=10, virtuell=true)
    */
   private void vernichteRoboter(BoardRoboter thorsten)
     {
@@ -500,11 +500,11 @@ public Vector getLasers(){
       // drehR = DrehRichtung
       switch (drehR) {
       case DUHRZ:
-	  robbi.setAusrichtung((robbi.getAusrichtung() + 1)%4);
+	  robbi.setAusrichtung((robbi.getFacing() + 1)%4);
 	break;
       case DGGUHRZ:
-	robbi.setAusrichtung(robbi.getAusrichtung() -1 );
-	if (robbi.getAusrichtung()==-1)
+	robbi.setAusrichtung(robbi.getFacing() -1 );
+	if (robbi.getFacing()==-1)
 	    robbi.setAusrichtung(3);
 	break;
       } // switch
@@ -516,10 +516,10 @@ public Vector getLasers(){
       // drehR = DrehRichtung
       switch (drehR) {
       case DUHRZ:
-	robbi.aa=(robbi.getAusrichtung() + 1)%4;
+	robbi.aa=(robbi.getFacing() + 1)%4;
 	break;
       case DGGUHRZ:
-	robbi.aa = (robbi.getAusrichtung() - 1);
+	robbi.aa = (robbi.getFacing() - 1);
 	if (robbi.aa==-1)
 	  robbi.aa=3;
 	break;
@@ -594,7 +594,7 @@ public Vector getLasers(){
       for (int i=0;i<robbis.length;i++){
 	robbis[i].xx=robbis[i].getX();
 	robbis[i].yy=robbis[i].getY();
-	robbis[i].aa=robbis[i].getAusrichtung();
+	robbis[i].aa=robbis[i].getFacing();
       } // for
     } // gedachteWerteSetzen
 
@@ -606,9 +606,9 @@ public Vector getLasers(){
       //d("doPushers called.");
       gedachteWerteInitialisieren(robbis);
       for (int i=0;i<robbis.length;i++){
-	if (robbis[i].getSchaden()>=10)
+	if (robbis[i].getDamage()>=10)
 	  continue;
-	Roboter r=robbis[i];
+	Bot r=robbis[i];
         int x = r.getX();
         int y = r.getY();
 	if( nw(x,y).isSouthPusherActive(phase) )
@@ -632,7 +632,7 @@ public Vector getLasers(){
 	robmove[i]=true;
       for (int rob1=0;rob1<robbis.length;rob1++)
 	for (int rob2=rob1+1;rob2<robbis.length;rob2++)
-	  if ((!robbis[rob1].istVirtuell())&&(!robbis[rob2].istVirtuell())){
+	  if ((!robbis[rob1].isVirtual())&&(!robbis[rob2].isVirtual())){
 	    if ((robbis[rob1].xx==robbis[rob2].xx)&&(robbis[rob1].yy==robbis[rob2].yy)) {
                                 // gleiches Zielfeld
 	      robmove[rob1]=false;
@@ -720,7 +720,7 @@ public Vector getLasers(){
 		      ausgabenMsg(de.botsnscouts.comm.MessageID.BORD_LASER_SHOT,tmp);
 		  }
 
-		  if (robbis[j].istVirtuell()){
+		  if (robbis[j].isVirtual()){
 		      // Virtuelle Robots kriegen Schaden, blocken aber nicht
 		      for (int s=l.strength;s>0;s--){  // Schaden zufügen und Register sperren
 			  robbis[j].incSchaden();
@@ -729,7 +729,7 @@ public Vector getLasers(){
 		      bewegt[j]=true;
 		  }
 		  else if (!hit){
-		      // Maximal ein nichtvirtueller Roboter wird getroffen
+                      // Maximal ein nichtvirtueller Bot wird getroffen
 		      // Danach wird dieser Laser beendet (hit==true)
 		      for (int s=l.strength;s>0;s--){
 			  robbis[j].incSchaden();
@@ -762,20 +762,20 @@ public Vector getLasers(){
       } // for length
       } //for Enumeration
 
-      //die Roboter-Laser
+      //die Bot-Laser
     aussen2: for (int rob=0;rob<robbis.length;rob++){
-      if ((robbis[rob].istVirtuell())||(!robbis[rob].istAktiviert()))
+      if ((robbis[rob].isVirtual())||(!robbis[rob].isActivated()))
 	continue aussen2;
       int x=robbis[rob].getX();
       int y=robbis[rob].getY();
-      switch (robbis[rob].getAusrichtung()){
+      switch (robbis[rob].getFacing()){
       case OST:
 	  if (ow(x,y).isExisting())
 	      continue aussen2;
 	  x++;  // Start auf Folgefeld
 	while((x<=sizeX)&&(!ww(x,y).isExisting())){
 	  for (int j=0;j<robbis.length;j++)
-	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].istVirtuell())){ // Treffer
+	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].isVirtual())){ // Treffer
 		robbis[j].incSchaden();
 		registerSperren(robbis[j]);
 		bewegt[j]=true; // Änderung erfolgt
@@ -783,7 +783,7 @@ public Vector getLasers(){
 		ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER,robbis[rob].getName(),robbis[j].getName());
 		actualStats=stats.getStats(robbis[rob].getName());
 		actualStats.incHits();
-		if (robbis[j].getSchaden()>=10)
+		if (robbis[j].getDamage()>=10)
 		    actualStats.incKills();
 		actualStats=stats.getStats(robbis[j].getName());
 		actualStats.incDamageByRobots();
@@ -801,7 +801,7 @@ public Vector getLasers(){
 	x--;
 	while((x>0)&&(!ow(x,y).isExisting())){
 	  for (int j=0;j<robbis.length;j++)
-	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].istVirtuell())){ //Treffer
+	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].isVirtual())){ //Treffer
 	      robbis[j].incSchaden();
 	      registerSperren(robbis[j]);
 	      bewegt[j]=true;
@@ -819,7 +819,7 @@ public Vector getLasers(){
 	y++;
 	while((y<=sizeY)&&(!sw(x,y).isExisting())){
 	  for (int j=0;j<robbis.length;j++)
-	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].istVirtuell())){ //Treffer
+	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].isVirtual())){ //Treffer
 		robbis[j].incSchaden();
 		registerSperren(robbis[j]);
 		bewegt[j]=true;
@@ -837,7 +837,7 @@ public Vector getLasers(){
 	y--;
 	while((y>0)&&(!nw(x,y).isExisting())){
 	  for (int j=0;j<robbis.length;j++)
-	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].istVirtuell())){ //Treffer
+	    if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)&&(!robbis[j].isVirtual())){ //Treffer
 		robbis[j].incSchaden();
 	      registerSperren(robbis[j]);
 	      bewegt[j]=true;
@@ -879,21 +879,21 @@ public Vector getLasers(){
       //d("doFlaggenUpdate called.");
 
       for (int i=0;i<robbis.length;i++) {
-	if (robbis[i].getNaechsteFlagge()==flaggen.length+1)
+	if (robbis[i].getNextFlag()==flaggen.length+1)
 		continue;
-	if ((robbis[i].getX()==flaggen[robbis[i].getNaechsteFlagge()-1].x)&&(robbis[i].getY()==flaggen[robbis[i].getNaechsteFlagge()-1].y)) {
+	if ((robbis[i].getX()==flaggen[robbis[i].getNextFlag()-1].x)&&(robbis[i].getY()==flaggen[robbis[i].getNextFlag()-1].y)) {
 	    robbis[i].incNaechsteFlagge();
 	  bewegt[i]=true;
 	  //d(robbis[i].getName()+" hat naechste Flagge erreicht.");
 	  ausgabenMsgString2(de.botsnscouts.comm.MessageID.FLAG_REACHED,
-                            robbis[i].getName(),""+(robbis[i].getNaechsteFlagge()-1));
+                            robbis[i].getName(),""+(robbis[i].getNextFlag()-1));
 	}
 
       }
     } // doCheckUpdate
 
   /**
-    Roboter am Ende der 5. Phase reparieren, falls er auf einem
+    Bot am Ende der 5. Phase reparieren, falls er auf einem
     Reparaturfeld/Flaggenfeld steht und beschädigt ist.
    */
   private void doRepairs(int phase,BoardRoboter[] robbis)
@@ -903,7 +903,7 @@ public Vector getLasers(){
       for (int i=0;i<robbis.length;i++) {
         Floor floor = bo(robbis[i].getX(), robbis[i].getY());
 	if ( floor.isRepairing() ) {
-	  boolean msg=robbis[i].getSchaden()>0;
+	  boolean msg=robbis[i].getDamage()>0;
 	  robbis[i].decrSchaden( floor.getInfo() );
 	  bewegt[i]=true;
 	  //d(robbis[i].getName()+" repariert wegen Repa-Feld.");
@@ -913,7 +913,7 @@ public Vector getLasers(){
 
 	for (int j=0;j<flaggen.length;j++)
 	  if ((robbis[i].getX()==flaggen[j].x)&&(robbis[i].getY()==flaggen[j].y)) {
-	    boolean msg=robbis[i].getSchaden()>0;
+	    boolean msg=robbis[i].getDamage()>0;
 	    robbis[i].decrSchaden(1);
 	    bewegt[i]=true;
 	    //d(robbis[i].getName()+" repariert wegen Flagge.");
@@ -921,15 +921,15 @@ public Vector getLasers(){
 		ausgabenMsgString("mRepFlag",robbis[i].getName());
 	  }
 
-	if (robbis[i].getSchaden() < 0)
+	if (robbis[i].getDamage() < 0)
 	    robbis[i].setSchaden(0);
       }
     } // doRepairs
 
 
   /**
-    Falls ein Roboter nicht zerstört ist, und auch kein anderer
-    Roboter auf ihm steht, so wird der Roboter wieder normal
+    Falls ein Bot nicht zerstört ist, und auch kein anderer
+    Bot auf ihm steht, so wird der Bot wieder normal
     (entvirtualisiert).
    */
   private void entvirtualisiere(int phase, BoardRoboter[] robbis)    // extended edition
@@ -937,27 +937,27 @@ public Vector getLasers(){
       boolean cont;
       for (int a=0;a<robbis.length;a++) {      // Schleife 1
 	cont=false;
-	if (robbis[a].istVirtuell()) {
+	if (robbis[a].isVirtual()) {
 	  for (int b=0;b<robbis.length;b++)   // Schleife 2
 	    if (robbis[a]!=robbis[b])
-	      if ((robbis[a].getX()==robbis[b].getX()) && (robbis[a].getY()==robbis[b].getY()))  // wenn zwei verschiedene Roboter auf gleicher Position
+	      if ((robbis[a].getX()==robbis[b].getX()) && (robbis[a].getY()==robbis[b].getY()))  // wenn zwei verschiedene Bot auf gleicher Position
 		{
 		  cont=true;   // continue aktivieren
 		  break;       // dann entvirtualisieren fuer robbis[a] abbrechen
 		}
-	  if (cont) continue;  // naechsten Roboter bearbeiten
-	  if (robbis[a].getSchaden()<10) {
+	  if (cont) continue;  // naechsten Bot bearbeiten
+	  if (robbis[a].getDamage()<10) {
 		    robbis[a].setVirtuell(false);     // wenn er nicht zerstoert ist: entvirtualisieren durchführen
-		    //d("Entvirtualisiere Roboter "+robbis[a].getName());
+              //d("Entvirtualisiere Bot "+robbis[a].getName());
 		    bewegt[a]=true;
 		  }
 	} // if
       } // for Schleife 1
-      if (robbis.length==1)          // Sonderfall einzelner Roboter
-	if (robbis[0].getSchaden()<10)
+      if (robbis.length==1)          // Sonderfall einzelner Bot
+	if (robbis[0].getDamage()<10)
 	  {
 	      robbis[0].setVirtuell(false);
-	  //d("Entvirtualisiere einzelnen Roboter "+robbis[0].getName());
+            //d("Entvirtualisiere einzelnen Bot "+robbis[0].getName());
 	  bewegt[0]=true;
 	  }
     } // entvirtualisiere ende
@@ -970,14 +970,14 @@ public Vector getLasers(){
     {
       //d("registerSperren called mit "+robbi.getName());
 
-      if (robbi.getSchaden()>=10) {
+      if (robbi.getDamage()>=10) {
 	vernichteRoboter(robbi);
 	return;
       }
-      if (robbi.getSchaden()>=5) {
+      if (robbi.getDamage()>=5) {
 	for (int i=4;i>=0;i--){
-	  if (robbi.getGesperrteRegister()[i]==null) {
-	      if (robbi.getZug()[i] != null){
+	  if (robbi.getLockedRegisters()[i]==null) {
+	      if (robbi.getMove()[i] != null){
 		  robbi.sperreReg(i);
 		  //d("Sperre Register "+i);
 	      }

@@ -244,7 +244,7 @@ public class ServerAnmeldeThread extends Thread{
 			farbe=server.allocateColor(farbe,clientname);
 			d("Farbe Nr. "+farbe+" zugeteilt.");
 
-			Roboter h=Roboter.getNewInstance(clientname);
+			Bot h=Bot.getNewInstance(clientname);
 			h.setBotVis(farbe);
 			KommServerRoboter komm = new KommServerRoboter(in,out);
 			try{
@@ -256,7 +256,7 @@ public class ServerAnmeldeThread extends Thread{
 			d("ok an Spieler geschickt.");
 
 			oberThread.anzSpieler=new Integer(oberThread.anzSpieler.intValue()+1);
-			d(""+oberThread.anzSpieler+". Roboter mit Name "+clientname+" erzeugt.");
+			d(""+oberThread.anzSpieler+". Bot mit Name "+clientname+" erzeugt.");
 
 			ServerRoboterThread neu=new ServerRoboterThread(h,server.getOKListener(),server.getInfoRequestAnswerer(),server.getRobThreadMaintainer(),komm);
 			server.addRobotThread(neu);

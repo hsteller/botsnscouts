@@ -61,15 +61,15 @@ public interface AusgabeViewInterface {
 
 
     /**
-     * Statusleiste der spielenden Roboter
+     * Statusleiste der spielenden Bot
      */
-    public void showRobStatus(Roboter r);
+    public void showRobStatus(Bot r);
 
 
     /**
      * shows the changed, new status of the robots
      */
-    public void showUpdatedRobots(Roboter[] r);
+    public void showUpdatedRobots(Bot[] r);
 
 
 

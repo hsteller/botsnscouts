@@ -27,14 +27,14 @@ package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
 /**
- * extends the Karte object with
+ * extends the Card object with
  * state of the card like:
  * LOCKED, FREE, FILLED
  * @see HumanPlayer.java
  *@author Lukasz Pekacki
 */
 
-public class HumanCard extends Karte{
+public class HumanCard extends Card{
 
 //    private int prio;
 //    private String action;
@@ -57,7 +57,7 @@ public class HumanCard extends Karte{
 //	this.action = action;
     }
 
-    public HumanCard (Karte k) {
+    public HumanCard (Card k) {
 	this (k.getprio(), k.getaktion());
     }
 
@@ -95,7 +95,7 @@ public class HumanCard extends Karte{
 //    /** returns the compare */
 //    // ENNO:nobody (except equals) ever used this, so I redefined it to do s.th. sensible, see below
 //    public int compareTo(Object c) {
-//	if ((this.getaktion() == ((Karte) c).getaktion()) && ((this.getprio() == ((Karte) c).getprio() ) ) ) {
+//	if ((this.getaktion() == ((Card) c).getaktion()) && ((this.getprio() == ((Card) c).getprio() ) ) ) {
 //	    return 0;
 //	}
 //	else {
@@ -104,7 +104,7 @@ public class HumanCard extends Karte{
 //    }
 
 //    public int compareTo(Object o){
-//        Karte k2 = (Karte)o;
+//        Card k2 = (Card)o;
 //        if (this.prio < k2.getprio() )
 //            return -1;
 //        else if (this.prio > k2.getprio() )
@@ -114,14 +114,14 @@ public class HumanCard extends Karte{
 //    }
 //
 //
-//    public boolean equals(Karte c) {
+//    public boolean equals(Card c) {
 //	return ( compareTo(c) == 0);
 //    }
 
 
 
     public String toString() {
-	return ("Karte hat prio "+prio+", Aktion:"+action+" und status (0:free, 2:locked ):"+state);
+	return ("Card hat prio "+prio+", Aktion:"+action+" und status (0:free, 2:locked ):"+state);
     }
 
 }

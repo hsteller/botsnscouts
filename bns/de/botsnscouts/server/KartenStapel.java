@@ -27,7 +27,7 @@ package de.botsnscouts.server;
 
 import java.util.Random;
 import java.util.*;
-import de.botsnscouts.util.Karte;
+import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Global;
 
 /** Card deck
@@ -60,13 +60,13 @@ public class KartenStapel {
      *  new desk.
      */
 
-    protected KartenStapel (Karte[] locked) {
+    protected KartenStapel (Card[] locked) {
 
 	// Initialize allCards - only needed one time
 	createAllCardsIfNeeded();
 	// -----------------------------------------
 
-	java.util.Arrays.sort(locked, Karte.PRIORITY_COMPARATOR);
+	java.util.Arrays.sort(locked, Card.PRIORITY_COMPARATOR);
 	int cLocked = 0;
 	for (int i=0; i < allCards.length; i++){
 	    if (cLocked < locked.length && locked[cLocked].equals(allCards[i])){
@@ -81,7 +81,7 @@ public class KartenStapel {
 
     /** creates new card deck */
     protected KartenStapel() {
-	this(new Karte[0]);
+	this(new Card[0]);
     }
 
 
@@ -111,9 +111,9 @@ public class KartenStapel {
     /** returns a card from the card deck
      * Pre: card deck is not empty.
      */
-    protected Karte gibKarte() {
+    protected Card gibKarte() {
 	int index = random.nextInt(deck.size());
-	Karte k = (Karte )deck.remove(index);
+	Card k = (Card )deck.remove(index);
 	return k;
     }
 
@@ -121,8 +121,8 @@ public class KartenStapel {
      * PRE: Es werden nicht zu viele Karten vom Server verteilt.
      *
      */
-    public Karte[] gibKarte(int n){
-	Karte[] k = new Karte[n];
+    public Card[] gibKarte(int n){
+	Card[] k = new Card[n];
 	for (int i=0; i < n; i++){
 	    k[i] = gibKarte();
 	}
@@ -133,7 +133,7 @@ public class KartenStapel {
      * We ignore the string... (depricated)
      */
 
-    public static Karte get(int prio, String action){
+    public static Card get(int prio, String action){
 	createAllCardsIfNeeded();
 	return allCards[prio-1];
     }
@@ -142,7 +142,7 @@ public class KartenStapel {
     /** returns one card as a reference for a kind of cards
      *  null if String is invalid.
      */
-    public static Karte getRefCard(String kind){
+    public static Card getRefCard(String kind){
 	createAllCardsIfNeeded();
 	int pos = 0;
 	for (int i=0; i < types.length; i++) {

@@ -63,7 +63,7 @@ public class KommStSrv{
     /**
      * Flage laut Protokol
      **/
-    public Ort[] flags;
+    public Location[] flags;
 
 
 
@@ -143,9 +143,9 @@ public class KommStSrv{
 		    feld+=fromclt+"\n";
 		    fromclt=br.readLine();
 		}
-		flags=new Ort[Integer.parseInt(br.readLine())];
+		flags=new Location[Integer.parseInt(br.readLine())];
 		for(int i=0;i<flags.length;i++){
-		    flags[i]=new Ort(Integer.parseInt(br.readLine()),Integer.parseInt(br.readLine()));
+		    flags[i]=new Location(Integer.parseInt(br.readLine()),Integer.parseInt(br.readLine()));
 		    /*     flags[i].x=Integer.parseInt(br.readLine());
 			   flags[i].y=Integer.parseInt(br.readLine());*/
 		}

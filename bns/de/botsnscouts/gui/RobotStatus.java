@@ -26,6 +26,8 @@
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
+
+
 import javax.swing.plaf.metal.*;
 import java.awt.*;
 import java.io.*;
@@ -39,7 +41,7 @@ import javax.swing.border.*;
      * Status of a robot
      */
 public interface RobotStatus {
-    public void updateRobot(Roboter r);
+    public void updateRobot(Bot r);
     public void setWinnerNumber (int ranking);
-    public Roboter getRobot();
+    public Bot getRobot();
 }

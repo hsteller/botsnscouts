@@ -30,10 +30,10 @@ interface InfoRequestAnswerer{
     int getFieldSizeX();
     int getFieldSizeY();
     String getFieldString();
-    de.botsnscouts.util.Ort[] getFlags();
+    de.botsnscouts.util.Location[] getFlags();
     String[] getNames();
-    de.botsnscouts.util.Ort getRobPos(String name);
-    de.botsnscouts.util.Roboter getRobStatus(String name);
+    de.botsnscouts.util.Location getRobPos(String name);
+    de.botsnscouts.util.Bot getRobStatus(String name);
     boolean gameRunning();
     String[] getStanding();
     de.botsnscouts.util.Status[] getEvalStatus();

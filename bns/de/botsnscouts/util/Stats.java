@@ -138,7 +138,7 @@ public class Stats implements Comparable{
     }
 
     public String toString () {
-	return ("Robot: "+name+"\tHits: "+hits+"\tKills: "+kills+"\tdamByBoard:"
+	return ("Bot: "+name+"\tHits: "+hits+"\tKills: "+kills+"\tdamByBoard:"
                 +damageByBoard+"\tdamByRobot:"+damageByRobots+
                 "\taskedWise"+askedWisenheimer);
     }

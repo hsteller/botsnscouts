@@ -62,9 +62,9 @@ public class AutoBot extends BNSThread {
     final String realname;
     SearchRecursively wirbel;
     String fieldAsString;
-    Ort[] flags;
+    Location[] flags;
 
-    Roboter myBot = Roboter.getNewInstance("OrgRobbi");
+    Bot myBot = Bot.getNewInstance("OrgRobbi");
     KommClientSpieler myComm = new KommClientSpieler();
     ClientAntwort answer = new ClientAntwort();
 
@@ -130,19 +130,19 @@ public class AutoBot extends BNSThread {
                     for (int i = 0; i < answer.karten.length; i++)
                         cat.debug("Card " + i + " is " + answer.karten[i].getprio() + "|" + answer.karten[i].getaktion());
                     updateBot();
-                    Roboter simRob = Roboter.getCopy(myBot);  // Kopieren fuer spaetere Powerdown-Simulationen
+                    Bot simRob = Bot.getCopy(myBot);  // Kopieren fuer spaetere Powerdown-Simulationen
 
-                    Karte[] maxCards = new Karte[9];
+                    Card[] maxCards = new Card[9];
 
                     for (int i = 0; i < answer.karten.length; i++)
                         maxCards[i] = answer.karten[i];
-                    Roboter pRob = Roboter.getCopy(myBot);
+                    Bot pRob = Bot.getCopy(myBot);
                     // copy locked registers
-                    for (int i = 0; i < pRob.getGesperrteRegister().length; i++)
-                        pRob.setZug(i, pRob.getGesperrteRegister(i));
+                    for (int i = 0; i < pRob.getLockedRegisters().length; i++)
+                        pRob.setZug(i, pRob.getLockedRegister(i));
                     pRob.zeige_Roboter();
 
-                    Karte[] vonPermut = wirbel.findBestMove(maxCards, pRob);
+                    Card[] vonPermut = wirbel.findBestMove(maxCards, pRob);
 
                     // Absende-Karten vorbereiten
                     int kartenZahl;
@@ -168,21 +168,21 @@ public class AutoBot extends BNSThread {
                         }
                     }
 
-                    Roboter[] simRobs = new Roboter[1];         // Powerdown !?
+                    Bot[] simRobs = new Bot[1];         // Powerdown !?
                     simRobs[0] = simRob;
-                    int schadenAlt = simRob.getSchaden();
+                    int schadenAlt = simRob.getDamage();
                     for (int i = 1; i < 6; i++) {
                         simRobs[0].setZug(i - 1, vonPermut[i - 1]);
                         myMap.doPhase(i, simRobs);       // geplante Belegung simulieren
                         simRobs[0].setZug(i - 1, null);
                     }
-                    if ((simRobs[0].getSchaden() > 5) || (java.lang.Math.random() < (((double) simRobs[0].getSchaden() - 1) * 0.1))) {
+                    if ((simRobs[0].getDamage() > 5) || (java.lang.Math.random() < (((double) simRobs[0].getDamage() - 1) * 0.1))) {
                         simRobs[0].setAktiviert(false);
                         simRobs[0].setSchaden(0);
                         for (int i = 1; i < 6; i++) {                    // die Phase mit powerdown simulieren
                             myMap.doPhase(i, simRobs);
                         }
-                        if (simRobs[0].getSchaden() <= schadenAlt)
+                        if (simRobs[0].getDamage() <= schadenAlt)
                             powerdown = true;
                     }
 
@@ -191,7 +191,7 @@ public class AutoBot extends BNSThread {
                     break;
 
                 case (ClientAntwort.REAKTIVIERUNG):
-                    myComm.respReaktivierung(realname, false); // Anwort: Roboter wiedereinsetzen
+                    myComm.respReaktivierung(realname, false); // Anwort: Bot wiedereinsetzen
                     break;
 
                 case (ClientAntwort.ENTFERNUNG):
@@ -212,7 +212,7 @@ public class AutoBot extends BNSThread {
     /**
      * get current status from server into myBot
      */
-    public Roboter updateBot() {
+    public Bot updateBot() {
         try {
             myBot = myComm.getRobStatus(realname);
         } catch (KommException e) {
@@ -229,7 +229,7 @@ public class AutoBot extends BNSThread {
     public void initField() {
         cat.debug("initializing field...");
         int dimx, dimy;
-        Ort dimension;
+        Location dimension;
 
         try {
             dimension = myComm.getSpielfeldDim();
@@ -259,7 +259,7 @@ public class AutoBot extends BNSThread {
         int[] regsToUnlock = new int[reparatur];
         int regsFound = 0;
         for (int i = 0; i < 5; i++) {
-            if (myBot.getGesperrteRegister(i) != null) {
+            if (myBot.getLockedRegister(i) != null) {
                 if (regsFound < reparatur) {
                     regsToUnlock[regsFound] = i + 1;
                     regsFound++;
@@ -271,7 +271,7 @@ public class AutoBot extends BNSThread {
 
     public void handleDestroyedRequest() {
         int direction = 0;
-        Roboter testRobbi = Roboter.getCopy(myBot);
+        Bot testRobbi = Bot.getCopy(myBot);
 
         testRobbi.zumArchiv();
 
