@@ -2,6 +2,7 @@ package de.botsnscouts.server;
 
 import java.net.*;
 import java.io.*;
+import de.botsnscouts.util.Global;
 
 /** Erlaubt die nebenlaeufige Anmeldung von Robotern und Ausgaben 
  *  Startet fuer jeden Anmeldeversuch einen ServerAnmeldeThread.

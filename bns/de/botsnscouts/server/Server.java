@@ -1050,7 +1050,7 @@ private void roboterThreadStart(){
 		    for (Iterator e=aktRoboter.listIterator(); e.hasNext();) {
 			ServerRoboterThread tmp = (ServerRoboterThread )e.next();
 			// Gewinner?
-			if (tmp.rob.getNaechsteFlagge() == feld.getFlaggen.length+1) {
+			if (tmp.rob.getNaechsteFlagge() == feld.getFlaggen().length+1) {
 			    //raus aus aktiven Robos, in Gewinnerliste,
                             // vom Plan nehmen, ausgabenbenachrichtigen
 			    synchronized(tmp.modus) {

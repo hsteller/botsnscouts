@@ -146,7 +146,7 @@ public class ServerRoboterThread extends Thread
                                 break;
 
                             case ServerAntwort.GIBSPIELFELDDIM: 
-                                komm.sendSpielfeldDim(server.feld.getSizeX,server.feld.getSizeY);
+                                komm.sendSpielfeldDim(server.feld.getSizeX(),server.feld.getSizeY());
                                 break;
                             
                             case ServerAntwort.GIBSPIELFELD:
@@ -154,7 +154,7 @@ public class ServerRoboterThread extends Thread
                                 break;
                             
                             case ServerAntwort.GIBFAHNENPOS:
-                                komm.sendFahnenpos(server.feld.getFlaggen);
+                                komm.sendFahnenpos(server.feld.getFlaggen());
                                 break;
                             
                             case ServerAntwort.GIBNAMEN:
@@ -187,10 +187,6 @@ public class ServerRoboterThread extends Thread
                                     ende=true;
                                 }
                     
-                                break;
-                            
-                            case ServerAntwort.GIBFELDINHALT:
-				komm.sendFeldinhalt(server.feld.getFeld(ans.ort.x, ans.ort.y));      
                                 break;
                             
                             case ServerAntwort.GIBROBSTATUS:
@@ -257,6 +253,6 @@ public class ServerRoboterThread extends Thread
 
     private void d(String s)
         {
-            Global.debug(this," for "+rob.name+": "+s);
+            Global.debug(this," for "+rob.getName()+": "+s);
         }
 } // class

@@ -1,5 +1,7 @@
 package de.botsnscouts.server;
 
+import de.botsnscouts.util.Global;
+
 /** Schickt einem Thread nach definiertem Timeout einen notify(). 
  *  @author: Dirk
  */
