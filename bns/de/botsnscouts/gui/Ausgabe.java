@@ -634,10 +634,13 @@ public class Ausgabe extends BNSThread {
                 }
           });
 
-      statsWindow.toFront();
       statsWindow.pack();
     }
-
+     if (statsWindow.getState()==JFrame.ICONIFIED) {
+        CAT.debug("iconified");
+        statsWindow.setState(JFrame.NORMAL);
+      }
+    statsWindow.toFront();
     statsWindow.setVisible(true);
     statsWindow.show();
   }
