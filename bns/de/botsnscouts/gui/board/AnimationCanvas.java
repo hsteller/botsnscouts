@@ -67,7 +67,7 @@ public class AnimationCanvas extends Canvas implements Scalable, DrawingConstant
    /**Needed to obtain the robot colors (for drawing lasers)*/
    private BotCanvas botCanvas;
    
-   private int delay=AusgabeView.MEDIUM;
+   private int delay=2000;
    
    
    private Bot [] robos;
