@@ -28,8 +28,16 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
     // settings for Zoom-Menu
     protected static final int MIN_ZOOM = 40;
-    protected static final int MAX_ZOOM = 140;
+    protected static final int DEFAULT_ZOOM = 100; // selects the RadioButton to
+                                                   // be selected as default, does not
+                                                   // influence the default zoom; that
+                                                   // will be always 100
+    protected static final int MAX_ZOOM = 150;
     protected static final int ZOOM_STEP = 10;
+
+    // settings for options-menu
+        // sound-menu
+        private boolean soundOn = false;
 
 
 
@@ -233,6 +241,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
        OptionsMenu () {
         super(Message.say("AusgabeFrame","mOptions"));
         add(new ZoomMenu());
+        add(new SoundMenu());
        }
     }
 
@@ -247,9 +256,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 		item.addActionListener( this );
 		super.add( item );
 		group.add( item );
-	    }
-	    if( item != null ) {
-		group.setSelected( item.getModel(), true );
+                if (d==DEFAULT_ZOOM)
+                  group.setSelected( item.getModel(), true );
 	    }
 	}
         public void actionPerformed(ActionEvent e) {
@@ -269,6 +277,21 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 		});
 	}
   }
+
+  private class SoundMenu extends JMenu {
+     SoundMenu () {
+        super ((Message.say("AusgabeFrame","mSound")));
+	JCheckBoxMenuItem soundBox = new JCheckBoxMenuItem(Message.say("AusgabeFrame","mSoundOn"), soundOn);
+	soundBox.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e){
+		    soundOn = !soundOn;
+		    spielFeld.setSoundActive(soundOn);
+		}
+	    });
+	add(soundBox);
+     }
+  }
+
 
    private class HelpMenu extends JMenu {
       HelpMenu () {

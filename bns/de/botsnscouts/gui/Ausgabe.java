@@ -536,17 +536,7 @@ public class Ausgabe extends Thread {
 	JMenu optionenMenu = new JMenu((Message.say("AusgabeFrame","mOptions")));
 	JMenu optSpeed = new JMenu((Message.say("AusgabeFrame","mSpeed")));
 
-	JMenu soundMenu = new JMenu ((Message.say("AusgabeFrame","mSound")));
-	JCheckBoxMenuItem soundBox = new JCheckBoxMenuItem(Message.say("AusgabeFrame","mSoundOn"), soundOn);
-	soundBox.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e){
-		    soundOn = !soundOn;
-		    //soundBox.setSelected(soundOn);
-		    ausgabe.getAusgabeView().getSpielfeld().setSoundActive(soundOn);
-		    CAT.debug("Setting sound to "+soundOn);
-		}
-	    });
-	soundMenu.add(soundBox);
+
 	optionenMenu.add(soundMenu);
 	SpeedMenuListener speedListener= new SpeedMenuListener();
 
