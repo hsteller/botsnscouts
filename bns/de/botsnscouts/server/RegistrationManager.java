@@ -16,28 +16,30 @@ import de.botsnscouts.comm.*;
  *  Startet fuer jeden Anmeldeversuch einen ServerAnmeldeThread.
 */
 
-class RegistrationManager extends Thread
+class RegistrationManager implements Runnable
 {
     static final Category CAT = Category.getInstance( RegistrationManager.class );
-    static final String REGISTER_PATTERN = "(RGS|RGA|RS2|RA2)\\(([:alpha:]+)(,([0-7]))?\\)";
+    static final String REGISTER_PATTERN = "(RGS|RGA|RS2|RA2)\\(([:alpha:]+)(,([1-8]))?\\)";
 
     Server server;
     ServerSocket seso;
     Set names = new HashSet();
     int anzSpieler = 0;
+    Thread workingThread = new Thread( this, "RegMan" );
+
 
     public RegistrationManager(Server s)
     {
-        super("RegistrationManager");
+        //super("RegistrationManager");
 	server=s;
     }
 
     public void beginRegistration() {
-        this.start();
+        workingThread.start();
     }
 
     public void endRegistration() {
-      this.interrupt();
+        workingThread.interrupt();
     }
 
     public void run()
@@ -47,9 +49,9 @@ class RegistrationManager extends Thread
         seso.setSoTimeout(0);
 
         Socket clientSocket;
-        while(!isInterrupted()){
+        while(!Thread.interrupted()){
           clientSocket = seso.accept();
-          CAT.debug("new registration");
+          if( CAT.isDebugEnabled() ) CAT.debug("new registration from " + clientSocket);
           register( clientSocket );
         }
       }catch( IOException io ) {
@@ -61,7 +63,7 @@ class RegistrationManager extends Thread
     }
 
     /** Registriert Namen als benutzt - soll mit isLegalName() benutzt werden */
-    protected void addName(String s) throws RegistrationException {
+    private void addName(String s) throws RegistrationException {
       if( CAT.isDebugEnabled() ) {
         CAT.debug( "want to add " + s + ", right now we have:" );
         Iterator i = names.iterator();
@@ -83,7 +85,7 @@ class RegistrationManager extends Thread
      *  bzw ServerAusgabeThread-Objekte und haengt diese in die richtigen Vektoren ein.
      */
 
-    public void register(Socket socket) {
+    private synchronized void register(Socket socket) {
         PrintWriter out=null;
         BufferedReader in=null;
 	String clientName="";
@@ -135,7 +137,7 @@ class RegistrationManager extends Thread
     }
 
 
-    void registerPlayer(String clientName, int farbe, BufferedReader in, PrintWriter out, float version )
+    private void registerPlayer(String clientName, int farbe, BufferedReader in, PrintWriter out, float version )
     throws RegistrationException
     {
 	    // darf ein Spieler sich anmelden?
@@ -187,7 +189,7 @@ class RegistrationManager extends Thread
 
         if (anzSpieler >= server.getMaxPlayers()){ // alle da
             try {
-                sleep(5000);
+                Thread.sleep(5000);
             }
             catch(InterruptedException ex) {
                 CAT.debug("InterruptedException "+ex);
@@ -197,7 +199,7 @@ class RegistrationManager extends Thread
         } // if maxspieler angemeldet
     }
 
-    void registerOutput( String clientName, BufferedReader in, PrintWriter out, float version )
+    private void registerOutput( String clientName, BufferedReader in, PrintWriter out, float version )
     throws RegistrationException
     {
         KommServerAusgabe ksa = new KommServerAusgabe(in, out);
