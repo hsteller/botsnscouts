@@ -284,7 +284,7 @@ public class HumanPlayer extends Thread {
 	    }
 	}
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
-	(new SpielerMensch(host,port,name,farbe)).start();
+	(new HumanPlayer(host,port,name,farbe)).start();
     }
 
     protected void sendCards(ArrayList registerCards, boolean nextTurnPowerDown) {

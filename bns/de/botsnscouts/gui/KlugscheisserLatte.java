@@ -13,7 +13,7 @@ import javax.swing.border.*;
      * KlugscheisserLatte, die im oben rechts in der Infoleiste dargestellt ist
      */
 public class KlugscheisserLatte extends JToggleButton {
-    SpielerMensch mensch;
+
     int xsize=60, ysize=60;
     Image klugSchlaf[];
     Image klugWach[];

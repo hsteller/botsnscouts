@@ -15,11 +15,10 @@ import de.botsnscouts.util.*;
      * Scoutvertiefung, die im oben rechts in der Infoleiste dargestellt ist
      */
 public class ScoutVertiefung extends JToggleButton {
-    SpielerMensch mensch;
+
     int xsize=60, ysize=60;
     Image imageActive[];
     Image imageDream[];
-    //    Image scoutImages[];
 
     public ScoutVertiefung(ActionListener al) {
 	imageActive=ImageMan.getImages(ImageMan.SCHLAFPLATZ);
