@@ -143,7 +143,7 @@
   <property name="tools-src"   value="${basedir}/${tools}/src" />
   <property name="tools-build" value="${basedir}/${tools}/classes" />
  
-  <target name="dist" depends="compile,compile-tools">
+  <target name="dist" depends="clean,compile,compile-tools">
     <ant antfile="dist.xml" target="dist" />
   </target>
 
