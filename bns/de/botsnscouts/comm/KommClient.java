@@ -102,7 +102,7 @@ public class KommClient {
 	if 'NTC' was read, gotNTC will be set to true, the NTC-String will be saved and the next
 	incoming String will be returned.
     */
-    protected String einlesen() throws KommFutschException, KommException{
+    protected String einlesen() throws KommException {
 	PrintWriter debug=null;
 	if (log) {
 
@@ -159,7 +159,8 @@ public class KommClient {
 	else if ((back.length()>=3)&&(back.substring(0,3).equals("NTC"))) {
 
 	    gotNTC=true; // changing state; indicating that there is an NTC waiting
-	    strNTC=new String(back); // saving the message of the server
+	    //strNTC=new String(back); // saving the message of the server
+            strNTC=back; // don't save: strings are immutable
 
 	    // now we will read the answer we are waiting for
 	    back = einlesen();
@@ -183,7 +184,7 @@ public class KommClient {
 	@exception KommException Any error parsing a server-message (including most
 	exceptions) will end up in throwing a KommException
     */
-    public ClientAntwort warte () throws KommFutschException, KommException {
+    public ClientAntwort warte () throws KommException {
 	String rein;
 	/*   try {
 	     rein = in.readLine();

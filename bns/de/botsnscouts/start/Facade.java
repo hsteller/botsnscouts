@@ -6,7 +6,7 @@ import de.botsnscouts.util.*;
 import de.botsnscouts.board.*;
 import de.botsnscouts.comm.*;
 import de.botsnscouts.gui.*;
-// Diese Klasse dient der Entkopplung der GUI-Schicht (StartSpieler) 
+// Diese Klasse dient der Entkopplung der GUI-Schicht (StartSpieler)
 // von der Fachkonzeptschicht(...) und der Datenhaltungsschicht (...)
 
 public class Facade{
@@ -47,7 +47,7 @@ public class Facade{
     public Facade(int gr){
 	thumbGR=gr;
 	tileFactory = new TileFactory(thumbGR);
-	tileFactory.start();
+	//tileFactory.start();
 	tileRaster = new TileRaster(tileFactory);
 	launcher = new Launcher();
 	com=new KommSpPr();
@@ -107,16 +107,16 @@ public class Facade{
 	return tileRaster.getFlaggeKomment(x,y);
     }
 
-    // fügt eine Flagge hinzu 
+    // fügt eine Flagge hinzu
     public void addFlagge(int x,int y) throws FlaggenException{
 	tileRaster.addFlagge(x,y);
     }
 
-    // löscht eine Flagge hinzu 
+    // löscht eine Flagge hinzu
     public void delFlagge(int nr){
 	tileRaster.delFlagge(nr);
     }
-    
+
     //löscht Flagge mit koordinaten ax,ay
     public void delFlagge(int ax,int ay){
 	tileRaster.delFlagge(ax,ay);
@@ -127,12 +127,12 @@ public class Facade{
 	return tileRaster.istFlagge(ax,ay);
     }
 
-    // versetzt eine Flagge 
+    // versetzt eine Flagge
     public void moveFlagge(int nr, int x,int y) throws FlaggenException{
 	tileRaster.moveFlagge(nr,x,y);
     }
 
-    // versetzt eine Flagge 
+    // versetzt eine Flagge
     public void moveFlagge(int ax,int ay, int x,int y) throws FlaggenException{
 	tileRaster.moveFlagge(ax,ay,x,y);
     }
@@ -247,17 +247,17 @@ public class Facade{
     public Thread einemSpielZuschauen(String ip, int port){
 	return launcher.einemSpielZuschauen(ip, port,false);
     }
- 
+
     // startet ein AusgabeKanal mit default parameter
     public Thread einemSpielZuschauen(){
 	return launcher.einemSpielZuschauen(DIP, DPORT,false);
     }
- 
+
     // startet ein AusgabeKanal mit default parameter und keinem Splashscreen
     public Thread einemSpielZuschauenNoSplash(){
 	return launcher.einemSpielZuschauen(DIP, DPORT,true);
     }
- 
+
     // startet einen SpielerMensch
     public Thread amSpielTeilnehmen(String ip, int port, String name, int farbe){
 	return launcher.amSpielTeilnehmen(ip, port, name, farbe,false);
@@ -294,6 +294,7 @@ public class Facade{
 
     // launch the game
     public boolean startGame() throws OneFlagException, NichtZusSpfException{
+        tileFactory.forgetTiles();
 	return startGame(DIP, DPORT, DPLAYERS, DTO, LPORT);
     }
 
@@ -304,7 +305,7 @@ public class Facade{
     public boolean startGame(String ip, int port, int pnum, int timeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
 	boolean ret;
 	ret=launcher.startGame(com, tileRaster, ip, port, pnum, timeOut, lisPort);
-
+        tileFactory.forgetTiles();
 	return ret;
     }
 
@@ -324,4 +325,7 @@ public class Facade{
 	com.cancelGame(DIP,DPORT);
     }
 
+    public void prepareTiles() {
+        //tileFactory.prepareTiles();
+    }
 }

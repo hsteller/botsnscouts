@@ -18,14 +18,16 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 
   // Wandgerätetypen
   // ================
+//  moved into class Wand (is representation)
+//  /** Kein Wandgerät in der Wand */
+//  public static final int WKEINS = 0;
+//  /**  Laser in der Wand */
+//  public static final int WLASER = 1;
+//  /**  Pusher in der Wand */
+//  public static final int WPUSHER = 2;
 
-  /** Kein Wandgerät in der Wand */
-  public static final int WKEINS = 0;
-  /**  Laser in der Wand */
-  public static final int WLASER = 1;
-  /**  Pusher in der Wand */
-  public static final int WPUSHER = 2;
-
+  public static final int W_LEFT_OR_UPPER   = 0;
+  public static final int W_WRIGHT_OR_BOTTOM  = 1;
   //  Bodentypen
   //  ==========
 
@@ -136,12 +138,12 @@ public class Spielfeld implements de.botsnscouts.util.Directions
    *  2-dimensional   1. x-Koordinate
    *                  2. y-Koordinate
    */
-  protected Boden[][] boden;
+  private Boden[][] boden;
 
   // Die Waende
   //
   /** 2-dimensionales Wand-Array vertikal */
-  protected Wand[][] vWand;    // vertikale Waende
+  private Wand[][] vWand;    // vertikale Waende
   /** 2-dimensionales Wand-Array horizontal */
   protected Wand[][] hWand;    // horizontale Waende
 
@@ -200,8 +202,8 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	    // Konflikte resolven
 	    for (int y=0;y<sizeY;y++){
 		vWand[s1.sizeX][y].da=s1.vWand[s1.sizeX][y].da||s2.vWand[0][y].da;
-		vWand[s1.sizeX][y].wandEl[0]=s1.vWand[s1.sizeX][y].wandEl[0];
-		vWand[s1.sizeX][y].spez[0]=s1.vWand[s1.sizeX][y].spez[0];
+		vWand[s1.sizeX][y].wandEl0(s1.vWand[s1.sizeX][y].wandEl0());
+		vWand[s1.sizeX][y].spez0(s1.vWand[s1.sizeX][y].spez0());
 	    }
 
 	}else{ //untereinander
@@ -237,8 +239,8 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	    // Konflikte resolven
 	    for (int x=0;x<sizeX;x++){
 		hWand[x][s2.sizeY].da=s1.vWand[x][0].da||s2.vWand[x][s2.sizeY].da;
-		vWand[x][s2.sizeY].wandEl[0]=s1.vWand[x][0].wandEl[0];
-		vWand[x][s2.sizeY].spez[0]=s1.vWand[x][0].spez[0];
+		vWand[x][s2.sizeY].wandEl0(s1.vWand[x][0].wandEl0());
+		vWand[x][s2.sizeY].spez0(s1.vWand[x][0].spez0());
 	    }
 	}
 
@@ -269,7 +271,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	  neu=new Wand();
 	  strpos=parseWand(strpos,kacheln,neu);
 	  hWand[spalte][zeile]=neu;
-	  //d("spalte="+spalte+"; zeile="+zeile+";neu: "+neu.wandEl[0]+"|"+neu.spez[0]+(neu.da?"#":"_")+neu.wandEl[1]+"|"+neu.spez[1]);
+	  //d("spalte="+spalte+"; zeile="+zeile+";neu: "+neu.wandEl[0]+"|"+neu.spez0()+(neu.da?"#":"_")+neu.wandEl[1]+"|"+neu.spez1());
 	}//for spalte, ZwischenR-parsen
 	strpos=assertws(kacheln,strpos);
 	//parse erste Wand
@@ -366,7 +368,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
       return flaggenProbleme;
     }
 
-/** Deep Magic */
+/** Deep Magic, rotates LEFT */
   public String get90GradGedreht()
     {
       CAT.debug("get90GradGedreht() called");
@@ -374,21 +376,25 @@ public class Spielfeld implements de.botsnscouts.util.Directions
       for (int x=sizeX;x>0;x--){
 	for (int y=sizeY;y>0;y--){
 	  // "obere" ZwischenReihe
-	  Wand w = ow(x,y);
-	  writeWandH(w,s);
+//	  Wand w = ow(x,y);
+//	  writeWandH(w,s);
+          ow(x,y).writeReversed(s);
 	}
 	s.append('\n');
-	writeWand(nw(x,sizeX),s);
+//	writeWand(nw(x,sizeX),s);
+        nw(x,sizeX).write(s);
 	for (int y=sizeY;y>0;y--){
 	  //Boden
 	  writeBoden(bo(x,y),s,true);
-	  writeWand(sw(x,y),s);
+//	  writeWand(sw(x,y),s);
+          sw(x,y).write(s);
 	}
 	s.append("\n");
       } //for x
       // unterste ZwischenReihe
       for (int y=sizeY;y>0;y--)
-	writeWandH(ww(1,y),s);
+        ww(1,y).writeReversed(s);
+//	writeWandH(ww(1,y),s);
       s.append("\n.\n");
       return new String(s);
     }
@@ -401,103 +407,109 @@ public class Spielfeld implements de.botsnscouts.util.Directions
             for (int y=sizeY;y>0;y--){
                 for (int x=1;x<=sizeX;x++){
                         // obere ZwischenReihe
-                    Wand w = nw(x,y);
-                    writeWand(w,s);
+//                    Wand w = nw(x,y);
+//                    writeWand(w,s);
+                    nw(x,y).write(s);
                 }
                 s.append("\n");
-                writeWand(ww(1,y),s);
+//                writeWand(ww(1,y),s);
+                ww(1,y).write(s);
                 for (int x=1;x<=sizeX;x++){
                         //Boden
                     writeBoden(bo(x,y),s,false);
-                    writeWand(ow(x,y),s);
+//                    writeWand(ow(x,y),s);
+                    ow(x,y).write(s);
                 }
                 s.append("\n");
             } //for y
                 // unterste ZwischenReihe
-            for (int x=1;x<=sizeX;x++)
-                writeWand(sw(x,1),s);
+            for (int x=1;x<=sizeX;x++) {
+//                writeWand(sw(x,1),s);
+                sw(x,1).write(s);
+            }
             s.append("\n.\n");
 	    return new String(s);
         }
+// moved into class Wand
+//  private void writeWandH(Wand w,StringBuffer s)
+//    {
+//	switch (w.wandEl1()){
+//	case WLASER:
+//	    s.append("[L(");
+//	    s.append(w.spez1());
+//	    s.append(")");
+//	    break;
+//	case WPUSHER:
+//	    s.append("[S(");
+//	    for (int i=1;i<6;i++){
+//	      if (isPusherActive(w.spez1(),i)){
+//		s.append(i);
+//		s.append(',');
+//	      }
+//	    }
+//	s.append(')');
+//	break;
+//      }
+//      s.append(w.da?'#':'_');
+//      switch (w.wandEl0()){
+//      case WLASER:
+//	s.append("L(");
+//	s.append(w.spez0());
+//	s.append(")]");
+//	break;
+//      case WPUSHER:
+//	s.append("S(");
+//	for (int i=1;i<6;i++){
+//	  if (isPusherActive(w.spez0(),i)){
+//	    s.append(i);
+//	    s.append(',');
+//	  }
+//	}
+//	s.append(")]");
+//
+//	break;
+//      }
+//    }
 
-  private void writeWandH(Wand w,StringBuffer s)
-    {
-	switch (w.wandEl[1]){
-	case WLASER:
-	    s.append("[L(");
-	    s.append(w.spez[1]);
-	    s.append(")");
-	    break;
-	case WPUSHER:
-	    s.append("[S(");
-	    for (int i=1;i<6;i++){
-	      if (isPusherActive(w.spez[1],i)){
-		s.append(i);
-		s.append(',');
-	      }
-	    }
-	s.append(')');
-	break;
-      }
-      s.append(w.da?'#':'_');
-      switch (w.wandEl[0]){
-      case WLASER:
-	s.append("L(");
-	s.append(w.spez[0]);
-	s.append(")]");
-	break;
-      case WPUSHER:
-	s.append("S(");
-	for (int i=1;i<6;i++){
-	  if (isPusherActive(w.spez[0],i)){
-	    s.append(i);
-	    s.append(',');
-	  }
-	}
-	s.append(")]");
-
-	break;
-      }
-    }
-
-  private void writeWand(Wand w,StringBuffer s)
-    {
-      switch (w.wandEl[0]){
-      case WLASER:
-	s.append("[L(");
-	s.append(w.spez[0]);
-	s.append(')');
-	break;
-      case WPUSHER:
-	s.append("[S(");
-	for (int i=1;i<6;i++){
-	  if (isPusherActive(w.spez[0],i)){
-	    s.append(i);
-	    s.append(',');
-	  }
-	}
-	s.append(')');
-	break;
-      }
-      s.append(w.da?'#':'_');
-      switch (w.wandEl[1]){
-      case WLASER:
-	s.append("L(");
-	s.append(w.spez[1]);
-	s.append(")]");
-	break;
-      case WPUSHER:
-	s.append("S(");
-	for (int i=1;i<6;i++){
-	  if (isPusherActive(w.spez[1],i)){
-	    s.append(i);
-	    s.append(',');
-	  }
-	}
-	s.append(")]");
-	break;
-      }
-    }
+// moved into class Wand
+//  private void writeWand(Wand w,StringBuffer s)
+//    {
+//      switch (w.wandEl0()){
+//      case WLASER:
+//	s.append("[L(");
+//	s.append(w.spez0());
+//	s.append(')');
+//	break;
+//      case WPUSHER:
+//	s.append("[S(");
+//	for (int i=1;i<6;i++){
+//	  if (isPusherActive(w.spez0(),i)){
+//	    s.append(i);
+//	    s.append(',');
+//	  }
+//	}
+//	s.append(')');
+//	break;
+//      }
+//      s.append(w.da?'#':'_');
+//      switch (w.wandEl1()){
+//      case WLASER:
+//	s.append("L(");
+//	s.append(w.spez1());
+//	s.append(")]");
+//	break;
+//      case WPUSHER:
+//	s.append("S(");
+//	for (int i=1;i<6;i++){
+//	  if (isPusherActive(w.spez1(),i)){
+//	    s.append(i);
+//	    s.append(',');
+//	  }
+//	}
+//	s.append(")]");
+//	break;
+//      }
+//    }
 
   private void writeBoden(Boden b,StringBuffer s,boolean drehen)
     {
@@ -748,11 +760,11 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	neu.da=true;
 	if(is(kacheln,strpos,'L')){
 	  //d("Laser [0] found");
-	  strpos=parseL(++strpos,kacheln,neu,0);
+	  strpos=parseL(++strpos,kacheln,neu, W_LEFT_OR_UPPER );
 	}
 	else if(is(kacheln,strpos,'S')){
 	  //d("Schieber [0] found");
-	  strpos=parseS(++strpos,kacheln,neu,0);
+	  strpos=parseS(++strpos,kacheln,neu, W_LEFT_OR_UPPER );
 	}
 	assert(kacheln,strpos++,'#');
       }
@@ -760,12 +772,12 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	throw new FormatException(Message.say("Spielfeld","xCharsNotFound","#_[",strpos,""+kacheln.charAt(strpos)));
       if(is(kacheln,strpos,'L')){
 	//d("Laser [1] found");
-	strpos=parseL(++strpos,kacheln,neu,1);
+	strpos=parseL(++strpos,kacheln,neu, W_WRIGHT_OR_BOTTOM );
 	assert(kacheln,strpos++,']');
       }
       else if(is(kacheln,strpos,'S')){
 	//d("Schieber [1] found");
-	strpos=parseS(++strpos,kacheln,neu,1);
+	strpos=parseS(++strpos,kacheln,neu, W_WRIGHT_OR_BOTTOM );
 	assert(kacheln,strpos++,']');
       }
       return strpos;
@@ -781,8 +793,9 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	assert(s,pos++,',');
       }
       assert(s,pos++,')');
-      it.wandEl[index]=WPUSHER;
-      it.spez[index]=tmp;
+      it.setPusher( index, tmp);
+//      it.wandEl(index, WPUSHER);
+//      it.spez(index,tmp);
       return pos;
     }
   private int parseL(int pos,String s,Wand it,int index) throws FormatException
@@ -790,8 +803,9 @@ public class Spielfeld implements de.botsnscouts.util.Directions
       assert(s,pos++,'(');
       int str=java.lang.Character.digit(s.charAt(pos++),10);
       assert(s,pos++,')');
-      it.wandEl[index]=WLASER;
-      it.spez[index]=str;
+      it.setLaser( index, str );
+//      it.wandEl(index, WLASER);
+//      it.spez(index,str);
       return pos;
     }
   private static boolean is(String s,int pos,char c)
@@ -877,7 +891,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	  if(vWand[x][y]==null)
 	    pn("null\t");
 	  else
-	    pn(vWand[x][y].da?vWand[x][y].wandEl[0]+"|"+vWand[x][y].spez[0]+"#"+vWand[x][y].wandEl[1]+"|"+vWand[x][y].spez[1]+"\t":".\t");
+	    pn(vWand[x][y].da?vWand[x][y].wandEl0()+"|"+vWand[x][y].spez0()+"#"+vWand[x][y].wandEl1()+"|"+vWand[x][y].spez1()+"\t":".\t");
 	}
 	p("");
       }
@@ -896,7 +910,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	  if(hWand[x][y]==null)
 	    pn("null\t");
 	  else
-	    pn(hWand[x][y].da?hWand[x][y].wandEl[0]+"|"+hWand[x][y].spez[0]+"#"+hWand[x][y].wandEl[1]+"|"+hWand[x][y].spez[1]+"\t":".\t");
+	    pn(hWand[x][y].da?hWand[x][y].wandEl0()+"|"+hWand[x][y].spez0()+"#"+hWand[x][y].wandEl1()+"|"+hWand[x][y].spez1()+"\t":".\t");
 	}
 	p("");
       }
@@ -941,21 +955,37 @@ public class Spielfeld implements de.botsnscouts.util.Directions
   /** Gibt true zurueck, wenn ein Pusher mit Spezifikationszahl spez
     in phase aktiv ist. False sonst.
     */
-  public boolean isPusherActive(int spez,int phase)
+  public static boolean isPusherActive(int spez,int phase)
     {
       return((spez>>(phase-1))%2==1);
     }
 
-    public Wand[][] getVWand() {
-        return vWand;
+//    public Wand[][] getVWand() {
+//        return vWand;
+//    }
+//
+//    public Wand[][] getHWand() {
+//        return hWand;
+//    }
+
+    public Wand getVWand(int a, int b) {
+        return vWand[a][b];
     }
 
-    public Wand[][] getHWand() {
-        return hWand;
+    public Wand getHWand(int a, int b) {
+        return hWand[a][b];
     }
 
-    public Boden[][] getBoden() {
-        return boden;
+//    public Boden[][] getBoden() {
+//        return boden;
+//    }
+
+    public Boden getBoden(int a, int b) {
+        return boden[a][b];
+    }
+
+    public void setBoden(int a, int b, Boden aBoden) {
+        boden[a][b] = aBoden;
     }
 }
 

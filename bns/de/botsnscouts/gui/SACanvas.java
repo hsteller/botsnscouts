@@ -18,17 +18,17 @@ import de.botsnscouts.util.*;
 import de.botsnscouts.*;
 /**
  * Spielfeld-Ausgabe-Canvas ist das Objekt, das der Ausgabe und dem menschlichen Spieler das Spielfeld grafisch darstellt und verwaltet
- * @author ursprÅnglich Daniel Holtz
+ * @author urspr\uFFFDnglich Daniel Holtz
  * @version Verbesserung von 1.0
 
  * changes: enno v1.23
  * 1. beim painten wird nur noch der teil ins sichtbare kopiert, der auch
  *   in gepaintet werden muss (hat aber nicht viel gebracht)
- * 2. Felder, die nicht wirklich neu gezeichnet werden mÅssen, werden nicht
+ * 2. Felder, die nicht wirklich neu gezeichnet werden m\uFFFDssen, werden nicht
  *    mehr betrachtet (bringt was!)
  * 3. Code insgesamt lesbarer strukturiert (noch nicht ganz beendet)
  * 4. makePixelArray in eigene Methode ausgelagert
- * 5. lokale Variablen eingefÅhrt ...
+ * 5. lokale Variablen eingef\uFFFDhrt ...
  *
  * 6. Verwaltung und Speicherung der Bilder ausgelagert in
  *    Klasse ImageMan (kann so dann auch vom KachelEditor verwendet werden)
@@ -863,14 +863,14 @@ public class SACanvas extends JComponent {
 
 		// Nordwand
 		if (sf.nw(xpos,ypos).da){
-		    if (sf.nw(xpos,ypos).wandEl[1]==1){
+		    if (sf.nw(xpos,ypos).wandEl1()==1){
 			g.drawImage(diverseCrop[15],actx,acty+5,64,64,this);
 		    }
-		    if (sf.nw(xpos,ypos).wandEl[1]==2){
+		    if (sf.nw(xpos,ypos).wandEl1()==2){
 			g.drawImage(diverseCrop[7],actx-1,acty+5,64,64,this);
 			// ------------Beschriftung --------------------
 			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.isPusherActive(sf.nw(xpos,ypos).spez[1],phasecount)){
+			    if (sf.isPusherActive(sf.nw(xpos,ypos).spez1(),phasecount)){
 				int strx = actx + 10*phasecount;
 				g.setColor( (phasecount % 2) == 0 ?
 					    Color.black : Color.yellow );
@@ -882,16 +882,16 @@ public class SACanvas extends JComponent {
 		    g.drawImage(diverseCrop[13],actx,acty-6,64,64,this);
 		}
 
-		// SÅdwand
+		// S\uFFFDdwand
 		if (sf.sw(xpos,ypos).da){
-		    if (sf.sw(xpos,ypos).wandEl[0]==1){
+		    if (sf.sw(xpos,ypos).wandEl0()==1){
 			g.drawImage(diverseCrop[17],actx,acty-5,64,64,this);
 		    }
-		    if (sf.sw(xpos,ypos).wandEl[0]==2){
+		    if (sf.sw(xpos,ypos).wandEl0()==2){
 			g.drawImage(diverseCrop[8],actx,acty-5,64,64,this);
 			// ------------Beschriftung --------------------
 			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.isPusherActive(sf.sw(xpos,ypos).spez[0],phasecount)){
+			    if (sf.isPusherActive(sf.sw(xpos,ypos).spez0(),phasecount)){
 				int strx = actx + 10 * phasecount;
 				g.setColor( (phasecount % 2) == 0 ?
 					    Color.black : Color.yellow );
@@ -904,14 +904,14 @@ public class SACanvas extends JComponent {
 
 		// Ostwand
 		if (sf.ow(xpos,ypos).da){
-		    if (sf.ow(xpos,ypos).wandEl[0]==1){
+		    if (sf.ow(xpos,ypos).wandEl0()==1){
 			g.drawImage(diverseCrop[14],actx-6,acty,64,64,this);
 		    }
-		    if (sf.ow(xpos,ypos).wandEl[0]==2){
+		    if (sf.ow(xpos,ypos).wandEl0()==2){
 			g.drawImage(diverseCrop[6],actx-6,acty,64,64,this);
 			// ------------Beschriftung --------------------
 			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.isPusherActive(sf.ow(xpos,ypos).spez[0],phasecount)){
+			    if (sf.isPusherActive(sf.ow(xpos,ypos).spez0(),phasecount)){
 				int stry = acty + 10 * phasecount;
 				g.setColor( (phasecount % 2) == 0 ?
 					    Color.black : Color.yellow );
@@ -925,14 +925,14 @@ public class SACanvas extends JComponent {
 
 		// Westwand
 		if (sf.ww(xpos,ypos).da){
-		    if (sf.ww(xpos,ypos).wandEl[1]==1){
+		    if (sf.ww(xpos,ypos).wandEl1()==1){
 			g.drawImage(diverseCrop[16],actx+5,acty,64,64,this);
 		    }
-		    if (sf.ww(xpos,ypos).wandEl[1]==2){
+		    if (sf.ww(xpos,ypos).wandEl1()==2){
 			g.drawImage(diverseCrop[9],actx+4,acty,64,64,this);
 			// ------------Beschriftung --------------------
 			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.isPusherActive(sf.ww(xpos,ypos).spez[1],phasecount)){
+			    if (sf.isPusherActive(sf.ww(xpos,ypos).spez1(),phasecount)){
 				int stry = acty + 10 * phasecount;
 				g.setColor( (phasecount % 2) == 0 ?
 					    Color.black : Color.yellow );
@@ -974,8 +974,8 @@ public class SACanvas extends JComponent {
     Rectangle rc = new Rectangle();
     // for internal use. see repaintOrt()
 
-    /** Triggert ein Neuzeichnen des Feldes mit den Åbergebenen
-     *  Koordinaten. NÅtzlich um einzelne Felder neuzeichnen zu lassen
+    /** Triggert ein Neuzeichnen des Feldes mit den \uFFFDbergebenen
+     *  Koordinaten. N\uFFFDtzlich um einzelne Felder neuzeichnen zu lassen
      */
 
     void repaintOrt(Ort ort) {

@@ -11,6 +11,8 @@ import de.botsnscouts.util.*;
 import de.botsnscouts.board.BoardRoboter;
 import de.botsnscouts.server.KartenStapel;
 
+import java.util.Arrays;
+
 public class Permu {
 
     private SpielfeldKS sf;
@@ -18,7 +20,7 @@ public class Permu {
     private int bestScore;
     private int malus;
 
-    private static final Karte[] zuege = { KartenStapel.getRefCard("RL"), 
+    private static final Karte[] zuege = { KartenStapel.getRefCard("RL"),
                                            KartenStapel.getRefCard("M1"),
                                            KartenStapel.getRefCard("M2"),
                                            KartenStapel.getRefCard("M3"),
@@ -31,7 +33,7 @@ public class Permu {
         malus=m;
     }
 
-    public Karte[] permutiere(Karte[] ka, Roboter r){
+    public Karte[] permutiere(Karte[] ka, final Roboter r){
 	int j = 0;
 	bestZug = new Karte[5];
 	for (int i = 0; i < 5; i++) {
@@ -58,79 +60,89 @@ public class Permu {
 
             // sortiere ka
 
-        Karte[] so=new Karte[9];
+        //Karte[] so=new Karte[9];
         int len=0;
         while ((len<9)&&(ka[len]!=null))
             len++;
-        for (int i=0;i<len;i++){
-            int highest=0;
-            int highind=0;
-            for (j=0;j<9;j++){
-                if (ka[j]==null)
-                    continue;
-                if (ka[j].getprio()>highest){
-                    highest=ka[j].getprio();
-                    highind=j;
-                }
-            }
-            so[i]=ka[highind];
-            ka[highind]=null;
-        }
-        
-	permut((BoardRoboter)r,so);
+        Arrays.sort( ka, 0, len, Karte.INVERSE_PRIORITY_COMPARATOR );
+
+//        for (int i=0;i<len;i++){
+//            int highest=0;
+//            int highind=0;
+//            for (j=0;j<9;j++){
+//                if (ka[j]==null)
+//                    continue;
+//                if (ka[j].getprio()>highest){
+//                    highest=ka[j].getprio();
+//                    highind=j;
+//                }
+//            }
+//            so[i]=ka[highind];
+//            ka[highind]=null;
+//        }
+
+//	permut((BoardRoboter)r,so);
+	permut((BoardRoboter)r,ka);
 	return bestZug;
     }
 
-    private void permut(BoardRoboter r, Karte[] ka) {
+    BoardRoboter tmp = new BoardRoboter();
+    private void permut(final BoardRoboter r, Karte[] ka) {
 	if (r.getSchaden() == 10) return;
 	int anzahl = 0;
 	for (int i = 0; i < 5; i++)
 	    if (r.getZug(i) != null) anzahl++;
 	if (anzahl == 5) {
+            // hier haben wir sowieso keine wahl
             int diemalus=0;
-            
+
+            // falls wir auf einem fliessband stehen, prüfen,
+            // ob wir nach der *ersten* phase des nächsten zuges
+            // sowieso sterben (dafür einfach jede möglichen kartentyp
+            // einmal an erster stelle simulieren
             if (sf.bo(r.getX(),r.getY()).typ>=100){ // Fliessband
                 for (int i=0;i<zuege.length;i++){
-                    BoardRoboter tmp = (BoardRoboter)Roboter.getCopy(r);
+                    //BoardRoboter tmp = (BoardRoboter)Roboter.getCopy(r);
+                    tmp.initFrom(r);
                     tmp.setZug(0,zuege[i]);
                     sf.doPhase(1,tmp);
                     if(tmp.getSchaden()==10) // wenn wir naechste Runde sterben ...
-                        diemalus+=zuegemali[i];    
+                        diemalus+=zuegemali[i];
                 }
                 if (diemalus==zuegemalisumme)
                     return; // keine Chance ...
             }
-            
+
 	    int entf = sf.getBewertung(r,malus)+diemalus;
 	    if (entf <= bestScore) {
 		bestScore = entf;
-		for (int i = 0; i < 5; i++) 
+		for (int i = 0; i < 5; i++)
                     bestZug[i] = r.getZug(i);
 	    }
 	    return;
 	}
+
 	for (int i = 0; i < 9; i++) {
-	    if (ka[i] == null) 
+	    if (ka[i] == null)
                 continue;
 	    Karte katemp = ka[i];
-	    BoardRoboter rBackup = (BoardRoboter)Roboter.getCopy(r);
 	    ka[i] = null; // ausspielen
+            tmp.initFrom( r );
 	    int j = 0;
-	    while (r.getZug(j) != null) j++;
-	    r.setZug(j, katemp);
-	    while ((j < 5) && (r.getZug(j) != null)){
-		sf.doPhase(j+1,r);
+	    while (tmp.getZug(j) != null) j++;
+	    tmp.setZug(j, katemp);
+	    while ((j < 5) && (tmp.getZug(j) != null)){
+		sf.doPhase(j+1,tmp);
 		j++;
 	    }
-	    permut(r,ka);
+	    permut(tmp,ka);
 	    ka[i] = katemp;
-	    r = rBackup;
-            
+
                 // Skip cards with identical action
 
             while ((i<8)&&((ka[i+1]==null)||(ka[i+1].getaktion().equals(katemp.getaktion()))))
                 i++;
-            
+
 	}
     }
 }

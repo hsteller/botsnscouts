@@ -28,7 +28,7 @@ public class GameFieldPanel extends JPanel{
     JPanel editPanel;
     JLabel spielfeld;
     JComboBox spielfelder;
-    JButton save; 
+    JButton save;
     JButton edit;
     JLabel name;
     JTextField nam;
@@ -52,7 +52,7 @@ public class GameFieldPanel extends JPanel{
 	requestFocus();
 
 	scrl=new JScrollPane();
-	
+
 	pnl =new JPanel();
 	pnl.setLayout(new FlowLayout());
 	pnl.setOpaque(false);
@@ -106,7 +106,7 @@ public class GameFieldPanel extends JPanel{
     private JPanel getEditPanel(){
 	JPanel panel=new JPanel();
 
-	JPanel inner = new JPanel(); 
+	JPanel inner = new JPanel();
 	GridBagLayout lay=new GridBagLayout();
 	GridBagConstraints gc = new GridBagConstraints();
 	gc.fill = GridBagConstraints.HORIZONTAL;
@@ -115,7 +115,7 @@ public class GameFieldPanel extends JPanel{
 	gc.gridy = GridBagConstraints.RELATIVE;
 	panel.setBorder(new EmptyBorder(20,10,10,10));
 	panel.setOpaque( false );
-	
+
 	inner.setLayout(lay);
 	inner.setOpaque(false);
 
@@ -144,7 +144,7 @@ public class GameFieldPanel extends JPanel{
 		public void actionPerformed(ActionEvent e) {
 		    Properties spfProp=parent.fassade.getSpfProp();
 		    chooser.rescanCurrentDirectory();
-		    int returnVal = chooser.showSaveDialog(parent); 
+		    int returnVal = chooser.showSaveDialog(parent);
 		    if(returnVal == JFileChooser.APPROVE_OPTION) {
 			File file = chooser.getSelectedFile();
 			String filename = file.getName();
@@ -259,7 +259,7 @@ public class GameFieldPanel extends JPanel{
     }
 
     private void makeChooser() {
-	chooser = new JFileChooser("kacheln");  
+	chooser = new JFileChooser("kacheln");
 	FileFilter filter = new FileFilter() {
 		public boolean accept(File file) {
 		    String name = file.getName();
@@ -268,8 +268,8 @@ public class GameFieldPanel extends JPanel{
 		public String getDescription() {
 		    return "spf";
 		}
-	    }; 
-	chooser.setFileFilter(filter); 
+	    };
+	chooser.setFileFilter(filter);
     }
 
     private void okClicked(){
@@ -281,7 +281,7 @@ public class GameFieldPanel extends JPanel{
 	    parent.addServer();
 	    if( mitspielen.getSelectedObjects()!=null){
 		//starte einen SpielerMensch
-		Thread smth=parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(),farben.getSelectedIndex()); 
+		Thread smth=parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(),farben.getSelectedIndex());
 		parent.addKS(smth);
 		Global.debug(this,"menschlichen spieler gestartet");
 	    }else{//starte einen AusgabeFrame
@@ -297,7 +297,7 @@ public class GameFieldPanel extends JPanel{
 	    JOptionPane.showMessageDialog(this,Message.say("Start","mNichtZus"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
 
 	}
-	
+
     }//okclicked
 
     void unrollOverButs(){

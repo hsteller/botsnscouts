@@ -6,6 +6,8 @@ import de.botsnscouts.util.Roboter;
 
 public class BoardRoboter extends Roboter {
 
+    public BoardRoboter() { super(""); };
+
     public BoardRoboter(String name) {
 	super(name);
     }
@@ -16,6 +18,17 @@ public class BoardRoboter extends Roboter {
 	xx = rob.xx;
 	yy = rob.yy;
 	aa = rob.aa;
+    }
+
+    public void fillCopy(BoardRoboter r) {
+        super.fillCopy(r);
+        r.xx = xx;
+        r.yy = yy;
+        r.aa = aa;
+    }
+
+    public void initFrom(BoardRoboter r) {
+        r.fillCopy( this );
     }
 
     /**

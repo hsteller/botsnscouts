@@ -41,84 +41,84 @@ class BoardPanel extends SACanvas implements MouseListener{
 
 	if(par.indx==54){//pusher nach west
 	    new PhaseDialog(par,Message.say("BoardEditor","mPusher"),true);
-	    par.spf.getVWand()[par.spfX+1][11-par.spfY].da=true;
-	    par.spf.getVWand()[par.spfX+1][11-par.spfY].wandEl[0]=2;
-	    par.spf.getVWand()[par.spfX+1][11-par.spfY].spez[0]=par.phasen;
+	    par.spf.getVWand(par.spfX+1, 11-par.spfY).da=true;
+	    par.spf.getVWand(par.spfX+1, 11-par.spfY).wandEl0(2);
+	    par.spf.getVWand(par.spfX+1, 11-par.spfY).spez0(par.phasen);
 	}
 	else if(par.indx==55){//pusher nach sued
 	    new PhaseDialog(par,Message.say("BoardEditor","mPusher"),true);
-	    par.spf.getHWand()[par.spfX][12-par.spfY].wandEl[1]=2;
-	    par.spf.getHWand()[par.spfX][12-par.spfY].spez[1]=par.phasen;
-	    par.spf.getHWand()[par.spfX][12-par.spfY].da=true;
+	    par.spf.getHWand(par.spfX, 12-par.spfY).wandEl1(2);
+	    par.spf.getHWand(par.spfX, 12-par.spfY).spez1(par.phasen);
+	    par.spf.getHWand(par.spfX, 12-par.spfY).da=true;
 	}
 	else if(par.indx==56){//pusher nach nord
 	    new PhaseDialog(par,Message.say("BoardEditor","mPusher"),true);
-	    par.spf.getHWand()[par.spfX][11-par.spfY].da=true;
-	    par.spf.getHWand()[par.spfX][11-par.spfY].wandEl[0]=2;
-	    par.spf.getHWand()[par.spfX][11-par.spfY].spez[0]=par.phasen;
+	    par.spf.getHWand(par.spfX, 11-par.spfY).da=true;
+	    par.spf.getHWand(par.spfX, 11-par.spfY).wandEl0(2);
+	    par.spf.getHWand(par.spfX, 11-par.spfY).spez0(par.phasen);
 	}
 	else if(par.indx==57){//pusher nach ost
 	    new PhaseDialog(par,Message.say("BoardEditor","mPusher"),true);
-	    par.spf.getVWand()[par.spfX][11-par.spfY].da=true;
-	    par.spf.getVWand()[par.spfX][11-par.spfY].wandEl[1]=2;
-	    par.spf.getVWand()[par.spfX][11-par.spfY].spez[1]=par.phasen;
+	    par.spf.getVWand(par.spfX, 11-par.spfY).da=true;
+	    par.spf.getVWand(par.spfX, 11-par.spfY).wandEl1(2);
+	    par.spf.getVWand(par.spfX, 11-par.spfY).spez1(par.phasen);
 	}
 	else if(par.indx==58){//crusher
-	    int tp=par.spf.getBoden()[par.spfX+1][12-par.spfY].typ;
+	    int tp=par.spf.getBoden(par.spfX+1,12-par.spfY).typ;
 	    if((tp>=100)&&(tp<=253)){
 		new PhaseDialog(par,Message.say("BoardEditor","mCrusher"),true);
-		par.spf.getBoden()[par.spfX+1][12-par.spfY].spez=par.phasen;
+		par.spf.getBoden(par.spfX+1,12-par.spfY).spez=par.phasen;
 	    }
 	}
 	else if(par.indx==59){//leer
-	    par.spf.getBoden()[par.spfX+1][12-par.spfY].spez=0;
-	    par.spf.getBoden()[par.spfX+1][12-par.spfY].typ=0;
-	    par.spf.getVWand()[par.spfX+1][11-par.spfY].da=false;
-	    par.spf.getVWand()[par.spfX+1][11-par.spfY].wandEl[0]=0;
-	    par.spf.getVWand()[par.spfX+1][11-par.spfY].spez[0]=0;
-	    par.spf.getVWand()[par.spfX][11-par.spfY].da=false;
-	    par.spf.getVWand()[par.spfX][11-par.spfY].wandEl[1]=0;
-	    par.spf.getVWand()[par.spfX][11-par.spfY].spez[1]=0;
-	    par.spf.getHWand()[par.spfX][12-par.spfY].wandEl[1]=0;
-	    par.spf.getHWand()[par.spfX][12-par.spfY].spez[1]=0;
-	    par.spf.getHWand()[par.spfX][12-par.spfY].da=false;
-	    par.spf.getHWand()[par.spfX][11-par.spfY].da=false;
-	    par.spf.getHWand()[par.spfX][11-par.spfY].wandEl[0]=0;
-	    par.spf.getHWand()[par.spfX][11-par.spfY].spez[0]=0;
+	    par.spf.getBoden(par.spfX+1,12-par.spfY).spez=0;
+	    par.spf.getBoden(par.spfX+1,12-par.spfY).typ=0;
+	    par.spf.getVWand(par.spfX+1, 11-par.spfY).da=false;
+	    par.spf.getVWand(par.spfX+1, 11-par.spfY).wandEl0(0);
+	    par.spf.getVWand(par.spfX+1, 11-par.spfY).spez0(0);
+	    par.spf.getVWand(par.spfX, 11-par.spfY).da=false;
+	    par.spf.getVWand(par.spfX, 11-par.spfY).wandEl1(0);
+	    par.spf.getVWand(par.spfX, 11-par.spfY).spez1(0);
+	    par.spf.getHWand(par.spfX, 12-par.spfY).wandEl1(0);
+	    par.spf.getHWand(par.spfX, 12-par.spfY).spez1(0);
+	    par.spf.getHWand(par.spfX, 12-par.spfY).da=false;
+	    par.spf.getHWand(par.spfX, 11-par.spfY).da=false;
+	    par.spf.getHWand(par.spfX, 11-par.spfY).wandEl0(0);
+	    par.spf.getHWand(par.spfX, 11-par.spfY).spez0(0);
 	}
 	else if(par.indx==60){//vert wand
-	    par.spf.getVWand()[vWInd][11-par.spfY].da=true;
+	    par.spf.getVWand(vWInd, 11-par.spfY).da=true;
 	}
 	else if(par.indx==61){//horiz. wand
-	    par.spf.getHWand()[par.spfX][12-hWInd].da=true;
+	    par.spf.getHWand(par.spfX, 12-hWInd).da=true;
 	}
 	else if(par.indx==62){//laser nach west
 	    new StrengthDialog(par,Message.say("BoardEditor","mLaser"),true);
-	    par.spf.getVWand()[par.spfX+1][11-par.spfY].da=true;
-	    par.spf.getVWand()[par.spfX+1][11-par.spfY].wandEl[0]=1;
-	    par.spf.getVWand()[par.spfX+1][11-par.spfY].spez[0]=par.laserSt;
+	    par.spf.getVWand(par.spfX+1, 11-par.spfY).da=true;
+	    par.spf.getVWand(par.spfX+1, 11-par.spfY).wandEl0(1);
+	    par.spf.getVWand(par.spfX+1, 11-par.spfY).spez0(par.laserSt);
 	}
 	else if(par.indx==63){//laser nach sued
 	    new StrengthDialog(par,Message.say("BoardEditor","mLaser"),true);
-	    par.spf.getHWand()[par.spfX][12-par.spfY].wandEl[1]=1;
-	    par.spf.getHWand()[par.spfX][12-par.spfY].spez[1]=par.laserSt;
-	    par.spf.getHWand()[par.spfX][12-par.spfY].da=true;
+	    par.spf.getHWand(par.spfX, 12-par.spfY).wandEl1(1);
+	    par.spf.getHWand(par.spfX, 12-par.spfY).spez1(par.laserSt);
+	    par.spf.getHWand(par.spfX, 12-par.spfY).da=true;
 	}
 	else if(par.indx==64){//laser nach ost
 	    new StrengthDialog(par,Message.say("BoardEditor","mLaser"),true);
-	    par.spf.getVWand()[par.spfX][11-par.spfY].da=true;
-	    par.spf.getVWand()[par.spfX][11-par.spfY].wandEl[1]=1;
-	    par.spf.getVWand()[par.spfX][11-par.spfY].spez[1]=par.laserSt;
+	    par.spf.getVWand(par.spfX, 11-par.spfY).da=true;
+	    par.spf.getVWand(par.spfX, 11-par.spfY).wandEl1(1);
+	    par.spf.getVWand(par.spfX, 11-par.spfY).spez1(par.laserSt);
 	}
 	else if(par.indx==65){//laser nach nord
 	    new StrengthDialog(par,Message.say("BoardEditor","mLaser"),true);
-	    par.spf.getHWand()[par.spfX][11-par.spfY].da=true;
-	    par.spf.getHWand()[par.spfX][11-par.spfY].wandEl[0]=1;
-	    par.spf.getHWand()[par.spfX][11-par.spfY].spez[0]=par.laserSt;
+	    par.spf.getHWand(par.spfX, 11-par.spfY).da=true;
+	    par.spf.getHWand(par.spfX, 11-par.spfY).wandEl0(1);
+	    par.spf.getHWand(par.spfX, 11-par.spfY).spez0(par.laserSt);
 	}
 	else{ //fliessband etc.
-	    par.spf.getBoden()[par.spfX+1][12-par.spfY].typ =par.elemTyp[par.indx];
-	    par.spf.getBoden()[par.spfX+1][12-par.spfY].spez=par.elemSpez[par.indx];
+	    par.spf.getBoden(par.spfX+1,12-par.spfY).typ =par.elemTyp[par.indx];
+	    par.spf.getBoden(par.spfX+1,12-par.spfY).spez=par.elemSpez[par.indx];
 	}
 	CAT.debug("hab' ich");
 	repaint();

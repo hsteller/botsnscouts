@@ -24,6 +24,27 @@ public class Roboter {
 	return new de.botsnscouts.board.BoardRoboter(r);
     }
 
+    public void fillCopy(Roboter r) {
+	r.name = name;
+	r.ausrichtung = ausrichtung;
+	r.pos.set(pos);
+	r.schaden = schaden;
+	r.naechsteFlagge = naechsteFlagge;
+	r.archivX = archivX;
+	r.archivY = archivY;
+	r.virtuell = virtuell;
+	r.leben = leben;
+	r.aktiviert = aktiviert;
+	for(int i=0;i < zug.length;i++)
+	    r.zug[i] = zug[i];
+	for(int i=0;i < gesperrteRegister.length; i++) {
+	    r.gesperrteRegister[i]=gesperrteRegister[i];
+	}
+	for (int i=0; i < karten.length; i++){
+	    r.karten[i] = karten[i];
+	}
+    }
+
     protected String name;
     /**
      * gibt die Ausrichtung des Roboters auf dem Spielfeld an
@@ -65,10 +86,10 @@ public class Roboter {
      * enthält die Karten der gesperrten Register
      * Invariant: gesperrteRegister[i] -> zug[i] ist gesperrt.
      */
-    protected boolean[] gesperrteRegister = new boolean[ANZREG];
+    protected final boolean[] gesperrteRegister = new boolean[ANZREG];
 
     /** Zugeteilte Karten */
-    protected Karte[] karten = new Karte[ANZKARTEN];
+    protected final Karte[] karten = new Karte[ANZKARTEN];
 
     /**
      * gibt an, ob der Roboter aktiviert (true) oder deaktiviert (false) ist

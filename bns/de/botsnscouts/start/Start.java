@@ -69,7 +69,11 @@ public class Start extends JFrame implements WindowListener{
     }
 
     public void windowDeactivated(WindowEvent e) {}
-    public void windowOpened(WindowEvent e)      {}
+    public void windowOpened(WindowEvent e)      {
+        CAT.debug("window opened");
+        CAT.debug("triggering tilefactory");
+        fassade.prepareTiles();
+    }
     public void windowClosing(WindowEvent e) {
 	myclose();
     }
@@ -173,7 +177,7 @@ public class Start extends JFrame implements WindowListener{
 		    anzKS=Integer.parseInt(argv[3]);
 		    for (int i=0;i<anzKS;i++){
 			fassade.kuenstlicheSpielerStarten(100);
-		    Global.debug("Knstlichen Spieler gestartet");
+		    Global.debug("K\uFFFDnstlichen Spieler gestartet");
 		    }
 		}catch(NumberFormatException e){
 		}

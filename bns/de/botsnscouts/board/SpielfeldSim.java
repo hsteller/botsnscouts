@@ -19,8 +19,8 @@ public class SpielfeldSim extends Spielfeld
   public static final int LOST=1;  //            Osten
   public static final int LSUED=2; //            Sueden
   public static final int LWEST=3; //            Westen
-  
-  /* Die Laser - um sie schnell iterieren zu können 
+
+  /* Die Laser - um sie schnell iterieren zu können
      Hier sollen _nur_ LaserDef's rein!
      */
   protected Vector lasers;
@@ -45,23 +45,23 @@ public Vector getLasers(){
       for (int i=0;i<bewegt.length;i++)
 	bewegt[i]=false;
     }
-  
+
   /* Benachrichtigt die Ausgaben von Aenderungen */
   private void benachrichtige(BoardRoboter[] robbis){
     if (server==null)
       return;
-    
+
     int anz=0;
     for (int i=0;i<bewegt.length;i++)
       if (bewegt[i])
 	anz++;
-    
+
     if (anz==0)
       return;
-    
+
     String[] s=new String[anz];
     int j=0;
-    
+
     for (int i=0;i<bewegt.length;i++)
       if (bewegt[i])
 	s[j++]=robbis[i].getName();
@@ -69,7 +69,7 @@ public Vector getLasers(){
     String str="Benachrichtige Ausgaben. Geaenderte Robs: ";
     for (int i=0;i<s.length;i++)
       str=str+s[i]+";";
-    
+
     //d(str);
 
     server.ausgabenBenachrichtigen(s);
@@ -99,10 +99,10 @@ public Vector getLasers(){
 	ausgabenMsg(id,tmp);
     }
 
-   
-    
+
+
     /** Creates the internal StatsList.
-    @param sl The robots that should be managed in the StatsList 
+    @param sl The robots that should be managed in the StatsList
      */
     public void initStats (StatsList sl)  {
 	stats= sl;
@@ -127,32 +127,32 @@ public Vector getLasers(){
       for (int x=1;x<=sizeX;x++)
 	for(int y=1;y<=sizeY;y++){
 	  Wand w=nw(x,y);
-	  //d("x="+x+"; y="+y+";w: "+w.wandEl[0]+"|"+w.spez[0]+(w.da?"#":"_")+w.wandEl[1]+"|"+w.spez[1]);
-	  if (w.da&&(w.wandEl[1]==WLASER)){  // Laser nach S
+	  //d("x="+x+"; y="+y+";w: "+w.wandEl[0]+"|"+w.spez0()+(w.da?"#":"_")+w.wandEl[1]+"|"+w.spez1());
+	  if (w.da&&(w.wandEl1()==Wand.WLASER)){  // Laser nach S
 	      //d("LaserSued");
 	    int length=findLLength(x,y,LSUED);
-	    LaserDef neu=new LaserDef(x,y,LSUED,w.spez[1],length);
+	    LaserDef neu=new LaserDef(x,y,LSUED,w.spez1(),length);
 	    lasers.addElement(neu);
 	  }
 	  w=ow(x,y);
-	  if (w.da&&(w.wandEl[0]==WLASER)){  // Laser nach W
+	  if (w.da&&(w.wandEl0()==Wand.WLASER)){  // Laser nach W
 	      //d("LaserWest");
 	    int length=findLLength(x,y,LWEST);
-	    LaserDef neu=new LaserDef(x,y,LWEST,w.spez[0],length);
+	    LaserDef neu=new LaserDef(x,y,LWEST,w.spez0(),length);
 	    lasers.addElement(neu);
 	  }
 	  w=sw(x,y);
-	  if (w.da&&(w.wandEl[0]==WLASER)){ // Laser nach N
+	  if (w.da&&(w.wandEl0()==Wand.WLASER)){ // Laser nach N
 	      //d("LaserNord");
 	    int length=findLLength(x,y,LNORD);
-	    LaserDef neu=new LaserDef(x,y,LNORD,w.spez[0],length);
+	    LaserDef neu=new LaserDef(x,y,LNORD,w.spez0(),length);
 	    lasers.addElement(neu);
 	  }
 	  w=ww(x,y);
-	  if (w.da&&(w.wandEl[1]==WLASER)){ // Laser nach O
+	  if (w.da&&(w.wandEl1()==Wand.WLASER)){ // Laser nach O
 	      //d("LaserOst");
 	    int length=findLLength(x,y,LOST);
-	    LaserDef neu=new LaserDef(x,y,LOST,w.spez[1],length);
+	    LaserDef neu=new LaserDef(x,y,LOST,w.spez1(),length);
 	    lasers.addElement(neu);
 	  }
 	}
@@ -177,7 +177,7 @@ public Vector getLasers(){
 	while((y-l>0)&&(!sw(x,y-l).da))
 	  l++;
       return l+1;
-    }        
+    }
 
   /** Initialisiert ohne Ausgabekanäle.
     @param kacheln Das Feld im f&uuml;r Netzkommunikation spezifizierten Format.
@@ -237,9 +237,9 @@ public Vector getLasers(){
       ausgabenMsg("mAuswExprFl",null);
       doExprFl(phase,robbis);        // Expressfliessbaender 1
       benachrichtige(robbis);
-      
+
       ausgabenMsg("mAuswFl",null);
-      doFl(phase,robbis);            // Exprf 2, Fliessbaender 1 
+      doFl(phase,robbis);            // Exprf 2, Fliessbaender 1
       benachrichtige(robbis);
 
       ausgabenMsg("mAuswPusher",null);
@@ -258,7 +258,7 @@ public Vector getLasers(){
       benachrichtige(robbis);
       doArchivUpdate(phase,robbis);  // Archivpointupdate
       benachrichtige(robbis);
-      doFlaggenUpdate(phase,robbis);  // letzte besuchte Flaggenupdate 
+      doFlaggenUpdate(phase,robbis);  // letzte besuchte Flaggenupdate
       benachrichtige(robbis);
       if (phase==5){                 // Ende Phase 5
 	doRepairs(phase,robbis);     // Reperaturfelder
@@ -289,7 +289,7 @@ public Vector getLasers(){
 	moveRob(robbis,highrob,robbis[highrob].getZug()[phase-1].getaktion());
 	bewegt[highrob]=true;
 	benachrichtige(robbis);
-	
+
 	todo--;
       }
     }
@@ -319,7 +319,7 @@ public Vector getLasers(){
 	moveRobOne(robbis,rob,(robbis[rob].getAusrichtung()+2)%4,true);
 	checkGrubenOpfer(robbis,false);
       }
-      else if(aktion.equals("RL")){  // Rotate Left 
+      else if(aktion.equals("RL")){  // Rotate Left
 	dreheRoboter(robbis[rob], DGGUHRZ);
 	bewegt[rob]=true;
       }
@@ -388,9 +388,9 @@ public Vector getLasers(){
 	//d("schubsen. now collision-checking...");
 	//third, check for collision with other robbis
 	for (int i=0;i<robbis.length;i++)
-	  if ((i!=rob)&&(robbis[i].getX()==xx)&&(robbis[i].getY()==yy)&&(!robbis[i].istVirtuell())&&(!robbis[rob].istVirtuell())) 
-	    if (!moveRobOne(robbis,i,direction,true)) return(false);	    
-	      
+	  if ((i!=rob)&&(robbis[i].getX()==xx)&&(robbis[i].getY()==yy)&&(!robbis[i].istVirtuell())&&(!robbis[rob].istVirtuell()))
+	    if (!moveRobOne(robbis,i,direction,true)) return(false);
+
 	//d("Now moving.");
 	//fourth, commit the change if we reach this point
 	robbis[rob].setPos(xx,yy);
@@ -421,8 +421,8 @@ public Vector getLasers(){
       return(true);
     }
 
-  private void checkGrubenOpfer(BoardRoboter[] robbis, boolean xxyy) 
-    { 
+  private void checkGrubenOpfer(BoardRoboter[] robbis, boolean xxyy)
+    {
       // d("cGrube: "+(xxyy?"xxyy":"richtige Koordinaten"));
       // Schaut ob jemand in eine Grube gefallen ist
       // xxyy ist Flag fuer Benutzung der gedachten Position
@@ -456,7 +456,7 @@ public Vector getLasers(){
     }
 
   private void dreheRoboter(BoardRoboter robbi, int drehR)
-    { 
+    {
       //d("dreheRoboter called. "+robbi.getName()+" nach "+drehR);
       // drehR = DrehRichtung
       switch (drehR) {
@@ -465,13 +465,13 @@ public Vector getLasers(){
 	break;
       case DGGUHRZ:
 	robbi.setAusrichtung(robbi.getAusrichtung() -1 );
-	if (robbi.getAusrichtung()==-1) 
+	if (robbi.getAusrichtung()==-1)
 	    robbi.setAusrichtung(3);
 	break;
       } // switch
     }
   private void dreheRoboterGedacht(BoardRoboter robbi, int drehR)
-    { 
+    {
       //d("dreheRoboterGedacht called. robbi="+robbi.getName()+"; drehR="+drehR);
       // veraendert die gedachte Ausrichtung
       // drehR = DrehRichtung
@@ -481,7 +481,7 @@ public Vector getLasers(){
 	break;
       case DGGUHRZ:
 	robbi.aa = (robbi.getAusrichtung() - 1);
-	if (robbi.aa==-1) 
+	if (robbi.aa==-1)
 	  robbi.aa=3;
 	break;
       } // switch
@@ -494,7 +494,7 @@ public Vector getLasers(){
       gedachteWerteInitialisieren(robbis);
       for (int i=0;i<robbis.length;i++)
 	if (((bo(robbis[i].getX(),robbis[i].getY()).typ)/100)>1)
-	  ausfuehrenFliessband(robbis,i,(bo(robbis[i].getX(),robbis[i].getY()).typ)%100);   
+	  ausfuehrenFliessband(robbis,i,(bo(robbis[i].getX(),robbis[i].getY()).typ)%100);
       checkGrubenOpfer(robbis,true);
       gedachtesAusfuehren(robbis);
     }
@@ -535,7 +535,7 @@ public Vector getLasers(){
       int bodn=bo(robbis[rob].xx,robbis[rob].yy).typ%100;
       //d("bodn="+bodn);
       if (((bodn/10)==2)||((bodn/10)==5)) // gegen den Uhrzeigersinn
-	if (((bodn%10+1)%4)==typ%10) 
+	if (((bodn%10+1)%4)==typ%10)
 	  dreheRoboterGedacht(robbis[rob],DGGUHRZ);
       if (((bodn/10)==3)||((bodn/10)==5)) // mit dem Uhrzeigersinn
 	if (((typ%10+1)%4)==bodn%10)
@@ -562,13 +562,13 @@ public Vector getLasers(){
 	if (robbis[i].getSchaden()>=10)
 	  continue;
 	Roboter r=robbis[i];
-	if((nw(r.getX(),r.getY()).wandEl[1]==WPUSHER)&&(isCrusherActive(nw(r.getX(),r.getY()).spez[1],phase)))
+	if((nw(r.getX(),r.getY()).wandEl1()==Wand.WPUSHER)&&(isCrusherActive(nw(r.getX(),r.getY()).spez1(),phase)))
 	  moveRobOne(robbis,i,SUED,false);
-	if((sw(r.getX(),r.getY()).wandEl[0]==WPUSHER)&&(isCrusherActive(sw(r.getX(),r.getY()).spez[0],phase)))
+	if((sw(r.getX(),r.getY()).wandEl0()==Wand.WPUSHER)&&(isCrusherActive(sw(r.getX(),r.getY()).spez0(),phase)))
 	  moveRobOne(robbis,i,NORD,false);
-	if((ow(r.getX(),r.getY()).wandEl[0]==WPUSHER)&&(isCrusherActive(ow(r.getX(),r.getY()).spez[0],phase)))
+	if((ow(r.getX(),r.getY()).wandEl0()==Wand.WPUSHER)&&(isCrusherActive(ow(r.getX(),r.getY()).spez0(),phase)))
 	  moveRobOne(robbis,i,WEST,false);
-	if((ww(r.getX(),r.getY()).wandEl[1]==WPUSHER)&&(isCrusherActive(ww(r.getX(),r.getY()).spez[1],phase)))
+	if((ww(r.getX(),r.getY()).wandEl1()==Wand.WPUSHER)&&(isCrusherActive(ww(r.getX(),r.getY()).spez1(),phase)))
 	  moveRobOne(robbis,i,OST,false);
       } //for
       checkGrubenOpfer(robbis, true);
@@ -582,9 +582,9 @@ public Vector getLasers(){
       for (int i=0;i<robmove.length;i++)
 	robmove[i]=true;
       for (int rob1=0;rob1<robbis.length;rob1++)
-	for (int rob2=rob1+1;rob2<robbis.length;rob2++) 
+	for (int rob2=rob1+1;rob2<robbis.length;rob2++)
 	  if ((!robbis[rob1].istVirtuell())&&(!robbis[rob2].istVirtuell())){
-	    if ((robbis[rob1].xx==robbis[rob2].xx)&&(robbis[rob1].yy==robbis[rob2].yy)) { 
+	    if ((robbis[rob1].xx==robbis[rob2].xx)&&(robbis[rob1].yy==robbis[rob2].yy)) {
                                 // gleiches Zielfeld
 	      robmove[rob1]=false;
 	      robmove[rob2]=false;
@@ -596,7 +596,7 @@ public Vector getLasers(){
 	      robmove[rob2]=false;
 	    }
 	  }
-      for (int i=0;i<robbis.length;i++) 
+      for (int i=0;i<robbis.length;i++)
 	if (robmove[i]) {
 	    robbis[i].setPos(robbis[i].xx,robbis[i].yy);
 	  if (robbis[i].aa > -1) {
@@ -604,16 +604,16 @@ public Vector getLasers(){
 	    robbis[i].aa = -1; // angenommene Ausrichtung auf ungueltig setzen
 	  }
 	  bewegt[i]=true;
-	}    
+	}
     } // gedachesAusfuehren
-  
+
   /**
     Ausführen der Drehelemente (Drehelemente != Drehfließbaender!!)
    */
   private void doDrehEl(int phase,BoardRoboter[] robbis)
     {
       //d("doDrehEl called.");
-      
+
       for (int i=0;i<robbis.length;i++)
 	if (bo(robbis[i].getX(),robbis[i].getY()).typ==BDDREHEL){
 	  dreheRoboter(robbis[i],bo(robbis[i].getX(),robbis[i].getY()).spez);
@@ -627,7 +627,7 @@ public Vector getLasers(){
   private void doCrushers(int phase,BoardRoboter[] robbis)
     {
       //d("doCrushers called.");
-      
+
       for (int i=0;i<robbis.length;i++) {
 	  if ((bo(robbis[i].getX(),robbis[i].getY()).typ>=100)&&((bo(robbis[i].getX(),robbis[i].getY()).spez)>0)&&(isCrusherActive(bo(robbis[i].getX(),robbis[i].getY()).spez,phase)))
               vernichteRoboter(robbis[i]);
@@ -640,14 +640,14 @@ public Vector getLasers(){
   private void doLasers(int phase,BoardRoboter[] robbis)
     {
       //d("doLasers called.");
-      
+
       // die Board-Laser
       for (Enumeration e = lasers.elements() ; e.hasMoreElements() ;) {
 	LaserDef l=(LaserDef)e.nextElement();
 	int x=l.x;
 	int y=l.y;
 	boolean hit=false;
-	
+
       aussen: for (int i=l.length;i>0;i--){
 	  for (int j=0;j<robbis.length;j++)
 	      if ((robbis[j].getX()==x)&&(robbis[j].getY()==y)){ // Treffer!
@@ -661,8 +661,8 @@ public Vector getLasers(){
 		      //d("Boardlasertreffer auf "+robbis[j].getName());
 		      actualStats = stats.getStats (robbis[j].getName());
 		      actualStats.incDamageByBoard();
-		      
-		      
+
+
 		      ausgabenMsg("mBoardLaser",tmp);
 		  }
 
@@ -685,11 +685,11 @@ public Vector getLasers(){
 		      hit=true;
 		  }
 	      } // Treffer
-	  
+
 	// Falls Treffer -> naechster Laser.
 	  if (hit)
 	      break aussen;
-	  
+
 	  // Ansonsten: naechstes Feld
 	  switch (l.facing){
 	  case LNORD:
@@ -707,7 +707,7 @@ public Vector getLasers(){
 	  } //switch
       } // for length
       } //for Enumeration
-      
+
       //die Roboter-Laser
     aussen2: for (int rob=0;rob<robbis.length;rob++){
       if ((robbis[rob].istVirtuell())||(!robbis[rob].istAktiviert()))
@@ -725,7 +725,7 @@ public Vector getLasers(){
 		robbis[j].incSchaden();
 		registerSperren(robbis[j]);
 		bewegt[j]=true; // Änderung erfolgt
-		
+
 		ausgabenMsgString2("mRobLaser",robbis[rob].getName(),robbis[j].getName());
 		actualStats=stats.getStats(robbis[rob].getName());
 		actualStats.incHits();
@@ -733,7 +733,7 @@ public Vector getLasers(){
 		    actualStats.incKills();
 		actualStats=stats.getStats(robbis[j].getName());
 		actualStats.incDamageByRobots();
-		
+
 
 
 		continue aussen2;
@@ -753,7 +753,7 @@ public Vector getLasers(){
 	      bewegt[j]=true;
 
 	      ausgabenMsgString2("mRobLaser",robbis[rob].getName(),robbis[j].getName());
-	      
+
 	      continue aussen2;
 	    }
 	  x--;
@@ -771,7 +771,7 @@ public Vector getLasers(){
 		bewegt[j]=true;
 
 		ausgabenMsgString2("mRobLaser",robbis[rob].getName(),robbis[j].getName());
-	      
+
 		continue aussen2;
 	    }
 	  y++;
@@ -789,7 +789,7 @@ public Vector getLasers(){
 	      bewegt[j]=true;
 
 	      ausgabenMsgString2("mRobLaser",robbis[rob].getName(),robbis[j].getName());
-	      
+
 	      continue aussen2;
 	    }
 	  y--;
@@ -802,9 +802,9 @@ public Vector getLasers(){
   private void doArchivUpdate(int phase,BoardRoboter[] robbis)
     {
       //d("doArchivUpdate called.");
-      
+
       for (int i=0;i<robbis.length;i++) {
-	
+
 	if ((bo(robbis[i].getX(),robbis[i].getY()).typ)==BDREPA) {
 	    robbis[i].setArchiv(robbis[i].getPos());
 	    bewegt[i]=true;
@@ -816,13 +816,13 @@ public Vector getLasers(){
 	      bewegt[i]=true;
 	      //d(robbis[i].getName()+" ist auf einer Flagge (R1). Archivpos updated");
 	  }
-      }      
+      }
     } // doArchivUpdate
 
   private void doFlaggenUpdate(int phase,BoardRoboter[] robbis)
-    { 
+    {
       //d("doFlaggenUpdate called.");
-      
+
       for (int i=0;i<robbis.length;i++) {
 	if (robbis[i].getNaechsteFlagge()==flaggen.length+1)
 		continue;
@@ -832,7 +832,7 @@ public Vector getLasers(){
 	  //d(robbis[i].getName()+" hat naechste Flagge erreicht.");
 	  ausgabenMsgString2("mNextFlag",robbis[i].getName(),""+(robbis[i].getNaechsteFlagge()-1));
 	}
-	
+
       }
     } // doCheckUpdate
 
@@ -843,7 +843,7 @@ public Vector getLasers(){
   private void doRepairs(int phase,BoardRoboter[] robbis)
     {
       //d("doRepairs called.");
-      
+
       for (int i=0;i<robbis.length;i++) {
 	if ((bo(robbis[i].getX(),robbis[i].getY()).typ)==BDREPA) {
 	  boolean msg=robbis[i].getSchaden()>0;
@@ -853,7 +853,7 @@ public Vector getLasers(){
 	  if (msg)
 	      ausgabenMsgString2("mRepFeld",robbis[i].getName(),""+bo(robbis[i].getX(),robbis[i].getY()).spez);
 	}
-	
+
 	for (int j=0;j<flaggen.length;j++)
 	  if ((robbis[i].getX()==flaggen[j].x)&&(robbis[i].getY()==flaggen[j].y)) {
 	    boolean msg=robbis[i].getSchaden()>0;
@@ -863,7 +863,7 @@ public Vector getLasers(){
 	    if (msg)
 		ausgabenMsgString("mRepFlag",robbis[i].getName());
 	  }
-	
+
 	if (robbis[i].getSchaden() < 0)
 	    robbis[i].setSchaden(0);
       }
@@ -897,14 +897,14 @@ public Vector getLasers(){
 	} // if
       } // for Schleife 1
       if (robbis.length==1)          // Sonderfall einzelner Roboter
-	if (robbis[0].getSchaden()<10) 
+	if (robbis[0].getSchaden()<10)
 	  {
 	      robbis[0].setVirtuell(false);
 	  //d("Entvirtualisiere einzelnen Roboter "+robbis[0].getName());
 	  bewegt[0]=true;
 	  }
     } // entvirtualisiere ende
-  
+
 
   /**
     Weiteres Register gesperren, falls mehr als 4 Schaden
@@ -929,7 +929,7 @@ public Vector getLasers(){
 	} // for
       } // if
     } // registerSperren ende
-    
+
     protected void d(String s){
 	if (debugmeldungen){
 		Global.debug(this,s);
