@@ -29,7 +29,7 @@ mGewinn Congratulations! $1 has reached the last flag in place $2!
 mHinrLL $1 lost all lives and cannot play anymore. :(
 mHinrRV $1 is being removed due to a rule violation.
 mHinrTO $1 has been removed, was too slow!
-mKlugSchKlick $1 needed to ask for the know-it-all's help!
+mKlugSchKlick $1 needed to ask for the wisenheimer's help!
 mNeueRunde Starting turn $1!
 mNextFlag $1 has reached flag number $2!
 mRepFeld $1 is being repaired $2 damage on a repair site.
@@ -194,7 +194,7 @@ gespReg locked registers
 goalFlag next flag 
 hurt damage 
 klatte log
-klugScheisser know-it-all
+klugScheisser wisenheimer
 lifes lifes 
 mAbout About
 mFast fast
@@ -377,4 +377,4 @@ mWarnung Warning
 mtooltip Scout
 
 [KlugscheisserLatte]
-mtooltip know-it-all
+mtooltip wisenheimer
