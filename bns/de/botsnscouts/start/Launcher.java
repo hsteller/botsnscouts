@@ -50,5 +50,17 @@ public class Launcher{
 	}
     }
 
+    public boolean startGame(KommSpPr com, KachelRaster kachelRaster, String ip, int port, int pnum, int timeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
+	Ort dim = kachelRaster.getSpielfeldSize();
+	int[][] flags = kachelRaster.getRFlaggen();
+	String field=kachelRaster.getSpielfeld();
+	int retFromNewGame = com.newGame(ip, port, pnum, 0, timeOut, field, flags[0], flags[1], dim.x, dim.y, lisPort);
+	return (retFromNewGame!=1);
+    }
+
+
+    public boolean spielGehtLos(KommSpPr com, String ip, int port){
+	return com.game(ip,port);
+    }
 
 }

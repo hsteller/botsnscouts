@@ -11,7 +11,6 @@ import de.botsnscouts.gui.*;
 
 public class Facade{
 
-    private SpielStarter spielStarter;
     private KachelRaster kachelRaster, kachelRasterSave;
     private Launcher launcher;
     private KommSpPr com;
@@ -20,6 +19,7 @@ public class Facade{
 
     private static final String DIP="127.0.0.1";
     private static final int DPORT=8077;
+    private static final int LPORT=8889;
     private static final int DPLAYERS=8;
     private static final int DTO=200;
 
@@ -30,7 +30,6 @@ public class Facade{
     }
     public Facade(int gr){
 	thumbGR=gr;
-	spielStarter = new SpielStarter();
 	kachelFactory = new KachelFactory(thumbGR);
 	kachelFactory.start();
 	kachelRaster = new KachelRaster(kachelFactory);
@@ -40,26 +39,6 @@ public class Facade{
 
     public int getThumbGR(){
 	return thumbGR;
-    }
-
-    //*SpielStarter*//
-    // Startet einfach das Spiel
-    public boolean startSpiel() throws OneFlagException, NichtZusSpfException{
-	return startSpiel(DIP, DPORT, DPLAYERS, DTO, 8889);
-    }
-
-    public boolean startSpiel(String ip, int port, int timeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
-	return startSpiel(ip, port, DPLAYERS, timeOut);
-    }
-
-    public boolean startSpiel(String ip, int port, int anzahl, int zugTimeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
-	Global.debug(this,"starte spiel!");
-	boolean ret;
-	ret=spielStarter.startSpiel(com, kachelRaster, ip, port, anzahl, zugTimeOut, lisPort);
-
-	Global.debug(this,"spiel gestartet!");
-
-	return ret;
     }
 
     //*KachelRaster*//
@@ -293,9 +272,25 @@ public class Facade{
 	return launcher.kuenstlicheSpielerStarten(DIP, DPORT, true, iq, com);
     }
 
+    // launch the game
+    public boolean startGame() throws OneFlagException, NichtZusSpfException{
+	return startGame(DIP, DPORT, DPLAYERS, DTO, LPORT);
+    }
+
+    public boolean startGame(String ip, int port, int timeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
+	return startGame(ip, port, DPLAYERS, timeOut, lisPort);
+    }
+
+    public boolean startGame(String ip, int port, int pnum, int timeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
+	boolean ret;
+	ret=launcher.startGame(com, kachelRaster, ip, port, pnum, timeOut, lisPort);
+
+	return ret;
+    }
+
     //startet das Spiel tatsächlich
     public boolean spielGehtLos(){
-	return spielStarter.spielGehtLos(com,DIP,DPORT);
+	return launcher.spielGehtLos(com,DIP,DPORT);
     }
 
     public void killStartServer(){

@@ -210,7 +210,7 @@ public class Start extends JFrame implements WindowListener{
 		Global.debug("Properties "+prop);
 		fassade.loadSpfProp(prop);
 		Global.debug("Spielfed loaded");
-		fassade.startSpiel();
+		fassade.startGame();
 		Global.debug("Server gestartet");
 		if (argv[2].equals("yes")){
 		    fassade.amSpielTeilnehmen(KrimsKrams.randomName(),0);

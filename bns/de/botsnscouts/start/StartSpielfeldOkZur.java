@@ -67,7 +67,7 @@ public class StartSpielfeldOkZur extends JPanel implements  ActionListener{
 		Global.debug(this,"neuen StartStart geStartStartet!!");
 	    }
 	    Global.debug(this,"starte spiel!");
-	    parent.fassade.startSpiel();//starte Spiel
+	    parent.fassade.startGame();//starte Spiel
 	    Global.debug(this,"spielGestartet!");
 	    parent.addServer();
 	    if(parent.startSpielfeld.buttons.mitspielen.getSelectedObjects()!=null){//starte einen SpielerMensch

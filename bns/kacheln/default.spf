@@ -1,19 +1,9 @@
-#Thu Mar 16 08:41:52 GMT+01:00 2000
-flag2y=18
-flag2x=22
-kach1,1=rotateleft.rra
-kach1,0=labyrinth.rra
-dreh0,1=0
+#Sat Mar 17 17:21:54 GMT+01:00 2001
+flag2y=2
+flag2x=3
 dreh0,0=0
-flag1y=7
-flag1x=18
-flag4y=11
-flag4x=3
-flag0y=2
-flag0x=13
-kach0,1=dima.rra
+flag1y=6
+flag1x=10
+flag0y=11
+flag0x=3
 kach0,0=bottleneck.rra
-flag3y=21
-flag3x=7
-dreh1,1=0
-dreh1,0=0
