@@ -1,0 +1,19 @@
+#Mon Apr 23 00:51:47 CEST 2001
+kach0,0=bottle.rra
+flag0y=9
+flag3y=5
+flag0x=7
+flag3x=22
+dreh0,1=1
+dreh0,0=0
+kach1,1=highway.rra
+kach1,0=highway.rra
+flag1y=23
+flag4y=8
+flag1x=22
+flag4x=7
+dreh1,1=1
+dreh1,0=1
+flag2y=22
+flag2x=5
+kach0,1=bottleneck.rra

@@ -1,0 +1,121 @@
+<!-- This  is an ant build file. Only used for building a
+  -  botnsnscouts-distribution.
+ -->
+
+<project name="BotsNScuots-dist" default="fail">
+
+  <target name="fail">
+    <echo message="Please don't call this file directly, use" />
+    <echo message="ant dist" />
+    <echo message="which will proceed to call this file." />
+  </target>
+
+<!-- Define our own tasks -->
+
+  <taskdef name="gentilesindex" 
+           classname="de.botsnscouts.build.GenerateTilesIndexTask"
+	   classpath="${tools-build}" />
+
+  <target name="genIdx">
+    <gentilesindex dir="${build}/${maindir}/tiles" />
+  </target>
+
+  <target name="genIdxIn">
+    <!-- ${where} must contain the directory where it should run -->
+    <gentilesindex dir="${where}" />
+  </target>
+
+
+<!-- Real make-dist logic -->
+
+  <property name="dest.src" value="${dist}/src/botsnscouts-${bns.ver}" />
+  <property name="dest.bin" value="${dist}/binary/botsnscouts-${bns.ver}" />
+
+  <target name="dist" depends="genIdx,dist-bin,dist-src">
+    <!-- Restore executable-bits lost during copying -->
+    <chmod perm="ugo+x">
+       <fileset dir="${dist}">
+         <include name="**/*.sh" />
+       </fileset>
+    </chmod>
+    
+    <antcall target="zipOnLin" />
+    <available property="noNeedToZip" file="${dist}/botsnscouts-${DSTAMP}.zip" />
+    <antcall target="zip_builtin" />
+  </target>
+
+  <target name="zipOnLin" depends="dist-bin,dist-src">
+  <!-- Zips up the stuff using /usr/bin/zip, which preserves the
+       executable bits and still yields windows-usable files     -->
+     <exec executable="zip" os="Unix,Linux" dir="${dist}/binary">
+	<arg line="-q -r ${basedir}/${dist}/botsnscouts-${DSTAMP}.zip botsnscouts-${bns.ver}" />
+     </exec>
+
+     <exec executable="zip" os="Unix,Linux" dir="${dist}/src">
+	<arg line="-q -r ${basedir}/${dist}/botsnscouts-${DSTAMP}-src.zip botsnscouts-${bns.ver}" />
+     </exec>
+  </target>
+
+  <target name="zip_builtin" unless="noNeedToZip">
+    <echo message="Warning! I can build zipfiles on this system, however,"/>
+    <echo message="they will lose the executable bits and thus will be"/>
+    <echo message="very hard to use on UNIX-Systems."/>
+    <zip zipfile="${dist}/botsnscouts-${DSTAMP}.zip">
+       <zipfileset dir="${dist}/binary" />
+    </zip>
+    <zip zipfile="${dist}/botsnscouts-${DSTAMP}-src.zip">
+       <zipfileset dir="${dist}/src" />
+    </zip>
+  </target>
+
+  <target name="dist-bin">
+    <!-- Creates a binary bns-tree under ${dest.bin} -->
+    <mkdir dir="${dest.bin}" />
+    <mkdir dir="${dest.bin}/lib" />
+    <copy todir="${dest.bin}/lib">
+      <fileset dir="${basedir}/lib" />
+    </copy>
+    <mkdir dir="${dest.bin}/tiles" />
+    <copy todir="${dest.bin}/tiles">
+      <fileset dir="${basedir}/tiles" />
+    </copy>
+    <copy todir="${dest.bin}">
+      <fileset dir="${basedir}/tools/distrib" excludes="*.nodist" />
+    </copy>
+    <copy todir="${dest.bin}">
+      <fileset dir="${basedir}/tools/distrib.binary" excludes="*.nodist" />
+    </copy>
+    <jar jarfile="${dest.bin}/botsnscouts.jar" manifest="tools/manifest">
+       <fileset dir="${build}" />
+    </jar>
+  </target>
+
+  <target name="dist-src">
+    <!-- Creates a binary bns-tree under ${dest.src} -->
+    <mkdir dir="${dest.src}" />
+    <mkdir dir="${dest.src}/lib" />
+    <mkdir dir="${dest.src}/classes" />
+    <mkdir dir="${dest.src}/src" />
+    <mkdir dir="${dest.src}/tiles" />
+    <copy todir="${dest.src}/tiles">
+      <fileset dir="${basedir}/tiles" />
+    </copy>
+    <copy todir="${dest.src}/lib">
+      <fileset dir="${basedir}/lib" />
+    </copy>
+    <copy todir="${dest.src}">
+      <fileset dir="${basedir}/tools/distrib" excludes="*.nodist" />
+    </copy>
+    <copy todir="${dest.src}">
+      <fileset dir="${basedir}/tools/distrib.src" excludes="*.nodist" />
+    </copy>
+    <copy todir="${dest.src}/classes">
+      <fileset dir="${build}" />
+    </copy>
+    <copy todir="${dest.src}" includeEmptyDirs="false">
+      <fileset dir="${src}/de" includes="${maindir}/**/*.java" />
+    </copy>
+<!--    <copy todir="${todir}" file="${basedir}/build.xml" /> -->
+  </target>
+
+</project>

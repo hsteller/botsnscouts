@@ -105,115 +105,6 @@
      </java>
   </target>
 
-  <target name="dist" depends="compile,dist-bin,dist-src,doc">
-    <chmod perm="ugo+x">
-       <fileset dir="${dist}">
-         <include name="**/*.sh" />
-       </fileset>
-    </chmod>
-    <antcall target="zipOnLin" />
-    <available property="noNeedToZip" file="${dist}/botsnscouts-${DSTAMP}.zip" />
-    <antcall target="zip_builtin" />
-  </target>
-
-  <target name="zipOnLin" depends="init,dist-bin,dist-src">
-  <!-- Zips up the stuff using /usr/bin/zip, which preserves the
-       executable bits and still yields windows-usable files     -->
-     <exec executable="ln" os="Unix,Linux" >
-	<arg line="-s binary ${dist}/botsnscouts-${bns.ver}" />
-     </exec>
-     <exec executable="zip" os="Unix,Linux" dir="${dist}">
-	<arg line="-q -r botsnscouts-${DSTAMP}.zip botsnscouts-${bns.ver}" />
-     </exec>
-     <exec executable="rm" os="Unix,Linux" >
-	<arg line="-rf ${dist}/botsnscouts-${bns.ver}" />
-     </exec>
-
-     <exec executable="ln" os="Unix,Linux" >
-	<arg line="-s source ${dist}/botsnscouts-${bns.ver}" />
-     </exec>
-     <exec executable="zip" os="Unix,Linux" dir="${dist}">
-	<arg line="-q -r botsnscouts-${DSTAMP}-src.zip botsnscouts-${bns.ver}" />
-     </exec>
-     <exec executable="cp" os="Unix,Linux" >
-	<arg line="-r ${src}/de ${dist}/source/" />
-     </exec>
-     <exec executable="zip" os="Unix,Linux" dir="${dist}">
-	<arg line="-q -r botsnscouts-${DSTAMP}-srconly.zip botsnscouts-${bns.ver} -x botsnscouts-${bns.ver}/classes/*" />
-     </exec>
-     <exec executable="rm" os="Unix,Linux" >
-	<arg line="-rf ${dist}/botsnscouts-${bns.ver}" />
-     </exec>
-
-     <exec executable="mkdir" os="Unix,Linux" >
-	<arg line="${dist}/botsnscouts-${bns.ver}" />
-     </exec>
-     <exec executable="ln" os="Unix,Linux" >
-	<arg line="-s ${doc} ${dist}/botsnscouts-${bns.ver}/javadoc" />
-     </exec>
-     <exec executable="zip" os="Unix,Linux" dir="${dist}">
-	<arg line="-q -r botsnscouts-${DSTAMP}-src.zip botsnscouts-${bns.ver}" />
-     </exec>
-     <exec executable="rm" os="Unix,Linux" >
-	<arg line="-rf ${dist}/botsnscouts-${bns.ver}" />
-     </exec>
-  </target>
-
-  <target name="zip_builtin" unless="noNeedToZip">
-    <echo message="Warning! I can build zipfiles on this system, however,"/>
-    <echo message="they will lose the executable bits and thus will be"/>
-    <echo message="very hard to use on UNIX-Systems."/>
-    <zip zipfile="${dist}/botsnscouts-${DSTAMP}.zip">
-       <zipfileset dir="${dist}/binary" prefix="botsnscouts-${bns.ver}" />
-    </zip>
-    <zip zipfile="${dist}/botsnscouts-${DSTAMP}-src.zip">
-       <zipfileset dir="${dist}/source" prefix="botsnscouts-${bns.ver}" />
-       <zipfileset dir="${doc}" prefix="botsnscouts-${bns.ver}/javadoc" />
-    </zip>
-    <zip zipfile="${dist}/botsnscouts-${DSTAMP}-srconly.zip">
-       <zipfileset dir="${dist}/source" prefix="botsnscouts-${bns.ver}"
-        excludes="classes" />
-    </zip>
-  </target>
-
-  <target name="dist-bin">
-    <mkdir dir="${dist}/binary/lib" />
-    <copy todir="${dist}/binary/lib">
-      <fileset dir="${basedir}/lib" />
-    </copy>
-    <copy todir="${dist}/binary">
-      <fileset dir="${basedir}/tools/distrib" excludes="*.nodist" />
-    </copy>
-    <copy todir="${dist}/binary">
-      <fileset dir="${basedir}/tools/distrib.binary" excludes="*.nodist" />
-    </copy>
-    <jar jarfile="${dist}/binary/botsnscouts.jar" manifest="tools/manifest">
-       <fileset dir="${build}" />
-    </jar>
-  </target>
-
-  <target name="dist-src">
-    <mkdir dir="${dist}/source/lib" />
-    <mkdir dir="${dist}/source/classes" />
-    <mkdir dir="${dist}/source/src" />
-    <copy todir="${dist}/source/lib">
-      <fileset dir="${basedir}/lib" />
-    </copy>
-    <copy todir="${dist}/source">
-      <fileset dir="${basedir}/tools/distrib" excludes="*.nodist" />
-    </copy>
-    <copy todir="${dist}/source">
-      <fileset dir="${basedir}/tools/distrib.src" excludes="*.nodist" />
-    </copy>
-    <copy todir="${dist}/source/classes">
-      <fileset dir="${build}" />
-    </copy>
-    <copy todir="${dist}/source" includeEmptyDirs="false">
-      <fileset dir="${src}" includes="${maindir}/**/*.java" />
-    </copy>
-    <copy todir="${dist}/source" file="${basedir}/build.xml" />
-  </target>
-
   <target name="doc">
      <mkdir dir="${doc}" />
      <javadoc sourcepath="${src}" destdir="${doc}" 
@@ -226,5 +117,42 @@
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
     <delete dir="${doc}"/>
+
+    <!-- Delete Utility-classes -->
+    <ant dir="${tools}" target="clean">
+      <property name="build" value="${tools-build}" />
+      <property name="src"   value="${tools-src}" />
+    </ant>
+
   </target>
+
+<!-- generate Indexfile for tiles in Place. 
+  -  usually done when making dist, but maybe we want to
+  -  call it directly.
+ -->
+
+  <target name="genIdxInPlace" depends="compile,compile-tools">
+    <ant antfile="dist.xml" target="genIdxIn">
+      <property name="where" value="${build}/${maindir}/tiles" />
+    </ant>
+  </target>
+  
+<!-- Stuff needed for packaging distributions up -->
+
+  <property name="tools"       value="tools" />
+  <property name="tools-src"   value="${basedir}/${tools}/src" />
+  <property name="tools-build" value="${basedir}/${tools}/classes" />
+ 
+  <target name="dist" depends="compile,compile-tools">
+    <ant antfile="dist.xml" target="dist" />
+  </target>
+
+  <target name="compile-tools">
+    <echo message="Compiling needed classes" />
+    <ant dir="${tools}">
+      <property name="build" value="${tools-build}" />
+      <property name="src"   value="${tools-src}" />
+    </ant>
+  </target>
+
 </project>
