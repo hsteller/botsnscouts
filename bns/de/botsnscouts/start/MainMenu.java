@@ -25,20 +25,20 @@
 
 package de.botsnscouts.start;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.awt.geom.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import java.net.*;
-import de.botsnscouts.util.*;
-
+import de.botsnscouts.util.Message;
+import de.botsnscouts.util.OptionPane;
+import de.botsnscouts.util.TransparentButton;
 import org.apache.log4j.Category;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 public class MainMenu extends JPanel implements  ActionListener{
-    static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( MainMenu.class.getName() );
+    static Category CAT = Category.getInstance( MainMenu.class.getName() );
 
     Paint paint;
     JButton gameBut;

@@ -1669,14 +1669,32 @@ public class BoardView extends JComponent {
     /**
      * Dump this BoardView as a png image file.
      * @param file The file name to dump the image to.
+     * @param size The width and hight of the generated image (square).
+     *             Use size=0 for keeping the orginal size.
      * @throws IOException is thrown if the file cannot be created.
      */
-    public void dumpPngImage(File file) throws IOException {
+    public void dumpPngImage(File file, int size) throws IOException {
         FileOutputStream fop = new FileOutputStream(file);
-        fop.write((new PngEncoder(getBoardImage())).pngEncode());
+        Image image;
+        if (size > 0) {
+            image = getThumb(size);
+        } else {
+            image = getBoardImage();
+        }
+        fop.write((new PngEncoder(image)).pngEncode());
         fop.flush();
         fop.close();
     }
+
+    /**
+     * Dump this BoardView as a png image file.
+     * @param file The file name to dump the image to.
+     * @throws IOException is thrown if the file cannot be created.
+     */
+    public void dumpPngImage(File file) throws IOException {
+        dumpPngImage(file, 0);
+    }
+
 
     public void paintComponent(Graphics g) {
 
@@ -1719,28 +1737,7 @@ public class BoardView extends JComponent {
 
 
     public Image getThumb(int size) {
-        /*
-        BufferedImage bi = new BufferedImage(x, y, BufferedImage.TYPE_INT_RGB);
-
-        Graphics2D g2 = bi.createGraphics();
-        g2.setClip(0,0,x,y);
-        //paint( g_off );
-
-
-        paintUnbuffered( g2 );
-        g2.dispose();
-
-        AffineTransformOp atop =
-            new AffineTransformOp(AffineTransform.getScaleInstance(((float)size)/x, ((float)size)/y), AffineTransformOp.TYPE_BILINEAR);
-        BufferedImage thumb = atop.filter( bi, null );
-
-        //Image thumb=createImage(new FilteredImageSource(dbi.getSource(), new AreaAveragingScaleFilter(size, size)));
-        g2.dispose();
-        return thumb;
-        */
-
         BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
-
         Graphics2D g2 = bi.createGraphics();
         g2.setClip(0, 0, size, size);
         g2.scale(((double) size) / x, ((double) size) / y);

@@ -256,6 +256,14 @@ public class SimBoard extends Board implements Directions {
         this(x, y, map, flags, null);
     }
 
+    /**
+     * Board without notification support and without inital flags.
+     * @throws FlagException  will not be thrown here.
+     */
+    public SimBoard(int x, int y, String map) throws FormatException, FlagException {
+        this(x, y, map, new Location[0]);
+    }
+
     /** Debugging only */
     public void print() {
         super.print();
