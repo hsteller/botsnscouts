@@ -3,6 +3,7 @@ package de.botsnscouts.util;
 import java.io.*;
 import java.util.*;
 import java.lang.*;
+import de.botsnscouts.*;
 /**
 * Diese Klasse setzt Meldungen aller Art in verschiedene Sprachen um,
 * abhaengig vom File conf/messages.language
@@ -26,7 +27,7 @@ import java.lang.*;
 	    // System.err.println("**********************************");
 	    try {
 
-		InputStream istr=Message.class.getResourceAsStream("conf/messages."+lang);//Ludmila
+		InputStream istr=BotsNScouts.class.getResourceAsStream("conf/messages."+lang);//Ludmila
 
 		messages = new BufferedReader(new InputStreamReader(istr));//Ludmila
 		

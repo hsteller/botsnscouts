@@ -1,4 +1,4 @@
-package de.botsnscouts.start;
+package de.botsnscouts.old;
 
 import java.awt.*; 
 import java.awt.image.*; 
