@@ -436,7 +436,7 @@ public class BoardView extends JLayeredPane {
                 if (bot.isVirtual())
                     g2d.setComposite(AC_SRC_OVER_05);
                 else
-                    g2d.setComposite(AC_SRC);               
+                    g2d.setComposite(AC_SRC_OVER);               
                 g2d.setColor(ROBOCOLOR[bot.getBotVis()]);
                 g2d.drawString(bot.getName(),xoffset,yoffset + acht + i * acht);
                 g2d.drawImage(getRobImage(bot, bot.getFacing()), xoffset, yoffset,scaledFeldSize, scaledFeldSize,this );                
@@ -693,7 +693,7 @@ public class BoardView extends JLayeredPane {
                        
             // painting the animated bot           
             backgroundWithBots.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
-            
+            mainGraphics.setComposite(ac);
             int animationStepsTurnRob =currentAnimationConfig.getAnimationStepsTurnRob();
             int animationDelayTurnRob = currentAnimationConfig.getAnimationDelayTurnRob();
              for (int step = 0; step<animationStepsTurnRob;step++) {
@@ -1692,22 +1692,22 @@ public class BoardView extends JLayeredPane {
         int botVis = robot.getBotVis();
         Image imgRob = robosCrop[robot.getFacing() + botVis * 4];
         boolean virtuell = robot.isVirtual();
-
+        Composite oldComp = g2d.getComposite();
         if (imgRob != null) {
-            if (virtuell) {
-                AlphaComposite ac = AC_SRC_OVER_05;
-                g2d.setComposite(ac);
+            if (virtuell) {               
+                g2d.setComposite(AC_SRC_OVER_05);
             }
             else {
             	g2d.setComposite(AC_SRC_OVER);
             }
             g2d.drawImage(imgRob, xpos64, ypos64, scaledFeldSize, scaledFeldSize, this);
-            if (virtuell) {
-                g2d.setComposite(AC_SRC);
-            }
+          // if (virtuell) {
+          //      g2d.setComposite(AC_SRC);
+          // XXXHS }
             String beschriftung = "" + robot.getName();
             g2d.setColor(ROBOCOLOR[botVis]);
             g2d.drawString(beschriftung, xpos64, ypos64 + acht + robocount * acht);
+            g2d.setComposite(oldComp);
         }
     }
 
@@ -1842,9 +1842,10 @@ public class BoardView extends JLayeredPane {
         paintHighlight(dbg);
 
        // dbg.scale(dScale, dScale);
-        dbg.setComposite(AC_SRC);
+       
         paintScout(dbg);
         paintRobos(dbg);
+        dbg.setComposite(AC_SRC);
     }
 
     protected void paintUnbuffered(Graphics dbg) {
