@@ -41,13 +41,14 @@ import java.awt.event.ActionListener;
  */
 public class ParticipatePanel extends ColoredComponent implements ActionListener {
 
-    JTextField serv;
-    JTextField nam;
-    JComboBox farb;
+    private JTextField hostName;
+    private JTextField robName;
+    private JComboBox colors;
+    private int port = GameOptions.DPORT;
 
-    Start parent;
+    private Start parent;
 
-    Paint paint;
+    private Paint paint;
 
     public ParticipatePanel(Start par) {
 
@@ -69,12 +70,14 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
                 OptionPane.niceBorder
         ));
 
-        serv = new TJTextField(Message.say("Start", "mServerInh"),
+
+
+        hostName = new TJTextField(Message.say("Start", "mServerInh"),
                                JTextField.CENTER, true);
-        nam = new TJTextField(Conf.getDefaultRobName(), JTextField.CENTER, true);
-        farb = new RoboBox(true);
-        farb.setOpaque(false);
-        farb.setFont(new Font("Sans", Font.BOLD, 24));
+        robName = new TJTextField(Conf.getDefaultRobName(), JTextField.CENTER, true);
+        colors = new RoboBox(true);
+        colors.setOpaque(false);
+        colors.setFont(new Font("Sans", Font.BOLD, 24));
         go = new TJButton(Message.say("Start", "mGoButton"));
         back = new TJButton(Message.say("Start", "mZurueckButton"));
 
@@ -85,19 +88,20 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
         back.setActionCommand("back");
 
         add(new TJLabel(Message.say("Start", "mServer"), Color.lightGray, true));
-        add(serv);
+        add(hostName);
         add(new TJLabel(Message.say("Start", "mName"), Color.lightGray, true ));
-        add(nam);
+        add(robName);
 
         add(new TJLabel(Message.say("Start", "mFarbe"), Color.lightGray, true ));
-        add(farb);
+        add(colors);
         add(go);
         add(back);
     }
 
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("go")) {
-            Thread smth = parent.fassade.amSpielTeilnehmen(serv.getText(), nam.getText(), farb.getSelectedIndex());
+            Thread smth = parent.fassade.amSpielTeilnehmen(hostName.getText(), port, robName.getText(),
+                    colors.getSelectedIndex());
             Global.debug(this, "SpielerMensch gestartet");
             parent.addKS(smth);
             parent.hide();
