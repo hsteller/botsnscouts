@@ -9,6 +9,8 @@ import java.util.zip.*;
 import de.botsnscouts.gui.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.board.*;
+import de.botsnscouts.start.*;
+import de.botsnscouts.autobot.*;
 /**
 * StartSpieler ermöglicht dem Benutzer einen neuen SpielServer auf dem remote Rechner,
 * künstliche Spieler lokal oder remote, menschlichen Spieler oder Ausgabekanal aus einem Programm

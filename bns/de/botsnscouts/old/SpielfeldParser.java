@@ -1,4 +1,9 @@
 package de.botsnscouts.old;
+import de.botsnscouts.util.*;
+import de.botsnscouts.board.*;
+import de.botsnscouts.autobot.*;
+import de.botsnscouts.start.*;
+import de.botsnscouts.comm.*;
 
 public class SpielfeldParser{
     private int KX=3, KY=3, FL=6 ;

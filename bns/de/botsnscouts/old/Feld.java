@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.start;
 
 /** Ein einzelnes Spielfeld.
  * @author: Dirk Materlik, Gero Eggers

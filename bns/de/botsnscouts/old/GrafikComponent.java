@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.start;
 
  /**
   * Unterklasse, die es ermöglicht, bequem Bilder einzufügen
