@@ -42,6 +42,7 @@ public class Handler extends Thread {
             if (request.getName().equals("game")) {
                 answer = MetaServer.getInstance().announce(request);
                 answer.write(writer);
+                writer.flush();
                 if (answer.getName().equals("announced")) {
                     try {
                         XMLElement revoke = new XMLElement();

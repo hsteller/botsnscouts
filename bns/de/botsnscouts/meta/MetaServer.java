@@ -73,6 +73,7 @@ public class MetaServer {
             int port = Integer.parseInt(request.getStringAttribute("port"));
             if (checkBNSServer(host, port)) {
                 /* If ok, announnce. */
+                announcedGames++;
                 games.add( request );
                 answer = new XMLElement();
                 answer.setName("announced");
