@@ -91,7 +91,7 @@ public class SimBoard extends Board implements Directions {
             if (moved[i])
                 s[j++] = robbis[i].getName();
 
-        server.ausgabenBenachrichtigen(s);
+        server.notifyViews(s);
         sendCollectedMsgs();
         bewegt2false();
     }

@@ -334,9 +334,11 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
       	d("spielfeld             : \n"+feld);
     }
 
-    // For the Board, to send the "something has changed"-message
-
-    public void ausgabenBenachrichtigen(String[] s){
+    /*
+    * Tell all boards that "something has changed"
+    * @param robotNames List of all robots whose state changed.
+    */
+    public void notifyViews(String[] robotNames){
 
         // PRE: currentThread ist der ServerThread
         //  ... aber wir pruefen das lieber nochmal :-)
@@ -346,7 +348,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	    throw new RuntimeException("nur der Serverthread darf Server.sendMsgWennNoetig aufrufen.");
 	}
 
-	if (s.length == 0){
+	if (robotNames.length == 0){
 	    CAT.debug("Warning: ausgabenBenachrichtigen called with 0-size array. Returning.");
 	    return;
 	}
@@ -369,7 +371,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		tmp.setMode(FRAGENERLAUBT);
 
 		try{
-		    tmp.notifyChange(s);
+		    tmp.notifyChange(robotNames);
 		}
 		catch (KommFutschException ex){
 		    new Fehlermeldung(Message.say("Server","eKommFutschA"));
@@ -621,7 +623,8 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
         return (t.rob.getDamage()-4 < t.rob.countLockedRegisters());
     }
 
-    /** Die eigentliche Spielmethode!
+    /**
+     * The main method of the server!
      */
     public void run(){
 	try{
@@ -652,11 +655,11 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		for(Iterator e=rThreads.iterator();e.hasNext();)
 		    alleN[i++]=((ServerRoboterThread)e.next()).rob.getName();
 	    }
-	    //initialisiere Statistik
+	    //Init Statistics.
 	    stats = new StatsList(alleN);
 	    feld.initStats(stats);
 
-	    ausgabenBenachrichtigen(alleN);
+	    notifyViews(alleN);
 
             // 2. Bot
 	    d("Spiel starten.");
@@ -680,11 +683,11 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		for(Iterator e=rThreads.iterator();e.hasNext();)
 		    alleN[i++]=((ServerRoboterThread)e.next()).rob.getName();
 	    }
-	    ausgabenBenachrichtigen(alleN);
+	    notifyViews(alleN);
 
-	    // Rundenschleife
+	    // Loop for all turns.
 	    gameover = false;
-	    Vector gesperrteKarten = new Vector(); //Vektor von Karten
+	    Vector gesperrteKarten = new Vector(); //Vector of cards!
 	    for (int iRunde = 1; !gameover; iRunde++) {
 
 		String[] tmpstr=new String[1];
@@ -719,7 +722,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		      alleN[i++]=((ServerRoboterThread)e.next()).rob.getName();
 		  }
 		  if (alleN.length > 0)
-		    ausgabenBenachrichtigen(alleN);
+		    notifyViews(alleN);
 		}
 		d("Es werden "+roboterEintrittsListe.size()+" nach ihrer Zerstörung wieder eingesetzt");
 
@@ -770,23 +773,22 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    roboterEintrittsListe.removeAllElements();
 		}
 
-		ausgabenBenachrichtigen(namen);
+		notifyViews(namen);
 
-                //PowerUp -- nach Zerstoert eingesetzte Bot werden auch gefragt!
-		// Sind bereits in vorheriger Liste in toBeAsked gesetzt worden
-
+                /* Power Up!
+                *  Ask just entering bots whether they want to be powered up again.
+                */
 		for(Iterator e=aktRoboter.iterator();e.hasNext();) {
-		    ServerRoboterThread tmp = ((ServerRoboterThread )e.next());
-		    if (!tmp.rob.isActivated())
-			toBeAsked.add(tmp);
-		    else if (tmp.rob.isPoweredDownNextTurn()) {
-			//Auschalten der, die letzte Mal PowerDown gesagt haben.
-			d(tmp.rob.getName()+" ist naechste Runde ausgeschaltet.");
-			tmp.rob.setActivated(false);
-			tmp.rob.setNextTurnPoweredDown(false);
-			tmp.rob.setDamage(0);
-		    }
-
+		    ServerRoboterThread robThread = ((ServerRoboterThread )e.next());
+		    if (!robThread.rob.isActivated()){
+                        if (robThread.rob.isPoweredDownNextTurn()){
+                            //This bot just chose PowerDown.
+                            robThread.rob.setNextTurnPoweredDown(false);
+                            robThread.rob.setDamage(0);
+                        } else {
+                            toBeAsked.add(robThread);
+                        }
+                    }
 		}
 		if (toBeAsked.size() > 0) {
 		    d("Ich frage "+toBeAsked.size()+" nach Powerup.");
@@ -808,7 +810,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    int idx=0;
 		    for (Iterator e=toBeAsked.iterator();e.hasNext();)
 			namen[idx++]=((ServerRoboterThread)e.next()).rob.getName();
-		    ausgabenBenachrichtigen(namen);
+		    notifyViews(namen);
 
 		    for (Iterator it=toBeAsked.iterator();it.hasNext();){
 			ServerRoboterThread srt=((ServerRoboterThread)it.next());
@@ -848,7 +850,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		wechselModus(aktRoboter.iterator(),NIX);
 		modus = NIX;
 
-		// Start der Phasenschleife
+		// Loop for the five phases.
 		for (aktPhase=1; aktPhase!=0; aktPhase = (aktPhase+1)%6) {
 		    CAT.info("Evaluation phase "+aktPhase+", turn "+iRunde +" starts.");
                     // Am Spiel beteiligte Bot in Array kopieren (aus technischen Gruenden)
@@ -868,7 +870,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    }
 		    feld.doPhase(aktPhase,robs);
 
-		    // Phase auswerten
+		    // Evaluate what has happends.
 		    synchronized(aktRoboter) {
 			for (Iterator e=aktRoboter.listIterator(); e.hasNext();) {
 			    ServerRoboterThread tmp = (ServerRoboterThread )e.next();
@@ -897,7 +899,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 				namen=new String[1];
 				namen[0]=tmp.rob.getName();
-				ausgabenBenachrichtigen(namen);
+				notifyViews(namen);
 
 				gameover = istSpielende();
 
@@ -940,15 +942,17 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 				namen=new String[1];
 				namen[0]=tmp.rob.getName();
-				ausgabenBenachrichtigen(namen);
+				notifyViews(namen);
 			    }
 			}
 		    }
 
-		} // Ende Phasenschleife
+		} // End phase evaluation
 
-		// Rundenauswertung
-		// Reparaturfelder/Fahnen auswerten und Powerdown setzen
+		/*  End-of-turn-evaluation:
+                    1.) Repairing issues.
+                    Relevant for all bots on flags and repair fields.
+                 */
 		Vector repairing = new Vector();
 		for (Iterator e=aktRoboter.iterator(); e.hasNext();) {
 		    ServerRoboterThread tmp = (ServerRoboterThread)e.next();
@@ -978,6 +982,32 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    }
 		}
 		d("Habe "+gesperrteKarten.size()+" gesperrte Karten gefunden und gespeichert.");
+
+                /* End-of-turn-evaluation:
+                   2.) Set bots to deactivated if they chose power down
+                 */
+                Vector changedBots = new Vector();
+                synchronized(rThreads){
+                     for (Iterator it=rThreads.iterator(); it.hasNext();){
+                        Bot bot = ((ServerRoboterThread )it.next()).rob;
+                        if (bot.isPoweredDownNextTurn()){
+                            bot.setActivated(false);
+                            changedBots.add(bot.getName());
+                            /* NextTurnPowerDown is not set to false here,
+                            *  but at the beginning of the next turn to be
+                            *  able to distinguish between bots that were
+                            *  already powered down and newly deactivated ones.
+                            *  ABOVE IS NOT NECESSARY?!
+                            */
+                        }
+                     }
+                }
+                /* Tell the clients if someone powered down. */
+                if (changedBots.size()>0){
+                    String[] changedBotsArray = new String[changedBots.size()];
+                    changedBots.toArray(changedBotsArray);
+                    notifyViews(changedBotsArray);
+                }
 
 	    } // Rundenschleife ende
 

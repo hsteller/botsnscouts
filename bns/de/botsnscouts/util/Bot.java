@@ -411,11 +411,6 @@ public class Bot {
 	virtual = b;
     }
 
-
-    public void setActivated() {
-	setActivated(true);
-    }
-
     public void setActivated(boolean b) {
 	activated = b;
     }
