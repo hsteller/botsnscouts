@@ -1,4 +1,6 @@
 package de.botsnscouts.gui;
+
+import de.botsnscouts.util.*;
 import java.awt.event.*;
 import java.awt.*;
 import javax.swing.*;
