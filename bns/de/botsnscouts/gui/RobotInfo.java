@@ -29,7 +29,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     Roboter robot;
 
 
-    static Image getImage(int nr) {
+    static synchronized Image getImage(int nr) {
         if( stuff == null ) {
                 stuff = new Image[MINI_IMAGE_COUNT];
                 ImageMan.loadImages();
