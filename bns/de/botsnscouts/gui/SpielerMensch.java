@@ -1,5 +1,6 @@
 package de.botsnscouts.gui;
 
+import  de.botsnscouts.*;
 import  de.botsnscouts.util.*;
 import  de.botsnscouts.comm.*;
 import  de.botsnscouts.autobot.*;
@@ -18,7 +19,7 @@ import javax.swing.plaf.metal.*;
 public class SpielerMensch extends Thread {
 
     // -----------  Konstanten -----------
-    static Class c = de.botsnscouts.BotsNScouts.class;
+    static Class c = BotsNScouts.class;
     private final static  Image RUECK = Toolkit.getDefaultToolkit().getImage(c.getResource("images/karterueck.gif"));
     private final static  Image M1 = Toolkit.getDefaultToolkit().getImage(c.getResource("images/m1.gif"));
     private final static  Image M2 = Toolkit.getDefaultToolkit().getImage(c.getResource("images/m2.gif"));
@@ -149,6 +150,7 @@ public class SpielerMensch extends Thread {
 	f.statusLine.schlaf.add(klugscheisserLatte);
 	f.statusLine.schlaf.add(new ScoutVertiefung(this));
 	f.statusLine.add(f.statusLine.schlaf);
+	f.setVisible(true);
     }
 
     // -----------  Klassenmethoden  -----------
@@ -723,7 +725,7 @@ public class SpielerMensch extends Thread {
 	    PfeilC we = new PfeilC("WEST",WEST);
 	    we.addActionListener(this);
 	    p.add(we);
-	    p.add(new JButton(new ImageIcon((ImageMan.getImages(ImageMan.SCOUT))[2])));
+	    p.add(new JButton());
 	    PfeilC os = new PfeilC("OST",OST);
 	    os.addActionListener(this);
 	    p.add(os);
@@ -1022,6 +1024,9 @@ public class SpielerMensch extends Thread {
      * Start des Menschlichen Spielers
      */ 
     public void run(){
+
+	Thread th = new Thread(f);
+	th.start();
 
 	// ------- Anmeldung am Server -------
 	boolean anmeldungErfolg = false;
