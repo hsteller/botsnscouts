@@ -4,12 +4,16 @@ import java.net.*;
 import java.io.*;
 import de.botsnscouts.util.Global;
 
+import org.apache.log4j.Category;
+
 /** Erlaubt die nebenlaeufige Anmeldung von Robotern und Ausgaben 
  *  Startet fuer jeden Anmeldeversuch einen ServerAnmeldeThread.
 */
 
 class ServerAnmeldeOberThread extends Thread
 {
+    static final Category CAT = Category.getInstance( ServerAnmeldeOberThread.class );
+
     Server server;
     ServerSocket seso;
     Boolean roboterAnmeldung;
@@ -32,37 +36,41 @@ class ServerAnmeldeOberThread extends Thread
     public void run()
     {
 	try{
-	    seso=new ServerSocket(server.anmeldePort);
-	} catch (IOException e){
-	    System.err.println("ServerAnmeldeOberThread: Konnte Socket nicht binden. Beende mich.");
-	    return;
-	}
-	
-	try{
-	    seso.setSoTimeout(0); // wir warten bis zum notify()
-	} catch (SocketException e){
-	    System.err.println("ServerAnmeldeOberThread: SocketExc beim Setzen des TO. Beende mich.");
-	    try {
-		seso.close();
-	    } catch (IOException f){}
-	    return;
-	}
-	
-	Socket client;
-
-	while(!isInterrupted()){
 	    try{
-		client = seso.accept();
-	    }catch(IOException e){
-		try{
-		    seso.close();
-		}catch(IOException f){}
-		System.err.println("ServerAnmeldeOberThread: Fehler bei ServerSocket.accept(). Beende mich.");
+		seso=new ServerSocket(server.anmeldePort);
+	    } catch (IOException e){
+		System.err.println("ServerAnmeldeOberThread: Konnte Socket nicht binden. Beende mich.");
 		return;
 	    }
-	    ServerAnmeldeThread handhaber=new ServerAnmeldeThread(server,client,this);
-	    d("Neuer Client! Starte ServerAnmeldeThread...");
-	    handhaber.start();
+	
+	    try{
+		seso.setSoTimeout(0); // wir warten bis zum notify()
+	    } catch (SocketException e){
+		System.err.println("ServerAnmeldeOberThread: SocketExc beim Setzen des TO. Beende mich.");
+		try {
+		    seso.close();
+		} catch (IOException f){}
+		return;
+	    }
+	
+	    Socket client;
+
+	    while(!isInterrupted()){
+		try{
+		    client = seso.accept();
+		}catch(IOException e){
+		    try{
+			seso.close();
+		    }catch(IOException f){}
+		    System.err.println("ServerAnmeldeOberThread: Fehler bei ServerSocket.accept(). Beende mich.");
+		    return;
+		}
+		ServerAnmeldeThread handhaber=new ServerAnmeldeThread(server,client,this);
+		d("Neuer Client! Starte ServerAnmeldeThread...");
+		handhaber.start();
+	    }
+	} catch( Throwable t ) {
+	    CAT.fatal("Exception:", t);
 	}
     }
     
@@ -70,7 +78,7 @@ class ServerAnmeldeOberThread extends Thread
     protected void addName(String s){
 	d("Addiere "+s+" zu namen hinzu.");
 	d("Namen: "+namen);
-	    namen+=s;
+	namen+=s;
     }
 
     /** True falls der Name noch unbenutzt ist */

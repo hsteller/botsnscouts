@@ -5,12 +5,15 @@ import java.net.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.comm.*;
 
+import org.apache.log4j.Category;
+
 /**
  * Handhabt eine Connection nebenlaeufig.
  * modified for 2.0 by Dirk
  */
 
 public class ServerAnmeldeThread extends Thread{
+    static final Category CAT = Category.getInstance( ServerAnmeldeThread.class );
 
     private ThreadMaintainer server;
     private Socket socket;
@@ -33,6 +36,7 @@ public class ServerAnmeldeThread extends Thread{
      *  bzw ServerAusgabeThread-Objekte und haengt diese in die richtigen Vektoren ein.
      */
     public void run(){
+	try{
 	PrintWriter out=null;
 	BufferedReader in=null;
 	int clienttype=ILLEGAL;
@@ -251,6 +255,9 @@ public class ServerAnmeldeThread extends Thread{
 		} // synchronized oberThread.namen
 	    } // synchronized oberThread.roboterAnmeldung
 	} //clienttype==spieler
+	} catch( Throwable t ) {
+	    CAT.fatal("Exception:", t);
+	}
     } //run
 
     private boolean nurLatein(String s)
