@@ -12,19 +12,21 @@ You may tell your wishes for future releases to the <A HREF="http://sourceforge.
 But you may use classical <a href="mailto:botsnscouts-devel@lists.sf.net">e-mail</a> as well.<BR>
 <H2>Known Bugs in 0.8.*</H2>
 <UL>
-<LI>On real multi-user operating systems you cannot save tiles if you haven't installed Bots'n'Scouts yourself.
-<LI>Layout still is nicer with higher monitor resolution. 800 x 600 causes some minor problems.
-<LI>Disconnecting during a game may cause problems
-<LI>The limitation to a maximum of 6 flags and 8 players applies to V0.8pre, too.
+<LI>Layout still is nicer with higher monitor resolution. 800 x 600 causes some minor problems.</LI>
+<LI>Disconnecting during a game may cause problems.</LI>
+<LI>The maximum number of flags is 6 and there may be only 8 players per game.</LI>
+<LI>On real multi-user operating systems you cannot save tiles if you haven't installed Bots'n'Scouts yourself.</LI>
 </UL>
 <P>
 <H2>There are more things to do...</H2>
 We still are currently working on:
 <UL>
-<LI>more sounds
-<LI>refactoring our source code which has a lot of cruft
-<LI>in the long term: option cards
-<LI>more cool features (know of any? <a href="mailto:botsnscouts-devel@lists.sorceforge.net">contact</a> us!)
+<LI>A meta server to announce your game via the internet to find players.
+<LI>Upload-facilty for your hand-crafted tiles and download, of course.
+<LI>More sounds. 
+<LI>Refactoring our source code which has a lot of cruft.
+<LI>In the very long term: option cards.
+<LI>More cool features. (Know of any? Tell us!)
 </UL>
 <P>
 <H2>Development</H2>
