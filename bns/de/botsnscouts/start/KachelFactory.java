@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 import de.botsnscouts.board.*;
+import de.botsnscouts.util.*;
 
 public class KachelFactory extends Thread{
 
