@@ -1,5 +1,7 @@
 package de.botsnscouts.gui;
 
+import de.botsnscouts.util.*;
+import de.botsnscouts.comm.*;
 import de.botsnscouts.comm.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.board.*

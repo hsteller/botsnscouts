@@ -1,6 +1,9 @@
 package de.botsnscouts.gui;
 
-
+import  de.botsnscouts.util.*;
+import  de.botsnscouts.comm.*;
+import  de.botsnscouts.autobot.*;
+import  de.botsnscouts.board.*;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
@@ -12,7 +15,7 @@ import javax.swing.plaf.metal.*;
  * Diese Klasse uebernimmt die Funktion der Benutzerschnittstelle.
  * @author Lukasz Pekacki
  */
-public class SpielerMensch extends Ausgabe {
+public class SpielerMensch extends Thread {
 
     // -----------  Konstanten -----------
     static Class c = SpielerMensch.class;
@@ -41,6 +44,9 @@ public class SpielerMensch extends Ausgabe {
     static final int WEST = 3;
 
     // Klassenvariablen
+    protected String host, name;
+    protected int port;
+
     private int myRobIndex;
     private boolean abgabeFertig;
     private boolean scoutAllowed=false;
@@ -54,6 +60,7 @@ public class SpielerMensch extends Ausgabe {
     private int reparaturPunkte;
 
     // Attribut-Klassen
+    private AusgabeFrame f;
     private KlugscheisserLatte klugscheisserLatte;
     private SpielfeldKS meinSpielfeld;
     private Permu wirbel;
@@ -85,9 +92,15 @@ public class SpielerMensch extends Ausgabe {
 	this (host, port, name, color, false);
     }
     public SpielerMensch(String host, int port, String name, int color, boolean nosplash) {
-	super(host,port,nosplash);
+	this.host = host;
+	this.port = port;
 	this.name = name;
 	myColor=color;
+
+	// -- Ausgabe anmelden
+	f = new AusgabeFrame(host,port,this,nosplash);
+
+
 	uICardLayout = new CardLayout();
 	userInterfaceContainer = new Panel(uICardLayout) {
 		public Dimension getMaximumSize() {
@@ -231,8 +244,8 @@ public class SpielerMensch extends Ausgabe {
 	if (scoutAktiv) {
 	    // ------- Scout tanzen lassen
 	    Roboter[] doPhaseRob = new Roboter[1];
-	    doPhaseRob[0] = new Roboter("blafasel");
-	    doPhaseRob[0] = new Roboter(f.statusLine.sC[myRobIndex].r);
+	    doPhaseRob[0] = Roboter.getNewInstance("blafasel");
+	    doPhaseRob[0] = Roboter.getCopy(f.statusLine.sC[myRobIndex].r);
 	    doPhaseRob[0].zeige_Roboter();
 	    int moeglichePhasen = 0;
 	    for (int j = 0; j < uI.register.length;j++) {
@@ -251,6 +264,17 @@ public class SpielerMensch extends Ausgabe {
     }
 
 
+
+    /**
+     * Schreibt in die Statuszeile einen Text
+     */
+    protected void setStatus(String s){
+	// Logframe instanziieren, falls nötig
+	f.stBar.setText(s);
+	f.ta.append("\n"+s);
+    }
+
+
     /**
      * Setzt den Scout für das Feld, das den gelegten Karten entspricht
      **/
@@ -258,7 +282,7 @@ public class SpielerMensch extends Ausgabe {
 	// -------- entferne Scout 
 	Roboter[] doPhaseRob = new Roboter[1];
 
-	doPhaseRob[0] = new Roboter(f.statusLine.sC[myRobIndex].r);
+	doPhaseRob[0] = Roboter.getCopy(f.statusLine.sC[myRobIndex].r);
 	doPhaseRob[0].zeige_Roboter();
 	int moeglichePhasen = 0;
 	f.spielFeld.vorschau(moeglichePhasen,doPhaseRob);
@@ -269,7 +293,7 @@ public class SpielerMensch extends Ausgabe {
     // aktivert den Klugscheisser
     private void fragKlug() {
 	KlugKarte[] kk = new KlugKarte[9];
-	Roboter r = new Roboter(name);
+	Roboter r = Roboter.getNewInstance(name);
 	try {
 	    r = kCS.getRobStatus(name);
 	}
@@ -294,9 +318,9 @@ public class SpielerMensch extends Ausgabe {
 	for (int i = 0; i < r.getGesperrteRegister().length; i++)
 	    r.setZug(i, r.getGesperrteRegister(i));
 
-	meinSpielfeld.debugmeldungen=false;
+	//	meinSpielfeld.debugmeldungen=false;
 	Karte[] vonPermut = wirbel.permutiere(kk, r);
-	meinSpielfeld.debugmeldungen=true;
+	//	meinSpielfeld.debugmeldungen=true;
 
 	// in vonPermut steht die vorgeschlagene Registerprogrammierung, so wie sie ggf. z.T.schon
 	// in den Registern steht
@@ -593,7 +617,7 @@ public class SpielerMensch extends Ausgabe {
     /**
      * Verwaltet und stellt dar die Register
      */
-    private class RegisterCanvas extends GrafikComponent{
+    class RegisterCanvas extends GrafikComponent{
 	int status = 0, bornnum, num;
 	boolean gesandt = false;
 	protected int karteNum, kartePrio, karteAusteilNum;
@@ -1024,8 +1048,9 @@ public class SpielerMensch extends Ausgabe {
 	}
 
 	// ----------- Ausgabe als Thread starten
-	frameThread = new Thread(f); // Ausgabeframe als Thread erzeugen
+	/*	frameThread = new Thread(f); // Ausgabeframe als Thread erzeugen
 	frameThread.start(); // Ausgabe starten -> meldet sich selbstaendig an
+	*/
 
 	// ----------- Zuhoeren, ob der Spieler beim naechsten Mal ein Power Down wuenscht
 	uI.uP.powerDownBox.addItemListener(pDL);
