@@ -399,6 +399,12 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	}
     }
 
+    public void sendChatMessage(String msg) {
+        if( msg != null && msg.trim().length() != 0) {
+            human.sendChat(msg);
+        }
+    }
+
 
     protected void quitHumanPlayer() {
       CAT.debug("HumanView asks the HumanPLayer to quit..");

@@ -25,6 +25,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     StatusRobot statusRobot1 = new StatusRobot();
     JButton diskButton1 = new JButton();
     int viz;
+    int ranking = 0;
     Roboter robot;
 
 
@@ -102,47 +103,50 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     }
 
 
+    static Color lineGreen =  new Color( 0, 80, 0 ) ;
+    static Color background =  Color.black.brighter().brighter() ;
+
     public void paint(Graphics _g) {
         Graphics2D g = (Graphics2D) _g;
-        //g.translate(8,7);
-        g.setColor( Color.black.brighter().brighter() );
-
-
-
-
-//        if( robot.istAktiviert() )
-//            g.setPaint( new GradientPaint( 0, 0, Color.lightGray, 72, 0, Color.darkGray ) );
-//        else
-//            g.setPaint( new GradientPaint( -72, -72, Color.gray, 72, -72, Color.darkGray ) );
-
+        g.setColor( background );
 
         g.fillRect( 0,0, getWidth(), getHeight() );
-        g.setColor( new Color( 0, 80, 0 ) );
+        g.setColor(lineGreen);
         for(int x=5; x< getWidth(); x+=5 )
             g.drawLine(x, 0, x, getHeight() );
         for(int y=5; y< getHeight(); y+=5 )
             g.drawLine(0, y, getWidth(), y );
 
-
         super.paint( g );
+        if( ranking > 0 ) {
+//            g.setPaint( someGray );
+//            g.fillRect( getWidth()/2, 0,getWidth()/2, getHeight() );
+            g.setFont( rankfont );
+            g.setColor( shadeGray );
+            g.drawString( ""+ ranking, getWidth()/2+2, getHeight() - 11 );
+            g.setColor( Color.yellow );
+            g.drawString( ""+ ranking, getWidth()/2, getHeight() - 13 );
+        }
 
         g.setFont( font );
-        g.setColor( new Color(200, 200, 200, 128 ));
+        g.setColor( shadeGray );
         g.drawString( robot.getName(), 15, 31 );
         g.setColor( textColor );
         g.drawString( robot.getName(), 14, 30 );
 
-        if( robot != null && !robot.istAktiviert()  ) {
-            g.setPaint( new Color(100, 100, 100, 128 ) );
+
+        if( ranking == 0 && robot != null && !robot.istAktiviert()  ) {
+            g.setPaint( shadeGray );
             g.fillRect( 0,0,getWidth(), getHeight() );
         }
 
-        //g.translate(-8,-7);
         frame.paintIcon(this, g, -2, -2);
-
-
     }
+    static Color someGray = new Color(100, 100, 100, 128 );
+    static Color shadeGray = new Color(200, 200, 200, 128 );
+
     static Font font = new Font("Serif", Font.ITALIC + Font.BOLD, 12 );
+    static Font rankfont = new Font("Serif", Font.ITALIC + Font.BOLD, 64 );
     static Color textColor = new Color( 0, 255, 0);
     static ImageIcon frame = new ImageIcon( ImageMan.getImage(ImageMan.STATUS_FRAME) );
     private transient Vector robotInfoListeners;
@@ -164,10 +168,15 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     }
     public void updateRobot(Roboter r) {
         robot = r;
+        damageBar1.setDamageValue(r.getSchaden());
+        flagBar2.setReachedFlag(r.getNaechsteFlagge()-1);
+        statusRobot1.setLifesLeft( r.getLeben() - 1);
         repaint();
     }
-    public void setWinnerNumber(int ranking) {
 
+    public void setWinnerNumber(int ranking) {
+        this.ranking = ranking;
+        repaint();
     }
 
     public static void main(String[] args) {
@@ -180,6 +189,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
             Roboter robot = Roboter.getNewInstance("TestRob " + i);
             robot.setAktiviert( i % 2 == 0 );
             final RobotInfo db = new RobotInfo( robot, 7, i);
+            db.setWinnerNumber(i+3);
             db.setBorder( BorderFactory.createLineBorder(Color.black) );
             db.setSize( db.getPreferredSize() );
             JPanel p = new JPanel();

@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
@@ -56,14 +56,14 @@ public class RepairRegisters extends JPanel implements ActionListener{
 		  System.err.println("Send.");
 		}
 	    });
-	     
+
     }
 
     public RepairRegisters(ActionListener al) {
 	setBorder(new EmptyBorder(10,10,10,10));
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 	title = new JLabel();
-	done=new JButton(Message.say("SpielerMensch","ok"));
+	done=OptionPane.getTransparentButton(Message.say("SpielerMensch","ok"), 14);
 	done.addActionListener(al);
 
 	Box right = new Box(BoxLayout.Y_AXIS);
@@ -79,8 +79,8 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	add(main);
     }
 
-    
-    public void setChoises(ArrayList registers, int repairPoints) {	
+
+    public void setChoises(ArrayList registers, int repairPoints) {
 	this.repairPoints=repairPoints;
 
 	zuVerteilen = repairPoints;
@@ -110,7 +110,7 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	this.registers=tmp;
     }
 
-    public ArrayList getSelection() {	
+    public ArrayList getSelection() {
 	int cntr=0;
 	boolean[] torepair=new boolean[5];
 	for(int i=0;i<registers.size();i++){
@@ -141,7 +141,7 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	    title.setText(Message.say("SpielerMensch","mregwahl",zuVerteilen));
 	}
       }
-    
+
 
     public static void main (String args[]) {
 	BasicConfigurator.configure();
@@ -158,7 +158,7 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	    rv.setCard(new HumanCard(100+i,"M2"));
 	    ra.add(rv);
 	}
-	
+
 	((RegisterView)ra.get(2)).setLocked(true);
 	((RegisterView)ra.get(0)).setLocked(true);
 	((RegisterView)ra.get(4)).setLocked(true);
@@ -172,7 +172,7 @@ public class RepairRegisters extends JPanel implements ActionListener{
     }
 
 
-    
+
 }
 
 

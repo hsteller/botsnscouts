@@ -132,6 +132,7 @@ public class Ausgabe extends BNSThread {
 		      CAT.debug("kommAntowrtnamen[0] ist: "+msgId+ "tmpstr ist: "+tmpstr[0]);
 		    // display the message in the statusbar
                     showActionMessage(Message.say("MSG",msgId,tmpstr));
+//                    view.chatFloatPane.addMessage( Message.say("MSG",msgId,tmpstr) );
 		}
 
 		if (msgId.equals("mRobLaser")){ // robots shooting
@@ -248,7 +249,7 @@ public class Ausgabe extends BNSThread {
 		    // --------- Neue Roboter-Position an Spielfeld senden ---------
 		    try {
 			Thread.sleep(100);
-		    } // Verzögerung der Ausgabegeschwindigkeit
+		    } // Verz÷gerung der Ausgabegeschwindigkeit
 		    catch (Exception e) {
 			System.err.println(e.getMessage());
 		    }
@@ -484,7 +485,7 @@ public class Ausgabe extends BNSThread {
 
     /**
      * Zeigt einen Text im Splashscreen an
-     * (erzeugt den Splashscreen, falls n÷tig)
+     * (erzeugt den Splashscreen, falls n”tig)
      */
     private void removeSplash() {
 	if(!nosplash) {

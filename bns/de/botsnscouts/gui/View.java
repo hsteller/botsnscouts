@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
@@ -102,12 +102,12 @@ public class View extends JFrame {
    }
 */
     synchronized private void initView() {
-	// Fenstergr÷˜e auf Vollbild setzen
+	// Fenstergr”ÿe auf Vollbild setzen
 	Toolkit tk=Toolkit.getDefaultToolkit();
 	setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);
 	setLocation(4,4);
 
-	// Fentster-Schlie˜en behandeln
+	// Fentster-Schlieÿen behandeln
 	addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e){
 		      if (ausgabeView!=null){
@@ -149,12 +149,43 @@ public class View extends JFrame {
     protected void makeVisible() {
         CAT.debug("makeVisible called");
         addMenuBar();
-        if (CAT.isDebugEnabled())
-          CAT.debug("menubar is "+menus);
-	validate();
+
+
 	setVisible(true);
+
+        JComponent board = ausgabeView.getBoardView();
+        Point p = board.getLocationOnScreen();
+
+        logFloatPane = new LogFloatPane(board, getLayeredPane());
+        logFloatPane.setExpandedSize( new Dimension( 400, 300 ) );
+        logFloatPane.setNormalSize( new Dimension( 400, 26 ) );
+        logFloatPane.setExpanded( false );
+        getLayeredPane().add( logFloatPane, JLayeredPane.MODAL_LAYER );
+
+        final ChatLine cp = new ChatLine( ausgabeView );
+        cp.setSize( cp.getPreferredSize() );
+        cp.setLocation( p.x + 2, p.y + 2 );
+        cp.setVisible( false );
+
+        addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) {
+                if( e.getKeyChar() == KeyEvent.VK_ENTER ) {
+                    if( humanView == null ) return;
+                      cp.setVisible( true );
+                      cp.text.requestFocus();
+                      //cp.requestFocus();
+                }
+
+            }
+            public void keyPressed(KeyEvent e) {}
+            public void keyReleased(KeyEvent e) {}
+        });
+        getLayeredPane().add( cp, JLayeredPane.MODAL_LAYER );
+
+	validate();
     }
 
+    public LogFloatPane logFloatPane;
 
     public void addAusgabeView(AusgabeView av) {
         CAT.debug("addAusgabeView called");
@@ -214,13 +245,8 @@ public class View extends JFrame {
         CAT.debug("View is now invisible");
 
     }
-
-
-
-
-
-
 }
+
 
 
 

@@ -73,7 +73,7 @@ public class ChatPane extends JPanel {
 	add(nachricht);
 	ChatActionListener cal=new ChatActionListener();
 	nachricht.addActionListener(cal);
-	JButton senden=new JButton(Message.say("ChatPane","button"));
+	JButton senden=OptionPane.getTransparentButton(Message.say("ChatPane","button"), 14);
 	senden.addActionListener(cal);
 	add(senden);
 	this.parent=parent;

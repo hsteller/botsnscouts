@@ -36,7 +36,7 @@ import javax.swing.border.*;
 
 import org.apache.log4j.Category;
 
-public class AusgabeView extends JPanel implements AusgabeViewInterface {
+public class AusgabeView extends JPanel implements AusgabeViewInterface, FocusListener {
     static Category CAT = Category.getInstance(AusgabeView.class);
 
     private final static long SHOW_MESSAGE_DELAY=300;
@@ -80,22 +80,16 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     public AusgabeView(SACanvas sa, Roboter[] robots, Ausgabe aus) {
 	ausgabe = aus;
 	gameBoardCanvas=sa;
-        statusLog = new StatusLog(aus.getView());
+//        statusLog = new StatusLog(aus.getView());
 
-//	JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        Box robotsStatusContainer = new Box(BoxLayout.X_AXIS) {
-            public void paint(Graphics g) {
-                g.setColor(Color.black);
-                g.fillRect(0,0,getWidth(), getHeight());
-                super.paint(g);
-            }
-        };
-        JPanel p = new JPanel( new BorderLayout() );
-        p.add( robotsStatusContainer, BorderLayout.CENTER );
-        add( p );
-        p.setBackground(Color.black);
-        p.setBorder(BorderFactory.createMatteBorder(10, 10, 20, 20, Color.black));
-        robotsStatusContainer.setBackground( Color.black );
+	JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+//        Box robotsStatusContainer = new Box(BoxLayout.X_AXIS) {
+//            public void paint(Graphics g) {
+//                g.setColor(Color.black);
+//                g.fillRect(0,0,getWidth(), getHeight());
+//                super.paint(g);
+//            }
+//        };
 	JPanel robotsCardContainer = new JPanel(new GridLayout(8,1));
         int flagCount = sa.sf.getFlaggen().length;
 
@@ -119,7 +113,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
                             ausgabe.trackPos(robot.getArchivX(), robot.getArchivY(), true);
                         }
              });
-            robotsStatusContainer.add( Box.createHorizontalStrut(20) );
+            //robotsStatusContainer.add( Box.createHorizontalStrut(20) );
 	    robotsStatusContainer.add(r);
 	    robotStatus.put(robots[i].getName(),r);
 
@@ -141,7 +135,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 
 	// create status log
-	add(statusLog,BorderLayout.SOUTH);
+//	add(statusLog,BorderLayout.SOUTH);
 
 	// create scroll panel
 	gameBoardScrollPane = new JScrollPane();
@@ -174,7 +168,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      * show the sinlge line action message that came from the server
      */
     public void showActionMessage(String s){
-	statusLog.addMessage(s);
+        ausgabe.getView().logFloatPane.addMessage( s );
+//	statusLog.addMessage(s);
         synchronized(this){
           try {
             wait(SHOW_MESSAGE_DELAY);
@@ -582,7 +577,16 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         }
     }
 
+    public JComponent getBoardView() {
+        return gameBoardView;
+    }
+    public void focusGained(FocusEvent parm1) {
+        CAT.error(parm1);
+    }
 
+    public void focusLost(FocusEvent parm1) {
+        CAT.error(parm1);
+    }
 
 }
 

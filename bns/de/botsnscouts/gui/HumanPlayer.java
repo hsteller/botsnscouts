@@ -99,7 +99,7 @@ public class HumanPlayer extends BNSThread {
 	}
 	else {
 	  ErrorView.show(Message.say("HumanPlayer","eNoServerRunning",host,port));
-	  
+
 	  return;
 	}
 
@@ -164,7 +164,7 @@ public class HumanPlayer extends BNSThread {
 	    // robot destroyed or initally set on the board
 	    case (ClientAntwort.ZERSTOERUNG): {
 		humanView.showGetDirection();
-		Global.debug(this,"Habe einee Zerst÷rung bekommen.");
+		Global.debug(this,"Habe einee Zerst”rung bekommen.");
 		showMessage(Message.say("SpielerMensch","roboauffeld"));
 		   // --- Spielfeld f\uFFFDr den Klugscheisser holen
 		if (intelliBoard==null) {
@@ -460,8 +460,8 @@ public class HumanPlayer extends BNSThread {
 	ausgabe = new Ausgabe(host, port, nosplash, view);   //adds the AusgabeView to the JFrame
 	ausgabe.initialize();
 	ausgabe.start();
-	ChatPane chatpane=new ChatPane(this);
-	view.addChatPane(chatpane);
+//	ChatPane chatpane=new ChatPane(this);
+//	view.addChatPane(chatpane);
     }
 
     /** Returns the size of the main JFrame or null if the JFrame

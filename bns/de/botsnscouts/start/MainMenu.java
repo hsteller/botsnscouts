@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.start;
 
 import java.awt.*;
@@ -32,22 +32,20 @@ import java.awt.geom.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.net.*;
+import de.botsnscouts.util.*;
 
 import org.apache.log4j.Category;
 
-import de.botsnscouts.util.*;
 
 public class MainMenu extends JPanel implements  ActionListener{
-
-    static Category CAT = Category.getInstance(MainMenu.class);
+    static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( MainMenu.class.getName() );
 
     Paint paint;
-
-    TransparentButton gameBut;
-    TransparentButton partBut;
-    TransparentButton watchBut;
-    TransparentButton editBut;
-    TransparentButton endBut;
+    JButton gameBut;
+    JButton partBut;
+    JButton watchBut;
+    JButton editBut;
+    JButton endBut;
     JLabel logo;
 
     Start parent;
@@ -57,27 +55,28 @@ public class MainMenu extends JPanel implements  ActionListener{
 	parent.setTitle(Message.say("Start","mStartTitel"));
 	paint=parent.paint;
 
-	GridLayout lay=new GridLayout(5,1);
+	GridLayout lay=new GridLayout(6,1);
 	lay.setHgap(170);
 	lay.setVgap(20);
 	//lay.setHgap(100);
 	//lay.setVgap(10);
 	JPanel buttons = new JPanel( lay );
+        setOpaque( false );
 	buttons.setOpaque( false );
+        buttons.setBackground( new java.awt.Color(60, 80, 60, 200) );
 	setLayout( new GridBagLayout() );
 
 	logo = new Logo();
 
-	gameBut=new TransparentButton(Message.say("Start","mSpielStarten"));
-	partBut=new TransparentButton(Message.say("Start","mTeilnehmen"));
-	watchBut=new TransparentButton(Message.say("Start","mZuschauen"));
-	editBut=new TransparentButton(Message.say("Start","mEdit"));
-	endBut=new TransparentButton(Message.say("Start","mBeenden"));
+	gameBut=OptionPane.getTransparentButton(Message.say("Start","mSpielStarten"));
+	partBut=OptionPane.getTransparentButton(Message.say("Start","mTeilnehmen"));
+	watchBut=OptionPane.getTransparentButton(Message.say("Start","mZuschauen"));
+	editBut=OptionPane.getTransparentButton(Message.say("Start","mEdit"));
 
 	gameBut.addActionListener(this);
 	partBut.addActionListener(this);
 	watchBut.addActionListener(this);
-	editBut.addActionListener(this);	
+	editBut.addActionListener(this);
 	endBut.addActionListener(this);
 
 	gameBut.setActionCommand("gameBut");
@@ -123,7 +122,7 @@ public class MainMenu extends JPanel implements  ActionListener{
 			parent.setContentPane(parent.current);
 			parent.show();
 			parent.stopBusy();
-		    }}).start();	    
+		    }}).start();
 	}else if(e.getActionCommand().equals("partBut")){
 	    new Thread(new Runnable(){
 		    public void run(){

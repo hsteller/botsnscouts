@@ -52,7 +52,7 @@ public class StatusLog  extends JPanel implements ActionListener{
         parent = out;
 
         lF = new LogFrame();
-        JButton logButton = new JButton(Message.say("StatusLog","afLog"));
+        JButton logButton = OptionPane.getTransparentButton(Message.say("StatusLog","afLog"), 14);
         logButton.addActionListener(this);
         add(logButton);
 
