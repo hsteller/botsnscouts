@@ -6,8 +6,8 @@
 </CENTER>
 <P>
 
-Since Bots'n'Scouts is entirely written in Java, it runs under any system (Linux, Windows, Solaris...)
-as long as you meet the hardware requirements. Mac is not tested yet, but we are optimistic. If you run it on a mac, we'd be glad to hear from you. Send mail to <a href="mailto:botsnscouts-devel@lists.sourceforge.net">botsnscouts-devel@lists.sourceforge.net</a>.
+Since Bots'n'Scouts is entirely written in Java, it runs under any system (Linux, Windows, Solaris, MacOS X...)
+as long as you meet the hardware requirements and a Java VM is available for your system. 
 <P>
 <H2>Hardware:</H2>
 
