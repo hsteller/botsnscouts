@@ -1,1 +1,3 @@
-Main-Class:de.spline.rr.Start
+Manifest-Version: 1.0
+Class-Path: lib/sixlegs.jar lib/log4j.jar
+Main-Class: de.botsnscouts.BotsNScouts
