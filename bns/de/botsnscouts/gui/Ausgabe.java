@@ -13,10 +13,9 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 /**
- * Diese Klasse erledigt die Ausgabe von Spielfeld und Status
+ * view logic 
  * @author Lukasz Pekacki
  */
-
 public class Ausgabe extends Thread {
 
 
@@ -50,7 +49,7 @@ public class Ausgabe extends Thread {
     public Ausgabe(String host, int port, boolean nosplash) {
 	this.nosplash=nosplash;
 	// Splash-Screen anzeigen
-	showSplash(Message.say("Ausgabe","msplashWarte"));
+	showSplash(Message.say("AusgabeFrame","msplashWarte"));
 
 	this.host = host;
 	this.port = port;
@@ -62,38 +61,21 @@ public class Ausgabe extends Thread {
 
 
     public void run() {
-	// ------- Anmeldung am Server -------
-	boolean anmeldungErfolg = false;
-	setStatus(Message.say("Ausgabe","Anmeldung"));
-	int versuche = 0;
-	while ((!anmeldungErfolg)&&(versuche < 3)) { 
-	    try{
-		anmeldungErfolg = kommClient.anmelden2(host,port,name); 
-	    } 
-	    catch (KommException kE) {
-		System.err.println(kE.getMessage()); 
-		showSplash(Message.say("Ausgabe","msplashFehlerAnmeldung"));
-		Global.debug("Ausgabe: Anmeldung fehlgeschlagen."); } 
-	    versuche++; 
-	    try {Thread.sleep(3000);} catch (Exception e) {System.err.println(e.getMessage());}
+	// --- registering for game ---
+	if (registerAtServer()) {
+	    Global.debug(this,"registered for game as new view with name: "+name);
 	}
-	if (!anmeldungErfolg) {
-	    new Fehlermeldung(Message.say("Ausgabe","eAnmeldung"));
-	    Global.debug(this, "Ausgabe: Beende Versuche.");  
-	    // entferne das Splash-Screen
-	    showSplash(Message.say("Ausgabe","msplashEnde"));
-	    try {Thread.sleep(1000);} catch (Exception e) {System.err.println(e.getMessage());}
+	else {
+	    Global.debug(this, "could not register at the server: "+host);  
+	    showSplash(Message.say("AusgabeFrame","msplashEnde"));
+	    try {Thread.sleep(2000);} catch (Exception e) {System.err.println(e.getMessage());}
 	    removeSplash();
 	    return;
 	}
-	else {Global.debug(this,"Ausgabe: Anmeldung erfolgt.");
-	}
 	
-	// ---- game  ---------
+	// ---- entering game  ---------
 
 	while (!spielEnde) {
-	    
-	    // ------- Empfang einer Server-Meldung  -------
 	    try {
 		kommAntwort = kommClient.warte();
 	    }
@@ -105,48 +87,47 @@ public class Ausgabe extends Thread {
 		System.err.println("ke: "+ke.getMessage());
 		return;
 	    }
-	
+	    // what did the server send?
 	    switch (kommAntwort.typ) {
-		
-		// ---------- start of the game  ------
+
 	    case (kommAntwort.SPIELSTART): { 
 		Global.debug(this,"Server send me: game start.");
 
-		// ------- Einmaliges Holen des Spielfeldes und ermitteln der Spieler -----
+		// ------- fetching the board -----
 		try { 
 		    String[] playerNames = kommClient.getNamen();
+		    String[] playerColors = kommClient.getFarben();
+		    Ort boardDim = kommClient.getSpielfeldDim();
+		    boardDimension = new Dimension(boardDim.x,boardDim.y);
+		    flags = kommClient.getFahnenPos();
+		    Color[] robotsDefaultColor = SACanvas.robocolor;
+		    Color[] robotsNewColor = new Color[8];
 		    
 		    for (int i=0; i < playerNames.length; i++) {
 			robots.put(playerNames[i], Roboter.getNewInstance(playerNames[i]));
 		    }
 
-		    String[] playerColors = kommClient.getFarben();
-		    Color[] roboColors = new Color[8];
 
-		    Ort boardDim = kommClient.getSpielfeldDim();
-		    boardDimension = new Dimension(boardDim.x,boardDim.y);
-		    flags = kommClient.getFahnenPos();
-		    SpielfeldSim sim = new SpielfeldSim(boardDimension.width,boardDimension.height,kommClient.getSpielfeld(),flags);
-		    if (sim == null) Global.debug(this,"Habe kein Spielfeldsim bekommen!");
-		    SACanvas sac = new SACanvas(sim);
-		    if (sac == null) Global.debug(this,"Habe kein SACanvas bekommen!");
-		    ausgabeView = new AusgabeView(new SACanvas(sim));
-		    // ------ let the view update the robots --------
+		    SpielfeldSim sim = new SpielfeldSim(boardDimension.width,
+							boardDimension.height,
+							kommClient.getSpielfeld(),
+							flags);
+		    
+		    int j=0;
+		    for (int i=0;i<8;i++) {
+			if(!playerColors[i].equals("0")) {
+			    robotsNewColor[j]=robotsDefaultColor[i];
+			    j++;
+			}
+		    }
+
+		    ausgabeView = new AusgabeView(new SACanvas(sim,robotsNewColor));
 		    ausgabeView.showUpdatedRobots(getRoboterArrray());
-		    // ------ create View
 		    view=new View(ausgabeView);
-		    Global.debug(this,"AusgabeView erzeugt.");
 		    removeSplash();
 
-		    /* 
-		       TO DO
-		       get color names an give it to ausgabeView
-		       ,roboNcolor)
-		    */
-		    
 		    // send OK to server
 		    kommClient.spielstart(); 
-		    Global.debug(this,"Bestaetigung des Spielstarts abgeschickt...");
 		    
 		    scrollFlag(1);
 
@@ -156,14 +137,19 @@ public class Ausgabe extends Thread {
 				       kE.getMessage());
 		    return;
 		}
-		catch (FormatException e) {System.err.println(e.getMessage());}
-		catch (FlaggenException e){System.err.println(e.getMessage());}
-
+		catch (FormatException e) {
+		    System.err.println(e.getMessage());
+		}
+		catch (FlaggenException e){
+		    System.err.println(e.getMessage());
+		}
 		break;
 	    }
+
 	    case (kommAntwort.MESSAGE):{
 		Global.debug(this,"Server send me: some messsage.");
 		String[] tmpstr=new String[kommAntwort.namen.length-1];
+
 		for (int i=0;i<tmpstr.length;i++)
 		    tmpstr[i]=kommAntwort.namen[i+1];
 
@@ -223,13 +209,14 @@ public class Ausgabe extends Thread {
 		    }
 		}
 		
-		
-		// send ok to server
+
 		kommClient.bestaetigung();
 		break;
 	    }
+
 	    case (kommAntwort.AENDERUNG): {
 		Global.debug(this,"Server send me: change occured.");
+
 		// ------- get changes  -----------
 		Global.debug(this,kommAntwort.namen.length+" robs have been updated.");
 		try { 
@@ -260,15 +247,16 @@ public class Ausgabe extends Thread {
 		  statusLine.weitereStati(stArray);
 		    // Phase ausgeben
 		    if (stArray[0].aktPhase != lastPhase) {
-		    setStatus(Message.say("Ausgabe","phase")+stArray[0].aktPhase);
+		    setStatus(Message.say("AusgabeFrame","phase")+stArray[0].aktPhase);
 		    lastPhase = stArray[0].aktPhase;
 		    }
 		    }
 		*/
-		// --------- has somebody already reached the final flag
+
+		// --------- has somebody already reached the final flag?
 		String[] spStand = kommClient.getSpielstand();
 		if (spStand != null) {
-		    Global.debug(this,"Es gibt schon Spieler, die am Ziel sind; hole Gewinnerliste...");
+		    Global.debug(this,spStand.length+" players have already won");
 		    // TODO show winner
 		
 		}
@@ -282,19 +270,17 @@ public class Ausgabe extends Thread {
 		    return;
 		}
 	
-		// finish questioning the server
-		Global.debug(this, "Ausgabe: Sende Aenderung fertig an Server.");
 		kommClient.aenderungFertig();
 		break;
 	    }
-	    case (kommAntwort.ENTFERNUNG): { 
-		Global.debug(this,"Das Spiel is over.");
 
-		// Gewinnerliste ausgeben
+	    case (kommAntwort.ENTFERNUNG): { 
+		Global.debug(this,"the game is over");
+
 		try {
 		    String[] spielErgebnis = kommClient.getSpielstand();
 		    if (spielErgebnis != null) {
-			Global.debug(this,"We have winners");
+			Global.debug(this,"We have "+spielErgebnis.length+" winners");
 			ausgabeView.showWinnerlist(spielErgebnis);
 		    }
 		    else Global.debug(this,"No winner exists");
@@ -309,7 +295,6 @@ public class Ausgabe extends Thread {
 		catch (InterruptedException e) {
 		    System.err.println("Ausgabe: Interrupted by "+e.toString());
 		}
-		// send OK to server
 		kommClient.spielstart(); 
 		spielEnde = true;
 	    }
@@ -317,7 +302,7 @@ public class Ausgabe extends Thread {
 	    
 	}
 	Global.debug(this,"I reached the end of my run() method");
-	setStatus(Message.say("Ausgabe","spielende"));
+	setStatus(Message.say("AusgabeFrame","spielende"));
 	return;
     }
 
@@ -356,6 +341,27 @@ public class Ausgabe extends Thread {
 			i++;
 		    }
 		    return robs;
+    }
+
+
+    private boolean registerAtServer() {
+	boolean anmeldungErfolg = false;
+	int versuche = 0;
+	
+	setStatus(Message.say("AusgabeFrame","Anmeldung"));
+	while ((!anmeldungErfolg)&&(versuche < 3)) { 
+	    try{
+		anmeldungErfolg = kommClient.anmelden2(host,port,name); 
+	    } 
+	    catch (KommException kE) {
+		System.err.println(kE.getMessage()); 
+		showSplash(Message.say("AusgabeFrame","msplashFehlerAnmeldung"));
+		versuche++; 
+		try {Thread.sleep(3000);} catch (Exception e) {System.err.println(e.getMessage());}
+	    }
+	}
+	    return anmeldungErfolg;
+	
     }
 
 

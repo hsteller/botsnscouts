@@ -19,11 +19,11 @@ public class View extends JFrame {
     AusgabeView ausgabeView;
 
     public View() {
-	setTitle(Message.say("Ausgabe","gameName"));
+	setTitle(Message.say("AusgabeFrame","gameName"));
     }
 
     public View(AusgabeView av) {
-	setTitle(Message.say("Ausgabe","gameName"));
+	setTitle(Message.say("AusgabeFrame","gameName"));
 	ausgabeView=av;
 	// Fenstergröße auf Vollbild setzen
 	Toolkit tk=Toolkit.getDefaultToolkit();
