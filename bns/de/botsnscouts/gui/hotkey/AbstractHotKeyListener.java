@@ -7,14 +7,14 @@ import org.apache.log4j.Category;
 public abstract class AbstractHotKeyListener implements KeyListener {
   private static Category CAT = Category.getInstance(AbstractHotKeyListener.class);
 
-  private HotKey key;
+  private String keyName;
 
   public AbstractHotKeyListener(){
     this (null);
   }
 
-  public AbstractHotKeyListener(HotKey k){
-    key = k;
+  public AbstractHotKeyListener(String keyName){
+    this.keyName = keyName;
   }
 
   public void keyTyped(KeyEvent e) {
@@ -35,10 +35,18 @@ public abstract class AbstractHotKeyListener implements KeyListener {
 
   public void keyReleased(KeyEvent e) {}
 
-  public HotKey getHotKey() {
+  public String getKeyName() {
+    return keyName;
+  }
+
+/*  public HotKey getHotKey() {
     return key;
   }
 
+  public void setHotKey(HotKey key) {
+    this.key = key;
+  }
+*/
   public abstract void doStuff (KeyEvent e, int hotkeyCode);
 
 }

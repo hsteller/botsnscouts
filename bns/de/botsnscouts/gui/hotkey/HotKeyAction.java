@@ -10,26 +10,26 @@ public abstract class HotKeyAction{
 
   private String description;
   private String optionalValues [];
-  private JComponent optionalComponent;
+  private JComponent optionalComponents [];
 
   public HotKeyAction(){
   }
 
   public HotKeyAction(String description,
-                      JComponent optionalComponent, String [] optionalValues){
+                      JComponent [] optionalComponent, String [] optionalValues){
 
     this.description = description;
-    this.optionalComponent = optionalComponent;
+    this.optionalComponents = optionalComponent;
     this.optionalValues = optionalValues;
   }
 
-   public HotKeyAction(JComponent optionalComponent, String [] optionalValues){
+   public HotKeyAction(JComponent [] optionalComponent, String [] optionalValues){
     this ( null, optionalComponent, optionalValues);
 
   }
 
-  public JComponent getOptionalComponent(){
-    return optionalComponent;
+  public JComponent[] getOptionalComponents(){
+    return optionalComponents;
   }
 
   public String [] getOptionalValues(){

@@ -123,7 +123,7 @@ public class View extends JFrame {
     HotKey k = new HotKey(HotKeyConf.HOTKEY_SHOW_CHATLINE,
                           new Integer(HotKeyConf.SHOW_CHATLINE),
                           act);
-    keyMan.setHotKey(k);
+    keyMan.addHotKey(k);
 
 
      String [] preparedChatMessages = HotKeyConf.GROUP_MESSAGES;
@@ -133,21 +133,23 @@ public class View extends JFrame {
         String [] s = HotKeyConf.getOptinalValues(preparedChatMessages[i]);
         if (s == null || s.length==0) {
           CAT.debug("no message properties found");
-          editPanel = new ChatMessageEditor();
+          editPanel = new ChatMessageEditor(keyMan, preparedChatMessages[i]);
         }
         else if (s.length==1){
           CAT.debug("found chatmessage: "+s[0]);
           CAT.debug("did not find autoCommit");
-          editPanel = new ChatMessageEditor(s[0], true);
+          editPanel = new ChatMessageEditor(s[0], false,
+                      keyMan, preparedChatMessages[i]);
         }
         else { //s.length>1
           CAT.debug("found chatmessage: "+s[0]);
           CAT.debug("found autoCommit property: "+s[1]);
-          editPanel = new ChatMessageEditor(s[0], new Boolean(s[1]).booleanValue());
+          editPanel = new ChatMessageEditor(s[0], new Boolean(s[1]).booleanValue(),
+                      keyMan, preparedChatMessages[i]);
         }
           HotKeyAction act2 = new ChatMessageHotKeyActionAdapter(editPanel){
           public void execute() {
-            ChatMessageEditor edit = (ChatMessageEditor) this.getOptionalComponent();
+            ChatMessageEditor edit = (ChatMessageEditor) this.getEditor();
             if (edit.isAutoCommit())
               humanView.sendChatMessage(edit.getMessage());
             else {
@@ -157,7 +159,7 @@ public class View extends JFrame {
 
           }
         };
-        keyMan.setHotKey(preparedChatMessages [i], act2);
+        keyMan.addHotKey(new HotKey(preparedChatMessages [i], act2));
 
       }
      if (CAT.isDebugEnabled())
@@ -200,7 +202,7 @@ public class View extends JFrame {
 	this.setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);
 	this.setLocation(4,4);
 
-	// Fentster-Schlieÿen behandeln
+	// Fentster-Schliessen behandeln
 	this.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e){
 		      if (ausgabeView!=null){

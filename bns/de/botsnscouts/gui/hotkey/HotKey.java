@@ -1,6 +1,6 @@
 package de.botsnscouts.gui.hotkey;
 
-
+//?? getter and setter for keycode synchronizen ??
 public class HotKey{
 
   public static final int UNDEFINED = -1;
@@ -36,13 +36,14 @@ public class HotKey{
       return UNDEFINED;
   }
 
+
   protected void setKeyCode(Integer key) throws KeyReserved{
       if (keyCode.equals(key))
         return;
       if (key != null && HotKeyConf.isReserved(key.intValue()))
         throw new KeyReserved();
       this.keyCode = key;
-      HotKeyConf.setKeyCode(keyName, key);
+      HotKeyConf.setKeyCode(this);
 
   }
 
@@ -54,10 +55,11 @@ public class HotKey{
     return action;
   }
 
-  public void setAction(HotKeyAction action){
+  protected void setAction(HotKeyAction action){
     String [] values = action.getOptionalValues();
     this.action = action;
-    HotKeyConf.setOptionalValues(keyName, action.getOptionalValues());
+   // HotKeyConf.setOptionalValues(keyName, action.getOptionalValues());
+    HotKeyConf.setKeyCode(this);
   }
 
   public String getName() {

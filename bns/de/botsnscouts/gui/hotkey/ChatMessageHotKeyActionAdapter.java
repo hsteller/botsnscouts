@@ -4,15 +4,16 @@ import javax.swing.*;
 
 public class ChatMessageHotKeyActionAdapter extends HotKeyAction {
 
+  // not necessary anymore, could be replaced by single components
   ChatMessageEditor editor;
 
   public ChatMessageHotKeyActionAdapter (String description, ChatMessageEditor editor) {
-      super (description, editor, new String [] {editor.getMessage(), editor.isAutoCommit()+""});
+      super (description, editor.getEditComponents(), new String [] {editor.getMessage(), editor.isAutoCommit()+""});
       this.editor = editor;
   }
 
    public ChatMessageHotKeyActionAdapter (ChatMessageEditor editor) {
-      super (editor, new String [] {editor.getMessage(), editor.isAutoCommit()+""});
+      super (editor.getEditComponents(), new String [] {editor.getMessage(), editor.isAutoCommit()+""});
       this.editor = editor;
   }
 
@@ -20,7 +21,15 @@ public class ChatMessageHotKeyActionAdapter extends HotKeyAction {
    *  getOptionalComponent().getMessage()/isAutoCommit() seems better to me
    */
   public String [] getOptionalValues() {
-    return new String [] {editor.getMessage(), editor.isAutoCommit()+""};
+    return editor.getValues();
+  }
+
+  public JComponent []  getOptionalComponents() {
+    return editor.getEditComponents();
+  }
+
+  public ChatMessageEditor getEditor() {
+    return editor;
   }
 
 

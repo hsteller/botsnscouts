@@ -683,20 +683,84 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
           zoomIn();
         }
       };
-      keyMan.setHotKey(HotKeyConf.HOTKEY_ZOOM_IN, zoomIn);
+      keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_ZOOM_IN, zoomIn));
 
        HotKeyAction zoomOut = new HotKeyActionAdapter() {
         public void execute(){
           zoomOut();
         }
       };
-      keyMan.setHotKey(HotKeyConf.HOTKEY_ZOOM_OUT, zoomOut);
+      keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_ZOOM_OUT, zoomOut));
+
+      final Location [] flags = gameBoardCanvas.getFlags();
+      int num = flags.length;
+      if (num >0) {
+        HotKeyAction showFlag1 =  new HotKeyActionAdapter() {
+          int x = flags [0].getX();
+          int y = flags [0].getY();
+          public void execute(){
+            showPos(x, y);
+          }
+        };
+        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG1, showFlag1));
+      }
+      if (num>1) {
+        HotKeyAction showFlag2 =  new HotKeyActionAdapter() {
+          int x = flags [1].getX();
+          int y = flags [1].getY();
+          public void execute(){
+            showPos(x, y);
+          }
+        };
+        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG2, showFlag2));
+      }
+      if (num>2) {
+        HotKeyAction showFlag3 =  new HotKeyActionAdapter() {
+          int x = flags [2].getX();
+          int y = flags [2].getY();
+          public void execute(){
+            showPos(x, y);
+          }
+        };
+        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG3, showFlag3));
+      }
+      if (num>3) {
+        HotKeyAction showFlag4 =  new HotKeyActionAdapter() {
+          int x = flags [3].getX();
+          int y = flags [3].getY();
+          public void execute(){
+            showPos(x, y);
+          }
+        };
+        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG4, showFlag4));
+      }
+      if (num>4) {
+        HotKeyAction showFlag5 =  new HotKeyActionAdapter() {
+          int x = flags [4].getX();
+          int y = flags [4].getY();
+          public void execute(){
+            showPos(x, y);
+          }
+        };
+        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG5, showFlag5));
+      }
+      if (num>5) {
+        HotKeyAction showFlag6 =  new HotKeyActionAdapter() {
+          int x = flags [5].getX();
+          int y = flags [5].getY();
+          public void execute(){
+            showPos(x, y);
+          }
+        };
+        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG6, showFlag6));
+      }
       if (CAT.isDebugEnabled())
         CAT.debug(keyMan.dump());
-
     }
 
     private JFrame hotKeyFrame;
+    //private HotKeyEditorPanel keyEdit;
+    //private boolean shown = false;
     private void showEditHotKeys() {
       if (hotKeyFrame == null) {
             hotKeyFrame = new JFrame(Message.say("AusgabeView", "hotkeyMenu"));
@@ -715,6 +779,24 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       hotKeyFrame.toFront();
       hotKeyFrame.setVisible(true);
       hotKeyFrame.show();
+      //
+      //if (keyEdit == null) {
+      //  keyEdit = new HotKeyEditorPanel(keyMan);
+      //  keyEdit.setOpaque(false);
+      //}
+      //View v = ausgabe.getView();
+      //
+      //if (shown){
+      //  v.getLayeredPane().remove(keyEdit);
+      //  shown = false;
+      //}
+      //else{
+      //   v.getLayeredPane().add(keyEdit, JLayeredPane.MODAL_LAYER);
+      //   shown = true;
+      //}
+
+
+
     }
 
 }

@@ -11,7 +11,10 @@ import org.apache.log4j.Category;
 public class HotKeyMan {
   static Category CAT = Category.getInstance(HotKeyMan.class);
 
+
+  /** maps keyCodes->HotKeys (type::Integer->HotKey)*/
   private HashMap hotkeys;
+  /** maps keyNames->HotKeys (type::String->Hotkey)*/
   private HashMap keysByName;
 
   public HotKeyMan() {
@@ -20,17 +23,22 @@ public class HotKeyMan {
   }
 
 
-  public synchronized void setHotKey (String keyName, HotKeyAction action){
-    CAT.debug("setting HotKey for: "+keyName);
-    setHotKey(new HotKey(keyName, action));
+  public synchronized void updateHotkeyCode (String keyName, Integer newkeyCode) throws KeyReserved{
+      HotKey k = (HotKey) keysByName.get(keyName);
+      if (k!=null) {
+        hotkeys.remove(k.getKeyCodeI());
+        k.setKeyCode(newkeyCode);
+        hotkeys.put(newkeyCode, k);
+        HotKeyConf.setKeyCode(k);
+      }
   }
 
 
-  public synchronized void setHotKey(HotKey key) {
-    CAT.debug("setting hotkey: "+key.toString());
+  public synchronized void addHotKey(HotKey key) {
+    CAT.debug("adding hotkey: "+key.toString());
     hotkeys.put(key.getKeyCodeI(), key);
     keysByName.put(key.getName(), key);
-    HotKeyConf.setKeyCode(key.getName(), key.getKeyCodeI());
+   // HotKeyConf.setKeyCode(key); // necessary??
   }
 
 

@@ -49,6 +49,12 @@ public class HotKeyConf {
 
   public static final String HOTKEY_ZOOM_IN =  "keyZoomIn";
   public static final String HOTKEY_ZOOM_OUT = "keyZoomOut";
+  public static final String HOTKEY_SHOW_FLAG1 = "keyShowFlag1";
+  public static final String HOTKEY_SHOW_FLAG2 = "keyShowFlag2";
+  public static final String HOTKEY_SHOW_FLAG3 = "keyShowFlag3";
+  public static final String HOTKEY_SHOW_FLAG4 = "keyShowFlag4";
+  public static final String HOTKEY_SHOW_FLAG5 = "keyShowFlag5";
+  public static final String HOTKEY_SHOW_FLAG6 = "keyShowFlag6";
 
 
   // Stuff used for ordering the keys in the keys in the HotKeyEditorpanel:
@@ -63,7 +69,8 @@ public class HotKeyConf {
                                                              HOTKEY_SHOW_CHATLINE
                                                               };
   public static final String [] GROUP_NORMAL  = new String [] {
-      HOTKEY_ZOOM_IN, HOTKEY_ZOOM_OUT
+      HOTKEY_ZOOM_IN, HOTKEY_ZOOM_OUT, HOTKEY_SHOW_FLAG1, HOTKEY_SHOW_FLAG2,
+      HOTKEY_SHOW_FLAG3,HOTKEY_SHOW_FLAG4,HOTKEY_SHOW_FLAG5,HOTKEY_SHOW_FLAG6,
     };
 
   /** Name of the section in the MessagesBundle files */
@@ -77,7 +84,7 @@ public class HotKeyConf {
       return s;
   }
 
-  public static Integer getKeyCode(String keyName){
+  protected static Integer getKeyCode(String keyName){
      String s = Conf.getProperty(keyName+CODE_SUFFIX);
      CAT.debug("loading code: name="+keyName+"\tvalue="+s);
      if (s==null || s.trim().length()<1){
@@ -98,21 +105,25 @@ public class HotKeyConf {
 
   }
 
-  protected static void setKeyCode (String keyName, Integer i) {
-    if (i!=null && isReserved(i.intValue()))
+
+  protected static void setKeyCode (HotKey k){
+   Integer code =  k.getKeyCodeI();
+   if (code!=null && isReserved(code.intValue()))
       return;
+   HotKeyAction act = k.getAction();
+   String [] opts = act.getOptionalValues();
+   int size = (opts==null?0:opts.length);
+   String [] all = new String [size+1];
+   all[0] = (code==null?" ":code.toString());
 
-    Conf.setProperty(keyName+CODE_SUFFIX, (i==null?"":i.toString()));
-    save();
+   for (int i=2;i<size;i++)
+      all[i] = opts[i-2];
+
+   Conf.setMultipleProperty(k.getName()+CODE_SUFFIX, all);
+   save();
   }
 
-  protected static void setOptionalValues(String keyName, String [] values) {
-    Conf.setMultipleProperty(keyName+TEXT_SUFFIX, values);
-    save();
-  }
-
-
-  public static String getDescription (String keyName) {
+  protected static String getDescription (String keyName) {
     return Message.say(MESSAGE_BUNDLE_SECTION, keyName);
   }
 
@@ -127,5 +138,7 @@ public class HotKeyConf {
         return true;
     return false;
   }
+
+
 
 }
