@@ -7,6 +7,7 @@ public class Floor implements FloorConstants {
     private int typ;
     // generelle Bodenart
     private int spez;
+
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Floor.class);
 
     final static String[] RUECK = {"N", "E", "S", "W"};
@@ -47,7 +48,7 @@ public class Floor implements FloorConstants {
         if(w == null) {
             w = Floor.parseFloor(floorString);
             if(!floorString.equals(w.toString())) {
-                CAT.error("assertion failed: " + floorString + " == " + w.toString(), new Exception());
+                CAT.warn("assertion failed: " + floorString + " == " + w.toString() );
             }
             cache.put(floorString, w);
         }
