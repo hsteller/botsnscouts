@@ -105,6 +105,7 @@ public class MetaServer {
      */
     private boolean checkBNSServer(String host, int port) {
         try {
+            debug("Host "+host+", port "+port);
             Socket socket = new Socket(host,port);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 	        PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()),true);
@@ -116,8 +117,10 @@ public class MetaServer {
             socket.close();
             return answer.equalsIgnoreCase("OK");
         } catch (UnknownHostException ex) {
+            ex.printStackTrace();
             return false;
         } catch (IOException ex) {
+            ex.printStackTrace();
             return false;
         }
     }

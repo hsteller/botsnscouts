@@ -371,7 +371,7 @@ public class Start extends JFrame implements WindowListener {
                 } catch (InterruptedException e) {
                     System.err.println(e);
                 }
-                fassade.spielGehtLos();
+                fassade.gameStarts();
                 CAT.debug("Spiel geht los");
                 return;
             } catch (Exception e) {

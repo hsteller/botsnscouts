@@ -312,9 +312,9 @@ public class Facade {
     }
 
     //startet das Spiel tatsächlich
-    public void spielGehtLos() {
+    public void gameStarts() {
         tileFactory.forgetTiles();
-        launcher.spielGehtLos(GameOptions.DIP, GameOptions.DPORT);
+        launcher.gameStarts(GameOptions.DIP, GameOptions.DPORT);
     }
 
 

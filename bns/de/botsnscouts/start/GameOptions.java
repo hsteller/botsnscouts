@@ -270,7 +270,7 @@ public class GameOptions {
     public XMLElement toXML() throws UnknownHostException {
         XMLElement xml = new XMLElement();
         xml.setName("game");
-        xml.setAttribute("host", InetAddress.getLocalHost());
+        xml.setAttribute("host", InetAddress.getLocalHost().getHostAddress());
         xml.setIntAttribute("port", registrationPort);
         xml.setAttribute("allowWisenheimer", allowWisenheimer?"true":"false");
         xml.setAttribute("allowScout", allowScout?"true":"false");

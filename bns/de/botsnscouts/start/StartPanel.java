@@ -197,7 +197,7 @@ public class StartPanel extends JPanel {
         GridBagConstraints gc = new GridBagConstraints();
         Insets noInsets = new Insets(0, 0, 0, 0);
         Insets insets = new Insets(0, 0, 20, 0);
-        
+
         // headline for the whole box
         JLabel label = new TJLabel(Message.say("Start", "mStartKS"), JLabel.CENTER);
         gc.weightx = 1.0;
@@ -212,7 +212,7 @@ public class StartPanel extends JPanel {
         label.setFont(font);
         panel.add(label, gc);
 
-        
+
         JLabel nameLabel = new TJLabel(Message.say("Start", "mKSName"), JLabel.LEFT);
         gc.weightx = 0.0;
         gc.gridy++; // 3
@@ -222,7 +222,7 @@ public class StartPanel extends JPanel {
         gc.fill = GridBagConstraints.NONE;
         gc.insets = new Insets(0,0,10,5);
         panel.add(nameLabel, gc);
-        
+
         final JTextField botNameField = new TJTextField(KrimsKrams.randomName());
         botNameField.setColumns(20);
         gc.gridx = 1;
@@ -230,24 +230,24 @@ public class StartPanel extends JPanel {
         gc.anchor = GridBagConstraints.WEST;
         gc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(botNameField, gc);
-        
+
         // headline above the intelligence slider
         JLabel ks = new TJLabel(Message.say("Start", "mIntel"), JLabel.CENTER);
-        gc.gridy++;        
+        gc.gridy++;
         gc.gridx = 1;
         gc.gridwidth = 2;
         gc.weightx = 1.0;
-        gc.insets = noInsets;     
+        gc.insets = noInsets;
         gc.anchor = GridBagConstraints.CENTER;
-        gc.fill = GridBagConstraints.HORIZONTAL;      
+        gc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(ks, gc);
 
         // left label on the slider (intelligent)
         JLabel lb = new TJLabel(Message.say("Start", "mSchlau"), JLabel.LEFT);
-        gc.gridy++; 
+        gc.gridy++;
         gc.gridx = 0;
         gc.weightx = 0.0;
-        gc.insets = insets;                
+        gc.insets = insets;
         gc.gridwidth = 1;
         gc.gridheight = 1;
         gc.fill = GridBagConstraints.NONE;
@@ -270,19 +270,19 @@ public class StartPanel extends JPanel {
         // right label on the slider (dumb)
         gc.weightx = 0.0;
         gc.gridx = 3;
-        gc.anchor = GridBagConstraints.EAST;       
+        gc.anchor = GridBagConstraints.EAST;
         gc.fill = GridBagConstraints.NONE;
         lb = new TJLabel(Message.say("Start", "mDumm"), JLabel.RIGHT);
         panel.add(lb, gc);
-        
+
         // labeled "likes belts"-checkbox
         final JCheckBox beltAware = new TJCheckBox(Message.say("Start", "beltAware"), false);
         beltAware.setOpaque(false);
-        beltAware.setToolTipText(Message.say("Start", "beltTooltip"));     
+        beltAware.setToolTipText(Message.say("Start", "beltTooltip"));
         gc.gridy++;
         gc.gridx = 0;
         gc.gridwidth = 2;
-        gc.weightx = 0.0;        
+        gc.weightx = 0.0;
         gc.anchor = GridBagConstraints.NORTHWEST;
         panel.add(beltAware, gc);
 
@@ -299,11 +299,11 @@ public class StartPanel extends JPanel {
                 botNameField.setText(KrimsKrams.randomName());
             }
         });
-      
+
         gc.gridx = 2;
         gc.gridwidth = 2;
-        gc.gridheight = 2;       
-        gc.weightx = 0.0;              
+        gc.gridheight = 2;
+        gc.weightx = 0.0;
         gc.anchor = GridBagConstraints.EAST;
         gc.fill = GridBagConstraints.NONE;
         gc.insets = noInsets;
@@ -331,7 +331,7 @@ public class StartPanel extends JPanel {
                 CAT.debug("Start-button pressed.");
                 if (playersComponent.names.size() != 8) {
                     CAT.debug("Going to kick the server to get really going...");
-                    parent.fassade.spielGehtLos();
+                    parent.fassade.gameStarts();
                     parent.hide();
                     //parent.beenden(); // will be done in playerspanel
                 }

@@ -89,7 +89,7 @@ public class Launcher {
    }
 
 
-    public void spielGehtLos(String ip, int port) {
+    public void gameStarts(String ip, int port) {
         server.startGame();
     }
 
