@@ -15,11 +15,6 @@ public class FlagBar extends JButton {
         setBorderPainted( false );
         setOpaque( false );
         setRolloverEnabled( false );
-        addActionListener( new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                System.out.println("flags");
-            }
-        });
     }
 
     public FlagBar() {
@@ -54,7 +49,6 @@ public class FlagBar extends JButton {
 
 
     public Dimension getMinimumSize() {
-        System.out.println("foo");
         int fw = getFlag().getIconWidth() - 6;
         return new Dimension( fw * maxFlag, getFlag().getIconHeight() );
     }
@@ -74,7 +68,6 @@ public class FlagBar extends JButton {
             db.setBorder( BorderFactory.createBevelBorder(2) );
             db.setSize( db.getPreferredSize() );
             int v = (int)(Math.random() *10.0);
-            System.out.println( v );
             db.setReachedFlag( v );
             b.add( db );
             db.addMouseListener( new MouseAdapter() {

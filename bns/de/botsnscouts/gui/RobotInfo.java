@@ -273,7 +273,6 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     }
     public void actionPerformed(ActionEvent parm1) {
         /**@todo: Implement this java.awt.event.MouseListener method*/
-        System.out.println("Method mouseClicked(), now dispatching");
         Object src = parm1.getSource();
         if( src == diskButton1 )
             fireDiskClicked( new RobotInfoEvent( this ) );

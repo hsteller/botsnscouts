@@ -61,7 +61,6 @@ public class DamageBar extends JComponent {
             db.setSize(10, 90);
             db.setBorder( BorderFactory.createBevelBorder(2) );
             int v = (int)(Math.random() *9.0);
-            System.out.println( v );
             db.setDamageValue( v );
             b.add( db );
             db.addMouseListener( new MouseAdapter() {

@@ -23,12 +23,6 @@ public class StatusRobot extends JButton {
         setBorderPainted( false );
         setOpaque( false );
         setRolloverEnabled( false );
-        addActionListener( new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                System.out.println("robs");
-            }
-        });
-
     }
 
     public StatusRobot() {
