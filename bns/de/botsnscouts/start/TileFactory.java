@@ -58,7 +58,7 @@ public class TileFactory {
 
             // Load those from bns.home/tiles
             File kd=null;
-            kd=new File(Conf.getBnsHome()+System.getProperty("file.separator")+"kacheln");
+            kd=new File(Conf.getBnsHome()+System.getProperty("file.separator")+"tiles");
             File[] all = kd.listFiles(new RRAFilter());
             //File[] allj = kdj.listFiles(new RRAFilter());
             FileInputStream istream;
