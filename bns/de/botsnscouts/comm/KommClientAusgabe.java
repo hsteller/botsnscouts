@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.comm;
 
 import de.botsnscouts.util.Stats;
@@ -48,9 +48,9 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
   return super.anmelden (ipnr, portnr, name, "RA2");
   }
 
-    
 
-  /** Zur Bestaetigung fuer den Server, dass die Ausgaben beendet wurden und der Server weitermachen darf*/ 
+
+  /** Zur Bestaetigung fuer den Server, dass die Ausgaben beendet wurden und der Server weitermachen darf*/
   public void aenderungFertig() {
       try {
 	  this.senden("ok");
@@ -70,9 +70,11 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
 	@exception ..if an error occurs
 	@return A sorted list of Stats-objects.
     */
-    
+
     public StatsList getStats() throws KommException {
-	// format: GST(name,int,int,int,int,name,..,name,int,int,int,int)
+        // Should be placed in StatsList, like toSendString()
+
+        // format: GST(name,int,int,int,int,name,..,name,int,int,int,int)
 	senden("GST");
 	String rein = einlesen();
 	if (rein.startsWith("GST")) {
@@ -85,6 +87,7 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
 		s.setKills(Integer.parseInt(st.nextToken()));
 		s.setDamageByBoard(Integer.parseInt(st.nextToken()));
 		s.setDamageByRobots(Integer.parseInt(st.nextToken()));
+                s.setAskedWisenheimer(Integer.parseInt(st.nextToken()));
 		stats.addElement(s);
 	    }
 	    catch (NumberFormatException nfe) {
@@ -93,12 +96,12 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
 	    }
 	    return new StatsList(stats);
 	}
-	else 
+	else
 	    throw new KommException ("getStats: Wrong answer: "+rein);
     }
-	
+
 
 }
-    
-   
+
+
 

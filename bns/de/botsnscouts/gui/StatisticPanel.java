@@ -42,7 +42,7 @@ public class StatisticPanel extends JPanel implements ActionListener {
     private JLabel [] [] desc;
     private static JLabel [] headings;
 
-    private static final int COL_COUNT=6;
+    private static final int COL_COUNT=7;
     private static final String MESSAGE_SECTION="StatisticPanel";
     private static final JLabel [] COL_HEADINGS = {
       //new JLabel(""),// robot icon
@@ -50,7 +50,8 @@ public class StatisticPanel extends JPanel implements ActionListener {
       new JLabel(Message.say(MESSAGE_SECTION, "kills"), SwingConstants.CENTER),
       new JLabel(Message.say(MESSAGE_SECTION, "hits"), SwingConstants.CENTER),
       new JLabel(Message.say(MESSAGE_SECTION, "damage_by_board"), SwingConstants.CENTER),
-      new JLabel(Message.say(MESSAGE_SECTION, "damage_by_robots"), SwingConstants.CENTER)
+      new JLabel(Message.say(MESSAGE_SECTION, "damage_by_robots"), SwingConstants.CENTER),
+      new JLabel(Message.say(MESSAGE_SECTION, "asked_wise"), SwingConstants.CENTER)
 
     };
 
@@ -142,6 +143,10 @@ public class StatisticPanel extends JPanel implements ActionListener {
       foo = s.getDamageByRobots();
       desc [row] [5].setForeground(c);
       desc [row] [5].setText(foo+"");
+
+      foo = s.getAskedWisenheimer();
+      desc [row] [6].setForeground(c);
+      desc [row] [6].setText(foo+"");
    }
 
    private void setAll(){

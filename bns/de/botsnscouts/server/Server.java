@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.server;
 
 import java.util.*;
@@ -137,7 +137,13 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
     /** Schickt eine Nachricht an alle Ausgaben >= Version 2.0 */
     public void sendMsg(String id,String[] s){
-	messageThread.append(id,s);
+	if (id.equals("mKlugSchKlick")){
+          // Dirk wants that to be counted :-)
+          Stats st = stats.getStats(s[0]);
+          if (st!=null)
+            st.incAskWisenheimer();
+        }
+        messageThread.append(id,s);
 	Thread.yield();                   // allow the message to be sent
     }
 
@@ -687,12 +693,12 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		for (Iterator iter=zerstoerteRoboter.iterator();iter.hasNext();)
 		  if (!(((ServerRoboterThread)iter.next()).isAlive()))
 		    iter.remove();
-		
+
 		if (zerstoerteRoboter.size()>0) {
 
 		  d("Warte kurz auf zerstoerte Roboter.");
 		  modus=ZERSTOERT_SYNC;
-		  
+
 		  tmpstr=new String[1];
 		  Iterator iter=zerstoerteRoboter.iterator();
 		  tmpstr[0]=(((ServerRoboterThread)iter.next()).rob.getName());
