@@ -45,6 +45,15 @@ public class Conf{
 	return bnsHome;
     }
 
+    public static String getDefaultRobName(){
+	String n=Conf.getProperty("robot.name");   // Set in bns.config?
+	if (n==null || n.equals(""))
+	    n=Conf.getProperty("user.name");	      // System property
+	if (n==null || n.equals(""))
+	    n=KrimsKrams.randomName();	      // KrimsKrams-Random
+	return n.substring(0,1).toUpperCase()+n.substring(1,n.length());
+    }
+
     public static String getProperty(String key){
 	String data=System.getProperty(key);
 	if (data==null)
