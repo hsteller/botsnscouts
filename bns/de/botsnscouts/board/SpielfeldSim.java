@@ -93,7 +93,7 @@ public class SpielfeldSim extends Spielfeld
 
     /** Schickt eine Nachricht an alle Ausgaben, falls wir einen Server haben
      */
-    private void ausgabenMsg(String id, String[] args){
+    public void ausgabenMsg(String id, String[] args){
 	if (server != null)
 	    server.ausgabenMsg(id,args);
     }

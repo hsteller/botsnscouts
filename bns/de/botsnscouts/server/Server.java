@@ -3,6 +3,8 @@ package de.botsnscouts.server;
 import java.util.*;
 import de.botsnscouts.start.*;
 import de.botsnscouts.util.*;
+import de.botsnscouts.board.*;
+import de.botsnscouts.comm.*;
 
 public class Server extends Thread{
 
@@ -261,7 +263,7 @@ public synchronized void ausgabenBenachrichtigen(String[] s){
         }
     
 
-    protected void ausgabenMsg(String id, String arg){
+    public void ausgabenMsg(String id, String arg){
 	String[] tmp=new String[1];
 	tmp[0]=arg;
 	ausgabenMsg(id,tmp);

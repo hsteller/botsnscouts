@@ -5,6 +5,11 @@ package de.botsnscouts.autobot;
  * @author Dirk, Lukasz
  * $Author$
  */
+
+import de.botsnscouts.boards.SpielfeldKS;
+import de.botsnscouts.util.Karte;
+import de.botsnscouts.boards.Roboter;
+
 class Permu {
 
     SpielfeldKS sf;
