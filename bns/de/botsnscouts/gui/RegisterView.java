@@ -59,6 +59,8 @@ public class RegisterView extends JButton {
     public RegisterView (ActionListener al) {
 	setContentAreaFilled(false);
 	setBorder(null);
+        setBorderPainted(false);
+        setFocusPainted( false );
 	setIcon(registerFree);
 	setEnabled(true);
 	addActionListener(al);
@@ -124,9 +126,11 @@ public class RegisterView extends JButton {
 	return h;
     }
 
-//    static final Image lockedImage = ImageMan.getPNGImage(ImageMan.REGLOCK);
     static final Image lockedImage = ImageMan.getImage(ImageMan.PNG_REGLOCK);
+    static Color back = new Color(65,65,65,192);
     public void paintComponent(Graphics g){
+        g.setColor( back );
+        g.fillRect(0,0,getWidth(),getHeight());
 	super.paintComponent(g);
 	if(myX==0||myY==0){
 	    Dimension d=getSize();

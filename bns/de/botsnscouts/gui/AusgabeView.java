@@ -36,7 +36,7 @@ import javax.swing.border.*;
 
 import org.apache.log4j.Category;
 
-public class AusgabeView extends JPanel implements AusgabeViewInterface, FocusListener {
+public class AusgabeView extends JPanel implements AusgabeViewInterface {
     static Category CAT = Category.getInstance(AusgabeView.class);
 
     private final static long SHOW_MESSAGE_DELAY=300;
@@ -582,13 +582,6 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface, FocusLi
 
     public JComponent getBoardView() {
         return gameBoardView;
-    }
-    public void focusGained(FocusEvent parm1) {
-        CAT.error(parm1);
-    }
-
-    public void focusLost(FocusEvent parm1) {
-        CAT.error(parm1);
     }
 
 }

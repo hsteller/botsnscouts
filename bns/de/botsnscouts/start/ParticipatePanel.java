@@ -78,7 +78,7 @@ public class ParticipatePanel extends ColoredComponent implements  ActionListene
 	farbe=new JLabel(Message.say("Start","mFarbe"));
         serv=new JTextField(Message.say("Start","mServerInh"),JTextField.CENTER);
         nam=new JTextField(Conf.getDefaultRobName(),JTextField.CENTER);
-	farb=new RoboBox( true );
+	farb=new RoboBox( true ); farb.setOpaque(false);
         go=new TransparentButton(Message.say("Start","mGoButton"));
         zurueck=new TransparentButton(Message.say("Start","mZurueckButton"));
 
@@ -108,9 +108,7 @@ public class ParticipatePanel extends ColoredComponent implements  ActionListene
         add(nam);
 
         add( farbe );
-        JPanel jp = new TJPanel();
-        jp.add(farb);
-        add(jp);
+        add( farb );
         add(go);
         add(zurueck);
     }

@@ -94,8 +94,6 @@ public class LogFloatPane extends ColoredComponent implements ComponentListener 
     private Rectangle recalcBounds() {
         Rectangle r = new Rectangle();
         Point p = master.getLocationOnScreen();
-        CAT.error( p );
-        CAT.error( "container null? " + (container == null) );
         SwingUtilities.convertPointFromScreen(p, container);
 
         r.height = expanded ? expandedSize.height : normalSize.height + 2;
