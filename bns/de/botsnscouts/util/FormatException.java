@@ -1,4 +1,4 @@
-package de.botsnscouts.board;
+package de.botsnscouts.util;
 
 /**
  * FormatException wird bei Abweichungen vom Spielfelddatenformat geworfen.
