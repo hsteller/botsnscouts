@@ -67,7 +67,7 @@ public class StartAnfang extends JPanel implements  ActionListener, MouseListene
 	con.weightx = 0.0;
 	add( buttons, con );
 
-	URL url = getClass().getResource(Message.say("Start","mBG"));
+	URL url = de.botsnscouts.BotsNScouts.class.getResource(Message.say("Start","mBG"));
 	ImageIcon icon = new ImageIcon( url );
 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 	Graphics g = bgimg.getGraphics();

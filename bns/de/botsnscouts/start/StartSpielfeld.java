@@ -49,7 +49,7 @@ public class StartSpielfeld extends JPanel implements  ActionListener{
  	add(BorderLayout.EAST,buttons);
 
 
-	URL url = getClass().getResource(Message.say("Start","mBG"));
+	URL url = de.botsnscouts.BotsNScouts.class.getResource(Message.say("Start","mBG"));
 	ImageIcon icon = new ImageIcon( url );
 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 	Graphics g = bgimg.getGraphics();
