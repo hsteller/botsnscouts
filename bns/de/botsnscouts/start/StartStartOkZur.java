@@ -1,5 +1,4 @@
- 
-package de.spline.rr;
+package de.botsnscouts.start;
 
 import java.awt.*;
 import java.awt.event.*;

@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.start;
 
 public interface KachelClickListener {
     //rx,ry: rasterkoordinaten 1 bis 12 

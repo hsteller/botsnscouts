@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.start;
 
 // startet SpielerMensch, AusgabeFrame u.s.w.
 

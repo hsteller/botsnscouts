@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.start;
 
 public class KachelRaster{
     private int KX=3, KY=3, FL=6 ;

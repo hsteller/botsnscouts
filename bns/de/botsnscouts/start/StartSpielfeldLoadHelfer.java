@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.start;
 
 import java.util.*;
 import java.io.*;
