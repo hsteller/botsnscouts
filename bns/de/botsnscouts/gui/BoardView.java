@@ -125,7 +125,7 @@ public class BoardView extends JLayeredPane {
     private Image[] cbeltCrop,ebeltCrop,diverseCrop,robosCrop,scoutCrop;
 
     /** maps Location(x,y) to the Image that should be painted as floor*/
-    private HashMap floorElementHash = new HashMap();
+   private HashMap floorElementHash = new HashMap();
 
     private int x,y;
 
@@ -361,7 +361,7 @@ public class BoardView extends JLayeredPane {
         // animateRobMove() gets informed earlier, so overwriting the positions
         // would reset the robot back to a position he has already left
         else {
-            if (Ausgabe.enableRobMoveAnimation) {
+            if (Ausgabe.IS_ROB_MOVE_ANIMATION_ENABLED) {
                 for (int i = 0; i < robos.length; i++) // saving my internal robot positions
                     internalPositionHash.put(robos[i].getName(), robos[i].getPos());
                 robos = robos_neu; // updating all robots
