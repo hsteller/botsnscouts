@@ -138,7 +138,10 @@ public class StartServer extends BNSThread {
                     Global.debug(this, "Neues Spiel mit " + spcnt + " Mitspieler, Port " + com.port);
 
                     servArr[servNum++] = new Server(
-                            new GameOptions(spcnt, com.port, com.zugTimeout,
+                            //Start stuff defines timeout in seconds,
+                            // server needs it in ms.
+                            //TODO: Use ms everywhere besides GUI.
+                            new GameOptions(spcnt, com.port, 1000*com.zugTimeout,
                                             com.feld, com.flags, com.feldX, com.feldY),
                             this);
                     ((Server) servArr[servNum - 1]).start();
