@@ -1,2 +1,2 @@
 #!/bin/sh
-java -cp botsnscouts.jar de.spline.rr.KachelEditor
+java -cp botsnscouts.jar de.botsnscouts.editor.BoardEditor
