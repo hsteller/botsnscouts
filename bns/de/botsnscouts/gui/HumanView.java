@@ -131,6 +131,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 			      new ActionListener(){
 				      public void actionPerformed(ActionEvent sendKlick) {
 					  treatSendCards();
+                                          setDialogInSidebarActive(false);
 				      }
 				  }
 			      );
@@ -182,7 +183,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
     /**
      * display the card
      */
-    public void showCards(ArrayList humanCards) {
+    public synchronized void showCards(ArrayList humanCards) {
         CAT.debug("Show cards");
 	cards.setCards(humanCards);
 	panelSwitcher.show(switcherPanel,"regsAndCards");
@@ -191,6 +192,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	    cards.activateButton();
 	}
 	this.requestFocus();
+        setDialogInSidebarActive(true);
     }
 
 
