@@ -27,7 +27,7 @@ class Timer extends Thread
             beenden=true;
         }
         
-    void run()
+    public void run()
         {
             synchronized(this){
                 setName("TimerThread");
