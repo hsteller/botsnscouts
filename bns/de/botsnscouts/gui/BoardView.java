@@ -36,6 +36,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.io.File;
@@ -100,14 +101,8 @@ public class BoardView extends JLayeredPane {
     
 
     
-    // for painting active Lasers
-    /** position of firing robot*/
-    private Location source;
-    /**position of robot hit*/
-    private Location target;
-    /** facing (direction) of the laser, according to the directions above*/
-    private int laserFacing;
-    private boolean activeBordLasers;
+  
+
 
     /** contains colors of the boardlasers, strength 1 to 3*/
     static final Color[] laserColor = {Color.red.brighter(), //strength 1
@@ -127,7 +122,8 @@ public class BoardView extends JLayeredPane {
     /** maps Location(x,y) to the Image that should be painted as floor*/
    private HashMap floorElementHash = new HashMap();
 
-    private int x,y;
+    private int widthInPixel;
+    private int heightInPixel;
 
     /** Stores data of the robots.*/
     private Bot[] robos;
@@ -159,7 +155,7 @@ public class BoardView extends JLayeredPane {
 
     /** scale factor for zooming*/
     private double dScale = 1.0;
-    boolean rescaled = true;
+    
 
     protected double scaledFeldSize; // FELDSIZE * scale
 
@@ -179,7 +175,7 @@ public class BoardView extends JLayeredPane {
      *   TODO: I guess that this must not be final and needs to be scaled so that it works
      *    with different zoomlevels
      */
-    private static final int MOVE_ROB_ANIMATION_OFFSET = 4;
+    private static final int MOVE_ROB_ANIMATION_OFFSET = 1;
     /** Amount of time (in ms) we wait after a single animation step
      *  of (pixel-)length MOVE_ROB_ANIMATION_OFFSET.
      */
@@ -218,11 +214,11 @@ public class BoardView extends JLayeredPane {
         // adapt this Component to the scaling factor
         dScale = scale;
         scaledFeldSize = (dScale * FELDSIZE);
-        x = (int) (sf.getSizeX() * scaledFeldSize);
-        y = (int) (sf.getSizeY() * scaledFeldSize);
-        rescaled = true;
-        CAT.debug("dim : " + x + " " + y);
-        setSize(x, y);
+        widthInPixel = (int) (sf.getSizeX() * scaledFeldSize);
+        heightInPixel = (int) (sf.getSizeY() * scaledFeldSize);
+       
+        CAT.debug("dim : " + widthInPixel + " " + heightInPixel);
+        setSize(widthInPixel, heightInPixel);
 
         // the preComputed-BoardImage is no longer valid
         preBoard = null;
@@ -231,7 +227,7 @@ public class BoardView extends JLayeredPane {
     }
 
     private void init(SimBoard sf_neu, Color[] robColors) {
-        activeBordLasers = false;
+
         gotColors = false;
         sf = sf_neu;
 
@@ -312,11 +308,11 @@ public class BoardView extends JLayeredPane {
     }
 
     public Dimension getMinimumSize() {
-        return new Dimension(x, y);
+        return new Dimension(widthInPixel, heightInPixel);
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(x, y);
+        return new Dimension(widthInPixel, heightInPixel);
     }
 
 
@@ -404,208 +400,142 @@ public class BoardView extends JLayeredPane {
 
     /////////////////////////////////////////////////////////////////////
 
-    private void moveRobNorth(Bot internal, int robocount) {    
+    private void moveRobNorth(Bot internal, int robocount, Graphics2D g2) {    
         CAT.debug("moving bot one square to the north");
-        synchronized (this) {
-           Graphics2D g2 = (Graphics2D) this.getGraphics();
-         
+        AlphaComposite ac = AC_SRC_OVER;         
+        if (internal.isVirtual())
+            ac = AC_SRC_OVER_05;
+        Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
+        synchronized (this) {           
             g2.scale(dScale, dScale);
-            AlphaComposite ac = AC_SRC;
-            AlphaComposite ac2 = null;
-            if (internal.isVirtual())
-                ac2 = AC_SRC_OVER_05;
-            Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
-            int x1 = internal.getX();
-            int y1 = internal.getY();
-            int xpos = x1 - 1;
-            int ypos = sf.getSizeY() - y1;
-            int xpos64 = xpos * 64;
-            int ypos64 = ypos * 64;
-            int actx1 = xpos64;
-            int acty1 = ypos64;
-            int x2 = x1;
-            int y2 = y1 + 1;
-            int actx2 = actx1;
-            int acty2 = acty1 - 64;
-            if (MOVE_ROB_ANIMATION_DELAY > 0) {
-                for (int yoffset = 0; yoffset >= -64; yoffset -= MOVE_ROB_ANIMATION_OFFSET) {
-                    paintRobotForMoveAnimation(g2, imgRob,
-                            x1, y1, actx1, acty1,
-                            x2, y2, actx2, acty2,
-                            xpos64, ypos64 + yoffset,
-                            ac, ac2);
 
-                    try {
-                        Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+            int xpos64 =  (internal.getX()-1) * FELDSIZE;
+            int ypos64 = (sf.getSizeY() - internal.getY()-1)* FELDSIZE;                         
+            int clipLength = 2*FELDSIZE;     
+            BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64, FELDSIZE,clipLength);
+            Raster blank = tmpImage.getData();
+            Graphics2D myg = (Graphics2D) tmpImage.getGraphics();
+            myg.setComposite(ac);
+                for (int yoffset = 0; yoffset >= -64; yoffset -= MOVE_ROB_ANIMATION_OFFSET) {
+                     tmpImage.setData(blank);                                   
+                     myg.drawImage(imgRob, 0,FELDSIZE+yoffset, FELDSIZE, FELDSIZE, this); // paint the image                                                                                        
+                     g2.drawImage(tmpImage, xpos64, ypos64, FELDSIZE, clipLength,this);
+                   try {
+                         Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
                     } catch (InterruptedException ie) {
                         CAT.warn("BoardView.paint: wait int moveRobNorth interrupted");
                     }
+                   
                 }
-            } else { // loop without sleeping
-                for (int yoffset = 0; yoffset >= -64; yoffset -= MOVE_ROB_ANIMATION_OFFSET) {
-                    paintRobotForMoveAnimation(g2, imgRob,
-                            x1, y1, actx1, acty1,
-                            x2, y2, actx2, acty2,
-                            xpos64, ypos64 + yoffset,
-                            ac, ac2);
-                }
-            }
+                tmpImage.setData(blank);            
         }
     }
-
-
-    private void moveRobSouth(Bot internal, int robocount) {
+    
+  
+   
+  
+    private void moveRobSouth(Bot internal, int robocount,Graphics2D g2) {
         CAT.debug("moving bot one square to the south");
+        AlphaComposite ac = AC_SRC_OVER;         
+        if (internal.isVirtual())
+            ac = AC_SRC_OVER_05;
+        Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
+        int clipLength=2*FELDSIZE;
         synchronized (this) {
-     Graphics2D g2 = (Graphics2D) this.getGraphics();
+   
+            g2.scale(dScale, dScale);
+            int xpos64 = (internal.getX()-1) * 64;
+            int ypos64 = (sf.getSizeY() -internal.getY())* 64;
             
-            g2.scale(dScale, dScale);
-            AlphaComposite ac = AC_SRC;
-            AlphaComposite ac2 = null;
-            if (internal.isVirtual())
-                ac2 = AC_SRC_OVER_05;
-            Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
-            int x1 = internal.getX();
-            int y1 = internal.getY();
-            int xpos = x1 - 1;
-            int ypos = sf.getSizeY() - y1;
-            int xpos64 = xpos * 64;
-            int ypos64 = ypos * 64;
-            int actx1 = xpos64;
-            int acty1 = ypos64;
-            // direction dependend part:
-            int x2 = x1;
-            int y2 = y1 - 1;
-            int actx2 = actx1;
-            int acty2 = acty1 + 64;
-            if (MOVE_ROB_ANIMATION_DELAY > 0) {
-                for (int yoffset = 0; yoffset <= 64; yoffset += MOVE_ROB_ANIMATION_OFFSET) {
-                    paintRobotForMoveAnimation(g2, imgRob,
-                            x1, y1, actx1, acty1,
-                            x2, y2, actx2, acty2,
-                            xpos64, ypos64 + yoffset,
-                            ac, ac2);
-                    if (MOVE_ROB_ANIMATION_DELAY > 0)
-                        try {
-                            Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64, FELDSIZE,clipLength);
+                Raster blank = tmpImage.getData();
+                Graphics2D myg = (Graphics2D) tmpImage.getGraphics();
+                myg.setComposite(ac);
+                    for (int yoffset = 0; yoffset <=64; yoffset += MOVE_ROB_ANIMATION_OFFSET) {
+                         tmpImage.setData(blank);                                   
+                         myg.drawImage(imgRob, 0,yoffset, FELDSIZE, FELDSIZE, this); // paint the image                                                                                        
+                         g2.drawImage(tmpImage, xpos64, ypos64, FELDSIZE, clipLength,this);
+                       try {
+                             Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
                         } catch (InterruptedException ie) {
-                            CAT.warn("BoardView.paint: wait int moveRobSouth interrupted");
+                            CAT.warn("BoardView.paint: wait int moveRobNorth interrupted");
                         }
-                }
-            } else {
-                for (int yoffset = 0; yoffset <= 64; yoffset += MOVE_ROB_ANIMATION_OFFSET) {
-                    paintRobotForMoveAnimation(g2, imgRob,
-                            x1, y1, actx1, acty1,
-                            x2, y2, actx2, acty2,
-                            xpos64, ypos64 + yoffset,
-                            ac, ac2);
-                }
-            }
-        }
-    }
-
-
-    private void moveRobEast(Bot internal, int robocount) {
-        CAT.debug("moving bot one square to the east");
-        synchronized (this) {
-         Graphics2D g2 = (Graphics2D) this.getGraphics();
-           
-            g2.scale(dScale, dScale);
-            AlphaComposite ac = AC_SRC;
-            AlphaComposite ac2 = null;
-            if (internal.isVirtual())
-                ac2 = AC_SRC_OVER_05;
-            Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
-            int x1 = internal.getX();
-            int y1 = internal.getY();
-            int xpos = x1 - 1;
-            int ypos = sf.getSizeY() - y1;
-            int xpos64 = xpos * 64;
-            int ypos64 = ypos * 64;
-            int actx1 = xpos64;
-            int acty1 = ypos64;
-            // direction dependend part:
-            int x2 = x1 + 1;
-            int y2 = y1;
-            int actx2 = actx1 + 64;
-            int acty2 = acty1;
-            if (MOVE_ROB_ANIMATION_DELAY > 0) {
-                for (int xoffset = 0; xoffset <= 64; xoffset += MOVE_ROB_ANIMATION_OFFSET) {
-                    paintRobotForMoveAnimation(g2, imgRob,
-                            x1, y1, actx1, acty1,
-                            x2, y2, actx2, acty2,
-                            xpos64 + xoffset, ypos64,
-                            ac, ac2);
-                    try {
-                        Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
-                    } catch (InterruptedException ie) {
-                        CAT.warn("BoardView.paint: wait int moveRobEast interrupted");
+                       
                     }
-                }
-            } else { // loop without sleeping
-                for (int xoffset = 0; xoffset <= 64; xoffset += MOVE_ROB_ANIMATION_OFFSET) {
-                    paintRobotForMoveAnimation(g2, imgRob,
-                            x1, y1, actx1, acty1,
-                            x2, y2, actx2, acty2,
-                            xpos64 + xoffset, ypos64,
-                            ac, ac2);
-                }
-            }
+                    tmpImage.setData(blank);            
         }
+    }
+
+
+    private void moveRobEast(Bot internal, int robocount, Graphics2D g2) {
+        CAT.debug("moving bot one square to the east");
+        AlphaComposite ac = AC_SRC_OVER;         
+        if (internal.isVirtual())
+            ac = AC_SRC_OVER_05;
+        Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
+        int clipLength = 2*FELDSIZE;     
+        synchronized (this) {        
+           
+            g2.scale(dScale, dScale);
+     
+            int xpos64 = (internal.getX()-1)* 64;
+            int ypos64 = (sf.getSizeY()-internal.getY()) * 64;
+           
+
+        BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64,clipLength, FELDSIZE);
+        Raster blank = tmpImage.getData();
+        Graphics2D myg = (Graphics2D) tmpImage.getGraphics();    
+        myg.setComposite(ac);
+            for (int xoffset = 0; xoffset <= 64; xoffset += MOVE_ROB_ANIMATION_OFFSET) {
+                tmpImage.setData(blank);                                   
+                 myg.drawImage(imgRob, xoffset,0, FELDSIZE, FELDSIZE, this); // paint the image                                                                                        
+                 g2.drawImage(tmpImage, xpos64, ypos64, clipLength, FELDSIZE,this);
+               try {
+                     Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                } catch (InterruptedException ie) {
+                    CAT.warn("BoardView.paint: wait int moveRobWest interrupted");
+                }
+               
+            }
+            tmpImage.setData(blank);            
+    }
 
     }
 
-    private void moveRobWest(Bot internal, int robocount) {
+    private void moveRobWest(Bot internal, int robocount, Graphics2D g2) {    
         CAT.debug("moving bot one square to the west");
-        synchronized (this) {
-      Graphics2D g2 = (Graphics2D) this.getGraphics();
-           
+        AlphaComposite ac = AC_SRC_OVER;         
+        if (internal.isVirtual())
+            ac = AC_SRC_OVER_05;
+        Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
+        int clipLength = 2*FELDSIZE;     
+        synchronized (this) {           
             g2.scale(dScale, dScale);
-            AlphaComposite ac = AC_SRC;
-            AlphaComposite ac2 = null;
-            if (internal.isVirtual())
-                ac2 = AC_SRC_OVER_05;
-            Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
-            int x1 = internal.getX();
-            int y1 = internal.getY();
-            int xpos = x1 - 1;
-            int ypos = sf.getSizeY() - y1;
-            int xpos64 = xpos * 64;
-            int ypos64 = ypos * 64;
-            int actx1 = xpos64;
-            int acty1 = ypos64;
-            // direction dependend part:
-            int x2 = x1 - 1;
-            int y2 = y1;
-            int actx2 = actx1 - 64;
-            int acty2 = acty1;
-            if (MOVE_ROB_ANIMATION_DELAY > 0) {
+
+            int xpos64 =  (internal.getX()-2) * FELDSIZE;
+            int ypos64 = (sf.getSizeY() - internal.getY())* FELDSIZE;                         
+          
+            BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64,clipLength, FELDSIZE);
+            Raster blank = tmpImage.getData();
+            Graphics2D myg = (Graphics2D) tmpImage.getGraphics();    
+            myg.setComposite(ac);
                 for (int xoffset = 0; xoffset >= -64; xoffset -= MOVE_ROB_ANIMATION_OFFSET) {
-                    paintRobotForMoveAnimation(g2, imgRob,
-                            x1, y1, actx1, acty1,
-                            x2, y2, actx2, acty2,
-                            xpos64 + xoffset, ypos64,
-                            ac, ac2);
-                    try {
-                        Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                    tmpImage.setData(blank);                                   
+                     myg.drawImage(imgRob, FELDSIZE+xoffset,0, FELDSIZE, FELDSIZE, this); // paint the image                                                                                        
+                     g2.drawImage(tmpImage, xpos64, ypos64, clipLength, FELDSIZE,this);
+                   try {
+                         Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
                     } catch (InterruptedException ie) {
                         CAT.warn("BoardView.paint: wait int moveRobWest interrupted");
                     }
+                   
                 }
-            } else {
-                for (int xoffset = 0; xoffset >= -64; xoffset -= MOVE_ROB_ANIMATION_OFFSET) {
-                    paintRobotForMoveAnimation(g2, imgRob,
-                            x1, y1, actx1, acty1,
-                            x2, y2, actx2, acty2,
-                            xpos64 + xoffset, ypos64,
-                            ac, ac2);
-                }
-            }
+                tmpImage.setData(blank);            
         }
     }
+    
 
-
-    protected void animateRobMove(Bot rob, int direction) {
+    protected synchronized void animateRobMove(Bot rob, int direction) {
         // important: according to the code on SpielfeldSim we do not get
         //            the updated robot position;
         //            the updated position will be the endposition of the total move,
@@ -628,13 +558,13 @@ public class BoardView extends JLayeredPane {
         }
         int oldX = internal.getX();
         int oldY = internal.getY();
-
+     
         // paint the move animation  and update the position in my internal robot array
         switch (direction) {
             case NORTH:
                 {
                     if (oldY < sf.getSizeY()) {
-                        moveRobNorth(internal, robocount);
+                        moveRobNorth(internal, robocount, (Graphics2D)getGraphics());
                         internal.setPos(oldX, oldY + 1);
                     }
                     return;
@@ -642,7 +572,7 @@ public class BoardView extends JLayeredPane {
             case EAST:
                 {
                     if (oldX < sf.getSizeX()) {
-                        moveRobEast(internal, robocount);
+                        moveRobEast(internal, robocount,(Graphics2D)getGraphics());
                         internal.setPos(oldX + 1, oldY);
                     }
                     return;
@@ -650,7 +580,7 @@ public class BoardView extends JLayeredPane {
             case WEST:
                 {
                     if (oldX > 1) {
-                        moveRobWest(internal, robocount);
+                        moveRobWest(internal, robocount,(Graphics2D)getGraphics());
                         internal.setPos(oldX - 1, oldY);
                     }
                     return;
@@ -658,7 +588,7 @@ public class BoardView extends JLayeredPane {
             case SOUTH:
                 {
                     if (oldY > 1) {
-                        moveRobSouth(internal, robocount);
+                        moveRobSouth(internal, robocount,(Graphics2D)getGraphics());
                         internal.setPos(oldX, oldY - 1);
                     }
                     return;
@@ -684,15 +614,15 @@ public class BoardView extends JLayeredPane {
         //  allDone = false;
         if (CAT.isDebugEnabled())
             CAT.debug("doRobLaser: " + sourceRob.getName() + " -> " + targetRob.getName());
-        source = sourceRob.getPos();
-        target = targetRob.getPos();
-        laserFacing = sourceRob.getFacing();
+        Location source = sourceRob.getPos();
+        Location target = targetRob.getPos();
+        int  laserFacing = sourceRob.getFacing();
         int laenge = calculateLaserLength(source, target, laserFacing);
         laenge *= 64;
 
         String name = sourceRob.getName();
 
-        Color c = getRobColor(name);
+        Color robColor = getRobColor(name);
         
         synchronized (this) {
             try {
@@ -706,7 +636,7 @@ public class BoardView extends JLayeredPane {
                 int tmp_laenge = (int) ((((double) i) / FULL_LENGTH_DOUBLE) * laenge);
                 Graphics2D g2 = (Graphics2D) getGraphics();
                 g2.scale(dScale, dScale);
-                paintActiveRobLaser(g2, tmp_laenge, c);
+                paintActiveRobLaser(g2, source, laserFacing,tmp_laenge, robColor);
 
                 //     synchronized(this){
                 try {
@@ -765,7 +695,7 @@ public class BoardView extends JLayeredPane {
         return pixel;
     }
 
-    private void paintActiveRobLaser(Graphics g, int actualLength, Color c) {
+    private void paintActiveRobLaser(Graphics g, Location source, int laserFacing, int actualLength, Color c) {
         // Laser sollen immer von Source nach Target gezeichnet werden
 
         int breite = 4; // Die Breite des Lasers, sollte gerade sein
@@ -837,8 +767,8 @@ public class BoardView extends JLayeredPane {
     private int calculateLaserLength(Location source, Location target, int facing) {
 
         int laenge = 0;
-        laserFacing = facing;
-        switch (laserFacing) {
+       
+        switch (facing) {
             case NORTH:
                 {
                     laenge = target.y - source.y;
@@ -861,14 +791,14 @@ public class BoardView extends JLayeredPane {
                 }
             default:
                 {
-                    CAT.error("BoardView.calculateLaserLength(): ungueltige Laserrichtung: " + laserFacing);
+                    CAT.error("BoardView.calculateLaserLength(): ungueltige Laserrichtung: " + facing);
                 }
         }
         //System.err.println("calculate Length: ("+source.x+","+source.y+")-"+facing+"->("+target.x+","+target.y+") ist "+laenge+" lang");
         return laenge;
     }
 
-    private void paintActiveBordLaser(Graphics g, Color c, int actualLength) {
+    private void paintActiveBordLaser(Graphics g, Location source, int facing, Color c, int actualLength) {
 
         Graphics2D g2d = (Graphics2D) g;
         AlphaComposite ac = AC_SRC_OVER;//, 0.5f
@@ -880,7 +810,7 @@ public class BoardView extends JLayeredPane {
         int lSourceY = 0; // Anfangspunkt des Lasers in Pixeln,
         Location tmp = mapC2PixelCenter(source.x, source.y);
         // synchronized (lock) {
-        switch (laserFacing) {
+        switch (facing) {
             case NORTH:
                 {
                     lSourceX = tmp.x - (breite / 2 - 1);
@@ -921,7 +851,7 @@ public class BoardView extends JLayeredPane {
             default :
                 {
                     CAT.error("BoardView.paintActiveRobLaser: ");
-                    CAT.error("Ungueltige Laserrichtung: " + laserFacing);
+                    CAT.error("Ungueltige Laserrichtung: " + facing);
                 }
         }// end switch facing
         //   allDone = true;
@@ -938,10 +868,9 @@ public class BoardView extends JLayeredPane {
      */
     protected void doBordLaser(Location laserPos, int laserDir, int strength, Location targetRob, JViewport surrounding) {
         // init laser values
-        source = laserPos;
-        target = targetRob;
-        laserFacing = laserDir;
-        int laenge = calculateLaserLength(source, target, laserFacing);
+      
+
+        int laenge = calculateLaserLength(laserPos, targetRob, laserDir);
         laenge = laenge * 64 + 17;
         Color c = laserColor[strength - 1];
 
@@ -959,7 +888,7 @@ public class BoardView extends JLayeredPane {
             int tmp_laenge = (int) ((((double) i) / FULL_LENGTH_DOUBLE) * laenge);
             Graphics2D g2 = (Graphics2D) getGraphics();
             g2.scale(dScale, dScale);
-            paintActiveBordLaser(g2, c, tmp_laenge);
+            paintActiveBordLaser(g2, laserPos, laserDir, c, tmp_laenge);
 
         }
         // activeBordLasers=false; // now paint the non-animated
@@ -1020,7 +949,7 @@ public class BoardView extends JLayeredPane {
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     protected void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty) {
-        paintFeldBoden(g, xpos, ypos, actx, acty, 64, 64);
+        paintFeldBoden(g, xpos, ypos, actx, acty, FELDSIZE, FELDSIZE);
     }
 
    //TODO: Make method private again and find a proper way to update the hash map if nec.
@@ -1549,28 +1478,36 @@ public class BoardView extends JLayeredPane {
     }
 
 
+
+    
     /** Some performance optimizations..*/
-    private void paintRobotForMoveAnimation(Graphics2D g2d, Image botImage,
+    private BufferedImage paintRobotForMoveAnimation(Graphics2D g2d, Image botImage,
                                             int xpos, int ypos, int actx, int acty,
                                             int x2, int y2, int actx2, int acty2,
                                             int xpos64, int ypos64,
-                                            AlphaComposite ac, AlphaComposite ac2) {
+                                            AlphaComposite ac, AlphaComposite ac2, BufferedImage tmpImage) {
         // erase the old robot image from the square of its original position by
         // painting it again
-        paintFeldWithElements(g2d, xpos, ypos, actx, acty);
+       //XXX HS paintFeldWithElements(g2d, xpos, ypos, actx, acty);
         // erase the old robot image from the square the robot is moving to
-        paintFeldWithElements(g2d, x2, y2, actx2, acty2);
-
+        //XXX HSpaintFeldWithElements(g2d, x2, y2, actx2, acty2);
+      //  BufferedImage tmpImage = preBoard.getSubimage(minx, miny, width,height);
+        Graphics2D myg = (Graphics2D) tmpImage.getGraphics();
 
         if (ac2 != null) {// robot is virtual
-            g2d.setComposite(ac2); // set the robot image to be half transparent
-            g2d.drawImage(botImage, xpos64, ypos64, 64, 64, this); // paint the image
-            g2d.setComposite(ac); // reset the transparency level as the next call
+            myg.setComposite(ac2); // set the robot image to be half transparent
+            myg.drawImage(botImage, xpos64, ypos64, FELDSIZE, FELDSIZE, this); // paint the image
+           
+            
+            myg.setComposite(ac); // reset the transparency level as the next call
             // of this method will start with painting the
             // background again
-        } else // robot is not virtual
-            g2d.drawImage(botImage, xpos64, ypos64, 64, 64, this);
-
+        }
+        else { // robot is not virtual
+            myg.drawImage(botImage, xpos64, ypos64, FELDSIZE, FELDSIZE, this);
+        }
+       return tmpImage;
+     //   g2d.drawImage(tmpImage, minx,miny,width,height,this);
         // for animating we will skip to paint the name of the bot
 
     }
@@ -1681,9 +1618,9 @@ public class BoardView extends JLayeredPane {
 
     private BufferedImage getBoardImage() {
         //preBoard = new BufferedImage(x,y, BufferedImage.TYPE_BYTE_INDEXED);
-        BufferedImage bi = new BufferedImage(x, y, BufferedImage.TYPE_INT_RGB);
+        BufferedImage bi = new BufferedImage(widthInPixel, heightInPixel, BufferedImage.TYPE_INT_RGB);
         g_off = (Graphics2D) bi.getGraphics();
-        g_off.setClip(0, 0, x, y);
+        g_off.setClip(0, 0, widthInPixel, heightInPixel);
         g_off.scale(dScale, dScale);
         paintUnbuffered(g_off);
         g_off.dispose();
@@ -1764,7 +1701,7 @@ public class BoardView extends JLayeredPane {
         BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = bi.createGraphics();
         g2.setClip(0, 0, size, size);
-        g2.scale(((double) size) / x, ((double) size) / y);
+        g2.scale(((double) size) / widthInPixel, ((double) size) / heightInPixel);
         paintUnbuffered(g2);
         g2.dispose();
 
@@ -1773,9 +1710,9 @@ public class BoardView extends JLayeredPane {
 
     private void ersetzeSpielfeld(SimBoard sfs) {
         sf = sfs;
-        x = (int) (sf.getSizeX() * scaledFeldSize);
-        y = (int) (sf.getSizeY() * scaledFeldSize);
-        setSize(x, y);
+        widthInPixel = (int) (sf.getSizeX() * scaledFeldSize);
+        heightInPixel = (int) (sf.getSizeY() * scaledFeldSize);
+        setSize(widthInPixel, heightInPixel);
         initFloorHashMap();
     }
 
