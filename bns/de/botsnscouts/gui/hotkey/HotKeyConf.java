@@ -41,17 +41,20 @@ public class HotKeyConf {
   public static final String HOTKEY_ZOOM_IN = "keyZoomIn";
   public static final String HOTKEY_ZOOM_OUT = "keyZoomOut";
 
-  public static String getOptinalValue(String keyName) {
-    String s = Conf.getProperty(keyName+TEXT_SUFFIX);
+
+  public static final String MESSAGE_BUNDLE_SECTION = "HotKeyDescription";
+
+  public static String [] getOptinalValues(String keyName) {
+    String []  s = Conf.getMultipleProperty(keyName+TEXT_SUFFIX);
     if ( s == null )
-      return "";
+      return new String [] {""};
     else
       return s;
   }
 
   public static Integer getKeyCode(String keyName){
      String s = Conf.getProperty(keyName+CODE_SUFFIX);
-     CAT.debug("laoding code: name="+keyName+"\tvalue="+s);
+     CAT.debug("loading code: name="+keyName+"\tvalue="+s);
      if (s==null || s.trim().length()<1){
       CAT.debug("returing null");
       return null;
@@ -78,18 +81,21 @@ public class HotKeyConf {
   }
 
   protected static void setKeyCode (String keyName, Integer i) {
+    if (i!=null && isReserved(i.intValue()))
+      return;
+
     Conf.setProperty(keyName+CODE_SUFFIX, (i==null?"":i.toString()));
     save();
   }
 
-  protected static void setOptionalValue(String keyName, String value) {
-    Conf.setProperty(keyName+TEXT_SUFFIX, value);
+  protected static void setOptionalValues(String keyName, String [] values) {
+    Conf.setMultipleProperty(keyName+TEXT_SUFFIX, values);
     save();
   }
 
 
   public static String getDescription (String keyName) {
-    return Message.say("HotKeyDescription", keyName);
+    return Message.say(MESSAGE_BUNDLE_SECTION, keyName);
   }
 
   private static void save(){

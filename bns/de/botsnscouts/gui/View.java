@@ -48,6 +48,7 @@ public class View extends JFrame {
     static Category CAT = Category.getInstance(View.class);
 
     private ChatPane chatpane;
+    private ChatLine chatLine;
     private JMenuBar menus;
 
     private HotKeyMan keyMan = new HotKeyMan();
@@ -89,7 +90,21 @@ public class View extends JFrame {
 	this.getContentPane().add(sp, BorderLayout.CENTER);
     }
 
+  private void initChatLine(java.awt.Point p) {
+        if (humanView == null) {
+          CAT.warn("tried to activate Chat for a GUI without an active plaxer!");
+          return;
+        }
+        chatLine = new ChatLine(ausgabeView, humanView.getHumanPlayer());
+        chatLine.setSize( chatLine.getPreferredSize() );
+        chatLine.setLocation( p.x + 2, p.y + 2 );
+        chatLine.setVisible( false );
+  }
 
+  private void showChatLine() {
+     chatLine.setVisible( true );
+     chatLine.text.requestFocus();
+  }
 
   /** Create hotkeys that will be enabled if this is a GUI of a
    *  participating player.
@@ -97,18 +112,52 @@ public class View extends JFrame {
    */
 
   private void initPlayerOnlyHotKeys(){
-    CAT.debug("initPlayerOnlyHotKeys()");
+     CAT.debug("initPlayerOnlyHotKeys()");
+     HotKeyAction  act = new HotKeyActionAdapter() {
+            public void execute(){
+                showChatLine();
+            }
+    };
+    // this strange way of creating a hotkey for "enter" is needed because
+    // of the crappy IBM KeyEvent..
+    HotKey k = new HotKey(HotKeyConf.HOTKEY_SHOW_CHATLINE,
+                          new Integer(HotKeyConf.SHOW_CHATLINE),
+                          act);
+    keyMan.setHotKey(k);
+
+
      String [] preparedChatMessages = HotKeyConf.MSGS;
       for (int i=0;i<HotKeyConf.MSGS.length;i++) {
         CAT.debug("creating Hotkey for: "+preparedChatMessages [i]);
-        String s = HotKeyConf.getOptinalValue(preparedChatMessages[i]);
-          HotKeyAction act = new ChatMessageHotKeyActionAdapter(new JTextField(s)){
+        ChatMessageEditor editPanel;
+        String [] s = HotKeyConf.getOptinalValues(preparedChatMessages[i]);
+        if (s == null || s.length==0) {
+          CAT.debug("no message properties found");
+          editPanel = new ChatMessageEditor();
+        }
+        else if (s.length==1){
+          CAT.debug("found chatmessage: "+s[0]);
+          CAT.debug("did not find autoCommit");
+          editPanel = new ChatMessageEditor(s[0], true);
+        }
+        else { //s.length>1
+          CAT.debug("found chatmessage: "+s[0]);
+          CAT.debug("found autoCommit property: "+s[1]);
+          editPanel = new ChatMessageEditor(s[0], new Boolean(s[1]).booleanValue());
+        }
+          HotKeyAction act2 = new ChatMessageHotKeyActionAdapter(editPanel){
           public void execute() {
-            humanView.sendChatMessage(getOptionalValue());
+            ChatMessageEditor edit = (ChatMessageEditor) this.getOptionalComponent();
+            if (edit.isAutoCommit())
+              humanView.sendChatMessage(edit.getMessage());
+            else {
+              chatLine.text.setText(edit.getMessage());
+              showChatLine();
+            }
+
           }
         };
-
-        keyMan.setHotKey(preparedChatMessages [i], act);
+        keyMan.setHotKey(preparedChatMessages [i], act2);
 
       }
      if (CAT.isDebugEnabled())
@@ -124,6 +173,9 @@ public class View extends JFrame {
   */
     private void initHotKeys() {
         CAT.debug("initHotKeys()");
+
+
+
         keyMan = ausgabeView.getHotKeyManager();
         if (humanView != null) {
             initPlayerOnlyHotKeys();
@@ -230,6 +282,8 @@ public class View extends JFrame {
       CAT.debug("Leaving addMenubar");
     }
 
+
+
     protected void makeVisible() {
         CAT.debug("makeVisible called");
         addMenuBar();
@@ -247,31 +301,8 @@ public class View extends JFrame {
         this.getLayeredPane().add( logFloatPane, JLayeredPane.MODAL_LAYER );
 
         if (humanView!=null) {
-          final ChatLine cp = new ChatLine( ausgabeView, humanView.getHumanPlayer() );
-
-
-           HotKeyAction  act = new HotKeyActionAdapter() {
-            public void execute(){
-               if( humanView == null )
-                 return;
-               cp.setVisible( true );
-               cp.text.requestFocus();
-
-            }
-          };
-          // this strange way of creating a hotkey for "enter" is needed because
-          // of the crappy IBM KeyEvent..
-          HotKey k = new HotKey(HotKeyConf.HOTKEY_SHOW_CHATLINE,
-                                new Integer(HotKeyConf.SHOW_CHATLINE),
-                                act);
-          keyMan.setHotKey(k);
-
-          cp.setSize( cp.getPreferredSize() );
-          cp.setLocation( p.x + 2, p.y + 2 );
-          cp.setVisible( false );
-
-
-          this.getLayeredPane().add( cp, JLayeredPane.MODAL_LAYER );
+            initChatLine(p);
+            this.getLayeredPane().add( chatLine, JLayeredPane.MODAL_LAYER );
         }
 	this.validate();
 

@@ -19,7 +19,7 @@ public class HotKey{
     this.keyName = keyName;
     this.action = action;
     action.setDescription(HotKeyConf.getDescription(keyName));
-    action.setOptionalValue(HotKeyConf.getOptinalValue(keyName));
+    action.setOptionalValues(HotKeyConf.getOptinalValues(keyName));
 
   }
 
@@ -59,17 +59,20 @@ public class HotKey{
   }
 
   public void setAction(HotKeyAction action){
-    boolean save = !action.getOptionalValue().equals(action.getOptionalValue());
+    String [] values = action.getOptionalValues();
     this.action = action;
-    if (save)
-      HotKeyConf.setOptionalValue(keyName, action.getOptionalValue());
+    HotKeyConf.setOptionalValues(keyName, action.getOptionalValues());
   }
 
   public String toString() {
     StringBuffer sb = new StringBuffer("Hotkey: code= ").append(keyCode);
     sb.append("   name=").append(keyName);
     sb.append("  action=").append(action.toString());
-    sb.append("  optional=").append(action.getOptionalValue());
+    sb.append("  optional=");
+    String [] opts = action.getOptionalValues();
+    if (opts != null)
+      for (int i=0;i<opts.length;i++)
+        sb.append(opts[i]).append(',');
     return sb.toString();
   }
 

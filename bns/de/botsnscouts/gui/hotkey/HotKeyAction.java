@@ -9,22 +9,22 @@ public abstract class HotKeyAction{
   Category CAT = Category.getInstance(HotKeyAction.class);
 
   private String description;
-  private String optionalValue;
+  private String optionalValues [];
   private JComponent optionalComponent;
 
   public HotKeyAction(){
   }
 
   public HotKeyAction(String description,
-                      JComponent optionalComponent, String optionalValue){
+                      JComponent optionalComponent, String [] optionalValues){
 
     this.description = description;
     this.optionalComponent = optionalComponent;
-    this.optionalValue = optionalValue;
+    this.optionalValues = optionalValues;
   }
 
-   public HotKeyAction(JComponent optionalComponent, String optionalValue){
-    this (null, optionalComponent, optionalValue);
+   public HotKeyAction(JComponent optionalComponent, String [] optionalValues){
+    this ( null, optionalComponent, optionalValues);
 
   }
 
@@ -32,8 +32,8 @@ public abstract class HotKeyAction{
     return optionalComponent;
   }
 
-  public String getOptionalValue(){
-    return optionalValue;
+  public String [] getOptionalValues(){
+    return optionalValues;
   }
 
   protected void setDescription (String desc){
@@ -43,8 +43,8 @@ public abstract class HotKeyAction{
        CAT.warn("may not set HotKey description twice!");
   }
 
-  protected void setOptionalValue (String value) {
-    optionalValue = value;
+  protected void setOptionalValues (String [] values) {
+    optionalValues = values;
   }
 
   public abstract void execute();

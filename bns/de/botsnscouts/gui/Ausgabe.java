@@ -603,8 +603,8 @@ public class Ausgabe extends BNSThread {
     }
 
     protected void quit (boolean keepWatching) {
-        CAT.debug("Ausgabe sends quit..");
-        abmelden();
+       // CAT.debug("Ausgabe sends quit..");
+       // abmelden();
         CAT.debug("Ausgabe sets condition for exiting its run method..");
         spielEnde=true;
         CAT.debug("Ausgabe tells the view to propagate quitting..");
