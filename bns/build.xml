@@ -8,7 +8,7 @@
   <property name="dist" value="dist"/>
   <property name="doc" value="docs" />
   <property name="jars" value="lib"/>
-  <property name="bns.ver" value="0.8.2" />     
+  <property name="bns.ver" value="0.8.9" />     
 
   <target name="init">
      <!-- Create the time stamp -->
@@ -80,7 +80,8 @@
   <target name="compile" depends="init">
     <!-- Compile the java code from ${src} into ${build} -->
     <javac srcdir="${src}" includes="${maindir}/**/*.java" 
-     destdir="${build}" deprecation="on">
+     destdir="${build}" deprecation="on" 
+    	debug="true">
       <classpath>
          <fileset dir="${jars}" includes="*.jar" />
       </classpath>	      
