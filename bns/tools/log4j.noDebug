@@ -24,6 +24,9 @@ log4j.appender.F1.File=botsnscouts.log
 log4j.appender.A1.layout=org.apache.log4j.PatternLayout
 log4j.appender.F1.layout=org.apache.log4j.PatternLayout
 
+# Truncate 'test' if it aleady exists.
+log4j.appender.F1.Append=false  
+
 # The conversion pattern consists of date in ISO8601 format, priority,
 # thread name, category name truncated to its rightmost two components
 # and left justified to 17 characters, location information consisting
