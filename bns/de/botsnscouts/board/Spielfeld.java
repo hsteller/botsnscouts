@@ -5,7 +5,7 @@ package de.botsnscouts.board;
  * Ausgabe, Spielern und Server verwendet werden (ggf.
  * extended).
  * @author: Dirk Materlik
- */ 
+ */
 
 import de.botsnscouts.util.*;
 
@@ -18,17 +18,17 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 
   // Wandgerätetypen
   // ================
-   
+
   /** Kein Wandgerät in der Wand */
   public static final int WKEINS = 0;
   /**  Laser in der Wand */
   public static final int WLASER = 1;
   /**  Pusher in der Wand */
   public static final int WPUSHER = 2;
-  
+
   //  Bodentypen
   //  ==========
-  
+
   /** Boden Grube */
   public static final int BDGRUBE   = -1;
   /** Boden normaler Boden */
@@ -67,63 +67,63 @@ public class Spielfeld implements de.botsnscouts.util.Directions
   /** Fliessband Richtung Norden, Geschwindigkeit 2 */
   public static final int FN2 = 200; //
   /** Fliessband Richtung Osten,  Geschwindigkeit 2 */
-  public static final int FO2 = 201; // 
+  public static final int FO2 = 201; //
   /** Fliessband Richtung Sueden, Geschwindigkeit 2 */
-  public static final int FS2 = 202; // 
+  public static final int FS2 = 202; //
   /** Fliessband Richtung Westen, Geschwindigkeit 2 */
-  public static final int FW2 = 203; // 
+  public static final int FW2 = 203; //
 
     // Fliessbaender - abbiegen -  normal
 
   /** Fließband Abbiegen (Richtung) Norden von Westen*/
-  public static final int NVW1 = 120;   
+  public static final int NVW1 = 120;
   /** Fließband Abbiegen (Richtung) Norden von Osten */
-  public static final int NVO1 = 130;   
+  public static final int NVO1 = 130;
   /** Fließband Abbiegen (Richtung) Osten von Norden */
-  public static final int OVN1 = 121;   
+  public static final int OVN1 = 121;
   /** Fließband Abbiegen (Richtung) Osten von Sueden */
-  public static final int OVS1 = 131;   
+  public static final int OVS1 = 131;
   /** Fließband Abbiegen (Richtung) Süden von Westen */
-  public static final int SVW1 = 132;   
+  public static final int SVW1 = 132;
   /** Fließband Abbiegen (Richtung) Süden von Osten */
-  public static final int SVO1 = 122;    
+  public static final int SVO1 = 122;
   /** Fließband Abbiegen (Richtung) Westen von Norden */
-  public static final int WVN1 = 133;   
+  public static final int WVN1 = 133;
   /** Fließband Abbiegen (Richtung) Westen von Süden */
-  public static final int WVS1 = 123;   
+  public static final int WVS1 = 123;
   /** Fließband Abbiegen (Richtung)  Norden von  Westen oder Osten */
-  public static final int NVWO1 = 150;   
+  public static final int NVWO1 = 150;
   /** Fließband Abbiegen (Richtung)  Osten von   Norden oder Süden */
-  public static final int OVNS1 = 151;   
+  public static final int OVNS1 = 151;
   /** Fließband Abbiegen (Richtung)  Süden von  Westen oder Osten */
-  public static final int SVWO1 = 152;   
+  public static final int SVWO1 = 152;
   /** Fließband Abbiegen (Richtung)  Westen von  Nord oder Süden */
-  public static final int WVNS1 = 153;           
+  public static final int WVNS1 = 153;
 
   // Fliessbaender - abbiegen - express
   //
   /** Express-Fließband Abbiegen (Richtung) Norden von Westen (kommend) */
-  public static final int NVW2 = 220;   
+  public static final int NVW2 = 220;
   /** Express-Fließband Abbiegen (Richtung) Norden von Osten */
-  public static final int NVO2 = 230;   
+  public static final int NVO2 = 230;
   /** Express-Fließband Abbiegen (Richtung) Osten von Norden */
-  public static final int OVN2 = 221;   
+  public static final int OVN2 = 221;
   /** Express-Fließband Abbiegen (Richtung) Osten von Sueden */
-  public static final int OVS2 = 231;   
+  public static final int OVS2 = 231;
   /** Express-Fließband Abbiegen (Richtung) Süden von Westen */
-  public static final int SVW2 = 232;   
+  public static final int SVW2 = 232;
   /** Express-Fließband Abbiegen (Richtung) Süden von Osten */
-  public static final int SVO2 = 222;    
+  public static final int SVO2 = 222;
   /** Express-Fließband Abbiegen (Richtung) Westen von Norden */
-  public static final int WVN2 = 233;   
+  public static final int WVN2 = 233;
   /** Express-Fließband Abbiegen (Richtung) Westen von Süden */
-  public static final int WVS2 = 223;   
+  public static final int WVS2 = 223;
   /** Express-Fließband Abbiegen (Richtung)  Norden von  Westen oder Osten */
-  public static final int NVWO2 = 250;   
+  public static final int NVWO2 = 250;
   /** Express-Fließband Abbiegen (Richtung)  Osten von   Norden oder Süden */
-  public static final int OVNS2 = 251;   
+  public static final int OVNS2 = 251;
   /** Express-Fließband Abbiegen (Richtung)  Süden von  Westen oder Osten */
-  public static final int SVWO2 = 252;   
+  public static final int SVWO2 = 252;
   /** Express-Fließband Abbiegen (Richtung)  Westen von  Nord oder Süden */
   public static final int WVNS2 = 253;
 
@@ -131,15 +131,15 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 
   /** Die Spielfeldgroesse */
   protected int sizeX,sizeY;
- 
-  /** Die Bodentypen 
-   *  2-dimensional   1. x-Koordinate 
+
+  /** Die Bodentypen
+   *  2-dimensional   1. x-Koordinate
    *                  2. y-Koordinate
    */
   protected Boden[][] boden;
-    
+
   // Die Waende
-  // 
+  //
   /** 2-dimensionales Wand-Array vertikal */
   protected Wand[][] vWand;    // vertikale Waende
   /** 2-dimensionales Wand-Array horizontal */
@@ -172,13 +172,13 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	    sizeY=s1.sizeY;
 	    if (sizeY!=s2.sizeY)
 		throw new FormatException("Die beiden Spielfelder sind nicht gleich hoch!");
-	    
+
 	    initArys();
-	    
+
 	    // Erstes reinkopieren
 	    for (int x=1;x<=s1.sizeX;x++)
 		for (int y=1;y<=sizeY;y++)
-		    boden[x][y]=s1.boden[x][y];		    
+		    boden[x][y]=s1.boden[x][y];
 	    for (int x=0;x<=s1.sizeX;x++)
 		for (int y=0;y<sizeY;y++)
 		    vWand[x][y]=s1.vWand[x][y];
@@ -203,19 +203,19 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 		vWand[s1.sizeX][y].wandEl[0]=s1.vWand[s1.sizeX][y].wandEl[0];
 		vWand[s1.sizeX][y].spez[0]=s1.vWand[s1.sizeX][y].spez[0];
 	    }
-		    
+
 	}else{ //untereinander
 	    sizeX=s1.sizeX;
 	    sizeY=s1.sizeY+s2.sizeY;
 	    if (sizeX!=s2.sizeX)
 		throw new FormatException("Die beiden Spielfelder sind nicht gleich breit!");
-	    
+
 	    initArys();
-	    
+
 	    // Erstes reinkopieren
 	    for (int x=1;x<=s1.sizeX;x++)
 		for (int y=1;y<=sizeY;y++)
-		    boden[x][s2.sizeY+y]=s1.boden[x][y];		    
+		    boden[x][s2.sizeY+y]=s1.boden[x][y];
 	    for (int x=0;x<=s1.sizeX;x++)
 		for (int y=0;y<sizeY;y++)
 		    vWand[x][s2.sizeY+y]=s1.vWand[x][y];
@@ -239,7 +239,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 		hWand[x][s2.sizeY].da=s1.vWand[x][0].da||s2.vWand[x][s2.sizeY].da;
 		vWand[x][s2.sizeY].wandEl[0]=s1.vWand[x][0].wandEl[0];
 		vWand[x][s2.sizeY].spez[0]=s1.vWand[x][0].spez[0];
-	    }	    
+	    }
 	}
 
 	SpielfeldString = getComputedString();
@@ -259,7 +259,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
       SpielfeldString=kacheln;
 
       initArys();
-   
+
       int strpos=0;            // Current pos in the String
       Wand neu;
       Boden nbo;
@@ -318,7 +318,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	}
     }
 
-    protected void checkFlaggen(Ort[] f) throws FlaggenException 
+    protected void checkFlaggen(Ort[] f) throws FlaggenException
     {
       // prueft ob Flaggen regelkonform plaziert sind (sonst Exception)
       // und ob sie "gut" sind - sonst kann man die Probleme mit
@@ -328,14 +328,14 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	flaggenProbleme=Message.say("Spielfeld","mFlagProbNoFlagSet");
 	return;
       }
-      
+
       for (int i=0;i<f.length;i++){
 	  if ((f[i].x>sizeX)||(f[i].y>sizeY))
 	      throw new FlaggenException(Message.say("Spielfeld","eFlagNotInField",(i+1)));
 	  if (bo(f[i].x,f[i].y).typ==BDGRUBE)
 	      throw new FlaggenException(Message.say("Spielfeld","eFlagOnHole",(i+1)));
       }
-      
+
       flaggenProbleme="";
       for (int i=0;i<f.length;i++){
 	int anzwand=0;
@@ -353,14 +353,14 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	    // flaggenProbleme+=Message.say("Spielfeld","mFlagProbManyWalls",(i+1),anzwand); //original
 	    flaggenProbleme+=Message.say("Spielfeld","mFlagProbManyWalls",anzwand);//geändert
 	}
-	
+
 	if (bo(f[i].x,f[i].y).typ >= 100){ //Fliessband
 	    //flaggenProbleme+=Message.say("Spielfeld","mFlagProbConvBelt",(i+1));//original
 	    flaggenProbleme+=Message.say("Spielfeld","mFlagProbConvBelt");//gfeändert
 	}
       }
     }
-    
+
     public String getFlaggenProbleme()
     {
       return flaggenProbleme;
@@ -455,7 +455,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	  }
 	}
 	s.append(")]");
-	
+
 	break;
       }
     }
@@ -553,7 +553,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	  s.append(RUECK[((typ%10)+1)%4]);
 	  s.append(",D(R))");
 	}
-	else if (((typ/10)%10)==5){ // beides 
+	else if (((typ/10)%10)==5){ // beides
 	    if (drehen){
 		s.append('(');
 		s.append(RUECK[((typ%10)+3)%4]);
@@ -582,7 +582,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	break;
       } //switch typ
     }
-  
+
   private int parseBoden(int pos,String s,Boden neu) throws FormatException
     {
       if (is(s,pos,'B')){
@@ -664,7 +664,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	  //if(((typus%100)/10)>1)
 	  //  throw new FormatException("Keine Crusher auf Drehfliessbaendern! Problem nahe Zeichen "+pos);
 	  //else if (((typus%100)/10)==0) //sonst ist's schon erhöht
-	  //  typus+=10;                                                 
+	  //  typus+=10;
 	}
 	assert(s,pos++,')');
 	assert(s,pos++,')');
@@ -703,7 +703,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	default:// Es werden nur vernuenftige Drehfliessbaender unterstuetzt. Problem bei Zeichen "pos"
 	  throw new FormatException(Message.say("Spielfeld","xTurnConvBeltNoSense",pos));
 	}
-	break;                        
+	break;
       case FSUED:
 	switch(from){
 	case 'E':
@@ -754,7 +754,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	  //d("Schieber [0] found");
 	  strpos=parseS(++strpos,kacheln,neu,0);
 	}
-	assert(kacheln,strpos++,'#');     
+	assert(kacheln,strpos++,'#');
       }
       else // "Fand keinen der erlaubten Chars '#_[' in Position "strpos"; da ist:"kacheln.charAt(strpos)"
 	throw new FormatException(Message.say("Spielfeld","xCharsNotFound","#_[",strpos,""+kacheln.charAt(strpos)));
@@ -784,7 +784,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
       it.wandEl[index]=WPUSHER;
       it.spez[index]=tmp;
       return pos;
-    }                   
+    }
   private int parseL(int pos,String s,Wand it,int index) throws FormatException
     {
       assert(s,pos++,'(');
@@ -793,13 +793,13 @@ public class Spielfeld implements de.botsnscouts.util.Directions
       it.wandEl[index]=WLASER;
       it.spez[index]=str;
       return pos;
-    }        
+    }
   private static boolean is(String s,int pos,char c)
     {
       return s.charAt(pos)==c;
     }
   private void assert(String s,int pos,char c) throws FormatException
-    {   
+    {
       //d("assert: Erwarte "+c+" an Pos "+pos+" ;da ist "+s.charAt(pos));
       if (s.charAt(pos)!=c)
 	  throw new FormatException(Message.say("Spielfeld","xExpectedChar",c,pos)); // "c" erwartet an Position "pos"
@@ -900,14 +900,14 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	}
 	p("");
       }
-    }           
+    }
 
 
   /* Bodentyp */
   public Boden bo(int x,int y) {
     return(boden[x][y]);
   }
-  
+
   /* Nordwand */
   public Wand nw(int x,int y) {
     return(hWand[x-1][y]);
@@ -944,6 +944,18 @@ public class Spielfeld implements de.botsnscouts.util.Directions
   public boolean isPusherActive(int spez,int phase)
     {
       return((spez>>(phase-1))%2==1);
+    }
+
+    public Wand[][] getVWand() {
+        return vWand;
+    }
+
+    public Wand[][] getHWand() {
+        return hWand;
+    }
+
+    public Boden[][] getBoden() {
+        return boden;
     }
 }
 

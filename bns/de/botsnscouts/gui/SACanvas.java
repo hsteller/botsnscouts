@@ -1212,33 +1212,26 @@ public class SACanvas extends JComponent {
     BufferedImage preBoard = null;
 
     /** ein Image des Spielfeldes anlegen, ohne aktive Elemente */
-    private void createBoardImage() {
+    private void prepareBoardImage() {
+	preBoard = getBoardImage();
+    }
+
+    public BufferedImage getBoardImage() {
 	//preBoard = new BufferedImage(x,y, BufferedImage.TYPE_BYTE_INDEXED);
-	preBoard = new BufferedImage(x,y, BufferedImage.TYPE_INT_RGB);
-	g_off = (Graphics2D)preBoard.getGraphics();
+        BufferedImage bi = new BufferedImage(x,y, BufferedImage.TYPE_INT_RGB);
+	g_off = (Graphics2D)bi.getGraphics();
 	g_off.setClip(0,0,x,y);
 	g_off.scale( dScale, dScale );
 	paintUnbuffered( g_off );
 	g_off.dispose();
+        return bi;
     }
 
 
-
     public void paintComponent(Graphics g) {
-	/*
-	  // the old-offscreen-image code
-	if(dbi == null || rescaled ) {
-	    createOffscreenImage();
-	    rescaled = false;
-	}
-	Graphics2D dbg = (Graphics2D)g_off;
-	Rectangle clip = g.getClipBounds();
-	//dbg.setClip( clip );
-	*/
-
 	// Blit the board (it's already scaled)
 	if( preBoard == null ) {
-	    createBoardImage();
+	    prepareBoardImage();
 	}
 	g.drawImage(preBoard, 0, 0, this);
 
@@ -1247,25 +1240,12 @@ public class SACanvas extends JComponent {
 	paintHighlight( dbg );
 
 	dbg.scale( dScale, dScale );
-	//paintSpielfeldBoden( dbg );
-	//paintLaserStrahlen( dbg );
-	//paintWaende( dbg );
-	//paintFlaggen( dbg );
 
 	paintScout( dbg );
 	paintRobos( dbg );
-	/*
-	Rectangle rc = g.getClipBounds();
-	int x0 = rc.x,
-	    y0 = rc.y,
-	    x1 = rc.x + rc.width,
-	    y1 = rc.y + rc.height;
-	g.drawImage( dbi, 0, 0, this );
-	//g.drawImage(dbi, x0, y0, x1, y1, x0, y0, x1, y1, this);
-	*/
     }
 
-    private void paintUnbuffered(Graphics dbg) {
+    protected void paintUnbuffered(Graphics dbg) {
 	paintSpielfeldBoden( dbg );
 	paintLaserStrahlen( dbg );
 	paintWaende( dbg );

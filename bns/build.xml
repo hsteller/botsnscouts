@@ -97,7 +97,7 @@
   </target>
 
   <target name="editor" depends="compile">
-     <java classname="de.botsnscouts.board.KachelEditor" fork="true">
+     <java classname="de.botsnscouts.editor.BoardEditor" fork="true">
         <classpath>
 	   <fileset dir="${jars}" includes="*.jar" />
 	   <pathelement path="${build}" />
