@@ -360,8 +360,8 @@ public class Ausgabe extends BNSThread {
                         if( (me.getModifiers() & MouseEvent.BUTTON3_MASK) > 0) {
                             CAT.debug("mouse clicked in canvas " + me.getPoint() );
                             Ort ort = new Ort();
-                            SACanvas board = (SACanvas) me.getSource();
-                            board.point2Ort( me.getPoint(), ort );
+                            SACanvas brd = (SACanvas) me.getSource();
+                            brd.point2Ort( me.getPoint(), ort );
                             CAT.debug("corresponding ort is: " + ort );
                             ausgabeView.showPixelPos( me.getPoint().x, me.getPoint().y );
                         }

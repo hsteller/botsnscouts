@@ -111,9 +111,9 @@ public class SoundMan {
 		    
 		    soundsLoaded = true;
 
-		  } catch (Throwable t) {
+		  } catch (Throwable thr) {
 		    SoundMan.CAT.error("Error occured while loading sounds");
-		    SoundMan.CAT.debug(t);
+		    SoundMan.CAT.debug(thr);
                     SoundMan.CAT.error("sounds deactivated for safety..");
                     soundsLoaded=false;
                  }
