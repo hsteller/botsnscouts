@@ -357,7 +357,21 @@ public class Ausgabe extends BNSThread {
 						    flags);
 
 
-		ausgabeView = new AusgabeView(new SACanvas(sim,robotsNewColor),getRoboterArray(),this);
+                SACanvas board = new SACanvas(sim,robotsNewColor);
+                board.setAutoscrolls( true );
+		ausgabeView = new AusgabeView(board,getRoboterArray(),this);
+                board.addMouseListener( new MouseAdapter() {
+                    public void mouseReleased( MouseEvent me ) {
+                        if( (me.getModifiers() & MouseEvent.BUTTON3_MASK) > 0) {
+                            CAT.debug("mouse clicked in canvas " + me.getPoint() );
+                            Ort ort = new Ort();
+                            SACanvas board = (SACanvas) me.getSource();
+                            board.point2Ort( me.getPoint(), ort );
+                            CAT.debug("corresponding ort is: " + ort );
+                            ausgabeView.showPixelPos( me.getPoint().x, me.getPoint().y );
+                        }
+                    }
+                });
 
 		if (view == null) {
 		    view=new View(ausgabeView);
@@ -528,6 +542,10 @@ public class Ausgabe extends BNSThread {
 
     public void trackPos (int x, int y) {
 	ausgabeView.showPos(x,y);
+    }
+
+    public void trackPos (int x, int y, boolean highlight) {
+	ausgabeView.showPos(x,y, highlight);
     }
 
     public AusgabeView getAusgabeView() {

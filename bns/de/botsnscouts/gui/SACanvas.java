@@ -969,6 +969,24 @@ public class SACanvas extends JComponent {
 	dest.height = (int)scaledFeldSize;
     }
 
+    public Ort point2Ort( Point p, Ort ort ) {
+        ort.x = (int)(p.x / scaledFeldSize) + 1;
+        ort.y = (int)((getHeight() - p.y) / scaledFeldSize) + 1;
+        return ort;
+    }
+
+    public Point ort2Point( Ort ort, Point p ) {
+        return ort2Point( ort.x, ort.y, p );
+    }
+
+    public Point ort2Point( int ortx, int orty, Point p ) {
+        // returns left upper point of square
+	p.x = (int) ((ortx - 1) * scaledFeldSize);
+	p.y = (int) ((sf.getSizeY() - orty) * scaledFeldSize);
+        return p;
+    }
+
+
     Rectangle rc = new Rectangle();
     // for internal use. see repaintOrt()
 
@@ -992,20 +1010,28 @@ public class SACanvas extends JComponent {
 	repaint();
     }
 
+    private final javax.swing.Timer t = new javax.swing.Timer(5000, new ActionListener() {
+        public void actionPerformed(ActionEvent ae) {
+            unhighlight();
+        }
+    });
+
+
     void highlight(int x, int y) {
+        // remove old highlight:
+        repaintOrt( highlightPos );
+
 	System.out.println("highlighting 1 " + x + " " + y);
 	highlightPos.x = x;
 	highlightPos.y = y;
 
-	javax.swing.Timer t = new javax.swing.Timer(5000, new ActionListener() {
-		public void actionPerformed(ActionEvent ae) {
-		    unhighlight();
-		}
-	    });
+        CAT.debug( "going to highlight" );
+        //this.paintHighlight((Graphics2D)this.getGraphics());
+        if( !t.isRunning() )
+            t.start();
+        else
+            t.restart();
 
-	t.setRepeats(false);
-        this.paintHighlight((Graphics2D)this.getGraphics());
-	t.start();
 	repaintOrt(x,y);
     }
 
@@ -1076,20 +1102,29 @@ public class SACanvas extends JComponent {
       return robosCrop[facing+botVis*4];
     }
 
+
+    private final static Stroke[] hi = new Stroke[] {
+        new BasicStroke(6), new BasicStroke(4), new BasicStroke(2), new BasicStroke(1)
+    };
+    private final static Color[] hiColOut = new Color[] {
+        Color.red.darker().darker(), Color.red.darker(), Color.red, Color.red.brighter()
+    };
+    public final Color highCol1 = new Color(255, 0, 0, 255 );
+    public final Color highCol2 = new Color(255, 255, 0, 128 );
     private void paintHighlight(Graphics2D g) {
-	//	if( highlightPos.x != 0 ) {
-	    Rectangle rc = new Rectangle();
-	    ort2Rect(highlightPos, rc);
-	    g.setColor( Color.red );
-	    g.setStroke( new BasicStroke(4) );
-	    g.drawOval( rc.x, rc.y, rc.width, rc.height );
+        Rectangle rc = new Rectangle();
+        ort2Rect(highlightPos, rc);
+        rc.grow(-3,-3);
+        for(int i = 0; i < hi.length; i++ ) {
+            g.setColor( hiColOut[i] );
+            g.setStroke( hi[i] );
+            g.drawOval( rc.x, rc.y, rc.width, rc.height );
+        }
 
-	    AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
-	    g.setComposite(ac);
-	    g.fillOval( rc.x, rc.y, rc.width, rc.height );
-
-	    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
-	    //}
+        Paint p = new GradientPaint( rc.x, rc.y, highCol1, rc.x + rc.width, rc.y + rc.height, highCol2 );
+        g.setPaint( p );
+        rc.grow(-1, -1);
+        g.fillOval( rc.x, rc.y, rc.width, rc.height );
     }
 
 //     private void createOffscreenImage() {

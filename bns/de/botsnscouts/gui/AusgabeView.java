@@ -71,17 +71,18 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	// create status panel
 	for (int i=0; i< robots.length; i++) {
 	    RobotStatus r = new RobotStatus(robots[i],
-					    new MouseAdapter(){
-						    public void mouseClicked(MouseEvent me) {
-							ausgabe.trackRob(((JLabel)me.getSource()).getName());
-						    }
-						},
-					    new MouseAdapter(){
-						    public void mouseClicked(MouseEvent me) {
-							ausgabe.scrollFlag(Integer.parseInt(((JLabel)me.getSource()).getText()));
-						    }
-						}
-					    );
+                new MouseAdapter(){
+                        public void mouseClicked(MouseEvent me) {
+                            CAT.debug("tracking rob: " + ((JLabel)me.getSource()).getName() );
+                            ausgabe.trackRob(((JLabel)me.getSource()).getName());
+                        }
+                    },
+                new MouseAdapter(){
+                        public void mouseClicked(MouseEvent me) {
+                            ausgabe.scrollFlag(Integer.parseInt(((JLabel)me.getSource()).getText()));
+                        }
+                    }
+                );
 	    robotsStatusContainer.add(r);
 	    robotStatus.put(robots[i].getName(),r);
 
@@ -167,11 +168,25 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	}
     }
 
+    public void showPixelPos(int x, int y ) {
+        CAT.debug(" scroll request: " + x + " " + y );
+        Dimension d = gameBoardView.getExtentSize();
+        Rectangle r = new Rectangle( x-(d.width/2), y- (d.width/2), d.width, d.height );
+        CAT.debug(" corresponding rect: " + r );
+        gameBoardView.scrollRectToVisible( r );
+        gameBoardCanvas.scrollRectToVisible( r );
+    }
 
-    public void showPos(int robix, int robiy) {
+    public void showPos(int robix, int robiy ) {
+        showPos(robix, robiy, true);
+    }
 
-	int x = robix*64;
-	int y = gameBoardCanvas.getHeight()-(robiy*64);
+    public void showPos(int robix, int robiy, boolean highlight) {
+        Point p = gameBoardCanvas.ort2Point( robix, robiy, new Point());
+//	int x = robix*gameBoardCanvas.getScaledFeld;
+//	int y = gameBoardCanvas.getHeight()-(robiy*64);
+        int x = p.x;
+        int y = p.y;
 
 	Dimension sz = gameBoardView.getExtentSize();
 	int w2 = sz.width/2;
@@ -183,7 +198,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	int x1 = Math.max( x - w2 , 0);
 	int y1 = Math.max( y - h2 , 0);
 
-	// soll ich berhaupt scrollen?
+	// soll ich \uFFFDberhaupt scrollen?
 	// in X-Richtung
 	if ((x < ( (gameBoardView.getViewPosition().x)+10 ) ) ||
 	    x > ( (gameBoardView.getViewPosition().x+sz.width)-10 )) {
@@ -198,11 +213,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	}
 	else y1 = gameBoardView.getViewPosition().y;
 
-
 	gameBoardView.setViewPosition(new Point(x1, y1));
-        this.gameBoardCanvas.highlight(x, y);
-
-
+        if( highlight ) this.gameBoardCanvas.highlight(robix, robiy);
     }
 
 

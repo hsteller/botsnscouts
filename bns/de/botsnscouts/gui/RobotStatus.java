@@ -21,13 +21,11 @@ public class RobotStatus extends JPanel {
     JLabel damage;
     JLabel track;
     JPanel roboInfo;
-//    Image robotImage[];
-    Image flagge = CursorMan.getImages(CursorMan.CURSOR)[0];
-    ImageIcon botcenterImage = ImageMan.getImageIcon(ImageMan.PNG_ROBOCENTER);
-    ImageIcon damageImage = ImageMan.getImageIcon(ImageMan.PNG_BOTDAMAGE);
-//    ImageIcon botcenterImage = ImageMan.getPNGImageIcon(ImageMan.ROBOCENTER);
-//    ImageIcon damageImage = ImageMan.getPNGImageIcon(ImageMan.BOTDAMAGE);
-    Image[] robotImages = CursorMan.getImages(CursorMan.STATUSROBOTS);
+
+    static final Image flagge = CursorMan.getImages(CursorMan.CURSOR)[0];
+    static final ImageIcon botcenterImage = ImageMan.getImageIcon(ImageMan.PNG_ROBOCENTER);
+    static final ImageIcon damageImage = ImageMan.getImageIcon(ImageMan.PNG_BOTDAMAGE);
+    static final Image[] robotImages = CursorMan.getImages(CursorMan.STATUSROBOTS);
     Roboter robot;
 
     public RobotStatus () {
@@ -118,6 +116,7 @@ public class RobotStatus extends JPanel {
 
 
     public static void main (String args[]) {
+        org.apache.log4j.BasicConfigurator.configure();
 	Message.setLanguage("deutsch");
         JWindow f = new JWindow();
 	JPanel pa = new JPanel(new GridLayout(1,4));
