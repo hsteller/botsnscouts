@@ -1795,6 +1795,7 @@ public class BoardView extends JComponent {
 	x = (int) (sf.getSizeX() * scaledFeldSize);
 	y = (int) (sf.getSizeY() * scaledFeldSize);
 	setSize(x,y);
+        initFloorHashMap();
     }
 
 
