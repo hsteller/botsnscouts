@@ -21,7 +21,7 @@ class GameFieldLoader{
     private static HashSet distSpf = new HashSet(); // The spfs from the distribution
 
     public String[] getSpielfelder(){
- 	File kd=new File("kacheln");
+ 	File kd=new File("tiles");
 	String[] part1 = kd.list(new SpfFilter());
 	for (int i=0;i<part1.length;i++){
 	    part1[i]=part1[i].substring(0,part1[i].length()-4);
@@ -75,7 +75,7 @@ class GameFieldLoader{
 	    }
 	}else{
 	    try{
-		istream=new FileInputStream("kacheln"+System.getProperty("file.separator")+name+".spf");
+		istream=new FileInputStream("tiles"+System.getProperty("file.separator")+name+".spf");
 	    }catch(IOException e){
 		CAT.warn("Error loading spf "+name+" from user-def");
 		return null;

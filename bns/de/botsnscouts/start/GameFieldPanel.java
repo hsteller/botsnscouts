@@ -261,7 +261,7 @@ public class GameFieldPanel extends JPanel{
 	if (chooser != null)
 	    return;
 
-	chooser = new JFileChooser("kacheln");
+	chooser = new JFileChooser("tiles");
 	FileFilter filter = new FileFilter() {
 		public boolean accept(File file) {
 		    String name = file.getName();
