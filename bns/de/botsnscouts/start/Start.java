@@ -46,24 +46,32 @@ public class Start extends JFrame implements WindowListener{
 
     Facade fassade;
 
-    Paint paint;
-    MainMenu mainMenu;                // Start screen
-    GameFieldPanel gameFieldPanel;          //build your board
-    ParticipatePanel partPanel;        //participate
-    WatchPanel watchPanel;          //watch
-    StartPanel startPanel;                  //Screen with all information and start button
-    FieldEditor fieldEditor;
-    DoingStuffPanel busyPanel;
+    protected Paint paint;
+    private MainMenu mainMenu;                // Start screen
+    private static String MAIN_MENU="main";
+    protected GameFieldPanel gameFieldPanel;          //build your board
+    private static String GAME_FIELD="gamefield";
+    private ParticipatePanel partPanel;        //participate
+    private static String PARTICIPATE="participate";
+    private WatchPanel watchPanel;          //watch
+    private static String WATCH="watch";
+    protected StartPanel startPanel;                  //Screen with all information and start button
+    private static String START="start";
+    private FieldEditor fieldEditor;
+    private static String FIELD_EDITOR="fieldedit";
+    private DoingStuffPanel busyPanel;
+    private static String BUSY="busy";
+    private CardLayout layout=new CardLayout();
 
-    JPanel current;         //was in moment angezeigt wird
-    WaiterThread wth;
+    protected WaiterThread wth;
 
-    Splash splash;
+    private Splash splash;
 
     private Start(Splash splash){
 	super(Message.say("Start","mStartTitel"));
 
 	this.splash=splash;
+	getContentPane().setLayout(layout);
 
 	wth=new WaiterThread(this);
 	Toolkit tk=Toolkit.getDefaultToolkit();
@@ -84,23 +92,29 @@ public class Start extends JFrame implements WindowListener{
 	paint = new TexturePaint( bgimg, anchor );
 
 	mainMenu=new MainMenu(this);
-	current=mainMenu;
-	setContentPane(current);
+	getContentPane().add(mainMenu, MAIN_MENU);
+
+	showMainMenu();
 
 	busyPanel=new DoingStuffPanel(paint);
+	getContentPane().add(busyPanel, BUSY);
 	
 	addWindowListener(this);
 	show();
     }
 
+    private void switchCard(String to){
+	layout.show(getContentPane(),to);
+    }
+
     protected void showBusy(String txt){
 	CAT.debug("setting busypanel. txt: "+txt);
 	busyPanel.setText(txt);
-	current=busyPanel;
-	setContentPane(current);
+	
+	switchCard(BUSY);
+
 	animatorThread=new Thread(busyAnimator);
 	animatorThread.start();
-	repaint();
     }
 
     private Thread animatorThread;
@@ -122,9 +136,8 @@ public class Start extends JFrame implements WindowListener{
 	animatorThread.interrupt();
     }
 
-    public void toMainMenu(){
-	current=mainMenu;
-	setContentPane(current);
+    public void showMainMenu(){
+	switchCard(MAIN_MENU);
 	mainMenu.unrollOverButs();
 	setTitle(Message.say("Start","mStartTitel"));
     }
@@ -185,7 +198,86 @@ public class Start extends JFrame implements WindowListener{
         CAT.debug( this );
     }
 
+    protected void showGameFieldPanel(){
+	showBusy(Message.say("Start","mLoadGameFieldPanel"));
+	new Thread(new Runnable(){
+		public void run(){
+		    if(gameFieldPanel==null){
+			gameFieldPanel=new GameFieldPanel(Start.this);
+			getContentPane().add(gameFieldPanel,GAME_FIELD);
+		    }
+		    CAT.debug("setting gameFieldPanel");
+		    switchCard(GAME_FIELD);
+		    stopBusy();
+		}}).start();
+    }
 
+    protected void showParticipatePanel(){
+	showBusy(Message.say("Start","mLoadParticipatePanel"));
+	new Thread(new Runnable(){
+		public void run(){
+		    if(partPanel==null){
+		        partPanel=new ParticipatePanel(Start.this);
+			getContentPane().add(partPanel,PARTICIPATE);
+		    }
+		    switchCard(PARTICIPATE);
+		    stopBusy();
+		}}).start();
+    }
+
+    protected void showWatchPanel(){
+	showBusy(Message.say("Start","mLoadWatchPanel"));
+	new Thread(new Runnable(){
+		public void run(){
+		    if(watchPanel==null){
+			    watchPanel=new WatchPanel(Start.this);
+			    getContentPane().add(watchPanel,WATCH);
+		    }
+		    switchCard(WATCH);
+		    stopBusy();
+		}}).start();
+    }
+
+    protected void showFieldEditor(final FieldGrid spf){
+	showBusy(Message.say("Start","mLoadFieldEditor"));
+	new Thread(new Runnable(){
+		public void run(){
+		    if(fieldEditor==null){
+			fieldEditor=new FieldEditor(Start.this,spf);
+			getContentPane().add(fieldEditor,FIELD_EDITOR);
+		    }else{
+			fieldEditor.spf.addTileClickListener(fieldEditor);
+			fieldEditor.fuerSpf.add(fieldEditor.spf);
+		    }
+		    fassade.saveTileRaster();
+		    switchCard(FIELD_EDITOR);
+		    stopBusy();
+		}}).start();
+    }
+
+    protected void showNewStartPanel(){
+	showBusy(Message.say("Start","mStartingServer"));
+	new Thread(new Runnable(){
+		public void run(){
+		    try{
+			if(startPanel==null){
+			    startPanel=new StartPanel(Start.this);
+			    getContentPane().add(startPanel,START);
+			}
+			fassade.startGame();//starte Spiel
+			addServer();
+			switchCard(START);
+			stopBusy();
+		    }catch(OneFlagException ex){
+			JOptionPane.showMessageDialog(Start.this,Message.say("Start","mZweiFlaggen"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
+			
+		    }catch(NichtZusSpfException exc){
+			JOptionPane.showMessageDialog(Start.this,Message.say("Start","mNichtZus"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
+			
+		    }
+		}}).start();
+
+    }
 
     public static void main(String[] argv, Splash splash){
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );

@@ -125,8 +125,7 @@ public class WatchPanel extends JPanel implements  ActionListener, MouseListener
 	    parent.dispose();
 	    parent.beenden();
 	}else if(e.getActionCommand().equals("zurueck")){
-	    parent.toMainMenu();
-	    parent.show();
+	    parent.showMainMenu();
 	}
 
     }

@@ -263,10 +263,8 @@ public class StartPanel extends JPanel{
 		    parent.fassade.killServer();
 		    parent.resetWaiter();
 		    listen.closeSock();
-		    parent.current=parent.gameFieldPanel;
+		    parent.showGameFieldPanel();
 		    parent.startPanel=null;
-		    parent.setContentPane(parent.current);
-		    parent.show();
 		}});
 
 	panel.add(okBut);

@@ -112,42 +112,11 @@ public class MainMenu extends JPanel implements  ActionListener{
 	if(e.getActionCommand().equals("endBut")){
 	    parent.myclose();
 	}else if(e.getActionCommand().equals("gameBut")){
-	    new Thread(new Runnable(){
-		    public void run(){
-			parent.showBusy(Message.say("Start","mLoadGameFieldPanel"));
-			if(parent.gameFieldPanel==null){
-			    parent.gameFieldPanel=new GameFieldPanel(parent);
-			}
-			CAT.debug("setting gameFieldPanel");
-			parent.current=parent.gameFieldPanel;
-			parent.setContentPane(parent.current);
-			parent.show();
-			parent.stopBusy();
-		    }}).start();
+	    parent.showGameFieldPanel();
 	}else if(e.getActionCommand().equals("partBut")){
-	    new Thread(new Runnable(){
-		    public void run(){
-			parent.showBusy(Message.say("Start","mLoadParticipatePanel"));
-			if(parent.partPanel==null){
-			    parent.partPanel=new ParticipatePanel(parent);
-			}
-			parent.current=parent.partPanel;
-			parent.setContentPane(parent.current);
-			parent.stopBusy();
-			parent.show();
-		    }}).start();
+	    parent.showParticipatePanel();
 	}else if(e.getActionCommand().equals("watchBut")){
-	    new Thread(new Runnable(){
-		    public void run(){
-			parent.showBusy(Message.say("Start","mLoadWatchPanel"));
-			if(parent.watchPanel==null){
-			    parent.watchPanel=new WatchPanel(parent);
-			}
-			parent.current=parent.watchPanel;
-			parent.setContentPane(parent.current);
-			parent.stopBusy();
-			parent.show();
-		    }}).start();
+	    parent.showWatchPanel();
 	} else if (e.getActionCommand().equals("editBut")){
 	  new de.botsnscouts.editor.BoardEditor();
 	}

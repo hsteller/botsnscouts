@@ -118,8 +118,7 @@ public class ParticipatePanel extends JPanel implements  ActionListener{
 	    parent.dispose();
 	    parent.beenden();
 	}else if(e.getActionCommand().equals("zurueck")){
-	    parent.toMainMenu();
-	    parent.show();
+	    parent.showMainMenu();
 	}
 
     }

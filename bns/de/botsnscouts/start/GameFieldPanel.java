@@ -122,8 +122,7 @@ public class GameFieldPanel extends JPanel{
 		}});
 	backBut.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    parent.toMainMenu();
-		    parent.show();
+		    parent.showMainMenu();
 		}});
 
 	panel.add(okBut);
@@ -202,22 +201,7 @@ public class GameFieldPanel extends JPanel{
 	edit.setEnabled(true);
 	edit.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    new Thread(new Runnable(){
-			    public void run(){
-				parent.showBusy(Message.say("Start","mLoadFieldEditor"));			       
-
-				if(parent.fieldEditor==null){
-				    parent.fieldEditor=new FieldEditor(parent,spf);
-				}else{
-				    parent.fieldEditor.spf.addTileClickListener(parent.fieldEditor);
-				    parent.fieldEditor.fuerSpf.add(parent.fieldEditor.spf);
-				}
-				parent.fassade.saveTileRaster();
-				parent.current=parent.fieldEditor;
-				parent.setContentPane(parent.current);
-				parent.stopBusy();
-				parent.show();
-			    }}).start();
+		    parent.showFieldEditor(spf);
 		    edit.getModel().setRollover(false);
 		}});
 
@@ -311,33 +295,18 @@ public class GameFieldPanel extends JPanel{
     }
 
     private void okClicked(){
+	parent.showNewStartPanel();
 	new Thread(new Runnable(){
 		public void run(){
-		    parent.showBusy(Message.say("Start","mStartingServer"));
-		    
-		    try{
-			if(parent.startPanel==null){
-			    parent.startPanel=new StartPanel(parent);
-			}
-			parent.fassade.startGame();//starte Spiel
-			parent.addServer();
-			if( mitspielen.getSelectedObjects()!=null){
-			    Thread smth=parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(),farben.getSelectedIndex());
-			    parent.addKS(smth);
-			    Global.debug(this,"menschlichen spieler gestartet");
-			}else{//starte einen AusgabeFrame
-			    parent.addKS( parent.fassade.einemSpielZuschauenNoSplash());
-			}
-			parent.current=parent.startPanel;
-			parent.setContentPane(parent.current);
-			parent.show();
-			parent.stopBusy();
-		    }catch(OneFlagException ex){
-			JOptionPane.showMessageDialog(GameFieldPanel.this,Message.say("Start","mZweiFlaggen"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
-			
-		    }catch(NichtZusSpfException exc){
-			JOptionPane.showMessageDialog(GameFieldPanel.this,Message.say("Start","mNichtZus"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
-			
+		    try{ // give the Server some time to come up
+			Thread.sleep(7000);
+		    }catch(InterruptedException iex){}
+		    if( mitspielen.getSelectedObjects()!=null){
+			Thread smth=parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(),farben.getSelectedIndex());
+			parent.addKS(smth);
+			Global.debug(this,"menschlichen spieler gestartet");
+		    }else{//starte einen AusgabeFrame
+			parent.addKS( parent.fassade.einemSpielZuschauenNoSplash());
 		    }
 		}}).start();
     }//okclicked

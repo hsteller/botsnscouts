@@ -205,14 +205,9 @@ public class FieldEditor extends JPanel implements  ActionListener, TileClickLis
 	if(e.getActionCommand().equals("ok")){
 	    try{
 		parent.fassade.checkSpielfeld();
-		if(parent.gameFieldPanel==null){
-		    parent.gameFieldPanel=new GameFieldPanel(parent);
-		}
+		parent.showGameFieldPanel();
 		spf.removeTileClickListener();
 		parent.gameFieldPanel.pnl.add(spf);
-		parent.current=parent.gameFieldPanel;
-		parent.setContentPane(parent.current);
-		parent.show();
 	    }catch(OneFlagException ex){
 		JOptionPane.showMessageDialog(this,Message.say("Start","mZweiFlaggen"),Message.say("Start","mError"),JOptionPane.ERROR_MESSAGE);
 
@@ -228,8 +223,7 @@ public class FieldEditor extends JPanel implements  ActionListener, TileClickLis
 	    parent.fassade.restorTileRaster();
 	    spf.removeTileClickListener();
 	    parent.gameFieldPanel.pnl.add(spf);
-	    parent.current=parent.gameFieldPanel;
-	    parent.setContentPane(parent.current);
+	    parent.showGameFieldPanel();
 	    spf.rasterChanged();
 
 	    parent.gameFieldPanel.unrollOverButs();
