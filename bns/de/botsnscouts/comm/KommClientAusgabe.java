@@ -27,13 +27,14 @@ package de.botsnscouts.comm;
 
 import de.botsnscouts.util.Stats;
 import de.botsnscouts.util.StatsList;
-import java.io.*;
+
 import java.net.URLDecoder;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
 /** Diese Klasse enthaelt die Methoden, Objekte usw., die nicht in KommClient enthalten sind und vom Spieler nicht benoetigt werden
 *@author Hendrik<BR>*/
+
 public class  KommClientAusgabe extends KommClient {
   public KommClientAusgabe() {
   super();
@@ -72,7 +73,7 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
     }
 
     /** This methods asks for the actual game stats (laserhits).
-	@exception ..if an error occurs
+	@throws KommException if an error occurs
 	@return A sorted list of Stats-objects.
     */
 

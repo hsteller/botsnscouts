@@ -57,7 +57,6 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     protected SimBoard feld;
 
     protected String[] angemeldet = new String[8];
-    //protected StartServer startServer;
     private boolean gameover = false;
     private boolean gameStarted = false;
     private int aktPhase = 0; // enthaelt die Nummer der gerade auswertenden Phase. 0 wenn nicht ausgewertet wird
