@@ -1,6 +1,7 @@
 package de.botsnscouts.start;
 
 import de.botsnscouts.util.Conf;
+import de.botsnscouts.util.InvalidInputException;
 import de.botsnscouts.server.GameOptions;
 import org.apache.log4j.Category;
 
@@ -52,7 +53,7 @@ class AnnounceGame {
      *  Trying to set a new server name and port from a string.
      * TODO: This is broken.
      */
-    void parse(String s) {
+    void parse(String s) throws InvalidInputException {
         try {
             for (int i=0; i < s.length(); i++) {
                 if (s.charAt(i)==':') {
@@ -63,12 +64,12 @@ class AnnounceGame {
                 }
                 if (!Character.isLetterOrDigit(s.charAt(i)) && s.charAt(i)!='.') {
                     // Cannot be an ip address!
-                    throw new RuntimeException("Invalid input.");
+                    throw new InvalidInputException("No IP address");
                 }
             }
         } catch (RuntimeException ex) {
             CAT.info("Invalid input", ex);
-            // TODO: Show the user the input was invalid. (Beep.)
+            throw new InvalidInputException();
         }
     }
 

@@ -25,10 +25,7 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.Conf;
-import de.botsnscouts.util.Global;
-import de.botsnscouts.util.Message;
-import de.botsnscouts.util.Task;
+import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.*;
 
 import javax.swing.*;
@@ -43,6 +40,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.Properties;
+
+import org.apache.log4j.Category;
 
 /**
  * You see this panel when you want to host a game.
@@ -75,7 +74,8 @@ public class GameFieldPanel extends JPanel {
 
     /** Announce the game at a meta server? */
     private AnnounceGame announceGame = new AnnounceGame();
-    //private final static Category CAT = Category.getInstance(GameFieldPanel.class);
+
+    private final static Category CAT = Category.getInstance(GameFieldPanel.class);
 
     public GameFieldPanel(Start par) {
         parent = par;
@@ -238,7 +238,13 @@ public class GameFieldPanel extends JPanel {
         metaServer.addActionListener(
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    announceGame.parse(((JTextField )e.getSource()).getText());
+                    try {
+                        announceGame.parse(((JTextField )e.getSource()).getText());
+                    } catch (InvalidInputException ex) {
+                        CAT.debug(ex.getMessage());
+                        //TODO: beep
+                        metaServer.setText(announceGame.getServerString());
+                    }
                 }
             }
         );
@@ -276,7 +282,7 @@ public class GameFieldPanel extends JPanel {
 	//not fully implemented yet -- commented out, do not remove.
 	if (false) {
             inner.add(allowWisenheimer, gc);
-	    inner.add(allowScout, gc);
+	        inner.add(allowScout, gc);
             inner.add(announce, gc);
             inner.add(metaServer, gc);
         }

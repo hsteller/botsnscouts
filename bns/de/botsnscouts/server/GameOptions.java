@@ -6,7 +6,7 @@ import de.botsnscouts.util.Location;
  *******************************************************************
  *        Bots 'n' Scouts - Multi-Player networked Java game       *
  *                                                                 *
- * Copyright (C) 2001 scouties.                                    *
+ * Copyright (C) 2001-2004 scouties.                               *
  * Contact botsnscouts-devel@sf.net                                *
  *******************************************************************
 
@@ -19,16 +19,20 @@ import de.botsnscouts.util.Location;
  * Options of a game, e.g. max number of players, allow scout, board ...
  */
 public class GameOptions {
+
     /** Max number of players for this game */
     private int maxPlayers;
+
     /** TCP/IP port for registration */
     private int registrationPort;
+
     /** Tiwmeout in ms for handing in cards. */
     private int handInTimeout;
     /** The board for the game.
      * Represented as a string in the fucking old board format.
      */
     private String board;
+
     /**
      * Location of the flags
      */
@@ -51,6 +55,11 @@ public class GameOptions {
      *  Allow the players to get help from Scout in this game.
      */
     private boolean allowScout = true;
+
+    /**
+     * A comment describing the game that will be announced with the game.
+     */
+    private String comment;
 
     /**
      *
@@ -76,7 +85,6 @@ public class GameOptions {
         this.flags = flags;
         this.x = x;
         this.y = y;
-
     }
     /**
      *
@@ -101,6 +109,31 @@ public class GameOptions {
         this.allowWisenheimer = allowWisenheimer;
         this.allowScout = allowScout;
     }
+
+     /**
+     *
+     * @param noPlayers  Max number of players for this game
+     * @param port TCP/IP port for registration
+     * @param timeout Timeout in ms for handing in cards.
+     * @param board   The board for the game.
+     * @param flags   Location of the flags
+     * @param x        "First coordinate of the board's dimension"
+     * @param y        "Second coordinate of the board's dimension"
+     */
+    public GameOptions( int noPlayers,
+                        int port,
+                        int timeout,
+                        String board,
+                        Location[] flags,
+                        int x,
+                        int y,
+                        boolean allowScout,
+                        boolean allowWisenheimer,
+                        String comment) {
+        this(noPlayers, port, timeout, board, flags, x, y, allowScout, allowWisenheimer);
+        this.comment = comment;
+     }
+
     /**
      *
      * @return  Max number of players for this game
@@ -151,6 +184,10 @@ public class GameOptions {
 
     public boolean isAllowWisenheimer() {
         return allowWisenheimer;
+    }
+
+    public String getComment() {
+        return comment;
     }
 
     public String toString() {
