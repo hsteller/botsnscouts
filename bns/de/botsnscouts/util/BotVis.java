@@ -25,7 +25,7 @@
 
 package de.botsnscouts.util;
 
-import de.botsnscouts.gui.SACanvas;
+import de.botsnscouts.gui.BoardView;
 
 import java.awt.*;
 import java.util.Hashtable;
@@ -71,7 +71,7 @@ public class BotVis {
     }
 
     public static Color getBotColorByName(String name) {
-        return SACanvas.robocolor[getBotVisByName(name)];
+        return BoardView.robocolor[getBotVisByName(name)];
     }
 
     public static Image getBotIconByName(String name) {

@@ -63,8 +63,8 @@ import de.botsnscouts.*;
  *    damit viel schneller, ebenso die Board-Vorschau
  */
 
-public class SACanvas extends JComponent {
-    static Category CAT = Category.getInstance(SACanvas.class);
+public class BoardView extends JComponent {
+    static Category CAT = Category.getInstance(BoardView.class);
 
     // inner classes
     public static interface ClickListener {
@@ -191,11 +191,11 @@ public class SACanvas extends JComponent {
 
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    public SACanvas(SimBoard sf_neu){
+    public BoardView(SimBoard sf_neu){
 	init( sf_neu, robocolor );
     }
 
-    public SACanvas(SimBoard sf_neu, Color [] robColors){
+    public BoardView(SimBoard sf_neu, Color [] robColors){
 	init( sf_neu, robColors );
 	mouseInit();
     }
@@ -368,7 +368,7 @@ public class SACanvas extends JComponent {
 	    wait (50);
           }
 	  catch (InterruptedException ie){
-	    CAT.error("SACanvas.paint: wait interrupted");
+	    CAT.error("BoardView.paint: wait interrupted");
 	  }
         }
 
@@ -384,7 +384,7 @@ public class SACanvas extends JComponent {
 		     wait (1);
 		 }
 		 catch (InterruptedException ie){
-		     CAT.error ("SACanvas.paint: wait interrupted");
+		     CAT.error ("BoardView.paint: wait interrupted");
 		 }
 	     }
 	}
@@ -397,7 +397,7 @@ public class SACanvas extends JComponent {
 		    wait (200);
 		}
 		catch (InterruptedException ie){
-		    CAT.error ("SACanvas.paint: wait interrupted");
+		    CAT.error ("BoardView.paint: wait interrupted");
 		}
 	    }
 	}
@@ -471,7 +471,7 @@ public class SACanvas extends JComponent {
 	    break;
 	}
 	default : {
-	    CAT.error("SACanvas.paintActiveRobLaser: ");
+	    CAT.error("BoardView.paintActiveRobLaser: ");
 	    CAT.error("Ungueltige Laserrichtung: "+laserFacing);
 	}
 	}// end switch facing
@@ -515,7 +515,7 @@ public class SACanvas extends JComponent {
 	    break;
 	}
 	default: {
-	    CAT.error("SACanvas.calculateLaserLength(): ungueltige Laserrichtung: "+laserFacing);
+	    CAT.error("BoardView.calculateLaserLength(): ungueltige Laserrichtung: "+laserFacing);
 	}
 	}
 	//System.err.println("calculate Length: ("+source.x+","+source.y+")-"+facing+"->("+target.x+","+target.y+") ist "+laenge+" lang");
@@ -568,7 +568,7 @@ public class SACanvas extends JComponent {
 	    break;
 	}
 	default : {
-	    CAT.error("SACanvas.paintActiveRobLaser: ");
+	    CAT.error("BoardView.paintActiveRobLaser: ");
 	    CAT.error("Ungueltige Laserrichtung: "+laserFacing);
 	}
 	}// end switch facing
@@ -606,12 +606,12 @@ public class SACanvas extends JComponent {
 	    Graphics2D g2 = (Graphics2D) getGraphics();
 	    g2.scale( dScale, dScale );
 	    paintActiveBordLaser(g2, c, tmp_laenge);
-	    /*  synchronized(this){
+/*  synchronized(this){
 		try {
 		    wait (1);
 		}
 		catch (InterruptedException ie){
-		    System.err.println ("SACanvas.doBordLaser: wait interrupted");
+		    System.err.println ("BoardView.doBordLaser: wait interrupted");
 		}
 
 		}*/
@@ -1272,12 +1272,12 @@ public class SACanvas extends JComponent {
 
 
   // Little helper for getting thumbnails of the board
-    private static SACanvas sac = null;
+    private static BoardView sac = null;
 
 
     public static Image createThumb(SimBoard sim, int size) {
 	if( sac == null ) {
-	    sac = new SACanvas(sim);
+	    sac = new BoardView(sim);
 	} else {
 	    sac.ersetzeSpielfeld( sim );
 	}

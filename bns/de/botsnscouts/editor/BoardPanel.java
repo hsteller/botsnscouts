@@ -30,12 +30,12 @@ import java.awt.event.*;
 
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.board.Wall;
-import de.botsnscouts.gui.SACanvas;
+import de.botsnscouts.gui.BoardView;
 import de.botsnscouts.util.Message;
 import org.apache.log4j.Category;
 
 
-class BoardPanel extends SACanvas implements MouseListener{
+class BoardPanel extends BoardView implements MouseListener{
     static final Category CAT = Category.getInstance( BoardPanel.class );
 
     protected BoardEditor editor=null;

@@ -356,7 +356,7 @@ public class Ausgabe extends BNSThread {
 		flags = kommClient.getFahnenPos();
 		// !!HACK!!
 
-		Color[] robotsDefaultColor = SACanvas.robocolor;
+		Color[] robotsDefaultColor = BoardView.robocolor;
 		Color[] robotsNewColor = new Color[8];
 
 		int[] colorMap = new int[8];
@@ -388,7 +388,7 @@ public class Ausgabe extends BNSThread {
 						    flags);
 
 
-                SACanvas board = new SACanvas(sim,robotsNewColor);
+                BoardView board = new BoardView(sim,robotsNewColor);
                 board.setAutoscrolls( true );
 		ausgabeView = new AusgabeView(board,getRoboterArray(),this);
                 board.addMouseListener( new MouseAdapter() {
@@ -396,7 +396,7 @@ public class Ausgabe extends BNSThread {
                         if( (me.getModifiers() & MouseEvent.BUTTON3_MASK) > 0) {
                             CAT.debug("mouse clicked in canvas " + me.getPoint() );
                             Location ort = new Location();
-                            SACanvas brd = (SACanvas) me.getSource();
+                            BoardView brd = (BoardView) me.getSource();
                             brd.point2Ort( me.getPoint(), ort );
                             CAT.debug("corresponding ort is: " + ort );
                             ausgabeView.showPixelPos( me.getPoint().x, me.getPoint().y );

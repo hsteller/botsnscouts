@@ -71,7 +71,7 @@ class PlayersPanel extends ColoredPanel{
 
     public void neurob(String name, int farbe){
 	map.put( name, new Integer(farbe) );
-	Global.debug(this,"neuer roboter:"+name+SACanvas.robocolor[farbe]);
+	Global.debug(this,"neuer roboter:"+name+BoardView.robocolor[farbe]);
 	names.addElement( name );
 	roblist.setListData( names );
 	parent.show();

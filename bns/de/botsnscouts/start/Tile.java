@@ -56,10 +56,10 @@ public class Tile extends SimBoard{
 	rotat=rot;
     }
 
-    /*public Image getImage(){
+/*public Image getImage(){
 	if (img==null){
 	    CAT.debug("creating image on-demand.");
-	    img=SACanvas.createThumb(this,thumbnailsize);
+	    img=BoardView.createThumb(this,thumbnailsize);
 	}
 	return img;
 	}*/

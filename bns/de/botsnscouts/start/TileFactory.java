@@ -157,7 +157,7 @@ public class TileFactory {
 	    return (Image)imgTab.get(name);
 	Tile[] kachAr=(Tile[])tileTab.get(name);
 	CAT.debug("creating image on-demand.");
-	Image img=SACanvas.createThumb(kachAr[0],thumbnailsize);
+	Image img=BoardView.createThumb(kachAr[0],thumbnailsize);
 	imgTab.put(name,img);
 	return img;
     }

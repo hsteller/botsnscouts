@@ -46,7 +46,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     // --- objects
     private JScrollPane gameBoardScrollPane;
     private JViewport gameBoardView;
-    private SACanvas  gameBoardCanvas;
+    private BoardView  gameBoardCanvas;
     private Ausgabe   ausgabe;
     private Hashtable robotStatus = new Hashtable(8);
     private Hashtable robotCardStatus = new Hashtable(8);
@@ -79,7 +79,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         this.initMenus();
     }
 
-    public AusgabeView(SACanvas sa, Bot[] robots, Ausgabe aus) {
+    public AusgabeView(BoardView sa, Bot[] robots, Ausgabe aus) {
 	ausgabe = aus;
 	gameBoardCanvas=sa;
 //        statusLog = new StatusLog(aus.getView());
@@ -299,7 +299,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     }
 
 
-    public SACanvas getSpielfeld() {
+    public BoardView getSpielfeld() {
       return gameBoardCanvas;
     }
 

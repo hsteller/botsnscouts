@@ -42,9 +42,9 @@ import org.apache.log4j.*;
 public class BoardEditor extends JFrame implements WindowListener, ActionListener {
     // enno:
     // 1. ImageMan wird verwendet (damit die Bilder nicht einmal von
-    //     BoardEditor und einmal vom LeftPanel/SACanvas geladen werden
+    //     BoardEditor und einmal vom LeftPanel/BoardView geladen werden
     // 2. BoardEditor reagiert nur noch auf die linke Maustaste (die anderen
-    //    sind irgendwann mal fürs Scrollen zuständig - s. SACanvas)
+    //    sind irgendwann mal fürs Scrollen zuständig - s. BoardView)
     //    das Scrollen funkt. im Editor und der Vorschau bereits, im Spiel noch nicht ..
     //    warum, weiss ich noch nicht
 
@@ -122,7 +122,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
     }//ende konstruktor
 
     private boolean loadImg(){
-	// enno: habe eingebaut, dass BoardEditor und SACanvas die gleichen
+        // enno: habe eingebaut, dass BoardEditor und BoardView die gleichen
 	// bilder benutzen und nicht jeder sie einzeln laedt.
 	ebeltCrop   = ImageMan.waitForImages( ImageMan.EBELTS );
 	cbeltCrop   = ImageMan.waitForImages( ImageMan.CBELTS );
