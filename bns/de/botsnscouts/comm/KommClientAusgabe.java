@@ -93,6 +93,7 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
 		s.setDamageByBoard(Integer.parseInt(st.nextToken()));
 		s.setDamageByRobots(Integer.parseInt(st.nextToken()));
                 s.setAskedWisenheimer(Integer.parseInt(st.nextToken()));
+                s.setWasSlowest(Integer.parseInt(st.nextToken()));
 		stats.addElement(s);
 	    }
 	    catch (NumberFormatException nfe) {

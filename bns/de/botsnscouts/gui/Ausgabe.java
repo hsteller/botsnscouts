@@ -137,7 +137,7 @@ public class Ausgabe extends BNSThread {
                     if(msgId.startsWith(MessageID.PROG_DONE)) {
                         Bot r1 = getBot(kommAntwort.namen[1]);
                         ausgabeView.notifyBotProgrammingDone(r1);
-
+                        stats.updateCardsSent(r1);
                     }
 		}
 

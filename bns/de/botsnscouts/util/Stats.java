@@ -43,6 +43,7 @@ public class Stats implements Comparable{
     private int damageByBoard;
     private int damageByRobots;
     private int askedWisenheimer;
+    private int sentCardsLast;
 
     private Vector listeners = new Vector();
 
@@ -54,6 +55,7 @@ public class Stats implements Comparable{
 	this.damageByBoard=0;
 	this.damageByRobots=0;
         this.askedWisenheimer=0;
+        this.sentCardsLast=0;
     }
 
 
@@ -73,6 +75,10 @@ public class Stats implements Comparable{
     }
     public int getKills(){
 	return kills;
+    }
+
+    public int getWasSlowest(){
+        return sentCardsLast;
     }
 
     public int getAskedWisenheimer() {
@@ -105,6 +111,12 @@ public class Stats implements Comparable{
       fireActionEvent();
     }
 
+    public void setWasSlowest(int i){
+      this.sentCardsLast = i;
+      fireActionEvent();
+    }
+
+
     public void incAskWisenheimer() {
       ++askedWisenheimer;
       fireActionEvent();
@@ -131,16 +143,21 @@ public class Stats implements Comparable{
         fireActionEvent();
     }
 
+    public void incWasSlowest() {
+      ++sentCardsLast;
+      fireActionEvent();
+    }
+
 
     public String toSendString () {
 	return (URLEncoder.encode(this.name)+","+this.hits+","+this.kills+","+this.damageByBoard+","
-               +this.damageByRobots+","+this.askedWisenheimer);
+               +this.damageByRobots+","+this.askedWisenheimer+","+sentCardsLast);
     }
 
     public String toString () {
 	return ("Bot: "+name+"\tHits: "+hits+"\tKills: "+kills+"\tdamByBoard:"
                 +damageByBoard+"\tdamByRobot:"+damageByRobots+
-                "\taskedWise"+askedWisenheimer);
+                "\taskedWise"+askedWisenheimer+"\tsentLast:"+sentCardsLast);
     }
 
     /** Helper method for implementing the <code>Comparable</code> interface.*/

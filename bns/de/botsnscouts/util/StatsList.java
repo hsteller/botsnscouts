@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.util;
 
 import java.util.Vector;
@@ -45,6 +45,12 @@ public class StatsList implements ActionListener{
 
     private Vector listeners = new Vector();
 
+
+    /** Counts the number of robots that already have sent their cards in this turn.
+     *  Is used to determine which bot needed the most time for programming in this turn.
+     *  @see setCardsSent(Bot)
+     */
+    private int cardsSentCounter;
 
     /** Creates a new list with length 0*/
     public StatsList () {
@@ -100,6 +106,9 @@ public class StatsList implements ActionListener{
 	    }
         fireActionEvent();
     }
+
+
+
 
     /** Sets the StatsList to <code>sl</code>
 	@param sl The new contents of the StatsList
@@ -189,6 +198,18 @@ public class StatsList implements ActionListener{
         ActionListener l = (ActionListener) it.next();
         l.actionPerformed(e);
       }
+    }
+
+
+    public void updateCardsSent(Bot robot){
+        CAT.debug("update cards for "+robot.getName());
+        ++cardsSentCounter;
+        if (cardsSentCounter == size()){ // this one was the slowest; Blame him!!!
+            CAT.debug("BLAMING "+robot.getName());
+            Stats s = getStats(robot.getName());
+            s.incWasSlowest(); // fires ActionEvent that calls our actionPerformed..
+            cardsSentCounter = 0;
+        }
     }
 
     public void actionPerformed(ActionEvent e){
