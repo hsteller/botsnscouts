@@ -92,7 +92,7 @@ public class SACanvas extends JComponent {
     
     private boolean soundsLoaded=false;
     private int laserWavCount;
-    private static final String SOUND_DIR="sounds";
+    private static final String SOUND_DIR="de/botsnscouts/sounds";
     private static SoundFileFilter soundFilter = new SoundFileFilter();
  
 
@@ -216,7 +216,12 @@ public class SACanvas extends JComponent {
 	Thread t = new Thread () {
 		public void run() {
 		    CAT.debug("Initializing sounds..");
+		   
+		    // if not in a jar..
+		    /*
 		    File f = new File (SOUND_DIR);
+		    CAT.error("SOUND_DIR="+f.getAbsolutePath());
+		  
 		    if (f!=null && f.exists() && f.isDirectory()){
 			String [] list = f.list(soundFilter);
 			if (list == null) {
@@ -224,8 +229,7 @@ public class SACanvas extends JComponent {
 			    return;
 			}
 			CAT.debug("Got "+list.length+" sounds");
-  
-			
+		    			
 			URL u = null;
 			AudioClip a = null;
 			Vector v = new Vector();
@@ -233,9 +237,10 @@ public class SACanvas extends JComponent {
 			for (int i=0;i<list.length;i++){
 			    s = list [i];
 			    CAT.debug("Trying to load sound: "+s);
-			    u = BotsNScouts.class.getResource(s);
+			    u = BotsNScouts.class.getResource("sounds/"+s);
 			    CAT.debug("sound-url: "+(u==null?"null":u.toString()));
-			    a = Applet.newAudioClip(u);
+			    if (u==null)
+				a = Applet.newAudioClip(u);
 			    if (a!=null)
 				v.add(a);
 			}
@@ -249,6 +254,26 @@ public class SACanvas extends JComponent {
 		    }
 		    else {
 			CAT.error("Error!: Unable to load sounds from "+SOUND_DIR);
+		    }
+		    */
+		    // fuer Jars
+		    mLaserWav = new AudioClip[2];
+		    mLaserWav [0] = Applet.newAudioClip(BotsNScouts.class.getResource("sounds/laserhit.wav"));
+		    mLaserWav [1] = Applet.newAudioClip(BotsNScouts.class.getResource("sounds/laser2.wav"));
+		    boolean error = false;
+		    if (mLaserWav [0] == null) {
+			CAT.debug("laserhit.wav not located :-(");
+			error=true;
+		    }
+		    if (mLaserWav [1] == null){
+			CAT.debug("laser2.wav not located :-(");
+			error = true;
+		    }
+		    if (error)
+			CAT.debug("Failed to load sounds; sounds deactivated");
+		    else{
+			CAT.debug("Sounds loaded!");
+			soundsLoaded=true;
 		    }
 		}
 	    };
