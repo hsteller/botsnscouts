@@ -483,6 +483,7 @@ public class SimBoard extends Board implements Directions {
                     break;
             }
         }
+        ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_MOVE, ""+robbis[rob].getName(),direction+"");
         return (true);
     }
 
@@ -861,7 +862,7 @@ public class SimBoard extends Board implements Directions {
                 //d(robbis[i].getName()+" ist auf einem Reperaturfeld. Archivpos updated");
             }
             for (int j = 0; j < flags.length; j++)
-                if ((robbis[i].getX() == flags[j].x) && (robbis[i].getY() == flags[j].y)) {
+                if ((robbis[i].getX() == flags[j].getX()) && (robbis[i].getY() == flags[j].getY())) {
                     robbis[i].touchArchive();
                     moved[i] = true;
                     //d(robbis[i].getName()+" ist auf einer Flagge (R1). Archivpos updated");
@@ -875,7 +876,7 @@ public class SimBoard extends Board implements Directions {
         for (int i = 0; i < robbis.length; i++) {
             if (robbis[i].getNextFlag() == flags.length + 1)
                 continue;
-            if ((robbis[i].getX() == flags[robbis[i].getNextFlag() - 1].x) && (robbis[i].getY() == flags[robbis[i].getNextFlag() - 1].y)) {
+            if ((robbis[i].getX() == flags[robbis[i].getNextFlag() - 1].getX()) && (robbis[i].getY() == flags[robbis[i].getNextFlag() - 1].getY())) {
                 robbis[i].incNextFlag();
                 moved[i] = true;
                 //d(robbis[i].getName()+" hat naechste Flagge erreicht.");
@@ -904,7 +905,7 @@ public class SimBoard extends Board implements Directions {
             }
 
             for (int j = 0; j < flags.length; j++)
-                if ((robbis[i].getX() == flags[j].x) && (robbis[i].getY() == flags[j].y)) {
+                if ((robbis[i].getX() == flags[j].getX()) && (robbis[i].getY() == flags[j].getY())) {
                     boolean msg = robbis[i].getDamage() > 0;
                     robbis[i].decrDamage(1);
                     moved[i] = true;
