@@ -45,7 +45,8 @@ public class HumanView extends JPanel implements HumanViewInterface {
 					       );
 	AgainPowerDown againPowerDown = new AgainPowerDown(new ActionListener(){
 		public void actionPerformed(ActionEvent ae) {
-		    sendAgainPowerDown(ae.getActionCommand().equals("againpowerdown"));
+		    d("The user clicked: "+ae.getActionCommand());
+		    sendAgainPowerDown(ae.getActionCommand().equals("powerdownagain"));
 		}
 	    }
 							   );
@@ -135,6 +136,11 @@ public class HumanView extends JPanel implements HumanViewInterface {
     public void showCards(ArrayList humanCards) {
 	cards.setCards(humanCards);
 	panelSwitcher.show(switcherPanel,"regsAndCards");
+	if (registers.allLocked()) {
+	    d("All Registes locked!");
+	    cards.activateButton();
+	}
+	
     }
 
 
@@ -212,9 +218,9 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	int predCard = -1;
 	if ((wisenheimerView.selected()) && ( human.mode == HumanPlayer.MODE_PROGRAM)){
 	    if (predicted){
-		predCard=human.getNextPrediction(registers.getCards(),cards.getCards());
+		predCard=human.getNextPrediction(registers.getWisenheimerCards(),cards.getCards());
 	    }else{
-		predCard=human.getPrediction(registers.getCards(),cards.getCards());
+		predCard=human.getPrediction(registers.getWisenheimerCards(),cards.getCards());
 	    }
 	    if (predCard==-1){
 		wisenheimerView.setSelected(false);
@@ -261,6 +267,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
     protected void updateRegisters(Karte[] robRegs){
 	registers.updateRegisters(robRegs);
+	d("Updating Registers...");
 	registers.resetAll();
     }
 
@@ -281,9 +288,20 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
     private void sendRepairRegisters () {
 	showMessageToPlayer(Message.say("SpielerMensch","mkartenMisch"));
-	human.sendRepair(repairRegisters.getSelection());
+	ArrayList regsRep = repairRegisters.getSelection();
+	human.sendRepair(regsRep);
+	unlockRegisters(regsRep);
     }
 
+    private void unlockRegisters(ArrayList repairRegs){
+	d("Die Register vor dem unlock: "+registers.toString());
+	for (int i =0; i< repairRegs.size(); i++) {
+	    d("Entsperre Register: "+((Integer)repairRegs.get(i)).intValue());
+	    registers.unlockRegister(((Integer)repairRegs.get(i)).intValue()-1);
+	}
+	d("Die Register nach dem unlock: "+registers.toString());
+	//	registers.resetAll();
+    }
 
     private void treatCardKlick (CardView cv) {
 	boolean predicted=false;

@@ -82,4 +82,9 @@ public class HumanCard implements Karte{
     }
 
 
+
+    public String toString() {
+	return ("Karte hat prio "+prio+", Aktion:"+action+" und status (0:free, 2:locked ):"+state);
+    }
+
 }

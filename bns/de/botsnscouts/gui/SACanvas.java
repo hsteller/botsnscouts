@@ -651,7 +651,6 @@ public class SACanvas extends JComponent {
     }
 
     protected void vorschau(int phasen, Roboter[] vorschauRobArray){
-	System.out.println("XXX: Simulating for " + vorschauRobArray[0] );
 	if (phasen==0){
 	    vorschauRob=null;
 	    deleteScout();
@@ -1098,7 +1097,6 @@ public class SACanvas extends JComponent {
 
     private void paintHighlight(Graphics2D g) {
 	//	if( highlightPos.x != 0 ) {
-	    System.out.println("XXX: highlighting " + highlightPos );
 	    Rectangle rc = new Rectangle();
 	    ort2Rect(highlightPos, rc);
 	    g.setColor( Color.red );

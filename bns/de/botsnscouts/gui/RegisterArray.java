@@ -54,6 +54,14 @@ public class RegisterArray extends JPanel {
 	return regs;
     }
 
+    protected ArrayList getWisenheimerCards() {
+	ArrayList regs = new ArrayList(programmed());
+	for (int i=0; i < registerView.size(); i++) {
+	    regs.add(((RegisterView) registerView.get(i)).getCard());
+	}
+	return regs;
+    }
+
     protected ArrayList getAlreadyChosen() {
 	int ap = alreadyProgrammed();
 	d("already Programmed Registers: "+ap);
@@ -111,13 +119,35 @@ public class RegisterArray extends JPanel {
     protected void updateRegisters(Karte[] roboCards) {
 	for (int i = 0; i < 5; i++) {
 	    if (roboCards[i] != null) {
-		((RegisterView)registerView.get(i)).getCard().setState(HumanCard.LOCKED);
+		((RegisterView)registerView.get(i)).setLocked(true);
 	    }
+	    else {
+		((RegisterView)registerView.get(i)).setLocked(false);
+	    }
+
 	}
+    }
+
+    protected void unlockRegister(int index) {
+		((RegisterView)registerView.get(index)).setLocked(false);
     }
 
     protected ArrayList getRegisterViewArray() {
 	return registerView;
+    }
+
+    protected boolean allLocked() {
+	for (int i=0; i< registerView.size();i++) {
+	    if ((RegisterView)registerView.get(i) != null) {
+		if ( ! ((RegisterView)registerView.get(i) ).locked()) {
+		    return false;
+		}
+	    }
+	    else {
+		return false;
+	    }
+	}
+	return true;
     }
 
     private int programmed() {
@@ -147,6 +177,13 @@ public class RegisterArray extends JPanel {
 	Global.debug(this,s);
     }
 
+    public String toString() {
+	String s = "";
+	for (int i =0; i < registerView.size(); i++) {
+	    s+= "Reg: "+(i+1)+" hat Karte: "+((RegisterView)registerView.get(i)).getCard() + "\n";
+	}
+	return s;
+    }
     
 }
 

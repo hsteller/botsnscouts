@@ -89,10 +89,11 @@ public class HumanPlayer extends Thread {
 		Global.debug(this,"I am requested to send cards");
 		// card 
 		showMessage(Message.say("SpielerMensch","mwartereg"));
-				// ---------- gesperrte Register nachfragen
+
 		try{
-		    Global.debug(this,"Versuche, Robstatus von "+name+" zu bekommen.");
 		    Roboter tempRob = comm.getRobStatus(name);
+		    d("rob has the following locked registers: ");
+			for (int i=0; i< tempRob.getGesperrteRegister().length; i++) d("index: "+i+" ist "+tempRob.getGesperrteRegister()[i]);
 		    humanView.updateRegisters(tempRob.getGesperrteRegister());
 		}
 		catch (KommException kE) {
@@ -105,11 +106,6 @@ public class HumanPlayer extends Thread {
 		    cards.add(i, new HumanCard(commAnswer.karten[i]));
 		}
 		humanView.showCards(cards);
-		//		scoutAllowed=true;
-
-		// --- ist der Klugscheisser aktiv?
-		//		if (klugAktiv) fragKlug();
-
 				// ----- Abgabe der Programmierung -----
 
 		/*	start Timer
@@ -157,10 +153,10 @@ public class HumanPlayer extends Thread {
 	    // robot reaktivated
 	    case (commAnswer.REAKTIVIERUNG): { 
 		showMessage(Message.say("SpielerMensch","roboreaktiviert"));
-				// -------- Nochmaliges PowerDown abfragen und senden ------
-		/* ask for powerDownagain, TODO
-		   uICardLayout.show(userInterfaceContainer,"wiederpowerdown");
-		*/
+		// ask for powerDownagain
+		humanView.showRePowerDown();
+
+
 		break;
 	    }
 
@@ -338,7 +334,7 @@ public class HumanPlayer extends Thread {
 
 
     protected void sendRepair(ArrayList respReparatur) {
-	d("Soll an den Server senden die ArrayList: "+respReparatur);
+	d("sende meinen Reparaturwunsch: "+respReparatur);
 	int[] repa = new int[respReparatur.size()];
 	for (int i = 0; i < respReparatur.size(); i++) {
 	    repa[i] = ((Integer) respReparatur.get(i)).intValue();
