@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.board;
 
 import java.awt.*; 
 import java.awt.image.*; 
@@ -9,7 +9,9 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.metal.*;
-
+import de.botsnscouts.util.*;
+import de.botsnscouts.gui.*;
+import de.botsnscouts.board.*;
 
 public class KachelEditor extends JFrame implements WindowListener, ActionListener,MouseListener{
     // enno:
