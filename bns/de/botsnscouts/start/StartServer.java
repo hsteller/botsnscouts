@@ -25,10 +25,6 @@
  
 package de.botsnscouts.start;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.net.*;
-import java.io.*;
 import de.botsnscouts.server.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.autobot.*;
@@ -38,14 +34,11 @@ import de.botsnscouts.autobot.*;
  *  von StartSpieler
  *
  *@author     Ludmila und Leo Scharf
- *@created    22. April 2001
- *@see        StartSpieler
+ * created    22. April 2001
  */
 public class StartServer extends BNSThread {
     private KommStSrv com;
     private KommStSrvPass comPass;
-    private boolean lazy;
-    private byte[] rd;
     private int spcnt = 0;
 
     private Server[] servArr = new Server[255];
@@ -54,8 +47,6 @@ public class StartServer extends BNSThread {
     //IP des Klienten, der diesen Server startete
     private int[] cltPort = new int[255];
     private int servNum = 0;
-
-// private Server srv;
 
     StartServer() {
         super("StartServer");
@@ -135,31 +126,6 @@ public class StartServer extends BNSThread {
                 }
                 com.ok();
             }
-            /*
-             * else if (spcnt==10){//GSL-GibServerListe
-             * int k=0;
-             * for(int i=servNum-1;i>=0;i--)
-             * if (!((Thread)servArr[i]).isAlive()){
-             * servArr[i]=null;
-             * k++;
-             * }
-             * for(int z=0;z<k;z++)
-             * for (int i=0;i<servNum;i++){
-             * if (servArr[i]==null){
-             * for(int j=i;j<servNum-1;j++){
-             * servArr[j]=servArr[j+1];
-             * servPort[j]=servPort[j+1];
-             * }
-             * servPort[servNum]=0;
-             * servArr[servNum]=null;
-             * i=servNum;
-             * servNum--;
-             * }
-             * }
-             * com.servPorts(servNum,servPort);
-             * com.ok();
-             * }
-             */
             else {
                 //neuen Server starten
                 boolean exists = false;
@@ -171,7 +137,10 @@ public class StartServer extends BNSThread {
                 if(!exists) {
                     Global.debug(this, "Neues Spiel mit " + spcnt + " Mitspieler, Port " + com.port);
 
-                    servArr[servNum++] = new Server(spcnt, this, com.port, com.zugTimeout, com.feld, com.flags, com.feldX, com.feldY);
+                    servArr[servNum++] = new Server(
+                            new GameOptions(spcnt, com.port, com.zugTimeout,
+                                            com.feld, com.flags, com.feldX, com.feldY),
+                            this);
                     ((Server) servArr[servNum - 1]).start();
                     servPort[servNum - 1] = com.port;
                     cltIP[servNum - 1] = com.cltIP;
@@ -193,32 +162,6 @@ public class StartServer extends BNSThread {
 
     public void spielGehtLos(Server s) {
         int si = searchServ(s);
-// 	servArr[si]=null;
-
-// 	int k=0;
-// 	for(int i=servNum-1;i>=0;i--)
-// 	    if ( servArr[i]==null)
-// 		k++;
-
-// 	for(int z=0;z<k;z++)
-// 	    for (int i=0;i<servNum;i++){
-// 		if (servArr[i]==null){
-// 		    Global.debug("Server nr."+i+"wird gelöscht:"+servArr[i]);
-// 		    for(int j=i;j<servNum-1;j++){
-// 			servArr[j]=servArr[j+1];
-// 			servPort[j]=servPort[j+1];
-// 			cltIP[j]=cltIP[j+1];
-// 			cltPort[j]=cltPort[j+1];
-// 		    }
-// 		    servPort[servNum]=0;
-// 		    servArr[servNum]=null;
-// 		    cltIP[servNum]=null;
-// 		    cltPort[servNum]=0;
-// 		    i=servNum;
-// 		    servNum--;
-// 		}
-
-// 	    }
         //SpielGehtLos
         if(!comPass.sendString("SGL\n", cltIP[si], cltPort[si])) {
             System.err.println("StartServer: Kann nicht mit dem StartSpielerListener kommunizieren!(SGL)");

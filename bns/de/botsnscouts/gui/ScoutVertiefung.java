@@ -25,16 +25,12 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
-import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.net.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import de.botsnscouts.util.ImageMan;
+import de.botsnscouts.util.Message;
 
-import de.botsnscouts.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
 
     /**
      * Scoutvertiefung, die im oben rechts in der Infoleiste dargestellt ist
@@ -70,7 +66,7 @@ public class ScoutVertiefung extends JToggleButton {
 
     public static void main (String[] args) {
 	Message.setLanguage("deutsch");
-        JFrame f = new JFrame();
+    JFrame f = new JFrame();
 	f.setSize(100,100);
 	f.getContentPane().add(new ScoutVertiefung(null));
 	f.setVisible(true);

@@ -27,11 +27,9 @@ package de.botsnscouts.server;
 
 import java.net.*;
 import java.io.*;
-import de.botsnscouts.util.Global;
 import org.apache.log4j.Category;
 import java.util.*;
 import org.apache.regexp.RE;
-import org.apache.regexp.RESyntaxException;
 import de.botsnscouts.util.*;
 import de.botsnscouts.comm.*;
 
@@ -70,7 +68,7 @@ class RegistrationManager implements Runnable
     public void run()
     {
       try {
-        seso=new ServerSocket(server.anmeldePort);
+        seso=new ServerSocket(server.getRegistrationPort());
         seso.setSoTimeout(0);
 
         Socket clientSocket;

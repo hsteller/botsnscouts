@@ -333,11 +333,6 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
 
     /***** protected Methods *****/
 
-    /* Debug */
-    protected void d(String s) {
-        CAT.debug(s);
-    }
-
     protected final static void p(String s) {
         sCAT.debug(s);
     }
