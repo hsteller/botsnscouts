@@ -15,10 +15,10 @@ public class SpielfeldSim extends Spielfeld
   protected boolean debugmeldungen=true; // Damit mehrere KIs auf einem
                                          // Rechner sich synchronisieren
 
-  protected static final int LNORD=0; // Laser nach Norden
-  protected static final int LOST=1;  //            Osten
-  protected static final int LSUED=2; //            Sueden
-  protected static final int LWEST=3; //            Westen
+  public static final int LNORD=0; // Laser nach Norden
+  public static final int LOST=1;  //            Osten
+  public static final int LSUED=2; //            Sueden
+  public static final int LWEST=3; //            Westen
   
   /* Die Laser - um sie schnell iterieren zu können 
      Hier sollen _nur_ LaserDef's rein!
