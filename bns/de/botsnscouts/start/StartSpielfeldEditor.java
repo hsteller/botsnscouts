@@ -9,6 +9,7 @@ import java.awt.geom.*;
 import javax.swing.border.*;
 import java.net.*;
 import de.botsnscouts.util.*;
+import de.botsnscouts.board.*;
 
 public class StartSpielfeldEditor extends JPanel implements  ActionListener, KachelClickListener,ListSelectionListener{
 
