@@ -70,7 +70,7 @@ public class View extends JFrame {
 		}});
 
 	// Layout erzeugen
-	setLayout(new BorderLayout());
+	getContentPane().setLayout(new BorderLayout());
 	
     }
 
