@@ -98,9 +98,9 @@ public class HumanPlayer extends BNSThread {
 	    Global.debug(this,"registered for game as new humanplayer with name: "+name);
 	}
 	else {
-	    Global.debug(this, "could not register at the server: "+host);
-	    try {Thread.sleep(2000);} catch (Exception e) {System.err.println(e.getMessage());}
-	    return;
+	  ErrorView.show(Message.say("HumanPlayer","eNoServerRunning",host,port));
+	  
+	  return;
 	}
 
 	initView();
@@ -349,7 +349,7 @@ public class HumanPlayer extends BNSThread {
 		anmeldungErfolg = comm.anmelden2(host,port,name,myColor);
 	    }
 	    catch (KommException kE) {
-		System.err.println(kE.getMessage());
+		CAT.fatal(kE.getMessage());
 		versuche++;
 		try {Thread.sleep(1000);} catch (Exception e) {System.err.println(e.getMessage());}
 	    }
