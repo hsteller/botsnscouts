@@ -46,13 +46,13 @@ public class StatusLog  extends JPanel implements ActionListener{
 
     private View parent;
     private LogFrame lF;
-    protected TextArea ta = new TextArea(Message.say("AusgabeFrame","afLog"),5,40);
+    protected TextArea ta = new TextArea(Message.say("StatusLog","afLog"),5,40);
 
     public StatusLog(View out) {
         parent = out;
 
         lF = new LogFrame();
-        JButton logButton = new JButton(Message.say("AusgabeFrame","afLog"));
+        JButton logButton = new JButton(Message.say("StatusLog","afLog"));
         logButton.addActionListener(this);
         add(logButton);
 
