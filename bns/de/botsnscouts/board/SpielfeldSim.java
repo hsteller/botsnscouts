@@ -9,20 +9,20 @@
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, in version 2 of the License.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program, in a file called COPYING in the top
- directory of the Bots 'n' Scouts distribution; if not, write to 
- the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ directory of the Bots 'n' Scouts distribution; if not, write to
+ the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  Boston, MA  02111-1307  USA
- 
+
  *******************************************************************/
- 
+
 package de.botsnscouts.board;
 
 import java.util.Vector;
@@ -470,12 +470,12 @@ public Vector getLasers(){
 	if (!xxyy) {
 	    if (bo(robbis[rob].getX(),robbis[rob].getY()).isPit() ){
 		if (!robbis[rob].istInGrube())
-		    ausgabenMsgString("mGrubenopfer",robbis[rob].getName());
+		    ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_IN_PIT,robbis[rob].getName());
 		vernichteRoboter(robbis[rob]);
 	    }
 	} else if (bo(robbis[rob].xx,robbis[rob].yy).isPit() ){
 	    if (!robbis[rob].istInGrube())
-		ausgabenMsgString("mGrubenopfer",robbis[rob].getName());
+		ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_IN_PIT,robbis[rob].getName());
 	    vernichteRoboter(robbis[rob]);
 	}
       }
@@ -681,8 +681,10 @@ public Vector getLasers(){
 
       for (int i=0;i<robbis.length;i++) {
           Floor floor = bo(robbis[i].getX(), robbis[i].getY());
-	  if (floor.isCrusherActive(phase))
+	  if (floor.isCrusherActive(phase)) {
               vernichteRoboter(robbis[i]);
+              ausgabenMsgString (de.botsnscouts.comm.MessageID.BOT_CRUSHED, robbis[i].getName());
+          }
       }
     } // doCrushers
 
@@ -715,7 +717,7 @@ public Vector getLasers(){
 		      actualStats.incDamageByBoard();
 
 
-		      ausgabenMsg("mBoardLaser",tmp);
+		      ausgabenMsg(de.botsnscouts.comm.MessageID.BORD_LASER_SHOT,tmp);
 		  }
 
 		  if (robbis[j].istVirtuell()){
@@ -778,7 +780,7 @@ public Vector getLasers(){
 		registerSperren(robbis[j]);
 		bewegt[j]=true; // Änderung erfolgt
 
-		ausgabenMsgString2("mRobLaser",robbis[rob].getName(),robbis[j].getName());
+		ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER,robbis[rob].getName(),robbis[j].getName());
 		actualStats=stats.getStats(robbis[rob].getName());
 		actualStats.incHits();
 		if (robbis[j].getSchaden()>=10)
@@ -804,7 +806,7 @@ public Vector getLasers(){
 	      registerSperren(robbis[j]);
 	      bewegt[j]=true;
 
-	      ausgabenMsgString2("mRobLaser",robbis[rob].getName(),robbis[j].getName());
+	      ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER,robbis[rob].getName(),robbis[j].getName());
 
 	      continue aussen2;
 	    }
@@ -822,7 +824,7 @@ public Vector getLasers(){
 		registerSperren(robbis[j]);
 		bewegt[j]=true;
 
-		ausgabenMsgString2("mRobLaser",robbis[rob].getName(),robbis[j].getName());
+		ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER,robbis[rob].getName(),robbis[j].getName());
 
 		continue aussen2;
 	    }
@@ -840,7 +842,7 @@ public Vector getLasers(){
 	      registerSperren(robbis[j]);
 	      bewegt[j]=true;
 
-	      ausgabenMsgString2("mRobLaser",robbis[rob].getName(),robbis[j].getName());
+	      ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER,robbis[rob].getName(),robbis[j].getName());
 
 	      continue aussen2;
 	    }
@@ -883,7 +885,8 @@ public Vector getLasers(){
 	    robbis[i].incNaechsteFlagge();
 	  bewegt[i]=true;
 	  //d(robbis[i].getName()+" hat naechste Flagge erreicht.");
-	  ausgabenMsgString2("mNextFlag",robbis[i].getName(),""+(robbis[i].getNaechsteFlagge()-1));
+	  ausgabenMsgString2(de.botsnscouts.comm.MessageID.FLAG_REACHED,
+                            robbis[i].getName(),""+(robbis[i].getNaechsteFlagge()-1));
 	}
 
       }
