@@ -11,4 +11,7 @@
 #	[<whitespace>]<filename><whitespace><error message><end-of-line>
 #
 # comment lines begin with '#'
-syncmail2	Unable to checkout / update syncmail2
+#syncmail2	Unable to checkout / update syncmail2
+CVSCommitConfiguration.py
+CVSCommitNotification.py
+CVSPrepareCommitNotification.py
