@@ -24,6 +24,7 @@ public class StartStart extends JPanel implements  ActionListener, MouseListener
 
     public StartStart(Start par){
 	parent=par;
+	paint=parent.paint;
 	Font font=new Font("Sans", Font.BOLD, 24);
 
 	BorderLayout lay=new BorderLayout();
@@ -66,13 +67,13 @@ public class StartStart extends JPanel implements  ActionListener, MouseListener
 	panel.add(ms, gc);
 	add(BorderLayout.EAST,panel);
 
-	ImageIcon icon = ImageMan.getIcon(Message.say("Start","mBG"));
-	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-	Graphics g = bgimg.getGraphics();
-	icon.paintIcon(this, g, 0,0);
-	g.dispose();
-	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
-	paint = new TexturePaint( bgimg, anchor );
+// 	ImageIcon icon = ImageMan.getIcon(Message.say("Start","mBG"));
+// 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+// 	Graphics g = bgimg.getGraphics();
+// 	icon.paintIcon(this, g, 0,0);
+// 	g.dispose();
+// 	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
+// 	paint = new TexturePaint( bgimg, anchor );
     }
 
     public void actionPerformed(ActionEvent e){
