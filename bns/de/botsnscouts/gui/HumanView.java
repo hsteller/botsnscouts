@@ -452,6 +452,9 @@ f     */
 
     private synchronized void setDialogInSidebarActive(boolean dialogInSidebarActive) {
         this.dialogInSidebarActive = dialogInSidebarActive;
+        if(!dialogInSidebarActive) {
+            panelSwitcher.show(switcherPanel,"userInfo");
+        }
     }
 }
 
