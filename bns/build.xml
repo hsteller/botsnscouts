@@ -7,7 +7,7 @@
   <property name="maindir" value="de/botsnscouts"/>
   <property name="dist" value="dist"/>
   <property name="doc" value="docs" />
-  <property name="jars" value="lib/log4j.jar:lib/sixlegs.jar:lib/jakarta-regexp-1.2.jar"/>
+  <property name="jars" value="lib"/>
   <property name="bns.ver" value="0.8pre" />     
 
   <target name="init">
@@ -27,14 +27,21 @@
 
   <target name="compile" depends="init">
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" includes="${maindir}/**/*.java" destdir="${build}" 
-	   classpath="${jars}:${build}" />
+    <javac srcdir="${src}" includes="${maindir}/**/*.java" destdir="${build}">
+      <classpath>
+         <fileset dir="${jars}" includes="*.jar" />
+      </classpath>	      
+    </javac>
   </target>
 
   <target name="run" depends="compile">
      <echo message="${jars}:${build}" />
-     <java classname="de.botsnscouts.BotsNScouts"
-	   classpath="${jars}:${build}" fork="true" />
+     <java classname="de.botsnscouts.BotsNScouts" fork="true">
+        <classpath>
+	   <fileset dir="${jars}" includes="*.jar" />
+	   <pathelement path="${build}" />
+	</classpath>
+     </java>
   </target>
 
   <target name="dist" depends="compile,dist-bin,dist-src,doc">
