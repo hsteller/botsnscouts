@@ -10,10 +10,11 @@ import java.net.*;
 
 
 public class TransparentButton extends JButton {
-    static Font font = new Font("Sans", Font.BOLD, 24);
+
+    static Font font = new Font("Lucida Sans", Font.BOLD, 24);
     static Stroke normalStroke = new BasicStroke(4);
     static Stroke pressedStroke = new BasicStroke(8);
-    
+
 
       public TransparentButton(String s) {
 	super(s);
@@ -21,7 +22,7 @@ public class TransparentButton extends JButton {
 	setOpaque( false );
 	setFont( TransparentButton.font );
       }
-      
+
       public void mypaint(Graphics g, Color c) {
 	  Graphics2D g2d = (Graphics2D) g;
 	  Dimension d = getSize();
@@ -38,14 +39,14 @@ public class TransparentButton extends JButton {
 	  g2d.setStroke( getModel().isPressed() ?
 			 pressedStroke : normalStroke );
 	  g2d.drawRoundRect(0,0, width, height, 8, 8);
-	 
-	  FontMetrics fm = g2d.getFontMetrics(); 
+
+	  FontMetrics fm = g2d.getFontMetrics();
 	  int sw = fm.stringWidth(getText());
 	  int sh = fm.getAscent();
    	  g2d.setColor( Color.black );
 	  g2d.drawString( getText(), (width-sw)/2, (height+sh)/2);
       }
-     
+
       public void paint(Graphics g) {
 	if( getModel().isPressed() ) {
 	  mypaint(g, Color.green ) ;

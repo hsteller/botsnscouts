@@ -52,7 +52,7 @@ public class Wall {
             return Wall.getWall( sb.toString() );
         }
         catch (FormatException ex) {
-            CAT.fatal("getWall triggers after constructing string itself");
+            CAT.fatal("getWall triggers after constructing string itself", ex);
             return null;
         }
     }
@@ -73,12 +73,6 @@ public class Wall {
             CAT.fatal( "'_' as wallstring triggers: ", fe );
             return null;
         }
-    }
-
-    private Wall() {
-        deviceTypeNW = NONE;
-        deviceTypeSE = NONE;
-        da = false;
     }
 
     public Wall getWithNWLaser(int strength) {
@@ -197,9 +191,6 @@ public class Wall {
         return deviceTypeNW == TYPE_PUSHER && Wall.checkPusherActivity(deviceInfoNW, phase);
     }
 
-
-
-
     public void write(StringBuffer s) {
         if(deviceTypeNW != NONE) {
             s.append('[');
@@ -242,32 +233,9 @@ public class Wall {
         return sb.toString();
     }
 
-
-//    private int getDeviceType(int i) {
-//        if(i == 0) {
-//            return deviceTypeNW;
-//        }
-//        if(i == 1) {
-//            return deviceTypeSE;
-//        }
-//        throw new RuntimeException("accessed unallowed wand deviceType (get)");
-//    }
-//
-//    private int getDeviceInfo(int i) {
-//        if(i == 0) {
-//            return deviceInfoNW;
-//        }
-//        if(i == 1) {
-//            return deviceInfoSE;
-//        }
-//        throw new RuntimeException("accessed unallowed wand deviceType (get)");
-//    }
-//
-
     private static boolean checkPusherActivity(int spez, int phase) {
         return ((spez >> (phase - 1)) % 2 == 1);
     }
-
 
     private static void writeDevice(StringBuffer s, int deviceType, int deviceInfo) {
         switch (deviceType) {
@@ -289,6 +257,12 @@ public class Wall {
             default:
             // nothing;
         }
+    }
+
+    private Wall() {
+        deviceTypeNW = NONE;
+        deviceTypeSE = NONE;
+        da = false;
     }
 
     private static Wall parseWall(String wallString) throws FormatException {
@@ -345,28 +319,29 @@ public class Wall {
         return pos;
     }
 
-    static int skipWallDef(int strpos,String kacheln) throws FormatException
+    static String extractWallDef(int pos,String kacheln) throws FormatException
     {
-      // return pointer to the first char after wall-definition
       // no wall?
+      int strpos = pos;
       if(ParseUtils.is(kacheln,strpos,'_')) {
-        return strpos+1;
-      }
-
-      // read up to the '#'
-      while( kacheln.charAt(strpos) != '#' )
         strpos++;
-
-      // first char after '#'
-      strpos++;
-
-      if(ParseUtils.is(kacheln,strpos,'L') || ParseUtils.is(kacheln,strpos,'S')){ // device?
-          while( kacheln.charAt(strpos) != ']' )
+      } else {
+          // read up to the '#'
+          while( kacheln.charAt(strpos) != '#' )
             strpos++;
 
+          // first char after '#'
           strpos++;
+
+          if(ParseUtils.is(kacheln,strpos,'L') || ParseUtils.is(kacheln,strpos,'S')){ // device?
+              while( kacheln.charAt(strpos) != ']' )
+                strpos++;
+
+              strpos++;
+          }
       }
-      return strpos;
+
+      return kacheln.substring( pos, strpos );
     }
 
 

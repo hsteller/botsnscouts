@@ -49,4 +49,16 @@ class EditableBoard extends de.botsnscouts.board.SpielfeldSim {
     }
 
 
+    // Floor-Stuff
+    void clearFloor(int x, int y) {
+        setFloor(x, y, Floor.getEmptyFloor() );
+    }
+
+    void setFloor( int x, int y, int type, int info ) {
+        setFloor( x, y, Floor.getFloor( type, info ) );
+    }
+
+    void setCrusher( int x, int y, int phases ) {
+        setFloor( x, y, getFloor(x,y).getWithCrusher( phases ) );
+    }
 }

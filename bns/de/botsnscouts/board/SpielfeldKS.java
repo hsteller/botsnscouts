@@ -39,7 +39,7 @@ public class SpielfeldKS extends SpielfeldSim {
         // Schaden beruecksichtigen
         entfernung += (robbi.getSchaden()) * (5 - robbi.getLeben());
         // reparaturfeld ist gut
-        if(bo(robbi.getX(), robbi.getY()).typ == BDREPA) {
+        if(bo(robbi.getX(), robbi.getY()).isRepairing() ) {
             entfernung -= (robbi.getSchaden());
         }
         // Spielstaerke einberechnen
@@ -171,41 +171,41 @@ public class SpielfeldKS extends SpielfeldSim {
         int max = 9999;
 
         if((u == x) && (v == y)) {
-            if((!hasNorthWall(x, y)) && (bo(x, y + 1).typ != BDGRUBE)) {
+            if((!hasNorthWall(x, y)) && !bo(x, y + 1).isPit() ) {
                 entftab[m][x][y + 1] = entftab[m][x][y] + 1;
                 feldEntf(entftab, x, y, x, y + 1, m);
             }
-            if((!hasEastWall(x, y)) && (bo(x - 1, y).typ != BDGRUBE)) {
+            if((!hasEastWall(x, y)) && !bo(x - 1, y).isPit() ) {
                 entftab[m][x - 1][y] = entftab[m][x][y] + 1;
                 feldEntf(entftab, x, y, x - 1, y, m);
             }
-            if((!hasEastWall(x, y)) && (bo(x + 1, y).typ != BDGRUBE)) {
+            if((!hasEastWall(x, y)) && !bo(x + 1, y).isPit() ) {
                 entftab[m][x + 1][y] = entftab[m][x][y] + 1;
                 feldEntf(entftab, x, y, x + 1, y, m);
             }
-            if(!(hasSouthWall(x, y)) && (bo(x, y - 1).typ != BDGRUBE)) {
+            if(!(hasSouthWall(x, y)) && !bo(x, y - 1).isPit() ) {
                 entftab[m][x][y - 1] = entftab[m][x][y] + 1;
                 feldEntf(entftab, x, y, x, y - 1, m);
             }
         }
 
         if((u == x) && (v != y)) {
-            if(!hasNorthWall(x, y) && bo(x, y + 1).typ != BDGRUBE &&
+            if(!hasNorthWall(x, y) && !bo(x, y + 1).isPit() &&
                     (entftab[m][x][y + 1] > entftab[m][x][y] + 1)) {
                 entftab[m][x][y + 1] = entftab[m][x][y] + 1;
                 feldEntf(entftab, x, y, x, y + 1, m);
             }
-            if(!hasWestWall(x, y) && bo(x - 1, y).typ != BDGRUBE &&
+            if(!hasWestWall(x, y) && !bo(x - 1, y).isPit() &&
                     (entftab[m][x - 1][y] > entftab[m][x][y] + 2)) {
                 entftab[m][x - 1][y] = entftab[m][x][y] + 2;
                 feldEntf(entftab, x, y, x - 1, y, m);
             }
-            if(!!hasEastWall(x, y) && bo(x + 1, y).typ != BDGRUBE &&
+            if(!!hasEastWall(x, y) && !bo(x + 1, y).isPit() &&
                     (entftab[m][x + 1][y] > entftab[m][x][y] + 2)) {
                 entftab[m][x + 1][y] = entftab[m][x][y] + 2;
                 feldEntf(entftab, x, y, x + 1, y, m);
             }
-            if(!hasSouthWall(x, y) && bo(x, y - 1).typ != BDGRUBE &&
+            if(!hasSouthWall(x, y) && !bo(x, y - 1).isPit() &&
                     (entftab[m][x][y - 1] > entftab[m][x][y] + 1)) {
                 entftab[m][x][y - 1] = entftab[m][x][y] + 1;
                 feldEntf(entftab, x, y, x, y - 1, m);
@@ -213,22 +213,22 @@ public class SpielfeldKS extends SpielfeldSim {
         }
 
         if((u != x) && (v == y)) {
-            if(!hasNorthWall(x, y) && bo(x, y + 1).typ != BDGRUBE &&
+            if(!hasNorthWall(x, y) && !bo(x, y + 1).isPit() &&
                     (entftab[m][x][y + 1] > entftab[m][x][y] + 2)) {
                 entftab[m][x][y + 1] = entftab[m][x][y] + 2;
                 feldEntf(entftab, x, y, x, y + 1, m);
             }
-            if(!hasWestWall(x, y) && bo(x - 1, y).typ != BDGRUBE &&
+            if(!hasWestWall(x, y) && !bo(x - 1, y).isPit() &&
                     (entftab[m][x - 1][y] > entftab[m][x][y] + 1)) {
                 entftab[m][x - 1][y] = entftab[m][x][y] + 1;
                 feldEntf(entftab, x, y, x - 1, y, m);
             }
-            if(!hasEastWall(x, y) && bo(x + 1, y).typ != BDGRUBE &&
+            if(!hasEastWall(x, y) && !bo(x + 1, y).isPit()  &&
                     (entftab[m][x + 1][y] > entftab[m][x][y] + 1)) {
                 entftab[m][x + 1][y] = entftab[m][x][y] + 1;
                 feldEntf(entftab, x, y, x + 1, y, m);
             }
-            if(!hasSouthWall(x, y) && bo(x, y - 1).typ != BDGRUBE &&
+            if(!hasSouthWall(x, y) && !bo(x, y - 1).isPit() &&
                     (entftab[m][x][y - 1] > entftab[m][x][y] + 2)) {
                 entftab[m][x][y - 1] = entftab[m][x][y] + 2;
                 feldEntf(entftab, x, y, x, y - 1, m);

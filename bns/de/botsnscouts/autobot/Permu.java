@@ -80,7 +80,7 @@ public class Permu {
 
 	    // If we are standing on a conveyor belt, check what cards we need
 	    // to not die next phase
-            if (sf.bo(r.getX(),r.getY()).typ>=100){ // Belt
+            if (sf.bo(r.getX(),r.getY()).isBelt() ){ // Belt
                 for (int i=0;i<zuege.length;i++){
                     tmp[recursionLevel].initFrom(r);
                     tmp[recursionLevel].setZug(0,zuege[i]);

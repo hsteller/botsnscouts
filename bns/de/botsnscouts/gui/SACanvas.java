@@ -187,8 +187,8 @@ public class SACanvas extends JComponent {
 	activeBordLasers=false;
 	gotColors=false;
 	sf=sf_neu;
-	//x=(sf.boden.length-2)*64;
-	//y=(sf.boden[0].length-2)*64;
+	//x=(sf.floor.length-2)*64;
+	//y=(sf.floor[0].length-2)*64;
 	setDoubleBuffered( true );
 	setScale( dScale ); // does setSize()
 	//setSize(x,y);
@@ -595,10 +595,8 @@ public class SACanvas extends JComponent {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     private boolean abbieger(int x, int y, int r){
-	if (sf.bo(x,y).typ>=100 && (sf.bo(x,y).typ%10)==r)
-	    return true;
-	else
-	    return false;
+        Floor floor = sf.bo(x,y);
+	return floor.isBelt() && (floor.getBeltDirection() == r);
     }
 
     protected void vorschau(int phasen, Roboter simRob){
@@ -643,8 +641,8 @@ public class SACanvas extends JComponent {
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     private void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty) {
-	Boden boden = sf.bo(xpos, ypos);
-	switch (boden.typ){
+	Floor floor = sf.bo(xpos, ypos);
+	switch ( floor.getType() ){
 
 	case (Spielfeld.BDGRUBE):
 	    g.drawImage(diverseCrop[3],actx,acty,64,64,this);
@@ -653,13 +651,13 @@ public class SACanvas extends JComponent {
 		g.drawImage(diverseCrop[24+((xpos*ypos*19)%17)%4],actx,acty,64,64,this);
 	    break;
 	case (Spielfeld.BDDREHEL):
-	    if (boden.spez==0)
+	    if (floor.getInfo()==0)
 		g.drawImage(diverseCrop[2],actx,acty,64,64,this);
 	    else
 		g.drawImage(diverseCrop[1],actx,acty,64,64,this);
 	    break;
 	case (Spielfeld.BDREPA):
-	    if (boden.spez==1)
+	    if (floor.getInfo()==1)
 		g.drawImage(diverseCrop[4],actx,acty,64,64,this);
 	    else
 		g.drawImage(diverseCrop[5],actx,acty,64,64,this);
@@ -748,13 +746,13 @@ public class SACanvas extends JComponent {
     // for painting crushers
     private static final int[] crushlb_x = { 20, 30, 30, 30, 40 };
     private static final int[] crushlb_y = { 35, 25, 35, 45, 35 };
-    private void paintCrusher(Graphics g, Boden boden,
+    private void paintCrusher(Graphics g, Floor floor,
 		      int actx, int acty)
     {
 	g.drawImage(diverseCrop[10],actx,acty,64,64,this);
 	g.setColor(Color.white);
 	for (int phasecount=1;phasecount<=5;phasecount++){
-	    if (boden.isCrusherActive(phasecount)){
+	    if (floor.isCrusherActive(phasecount)){
 		int strx = actx + crushlb_x[phasecount-1];
 		int stry = acty + crushlb_y[phasecount-1];
 		g.drawString("" + phasecount,strx,stry);
@@ -780,11 +778,11 @@ public class SACanvas extends JComponent {
 		int acty = (vert-1) * 64;
 		int xpos = hori;
 		int ypos = sf.getSizeY() + 1 - vert;
-		Boden boden = sf.bo(xpos, ypos);
+		Floor floor = sf.bo(xpos, ypos);
 
 		paintFeldBoden( g, xpos, ypos, actx, acty );
-		if ((boden.typ>=100) && (boden.spez>0))
-		    paintCrusher( g, boden, actx, acty);
+		if ((floor.isBelt() ) && (floor.getInfo()>0))
+		    paintCrusher( g, floor, actx, acty);
 	    }
 	}
     }

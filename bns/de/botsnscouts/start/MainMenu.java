@@ -47,7 +47,7 @@ public class MainMenu extends JPanel implements  ActionListener{
 	partBut.setActionCommand("partBut");
 	watchBut.setActionCommand("watchBut");
 	endBut.setActionCommand("endBut");
-	
+
 	buttons.add(gameBut);
 	buttons.add(partBut);
 	buttons.add(watchBut);

@@ -20,11 +20,11 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
   /** Die Spielfeldgroesse */
   protected int sizeX,sizeY;
 
-  /** Die Bodentypen
+  /** Die Floortypen
    *  2-dimensional   1. x-Koordinate
    *                  2. y-Koordinate
    */
-  private Boden[][] boden;
+  private Floor[][] floor;
 
   // Die Waende
   //
@@ -66,7 +66,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
 //	    // Erstes reinkopieren
 //	    for (int x=1;x<=s1.sizeX;x++)
 //		for (int y=1;y<=sizeY;y++)
-//		    boden[x][y]=s1.boden[x][y];
+//		    floor[x][y]=s1.floor[x][y];
 //	    for (int x=0;x<=s1.sizeX;x++)
 //		for (int y=0;y<sizeY;y++)
 //		    vWall[x][y]=s1.vWall[x][y];
@@ -77,7 +77,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
 //	    // Zweites reinkopieren
 //	    for (int x=1;x<=s2.sizeX;x++)
 //		for (int y=1;y<=sizeY;y++)
-//		    boden[x+s1.sizeX][y]=s2.boden[x][y];
+//		    floor[x+s1.sizeX][y]=s2.floor[x][y];
 //	    for (int x=0;x<=s2.sizeX;x++)
 //		for (int y=0;y<sizeY;y++)
 //		    vWall[x+s1.sizeX][y]=s2.vWall[x][y];
@@ -108,7 +108,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
 //	    // Erstes reinkopieren
 //	    for (int x=1;x<=s1.sizeX;x++)
 //		for (int y=1;y<=sizeY;y++)
-//		    boden[x][s2.sizeY+y]=s1.boden[x][y];
+//		    floor[x][s2.sizeY+y]=s1.floor[x][y];
 //	    for (int x=0;x<=s1.sizeX;x++)
 //		for (int y=0;y<sizeY;y++)
 //		    vWall[x][s2.sizeY+y]=s1.vWall[x][y];
@@ -119,7 +119,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
 //	    // Zweites reinkopieren
 //	    for (int x=1;x<=s2.sizeX;x++)
 //		for (int y=1;y<=sizeY;y++)
-//		    boden[x][y]=s2.boden[x][y];
+//		    floor[x][y]=s2.floor[x][y];
 //	    for (int x=0;x<=s2.sizeX;x++)
 //		for (int y=0;y<sizeY;y++)
 //		    vWall[x][y]=s2.vWall[x][y];
@@ -157,7 +157,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
 
       int strpos=0;            // Current pos in the String
 
-      Boden nbo;
+      Floor nbo;
       for (int zeile=sizeY;zeile > 0;zeile--){
 	//parse ZwischenReihe (Nordwaende)
 	for (int spalte=0;spalte < sizeX;spalte++){
@@ -168,7 +168,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
         // one wall, then repeatedly floor & wall
         strpos = parseAndCreateWall(strpos, kacheln, vWall, 0, zeile-1 );
 	for (int spalte=1;spalte <= sizeX;spalte++){
-          strpos = parseAndCreateFloor( strpos, kacheln, boden, spalte, zeile );
+          strpos = parseAndCreateFloor( strpos, kacheln, floor, spalte, zeile );
           strpos = parseAndCreateWall(strpos, kacheln, vWall, spalte, zeile-1 );
 	}
 	strpos=ParseUtils.assertws(kacheln,strpos);
@@ -184,20 +184,16 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
 
     private void initArys(){
 	// initialize arrays
-	boden = new Boden[sizeX+2][sizeY+2];
+	floor = new Floor[sizeX+2][sizeY+2];
 	vWall = new Wall[sizeX+1][sizeY];
 	hWall = new Wall[sizeX][sizeY+1];
-	for (int i=0;i<=sizeX+1;i++){
-	    boden[i][0]=new Boden();
-	    boden[i][0].typ=BDGRUBE;
-	    boden[i][sizeY+1]=new Boden();
-	    boden[i][sizeY+1].typ=BDGRUBE;
+	for (int i=0; i <= sizeX+1; i++){
+	    floor[i][0] = Floor.getPit();
+	    floor[i][sizeY+1] = Floor.getPit();
 	}
-	for (int j=1;j<=sizeY;j++){
-	    boden[0][j]=new Boden();
-	    boden[0][j].typ=BDGRUBE;
-	    boden[sizeX+1][j]=new Boden();
-	    boden[sizeX+1][j].typ=BDGRUBE;
+	for (int j=1; j <= sizeY; j++){
+	    floor[0][j] = Floor.getPit();
+	    floor[sizeX+1][j] = Floor.getPit();
 	}
     }
 
@@ -215,7 +211,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
       for (int i=0;i<f.length;i++){
 	  if ((f[i].x>sizeX)||(f[i].y>sizeY))
 	      throw new FlaggenException(Message.say("Spielfeld","eFlagNotInField",(i+1)));
-	  if (bo(f[i].x,f[i].y).typ==BDGRUBE)
+	  if ( bo(f[i].x,f[i].y).isPit() )
 	      throw new FlaggenException(Message.say("Spielfeld","eFlagOnHole",(i+1)));
       }
 
@@ -237,7 +233,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
 	    flaggenProbleme+=Message.say("Spielfeld","mFlagProbManyWalls",anzwand);//geändert
 	}
 
-	if (bo(f[i].x,f[i].y).typ >= 100){ //Fliessband
+	if (bo(f[i].x,f[i].y).isBelt() ){ //Fliessband
 	    //flaggenProbleme+=Message.say("Spielfeld","mFlagProbConvBelt",(i+1));//original
 	    flaggenProbleme+=Message.say("Spielfeld","mFlagProbConvBelt");//gfeändert
 	}
@@ -262,8 +258,8 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
 	s.append('\n');
         nw(x,sizeX).write(s);
 	for (int y=sizeY;y>0;y--){
-	  //Boden
-	  writeBoden(bo(x,y),s,true);
+	  //Floor
+	  bo(x,y).write(s,true);
           sw(x,y).write(s);
 	}
 	s.append("\n");
@@ -288,8 +284,8 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
                 s.append("\n");
                 ww(1,y).write(s);
                 for (int x=1;x<=sizeX;x++){
-                        //Boden
-                    writeBoden(bo(x,y),s,false);
+                        //Floor
+                    bo(x,y).write(s,false);
                     ow(x,y).write(s);
                 }
                 s.append("\n");
@@ -302,109 +298,25 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
 	    return new String(s);
         }
 
-  private void writeBoden(Boden b,StringBuffer s,boolean drehen)
-    {
-        b.write( s, drehen );
-//      final String[] RUECK={ "N", "E", "S", "W" };
-//
-//      switch (b.typ){
-//      case BDGRUBE:
-//	s.append('G');
-//	break;
-//      case BDNORMAL:
-//	s.append('B');
-//	break;
-//      case BDREPA:
-//	s.append("R(");
-//	s.append(b.spez);
-//	s.append(')');
-//	break;
-//      case BDDREHEL:
-//	s.append("D(");
-//	s.append((b.spez==DUHRZ)?'R':'L');
-//	s.append(')');
-//	break;
-//      default:
-//	  int typ=b.typ;
-//	  if (drehen){
-//	      typ=(b.typ/10)*10;
-//	      typ+=(((b.typ%10)+3)%4);
-//	  }
-//	s.append("F(");
-//	switch (typ%10){
-//	case FNORD:
-//	  s.append("N,");
-//	  break;
-//	case FOST:
-//	  s.append("E,");
-//	  break;
-//	case FSUED:
-//	  s.append("S,");
-//	  break;
-//	case FWEST:
-//	  s.append("W,");
-//	  break;
-//	} //switch richtung
-//	s.append(typ/100);
-//	s.append(",(");
-//	if (((typ/10)%10)==2) {// gegen den Uhrzeigersinn
-//	  s.append('(');
-//	  s.append(RUECK[((typ%10)+3)%4]);
-//	  s.append(",D(L))");
-//	}
-//	else if (((typ/10)%10)==3){ // im Uhrzeigersinn
-//	  s.append('(');
-//	  s.append(RUECK[((typ%10)+1)%4]);
-//	  s.append(",D(R))");
-//	}
-//	else if (((typ/10)%10)==5){ // beides
-//	    if (drehen){
-//		s.append('(');
-//		s.append(RUECK[((typ%10)+3)%4]);
-//		s.append(",D(R))");
-//		s.append('(');
-//		s.append(RUECK[((typ%10)+1)%4]);
-//		s.append(",D(L))");
-//	    } else {
-//		s.append("(");
-//		s.append(RUECK[((typ%10)+1)%4]);
-//		s.append(",D(R))");
-//		s.append('(');
-//		s.append(RUECK[((typ%10)+3)%4]);
-//		s.append(",D(L))");
-//	    }
-//	}
-//	s.append(")("); //crushers
-//	if (b.spez>0)
-//	  for (int i=1;i<6;i++){
-//	    if (isCrusherActive(b.spez,i)){
-//	      s.append(i);
-//	      s.append(',');
-//	    }
-//	  }
-//	s.append("))");
-//	break;
-//      } //switch typ
-    }
-
-
+//  private void writeFloor(Floor b,StringBuffer s,boolean drehen)
+//    {
+//        b.write( s, drehen );
+//    }
 
     private int parseAndCreateWall(int strpos, String kacheln, Wall[][] walls, int a, int b)
     throws FormatException
     {
-          int newpos = Wall.skipWallDef( strpos, kacheln );
-          String wallString = kacheln.substring( strpos, newpos );
+          String wallString = Wall.extractWallDef( strpos, kacheln );
 	  walls[a][b] = Wall.getWall( wallString );
-          return newpos;
+          return strpos + wallString.length();
     }
 
-    private int parseAndCreateFloor(int strpos, String kacheln, Boden[][] floor, int a, int b)
+    private int parseAndCreateFloor(int strpos, String kacheln, Floor[][] floor, int a, int b)
     throws FormatException
     {
-	  Boden newFloor = new Boden();
-	  int newpos = Boden.parseBoden(strpos, kacheln, newFloor);
-	  floor[a][b] = newFloor;
-          return newpos;
+        String floorString = Floor.extractFloorDef( strpos, kacheln );
+        floor[a][b] = Floor.getFloor( floorString );
+        return strpos + floorString.length();
     }
 
 
@@ -453,9 +365,9 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
     public boolean hasEastWall( int x,int y) {
         return ew(x,y).isExisting();
     }
-  /* Bodentyp */
-  public Boden bo(int x,int y) {
-    return(boden[x][y]);
+  /* Floortyp */
+  public Floor bo(int x,int y) {
+    return(floor[x][y]);
   }
 
   /* Nordwand */
@@ -498,18 +410,18 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
         hWall[a][b] = wand;
     }
 
-    public Boden getBoden(int a, int b) {
-        return boden[a][b];
+    public Floor getFloor(int a, int b) {
+        return floor[a][b];
     }
 
-    public void setBoden(int a, int b, Boden aBoden) {
-        boden[a][b] = aBoden;
+    public void setFloor(int a, int b, Floor aFloor) {
+        floor[a][b] = aFloor;
     }
   public void print()
     /* Rein zu Debuggingzwecken; gibt die Zahlen der internen Repräsentation aus */
     {
-      p("Boden:");
-      p("X="+boden.length+"; Y="+boden[0].length);
+      p("Floor:");
+      p("X="+floor.length+"; Y="+floor[0].length);
       p("");
       pn("\t");
       for (int x=0;x<=sizeX+1;x++)
@@ -518,10 +430,10 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
       for (int y=sizeY+1;y>=0;y--){
 	pn(y+"\t");
 	for (int x=0;x<=sizeX+1;x++){
-	  if(boden[x][y]==null)
+	  if(floor[x][y]==null)
 	    pn("null\t");
 	  else
-	    pn(boden[x][y].typ+"|"+boden[x][y].spez+"\t");
+	    pn(floor[x][y].getType()+"|"+floor[x][y].getInfo()+"\t");
 	}
 	p("");
       }

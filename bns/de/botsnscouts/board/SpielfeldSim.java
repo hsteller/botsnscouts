@@ -441,14 +441,14 @@ public Vector getLasers(){
       // Schaut ob jemand in eine Grube gefallen ist
       // xxyy ist Flag fuer Benutzung der gedachten Position
       for (int rob=0;rob<robbis.length;rob++) {
-	  //d("checkGrubenOpfer: rob="+robbis[rob].getName()+"; x="+robbis[rob].x+"; y="+robbis[rob].y+"; xx="+robbis[rob].xx+"; yy="+robbis[rob].yy+"; boden="+bo(robbis[rob].x,robbis[rob].y)+"boden-xxyy="+bo(robbis[rob].xx,robbis[rob].yy).typ+(xxyy?"virtuelle Koord":"reale Koord"));
+	  //d("checkGrubenOpfer: rob="+robbis[rob].getName()+"; x="+robbis[rob].x+"; y="+robbis[rob].y+"; xx="+robbis[rob].xx+"; yy="+robbis[rob].yy+"; floor="+bo(robbis[rob].x,robbis[rob].y)+"floor-xxyy="+bo(robbis[rob].xx,robbis[rob].yy).typ+(xxyy?"virtuelle Koord":"reale Koord"));
 	if (!xxyy) {
-	    if (bo(robbis[rob].getX(),robbis[rob].getY()).typ==BDGRUBE){
+	    if (bo(robbis[rob].getX(),robbis[rob].getY()).isPit() ){
 		if (!robbis[rob].istInGrube())
 		    ausgabenMsgString("mGrubenopfer",robbis[rob].getName());
 		vernichteRoboter(robbis[rob]);
 	    }
-	} else if (bo(robbis[rob].xx,robbis[rob].yy).typ==BDGRUBE){
+	} else if (bo(robbis[rob].xx,robbis[rob].yy).isPit() ){
 	    if (!robbis[rob].istInGrube())
 		ausgabenMsgString("mGrubenopfer",robbis[rob].getName());
 	    vernichteRoboter(robbis[rob]);
@@ -506,9 +506,11 @@ public Vector getLasers(){
       //d("doExprFl called");
       // ExpressFliessband
       gedachteWerteInitialisieren(robbis);
-      for (int i=0;i<robbis.length;i++)
-	if (((bo(robbis[i].getX(),robbis[i].getY()).typ)/100)>1)
-	  ausfuehrenFliessband(robbis,i,(bo(robbis[i].getX(),robbis[i].getY()).typ)%100);
+      for (int i=0;i<robbis.length;i++) {
+        Floor floor = bo(robbis[i].getX(), robbis[i].getY());
+	if( floor.isExpressBelt() )
+	  ausfuehrenFliessband(robbis, i, floor.getBeltInfo() );
+      }
       checkGrubenOpfer(robbis,true);
       gedachtesAusfuehren(robbis);
     }
@@ -518,9 +520,11 @@ public Vector getLasers(){
       //d("doFliessband called");
       // Fliessband (normal)
       gedachteWerteInitialisieren(robbis);
-      for (int i=0;i<robbis.length;i++)
-	if (((bo(robbis[i].getX(),robbis[i].getY()).typ)/100)>0)
-	  ausfuehrenFliessband(robbis,i,(bo(robbis[i].getX(),robbis[i].getY()).typ)%100);
+      for (int i=0;i<robbis.length;i++) {
+        Floor floor = bo(robbis[i].getX(), robbis[i].getY());
+	if( floor.isBelt() )
+	  ausfuehrenFliessband(robbis, i, floor.getBeltInfo() );
+      }
       checkGrubenOpfer(robbis,true);
       gedachtesAusfuehren(robbis);
     }
@@ -546,14 +550,18 @@ public Vector getLasers(){
 	if (!moveRobOne(robbis,rob,WEST,false)) return;
 	break;
       } // switch
-      int bodn=bo(robbis[rob].xx,robbis[rob].yy).typ%100;
-      //d("bodn="+bodn);
-      if (((bodn/10)==2)||((bodn/10)==5)) // gegen den Uhrzeigersinn
-	if (((bodn%10+1)%4)==typ%10)
-	  dreheRoboterGedacht(robbis[rob],DGGUHRZ);
-      if (((bodn/10)==3)||((bodn/10)==5)) // mit dem Uhrzeigersinn
-	if (((typ%10+1)%4)==bodn%10)
-	  dreheRoboterGedacht(robbis[rob],DUHRZ);
+
+      Floor floor = bo(robbis[rob].xx,robbis[rob].yy);
+      if( floor.isBelt() ) {
+          int bInfo=floor.getBeltInfo();
+          //d("bInfo="+bInfo);
+          if (((bInfo/10)==2)||((bInfo/10)==5)) // gegen den Uhrzeigersinn
+            if (((bInfo%10+1)%4)==typ%10)
+              dreheRoboterGedacht(robbis[rob],DGGUHRZ);
+          if (((bInfo/10)==3)||((bInfo/10)==5)) // mit dem Uhrzeigersinn
+            if (((typ%10+1)%4)==bInfo%10)
+              dreheRoboterGedacht(robbis[rob],DUHRZ);
+      }
     } // ausfuehrenFliessband
 
   private void gedachteWerteInitialisieren(BoardRoboter[] robbis)
@@ -630,11 +638,13 @@ public Vector getLasers(){
     {
       //d("doDrehEl called.");
 
-      for (int i=0;i<robbis.length;i++)
-	if (bo(robbis[i].getX(),robbis[i].getY()).typ==BDDREHEL){
-	  dreheRoboter(robbis[i],bo(robbis[i].getX(),robbis[i].getY()).spez);
+      for (int i=0;i<robbis.length;i++) {
+        Floor floor = bo(robbis[i].getX(), robbis[i].getY());
+	if ( floor.isRotator() ){
+	  dreheRoboter(robbis[i], floor.getInfo() );
 	  bewegt[i]=true;
 	}
+      }
     } // doDrehEl
 
   /**
@@ -645,7 +655,7 @@ public Vector getLasers(){
       //d("doCrushers called.");
 
       for (int i=0;i<robbis.length;i++) {
-          Boden floor = bo(robbis[i].getX(), robbis[i].getY());
+          Floor floor = bo(robbis[i].getX(), robbis[i].getY());
 	  if (floor.isCrusherActive(phase))
               vernichteRoboter(robbis[i]);
       }
@@ -821,8 +831,9 @@ public Vector getLasers(){
       //d("doArchivUpdate called.");
 
       for (int i=0;i<robbis.length;i++) {
+        Floor floor = bo(robbis[i].getX(), robbis[i].getY());
 
-	if ((bo(robbis[i].getX(),robbis[i].getY()).typ)==BDREPA) {
+	if ( floor.isRepairing() ) {
 	    robbis[i].setArchiv(robbis[i].getPos());
 	    bewegt[i]=true;
 	    //d(robbis[i].getName()+" ist auf einem Reperaturfeld. Archivpos updated");
@@ -862,13 +873,14 @@ public Vector getLasers(){
       //d("doRepairs called.");
 
       for (int i=0;i<robbis.length;i++) {
-	if ((bo(robbis[i].getX(),robbis[i].getY()).typ)==BDREPA) {
+        Floor floor = bo(robbis[i].getX(), robbis[i].getY());
+	if ( floor.isRepairing() ) {
 	  boolean msg=robbis[i].getSchaden()>0;
-	  robbis[i].decrSchaden(bo(robbis[i].getX(),robbis[i].getY()).spez);
+	  robbis[i].decrSchaden( floor.getInfo() );
 	  bewegt[i]=true;
 	  //d(robbis[i].getName()+" repariert wegen Repa-Feld.");
 	  if (msg)
-	      ausgabenMsgString2("mRepFeld",robbis[i].getName(),""+bo(robbis[i].getX(),robbis[i].getY()).spez);
+	      ausgabenMsgString2("mRepFeld",robbis[i].getName(),""+floor.getInfo() );
 	}
 
 	for (int j=0;j<flaggen.length;j++)

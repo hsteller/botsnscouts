@@ -57,20 +57,23 @@ class BoardPanel extends SACanvas implements MouseListener{
 	    editor.board.setEastPusher(editor.spfX, 11-editor.spfY, editor.phasen );
 	}
 	else if(editor.indx==58){//crusher
-	    int tp=editor.board.getBoden(editor.spfX+1,12-editor.spfY).typ;
-	    if((tp>=100)&&(tp<=253)){
+            int x = editor.spfX + 1;
+            int y = 12 - editor.spfY;
+	    if( editor.board.getFloor(x, y).isBelt() ){
 		new PhaseDialog(editor,Message.say("BoardEditor","mCrusher"),true);
-		editor.board.getBoden(editor.spfX+1,12-editor.spfY).spez=editor.phasen;
+		editor.board.setCrusher( x, y, editor.phasen );
 	    }
 	}
 	else if(editor.indx==59){//leer
-	    editor.board.getBoden(editor.spfX+1,12-editor.spfY).spez=0;
-	    editor.board.getBoden(editor.spfX+1,12-editor.spfY).typ=0;
+            int x = editor.spfX + 1;
+            int y = 12 - editor.spfY;
 
-            editor.board.removeVWall(editor.spfX+1, 11-editor.spfY);
-            editor.board.removeVWall(editor.spfX, 11-editor.spfY);
-            editor.board.removeHWall(editor.spfX, 12-editor.spfY);
-            editor.board.removeHWall(editor.spfX, 11-editor.spfY);
+	    editor.board.clearFloor(  x  , y );
+
+            editor.board.removeVWall( x  , y-1 );
+            editor.board.removeVWall( x-1, y-1 );
+            editor.board.removeHWall( x-1, y   );
+            editor.board.removeHWall( x-1, y-1 );
 	}
 	else if(editor.indx==60){//vert wand
 	    editor.board.addVWall(vWInd, 11-editor.spfY);
@@ -95,8 +98,7 @@ class BoardPanel extends SACanvas implements MouseListener{
 	    editor.board.setNorthLaser(editor.spfX, 11-editor.spfY, editor.laserSt);
 	}
 	else{ //fliessband etc.
-	    editor.board.getBoden(editor.spfX+1,12-editor.spfY).typ =editor.elemTyp[editor.indx];
-	    editor.board.getBoden(editor.spfX+1,12-editor.spfY).spez=editor.elemSpez[editor.indx];
+	    editor.board.setFloor(editor.spfX+1,12-editor.spfY, editor.elemTyp[editor.indx], editor.elemSpez[editor.indx] );
 	}
 	CAT.debug("hab' ich");
 	repaint();

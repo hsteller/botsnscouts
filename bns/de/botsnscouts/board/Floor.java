@@ -1,33 +1,127 @@
 package de.botsnscouts.board;
 
 import de.botsnscouts.util.*;
+import java.util.HashMap;
 
-/**
- *  Description of the Class
- *
- *@author     enno
- *@created    22. April 2001
- */
-public class Boden implements FloorConstants {
-    public int typ;
+public class Floor implements FloorConstants {
+    private int typ;
     // generelle Bodenart
-    public int spez;
+    private int spez;
+    static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Floor.class);
+
+    final static String[] RUECK = {"N", "E", "S", "W"};
+
+    final static String wallChars = "#_[";
 
     //  spezielle Eigenschaften:
 
     //   Crusherphasen (Feld ist Crusher wenn spez>0 und Feld Fliessband)
     //   Drehrichtung von Drehelementen
     //   Staerke des Reparaturfeldes
-    Boden() {
-        spez = 0;
-        typ = Spielfeld.BDNORMAL;
+
+
+    ///////////////////////////////////////////////////
+    // Factory methods
+    ///////////////////////////////////////////////////
+
+    public static Floor getPit() {
+        try {
+            return Floor.getFloor("G");
+        } catch( FormatException fe ) {
+            CAT.fatal( "'G' as floorstring triggers: ", fe );
+            return null;
+        }
     }
 
+    public static Floor getEmptyFloor() {
+        try {
+            return Floor.getFloor("B");
+        } catch( FormatException fe ) {
+            CAT.fatal( "'B' as floorstring triggers: ", fe );
+            return null;
+        }
+    }
 
-    final static String[] RUECK = {"N", "E", "S", "W"};
-    public void write(StringBuffer s, boolean drehen) {
+    public static Floor getFloor(String floorString) throws FormatException {
+        Floor w = (Floor) cache.get(floorString);
+        if(w == null) {
+            w = Floor.parseFloor(floorString);
+            if(!floorString.equals(w.toString())) {
+                CAT.error("assertion failed: " + floorString + " == " + w.toString(), new Exception());
+            }
+            cache.put(floorString, w);
+        }
+        return w;
+    }
 
-        switch (typ) {
+    public static Floor getFloor(int type, int info) {
+        try {
+            StringBuffer sb = new StringBuffer(10);
+            Floor.write(sb, type, info);
+            return Floor.getFloor(sb.toString());
+        } catch(FormatException ex) {
+            CAT.fatal("getFloor triggers after constructing string itself", ex);
+            return null;
+        }
+    }
+
+    private static HashMap cache = new HashMap();
+
+    ///////////////////////////////////////////////////
+    private Floor() {
+        this.spez = 0;
+        this.typ = Spielfeld.BDNORMAL;
+    }
+
+    public Floor getWithCrusher(int phases) {
+        CAT.assert(isBelt(), "requesting crusher on non-belt-floor");
+        return Floor.getFloor(typ, phases);
+    }
+
+    public int getType() {
+        return typ;
+    }
+
+    public int getInfo() {
+        return spez;
+    }
+
+    public boolean isPit() {
+        return typ == BDGRUBE;
+    }
+
+    public boolean isBelt() {
+        return typ >= 100;
+    }
+
+    public boolean isExpressBelt() {
+        return typ >= 200;
+    }
+
+    public boolean isRepairing() {
+        return typ == BDREPA;
+    }
+
+    public boolean isRotator() {
+        return typ == BDDREHEL;
+    }
+
+    public int getBeltInfo() {
+        CAT.assert(isBelt(), "getBeltInfo() called on non-belt-floor");
+        return typ % 100;
+    }
+
+    public int getBeltDirection() {
+        CAT.assert(isBelt(), "getBeltDirection() called on non-belt-floor");
+        return typ % 10;
+    }
+
+    public boolean isCrusherActive(int phase) {
+        return typ >= 100 && ((spez >> (phase - 1)) % 2 == 1);
+    }
+
+    public static void write(StringBuffer s, int type, int info, boolean drehen) {
+        switch (type) {
             case BDGRUBE:
                 s.append('G');
                 break;
@@ -36,19 +130,19 @@ public class Boden implements FloorConstants {
                 break;
             case BDREPA:
                 s.append("R(");
-                s.append(spez);
+                s.append(info);
                 s.append(')');
                 break;
             case BDDREHEL:
                 s.append("D(");
-                s.append((spez == DUHRZ) ? 'R' : 'L');
+                s.append((info == DUHRZ) ? 'R' : 'L');
                 s.append(')');
                 break;
             default:
-                int btyp = typ;
+                int btyp = type;
                 if(drehen) {
-                    btyp = (typ / 10) * 10;
-                    btyp += (((typ % 10) + 3) % 4);
+                    btyp = (type / 10) * 10;
+                    btyp += (((type % 10) + 3) % 4);
                 }
                 s.append("F(");
                 switch (btyp % 10) {
@@ -98,9 +192,9 @@ public class Boden implements FloorConstants {
                 }
                 s.append(")(");
                 //crushers
-                if(spez > 0) {
+                if(info > 0) {
                     for(int i = 1; i < 6; i++) {
-                        if(isCrusherActive(i)) {
+                        if(isCrusherActive(i, type, info)) {
                             s.append(i);
                             s.append(',');
                         }
@@ -109,10 +203,44 @@ public class Boden implements FloorConstants {
                 s.append("))");
                 break;
         }
-        //switch typ
+        //switch type
     }
 
-    public static int parseBoden(int pos, String s, Boden neu) throws FormatException {
+
+    public static void write(StringBuffer s, int type, int info) {
+        Floor.write(s, type, info, false );
+    }
+
+    public void write(StringBuffer s, boolean drehen ) {
+        Floor.write(s, typ, spez, drehen );
+    }
+
+    public static String extractFloorDef(int pos, String s) throws FormatException {
+        int i = skipFloorDef(pos, s);
+        return s.substring(pos, i);
+    }
+
+    // static variant
+    private static boolean isCrusherActive(int phase, int type, int info) {
+        return type >= 100 && ((info >> (phase - 1)) % 2 == 1);
+    }
+
+    private static int skipFloorDef(int pos, String s) throws FormatException {
+        // there always comes a wall after a floor element, so we only have to look
+        // for the next char that starts a wall defintion
+        int idx = pos + 1;
+        int l = s.length();
+        // look for the first following char thats in 'wallChars'
+        while((idx < l) && (wallChars.indexOf(s.charAt(idx)) == -1)) {
+            idx++;
+        }
+        return idx;
+    }
+
+    private static Floor parseFloor(String floorDef) throws FormatException {
+        Floor neu = new Floor();
+        String s = floorDef;
+        int pos = 0;
         if(ParseUtils.is(s, pos, 'B')) {
             neu.typ = BDNORMAL;
             pos++;
@@ -204,8 +332,9 @@ public class Boden implements FloorConstants {
             // Keines der erlaubten Zeichen 'BGDRF' in Position "pos"
             throw new FormatException(Message.say("Spielfeld", "xCharNotAllowed", pos, "BGDRF"));
         }
-        return pos;
+        return neu;
     }
+
 
     private static int drehungLegal(int typus, char from, char dreh, int pos) throws FormatException {
         int t = typus;
@@ -266,9 +395,9 @@ public class Boden implements FloorConstants {
         return t;
     }
 
-    public boolean isCrusherActive(int phase)
-    {
-        return typ>=100 && ((spez>>(phase-1))%2==1);
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        write(sb, false);
+        return sb.toString();
     }
-
 }
