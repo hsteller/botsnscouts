@@ -305,15 +305,35 @@ public class SpielerKuenstlich extends Thread {
         {
             int sPort = 0;
             SpielerKuenstlich spK;
+            int malus=0;
+            String host="";
+
                 // Kommandozeilenparameter auswerten
-            if ((args.length > 0) &&(args[0] != "") && (args[1]) !="") {
-                try {sPort = Integer.parseInt(args[1]); } 
-                catch (Exception e) {
-		    System.err.println("Usage: java de.spline.rr.SpielerKuenstlich <host> <port>");
-                }
-                spK = new SpielerKuenstlich(args[0],sPort);
+            
+            try{
+                switch(args.length){
+                    case 3:
+                        malus=Integer.parseInt(args[2]);
+                    case 2:
+                        sPort=Integer.parseInt(args[1]);
+                    case 1:
+                        host=args[0];
+                        break;
+                    default:
+                        throw new Exception();
+                } // switch
             }
-            else spK = new SpielerKuenstlich("localhost",8077);
+            catch (Exception e) {
+                System.err.println("Usage: java de.botsnscouts.autobot.SpielerKuenstlich <host> <port>");
+            }
+            
+            if (host.equals(""))
+                host="localhost";
+            if (sPort==0)
+                sPort=8077;
+
+            spK=new SpielerKuenstlich(host, sPort, malus);
+
             spK.start();
         }
 
