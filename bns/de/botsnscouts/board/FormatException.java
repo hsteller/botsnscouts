@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.board;
 
 /**
  * FormatException wird bei Abweichungen vom Spielfelddatenformat geworfen.

@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.board;
 
 /**
  * Diese Klasse repraesentiert das Spielfeld. Sie soll von
@@ -6,15 +6,12 @@ package de.spline.rr;
  * extended).
  * @author: Dirk Materlik, Gero Eggers
  */ 
-public class Spielfeld
+
+import de.botsnscouts.util.Roboter;
+
+public class Spielfeld implemets de.botsnscouts.util.Directions
 {
 
-  /** Konstanten für Richtungen */
-
-  public static final int NORD=0;  // fuer Roboterbewegung etc.  
-  public static final int OST=1;
-  public static final int SUED=2;
-  public static final int WEST=3;
 
 
   //  protected inner classes 

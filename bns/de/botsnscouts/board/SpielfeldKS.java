@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.board;
 
 /**
  *Diese Klasse ist das intelligente Spielfeld des künstlichen Spielers.
@@ -9,6 +9,9 @@ package de.spline.rr;
 
 import java.io.*;
 import java.lang.*;
+
+import de.botsnscouts.util.Roboter;
+
 public class SpielfeldKS extends SpielfeldSim  {
     private int[][][] entftab;
     private static SpielfeldKS uniqueInstance;

@@ -1,4 +1,5 @@
-package de.spline.rr;
+
+package de.botsnscouts.board;
 
 public class RRdoPhaseException extends RuntimeException
 {

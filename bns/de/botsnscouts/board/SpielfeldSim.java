@@ -1,8 +1,13 @@
-package de.spline.rr;
+package de.botsnscouts.board;
 
 
 import java.util.Vector;
 import java.util.Enumeration;
+
+
+import de.botsnscouts.util.Roboter;
+import de.botsnscouts.util.Ort;
+import de.botsnscouts.server.Server;
 
 /** Das intelligente Spielfeld
  * @author: Dirk Materlik, Gero Eggers
