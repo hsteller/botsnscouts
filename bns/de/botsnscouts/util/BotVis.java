@@ -1,4 +1,4 @@
-package de.botsnscouts.util.*;
+package de.botsnscouts.util;
 
 import java.awt.*;
 
