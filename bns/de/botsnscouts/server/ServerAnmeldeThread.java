@@ -225,6 +225,7 @@ public class ServerAnmeldeThread extends java.lang.Thread{
 			d("Farbe Nr. "+farbe+" zugeteilt.");
 
 			Roboter h=Roboter.getNewInstance(clientname);
+			h.setBotVis(farbe);
 			KommServerRoboter komm = new KommServerRoboter(in,out);
 			try{
 			    komm.anmeldeBestaetigung(true);
