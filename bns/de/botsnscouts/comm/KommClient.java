@@ -940,9 +940,9 @@ public class KommClient {
     */
     public Bot getRobStatus (String name) throws KommException {
         String com ="";
-	Bot robot=Bot.getNewInstance(name);
+        Bot robot=Bot.getNewInstance(name);
         String raus ="GRS("+URLEncoder.encode(name)+")";
-	this.senden(raus);
+        this.senden(raus);
         //Server sends "RS(Richtung(N,O..), Location(1,1), LFlag, LArchF, Schaden, VLeben, GespRegister, Aktiv, Virtuell, RSreserveiert)"
 	/*try{
 	  com=in.readLine();
@@ -959,13 +959,13 @@ public class KommClient {
 	else{
 	    char richtung =com.charAt(3); // Richtung auslesen
 	    if (richtung=='N')
-		robot.setFacing(0);
+	        robot.setFacing(Directions.NORTH);
 	    else if (richtung=='S')
-		robot.setFacing(2);
+	        robot.setFacing(Directions.SOUTH);
 	    else if ((richtung=='E')||(richtung=='O'))
-		robot.setFacing(1);
+	        robot.setFacing(Directions.EAST);
 	    else if (richtung=='W')
-		robot.setFacing(3);
+	        robot.setFacing(Directions.WEST);
 	    int kommapos=com.indexOf(',');
 	    if (kommapos==-1)
 		throw new KommException("getrobStatus: kein Komma gefunden");
@@ -975,7 +975,7 @@ public class KommClient {
 	    String xk=com.substring(1,kommapos);
 	    String yk=com.substring(kommapos+1,klazupos);
 	    try {
-		robot.setPos(Integer.parseInt(xk), Integer.parseInt(yk));
+	        robot.setPos(Integer.parseInt(xk), Integer.parseInt(yk));
 	    }
 	    catch (NumberFormatException nfe) {
 		throw new KommException ("getRobStatus: (Location-Parsen) NumberFormatException(Message: "+nfe.getMessage());

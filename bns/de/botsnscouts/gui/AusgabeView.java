@@ -80,11 +80,13 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private boolean soundOn = false;
 
     // speed-menu
-    public static final int SLOW = 1000; // FIXME aus propeties einlesen bzw. fuer Benutzer einstellbar machen
-    public static final int MEDIUM = 500;
-    public static final int FAST = 100;
-
-    protected int speed=MEDIUM;
+   // public static final int SLOW = 1000; // TODO aus propeties einlesen bzw. fuer Benutzer einstellbar machen->OptionsPanel 
+  //  public static final int MEDIUM = 500;
+  //  public static final int FAST = 100;
+    private  AnimationConfig speedSettingSlow;
+    private  AnimationConfig speedSettingMedium;
+    private  AnimationConfig speedSettingFast;
+//    protected int speed=MEDIUM;
  
     public AusgabeView(BoardView sa, Bot[] robots, Ausgabe aus) {
 		ausgabe = aus;
@@ -165,6 +167,13 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 		
 
 	}
+    
+    private void initSpedSettings() {
+        // TODO: aus properties einlesen
+        speedSettingFast = AnimationConfig.getGlobalAnimationConfig();
+        speedSettingMedium = AnimationConfig.getGlobalAnimationConfig();
+        speedSettingSlow = AnimationConfig.getGlobalAnimationConfig();
+    }
 
     protected void addWiseAndScout(JPanel p){
         CAT.debug("adding WiseAndScout to Northpanel/EAST");
@@ -232,30 +241,19 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      * Shows the new Positions of the Robots
      */
     public void showUpdatedRobots(Bot[] r){
-	gameBoardCanvas.ersetzeRobos(r);
-        //synchronized (gameBoardCanvas.getLockObj()) {
-        //  while (!gameBoardCanvas.isReady()) {
-        //    try{
-        //      wait();
-        //    }
-        //    catch (InterruptedException ie) {
-        //      CAT.error(ie.getMessage(), ie);
-        //    }
-        //  }
-       // }
-	for (int i = 0; i < r.length; i++) {
-	    ((RobotStatus) robotStatus.get(r[i].getName())).updateRobot(r[i]);
-	    ((RobotCard) robotCardStatus.get(r[i].getName())).updateRobot(r[i]);
-	    // RobCards aktualisieren TODO
-	}
-
-      try { // wait a little for the display to update
-          Thread.sleep(speed);
-      }
-      catch (Exception e) {
-          CAT.error(e.getMessage(), e);
-      }
+		gameBoardCanvas.ersetzeRobos(r);        	
+		updateRobotStatusDisplay(r);		
     }
+    
+    protected void updateRobotStatusDisplay(Bot [] r){
+        int count = r.length;
+	    for (int i = 0; i < count; i++) {
+	        Bot b = r[i];
+	        String name = b.getName();
+		    ((RobotStatus) robotStatus.get(name)).updateRobot(b);
+		    ((RobotCard) robotCardStatus.get(name)).updateRobot(b);		
+		}  
+	}
 
     public void showPixelPos(int x, int y ) {
         CAT.debug(" scroll request: " + x + " " + y );
@@ -327,7 +325,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     /**
      * board view is to paint bord laser activity
      */
-    public void showBoardLaser(Location laserPos, int facing, int stregth, Location r1Pos){
+    protected void showBoardLaser(Location laserPos, int facing, int stregth, Location r1Pos){
        gameBoardCanvas.doBordLaser(laserPos, facing, stregth, r1Pos,gameBoardView);
     }
 
@@ -342,6 +340,10 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     /** bord view is to animate robot movement*/
     protected void animateRobUTurn(Bot rob){
         gameBoardCanvas.animateRobUTurn(rob);
+    }
+    
+    protected void setInitialFacings(Bot [] botsWithUpdatedFacing){
+        gameBoardCanvas.updateFacings(botsWithUpdatedFacing);
     }
 
     //protected int getDelay() {
@@ -376,7 +378,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     }
 
 
-    public BoardView getSpielfeld() {
+    public BoardView getBoardView() {
       return gameBoardCanvas;
     }
 
@@ -596,22 +598,21 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
       public void actionPerformed(ActionEvent e) {
 	    String message = null;
-      	if (e.getSource() == lSpeed) {
-			speed=SLOW;
+      	AnimationConfig neu;
+	    if (e.getSource() == lSpeed) {
+			neu = speedSettingSlow;
 			message = "gAufLang";	
 	    }
       	else if (e.getSource() == hSpeed){
-    		speed=FAST;
+    		neu = speedSettingFast;
     		message = "gAufUn";    	
     	}
 	    else  {
-			speed=MEDIUM;
+			neu = speedSettingMedium;
 			message = "gAufMitt";              
         }
       	
-      	if (gameBoardCanvas != null) {
-      		gameBoardCanvas.setDelay(speed);
-      	}      		      	
+        AnimationConfig.setGlobalAnimationConfig(neu);     	
       	showActionMessage(Message.say("AusgabeFrame",message));
 	}
 
@@ -722,7 +723,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         }
     }
 
-    public JComponent getBoardView() {
+    public JComponent getBoardViewport() {
         return gameBoardView;
     }
 

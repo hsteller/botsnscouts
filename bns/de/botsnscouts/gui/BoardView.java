@@ -39,6 +39,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
+import java.awt.image.RasterFormatException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -99,16 +100,6 @@ public class BoardView extends JLayeredPane {
     private static final double FULL_LENGTH_DOUBLE = 30.0;
 
 
-    
-    
-    
-    
-    
-
-    
-  
-
-
     /** contains colors of the boardlasers, strength 1 to 3*/
     static final Color[] laserColor = {Color.red.brighter(), //strength 1
                                        Color.orange, //strength 2
@@ -132,6 +123,7 @@ public class BoardView extends JLayeredPane {
 
     /** Stores data of the robots.*/
     private Bot[] robos;
+    
     /** This robot is used for calculations,
      *  like making a suggestion for the next move.
      */
@@ -170,24 +162,10 @@ public class BoardView extends JLayeredPane {
     ClickListener myClickListener;
 
 
-    private int delay=AusgabeView.MEDIUM;
+   // private int delay=AusgabeView.MEDIUM;
     
+    private AnimationConfig globalAnimationConfig = AnimationConfig.getGlobalAnimationConfig();
     
-    /** Number of pixels a robot will be moved in a single animation step.
-     *  Has to be between 1 and scaledFieldSize
-     *  => Number of steps a one-field-move is drawn = scaledFieldSize/MOVE_ROB_ANIMATION_OFFSET
-     *
-     */
-    private static final int MOVE_ROB_ANIMATION_OFFSET = 1;
-    /** Amount of time (in ms) we wait after a single animation step
-     *  of (pixel-)length MOVE_ROB_ANIMATION_OFFSET.
-     */
-    private static final int MOVE_ROB_ANIMATION_DELAY = 1;
-    
-    /** Number of steps a 90 degree turn is animated with*/ 
-    private static final int TURN_ROB_ANIMATION_STEPS = 45;
-    private static final int TURN_ROB_ANIMATION_DELAY = 1;
-
     private static final AlphaComposite AC_SRC = AlphaComposite.getInstance(AlphaComposite.SRC);
     private static final AlphaComposite AC_SRC_OVER = AlphaComposite.getInstance(AlphaComposite.SRC_OVER);
     private static final AlphaComposite AC_SRC_OVER_05 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
@@ -358,11 +336,16 @@ public class BoardView extends JLayeredPane {
     private HashMap internalBotHash = new java.util.HashMap();
     private static final Location pit = new Location(0, 0);
 
+    
+    
     protected void ersetzeRobos(Bot[] robos_neu) {
 
         if (!gotColors) { // this is the first time I get the robots
             setRobColors(robos_neu);
             robos = robos_neu;
+            int count = robos!=null?robos.length:0;
+            for (int i = 0; i < count; i++) // initalizing my internal hash
+                internalBotHash.put(robos[i].getName(), robos[i]);
         }
         // we dont want to overwrite the robots positions/facings, because they
         // have been updated in animateRobMove()/animateRobTurn() before;
@@ -370,13 +353,14 @@ public class BoardView extends JLayeredPane {
         // would reset a robot back to a position/facing he has already left
         else {
             if (Ausgabe.IS_ROB_MOVE_ANIMATION_ENABLED) {
-                for (int i = 0; i < robos.length; i++) // saving my internal robot values
+                int count = robos!=null?robos.length:0;
+                for (int i = 0; i < count; i++) // saving my internal robot values
                     internalBotHash.put(robos[i].getName(), robos[i]);
                 robos = robos_neu; // updating all robots
 
                 // replacing robot values - if it was not destroyed -
                 // with the values we saved above
-                for (int i = 0; i < robos.length; i++) {
+                for (int i = 0; i < count; i++) {
                     Bot r = robos[i];
                     Bot tmpBot  = (Bot) internalBotHash.get(r.getName());
                     Location tmp = tmpBot.getPos();
@@ -411,6 +395,34 @@ public class BoardView extends JLayeredPane {
 
     }
     
+    /** This method was added so that we can get the initial facings of the robots.
+     * ersetzeRobos(Bot[]) doesn't work if animations are enabled (if animations are enabled
+     * we have to use an internal version of the bots and ignore the server values for position and
+     * facing because we have the bots moved before we get the notification that something has changed
+     * (and might get other notification in between that still contain the old values=>bots would be animated and
+     * then placed back to their position before the animation).
+     * 
+     * DON'T USE THIS METHOD TO TURN ROBOTS, use animateRobTurn etc. instead
+     * 
+     * @param updated the facing of these Bots will be updated 
+     */
+    protected void updateFacings (Bot [] updated){
+        if (robos == null ){ // just in case, probably unnecessary
+            CAT.warn("updateFacings called but we didn't even no the robots!");
+            robos = updated;
+            repaint();
+            return;
+        }
+       
+        int count = updated!=null?updated.length:0;
+        for (int i=0;i<count;i++){
+            Bot tmp = updated[i];
+            Bot internal = getBotByName(tmp.getName());
+            internal.setFacing(tmp.getFacing());
+        }
+        repaint();
+    }
+    
     private void paintBotsOnPositionButNotMe(Location position, Bot me, Graphics2D g2d, int xoffset, int yoffset){       
        int botCount = robos.length;
        int acht = (int)(8*dScale);
@@ -421,11 +433,11 @@ public class BoardView extends JLayeredPane {
                 if (bot.isVirtual())
                     g2d.setComposite(AC_SRC_OVER_05);
                 else
-                    g2d.setComposite(AC_SRC);
-                g2d.drawImage(getRobImage(bot, bot.getFacing()), xoffset, yoffset,scaledFeldSize, scaledFeldSize,this );                
-                
+                    g2d.setComposite(AC_SRC);               
                 g2d.setColor(ROBOCOLOR[bot.getBotVis()]);
                 g2d.drawString(bot.getName(),xoffset,yoffset + acht + i * acht);
+                g2d.drawImage(getRobImage(bot, bot.getFacing()), xoffset, yoffset,scaledFeldSize, scaledFeldSize,this );                
+                
             }
         }
         
@@ -460,14 +472,15 @@ public class BoardView extends JLayeredPane {
             paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,0);
             Raster blankWithBots = tmpImage.getData();
             myg.setComposite(ac);
-      
-            for (int yoffset = 0; yoffset >= -feldSize; yoffset -= MOVE_ROB_ANIMATION_OFFSET) {
+            int animationOffsetMoveRob =globalAnimationConfig.getAnimationOffsetMoveRob();
+            int animationDelayMoveRob = globalAnimationConfig.getAnimationDelayMoveRob();
+            for (int yoffset = 0; yoffset >= -feldSize; yoffset -= animationOffsetMoveRob) {
                      tmpImage.setData(blankWithBots);                                                        
                      myg.drawImage(imgRob, 0,feldSize+yoffset, feldSize, feldSize, this); // paint the image                                                                                        
                     // myg.scale(dScale, dScale);
                      g2.drawImage(tmpImage, xposScaled, yposScaled, feldSize, clipLength,this);
                    try {
-                         Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                         Thread.currentThread().sleep(animationDelayMoveRob);
                     } catch (InterruptedException ie) {
                         CAT.warn("BoardView.paint: wait int moveRobNorth interrupted");
                     }
@@ -503,14 +516,15 @@ public class BoardView extends JLayeredPane {
             paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, 0);
             paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,scaledFeldSize);
             Raster blankWithBots = tmpImage.getData();
-            
+            int animationOffsetMoveRob =globalAnimationConfig.getAnimationOffsetMoveRob();
+            int animationDelayMoveRob = globalAnimationConfig.getAnimationDelayMoveRob();
             myg.setComposite(ac);
-                for (int yoffset = 0; yoffset <=feldSize; yoffset += MOVE_ROB_ANIMATION_OFFSET) {
+                for (int yoffset = 0; yoffset <=feldSize; yoffset += animationOffsetMoveRob) {
                      tmpImage.setData(blankWithBots);                                   
                      myg.drawImage(imgRob, 0,yoffset, feldSize,feldSize, this); // paint the image                                                                                        
                      g2.drawImage(tmpImage, xpos64, ypos64, feldSize, clipLength,this);
                    try {
-                         Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                         Thread.currentThread().sleep(animationDelayMoveRob);
                     } catch (InterruptedException ie) {
                         CAT.warn("BoardView.paint: wait int moveRobNorth interrupted");
                     }
@@ -545,12 +559,14 @@ public class BoardView extends JLayeredPane {
             paintBotsOnPositionButNotMe(botEndPos, internal,myg,scaledFeldSize,0);
             Raster blankWithBots = tmpImage.getData();
             myg.setComposite(ac);
-            for (int xoffset = 0; xoffset <= feldSize; xoffset += MOVE_ROB_ANIMATION_OFFSET) {
+            int animationOffsetMoveRob =globalAnimationConfig.getAnimationOffsetMoveRob();
+            int animationDelayMoveRob = globalAnimationConfig.getAnimationDelayMoveRob();
+            for (int xoffset = 0; xoffset <= feldSize; xoffset += animationOffsetMoveRob) {
                 tmpImage.setData(blankWithBots);                                   
                  myg.drawImage(imgRob, xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
                  g2.drawImage(tmpImage, xpos64, ypos64, clipLength, feldSize,this);
                try {
-                     Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                     Thread.currentThread().sleep(animationDelayMoveRob);
                 } catch (InterruptedException ie) {
                     CAT.warn("BoardView.paint: wait int moveRobWest interrupted");
                 }
@@ -583,14 +599,15 @@ public class BoardView extends JLayeredPane {
             paintBotsOnPositionButNotMe(botStartPos, internal, myg,scaledFeldSize, 0);
             paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,0);
             Raster blankWithBots = tmpImage.getData();
-            
+            int animationOffsetMoveRob =globalAnimationConfig.getAnimationOffsetMoveRob();
+            int animationDelayMoveRob = globalAnimationConfig.getAnimationDelayMoveRob();
             myg.setComposite(ac);
-                for (int xoffset = 0; xoffset >= -feldSize; xoffset -= MOVE_ROB_ANIMATION_OFFSET) {
+                for (int xoffset = 0; xoffset >= -feldSize; xoffset -= animationOffsetMoveRob) {
                     tmpImage.setData(blankWithBots);                                   
                      myg.drawImage(imgRob, feldSize+xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
                      g2.drawImage(tmpImage, xpos64, ypos64, clipLength, feldSize,this);
                    try {
-                         Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                         Thread.currentThread().sleep(animationDelayMoveRob);
                     } catch (InterruptedException ie) {
                         CAT.warn("BoardView.paint: wait int moveRobWest interrupted");
                     }
@@ -603,36 +620,44 @@ public class BoardView extends JLayeredPane {
     
     protected synchronized void animateRobUTurn(Bot rob) {
         Bot internal = getBotByName(rob.getName());
-        turnRobot(internal, 180, TURN_ROB_ANIMATION_STEPS*2, true);
+        turnRobot(internal, 180, 2* globalAnimationConfig.getAnimationStepsTurnRob(), true);
         internal.turnClockwise();
         internal.turnClockwise();
     }
     
     private Bot getBotByName (String botName){
-        Bot internal=null;
-        for (int i = 0; i < robos.length; i++) {
+       // return internalBotHash.get(botName);
+         int count = robos.length;
+        for (int i = 0; i < count; i++) {
             if (robos[i].getName().equals(botName)) {
-                internal = robos[i];
-                break;
+                return robos[i];              
             }
         }
-        return internal;
+        return null;
+    
     }
     
     /** @param direction either BOT_TURN_CLOCKWISE or BOT_TURN_COUNTER_CLOCKWISE in MessageID*/
     protected synchronized void animateRobTurn(Bot rob, int direction) {
-
-        Bot internal = getBotByName(rob.getName());
-       
-        int oldFacing = internal.getFacing();
-                
-        if (direction == OtherConstants.BOT_TURN_CLOCKWISE){
-            turnRobot(internal, 90,TURN_ROB_ANIMATION_STEPS, true);
-            internal.turnClockwise();
+        try {
+	        Bot internal = getBotByName(rob.getName());
+	       
+	        int oldFacing = internal.getFacing();
+	        int animationStepsTurnRob =globalAnimationConfig.getAnimationStepsTurnRob();
+	        int animationDelayTurnRob = globalAnimationConfig.getAnimationDelayTurnRob();
+	        
+	        if (direction == OtherConstants.BOT_TURN_CLOCKWISE){
+	            turnRobot(internal, 90,animationStepsTurnRob, true);
+	            internal.turnClockwise();
+	        }
+	        else {
+	            turnRobot(internal, 90, animationStepsTurnRob,false);
+	            internal.turnCounterClockwise();
+	        }
         }
-        else {
-            turnRobot(internal, 90, TURN_ROB_ANIMATION_STEPS,false);
-            internal.turnCounterClockwise();
+        // FIXME 
+        catch ( RasterFormatException fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore){
+            CAT.error(fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore);
         }
        
          
@@ -652,6 +677,7 @@ public class BoardView extends JLayeredPane {
         CAT.debug("turning bot:; theta="+rotateTheta);
         synchronized (this) {       
             Graphics2D mainGraphics = (Graphics2D)getGraphics();  
+            Composite oldComposite = mainGraphics.getComposite();
             int feldSize = scaledFeldSize;           
             int xposScaled=  (internal.getX()-1) *feldSize;
             int yposScaled = (sf.getSizeY() - internal.getY())*feldSize;                         
@@ -660,38 +686,36 @@ public class BoardView extends JLayeredPane {
             if (preBoard == null)
                 preBoard = getBoardImage();
             
-            // transforming the robot image into an image that we are allowed to call getGraphics() on so
-            // that we will be able to rotate it later
-            BufferedImage robImage=  preBoard.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
+            BufferedImage backgroundImage=  preBoard.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
+            Graphics2D backgroundWithBots = (Graphics2D) backgroundImage.getGraphics();     
+            backgroundWithBots.setComposite(ac);       
             // saving a copy of the background:
-            Raster blank = robImage.getData();
-            Graphics2D botImageGraphics = (Graphics2D) robImage.getGraphics();
-                        
-            paintBotsOnPositionButNotMe(internal.getPos(), internal,botImageGraphics,0,0);
-            Raster blankWithBots = robImage.getData();
+            Raster blank = backgroundImage.getData();                                          
+            paintBotsOnPositionButNotMe(internal.getPos(), internal,backgroundWithBots,0,0);
+            Raster blankWithBots = backgroundImage.getData();
+                       
+            // painting the animated bot           
+            backgroundWithBots.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
             
-            
-            
-            botImageGraphics.setComposite(ac);
-       
-            botImageGraphics.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
-           
-             for (int step = 0; step<TURN_ROB_ANIMATION_STEPS;step++) {
+            int animationStepsTurnRob =globalAnimationConfig.getAnimationStepsTurnRob();
+            int animationDelayTurnRob = globalAnimationConfig.getAnimationDelayTurnRob();
+             for (int step = 0; step<animationStepsTurnRob;step++) {
 
-                 	 robImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
-                     botImageGraphics.rotate(rotateTheta,halfSize, halfSize); // rotating the robot pic further   
-                     botImageGraphics.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);                  
+                 	 backgroundImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
+                     backgroundWithBots.rotate(rotateTheta,halfSize, halfSize); // rotating the robot pic further   
+                     backgroundWithBots.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);                  
                      // paint the offscreen image on the screen:
-                     mainGraphics.drawImage(robImage, xposScaled, yposScaled, feldSize, clipLength,this);
+                     mainGraphics.drawImage(backgroundImage, xposScaled, yposScaled, feldSize, clipLength,this);
                 
                      try {
-                         Thread.currentThread().sleep(TURN_ROB_ANIMATION_DELAY);
+                         Thread.currentThread().sleep(animationDelayTurnRob);
                     } catch (InterruptedException ie) {
                         CAT.warn("BoardView.paint: wait in turnRobot  interrupted");
                     }
                    
                 }
-                robImage.setData(blank);
+                backgroundImage.setData(blank);
+                mainGraphics.setComposite(oldComposite);
         }
     }
     protected synchronized void animateRobMove(Bot rob, int direction) {
@@ -704,7 +728,7 @@ public class BoardView extends JLayeredPane {
         //             (i.e. three times for a "Move 3 forward")
         //            So we have to update our internal position of the robot in
         //            between to show an animation that makes sense
-
+        try {
         String name = rob.getName();
         Bot internal = null;
         int robocount = -1;
@@ -760,6 +784,10 @@ public class BoardView extends JLayeredPane {
                     CAT.fatal("Got illgeal direction for animating robot");
                 }
         }
+        } // FIXME
+        catch ( RasterFormatException fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore){
+            CAT.error(fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore);
+        }
     }
 
 
@@ -783,14 +811,16 @@ public class BoardView extends JLayeredPane {
 
         Color robColor = getRobColor(name);
         
+        
+        SoundMan.playSound(BotVis.getBotLaserSoundByName(name));
         synchronized (this) {
             try {
-                wait(delay/2);  
+                wait(globalAnimationConfig.getLaserDelayBetweenStartOfSoundAndAnimation());  
             } catch (InterruptedException ie) {
                 CAT.error("BoardView.paint: wait interrupted");
             }
             		
-            SoundMan.playSound(BotVis.getBotLaserSoundByName(name));
+            
             Graphics2D g2 = (Graphics2D) getGraphics();
             //g2.scale(dScale, dScale);
             int step = Math.max(1, (int) (((double)laenge)/FULL_LENGTH_DOUBLE)); // step must not be 0 
@@ -799,6 +829,8 @@ public class BoardView extends JLayeredPane {
             
             //for (int i = 1; i <= FULL_LENGTH_INT; i++) {
             //    int tmp_laenge = (int) ((((double) i) / FULL_LENGTH_DOUBLE) * laenge);
+           
+            int someDelay = globalAnimationConfig.getLaserDelayPerAnimationStep();
             while (tmp_laenge<=laenge)  {  
                
                 paintActiveRobLaser(g2, source, laserFacing,tmp_laenge, robColor);
@@ -812,8 +844,9 @@ public class BoardView extends JLayeredPane {
                 
                 //   }
             }
+            repaint();
             try {
-                wait(delay/2);  
+                wait(globalAnimationConfig.getLaserDelayAfterEndOfAnimation());  
             } catch (InterruptedException ie) {
                 CAT.error("BoardView.paint: wait interrupted");
             }
@@ -830,7 +863,7 @@ public class BoardView extends JLayeredPane {
                 }
             }
         }
-        repaint();
+       
 
 
     }
@@ -1060,7 +1093,7 @@ public class BoardView extends JLayeredPane {
         repaint();              // lasers again
         try {
             synchronized (this){
-                wait(delay);  
+                wait(globalAnimationConfig.getLaserDelayAfterEndOfAnimation());  
             }
          } catch (InterruptedException ie) {
             CAT.error("BoardView.doBordLaser: wait interrupted");
@@ -1706,19 +1739,21 @@ public class BoardView extends JLayeredPane {
 
     private void paintRobos(Graphics g, Bot dontPaintMe) {
         Graphics2D g2d = (Graphics2D) g;
+        int numOfBots = robos!=null?robos.length:0;
         if (dontPaintMe == null) {
-            if (robos != null) {
-                for (int robocount = 0; robocount < robos.length; robocount++) {
+
+                for (int robocount = 0; robocount < numOfBots; robocount++) {
                     Bot robot = robos[robocount];
                     if ((robot.getDamage() < 10) &&
                             (robot.getLivesLeft() > 0)) {
                         paintRobot(g2d, robot, robocount);
                     }
                 }
-            }
-        } else {
-            if (robos != null) {
-                for (int robocount = 0; robocount < robos.length; robocount++) {
+       
+        } 
+        else {
+           
+                for (int robocount = 0; robocount < numOfBots; robocount++) {
                     Bot robot = robos[robocount];
                     if ((robot.getDamage() < 10) &&
                             (robot.getLivesLeft() > 0) &&
@@ -1726,7 +1761,7 @@ public class BoardView extends JLayeredPane {
                         paintRobot(g2d, robot, robocount);
                     }
                 }
-            }
+           
         }
 
     }
@@ -1876,13 +1911,7 @@ public class BoardView extends JLayeredPane {
     }
 
     
-    public void setDelay(int millisecs){
-    	delay = millisecs;
-    }
     
-    public int getDelay() {
-    	return delay;
-    }
 
     // Little helper for getting thumbnails of the board
     private static BoardView sac = null;

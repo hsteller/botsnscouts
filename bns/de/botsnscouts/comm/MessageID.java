@@ -13,6 +13,7 @@ public interface MessageID {
     public static final String CHAT = "mChat";
     public static final String PROG_DONE = "mProgReceived";
     public static final String LAST_PROG = "mLastProg";
+    public static final String INITIAL_FACINGS = "mInitFacing";
     public static final String BOT_MOVE = AUSWERTUNG + "Move";
     
     public static final String BOT_TURN = AUSWERTUNG+"Turn";

@@ -580,17 +580,47 @@ public class Ausgabe extends BNSThread {
 
     }
   */
+    
+    private Bot [] getBotsDataFromServer(String [] botNames)throws KommException{
+        return getBotsDataFromServer(botNames,0);
+    }
+    /**
+     *  Gets current data for all Bots named in botNames from the server.
+     * The startIndex is a little helper for server MSG-messages where 
+     * ClientAntwort.namen[0] is the MessageId and not the first botname 
+     * 
+     * @param botNames Names of Bots to get updated data for
+     * @param startIndex offset for botNames: only fetch data for bots at position startIndex or greater 
+     *                                    MUST BE  less than botNames.length (and non-negative, for the pedants)    
+     * @return Bot objects that contain the current (server-)data 
+     * @throws KommException
+     */
+    private Bot [] getBotsDataFromServer(String [] botNames, int startIndex)throws KommException{
+        	int numOfBots = botNames != null?(botNames.length-startIndex):0;
+        	Bot [] updatedBots = new Bot[numOfBots];
+        	for (int i=0, counter=startIndex;i<numOfBots;i++,counter++)
+        	    updatedBots[i] = getBotDataFromServer(botNames[counter]);
+        	return updatedBots;
+    }
+
+
+    private void comMsgHandleInitialFacings(ClientAntwort kommAntwort)  {
+        try {
+            Bot[] updated = getBotsDataFromServer(kommAntwort.namen,1); // namen[0] contains the messageId
+            ausgabeView.setInitialFacings(updated);
+            ausgabeView.updateRobotStatusDisplay(updated); 
+        }
+        catch (KommException ke ){
+            CAT.error ("KommException while retrieving the robot data for the initial facing");
+            CAT.error(ke.getMessage(), ke);
+        }
+     }
 
 
     private void comHandleNotifyChange(ClientAntwort kommAntwort) throws KommException {
 
-        // getting the names of the players that have some values changed
-        String[] playerNames = kommAntwort.namen;
-        Bot[] tmp = new Bot[playerNames.length];
-        for (int i = 0; i < playerNames.length; i++) {
-            Bot newBotValues = getBotDataFromServer(playerNames[i]);
-            tmp[i] = newBotValues;
-        }
+        // updating the data for the bots that have changed 
+        Bot[] tmp = getBotsDataFromServer(kommAntwort.namen);
 
 
 
@@ -623,16 +653,17 @@ public class Ausgabe extends BNSThread {
 
     // now some methods for fixing an issue that is caused by using the sequencer:
     // <SEQUENCER-FIX>
-    /**
-     * contains messages that have special handler methods that also take
-     * care about displaying them in the chatpane.
+    /** contains messages that have special handler methods that also take
+     *  care about displaying them in the chatpane or not displaying them at all..
      */
+
     private HashSet specialMessages = new HashSet();
 
-    /**
-     * Add all message ids to <code>specialMessages</code> that have a special
-     * handler method
+
+    /** Add all message ids to <code>specialMessages</code> that have a special
+     *  handler method (for displaying them in the chatpane or not displaying them at all).
      */
+
     private void initSpecialMessagesSet() {
         specialMessages = new HashSet();
 
@@ -646,7 +677,8 @@ public class Ausgabe extends BNSThread {
         specialMessages.add(MessageID.FLAG_REACHED);
         specialMessages.add(MessageID.BOT_REMOVED);
         specialMessages.add(MessageID.WISE_USED);
-
+        specialMessages.add(MessageID.INITIAL_FACINGS);
+        
         // some deprecated messages that should not be animated but also not
         // start with "mAusw" and not also be displayed..
         specialMessages.add(MessageID.SIGNAL_ACTION_START);
@@ -660,13 +692,13 @@ public class Ausgabe extends BNSThread {
 
     private boolean isActionToBeDisplayedInInfopanelOnly(String msgid) {
         // the message must not start with MesssageID.AUSW
-        boolean condition1 = !(msgid.substring(0, 5).equals(de.botsnscouts.comm.MessageID.AUSWERTUNG));
+        boolean condition1 = !(msgid.startsWith(de.botsnscouts.comm.MessageID.AUSWERTUNG));
 
         return condition1 && (!isMessageSpecial(msgid));
 
     }
 
-    //</SEQUENCCER-FIx>
+    //</SEQUENCER-FIx>
 
     private void comHandleMessages(ClientAntwort kommAntwort) {
         String msgId = kommAntwort.namen[0];
@@ -1098,13 +1130,20 @@ public class Ausgabe extends BNSThread {
                     }
                 });
         sequencer.addActionMapping(MessageID.BOT_UTURN,
-                new AbstractMessageAction() {
-                    public void invoke(ClientAntwort msgData) {
-                        if (IS_ROB_MOVE_ANIMATION_ENABLED)
-                            comMsgHandleRobotUTurn(msgData);
-                    }
-                });
 
+                        new AbstractMessageAction() {
+                            public void invoke(ClientAntwort msgData) {
+                                if (IS_ROB_MOVE_ANIMATION_ENABLED)
+                                    comMsgHandleRobotUTurn(msgData);
+                            }
+                        });
+        sequencer.addActionMapping(MessageID.INITIAL_FACINGS,
+                        new AbstractMessageAction() {
+                            public void invoke(ClientAntwort msgData) {
+                                comMsgHandleInitialFacings(msgData);
+                            }
+                        });
+        
 
         sequencer.addActionMapping(DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY,
                 new AbstractMessageAction() {
@@ -1121,7 +1160,7 @@ public class Ausgabe extends BNSThread {
                         Bot[] updatedBots = msgData.updatedBotsForNTC;
                         int l = updatedBots.length;
                         for (int i = 0; i < l; i++) {
-                            Bot $_ = updatedBots[i];
+                            Bot $_ = updatedBots[i];  // it seems someone read to much Perl books.. ;-)
                             robots.put($_.getName(), $_);
                         }
                         updateBoardView();

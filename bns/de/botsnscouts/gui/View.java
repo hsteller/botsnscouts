@@ -171,8 +171,8 @@ public class View extends JFrame {
             };
             keyMan.addHotKey(new HotKey(preparedChatMessages[i], sendChatlineAction));
       }
-     if (CAT.isDebugEnabled())
-        CAT.debug(keyMan.dump());
+   //  if (CAT.isDebugEnabled())
+   //     CAT.debug(keyMan.dump());
   }
 
 
@@ -262,7 +262,7 @@ public class View extends JFrame {
 
         this.setVisible(true);
 
-        JComponent board = ausgabeView.getBoardView();
+        JComponent board = ausgabeView.getBoardViewport();
        
         Point p = board.getLocationOnScreen();
 
