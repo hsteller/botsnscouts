@@ -8,7 +8,7 @@ package de.botsnscouts.util;
 
 import java.util.Comparator;
 
-public abstract class Karte {
+public abstract class Karte  {
     protected int prio;
     protected String action;
 
@@ -17,6 +17,14 @@ public abstract class Karte {
             int p1 = ((Karte)o1).getprio();
             int p2 = ((Karte)o2).getprio();
             return (p2-p1);
+        }
+    };
+
+    public static final Comparator PRIORITY_COMPARATOR = new Comparator() {
+        public int compare(Object o1, Object o2) {
+            int p1 = ((Karte)o1).getprio();
+            int p2 = ((Karte)o2).getprio();
+            return (p1-p2);
         }
     };
 
