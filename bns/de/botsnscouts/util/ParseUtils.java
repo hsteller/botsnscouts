@@ -36,7 +36,7 @@ public class ParseUtils {
         return s.charAt(pos) == c;
     }
 
-    public static void assert(String s, int pos, char c) throws FormatException {
+    public static void assertTrue(String s, int pos, char c) throws FormatException {
         //d("assert: Erwarte "+c+" an Pos "+pos+" ;da ist "+s.charAt(pos));
         if(s.charAt(pos) != c) {
             throw new FormatException(Message.say("Spielfeld", "xExpectedChar", c, pos));

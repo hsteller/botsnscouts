@@ -276,7 +276,7 @@ public class Floor implements FloorConstants {
         } else if(ParseUtils.is(s, pos, 'D')) {
             neu.typ = BDDREHEL;
             pos++;
-            ParseUtils.assert(s, pos++, '(');
+            ParseUtils.assertTrue(s, pos++, '(');
             if(ParseUtils.is(s, pos, 'L')) {
                 neu.spez = DGGUHRZ;
             } else if(ParseUtils.is(s, pos, 'R')) {
@@ -286,16 +286,16 @@ public class Floor implements FloorConstants {
                 throw new FormatException(Message.say("Spielfeld", "xCharNotAllowed", pos, "LR"));
             }
             pos++;
-            ParseUtils.assert(s, pos++, ')');
+            ParseUtils.assertTrue(s, pos++, ')');
         } else if(ParseUtils.is(s, pos, 'R')) {
             neu.typ = BDREPA;
             pos++;
-            ParseUtils.assert(s, pos++, '(');
+            ParseUtils.assertTrue(s, pos++, '(');
             neu.spez = java.lang.Character.digit(s.charAt(pos++), 10);
-            ParseUtils.assert(s, pos++, ')');
+            ParseUtils.assertTrue(s, pos++, ')');
         } else if(ParseUtils.is(s, pos, 'F')) {
             pos++;
-            ParseUtils.assert(s, pos++, '(');
+            ParseUtils.assertTrue(s, pos++, '(');
             int typus;
             if(ParseUtils.is(s, pos, 'N')) {
                 typus = FNORD;
@@ -310,46 +310,46 @@ public class Floor implements FloorConstants {
                 throw new FormatException(Message.say("Spielfeld", "xCharNotAllowed", pos, "NEWS"));
             }
             pos++;
-            ParseUtils.assert(s, pos++, ',');
+            ParseUtils.assertTrue(s, pos++, ',');
             typus += 100 * (java.lang.Character.digit(s.charAt(pos++), 10));
-            ParseUtils.assert(s, pos++, ',');
-            ParseUtils.assert(s, pos++, '(');
+            ParseUtils.assertTrue(s, pos++, ',');
+            ParseUtils.assertTrue(s, pos++, '(');
             if(ParseUtils.is(s, pos, '(')) {
                 pos++;
                 char fromR = s.charAt(pos++);
-                ParseUtils.assert(s, pos++, ',');
-                ParseUtils.assert(s, pos++, 'D');
-                ParseUtils.assert(s, pos++, '(');
+                ParseUtils.assertTrue(s, pos++, ',');
+                ParseUtils.assertTrue(s, pos++, 'D');
+                ParseUtils.assertTrue(s, pos++, '(');
                 char drehR = s.charAt(pos++);
                 typus = drehungLegal(typus, fromR, drehR, pos);
-                ParseUtils.assert(s, pos++, ')');
-                ParseUtils.assert(s, pos++, ')');
+                ParseUtils.assertTrue(s, pos++, ')');
+                ParseUtils.assertTrue(s, pos++, ')');
             }
             if(ParseUtils.is(s, pos, '(')) {
                 pos++;
                 char fromR = s.charAt(pos++);
-                ParseUtils.assert(s, pos++, ',');
-                ParseUtils.assert(s, pos++, 'D');
-                ParseUtils.assert(s, pos++, '(');
+                ParseUtils.assertTrue(s, pos++, ',');
+                ParseUtils.assertTrue(s, pos++, 'D');
+                ParseUtils.assertTrue(s, pos++, '(');
                 char drehR = s.charAt(pos++);
                 typus = drehungLegal(typus, fromR, drehR, pos);
-                ParseUtils.assert(s, pos++, ')');
-                ParseUtils.assert(s, pos++, ')');
+                ParseUtils.assertTrue(s, pos++, ')');
+                ParseUtils.assertTrue(s, pos++, ')');
             }
-            ParseUtils.assert(s, pos++, ')');
-            ParseUtils.assert(s, pos++, '(');
+            ParseUtils.assertTrue(s, pos++, ')');
+            ParseUtils.assertTrue(s, pos++, '(');
             int crusher = 0;
             while(java.lang.Character.isDigit(s.charAt(pos))) {
                 crusher += (int) java.lang.Math.pow(2, java.lang.Character.digit(s.charAt(pos++), 10) - 1);
                 //d("parseFließbandCrusher: read "+s.charAt(pos-1)+"; crusher="+crusher);
-                ParseUtils.assert(s, pos++, ',');
+                ParseUtils.assertTrue(s, pos++, ',');
                 //if(((typus%100)/10)>1)
                 //  throw new FormatException("Keine Crusher auf Drehfliessbaendern! Problem nahe Zeichen "+pos);
                 //else if (((typus%100)/10)==0) //sonst ist's schon erhöht
                 //  typus+=10;
             }
-            ParseUtils.assert(s, pos++, ')');
-            ParseUtils.assert(s, pos++, ')');
+            ParseUtils.assertTrue(s, pos++, ')');
+            ParseUtils.assertTrue(s, pos++, ')');
             neu.typ = typus;
             if(crusher != 0) {
                 neu.spez = crusher;

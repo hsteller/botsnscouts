@@ -307,7 +307,7 @@ public class Wall {
             } else if(ParseUtils.is(wallString, strpos, 'S')) {
                 strpos = parseS(++strpos, wallString, neu, Wall.W_NORTH_OR_WEST);
             }
-            ParseUtils.assert(wallString, strpos++, '#');
+            ParseUtils.assertTrue(wallString, strpos++, '#');
         } else {
             // "Fand keinen der erlaubten Chars '#_[' in Position "strpos"; da ist:"wallString.charAt(strpos)"
             throw new FormatException(Message.say("Spielfeld", "xCharsNotFound", "#_[", strpos, "" + wallString.charAt(strpos)));
@@ -315,31 +315,31 @@ public class Wall {
         if( strpos == wallString.length() ) return neu;
         if(ParseUtils.is(wallString, strpos, 'L')) {
             strpos = parseL(++strpos, wallString, neu, Wall.W_SOUTH_OR_EAST);
-            ParseUtils.assert(wallString, strpos++, ']');
+            ParseUtils.assertTrue(wallString, strpos++, ']');
         } else if(ParseUtils.is(wallString, strpos, 'S')) {
             strpos = parseS(++strpos, wallString, neu, Wall.W_SOUTH_OR_EAST);
-            ParseUtils.assert(wallString, strpos++, ']');
+            ParseUtils.assertTrue(wallString, strpos++, ']');
         }
         return neu;
     }
 
     private static int parseS(int pos, String s, Wall it, int index) throws FormatException {
-        ParseUtils.assert(s, pos++, '(');
+        ParseUtils.assertTrue(s, pos++, '(');
         int tmp = 0;
         while(!ParseUtils.is(s, pos, ')')) {
             int digit = java.lang.Character.digit(s.charAt(pos++), 10);
             tmp += (int) java.lang.Math.pow(2, digit - 1);
-            ParseUtils.assert(s, pos++, ',');
+            ParseUtils.assertTrue(s, pos++, ',');
         }
-        ParseUtils.assert(s, pos++, ')');
+        ParseUtils.assertTrue(s, pos++, ')');
         it.setPusher(index, tmp);
         return pos;
     }
 
     private static int parseL(int pos, String s, Wall it, int index) throws FormatException {
-        ParseUtils.assert(s, pos++, '(');
+        ParseUtils.assertTrue(s, pos++, '(');
         int str = java.lang.Character.digit(s.charAt(pos++), 10);
-        ParseUtils.assert(s, pos++, ')');
+        ParseUtils.assertTrue(s, pos++, ')');
         it.setLaser(index, str);
         return pos;
     }
