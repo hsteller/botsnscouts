@@ -44,6 +44,11 @@ public class CardView extends JButton {
 	h = null;
     }
 
+    protected void delWisenheimer(){
+	wisenheimerPresent=false;
+	repaint();
+    }
+
     public boolean locked() {
 	return h.locked();
     }
@@ -94,6 +99,10 @@ public class CardView extends JButton {
 	wisenheimerPresent = true;
 	Global.debug(this,"lasse mich von einem Klugscheisser besetzten, ich habe die Karte: "+h);
 	repaint();
+    }
+
+    protected boolean isWisenheimer(){
+	return wisenheimerPresent;
     }
 
 }

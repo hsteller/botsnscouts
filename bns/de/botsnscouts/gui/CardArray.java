@@ -103,7 +103,12 @@ public class CardArray extends JPanel {
     }
 
     protected void setWisenheimer(int predCard) {
-	((CardView)cardsView.get(predCard)).setWisenheimer();
+	for (int i=0;i<9;i++){
+	    ((CardView)cardsView.get(i)).delWisenheimer();
+	}
+	if (predCard!=-1){
+	    ((CardView)cardsView.get(predCard)).setWisenheimer();
+	}
     }
 
     public Dimension getMinimumSize() {

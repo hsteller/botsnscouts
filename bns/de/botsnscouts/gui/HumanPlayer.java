@@ -363,6 +363,9 @@ public class HumanPlayer extends Thread {
 	comm.respReaktivierung(name,down);
     }
 
+    protected int getNextPrediction(ArrayList registerList,ArrayList cardList){
+	return wisenheimer.getNextPrediction(registerList,cardList);
+    }
     protected int getPrediction(ArrayList registerList, ArrayList cardList) {
 	return wisenheimer.getPrediction(registerList, cardList, ausgabe.getRob(name));
     }

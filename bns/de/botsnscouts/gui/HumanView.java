@@ -208,11 +208,20 @@ public class HumanView extends JPanel implements HumanViewInterface {
     /**
      * update the position of the wisenheimer
      */
-    public void showUpdatedWisenheimer() {
+    public void showUpdatedWisenheimer(boolean predicted) {
+	int predCard = -1;
 	if ((wisenheimerView.selected()) && ( human.mode == HumanPlayer.MODE_PROGRAM)){
-	int predCard = human.getPrediction(registers.getCards(),cards.getCards());
-	cards.setWisenheimer(predCard);
+	    if (predicted){
+		predCard=human.getNextPrediction(registers.getCards(),cards.getCards());
+	    }else{
+		predCard=human.getPrediction(registers.getCards(),cards.getCards());
+	    }
+	    if (predCard==-1){
+		wisenheimerView.setSelected(false);
+	    }
+	    
 	}
+	cards.setWisenheimer(predCard);
     }
 
     /**
@@ -277,15 +286,17 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
 
     private void treatCardKlick (CardView cv) {
+	boolean predicted=false;
 	if ( (cv.getCard() != null) && ( ! registers.allOcupied() ) ) {
 	    registers.addCard(cv.getCard());
+	    predicted=cv.isWisenheimer();
 	    cv.reset();
 	    if (registers.allOcupied()) {
 		cards.activateButton();
 	    }
 	}
 	showUpdatedScout();
-	showUpdatedWisenheimer();
+	showUpdatedWisenheimer(predicted);
     }
 
 
@@ -312,12 +323,13 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	    cards.deActivateButton();
 	}
 	showUpdatedScout();
-
+	showUpdatedWisenheimer(false);
     }
 
     private void klugscheisserClicked (boolean awake) {
-	if ((awake) && ( human.mode == HumanPlayer.MODE_PROGRAM)){
-	    showUpdatedWisenheimer();
+	//if ((awake) && ( human.mode == HumanPlayer.MODE_PROGRAM)){
+	if ( human.mode == HumanPlayer.MODE_PROGRAM ){
+	    showUpdatedWisenheimer(false);
 	}
     }
 

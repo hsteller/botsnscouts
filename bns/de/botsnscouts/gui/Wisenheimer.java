@@ -16,14 +16,26 @@ public class Wisenheimer{
     private Permu wirbel;
     private Roboter simRob = Roboter.getNewInstance("dummy");
     // damit wir nicht immer für jede Simulation einen neuen Robby brauchen
+    private int[] predict=new int[5];
+    private int lastPredict;
 
     public Wisenheimer (SpielfeldKS aiB) {
 	aiBoard=aiB;
 	wirbel = new Permu(aiBoard,0);
     }
 
+    //berechnet den zug neu und gibt index der Karte zurück
     protected int getPrediction(ArrayList registers, ArrayList cards, Roboter robi){
-	Global.debug(this,"habe bekommen: register: "+registers+" cards: "+cards+" und einen Robi: "+robi);
+
+	//teste ob alle register belegt sind
+	int t=0;
+	for (t=0;t<5;t++){
+	    if (registers.get(t)==null)
+		break;
+	}
+	if (t==5)
+	    return -1;
+
 	simRob.copyRob(robi);
 
 	Karte[] simCards=new HumanCard[9];
@@ -46,10 +58,13 @@ public class Wisenheimer{
 	    simRob.setZug(i, simRob.getGesperrteRegister(i));
 	}
 	Karte[] vonPermut = wirbel.permutiere(simCards, simRob);
-	Global.debug(this,"karten bekommen anz: "+vonPermut.length+" "+vonPermut);
-	for (int i=0; i < vonPermut.length; i++) {
-	    Global.debug(this,"vonPermut["+i+"] ist "+vonPermut[i].getprio());
+	for (int i=0;i<5;i++){
+	    predict[i]=vonPermut[i].getprio();
 	}
+	//Global.debug(this,"karten bekommen anz: "+vonPermut.length+" "+vonPermut);
+	//for (int i=0; i < vonPermut.length; i++) {
+	//Global.debug(this,"vonPermut["+i+"] ist "+vonPermut[i].getprio());
+	//}
 
 	// in vonPermut steht die vorgeschlagene Registerprogrammierung, so wie sie ggf. z.T.schon
 	// in den Registern steht
@@ -57,19 +72,46 @@ public class Wisenheimer{
 	for (int su=0; su<5;su++){
 	    if ((registers.get(su) == null) || ((HumanCard)registers.get(su)).getprio() != (vonPermut[su].getprio())){
                 nextprio = vonPermut[su].getprio();
+		lastPredict=su;
                 break;
             }
 	}
+	if (lastPredict==5){
+	    return -1;
+	}
+	return getIndex(nextprio,cards);
+    }
+
+    private int getIndex(int nextprio,ArrayList robiCards){
 	int ind=0;
-	for (int i=0; i<cards.size();i++){
-	    if (cards.get(i) != null) {
-		if (((HumanCard)cards.get(i)).getprio() == nextprio) {
+	for (int i=0; i<robiCards.size();i++){
+	    if (robiCards.get(i) != null) {
+		if (((HumanCard)robiCards.get(i)).getprio() == nextprio) {
 		    ind=i;
 		    break;
 		}
 	    }
 	}
 	return ind;
+    }
+
+    //gibt die nächste karte von dem berechneten zug
+    public int getNextPrediction(ArrayList registers,ArrayList robiCards){
+	//teste ob alle register belegt sind
+	int t=0;
+	for (t=0;t<5;t++){
+	    if (registers.get(t)==null)
+		break;
+	}
+	if (t==5)
+	    return -1;
+	while(lastPredict<5&&registers.get(lastPredict)!=null){
+	    lastPredict++;
+	}
+	if (lastPredict==5){
+	    return -1;
+	}
+	return getIndex(predict[lastPredict],robiCards);
     }
     
 }
