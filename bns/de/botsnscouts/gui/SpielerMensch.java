@@ -18,7 +18,7 @@ import javax.swing.plaf.metal.*;
 public class SpielerMensch extends Thread {
 
     // -----------  Konstanten -----------
-    static Class c = SpielerMensch.class;
+    static Class c = de.botsnscouts.BotsNScouts.class;
     private final static  Image RUECK = Toolkit.getDefaultToolkit().getImage(c.getResource("images/karterueck.gif"));
     private final static  Image M1 = Toolkit.getDefaultToolkit().getImage(c.getResource("images/m1.gif"));
     private final static  Image M2 = Toolkit.getDefaultToolkit().getImage(c.getResource("images/m2.gif"));
