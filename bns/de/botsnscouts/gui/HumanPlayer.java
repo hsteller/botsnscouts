@@ -410,7 +410,7 @@ public class HumanPlayer extends BNSThread {
     }
 
     protected Bot getRob() {
-	return ausgabe.getRob(name);
+	return ausgabe.getBot(name);
 
     }
 
@@ -429,7 +429,7 @@ public class HumanPlayer extends BNSThread {
 	return wisenheimer.getNextPrediction(registerList,cardList);
     }
     protected int getPrediction(ArrayList registerList, ArrayList cardList) {
-	return wisenheimer.getPrediction(registerList, cardList, ausgabe.getRob(name));
+	return wisenheimer.getPrediction(registerList, cardList, ausgabe.getBot(name));
     }
 
     private void initIntelligentBoard()

@@ -13,23 +13,6 @@ public class LogFloatPane extends ColoredComponent implements ComponentListener 
     Component master;
     Container container;
 
-//    class MiniButton extends JButton {
-//        Dimension size = new Dimension(10,10);
-//        Color c = Color.blue;
-//        MiniButton() {
-//            setBorderPainted( false );
-//            setOpaque( false );
-//        }
-//        public Dimension getPreferredSize() { return size; };
-//        public Dimension getMinimumSize() { return size; };
-//        public Dimension getMaximumSize() { return size; };
-//        public void paintComponent(Graphics g) {
-//            g.setColor(c);
-//            g.fillRect( 0,0,getWidth(), getHeight());
-//        }
-//    }
-//
-//    JButton mini = new MiniButton();
     public LogFloatPane(Component master, Container container) {
         this.master = master;
         this.container = container;
@@ -37,14 +20,6 @@ public class LogFloatPane extends ColoredComponent implements ComponentListener 
         enableEvents( AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
         setBorder( BorderFactory.createEtchedBorder( new Color(0, 255,0, 128), new Color(0,128,0,128) ) );
         setOpaque( false );
-//        setLayout( null );
-//        add( mini );
-//        mini.setSize( mini.getPreferredSize() );
-//        mini.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                switchSize();
-//            }
-//        });
         enableEvents(AWTEvent.MOUSE_EVENT_MASK);
     }
 
@@ -108,7 +83,6 @@ public class LogFloatPane extends ColoredComponent implements ComponentListener 
         Rectangle r = recalcBounds();
         setBounds( r );
         Insets in = getInsets();
-//        mini.setLocation( in.left, in.top );
     }
 
     void switchSize() {

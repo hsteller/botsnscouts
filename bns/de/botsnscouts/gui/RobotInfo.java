@@ -20,6 +20,11 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     static final Image[] cursors = CursorMan.getImages( CursorMan.STATUSROBOTS );
     static Image[] stuff = null;
 
+    static final Color COLOR_LED_OFF = new Color(0,0,50);
+    static final Color COLOR_LED_ON  = Color.green;
+    static final Color COLOR_LED_RED = Color.red;
+
+
     static final int MINI_IMAGE_COUNT = 4;
     DamageBar damageBar1 = new DamageBar();
     FlagBar flagBar2 = new FlagBar();
@@ -29,6 +34,15 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     int ranking = 0;
     Bot robot;
 
+    Color ledColor = COLOR_LED_OFF;
+
+    public Color getLedColor() {
+        return ledColor;
+    }
+
+    public void setLedColor(Color ledColor) {
+        this.ledColor = ledColor;
+    }
 
     static synchronized Image getImage(int nr) {
         if( stuff == null ) {
@@ -149,6 +163,8 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
 
     void paintFrame(Graphics2D g) {
         frame.paintIcon(this, g, -2, -2);
+        g.setColor(ledColor);
+        g.fillRect(1,1,5,4);
     }
 
     public void paint(Graphics _g) {
@@ -198,6 +214,16 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     public Bot getRobot() {
         return robot;
     }
+
+    public void setLedOn( boolean on ) {
+        if( on ) {
+            setLedColor(COLOR_LED_ON);
+        }
+        else {
+            setLedColor(COLOR_LED_OFF);
+        }
+    }
+
     public void updateRobot(Bot r) {
         robot = r;
         damageBar1.setDamageValue(r.getDamage());
@@ -226,6 +252,16 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
             db.setWinnerNumber(i);
             db.setBorder( BorderFactory.createLineBorder(Color.black) );
             db.setSize( db.getPreferredSize() );
+            switch(i) {
+            case 0:
+                    db.setLedColor(COLOR_LED_ON);
+                    break;
+
+            case 1:
+                    db.setLedColor(COLOR_LED_RED);
+                    break;
+
+            }
             JPanel p = new JPanel();
             p.add( db );
             b.add( p );

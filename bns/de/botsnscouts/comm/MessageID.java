@@ -9,6 +9,7 @@ public interface MessageID {
   public static final String BORD_LASER_SHOT = "mBoardLaser";
   public static final String FLAG_REACHED    = "mNextFlag";
   public static final String CHAT            = "mChat";
+  public static final String PROG_DONE       = "mProgReceived";
 
 
   public static final String AUSWERTUNG      = "mAusw";

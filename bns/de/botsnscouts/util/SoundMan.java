@@ -64,6 +64,8 @@ public class SoundMan {
     public static final int LASER_VIOLET = 13;
 
    public static final int MESSAGE = 14;
+   public static final int PROGRAMMING_DONE = 15;
+
 
     /** How to locate the sounds relative to de.botsnscouts.BotsNScouts
      *  Mind the ordering.
@@ -83,7 +85,8 @@ public class SoundMan {
         "sounds/laser_orange.wav",
         "sounds/laser_gray.wav",
         "sounds/laser_violet.wav",
-        "sounds/sms.wav"
+        "sounds/sms.wav",
+        "sounds/ledon.wav"
     };
 
     /** These sounds are robot laser sounds */

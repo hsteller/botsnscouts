@@ -134,6 +134,11 @@ public class Ausgabe extends BNSThread {
 		    // display the message in the statusbar
                     showActionMessage(Message.say("MSG",msgId,tmpstr));
 //                    view.chatFloatPane.addMessage( Message.say("MSG",msgId,tmpstr) );
+                    if(msgId.startsWith(MessageID.PROG_DONE)) {
+                        Bot r1 = getBot(kommAntwort.namen[1]);
+                        ausgabeView.notifyBotProgrammingDone(r1);
+
+                    }
 		}
 
 		if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_LASER)){ // robots shooting
@@ -267,6 +272,9 @@ public class Ausgabe extends BNSThread {
 		    Status[] stArray = kommClient.getSpielstatus();
 		    if (stArray != null) {
 			if (stArray[0].aktPhase != lastPhase) {
+                            /* its ok to do the reset on each phase change,
+                                will not do anything if all are reset */
+                            ausgabeView.resetProgrammingLEDs();
 			    view.showGameStatusMessage(Message.say("AusgabeFrame","phase")+ " " + stArray[0].aktPhase);
 			    lastPhase = stArray[0].aktPhase;
 			}
@@ -469,7 +477,7 @@ public class Ausgabe extends BNSThread {
 	}
     }
 
-    protected Bot getRob(String name){
+    protected Bot getBot(String name){
 	return (Bot) robots.get(name);
     }
 

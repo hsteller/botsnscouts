@@ -194,6 +194,29 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     public void showRobStatus(Bot r){
     }
 
+    boolean allLedReset  = true;
+    public void notifyBotProgrammingDone(Bot bot) {
+        RobotInfo ri = (RobotInfo)robotStatus.get( bot.getName() );
+        ri.setLedOn(true);
+        SoundMan.playSound(SoundMan.PROGRAMMING_DONE);
+        ri.repaint();
+        allLedReset = false;
+    }
+
+
+    public void resetProgrammingLEDs() {
+        if( allLedReset ) {
+            return;
+        }
+
+        Collection c = robotStatus.values();
+        for (Iterator iterator = c.iterator(); iterator.hasNext();) {
+            RobotInfo info = (RobotInfo) iterator.next();
+            info.setLedOn(false);
+        }
+        northPanel.repaint();
+        allLedReset = true;
+    }
 
     /**
      * Shows the new Positions of the Robots
