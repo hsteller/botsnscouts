@@ -42,11 +42,7 @@ public class SoundMan {
     /** Sound of robot falling in a pit. */
     public static final int PIT = 0;
 
-    /** Sound of robot laser */
-    public static final int LASER1 = 1;
 
-    /** Another Sound of robot laser */
-    public static final int LASER2 = 2;
 
     public static final int LASER_GREEN = 6;
     public static final int LASER_YELLOW = 7;
@@ -67,17 +63,17 @@ public class SoundMan {
     /** Sound of a robot pushing another one. */
     public static final int PUSHING = 5;
 
-   public static final int BOO = 14;
+   public static final int BOO = 1;
 
-   public static final int CRUSHED = 15;
+   public static final int CRUSHED = 2;
 
     /** How to locate the sounds relative to de.botsnscouts.BotsNScouts
      *  Mind the ordering.
      */
     private static final String[] filenames = {
 	"sounds/pit.wav",
-	"sounds/laser1.wav",
-	"sounds/laser2.wav",
+        "sounds/boo.wav",
+        "sounds/crusher.wav",
 	"sounds/flag_reached.wav",
 	"sounds/boardlaser.wav",
 	"sounds/push.wav",
@@ -88,9 +84,7 @@ public class SoundMan {
         "sounds/laser_rosa.wav",
         "sounds/laser_orange.wav",
         "sounds/laser_gray.wav",
-        "sounds/laser_violet.wav",
-        "sounds/boo.wav",
-        "sounds/crusher.wav"
+        "sounds/laser_violet.wav"
     };
 
     /** These sounds are robot laser sounds */
