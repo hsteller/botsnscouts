@@ -81,6 +81,11 @@ public class SoundMan {
 
   public SoundMan() {
     actualLaserSound=0;
+    String tmp=Conf.getProperty("sound.active");
+    if (tmp==null)
+	soundsEnabled=false;
+    else
+	soundsEnabled=tmp.equals("true");
   }
 
     public static synchronized void playSound(int sound){
@@ -110,6 +115,7 @@ public class SoundMan {
   // does it hurt..?? Hmm, guess no ;-)
   public static synchronized void setSoundActive(boolean soundOn){
     soundsEnabled=soundOn;
+    Conf.setProperty("sound.active",soundOn?"true":"false");
     if (!soundsLoaded)
 	loadSounds();
   }
