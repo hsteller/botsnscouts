@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.image.*;
 
 import de.botsnscouts.BotsNScouts;
+import com.sixlegs.image.png.*; 
 import javax.swing.ImageIcon;
 import java.net.URL;
 
@@ -22,9 +23,13 @@ public class ImageMan {
 	KSCHLAF = 8,
 	KWACH = 9;
 
+
+    public final static int 
+	ROBOCENTER = 0;
+
+
     static Class c = de.botsnscouts.BotsNScouts.class;
 
-    
     public final static  ImageIcon CardRUECK = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/karterueck.gif")));
     public final static  ImageIcon CardM1 = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/m1.gif")));
     public final static  ImageIcon CardM2 = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/m2.gif")));
@@ -35,7 +40,11 @@ public class ImageMan {
     public final static  ImageIcon CardUT = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/ut.gif")));
     public final static  ImageIcon CardRLEER = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/register-leer.gif")));
 	
+    public final static String[] PngImages = {
+	"images/robocenter.png"
+    };
 
+    public static ImageIcon[] PNGImageIcons = new ImageIcon[PngImages.length];
 	
     
     final static ImageSet[] imgSetDescr = {
@@ -78,6 +87,15 @@ public class ImageMan {
 	    tracker.addImage( img, i );
 	    imgSets[i] = new Image[ descr.size ];
 	    gridCropper.multiCrop( img, descr.rowlength, descr.size, imgSets[i], tracker, i);
+	}
+
+	for (int i=0; i < PngImages.length; i++) {
+	        try {
+		    PngImage png = new PngImage(c.getResource(PngImages[i]));
+		    PNGImageIcons[i] = new ImageIcon(tk.createImage(png));
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}                                                                
 	}
 
 	// start loading in a different thread
@@ -127,6 +145,13 @@ public class ImageMan {
 
 	return imgSets[id];
     }
+
+    public static ImageIcon getPNGImageIcon(int id) {
+	if( !imagesLoading ) 
+	    loadImages();
+	return PNGImageIcons[id];
+    }
+
 
     public static void finishLoading() {
 	if(! imagesLoading ) 

@@ -170,7 +170,7 @@ public class Ausgabe extends Thread {
 
 		    // --------- Neue Roboter-Position an Spielfeld senden ---------
 		    try {
-			Thread.sleep(1000);
+			Thread.sleep(100);
 		    } // Verzögerung der Ausgabegeschwindigkeit
 		    catch (Exception e) {
 			System.err.println(e.getMessage());

@@ -37,10 +37,9 @@ public class RegisterView extends JButton {
     }
 
     public void reset() {
-	setSelected(false);
-	setIcon(registerFree);
 	if (!locked()) {
 	h = null;
+	setIcon(registerFree);
 	}
     }
 

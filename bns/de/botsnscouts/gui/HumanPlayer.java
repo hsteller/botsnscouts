@@ -93,14 +93,7 @@ public class HumanPlayer extends Thread {
 		try{
 		    Global.debug(this,"Versuche, Robstatus von "+name+" zu bekommen.");
 		    Roboter tempRob = comm.getRobStatus(name);
-		    for (int i=0; i < tempRob.getGesperrteRegister().length; i++) {
-			if (tempRob.getGesperrteRegister(i) != null) {
-			    // lock Register i
-			}
-			else {
-			    // unlock Register i
-			}
-		    }
+		    humanView.updateRegisters(tempRob.getGesperrteRegister());
 		}
 		catch (KommException kE) {
 		    System.err.println("SpielerMenschERROR: "+kE.getMessage());
@@ -345,6 +338,7 @@ public class HumanPlayer extends Thread {
 
 
     protected void sendRepair(ArrayList respReparatur) {
+	d("Soll an den Server senden die ArrayList: "+respReparatur);
 	int[] repa = new int[respReparatur.size()];
 	for (int i = 0; i < respReparatur.size(); i++) {
 	    repa[i] = ((Integer) respReparatur.get(i)).intValue();
@@ -369,6 +363,9 @@ public class HumanPlayer extends Thread {
 	comm.respReaktivierung(name,down);
     }
 
+    protected int getPrediction(ArrayList registerList, ArrayList cardList) {
+	return wisenheimer.getPrediction(registerList, cardList, ausgabe.getRob(name));
+    }
 
     /**
      * Schreibt in die Statuszeile einen Text

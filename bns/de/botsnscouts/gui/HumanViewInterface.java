@@ -54,7 +54,7 @@ public interface HumanViewInterface {
     /**
      * update the position of the knowitalll
      */
-    public void showUpdatedKlugScheisser();
+    //    public void showUpdatedKlugScheisser();
 
     /**
      * activate the knowitall

@@ -444,7 +444,7 @@ public class Roboter {
     }
 
     /** Register n wird gesperrt und mit Karte k belegt. 
-     *  @deprecated Eigentlich hat man die entsprechende Karte ja bereits im letzten Zug drin!!!
+     *  deprecated Eigentlich hat man die entsprechende Karte ja bereits im letzten Zug drin!!!
      */
     public void sperreRegister(int i, Karte k){
 	zug[i] = k;

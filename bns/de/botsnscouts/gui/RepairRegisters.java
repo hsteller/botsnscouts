@@ -43,9 +43,9 @@ public class RepairRegisters extends JPanel implements ActionListener{
     
     public void setChoises(ArrayList registers, int repairPoints) {	
 	this.repairPoints=repairPoints;
-	this.registers=registers;
-	zuVerteilen = repairPoints;
 
+	zuVerteilen = repairPoints;
+	ArrayList tmp=new ArrayList(5);
 //	resetAll();
 
 	titel.setText(Message.say("SpielerMensch","mregwahl",repairPoints));
@@ -61,10 +61,14 @@ public class RepairRegisters extends JPanel implements ActionListener{
 	    prio=rv.getPrio();
 	    rv=new RegisterView(this);
 	    rv.setCard(new HumanCard(prio,act));
+	    rv.setLocked(lo);
+	    tmp.add(rv);
 	    add(rv);
-	    ((RegisterView)registers.get(i)).setActionCommand(""+i);
+	    rv.setActionCommand(""+i);
 	    locked[i]=((RegisterView)registers.get(i)).locked();
+	    if (locked[i]) {Global.debug(this,"Das Register "+(i+1)+" ist gelockt");}
 	}
+	this.registers=tmp;
 	add(titel);
 	add(fertig);
     }
@@ -72,6 +76,7 @@ public class RepairRegisters extends JPanel implements ActionListener{
     public ArrayList getSelection() {	
 	int cntr=0;
 	boolean[] torepair=new boolean[5];
+//	Global.debug(this,"registers: "+registers);
 	for(int i=0;i<registers.size();i++){
 	    torepair[i]=locked[i]&&(!(((RegisterView)registers.get(i)).locked()));
 	    if(torepair[i]){

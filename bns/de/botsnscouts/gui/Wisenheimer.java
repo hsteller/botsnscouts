@@ -23,20 +23,21 @@ public class Wisenheimer{
     }
 
     protected int getPrediction(ArrayList registers, ArrayList cards, Roboter robi){
+	Global.debug(this,"habe bekommen: register: "+registers+" cards: "+cards+" und einen Robi: "+robi);
 	simRob.copyRob(robi);
 
 	Karte[] simCards=new HumanCard[9];
 	// cards in simCards einlesen, gesperrte Karten werden nicht berücksichtigt
 	int j=0;
 	for (int i = 0; i < cards.size(); i++) {
-	    if(((HumanCard)cards.get(i)).getState() == HumanCard.FREE) {
+	    if((cards.get(i) != null)&&((HumanCard)cards.get(i)).getState() == HumanCard.FREE) {
 		simCards[j] = new HumanCard((HumanCard)cards.get(i));
 		j++;
 	    }
 	}
 	// gelegte Karten in das enstprechende gesperrte Register des Robis packen
 	for (int l = 0; l<registers.size();l++) {
-	    if (!((HumanCard)registers.get(l)).free()) {
+	    if ((registers.get(l) != null)&&(!((HumanCard)registers.get(l)).free())) {
 		simRob.sperreRegister(l,  KartenStapel.get(((HumanCard)registers.get(l)).getprio(),((HumanCard)registers.get(l)).getaktion()));
 	    }
 	}
@@ -45,21 +46,27 @@ public class Wisenheimer{
 	    simRob.setZug(i, simRob.getGesperrteRegister(i));
 	}
 	Karte[] vonPermut = wirbel.permutiere(simCards, simRob);
+	Global.debug(this,"karten bekommen anz: "+vonPermut.length+" "+vonPermut);
+	for (int i=0; i < vonPermut.length; i++) {
+	    Global.debug(this,"vonPermut["+i+"] ist "+vonPermut[i].getprio());
+	}
 
 	// in vonPermut steht die vorgeschlagene Registerprogrammierung, so wie sie ggf. z.T.schon
 	// in den Registern steht
 	int nextprio =-1;
 	for (int su=0; su<5;su++){
-	    if (((HumanCard)registers.get(su)).getprio() != (vonPermut[su].getprio())){
+	    if ((registers.get(su) == null) || ((HumanCard)registers.get(su)).getprio() != (vonPermut[su].getprio())){
                 nextprio = vonPermut[su].getprio();
                 break;
             }
 	}
 	int ind=0;
 	for (int i=0; i<cards.size();i++){
-            if (((HumanCard)cards.get(i)).getprio() == nextprio) {
-		ind=i;
-		break;
+	    if (cards.get(i) != null) {
+		if (((HumanCard)cards.get(i)).getprio() == nextprio) {
+		    ind=i;
+		    break;
+		}
 	    }
 	}
 	return ind;

@@ -17,6 +17,7 @@ public class CardView extends JButton {
     ImageIcon cardFree = ImageMan.CardRUECK;
     ImageIcon cardImage;
     HumanCard h;
+    private boolean wisenheimerPresent = false;
 
     public CardView() {
 	this(new ActionListener() {
@@ -38,7 +39,7 @@ public class CardView extends JButton {
 
     public void reset() {
 	setSelected(false);
-	//	setEnabled(false);
+	wisenheimerPresent=false;
 	setIcon(cardFree);
 	h = null;
     }
@@ -68,6 +69,7 @@ public class CardView extends JButton {
 	return h;
     }
 
+    
 
     public static void main (String args[]) {
 	Message.setLanguage("deutsch");
@@ -80,6 +82,18 @@ public class CardView extends JButton {
 	f.pack();
 	f.setLocation(100,100);
 	f.setVisible(true);
+    }
+    
+    public void paintComponent(Graphics g){
+	super.paintComponent(g);
+	if (wisenheimerPresent) g.drawImage(Images.KSCHEISSER,25,42,this);
+    }
+    
+
+    protected void setWisenheimer() {
+	wisenheimerPresent = true;
+	Global.debug(this,"lasse mich von einem Klugscheisser besetzten, ich habe die Karte: "+h);
+	repaint();
     }
 
 }

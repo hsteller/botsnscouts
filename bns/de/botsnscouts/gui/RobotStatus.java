@@ -14,7 +14,7 @@ import javax.swing.border.*;
      * Status of a robot
      */
 public class RobotStatus extends JPanel {
-    int xsize=75, ysize=64;
+    int xsize=75, ysize=70;
     JLabel name;
     JLabel lifes;
     JLabel flag;
@@ -23,7 +23,7 @@ public class RobotStatus extends JPanel {
     JPanel roboInfo;
     Image robotImage[];
     Image flagge = CursorMan.getImages(CursorMan.CURSOR)[0];
-    Image botcenterImage = CursorMan.getImages(CursorMan.BOTCENTER)[0];
+    ImageIcon botcenterImage = ImageMan.getPNGImageIcon(ImageMan.ROBOCENTER);
     Image damageImage = CursorMan.getImages(CursorMan.DAMAGE)[0];
     Image[] robotImages = CursorMan.getImages(CursorMan.STATUSROBOTS);
     Roboter robot;
@@ -39,7 +39,7 @@ public class RobotStatus extends JPanel {
 	lifes = new JLabel(""+r.getLeben(),new ImageIcon(robotImages[r.getBotVis()]),JLabel.RIGHT);
 	d("Visualisierung :"+r.getBotVis()+ " an "+r.getName()+" zugeteilt.");
 	damage = new JLabel(""+r.getSchaden(),new ImageIcon(damageImage),JLabel.LEFT);
-	track = new JLabel("F",new ImageIcon(botcenterImage),JLabel.RIGHT);
+	track = new JLabel("F",botcenterImage,JLabel.RIGHT);
 	Font labelFont = new Font("Dialog",Font.PLAIN,8);
 	Font nameFont = new Font("Dialog",Font.BOLD,10);
 	roboInfo = new JPanel();

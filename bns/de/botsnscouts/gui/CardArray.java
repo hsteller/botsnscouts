@@ -78,6 +78,15 @@ public class CardArray extends JPanel {
 	}
     }
 
+    protected ArrayList getCards() {
+	ArrayList regs = new ArrayList(9);
+	for (int i=0; i < cardsView.size(); i++) {
+	    regs.add(((CardView) cardsView.get(i)).getCard());
+	}
+	return regs;
+    }
+
+
     public void setCards(ArrayList cards) {	
 	resetAll();
 	for (int i=0; i < cards.size(); i++) {
@@ -91,6 +100,10 @@ public class CardArray extends JPanel {
 
     protected void deActivateButton() {
 	sendButton.setEnabled(false);
+    }
+
+    protected void setWisenheimer(int predCard) {
+	((CardView)cardsView.get(predCard)).setWisenheimer();
     }
 
     public Dimension getMinimumSize() {
