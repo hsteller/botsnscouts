@@ -4,6 +4,11 @@ Bugs bitte oben ergaenzen. Vermutete zustaendige Klassen erwaehnen.
 Wenn gefixt, bitte nicht loeschen, sondern DONE <Name> dahinter.
 Fuer Nachfragen bitte mit eigenem Namen anfangen.
 --------------------------------------------------------------------------
+Dirk: Scrollen mit rechter Maustaste ist kaputt.
+--------------------------------------------------------------------------
+Dirk: Cursors sind kaputt, viel zu gross beim Spielfeldzusammenbauen - 
+und  meine Klicks gehen irgendwie verloren
+--------------------------------------------------------------------------
 
 leo an lukasz: wenn man beim SpielerMensch quit auswählt, beenden sich die
 Threads (weder SpielerMensch noch AusgabeThread) nicht; auch nicht nach
