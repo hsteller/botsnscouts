@@ -137,7 +137,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
     /** Schickt eine Nachricht an alle Ausgaben >= Version 2.0 */
     public void sendMsg(String id,String[] s){
-	if (id.equals("mKlugSchKlick")){
+	if (id.equals(de.botsnscouts.comm.MessageID.WISE_USED)){
           // Dirk wants that to be counted :-)
           Stats st = stats.getStats(s[0]);
           if (st!=null)
