@@ -384,8 +384,8 @@ public class GameOptions {
         invitor = name;
     }
 
-    public String getHostString() {
-        return host+":"+registrationPort;
+    public String getHost() {
+        return host;
     }
 
 }

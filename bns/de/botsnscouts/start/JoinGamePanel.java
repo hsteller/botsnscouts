@@ -7,6 +7,8 @@ import de.botsnscouts.util.Conf;
 import de.botsnscouts.gui.OkComponent;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -32,28 +34,32 @@ import java.awt.*;
  *
  * This will replace ParticipatePanel !!!
  *
+ * TODO: i18n
+ *
  * @author Miriam
  */
 public class JoinGamePanel extends ColoredComponent {
 
-    private JTextField hostName;
+    private JTextField hostName = new TJTextField(Message.say("Start", "mServerInh"),
+                                        JTextField.CENTER, true);
     private JTextField robName;
     private JComboBox colors;
     private int port = GameOptions.DPORT;
 
+    private JList favServerList;
+    private JList announcedGamesList = new JList();
+    private JButton queryMetaButton = new TJButton(Conf.getDefaultMetaServer());
+
     private Start parent;
+
+    private GamePreview gamePreview = new GamePreview( announcedGamesList, hostName );
 
     public JoinGamePanel(Start par) {
 
         parent = par;
         parent.setTitle(Message.say("Start", "mTeilnehmen"));
 
-        GridLayout lay;
-        lay = new GridLayout(3, 1);
-        lay.setHgap(170);
-        lay.setVgap(80);
-
-        setLayout(lay);
+        setLayout( new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createCompoundBorder(
                 new EmptyBorder(150, 150, 150, 150),
                 OptionPane.niceBorder
@@ -61,7 +67,9 @@ public class JoinGamePanel extends ColoredComponent {
 
 
         add(newParticipateAsPanel());
+        add(Box.createVerticalStrut(20));
         add(newChooseGamePanel());
+        add(Box.createVerticalStrut(20));
 
         OkComponent confirmPanel = new OkComponent(Message.say("Start", "mGoButton"),
                 Message.say("Start", "mZurueckButton"));
@@ -94,15 +102,50 @@ public class JoinGamePanel extends ColoredComponent {
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-        hostName = new TJTextField(Message.say("Start", "mServerInh"),
-                JTextField.CENTER, true);
+        JComponent left = createFindServersView();
+        JComponent right = Box.createVerticalBox();
 
-        panel.add(new TJLabel(Message.say("Start", "mServer"), Color.lightGray, true));
-        panel.add(hostName);
+;
+
+        right.add(new TJLabel(Message.say("Start", "mServer")+" ", Color.lightGray, true));
+        right.add(hostName);
+        right.add(gamePreview);
+
+        panel.add(left);
+        panel.add(right);
 
         return panel;
 
     }
+
+    private JComponent createFindServersView() {
+        // For now this contains just the list,
+        // later buttons may follow...
+
+        JComponent box = Box.createVerticalBox();
+        box.add(new TJLabel("Favorite Servers"));
+
+        favServerList = new JList( Conf.getFavoriteGameServers() );
+        favServerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        favServerList.addListSelectionListener( new ListSelectionListener(){
+            public void valueChanged(ListSelectionEvent event) {
+                hostName.setText((String )favServerList.getSelectedValue());
+            }
+
+        });
+        box.add(favServerList);
+
+        queryMetaButton.addActionListener(gamePreview);
+
+        box.add( new TJLabel("Query Meta Server") );
+        box.add( queryMetaButton );
+
+        box.add( new TJLabel("Public Games:"));
+        box.add( announcedGamesList );
+
+        return box;
+    }
+
 
     private JComponent newParticipateAsPanel() {
 
@@ -113,22 +156,29 @@ public class JoinGamePanel extends ColoredComponent {
 
         JComponent panel = new ColoredComponent();
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        GridLayout layout = new GridLayout(2,2);
+        layout.setHgap(20);
+        layout.setVgap(10);
+        panel.setLayout( layout );
 
         panel.add( new TJLabel(Message.say("Start", "mParticipateAs"), Color.lightGray, true));
+        panel.add( Box.createGlue() );
 
-        JComponent panelSouth = new JPanel();
-        panelSouth.setLayout(new BoxLayout(panelSouth, BoxLayout.X_AXIS));
+        JComponent panelLeft = new JPanel();
+        panelLeft.setLayout(new BoxLayout(panelLeft, BoxLayout.X_AXIS));
 
-        panelSouth.add(new TJLabel(Message.say("Start", "mName"), Color.lightGray, true));
-        panelSouth.add(robName);
+        panelLeft.add(new TJLabel(Message.say("Start", "mName")+" ", Color.lightGray, true));
+        panelLeft.add(robName);
 
-        panelSouth.add(Box.createHorizontalGlue());
+        panel.add( panelLeft );
 
-        panelSouth.add(new TJLabel(Message.say("Start", "mFarbe"), Color.lightGray, true));
-        panelSouth.add(colors);
+        JComponent panelRight = new JPanel();
+        panelRight.setLayout(new BoxLayout(panelRight, BoxLayout.X_AXIS));
 
-        panel.add(panelSouth);
+        panelRight.add(new TJLabel(Message.say("Start", "mFarbe")+" ", Color.lightGray, true));
+        panelRight.add(colors);
+
+        panel.add(panelRight);
 
         return panel;
     }

@@ -51,7 +51,7 @@ public class Start extends JFrame implements WindowListener {
     private static String MAIN_MENU = "main";
     protected GameFieldPanel gameFieldPanel;          //build your board
     private static String GAME_FIELD = "gamefield";
-    private ParticipatePanel partPanel;        //participate
+    private JoinGamePanel partPanel;        //participate
     private static String PARTICIPATE = "participate";
     private WatchPanel watchPanel;          //watch
     private static String WATCH = "watch";
@@ -226,7 +226,7 @@ public class Start extends JFrame implements WindowListener {
         new Thread(new Runnable() {
             public void run() {
                 if (partPanel == null) {
-                    partPanel = new ParticipatePanel(Start.this);
+                    partPanel = new JoinGamePanel(Start.this);
                     getContentPane().add(partPanel, PARTICIPATE);
                 }
                 switchCard(PARTICIPATE);
