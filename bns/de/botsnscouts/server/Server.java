@@ -684,33 +684,34 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		sendMsg("mNeueRunde",tmpstr);
 
 		// Evtl. auf wiedereintretende Roboter warten
+		for (Iterator iter=zerstoerteRoboter.iterator();iter.hasNext();)
+		  if (!(((ServerRoboterThread)iter.next()).isAlive()))
+		    iter.remove();
+		
 		if (zerstoerteRoboter.size()>0) {
-		    for (Iterator iter=zerstoerteRoboter.iterator();iter.hasNext();)
-			if (!(((ServerRoboterThread)iter.next()).isAlive()))
-			    iter.remove();
 
-		    d("Warte kurz auf zerstoerte Roboter.");
-		    modus=ZERSTOERT_SYNC;
+		  d("Warte kurz auf zerstoerte Roboter.");
+		  modus=ZERSTOERT_SYNC;
+		  
+		  tmpstr=new String[1];
+		  Iterator iter=zerstoerteRoboter.iterator();
+		  tmpstr[0]=(((ServerRoboterThread)iter.next()).rob.getName());
+		  while (iter.hasNext())
+		    tmpstr[0]=tmpstr[0]+", "+(((ServerRoboterThread)iter.next()).rob.getName());
+		  sendMsg("mZerstSync",tmpstr);
 
-		    tmpstr=new String[1];
-		    Iterator iter=zerstoerteRoboter.iterator();
-		    tmpstr[0]=(((ServerRoboterThread)iter.next()).rob.getName());
-		    while (iter.hasNext())
-			tmpstr[0]=tmpstr[0]+", "+(((ServerRoboterThread)iter.next()).rob.getName());
-		    sendMsg("mZerstSync",tmpstr);
-
-		    waitablesImWaitingFor = new WaitingForSet(zerstoerteRoboter);
-		    wechselModus(waitablesImWaitingFor.iterator(), ZERSTOERT_SYNC);
-		    warteAufRoboter();
-		    wechselModus(zerstoerteRoboter.iterator(), ZERSTOERT_ASYNC);
-		    synchronized(roboterEintrittsListe){
-			alleN=new String[roboterEintrittsListe.size()];
-			int i=0;
-			for(Iterator e=roboterEintrittsListe.iterator();e.hasNext();)
-			    alleN[i++]=((ServerRoboterThread)e.next()).rob.getName();
-		    }
-		    if (alleN.length > 0)
-			ausgabenBenachrichtigen(alleN);
+		  waitablesImWaitingFor = new WaitingForSet(zerstoerteRoboter);
+		  wechselModus(waitablesImWaitingFor.iterator(), ZERSTOERT_SYNC);
+		  warteAufRoboter();
+		  wechselModus(zerstoerteRoboter.iterator(), ZERSTOERT_ASYNC);
+		  synchronized(roboterEintrittsListe){
+		    alleN=new String[roboterEintrittsListe.size()];
+		    int i=0;
+		    for(Iterator e=roboterEintrittsListe.iterator();e.hasNext();)
+		      alleN[i++]=((ServerRoboterThread)e.next()).rob.getName();
+		  }
+		  if (alleN.length > 0)
+		    ausgabenBenachrichtigen(alleN);
 		}
 		d("Es werden "+roboterEintrittsListe.size()+" nach ihrer Zerstörung wieder eingesetzt");
 
