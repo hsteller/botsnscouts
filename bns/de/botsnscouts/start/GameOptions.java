@@ -101,6 +101,9 @@ public class GameOptions {
     /** Game hosted by */
     private String invitor;
 
+    /** The server hosting the game */
+    private String host;
+
     /**
      * Set the relevant information later.
      */
@@ -357,6 +360,7 @@ public class GameOptions {
                     Boolean.valueOf(game.getStringAttribute("allowWisenheimer")).booleanValue(),
                     Boolean.valueOf(game.getStringAttribute("allowWisenheimer")).booleanValue(),
                     game.getStringAttribute("comment"));
+            gameOptions.setHost(game.getStringAttribute("host"));
             if (!map.containsKey(gameOptions.name)) {
                 map.put( gameOptions.name, gameOptions);
             }  else {
@@ -367,6 +371,10 @@ public class GameOptions {
         return map;
     }
 
+    private void setHost(String host) {
+        this.host = host;
+    }
+
     private static void assertXMLTagName(XMLElement xml, String name) {
         if (!xml.getName().equals(name))
             throw new XMLParseException(xml.getName(),"Expected tag: "+name);
@@ -374,6 +382,10 @@ public class GameOptions {
 
     public void setInvitor(String name) {
         invitor = name;
+    }
+
+    public String getHostString() {
+        return host+":"+registrationPort;
     }
 
 }
