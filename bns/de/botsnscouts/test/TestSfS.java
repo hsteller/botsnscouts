@@ -1,6 +1,8 @@
-package de.spline.rr;
+package de.botsnscouts.board;
 
 import java.io.*;
+
+import de.botsnscouts.util.*;
 
 /** Testklasse fuer SpielfeldSim
     @author Gero */
@@ -50,7 +52,7 @@ public class TestSfS
                 }
                 else if (id.equals("R ")){
                     p("Roboter-Definition");
-                    Roboter r=new Roboter(s.substring(6,12));
+                    Roboter r=Roboter.getNewInstance(s.substring(6,12));
                     p("Name: |"+s.substring(6,12)+"|");
                     p("Index: "+parseInt(s,2));
                     
