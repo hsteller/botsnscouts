@@ -7,7 +7,7 @@ package de.botsnscouts.board;
  * @author: Dirk Materlik, Gero Eggers
  */ 
 
-import de.botsnscouts.util.Roboter;
+import de.botsnscouts.util.*;
 
 public class Spielfeld implements de.botsnscouts.util.Directions
 {
@@ -797,41 +797,6 @@ public class Spielfeld implements de.botsnscouts.util.Directions
     }
 
   /***** public Instanzenmethoden *****/
-
-  /** @param x X-Koordinate des gew&uuml;nschten Feldes
-    @param y Y-Koordinate des gew&uuml;nschten Feldes
-    @return Das gew&uuml;nschte Feld
-    @see Feld
-    */
-  public Feld getFeld(int x, int y)
-    {
-      Feld nFeld = new Feld();
-      nFeld.x = x;
-      nFeld.y = y;
-      nFeld.l_exist = ww(x,y).da;
-      nFeld.r_exist = ow(x,y).da;
-      nFeld.o_exist = nw(x,y).da;
-      nFeld.u_exist = sw(x,y).da;
-      nFeld.l_WandEl1 = ww(x,y).wandEl[1]; // das rechte Wandelement in Westwand
-      nFeld.l_WandEl2 = ww(x,y).wandEl[0]; // das linke Wandelement in Westwand
-      nFeld.r_WandEl1 = ow(x,y).wandEl[0]; // das linke Wandelem. in Ostwand
-      nFeld.r_WandEl2 = ow(x,y).wandEl[1]; // das rechte Wandelem. in Ostwand
-      nFeld.o_WandEl1 = nw(x,y).wandEl[1]; // das Wandelem. unten in Nordwand
-      nFeld.o_WandEl2 = nw(x,y).wandEl[0]; // das Wandelem. oben in Nordwand
-      nFeld.u_WandEl1 = sw(x,y).wandEl[0]; // das Wandelem. oben in Suedwand
-      nFeld.u_WandEl2 = sw(x,y).wandEl[0]; // das Wandelem. unten in Suedwand
-      nFeld.l_WandEl1Spez = ww(x,y).spez[1]; // das rechte Wandelement in Westwand
-      nFeld.l_WandEl2Spez = ww(x,y).spez[0]; // das linke Wandelement in Westwand
-      nFeld.r_WandEl1Spez = ow(x,y).spez[0]; // das linke Wandelem. in Ostwand
-      nFeld.r_WandEl2Spez = ow(x,y).spez[1]; // das rechte Wandelem. in Ostwand
-      nFeld.o_WandEl1Spez = nw(x,y).spez[1]; // das Wandelem. unten in Nordwand
-      nFeld.o_WandEl2Spez = nw(x,y).spez[0]; // das Wandelem. oben in Nordwand
-      nFeld.u_WandEl1Spez = sw(x,y).spez[0]; // das Wandelem. oben in Suedwand
-      nFeld.u_WandEl2Spez = sw(x,y).spez[1]; // das Wandelem. unten in Suedwand
-      nFeld.bodenTyp = bo(x,y).typ;
-      nFeld.bodenSpez = bo(x,y).spez;
-      return (nFeld);
-    }
 
   /** @return Alle Flaggen die existieren in einem Array. */
   public Ort[] getFlaggen()

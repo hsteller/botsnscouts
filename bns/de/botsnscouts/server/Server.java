@@ -270,7 +270,7 @@ public synchronized void ausgabenBenachrichtigen(String[] s){
     }
 
         /** Schickt eine Nachricht an alle Ausgaben >= Version 2.0 */
-    protected synchronized void ausgabenMsg(String id,String s[]){
+    public synchronized void ausgabenMsg(String id,String s[]){
 
             /* Vorsicht: Nur der ServerThread darf diese Methode wirklich ausführen!
                Ansonsten legt sich ein anderer Thread sleepen, und der Server wird

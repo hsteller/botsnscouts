@@ -1,3 +1,5 @@
+package de.botsnscouts.util;
+
 public interface Directions {
 
     public static final int NORTH=0;  
