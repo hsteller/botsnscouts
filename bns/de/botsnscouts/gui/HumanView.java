@@ -21,7 +21,6 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
     private HumanPlayer human;
     private CardLayout panelSwitcher = new CardLayout();
-    private JPanel scoutNFriends = new JPanel();
     private RepairRegisters repairRegisters;
     private UserInfo userInfo;
     private CardArray cards;
@@ -29,13 +28,14 @@ public class HumanView extends JPanel implements HumanViewInterface {
     ScoutVertiefung scoutView;
     KlugscheisserLatte wisenheimerView;
     private JPanel switcherPanel;
+    private JPanel wiseAndScout;
 
     public HumanView(HumanPlayer hp) {
 	human = hp;
 	setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 	switcherPanel = new JPanel();
 	JPanel regsAndCards = new JPanel();
-	JPanel wiseAndScout = new JPanel();
+        wiseAndScout = new JPanel();
 
 	switcherPanel.setLayout(panelSwitcher);
 
@@ -122,8 +122,14 @@ public class HumanView extends JPanel implements HumanViewInterface {
 	switcherPanel.add(regsAndCards,"regsAndCards");
 	switcherPanel.add(reachedEndDead,"reachedEndDead");
 	switcherPanel.add(reachedEndWinner,"reachedEndWinner");
-	add(wiseAndScout);
+	//add(wiseAndScout);
 	add(switcherPanel);
+    }
+
+
+    protected JPanel getWiseAndScoutPanel(){
+      return wiseAndScout;
+
     }
 
     /**

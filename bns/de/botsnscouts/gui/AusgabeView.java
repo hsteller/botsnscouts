@@ -14,6 +14,8 @@ import org.apache.log4j.Category;
 public class AusgabeView extends JPanel implements AusgabeViewInterface {
     static Category CAT = Category.getInstance(AusgabeView.class);
 
+    private final static long SHOW_MESSAGE_DELAY=300;
+
     // --- objects
     private JScrollPane gameBoardScrollPane;
     private JViewport gameBoardView;
@@ -23,6 +25,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private Hashtable robotCardStatus = new Hashtable(8);
     private StatusLog statusLog = new StatusLog();
     private JMenuBar menus = new JMenuBar();
+
+    private JPanel northPanel = new JPanel();
 
     // settings for Zoom-Menu
     protected static final int MIN_ZOOM = 40;
@@ -61,7 +65,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	JPanel robotsCardContainer = new JPanel(new GridLayout(8,1));
 
-	setLayout(new BorderLayout());
+
+        setLayout(new BorderLayout());
 
 	// create status panel
 	for (int i=0; i< robots.length; i++) {
@@ -89,7 +94,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	    robotsCardContainer.add(rc);
 	    robotCardStatus.put(robots[i].getName(),rc);
 	}
-	add(robotsStatusContainer,BorderLayout.NORTH);
+
+        this.northPanel.setLayout(new BorderLayout());
+        northPanel.add(robotsStatusContainer, BorderLayout.WEST);
+	//this.add(northPanel, BorderLayout.NORTH);
+        // before splitpane: add(robotsStatusContainer,BorderLayout.NORTH);
 //	add(robotsCardContainer,BorderLayout.EAST);
 
 
@@ -108,6 +117,14 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
     }
 
+    protected void addWiseAndScout(JPanel p){
+        CAT.debug("adding WiseAndScout to Northpanel/EAST");
+        northPanel.add(p, BorderLayout.EAST);
+    }
+
+    protected JPanel getNorthPanel(){
+      return northPanel;
+    }
     /*
     public void shutup() {
 	System.exit(0);
@@ -120,6 +137,14 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      */
     public void showActionMessage(String s){
 	statusLog.addMessage(s);
+        synchronized(this){
+          try {
+            wait(SHOW_MESSAGE_DELAY);
+          }
+         catch (InterruptedException ie){
+          CAT.debug("interrupted!");
+         }
+        }
     }
 
 
@@ -328,7 +353,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	soundBox.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e){
 		    soundOn = !soundOn;
-		    gameBoardCanvas.setSoundActive(soundOn);
+		    SoundMan.setSoundActive(soundOn);
                     String status = Message.say("AusgabeView","mSoundChange")+" ";
                     if (soundOn)
                       status += Message.say("AusgabeView","mSoundOn");
@@ -445,7 +470,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
          Enumeration e = robotStatus.elements();
          while (e.hasMoreElements()){
             RobotStatus rs = (RobotStatus) e.nextElement();
-            JMenuItem rob = new JMenuItem(rs.robot.getName());
+            JMenuItem rob = new JMenuItem(rs.robot.getName(),new ImageIcon(rs.robotImages[rs.robot.getBotVis()]));
             rob.addActionListener(new ShowRobListener(rs));
             this.add(rob);
           }

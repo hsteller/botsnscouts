@@ -21,6 +21,7 @@ public class View extends JFrame {
 
     private ChatPane chatpane;
     private JMenuBar menus;
+    JSplitPane sp;
 
     AusgabeView ausgabeView;
     HumanView humanView;
@@ -28,15 +29,20 @@ public class View extends JFrame {
     protected final boolean NURAUSGABE = true;
     protected final boolean MENSCHAUSGABE = false;
 
+
+
+    /*
     public View() {
 	setTitle(Message.say("AusgabeFrame","gameName"));
+        sp = new JSplitPane();
     }
-
+*/
     public View(AusgabeView av) {
 	setTitle(Message.say("AusgabeFrame","gameName"));
 	ausgabeView=av;
 	initView();
 	getContentPane().add(av, BorderLayout.CENTER);
+        getContentPane().add(av.getNorthPanel(), BorderLayout.NORTH);
 	makeVisible();
     }
 
@@ -44,17 +50,24 @@ public class View extends JFrame {
 	setTitle(Message.say("AusgabeFrame","gameName"));
 	humanView = hv;
 	initView();
-	getContentPane().add(hv, BorderLayout.EAST);
+        hv.setMinimumSize(new Dimension(0, 0));
+
+        sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        sp.setRightComponent(hv);
+        sp.setOneTouchExpandable(true);
+
+	getContentPane().add(sp, BorderLayout.CENTER);
     }
 
 /*
     public void shutup() {
 	System.exit(0);
+
     }
 
 */
 
-
+/*
     public static void main (String args[]) {
 	Message.setLanguage("deutsch");
 	JFrame f = new View();
@@ -62,7 +75,7 @@ public class View extends JFrame {
 	f.getContentPane().add(a);
 	f.setVisible(true);
    }
-
+*/
     synchronized private void initView() {
 	// Fenstergröße auf Vollbild setzen
 	Toolkit tk=Toolkit.getDefaultToolkit();
@@ -123,15 +136,37 @@ public class View extends JFrame {
 	if (ausgabeView==null) {
           CAT.debug("ausgabeView is null");
           ausgabeView=av;
+          getContentPane().add(ausgabeView.getNorthPanel(), BorderLayout.NORTH);
           this.addMenuBar();
         }
-        getContentPane().add(av, BorderLayout.CENTER);
+        if (humanView!=null){
+          Toolkit tk = Toolkit.getDefaultToolkit();
+          int w = tk.getScreenSize().width-8;
+          int h = tk.getScreenSize().height-8;
+          int leftPanelWidth=Math.max(w-250, 400);
+          int leftPanelHeight=Math.max(h-250, 350);
+          if (CAT.isDebugEnabled()){
+            CAT.debug("Setting minimum and preferred width of left Splitpane to: "+leftPanelWidth);
+            CAT.debug("Setting minimum height of left Splitpane to: "+leftPanelHeight);
+          }
 
+          JPanel p = humanView.getWiseAndScoutPanel();
+          av.addWiseAndScout(p);
+          av.setPreferredSize(new Dimension(leftPanelWidth,leftPanelHeight));
+          av.setMinimumSize(new Dimension(leftPanelWidth,leftPanelHeight));
+          humanView.setPreferredSize(new Dimension(250, 400));
+          sp.setLeftComponent(av);
+         // sp.setDividerLocation(0.75);
+        }
+        else{
+          getContentPane().add(av, BorderLayout.CENTER);
+        }
     }
 
     public void addChatPane(ChatPane cp){
         chatpane = cp;
-	getContentPane().add(cp, BorderLayout.SOUTH);
+        getContentPane().add(cp, BorderLayout.SOUTH);
+
     }
 
     public void removeChatPane() {
