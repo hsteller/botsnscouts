@@ -412,7 +412,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	    if ((r.getLeben() != rob.getLeben()) || 
 		(r.getNaechsteFlagge() != rob.getNaechsteFlagge()) ||
 		(r.getSchaden() != rob.getSchaden()) ||
-		(r.istAktiviert() != rob.aktiviert)) {
+		(r.istAktiviert() != rob.istAktiviert())) {
 		r = rob;
 		robcolor = roboNcolor[color];
 		this.repaint();
@@ -428,7 +428,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	}
 	public void paint(Graphics g)
 	{
-	    if (!r.aktiviert) this.setBackground(Color.gray);
+	    if (!r.istAktiviert()) this.setBackground(Color.gray);
 	    else this.setBackground(backColor);
 	    // Name
 	    g.setFont(new Font("SansSerif",Font.BOLD,12));
@@ -724,16 +724,16 @@ public class AusgabeFrame extends JFrame implements Runnable {
 
 	    // ---- gesperrte Regisster toString
 	    String gespReg = "[ ";
-	    if (r.gesperrteRegister != null) 
-		for (int i = 0; i < r.gesperrteRegister.length; i++) 
-		    if (r.gesperrteRegister[i] != null) gespReg+= r.gesperrteRegister[i].getaktion() + " | ";
+	    if (r.gesperrteRegs() > 0) 
+		for (int i = 0; i < r.gesperrteRegs(); i++) 
+		    if (r.getGesperrteRegister()[i] != null) gespReg+= r.getGesperrteRegister()[i].getaktion() + " | ";
 	    gespReg += "]";
 
 	    // ---- gelegte Karten toString
 	    String gelegtKarte = "[ ";
-	    if (r.zug != null) 
-		for (int i = 0; i < r.zug.length; i++) 
-		    if (r.zug[i] != null) gelegtKarte+= r.zug[i].getaktion() + " | ";
+	    if (r.getZug() != null) 
+		for (int i = 0; i < r.getZug().length; i++) 
+		    if (r.getZug()[i] != null) gelegtKarte+= r.getZug()[i].getaktion() + " | ";
 	    gelegtKarte += "]";
 
 	    // ---- Label erzeugen
@@ -749,11 +749,11 @@ public class AusgabeFrame extends JFrame implements Runnable {
 	    archivpos.setSize(xsize,ysize/7);
 	    archivpos.setLocation(5,ysize/7*3);
 	    this.add(archivpos);
-	    aktiviert = new Label(Message.say("AusgabeFrame","aktiviert")+r.aktiviert);
+	    aktiviert = new Label(Message.say("AusgabeFrame","aktiviert")+r.istAktiviert());
 	    aktiviert.setSize(xsize,ysize/7);
 	    aktiviert.setLocation(5,ysize/7*4);
 	    this.add(aktiviert);
-	    virtuell = new Label(Message.say("AusgabeFrame","virtuell")+r.virtuell);
+	    virtuell = new Label(Message.say("AusgabeFrame","virtuell")+r.istVirtuell());
 	    virtuell.setSize(xsize,ysize/7);
 	    virtuell.setLocation(5,ysize/7*5);
 	    this.add(virtuell);
@@ -1065,7 +1065,7 @@ public class AusgabeFrame extends JFrame implements Runnable {
 				// ------------- Spieler erfragen und den Status anlegen ------------
 		try { 
 		    Global.debug(this,"Versuche, Namen zu holen...");
-		    String[] spNamen = kCA.name;
+		    String[] spNamen = kCA.getNamen();
 		    String[] spColor = kCA.getFarben();
 		    int nco=0;
 		    for (int co=0;co<8;co++){
