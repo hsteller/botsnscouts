@@ -39,8 +39,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
@@ -407,6 +410,27 @@ public class BoardView extends JLayeredPane {
 
 
     }
+    
+    private void paintBotsOnPositionButNotMe(Location position, Bot me, Graphics2D g2d, int xoffset, int yoffset){       
+       int botCount = robos.length;
+       int acht = (int)(8*dScale);
+       Composite old = g2d.getComposite();
+        for (int i = 0; i < botCount; i++) {
+            Bot bot = robos[i];
+            if (!bot.getName().equals(me.getName()) && bot.getPos().equals(position) ){
+                if (bot.isVirtual())
+                    g2d.setComposite(AC_SRC_OVER_05);
+                else
+                    g2d.setComposite(AC_SRC);
+                g2d.drawImage(getRobImage(bot, bot.getFacing()), xoffset, yoffset,scaledFeldSize, scaledFeldSize,this );                
+                
+                g2d.setColor(ROBOCOLOR[bot.getBotVis()]);
+                g2d.drawString(bot.getName(),xoffset,yoffset + acht + i * acht);
+            }
+        }
+        
+        g2d.setComposite(old);
+    }
 
 
     /////////////////////////////////////////////////////////////////////
@@ -417,6 +441,9 @@ public class BoardView extends JLayeredPane {
         if (internal.isVirtual())
             ac = AC_SRC_OVER_05;
         Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
+        Location botStartPos = internal.getPos();
+        Location botEndPos = new Location(botStartPos.getX(), botStartPos.getY()+1);
+        
         synchronized (this) {           
          //  g2.scale(dScale, dScale);
             int feldSize = scaledFeldSize;//  FELDSIZE;//(int)(FELDSIZE*dScale);
@@ -427,13 +454,15 @@ public class BoardView extends JLayeredPane {
             if (preBoard == null)
                 preBoard = getBoardImage();
             BufferedImage tmpImage = preBoard.getSubimage(xposScaled, yposScaled, feldSize,clipLength);
-           
-               	
-            Raster blank = tmpImage.getData();
             Graphics2D myg = (Graphics2D) tmpImage.getGraphics();
+            Raster blank = tmpImage.getData();            
+            paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, scaledFeldSize);
+            paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,0);
+            Raster blankWithBots = tmpImage.getData();
             myg.setComposite(ac);
-                for (int yoffset = 0; yoffset >= -feldSize; yoffset -= MOVE_ROB_ANIMATION_OFFSET) {
-                     tmpImage.setData(blank);                                                        
+      
+            for (int yoffset = 0; yoffset >= -feldSize; yoffset -= MOVE_ROB_ANIMATION_OFFSET) {
+                     tmpImage.setData(blankWithBots);                                                        
                      myg.drawImage(imgRob, 0,feldSize+yoffset, feldSize, feldSize, this); // paint the image                                                                                        
                     // myg.scale(dScale, dScale);
                      g2.drawImage(tmpImage, xposScaled, yposScaled, feldSize, clipLength,this);
@@ -444,7 +473,8 @@ public class BoardView extends JLayeredPane {
                     }
                    
                 }
-                tmpImage.setData(blank);            
+                tmpImage.setData(blank);   
+                //paintRobos(this.getGraphics());
         }
     }
     
@@ -457,7 +487,8 @@ public class BoardView extends JLayeredPane {
         if (internal.isVirtual())
             ac = AC_SRC_OVER_05;
         Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
-        
+        Location botStartPos = internal.getPos();
+        Location botEndPos = new Location (botStartPos.getX(), botStartPos.getY()+1);
         synchronized (this) {
             int feldSize = scaledFeldSize;//(int)(FELDSIZE*dScale);
          //  g2.scale(dScale, dScale);
@@ -469,9 +500,13 @@ public class BoardView extends JLayeredPane {
             BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64, feldSize,clipLength);
             Raster blank = tmpImage.getData();
             Graphics2D myg = (Graphics2D) tmpImage.getGraphics();
+            paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, 0);
+            paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,scaledFeldSize);
+            Raster blankWithBots = tmpImage.getData();
+            
             myg.setComposite(ac);
                 for (int yoffset = 0; yoffset <=feldSize; yoffset += MOVE_ROB_ANIMATION_OFFSET) {
-                     tmpImage.setData(blank);                                   
+                     tmpImage.setData(blankWithBots);                                   
                      myg.drawImage(imgRob, 0,yoffset, feldSize,feldSize, this); // paint the image                                                                                        
                      g2.drawImage(tmpImage, xpos64, ypos64, feldSize, clipLength,this);
                    try {
@@ -492,7 +527,8 @@ public class BoardView extends JLayeredPane {
         if (internal.isVirtual())
             ac = AC_SRC_OVER_05;
         Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
-           
+         Location botStartPos =  internal.getPos();
+         Location botEndPos = new Location(botStartPos.getX()+1, botStartPos.getY());
         synchronized (this) {        
            
          //   g2.scale(dScale, dScale);
@@ -505,9 +541,12 @@ public class BoardView extends JLayeredPane {
             BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64,clipLength,scaledFeldSize);
             Raster blank = tmpImage.getData();
             Graphics2D myg = (Graphics2D) tmpImage.getGraphics();    
+            paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, 0);
+            paintBotsOnPositionButNotMe(botEndPos, internal,myg,scaledFeldSize,0);
+            Raster blankWithBots = tmpImage.getData();
             myg.setComposite(ac);
             for (int xoffset = 0; xoffset <= feldSize; xoffset += MOVE_ROB_ANIMATION_OFFSET) {
-                tmpImage.setData(blank);                                   
+                tmpImage.setData(blankWithBots);                                   
                  myg.drawImage(imgRob, xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
                  g2.drawImage(tmpImage, xpos64, ypos64, clipLength, feldSize,this);
                try {
@@ -528,7 +567,8 @@ public class BoardView extends JLayeredPane {
         if (internal.isVirtual())
             ac = AC_SRC_OVER_05;
         Image imgRob = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
-       
+       Location botStartPos = internal.getPos();
+       Location botEndPos = new Location(botStartPos.getX()-1, botStartPos.getY());
         synchronized (this) {           
       //      g2.scale(dScale, dScale);
             int feldSize = scaledFeldSize;//(int)( FELDSIZE*dScale);
@@ -540,9 +580,13 @@ public class BoardView extends JLayeredPane {
             BufferedImage tmpImage  = preBoard.getSubimage(xpos64, ypos64,clipLength, feldSize);
             Raster blank = tmpImage.getData();
             Graphics2D myg = (Graphics2D) tmpImage.getGraphics();    
+            paintBotsOnPositionButNotMe(botStartPos, internal, myg,scaledFeldSize, 0);
+            paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,0);
+            Raster blankWithBots = tmpImage.getData();
+            
             myg.setComposite(ac);
                 for (int xoffset = 0; xoffset >= -feldSize; xoffset -= MOVE_ROB_ANIMATION_OFFSET) {
-                    tmpImage.setData(blank);                                   
+                    tmpImage.setData(blankWithBots);                                   
                      myg.drawImage(imgRob, feldSize+xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
                      g2.drawImage(tmpImage, xpos64, ypos64, clipLength, feldSize,this);
                    try {
@@ -622,13 +666,19 @@ public class BoardView extends JLayeredPane {
             // saving a copy of the background:
             Raster blank = robImage.getData();
             Graphics2D botImageGraphics = (Graphics2D) robImage.getGraphics();
+                        
+            paintBotsOnPositionButNotMe(internal.getPos(), internal,botImageGraphics,0,0);
+            Raster blankWithBots = robImage.getData();
+            
+            
+            
             botImageGraphics.setComposite(ac);
        
             botImageGraphics.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
            
              for (int step = 0; step<TURN_ROB_ANIMATION_STEPS;step++) {
 
-                 	 robImage.setData(blank); // erasing the offscreen image with the boardbackground
+                 	 robImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
                      botImageGraphics.rotate(rotateTheta,halfSize, halfSize); // rotating the robot pic further   
                      botImageGraphics.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);                  
                      // paint the offscreen image on the screen:
@@ -1622,7 +1672,10 @@ public class BoardView extends JLayeredPane {
         int ypos = sf.getSizeY() - robot.getY();
         int xpos64 = xpos * scaledFeldSize;
         int ypos64 = ypos * scaledFeldSize;
-
+        paintRobot(g2d,robot,robocount, xpos64, ypos64);
+    }
+  
+    private void paintRobot (Graphics2D g2d, Bot robot, int robocount, int xpos64, int ypos64) {
         int acht = (int)(dScale*8);
         
         int botVis = robot.getBotVis();
@@ -1814,7 +1867,7 @@ public class BoardView extends JLayeredPane {
         return bi;
     }
 
-    private void ersetzeSpielfeld(SimBoard sfs) {
+    private synchronized void ersetzeSpielfeld(SimBoard sfs) {
         sf = sfs;
         widthInPixel = (int) (sf.getSizeX() * scaledFeldSize);
         heightInPixel = (int) (sf.getSizeY() * scaledFeldSize);
