@@ -39,6 +39,8 @@ public class Launcher {
     static final Category CAT = Category.getInstance(Launcher.class);
 
     private Server server;
+    private boolean allowWisenheimer = true;
+    private boolean allowScout = true;
 
     // launches output
     public Thread einemSpielZuschauen(String ip, int port, boolean noSplash) {
@@ -90,7 +92,8 @@ public class Launcher {
 //        int retFromNewGame = com.newGame(ip, port, pnum, 0, timeOut, field, flags[0], flags[1], dim.x, dim.y, lisPort);
 //        return (retFromNewGame != 1);
         server = new Server(new GameOptions(pnum, lisPort, 1000*timeOut, field,
-                    tileRaster.getRFlaggen(), dim.x, dim.y),
+                    tileRaster.getRFlaggen(), dim.x, dim.y,
+                    allowScout, allowWisenheimer),
                     listener);
          server.start();
     }
@@ -102,6 +105,14 @@ public class Launcher {
     public void stopServer() {
         // Not nice, but this is the way it was done before...
         server.interrupt();
+    }
+
+    public void setAllowWisenheimer(boolean selected) {
+        allowWisenheimer = selected;
+    }
+
+    public void setAllowScout(boolean selected) {
+        allowScout = selected;
     }
 
 }

@@ -721,6 +721,15 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             notifyViews(alleN);
 
 // 2. Bot
+            sendMsg("mWelcome", "");
+            if (!options.isAllowScout()){
+                CAT.debug("No scout this game.");
+                sendMsg("mNoScoutAllowed", "");
+            }
+            if (!options.isAllowWisenheimer()){
+                CAT.debug("No Wisenheimer this game.");
+                sendMsg("mNoWisenheimerAllowed", "");
+            }
             d("Spiel starten.");
             modus = SPIELSTART;
             waitablesImWaitingFor = new WaitingForSet(rThreads);

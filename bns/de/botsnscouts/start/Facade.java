@@ -44,7 +44,6 @@ public class Facade {
 
     private static final String DIP;//="127.0.0.1";
     private static final int DPORT;//=8077;
-    private static final int LPORT;//=8889;
     private static final int DPLAYERS;//=8;
     private static final int DTO;//=200;
 
@@ -55,8 +54,6 @@ public class Facade {
         DIP = (stmp == null ? "127.0.0.1" : stmp);
         tmp = Conf.getIntProperty("server.port");
         DPORT = (tmp == -1 ? 8077 : tmp);
-        tmp = Conf.getIntProperty("startserver.port");
-        LPORT = (tmp == -1 ? 8889 : tmp);
         tmp = Conf.getIntProperty("players");
         DPLAYERS = (tmp == -1 ? 8 : tmp);
         tmp = Conf.getIntProperty("timeout");
@@ -344,5 +341,13 @@ public class Facade {
 
     public void prepareTiles() {
         tileFactory.prepareTiles();
+    }
+
+    void setAllowWisenheimer(boolean selected) {
+        launcher.setAllowWisenheimer(selected);
+    }
+
+    void setAllowScout(boolean selected) {
+        launcher.setAllowScout(selected);
     }
 }

@@ -968,7 +968,6 @@ public class Ausgabe extends BNSThread {
 
 
     private void initMessageToActionMapping(){
-
        sequencer.addActionMapping(MessageID.SIGNAL_ACTION_START,
                                   new AbstractMessageAction(){
                                       public void invoke(ClientAntwort msgData){

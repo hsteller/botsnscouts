@@ -1,11 +1,11 @@
 package de.botsnscouts.gui;
 
+import de.botsnscouts.util.OptionPane;
+import org.apache.log4j.Category;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.StringTokenizer;
-import de.botsnscouts.util.OptionPane;
-import org.apache.log4j.Category;
 
 public class ChatLine extends ColoredComponent implements ActionListener, ComponentListener, KeyListener  {
     static final Category CAT = Category.getInstance(ChatLine.class);
@@ -96,9 +96,5 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
             timer.restart();
     }
     public void keyReleased(KeyEvent parm1) {}
-
-
-    private void cleanUp (){
-    }
 
 }

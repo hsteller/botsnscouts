@@ -25,29 +25,24 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
 import de.botsnscouts.gui.hotkey.*;
-
-import java.awt.*;
-import java.io.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import java.util.HashMap;
-
-
+import de.botsnscouts.util.Message;
 import org.apache.log4j.Category;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 /**
- * Helferklasse, die die Komponenten auf dem Bildschirm plaziert
+ * Helper class for placing components
  * @author Lukasz Pekacki
  */
 
 public class View extends JFrame {
     static Category CAT = Category.getInstance(View.class);
 
-    private ChatPane chatpane;
     private ChatLine chatLine;
     private JMenuBar menus;
 
@@ -150,7 +145,7 @@ public class View extends JFrame {
         }
           HotKeyAction act2 = new ChatMessageHotKeyActionAdapter(editPanel){
           public void execute() {
-            ChatMessageEditor edit = (ChatMessageEditor) this.getEditor();
+            ChatMessageEditor edit = this.getEditor();
             if (edit.isAutoCommit())
               humanView.sendChatMessage(edit.getMessage());
             else {
@@ -341,17 +336,6 @@ public class View extends JFrame {
         else{
           this.getContentPane().add(av, BorderLayout.CENTER);
         }
-    }
-
-    public void addChatPane(ChatPane cp){
-        chatpane = cp;
-        this.getContentPane().add(cp, BorderLayout.SOUTH);
-
-    }
-
-    public void removeChatPane() {
-        this.getContentPane().remove(chatpane);
-        chatpane = null;
     }
 
     protected void quitHumanPlayer() {

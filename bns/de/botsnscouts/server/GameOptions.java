@@ -41,6 +41,17 @@ public class GameOptions {
      * "Second coordinate of the board's dimension"
      */
     private int y;
+
+    /**
+     * Allow the players to get help from wisenhimer in this game.
+     */
+    private boolean allowWisenheimer = true;
+
+    /**
+     *  Allow the players to get help from Scout in this game.
+     */
+    private boolean allowScout = true;
+
     /**
      *
      * @param noPlayers  Max number of players for this game
@@ -67,7 +78,29 @@ public class GameOptions {
         this.y = y;
 
     }
-
+    /**
+     *
+     * @param noPlayers  Max number of players for this game
+     * @param port TCP/IP port for registration
+     * @param timeout Timeout in ms for handing in cards.
+     * @param board   The board for the game.
+     * @param flags   Location of the flags
+     * @param x        "First coordinate of the board's dimension"
+     * @param y        "Second coordinate of the board's dimension"
+     */
+    public GameOptions( int noPlayers,
+                        int port,
+                        int timeout,
+                        String board,
+                        Location[] flags,
+                        int x,
+                        int y,
+                        boolean allowScout,
+                        boolean allowWisenheimer ) {
+        this(noPlayers, port, timeout, board, flags, x, y);
+        this.allowWisenheimer = allowWisenheimer;
+        this.allowScout = allowScout;
+    }
     /**
      *
      * @return  Max number of players for this game
@@ -110,6 +143,14 @@ public class GameOptions {
 
     public int getY() {
         return y;
+    }
+
+    public boolean isAllowScout() {
+        return allowScout;
+    }
+
+    public boolean isAllowWisenheimer() {
+        return allowWisenheimer;
     }
 
     public String toString() {

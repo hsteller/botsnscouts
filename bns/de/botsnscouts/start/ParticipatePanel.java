@@ -58,7 +58,6 @@ public class ParticipatePanel extends ColoredComponent implements  ActionListene
 	parent.setTitle(Message.say("Start","mTeilnehmen"));
 	paint=parent.paint;
 
-	String[] farben={Message.say("Start","mFarbeEgal"),Message.say("Start","mFarbeGruen"),Message.say("Start","mFarbeGelb"),Message.say("Start","mFarbeRot"),Message.say("Start","mFarbeBlau"),Message.say("Start","mFarbeMagenta"),Message.say("Start","mFarbeOrange"),Message.say("Start","mFarbeGrau"),Message.say("Start","mFarbeDunkelMagenta")};
 	font=new Font("Sans", Font.BOLD, 24);
 
 	GridLayout lay;

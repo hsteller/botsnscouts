@@ -73,10 +73,10 @@ public class MessageSequencer {
           return;
 
       ClientAntwort smallest = (ClientAntwort) messages.first();
-      int actualId = smallest.messageSequenceNumber;
+      int currentId = smallest.messageSequenceNumber;
 
-      while (actualId == nextMsg) {
-        CAT.debug("INVOKING MESSAGEACTION #"+actualId);
+      while (currentId == nextMsg) {
+        CAT.debug("INVOKING MESSAGEACTION #"+currentId);
         String actionType = smallest.specialMessageId;
         if ( actionType == null )
           actionType = smallest.namen[0];
@@ -88,10 +88,10 @@ public class MessageSequencer {
         messages.remove(smallest);
         if (!messages.isEmpty()){
           smallest= (ClientAntwort)messages.first();
-          actualId=smallest.messageSequenceNumber;
+          currentId=smallest.messageSequenceNumber;
         }
-        CAT.debug("actual="+actualId+"\tnext="+nextMsg);
-        // else nextMsg!=actualId -> exiting loop
+        CAT.debug("actual="+currentId+"\tnext="+nextMsg);
+        // else nextMsg!=currentId -> exiting loop
       }
 
     }
