@@ -9,7 +9,7 @@ package de.botsnscouts.board;
 
 import de.botsnscouts.util.Roboter;
 
-public class Spielfeld implemets de.botsnscouts.util.Directions
+public class Spielfeld implements de.botsnscouts.util.Directions
 {
 
 
