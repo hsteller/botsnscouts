@@ -46,8 +46,9 @@ public class CardArray extends TJPanel {
     private JButton sendButton = OptionPane.getTransparentButton(Message.say("SpielerMensch","senden"), 14);
     private ArrayList cardsView = new ArrayList(9);
     private JCheckBox powerDownBox = new TJCheckBox(Message.say("SpielerMensch","powerdown"),false);
-    private int xsize=150, ysize=550;
-
+    
+    private Dimension myPrefSize = new Dimension (150,550);
+    
     public CardArray() {
 	this(new ActionListener(){
 		public void actionPerformed(ActionEvent ae) {
@@ -84,7 +85,7 @@ public class CardArray extends TJPanel {
 	//chooser.setBorder(new EmptyBorder(25,0,0,0));
 	chooser.add(sendButton);
 	chooser.add(powerDownBox);
-
+	
 	add(chooser);
 
     }
@@ -146,13 +147,14 @@ public class CardArray extends TJPanel {
     }
 
     public Dimension getMinimumSize() {
-	return new Dimension(xsize,ysize);
+	return myPrefSize;
     }
 
     public Dimension getPreferredSize() {
-	return new Dimension(xsize,ysize);
+	return myPrefSize;
     }
 
+   
 
     public static void main (String args[]) {
 	Message.setLanguage("deutsch");

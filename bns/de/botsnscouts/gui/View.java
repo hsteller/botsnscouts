@@ -85,10 +85,14 @@ public class View extends JFrame {
 		initView();
         hv.setMinimumSize(new Dimension(0, 0));
         sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        sp.setRightComponent(hv);
+        JScrollPane right = new JScrollPane(hv);
+        right.setAutoscrolls(true);
+        sp.setRightComponent(right);
+       
         sp.setOneTouchExpandable(true);
-        sp.setOpaque(false);
+        sp.setOpaque(true);
         contentpane.add ( sp);
+      
         // not AusgabeView yet :(
         // => will call initHotKeys in addAusgabeView()
         //initHotKeys();

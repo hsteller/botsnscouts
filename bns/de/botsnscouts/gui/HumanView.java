@@ -455,5 +455,11 @@ public class HumanView extends JPanel implements HumanViewInterface {
             panelSwitcher.show(switcherPanel, "userInfo");
         }
     }
+    public Dimension getPreferredSize () {
+        return new Dimension(150,550);
+    } public Dimension getMinimumSize () {
+        return new Dimension(150,550);
+    }
+    
 }
 

@@ -28,7 +28,7 @@ public class HotKeyEditorPanel extends JPanel {
   public final JLabel colChatMesgLbl   = new JLabel(Message.say(SEC,"editMessageLabel"));
   public final JLabel colChatCommitLbl = new JLabel(Message.say(SEC, "autoCommitBoxLabel"));
 
-  private final static int KEY_FIELD_SIZE = 5;
+  private final static int KEY_FIELD_SIZE = 10;
   private final static Font headlineFont = new Font(null, Font.BOLD, 14);
   private final static String NOT_EDITABLE_TOOLTIP = Message.say(SEC, "notEditableTooltip");
 
@@ -128,11 +128,11 @@ public class HotKeyEditorPanel extends JPanel {
       key.setToolTipText(NOT_EDITABLE_TOOLTIP);
       JLabel lblFunc = new JLabel(k.getAction().getDescription());
       this.add(key, new GridBagConstraints(startColumn++, startRow ,1,1,0.0,0.0,
-                                               GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+                                               GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                new Insets(0,10,0,0), 0,0));
                                                //top,left,bottom,right
       this.add(lblFunc, new GridBagConstraints(startColumn, startRow,1,1,0.0,0.0,
-                                               GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                               GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                new Insets(0,10,0,10),0,0));
 
     }
@@ -151,21 +151,21 @@ public class HotKeyEditorPanel extends JPanel {
       startColumn++;
      else
        this.add(x1, new GridBagConstraints(startColumn++, startRow ,1,1,0.0,0.0,
-                                               GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                               new Insets(0,10,bottomInset,0), 0,0));
+                                               GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                                               new Insets(0,10,bottomInset,0),0,0));
                                                //top,left,bottom,right
      if (x2 == null)
         startColumn++;
      else
       this.add(x2, new GridBagConstraints(startColumn++, startRow,1,1,0.0,0.0,
-                                               GridBagConstraints.WEST, GridBagConstraints.NONE,
+                                               GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                new Insets(0,10,bottomInset,10),0,0));
      if (x3 == null)
         startColumn++;
      else
-      this.add(x3, new GridBagConstraints(startColumn++, startRow,1,1,0.0,0.0,
+      this.add(x3, new GridBagConstraints(startColumn++, startRow,1,1,1.0,0.0,
                                                GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                                               new Insets(0,0,bottomInset,5), 100,0));
+                                               new Insets(0,0,bottomInset,5), 0,0));
      if (x4 != null)
        this.add(x4, new GridBagConstraints(startColumn++, startRow,1,1,0.0,0.0,
                                                GridBagConstraints.CENTER, GridBagConstraints.NONE,

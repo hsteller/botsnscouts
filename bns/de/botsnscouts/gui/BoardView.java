@@ -162,9 +162,10 @@ public class BoardView extends JLayeredPane {
     ClickListener myClickListener;
 
 
-   // private int delay=AusgabeView.MEDIUM;
+   
     
-    private AnimationConfig globalAnimationConfig = AnimationConfig.getGlobalAnimationConfig();
+    private AnimationConfig currentAnimationConfig;
+    
     
     private static final AlphaComposite AC_SRC = AlphaComposite.getInstance(AlphaComposite.SRC);
     private static final AlphaComposite AC_SRC_OVER = AlphaComposite.getInstance(AlphaComposite.SRC_OVER);
@@ -472,8 +473,8 @@ public class BoardView extends JLayeredPane {
             paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,0);
             Raster blankWithBots = tmpImage.getData();
             myg.setComposite(ac);
-            int animationOffsetMoveRob =globalAnimationConfig.getAnimationOffsetMoveRob();
-            int animationDelayMoveRob = globalAnimationConfig.getAnimationDelayMoveRob();
+            int animationOffsetMoveRob =currentAnimationConfig.getAnimationOffsetMoveRob();           
+            int animationDelayMoveRob = currentAnimationConfig.getAnimationDelayMoveRob();
             for (int yoffset = 0; yoffset >= -feldSize; yoffset -= animationOffsetMoveRob) {
                      tmpImage.setData(blankWithBots);                                                        
                      myg.drawImage(imgRob, 0,feldSize+yoffset, feldSize, feldSize, this); // paint the image                                                                                        
@@ -516,8 +517,8 @@ public class BoardView extends JLayeredPane {
             paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, 0);
             paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,scaledFeldSize);
             Raster blankWithBots = tmpImage.getData();
-            int animationOffsetMoveRob =globalAnimationConfig.getAnimationOffsetMoveRob();
-            int animationDelayMoveRob = globalAnimationConfig.getAnimationDelayMoveRob();
+            int animationOffsetMoveRob =currentAnimationConfig.getAnimationOffsetMoveRob();
+            int animationDelayMoveRob = currentAnimationConfig.getAnimationDelayMoveRob();
             myg.setComposite(ac);
                 for (int yoffset = 0; yoffset <=feldSize; yoffset += animationOffsetMoveRob) {
                      tmpImage.setData(blankWithBots);                                   
@@ -559,8 +560,8 @@ public class BoardView extends JLayeredPane {
             paintBotsOnPositionButNotMe(botEndPos, internal,myg,scaledFeldSize,0);
             Raster blankWithBots = tmpImage.getData();
             myg.setComposite(ac);
-            int animationOffsetMoveRob =globalAnimationConfig.getAnimationOffsetMoveRob();
-            int animationDelayMoveRob = globalAnimationConfig.getAnimationDelayMoveRob();
+            int animationOffsetMoveRob =currentAnimationConfig.getAnimationOffsetMoveRob();
+            int animationDelayMoveRob = currentAnimationConfig.getAnimationDelayMoveRob();
             for (int xoffset = 0; xoffset <= feldSize; xoffset += animationOffsetMoveRob) {
                 tmpImage.setData(blankWithBots);                                   
                  myg.drawImage(imgRob, xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
@@ -599,8 +600,8 @@ public class BoardView extends JLayeredPane {
             paintBotsOnPositionButNotMe(botStartPos, internal, myg,scaledFeldSize, 0);
             paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,0);
             Raster blankWithBots = tmpImage.getData();
-            int animationOffsetMoveRob =globalAnimationConfig.getAnimationOffsetMoveRob();
-            int animationDelayMoveRob = globalAnimationConfig.getAnimationDelayMoveRob();
+            int animationOffsetMoveRob =currentAnimationConfig.getAnimationOffsetMoveRob();
+            int animationDelayMoveRob = currentAnimationConfig.getAnimationDelayMoveRob();
             myg.setComposite(ac);
                 for (int xoffset = 0; xoffset >= -feldSize; xoffset -= animationOffsetMoveRob) {
                     tmpImage.setData(blankWithBots);                                   
@@ -620,7 +621,7 @@ public class BoardView extends JLayeredPane {
     
     protected synchronized void animateRobUTurn(Bot rob) {
         Bot internal = getBotByName(rob.getName());
-        turnRobot(internal, 180, 2* globalAnimationConfig.getAnimationStepsTurnRob(), true);
+        turnRobot(internal, 180, 2* currentAnimationConfig.getAnimationStepsTurnRob(), true);
         internal.turnClockwise();
         internal.turnClockwise();
     }
@@ -643,8 +644,8 @@ public class BoardView extends JLayeredPane {
 	        Bot internal = getBotByName(rob.getName());
 	       
 	        int oldFacing = internal.getFacing();
-	        int animationStepsTurnRob =globalAnimationConfig.getAnimationStepsTurnRob();
-	        int animationDelayTurnRob = globalAnimationConfig.getAnimationDelayTurnRob();
+	        int animationStepsTurnRob =currentAnimationConfig.getAnimationStepsTurnRob();
+	        int animationDelayTurnRob = currentAnimationConfig.getAnimationDelayTurnRob();
 	        
 	        if (direction == OtherConstants.BOT_TURN_CLOCKWISE){
 	            turnRobot(internal, 90,animationStepsTurnRob, true);
@@ -697,8 +698,8 @@ public class BoardView extends JLayeredPane {
             // painting the animated bot           
             backgroundWithBots.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
             
-            int animationStepsTurnRob =globalAnimationConfig.getAnimationStepsTurnRob();
-            int animationDelayTurnRob = globalAnimationConfig.getAnimationDelayTurnRob();
+            int animationStepsTurnRob =currentAnimationConfig.getAnimationStepsTurnRob();
+            int animationDelayTurnRob = currentAnimationConfig.getAnimationDelayTurnRob();
              for (int step = 0; step<animationStepsTurnRob;step++) {
 
                  	 backgroundImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
@@ -815,7 +816,7 @@ public class BoardView extends JLayeredPane {
         SoundMan.playSound(BotVis.getBotLaserSoundByName(name));
         synchronized (this) {
             try {
-                wait(globalAnimationConfig.getLaserDelayBetweenStartOfSoundAndAnimation());  
+                Thread.sleep(currentAnimationConfig.getLaserDelayBetweenStartOfSoundAndAnimation());  
             } catch (InterruptedException ie) {
                 CAT.error("BoardView.paint: wait interrupted");
             }
@@ -830,14 +831,14 @@ public class BoardView extends JLayeredPane {
             //for (int i = 1; i <= FULL_LENGTH_INT; i++) {
             //    int tmp_laenge = (int) ((((double) i) / FULL_LENGTH_DOUBLE) * laenge);
            
-            int someDelay = globalAnimationConfig.getLaserDelayPerAnimationStep();
+            int delayPerStep = currentAnimationConfig.getLaserDelayPerAnimationStep();
             while (tmp_laenge<=laenge)  {  
                
                 paintActiveRobLaser(g2, source, laserFacing,tmp_laenge, robColor);
                 tmp_laenge+=step;
                 //     synchronized(this){
                 try {
-                    wait(someDelay);
+                   Thread.sleep(delayPerStep);
                 } catch (InterruptedException ie) {
                     CAT.error("BoardView.paint: wait interrupted");
                 }
@@ -846,7 +847,7 @@ public class BoardView extends JLayeredPane {
             }
             repaint();
             try {
-                wait(globalAnimationConfig.getLaserDelayAfterEndOfAnimation());  
+                Thread.sleep(currentAnimationConfig.getLaserDelayAfterEndOfAnimation());  
             } catch (InterruptedException ie) {
                 CAT.error("BoardView.paint: wait interrupted");
             }
@@ -857,7 +858,7 @@ public class BoardView extends JLayeredPane {
             // SoundMan.playSound(SoundMan.BUMM);
             synchronized (this) {
                 try {
-                    wait(200);
+                    Thread.sleep(200);
                 } catch (InterruptedException ie) {
                     CAT.error("BoardView.paint: wait interrupted");
                 }
@@ -1093,7 +1094,7 @@ public class BoardView extends JLayeredPane {
         repaint();              // lasers again
         try {
             synchronized (this){
-                wait(globalAnimationConfig.getLaserDelayAfterEndOfAnimation());  
+                Thread.sleep(currentAnimationConfig.getLaserDelayAfterEndOfAnimation());  
             }
          } catch (InterruptedException ie) {
             CAT.error("BoardView.doBordLaser: wait interrupted");
@@ -1655,6 +1656,10 @@ public class BoardView extends JLayeredPane {
     }
 
 
+    protected void setAnimationSettings (AnimationConfig current){
+        currentAnimationConfig = current;
+    }
+    
     private void showScout(Location ort) {
         deleteScout();
         repaintOrt(ort);

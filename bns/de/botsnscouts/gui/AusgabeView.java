@@ -33,6 +33,7 @@ import de.botsnscouts.widgets.TJLabel;
 import org.apache.log4j.Category;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -80,13 +81,13 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private boolean soundOn = false;
 
     // speed-menu
-   // public static final int SLOW = 1000; // TODO aus propeties einlesen bzw. fuer Benutzer einstellbar machen->OptionsPanel 
-  //  public static final int MEDIUM = 500;
-  //  public static final int FAST = 100;
+
     private  AnimationConfig speedSettingSlow;
     private  AnimationConfig speedSettingMedium;
     private  AnimationConfig speedSettingFast;
-//    protected int speed=MEDIUM;
+    
+    private AnimationsSettingEditor speedSettingEditor;
+    
  
     public AusgabeView(BoardView sa, Bot[] robots, Ausgabe aus) {
 		ausgabe = aus;
@@ -163,16 +164,35 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 		gameBoardScrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		add(gameBoardScrollPane, BorderLayout.CENTER);
 		gameBoardView = gameBoardScrollPane.getViewport();
+		this.initSpeedSettings();
 		this.initMenus();
 		
 
 	}
     
-    private void initSpedSettings() {
-        // TODO: aus properties einlesen
-        speedSettingFast = AnimationConfig.getGlobalAnimationConfig();
-        speedSettingMedium = AnimationConfig.getGlobalAnimationConfig();
-        speedSettingSlow = AnimationConfig.getGlobalAnimationConfig();
+    public static final String PROPERTY_DEFAULT_SPEED="defaultAnimationSetting";
+    
+    private void initSpeedSettings() {
+        
+        speedSettingSlow = new AnimationConfig(AnimationConfig.ANIMATION_SLOW, true);
+        speedSettingMedium = new AnimationConfig(AnimationConfig.ANIMATION_MEDIUM, true);
+        speedSettingFast = new AnimationConfig(AnimationConfig.ANIMATION_FAST, true);
+       AnimationConfig defaultSpeed = speedSettingMedium;
+        String lastSetting = Conf.getProperty(PROPERTY_DEFAULT_SPEED);
+        if (lastSetting != null){
+            if (lastSetting.equals(speedSettingSlow.getConfigName())) {
+               defaultSpeed = speedSettingSlow;
+            }
+            else if (lastSetting.equals(speedSettingFast.getConfigName())){
+               defaultSpeed = speedSettingFast;
+            }
+           // else: we keep medium as the defaultspeed
+        }
+        setAnimationSpeed(defaultSpeed);
+        
+        speedSettingEditor = new AnimationsSettingEditor(speedSettingSlow, speedSettingMedium,
+                                                                                                   speedSettingFast);
+        speedSettingEditor.pack();
     }
 
     protected void addWiseAndScout(JPanel p){
@@ -507,7 +527,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         zoom (actualScale-ZOOM_STEP);
     }
 
-
+    private void setAnimationSpeed(AnimationConfig conf){
+       Conf.setProperty(PROPERTY_DEFAULT_SPEED, conf.getConfigName());
+       Conf.saveProperties();
+       gameBoardCanvas.setAnimationSettings(conf);
+    }
 
     private class ZoomMenu extends JMenu implements ActionListener {
         private ButtonModel [] zoomItemModels = new ButtonModel [MAX_ZOOM_SCALE-MIN_ZOOM_SCALE+1];
@@ -576,44 +600,59 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
   }
 
   private class SpeedMenu extends JMenu implements ActionListener {
-    JRadioButtonMenuItem lSpeed;
-    JRadioButtonMenuItem mSpeed;
-    JRadioButtonMenuItem hSpeed;
+      	JRadioButtonMenuItem lSpeed;
+      	JRadioButtonMenuItem mSpeed;
+    	JRadioButtonMenuItem hSpeed;
+        JMenuItem customizeButton = new JMenuItem(Message.say("AusgabeFrame", "mCustomize"));
       SpeedMenu () {
         super(Message.say("AusgabeFrame","mSpeed"));
-	ButtonGroup speedGroup = new ButtonGroup();
-	lSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mSlow"),false);
-	mSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mMiddle"),true);
-        hSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mFast"),false);
+        ButtonGroup speedGroup = new ButtonGroup();
+		lSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mSlow"),false);
+		mSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mMiddle"),true);
+	        hSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mFast"),false);
         lSpeed.addActionListener(this);
-	mSpeed.addActionListener(this);
+        mSpeed.addActionListener(this);
         hSpeed.addActionListener(this);
         speedGroup.add(lSpeed);
         speedGroup.add(mSpeed);
         speedGroup.add(hSpeed);
         this.add(lSpeed);
         this.add(mSpeed);
-	this.add(hSpeed);
+        this.add(hSpeed);
+        
+        customizeButton.addActionListener(this);
+        this.add(customizeButton);
       }
 
       public void actionPerformed(ActionEvent e) {
 	    String message = null;
       	AnimationConfig neu;
-	    if (e.getSource() == lSpeed) {
-			neu = speedSettingSlow;
-			message = "gAufLang";	
-	    }
-      	else if (e.getSource() == hSpeed){
-    		neu = speedSettingFast;
-    		message = "gAufUn";    	
-    	}
-	    else  {
-			neu = speedSettingMedium;
-			message = "gAufMitt";              
-        }
-      	
-        AnimationConfig.setGlobalAnimationConfig(neu);     	
-      	showActionMessage(Message.say("AusgabeFrame",message));
+	 
+      	if (e.getSource()==customizeButton){    
+      	  if (speedSettingEditor.getState() == JFrame.ICONIFIED) {
+              speedSettingEditor.setState(JFrame.NORMAL);
+          }
+      	    speedSettingEditor.setVisible(true);
+      	    speedSettingEditor.toFront();
+      	    
+      	}
+      	else {
+	      	if (e.getSource() == lSpeed) {
+				neu = speedSettingSlow;
+				message = "gAufLang";	
+		    }
+	      	else if (e.getSource() == hSpeed){
+	    		neu = speedSettingFast;
+	    		message = "gAufUn";    	
+	    	}
+		    else  {
+				neu = speedSettingMedium;
+				message = "gAufMitt";              
+	        }
+	      	
+		    setAnimationSpeed(neu);
+	      	showActionMessage(Message.say("AusgabeFrame",message));
+      	}
 	}
 
 
