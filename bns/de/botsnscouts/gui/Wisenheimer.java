@@ -12,7 +12,7 @@ import  de.botsnscouts.server.*;
  */
 public class Wisenheimer{
 
-    public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(SACanvas.class);
+    public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Wisenheimer.class);
 
     private SpielfeldKS aiBoard;
     private Permu wirbel;
