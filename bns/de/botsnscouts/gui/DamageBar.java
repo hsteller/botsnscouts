@@ -9,6 +9,7 @@ public class DamageBar extends JComponent {
     int damage;
 
     public DamageBar() {
+        setFocusable(false);
     }
 
     public void paintComponent(Graphics g_) {

@@ -54,6 +54,7 @@ public class KlugscheisserLatte extends JToggleButton {
 	setIcon(new ImageIcon(klugSchlaf[0]));
 	setSelectedIcon(new ImageIcon(klugWach[0]));
 	addActionListener(al);
+	setFocusable(false);
 
     }
 

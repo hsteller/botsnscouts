@@ -10,13 +10,15 @@ import java.awt.event.*;
 
 public class ChatLine extends ColoredComponent implements ActionListener, ComponentListener, KeyListener  {
     static final Category CAT = Category.getInstance(ChatLine.class);
-    AusgabeView ausgabeview;
+   // AusgabeView ausgabeview;
+   View view;
     public JTextField text;
     Timer timer;
     HumanPlayer humanPlayer;
 
-    ChatLine(AusgabeView ausgabeview, HumanPlayer humanPlayer) {
-        this.ausgabeview = ausgabeview;
+    ChatLine(/*AusgabeView ausgabeview, */View view, HumanPlayer humanPlayer) {
+       // this.ausgabeview = ausgabeview;
+        this.view = view;
         this.humanPlayer = humanPlayer;
         setLayout( new BorderLayout() );
         add( new JLabel("Chat: "), BorderLayout.WEST );
@@ -49,6 +51,7 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
             }
         });
         addComponentListener( this );
+        
     }
     private boolean autoHide;
     public boolean isAutoHide() {
@@ -75,9 +78,16 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
     }
     public void componentHidden(ComponentEvent parm1) {
         CAT.debug("comp hidden");
-        ausgabeview.requestFocus();
+        // XXX HS ausgabeview.requestFocus();
         text.setText("");
+        KeyboardFocusManager kman = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        Object o = kman.getFocusOwner();
+        System.out.println("OWNER: "+o);
+        view.requestFocus();
+         o = kman.getFocusOwner();
+        System.out.println("OWNER: "+o);
         timer.stop();
+        
     }
     public void componentResized(ComponentEvent parm1) {    }
     public void componentMoved(ComponentEvent parm1) {    }
@@ -92,6 +102,7 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
 
         if( parm1.getKeyCode() == KeyEvent.VK_ESCAPE ) {
             setVisible( false );
+            view.requestFocus();
         }
         else
             timer.restart();

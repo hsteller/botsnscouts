@@ -65,7 +65,7 @@ import com.keypoint.PngEncoder;
  *    damit viel schneller, ebenso die Board-Vorschau
  */
 
-public class BoardView extends JComponent {
+public class BoardView extends JLayeredPane {
     static Category CAT = Category.getInstance(BoardView.class);
 
     // inner classes
@@ -93,6 +93,13 @@ public class BoardView extends JComponent {
     private static final double FULL_LENGTH_DOUBLE = 30.0;
 
 
+    
+    
+    
+    
+    
+
+    
     // for painting active Lasers
     /** position of firing robot*/
     private Location source;
@@ -185,6 +192,7 @@ public class BoardView extends JComponent {
 
     public BoardView(SimBoard sf_neu) {
         init(sf_neu, ROBOCOLOR);
+        
     }
 
     public BoardView(SimBoard sf_neu, Color[] robColors) {
@@ -239,7 +247,8 @@ public class BoardView extends JComponent {
         scoutCrop = ImageMan.getImages(ImageMan.SCOUT);
 
         initFloorHashMap();
-
+        
+      
     }
 
 
@@ -343,7 +352,7 @@ public class BoardView extends JComponent {
 
     protected void ersetzeRobos(Bot[] robos_neu) {
 
-        if (!gotColors) { // this os the first time I get the robots
+        if (!gotColors) { // this is the first time I get the robots
             setRobColors(robos_neu);
             robos = robos_neu;
         }
@@ -395,10 +404,11 @@ public class BoardView extends JComponent {
 
     /////////////////////////////////////////////////////////////////////
 
-    private void moveRobNorth(Bot internal, int robocount) {
+    private void moveRobNorth(Bot internal, int robocount) {    
         CAT.debug("moving bot one square to the north");
         synchronized (this) {
-            Graphics2D g2 = (Graphics2D) this.getGraphics();
+           Graphics2D g2 = (Graphics2D) this.getGraphics();
+         
             g2.scale(dScale, dScale);
             AlphaComposite ac = AC_SRC;
             AlphaComposite ac2 = null;
@@ -447,7 +457,8 @@ public class BoardView extends JComponent {
     private void moveRobSouth(Bot internal, int robocount) {
         CAT.debug("moving bot one square to the south");
         synchronized (this) {
-            Graphics2D g2 = (Graphics2D) this.getGraphics();
+     Graphics2D g2 = (Graphics2D) this.getGraphics();
+            
             g2.scale(dScale, dScale);
             AlphaComposite ac = AC_SRC;
             AlphaComposite ac2 = null;
@@ -497,7 +508,8 @@ public class BoardView extends JComponent {
     private void moveRobEast(Bot internal, int robocount) {
         CAT.debug("moving bot one square to the east");
         synchronized (this) {
-            Graphics2D g2 = (Graphics2D) this.getGraphics();
+         Graphics2D g2 = (Graphics2D) this.getGraphics();
+           
             g2.scale(dScale, dScale);
             AlphaComposite ac = AC_SRC;
             AlphaComposite ac2 = null;
@@ -546,7 +558,8 @@ public class BoardView extends JComponent {
     private void moveRobWest(Bot internal, int robocount) {
         CAT.debug("moving bot one square to the west");
         synchronized (this) {
-            Graphics2D g2 = (Graphics2D) this.getGraphics();
+      Graphics2D g2 = (Graphics2D) this.getGraphics();
+           
             g2.scale(dScale, dScale);
             AlphaComposite ac = AC_SRC;
             AlphaComposite ac2 = null;
@@ -952,8 +965,10 @@ public class BoardView extends JComponent {
         // activeBordLasers=false; // now paint the non-animated
         repaint();              // lasers again
         try {
-            wait(delay);  
-        } catch (InterruptedException ie) {
+            synchronized (this){
+                wait(delay);  
+            }
+         } catch (InterruptedException ie) {
             CAT.error("BoardView.doBordLaser: wait interrupted");
         }
     }

@@ -61,6 +61,7 @@ public class ScoutVertiefung extends JToggleButton {
 	//	setPressedIcon(new ImageIcon(scoutImages[2]));
 	setSelectedIcon(new ImageIcon(imageDream[0]));
 	addActionListener(al);
+	setFocusable(false);
 
     }
 

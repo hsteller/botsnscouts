@@ -15,6 +15,7 @@ public class FlagBar extends JButton {
         setBorderPainted( false );
         setOpaque( false );
         setRolloverEnabled( false );
+        setFocusable(false);
     }
 
     public FlagBar() {

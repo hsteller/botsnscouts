@@ -33,7 +33,11 @@ import org.apache.log4j.Category;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -48,60 +52,79 @@ public class View extends JFrame {
     private ChatLine chatLine;
     private JMenuBar menus;
 
-    private HotKeyMan keyMan = new HotKeyMan();
-
-    JSplitPane sp;
-
-    AusgabeView ausgabeView;
-    HumanView humanView;
+    private HotKeyMan keyMan; 
+  //  private KeyListener hotkeyListener;
+    private JSplitPane sp;
+    private final JComponent contentpane= new JPanel();
+    private AusgabeView ausgabeView;
+    private  HumanView humanView;
 
     protected final boolean NURAUSGABE = true;
     protected final boolean MENSCHAUSGABE = false;
 
     public View(AusgabeView av) {
-	this.setTitle(Message.say("AusgabeFrame","gameName"));
-	ausgabeView=av;
-	initView();
-        JComponent content = new ColoredComponent();
-        content.setLayout(new BorderLayout());
-	content.add(av, BorderLayout.CENTER);
-        content.add(av.getNorthPanel(), BorderLayout.NORTH);
-        this.setContentPane( content );
-        initHotKeys();
-	makeVisible();
+        this.setContentPane( contentpane );
+        this.setTitle(Message.say("AusgabeFrame","gameName"));		
+		ausgabeView=av;
+		initView();
+        ColoredComponent comp = new ColoredComponent();
+        comp.setLayout(new BorderLayout());
+        comp.add(av, BorderLayout.CENTER);
+        comp.add(av.getNorthPanel(), BorderLayout.NORTH);
+        contentpane.add(comp);       
+        initHotKeys(av);
+        makeVisible();
+
     }
 
     public View(HumanView hv) {
-	this.setTitle(Message.say("AusgabeFrame","gameName"));
-	humanView = hv;
-	initView();
+        this.setContentPane( contentpane );
+		this.setTitle(Message.say("AusgabeFrame","gameName"));
+		humanView = hv;
+		initView();
         hv.setMinimumSize(new Dimension(0, 0));
-
         sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         sp.setRightComponent(hv);
         sp.setOneTouchExpandable(true);
         sp.setOpaque(false);
+        contentpane.add ( sp);
         // not AusgabeView yet :(
         // => will call initHotKeys in addAusgabeView()
         //initHotKeys();
-	this.getContentPane().add(sp, BorderLayout.CENTER);
+        this.getContentPane().add(sp, BorderLayout.CENTER);
+      
+ 
     }
+    
+    
 
   private void initChatLine(java.awt.Point p) {
         if (humanView == null) {
-          CAT.warn("tried to activate Chat for a GUI without an active plaxer!");
+          CAT.warn("tried to activate Chat for a GUI without an active player!");
           return;
         }
-        chatLine = new ChatLine(ausgabeView, humanView.getHumanPlayer());
+        chatLine = new ChatLine(/*ausgabeView*/this, humanView.getHumanPlayer());
         chatLine.setSize( chatLine.getPreferredSize() );
         chatLine.setLocation( p.x + 2, p.y + 2 );
         chatLine.setVisible( false );
   }
 
+  public void requestFocus(){
+      if (contentpane!=null){
+          contentpane.requestFocus(); 
+     }
+      else
+          super.requestFocus();
+  }
+  
+
+
+  
+  
+  
   private void showChatLine() {
      chatLine.text.requestFocus();
      chatLine.setVisible( true );
-
   }
 
   /** Create hotkeys that will be enabled if this is a GUI of a
@@ -109,118 +132,78 @@ public class View extends JFrame {
    *  (Only players should be able to chat)
    */
 
-  private void initPlayerOnlyHotKeys(){
+  private void initPlayerOnlyHotKeys(){ 
+
      CAT.debug("initPlayerOnlyHotKeys()");
-     HotKeyAction  act = new HotKeyActionAdapter() {
-            public void execute(){
-                showChatLine();
-            }
-    };
-    // this strange way of creating a hotkey for "enter" is needed because
-    // of the crappy IBM KeyEvent..
-    HotKey k = new HotKey(HotKeyConf.HOTKEY_SHOW_CHATLINE,
-                          new Integer(HotKeyConf.SHOW_CHATLINE),
-                          act);
-    keyMan.addHotKey(k);
+     // creating HotKey(Action) for showing the Chatline
+    HotKeyAction showChat = new HotKeyAction(){
+         public void actionPerformed(ActionEvent ae){                           
+             showChatLine();
+         }
+     };
+   
+    HotKey key = new HotKey(HotKeyConf.HOTKEY_SHOW_CHATLINE,
+                    								KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+                    								showChat);
+    keyMan.addHotKey(key);
+    
+    // creating HotKey(Action)s for sending prepared Chatmessages
+    // and the GUI-components to edit their values
+    String [] preparedChatMessages = HotKeyConf.GROUP_MESSAGES;
+    int chatMsgCount = HotKeyConf.GROUP_MESSAGES.length;
+    for (int i = 0; i < chatMsgCount; i++) {
+            CAT.debug("creating Hotkey for: " + preparedChatMessages[i]);
+            String chatMessageName = preparedChatMessages[i];
+            ChatMessageEditor editPanel = ChatMessageEditor.createEditorForMessage(chatMessageName, keyMan);
 
+            HotKeyAction sendChatlineAction = new ChatMessageHotKeyActionAdapter(editPanel) {
+                public void actionPerformed(ActionEvent act) {
+                    ChatMessageEditor edit = this.getEditor();
+                    if (edit.isAutoCommit())
+                        humanView.sendChatMessage(edit.getMessage());
+                    else {
+                        chatLine.text.setText(edit.getMessage());
+                        showChatLine();
+                    }
 
-     String [] preparedChatMessages = HotKeyConf.GROUP_MESSAGES;
-      for (int i=0;i<HotKeyConf.GROUP_MESSAGES.length;i++) {
-        CAT.debug("creating Hotkey for: "+preparedChatMessages [i]);
-        ChatMessageEditor editPanel;
-        String [] s = HotKeyConf.getOptinalValues(preparedChatMessages[i]);
-        if (s == null || s.length==0) {
-          CAT.debug("no message properties found");
-          editPanel = new ChatMessageEditor(keyMan, preparedChatMessages[i]);
-        }
-        else if (s.length==1){
-          CAT.debug("found chatmessage: "+s[0]);
-          CAT.debug("did not find autoCommit");
-          editPanel = new ChatMessageEditor(s[0], false,
-                      keyMan, preparedChatMessages[i]);
-        }
-        else { //s.length>1
-          CAT.debug("found chatmessage: "+s[0]);
-          CAT.debug("found autoCommit property: "+s[1]);
-          editPanel = new ChatMessageEditor(s[0], new Boolean(s[1]).booleanValue(),
-                      keyMan, preparedChatMessages[i]);
-        }
-          HotKeyAction act2 = new ChatMessageHotKeyActionAdapter(editPanel){
-          public void execute() {
-            ChatMessageEditor edit = this.getEditor();
-            if (edit.isAutoCommit())
-              humanView.sendChatMessage(edit.getMessage());
-            else {
-              chatLine.text.setText(edit.getMessage());
-              showChatLine();
-            }
-
-          }
-        };
-        keyMan.addHotKey(new HotKey(preparedChatMessages [i], act2));
-
+                }
+            };
+            keyMan.addHotKey(new HotKey(preparedChatMessages[i], sendChatlineAction));
       }
      if (CAT.isDebugEnabled())
         CAT.debug(keyMan.dump());
   }
 
 
-  /** Note: the hotkey for showing the chatline is initialized in makeVisible()
-  *       because the chatline is created there and the hotkey's HotKeyAction.execute();
-  *       needs a reference of the chatline.
+  /** 
   *       Hotkeys that will be used by both players and spectators will be defined
   *       in AusgabeView
   */
-    private void initHotKeys() {
+    private void initHotKeys(AusgabeView av) {
         CAT.debug("initHotKeys()");
-
-
-
-        keyMan = ausgabeView.getHotKeyManager();
+        if (keyMan == null) {
+            	keyMan = new HotKeyMan(contentpane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT),
+            	                								contentpane.getActionMap());
+        }
+        
         if (humanView != null) {
             initPlayerOnlyHotKeys();
         }
-        CAT.debug("adding Keylistener");
-
-        // !! IBM's JDK1.3 KeyEvent is buggy/crap, but this this trial&error approach
-        // of mixing keyCode/KeyChar seems to work for the beginning !!
-        this.addKeyListener(new AbstractHotKeyListener() {
-              public void doStuff(KeyEvent e, int hotkeyCode){
-                if (CAT.isDebugEnabled()) {
-                  CAT.debug("KEYEVENT:");
-                  CAT.debug("code="+e.getKeyCode()+"\tchar="+e.getKeyChar()
-                          +"\t="+e.getKeyText(e.getKeyCode()));
-                  CAT.debug("chatline showing?"+chatLine.isShowing());
-                }
-               // <hack alert>
-                if (chatLine.isShowing()) {
-                  if (chatLine.text.hasFocus())
-                    CAT.debug("chatline has focus, ignoring key event");
-                  else {
-                    CAT.debug("forcing focus to chatline!"); //s.o. typing and chatline lost focus!
-                    chatLine.text.requestFocus();
-                  }
-                }
-                else {
-                  if (chatLine.hasFocus())
-                    ausgabeView.requestFocus();
-                  keyMan.invoke(hotkeyCode);
-                }
-                //</hack alert>
-              }
-
-          });
+        if ( av != null) {
+            av.initHotKeysAndAddToHotkeyman(keyMan);
+        }
     }
 
 
     synchronized private void initView() {
 
-	// Fenstergr”ÿe auf Vollbild setzen
-	Toolkit tk=Toolkit.getDefaultToolkit();
-	this.setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);
+	// set window size to fullscreen 
+	
+    Toolkit tk=Toolkit.getDefaultToolkit();   
+	this.setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);	
 	this.setLocation(4,4);
 
-	// Fentster-Schliessen behandeln
+	// handle window closing 
 	this.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e){
 		      if (ausgabeView!=null){
@@ -233,8 +216,7 @@ public class View extends JFrame {
                       }
                      //shutup()
 		}});
-
-	// Layout erzeugen
+	// create layout
 	this.getContentPane().setLayout(new BorderLayout());
         addMenuBar();
 
@@ -277,9 +259,10 @@ public class View extends JFrame {
         addMenuBar();
 
 
-	this.setVisible(true);
+        this.setVisible(true);
 
         JComponent board = ausgabeView.getBoardView();
+       
         Point p = board.getLocationOnScreen();
 
         logFloatPane = new LogFloatPane(board, this.getLayeredPane());
@@ -292,7 +275,8 @@ public class View extends JFrame {
             initChatLine(p);
             this.getLayeredPane().add( chatLine, JLayeredPane.MODAL_LAYER );
         }
-	this.validate();
+        this.validate();
+ 
 
     }
 
@@ -309,35 +293,35 @@ public class View extends JFrame {
 
     public void addAusgabeView(AusgabeView av) {
         CAT.debug("addAusgabeView called");
-	if (ausgabeView==null) {
+        if (ausgabeView==null) {
           CAT.debug("ausgabeView is null");
           ausgabeView=av;
           this.getContentPane().add(ausgabeView.getNorthPanel(), BorderLayout.NORTH);
           this.addMenuBar();
         }
-        if (humanView!=null){
-          initHotKeys();
-          Toolkit tk = Toolkit.getDefaultToolkit();
-          int w = tk.getScreenSize().width-8;
-          int h = tk.getScreenSize().height-8;
-          int leftPanelWidth=Math.max(w-250, 400);
-          int leftPanelHeight=Math.max(h-250, 350);
-          if (CAT.isDebugEnabled()){
-            CAT.debug("Setting minimum and preferred width of left Splitpane to: "+leftPanelWidth);
-            CAT.debug("Setting minimum height of left Splitpane to: "+leftPanelHeight);
-          }
-
-          JPanel p = humanView.getWiseAndScoutPanel();
-          av.addWiseAndScout(p);
-          av.setPreferredSize(new Dimension(leftPanelWidth,leftPanelHeight));
-          av.setMinimumSize(new Dimension(leftPanelWidth,leftPanelHeight));
-          humanView.setPreferredSize(new Dimension(250, 400));
-          sp.setLeftComponent(av);
-         // sp.setDividerLocation(0.75);
+        if (humanView!=null){	      
+	          Toolkit tk = Toolkit.getDefaultToolkit();
+	          int w = tk.getScreenSize().width-8;
+	          int h = tk.getScreenSize().height-8;
+	          int leftPanelWidth=Math.max(w-250, 400);
+	          int leftPanelHeight=Math.max(h-250, 350);
+	          if (CAT.isDebugEnabled()){
+	            CAT.debug("Setting minimum and preferred width of left Splitpane to: "+leftPanelWidth);
+	            CAT.debug("Setting minimum height of left Splitpane to: "+leftPanelHeight);
+	          }
+	
+	          JPanel p = humanView.getWiseAndScoutPanel();
+	          av.addWiseAndScout(p);
+	          av.setPreferredSize(new Dimension(leftPanelWidth,leftPanelHeight));
+	          av.setMinimumSize(new Dimension(leftPanelWidth,leftPanelHeight));
+	          humanView.setPreferredSize(new Dimension(250, 400));
+	          sp.setLeftComponent(av);
+	         // sp.setDividerLocation(0.75);
         }
         else{
           this.getContentPane().add(av, BorderLayout.CENTER);
         }
+        initHotKeys(av);
     }
 
     protected void quitHumanPlayer() {

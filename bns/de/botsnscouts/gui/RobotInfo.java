@@ -78,7 +78,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         statusRobot1.addActionListener(this);
         diskButton1.addActionListener(this);
         try {
-            jbInit();
+            initLayout();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -87,14 +87,15 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
 
     public RobotInfo() {
         try {
-            jbInit();
+            initLayout();
         }
         catch(Exception e) {
             e.printStackTrace();
         }
     }
 
-   private void jbInit() throws Exception {
+   private void initLayout() throws Exception {
+ 
         this.setBackground( Color.black );
         this.setSize( getPreferredSize() );
         this.setLayout(null);
@@ -117,7 +118,12 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         flagBar2.setToolTipText(Message.say("RobotInfo", "nextFlag", robot.getName()));
         statusRobot1.setToolTipText(Message.say("RobotInfo", "botPos", robot.getName()));
         damageBar1.setToolTipText(Message.say("RobotInfo", "damage", robot.getName(),""+robot.getDamage()));
-    }
+    
+        // flagBar2, statusRobot1,damageBar1 should not be focusable either;
+        // the constructors of the above classes should take care of that and set the focusable
+        // property to false
+        diskButton1.setFocusable(false);
+   }
 
 
     static Color lineGreen =  new Color( 0, 80, 0 ) ;

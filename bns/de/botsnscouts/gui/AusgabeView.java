@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 public class AusgabeView extends JPanel implements AusgabeViewInterface {
     static Category CAT = Category.getInstance(AusgabeView.class);
@@ -54,12 +55,12 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private Ausgabe   ausgabe;
     private Hashtable robotStatus = new Hashtable(8);
     private Hashtable robotCardStatus = new Hashtable(8);
+   
 
+    
     private JMenuBar menus = new JMenuBar();
 
     private JComponent northPanel = new PaintPanel( OptionPane.getBackgroundPaint(this) );
-
-    private HotKeyMan keyMan = new HotKeyMan();
     private ZoomMenu zoomMenu;
 
     // settings for Zoom-Menu
@@ -83,88 +84,87 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     protected static final int FAST = 100;
 
     protected int speed=MEDIUM;
-
-    public AusgabeView() {
-        super();
-        this.initMenus();
-        this.initSharedHotKeys();
-    }
-
+ 
     public AusgabeView(BoardView sa, Bot[] robots, Ausgabe aus) {
-	ausgabe = aus;
-	gameBoardCanvas=sa;
-//        statusLog = new StatusLog(aus.getView());
+		ausgabe = aus;
+		gameBoardCanvas = sa;
+		//        statusLog = new StatusLog(aus.getView());
 
-	JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        robotsStatusContainer.setOpaque(false);
-//        Box robotsStatusContainer = new Box(BoxLayout.X_AXIS) {
-//            public void paint(Graphics g) {
-//                g.setColor(Color.black);
-//                g.fillRect(0,0,getWidth(), getHeight());
-//                super.paint(g);
-//            }
-//        };
-	JPanel robotsCardContainer = new JPanel(new GridLayout(8,1));
-        int flagCount = sa.sf.getFlags().length;
+		JPanel robotsStatusContainer = new JPanel(new FlowLayout(
+				FlowLayout.LEFT));
+		robotsStatusContainer.setOpaque(false);
+		//        Box robotsStatusContainer = new Box(BoxLayout.X_AXIS) {
+		//            public void paint(Graphics g) {
+		//                g.setColor(Color.black);
+		//                g.fillRect(0,0,getWidth(), getHeight());
+		//                super.paint(g);
+		//            }
+		//        };
+		JPanel robotsCardContainer = new JPanel(new GridLayout(8, 1));
+		int flagCount = sa.sf.getFlags().length;
 
-        setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 
-	// create status panel
-	for (int i=0; i< robots.length; i++) {
-            final String robotName = robots[i].getName();
-	    RobotInfo r = new RobotInfo(robots[i], flagCount );
-            r.addRobotInfoListener( new RobotInfoListener() {
-                        public void robotClicked(RobotInfoEvent rie) {
-                            CAT.debug("tracking rob: " + robotName );
-                            ausgabe.trackRob(robotName);
-                        }
-                        public void flagClicked(RobotInfoEvent rie) {
-                            RobotInfo ri = (RobotInfo)rie.getSource();
-                            ausgabe.scrollFlag(ri.getRobot().getNextFlag());
-                        }
-                        public void diskClicked(RobotInfoEvent rie) {
-                            Bot robot = ((RobotInfo)rie.getSource()).getRobot();
-                            ausgabe.trackPos(robot.getArchiveX(), robot.getArchiveY(), true);
-                        }
-             });
-	    robotsStatusContainer.add(r);
-	    robotStatus.put(robots[i].getName(),r);
+		// create status panel
+		for (int i = 0; i < robots.length; i++) {
+			final String robotName = robots[i].getName();
+			RobotInfo r = new RobotInfo(robots[i], flagCount);
+			r.addRobotInfoListener(new RobotInfoListener() {
+				public void robotClicked(RobotInfoEvent rie) {
+					CAT.debug("tracking rob: " + robotName);
+					ausgabe.trackRob(robotName);
+				}
 
-            // add entry to track menu
-          //  JMenuItem trackItem = new JMenuItem( r.getName() );
-           // trackItem.addActionListener( new HumanPlayer.RoboTrackListener(robots[i]) );
-    	   // optTrack.add(trackItem);
+				public void flagClicked(RobotInfoEvent rie) {
+					RobotInfo ri = (RobotInfo) rie.getSource();
+					ausgabe.scrollFlag(ri.getRobot().getNextFlag());
+				}
 
-	    RobotCard rc= new RobotCard(robots[i]);
-	    robotsCardContainer.add(rc);
-            robotsCardContainer.setOpaque( false );
-	    robotCardStatus.put(robots[i].getName(),rc);
+				public void diskClicked(RobotInfoEvent rie) {
+					Bot robot = ((RobotInfo) rie.getSource()).getRobot();
+					ausgabe.trackPos(robot.getArchiveX(), robot.getArchiveY(),
+							true);
+				}
+			});
+			robotsStatusContainer.add(r);
+			robotStatus.put(robots[i].getName(), r);
+
+			// add entry to track menu
+			//  JMenuItem trackItem = new JMenuItem( r.getName() );
+			// trackItem.addActionListener( new
+			// HumanPlayer.RoboTrackListener(robots[i]) );
+			// optTrack.add(trackItem);
+
+			RobotCard rc = new RobotCard(robots[i]);
+			robotsCardContainer.add(rc);
+			robotsCardContainer.setOpaque(false);
+			robotCardStatus.put(robots[i].getName(), rc);
+		}
+
+		this.northPanel.setLayout(new BorderLayout());
+		northPanel.setOpaque(false);
+		northPanel.add(robotsStatusContainer, BorderLayout.WEST);
+		//this.add(northPanel, BorderLayout.NORTH);
+		// before splitpane: add(robotsStatusContainer,BorderLayout.NORTH);
+		//	add(robotsCardContainer,BorderLayout.EAST);
+
+		// create status log
+		//	add(statusLog,BorderLayout.SOUTH);
+
+		// create scroll panel
+		gameBoardScrollPane = new JScrollPane();
+		gameBoardScrollPane.getHorizontalScrollBar().setUnitIncrement(64);
+		gameBoardScrollPane.getVerticalScrollBar().setUnitIncrement(64);
+		gameBoardScrollPane.setViewportView(gameBoardCanvas);
+		gameBoardScrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5,
+				5));
+		//.setScrollPane(gameBoardScrollPane);
+		add(gameBoardScrollPane, BorderLayout.CENTER);
+		gameBoardView = gameBoardScrollPane.getViewport();
+		this.initMenus();
+		
+
 	}
-
-        this.northPanel.setLayout(new BorderLayout());
-        northPanel.setOpaque( false );
-        northPanel.add(robotsStatusContainer, BorderLayout.WEST);
-	//this.add(northPanel, BorderLayout.NORTH);
-        // before splitpane: add(robotsStatusContainer,BorderLayout.NORTH);
-//	add(robotsCardContainer,BorderLayout.EAST);
-
-
-	// create status log
-//	add(statusLog,BorderLayout.SOUTH);
-
-	// create scroll panel
-	gameBoardScrollPane = new JScrollPane();
-	gameBoardScrollPane.getHorizontalScrollBar().setUnitIncrement(64);
-	gameBoardScrollPane.getVerticalScrollBar().setUnitIncrement(64);
-	gameBoardScrollPane.setViewportView(gameBoardCanvas);
-        gameBoardScrollPane.setBorder( BorderFactory.createEmptyBorder(5,5,5,5) );
-	//.setScrollPane(gameBoardScrollPane);
-	add(gameBoardScrollPane,BorderLayout.CENTER);
-	gameBoardView = gameBoardScrollPane.getViewport();
-        this.initMenus();
-        this.initSharedHotKeys();
-
-    }
 
     protected void addWiseAndScout(JPanel p){
         CAT.debug("adding WiseAndScout to Northpanel/EAST");
@@ -175,15 +175,13 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       return northPanel;
     }
     /*
-    public void shutup() {
-	System.exit(0);
-    }
-*/
+	 * public void shutup() { System.exit(0); }
+	 */
 
 
     /**
-     * show the sinlge line action message that came from the server
-     */
+	 * show the sinlge line action message that came from the server
+	 */
     public void showActionMessage(String s){
         ausgabe.getView().logFloatPane.addMessage( s );
 //	statusLog.addMessage(s);
@@ -717,111 +715,71 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         return gameBoardView;
     }
 
-    public HotKeyMan getHotKeyManager() {
-      return keyMan;
-    }
 
-    private void initSharedHotKeys() {
-      CAT.debug("initSharedHotKeys()");
-      HotKeyAction zoomIn = new HotKeyActionAdapter() {
-        public void execute(){
-          zoomIn();
+   
+    protected void initHotKeysAndAddToHotkeyman(HotKeyMan keyMan) {
+        
+        HotKeyAction zoomIn = new HotKeyAction() {
+            public void actionPerformed(ActionEvent ae) {
+                zoomIn();
+            }
+        };
+        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_ZOOM_IN, zoomIn));
+
+        HotKeyAction zoomOut = new HotKeyAction() {
+            public void actionPerformed(ActionEvent ae) {
+                zoomOut();
+            }
+        };
+        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_ZOOM_OUT, zoomOut));
+
+        final Location[] flags = gameBoardCanvas.getFlags();
+        int num = flags.length;
+
+        for (int i = 0; i < num; i++) {           
+            final Location pos = flags[i];
+            HotKeyAction showFlagAction = new HotKeyAction() {              
+                public void actionPerformed(ActionEvent ae) {
+                    showPos(pos.getX(), pos.getY());
+                }
+            };
+            String keynameForFlagX = HotKeyConf.HOTKEY_SHOW_FLAG_X[i];
+            keyMan.addHotKey(new HotKey(keynameForFlagX, showFlagAction));
         }
-      };
-      keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_ZOOM_IN, zoomIn));
-
-       HotKeyAction zoomOut = new HotKeyActionAdapter() {
-        public void execute(){
-          zoomOut();
-        }
-      };
-      keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_ZOOM_OUT, zoomOut));
-
-      final Location [] flags = gameBoardCanvas.getFlags();
-      int num = flags.length;
-      if (num >0) {
-        HotKeyAction showFlag1 =  new HotKeyActionAdapter() {
-          int x = flags [0].getX();
-          int y = flags [0].getY();
-          public void execute(){
-            showPos(x, y);
-          }
-        };
-        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG1, showFlag1));
-      }
-      if (num>1) {
-        HotKeyAction showFlag2 =  new HotKeyActionAdapter() {
-          int x = flags [1].getX();
-          int y = flags [1].getY();
-          public void execute(){
-            showPos(x, y);
-          }
-        };
-        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG2, showFlag2));
-      }
-      if (num>2) {
-        HotKeyAction showFlag3 =  new HotKeyActionAdapter() {
-          int x = flags [2].getX();
-          int y = flags [2].getY();
-          public void execute(){
-            showPos(x, y);
-          }
-        };
-        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG3, showFlag3));
-      }
-      if (num>3) {
-        HotKeyAction showFlag4 =  new HotKeyActionAdapter() {
-          int x = flags [3].getX();
-          int y = flags [3].getY();
-          public void execute(){
-            showPos(x, y);
-          }
-        };
-        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG4, showFlag4));
-      }
-      if (num>4) {
-        HotKeyAction showFlag5 =  new HotKeyActionAdapter() {
-          int x = flags [4].getX();
-          int y = flags [4].getY();
-          public void execute(){
-            showPos(x, y);
-          }
-        };
-        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG5, showFlag5));
-      }
-      if (num>5) {
-        HotKeyAction showFlag6 =  new HotKeyActionAdapter() {
-          int x = flags [5].getX();
-          int y = flags [5].getY();
-          public void execute(){
-            showPos(x, y);
-          }
-        };
-        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_SHOW_FLAG6, showFlag6));
-      }
-      if (CAT.isDebugEnabled())
-        CAT.debug(keyMan.dump());
+        
+        // Important: don't call this method before all keys are created and  added to the Keymanager!
+        createHotkeyEditFrame(keyMan);
     }
 
     private JFrame hotKeyFrame;
+    /** Important: don't call this method before all keys are created and added to the Keymanager!
+     *  (The EditFrame won't show fields for the keys that are added to the Keyman after this method was called)*/
+    private void createHotkeyEditFrame(HotKeyMan keyMan){
+        hotKeyFrame = new JFrame(Message.say("AusgabeView", "hotkeyMenu"));
+        hotKeyFrame.getContentPane().add(new HotKeyEditorPanel(keyMan));
+        final HotKeyMan finalkeyMan = keyMan;
+        hotKeyFrame.addWindowListener(new WindowAdapter() {  	   
+	       public void windowClosing(WindowEvent e){
+	                    CAT.debug("saving properties to save hotkey settings");
+	                    finalkeyMan.save(); // important, because changes done to
+	                                          // chatmessages will not be saved by
+	                                          // ChatMessageEditor or HotKeyEditorPanel
+	                    hotKeyFrame.setVisible(false);
+	
+	                  }
+	     });
+	    hotKeyFrame.pack();	  
+    }
+    
     //private HotKeyEditorPanel keyEdit;
     //private boolean shown = false;
     private void showEditHotKeys() {
       if (hotKeyFrame == null) {
-            hotKeyFrame = new JFrame(Message.say("AusgabeView", "hotkeyMenu"));
-            hotKeyFrame.getContentPane().add(new HotKeyEditorPanel(keyMan));
-            hotKeyFrame.addWindowListener(new WindowAdapter() {
-		public void windowClosing(WindowEvent e){
-                  CAT.debug("saving properties to save hotkey settings");
-                  keyMan.save(); // important, because changes done to
-                                        // chatmessages will not be saved by
-                                        // ChatMessageEditor or HotKeyEditorPanel
-                  hotKeyFrame.setVisible(false);
-
-                }
-            });
-            hotKeyFrame.pack();
+          CAT.error("HotkeyFrame is still NULL! "+
+                             "Make sure to call initHotKeysAndAddToHotkeyman before "+
+                             "as the Frame will be initinalized there!");
       }
+ 
 
       if (hotKeyFrame.getState()==JFrame.ICONIFIED)
         hotKeyFrame.setState(JFrame.NORMAL);
