@@ -51,6 +51,12 @@ public class BotCanvas extends Canvas implements DrawingConstants, Scalable{
     /** Stores data of the robots.*/
     private Bot[] robos;
 
+    /** During movement animation this robot must not be painted because
+     * it will be painted in the AnimationCanvas
+     * 
+     */ 
+    private Bot animatedBot = null;
+    
     public BotCanvas(SimBoard board, Image [] botImages){
         this.gameboard = board;
         this.botImages = botImages;
@@ -111,6 +117,7 @@ public class BotCanvas extends Canvas implements DrawingConstants, Scalable{
     
     public void setScale(double scale){
         dScale = scale;
+        blank = null;
     }
     
     
@@ -139,11 +146,22 @@ public class BotCanvas extends Canvas implements DrawingConstants, Scalable{
                nameToColorHash.put(robs[i].getName(), ROBOCOLOR[robs[i].getBotVis()]);
    }
     
-
+/** Will be called by AnimationCanvas during animation of robot movements.
+ * During animation the animated bot must not be painted here it will be painted by
+ * the AnimationCanvas.
+ * @param bot the bot that must not be painted 
+ */
+   protected void setBotToBeHiddenForAnimation(Bot bot ){
+       this.animatedBot = bot;
+   }
+   
    private void paintRobos(Graphics g) {
-       paintRobos(g, null);
+      
+       paintRobos(g, animatedBot);
    }
 
+  
+   
    private void paintRobos(Graphics g, Bot dontPaintMe) {
        Graphics2D g2d = (Graphics2D) g;
        if (dontPaintMe == null) {
@@ -204,7 +222,7 @@ public class BotCanvas extends Canvas implements DrawingConstants, Scalable{
    public void paintComponent(Graphics g) {
 
        if (blank== null) {
-           blank = getBlankImage();
+           blank = BoardLayers.getBlankImage(dScale, gameboard);
           }
           g.drawImage(blank, 0, 0, this);
 
@@ -214,16 +232,6 @@ public class BotCanvas extends Canvas implements DrawingConstants, Scalable{
        paintRobos(dbg);
    }
   
-   private BufferedImage getBlankImage(){
-       Dimension dim = BoardLayers.calcBoardDimensionInPixel(dScale,gameboard);
-       int width = (int) dim.getWidth();
-       int height = (int) dim.getHeight();
-       BufferedImage bi = new BufferedImage(width, height,  BufferedImage.TYPE_INT_RGB);
-       Graphics2D g_off = (Graphics2D) bi.getGraphics();
-       g_off.setClip(0, 0, width,height);
-       g_off.scale(dScale, dScale);
-       // XXX g_off.dispose() ???
-       return bi;
-   }
+  
    
 }

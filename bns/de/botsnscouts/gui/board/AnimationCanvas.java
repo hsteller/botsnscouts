@@ -12,12 +12,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JViewport;
 
 import org.apache.log4j.Category;
 
+import de.botsnscouts.board.Floor;
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.gui.AusgabeView;
 import de.botsnscouts.util.Bot;
@@ -34,7 +36,18 @@ import de.botsnscouts.util.SoundMan;
 public class AnimationCanvas extends Canvas implements Scalable, DrawingConstants{
     Category CAT = Category.getInstance(AnimationCanvas.class);
     
-    
+    /** Number of pixels a robot will be moved in a single animation step.
+     *  Has to be between 1 and FELDSIZE.
+     *  => Number of steps a one-field-move is drawn = FELDSIZE/MOVE_ROB_ANIMATION_OFFSET
+     *
+     *   TODO: I guess that this must not be final and needs to be scaled so that it works
+     *    with different zoomlevels
+     */
+    private static final int MOVE_ROB_ANIMATION_OFFSET = 4;
+    /** Amount of time (in ms) we wait after a single animation step
+     *  of (pixel-)length MOVE_ROB_ANIMATION_OFFSET.
+     */
+    private static final int MOVE_ROB_ANIMATION_DELAY = 1;
     
     
     /**Number of single steps a laser animation is drawn.*/
@@ -56,10 +69,19 @@ public class AnimationCanvas extends Canvas implements Scalable, DrawingConstant
    
    private int delay=AusgabeView.MEDIUM;
    
-   /** @param botCanvas to obtain the robot colors (for drawing lasers)*/
-   public AnimationCanvas (SimBoard gameBoard, BotCanvas botCanvas){
+   
+   private Bot [] robos;
+   private Image [] botImages;
+   
+   
+   /** @param botCanvas to obtain the robot colors (for drawing lasers); <br> also needed to erase the image of a before/during animation
+    * 
+    * @param roboImages for painting robot movements*/
+   
+   public AnimationCanvas (SimBoard gameBoard, BotCanvas botCanvas, Image [] roboImages){
        this.gameboard  = gameBoard;       
        this.botCanvas = botCanvas;
+       this.botImages = roboImages;
    }
    
    
@@ -92,7 +114,8 @@ public class AnimationCanvas extends Canvas implements Scalable, DrawingConstant
 
        }
        // now paint the non-animated lasers again
-       repaint();              
+       repaint();         
+// XXX HS maybe necessary: clear();
        try {
            synchronized (this){
                wait(delay);  
@@ -226,6 +249,7 @@ public class AnimationCanvas extends Canvas implements Scalable, DrawingConstant
   
   public void setScale (double dscale){
       this.dScale = dscale;
+      blank = null;
   }
  
   
@@ -367,14 +391,14 @@ public class AnimationCanvas extends Canvas implements Scalable, DrawingConstant
           }
       }
       repaint();
-
+      // XXX HS maybe necessary: clear();
 
   }
 
   public void paintComponent(Graphics g) {
       
       if (blank== null) {
-          blank = getBlankImage();
+          blank = BoardLayers.getBlankImage(dScale, gameboard);
          }
          g.drawImage(blank, 0, 0, this);
 
@@ -384,16 +408,315 @@ public class AnimationCanvas extends Canvas implements Scalable, DrawingConstant
      
   }
  
-  private BufferedImage getBlankImage(){
-      Dimension dim = BoardLayers.calcBoardDimensionInPixel(dScale,gameboard);
-      int width = (int) dim.getWidth();
-      int height = (int) dim.getHeight();
-      BufferedImage bi = new BufferedImage(width, height,  BufferedImage.TYPE_INT_RGB);
-      Graphics2D g_off = (Graphics2D) bi.getGraphics();
-      g_off.setClip(0, 0, width,height);
-      g_off.scale(dScale, dScale);
-      // XXX g_off.dispose() ???
-      return bi;
+  protected void animateRobMove(Bot rob, int direction) {
+      // important: according to the code on SpielfeldSim we do not get
+      //            the updated robot position;
+      //            the updated position will be the endposition of the total move,
+      //            as ersetzeRobos() will be called when the robot has reached its
+      //            final position
+      //            THIS METHOD will be called for each single step of a move
+      //             (i.e. three times for a "Move 3 forward")
+      //            So we have to update our internal position of the robot in
+      //            between to show an animation that makes sense
+   
+	      String name = rob.getName();
+	      Bot internal = null;
+	      int robocount = -1;
+	      for (int i = 0; i < robos.length; i++) {
+	          if (robos[i].getName().equals(name)) {
+	              internal = robos[i];
+	              robocount = i;
+	              break;
+	          }
+	      }
+	      
+	      // BotCanvas must not paint the bot while we are moving it around..
+	      botCanvas.setBotToBeHiddenForAnimation(rob);
+	      
+	      int oldX = internal.getX();
+	      int oldY = internal.getY();
+	
+	      // paint the move animation  and update the position in my internal robot array
+	      switch (direction) {
+	          case NORTH:
+	              {
+	                  if (oldY < gameboard.getSizeY()) {
+	                      moveRobNorth(internal, robocount);
+	                      internal.setPos(oldX, oldY + 1);
+	                  }
+	                 break;
+	              }
+	          case EAST:
+	              {
+	                  if (oldX < gameboard.getSizeX()) {
+	                      moveRobEast(internal, robocount);
+	                      internal.setPos(oldX + 1, oldY);
+	                  }
+	                  break;;
+	              }
+	          case WEST:
+	              {
+	                  if (oldX > 1) {
+	                      moveRobWest(internal, robocount);
+	                      internal.setPos(oldX - 1, oldY);
+	                  }
+	                  break;
+	              }
+	          case SOUTH:
+	              {
+	                  if (oldY > 1) {
+	                      moveRobSouth(internal, robocount);
+	                      internal.setPos(oldX, oldY - 1);
+	                  }
+	                  break;;
+	              }
+	          default:
+	              {
+	                  // this must not happen,
+	                  // otherwise the whole gui might be useless as it keeps probably
+	                  // a wrong position for one robot
+	                  CAT.fatal("Got illgeal direction for animating robot");
+	              }
+	      }
+     
+          clear();
+    
+  }
+  
+  /////////////////////////////////////////////////////////////////////
+
+  private void moveRobNorth(Bot internal, int robocount) {    
+      CAT.debug("moving bot one square to the north");
+      synchronized (this) {
+         Graphics2D g2 = (Graphics2D) this.getGraphics();
+       
+          g2.scale(dScale, dScale);
+          AlphaComposite ac = AC_SRC;
+          AlphaComposite ac2 = null;
+          if (internal.isVirtual())
+              ac2 = AC_SRC_OVER_05;
+          Image imgRob = botImages[internal.getFacing() + internal.getBotVis() * 4];
+  
+          int xpos = internal.getX() - 1;
+          int ypos = gameboard.getSizeY() -  internal.getY();
+          int xpos64 = xpos * 64;
+          int ypos64 = ypos * 64;
+          int actx1 = xpos64;
+          int acty1 = ypos64;
+       
+          int actx2 = actx1;
+          int acty2 = acty1 - 64;
+          if (MOVE_ROB_ANIMATION_DELAY > 0) {
+              for (int yoffset = 0; yoffset >= -64; yoffset -= MOVE_ROB_ANIMATION_OFFSET) {
+                  paintRobotForMoveAnimation(g2, imgRob,
+                          actx1, acty1,
+                          actx2, acty2,
+                          xpos64, ypos64 + yoffset,
+                          ac, ac2);
+
+                  try {
+                      Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                  } catch (InterruptedException ie) {
+                      CAT.warn("BoardView.paint: wait int moveRobNorth interrupted");
+                  }
+              }
+          } else { // loop without sleeping
+              for (int yoffset = 0; yoffset >= -64; yoffset -= MOVE_ROB_ANIMATION_OFFSET) {
+                  paintRobotForMoveAnimation(g2, imgRob,
+                          actx1, acty1,
+                          actx2, acty2,
+                          xpos64, ypos64 + yoffset,
+                          ac, ac2);
+              }
+          }
+      }
+      
+      // we have finished the animation so BotCanvas is allowed to paint it again,
+      // hopefully at the correct position ;-)
+      botCanvas.setBotToBeHiddenForAnimation(null);
+      clear(); // removing our robot
+  }
+
+
+  private void moveRobSouth(Bot internal, int robocount) {
+      CAT.debug("moving bot one square to the south");
+      synchronized (this) {
+          Graphics2D g2 = (Graphics2D) this.getGraphics();
+          
+          g2.scale(dScale, dScale);
+          AlphaComposite ac = AC_SRC;
+          AlphaComposite ac2 = null;
+          if (internal.isVirtual())
+              ac2 = AC_SRC_OVER_05;
+          Image imgRob = botImages[internal.getFacing() + internal.getBotVis() * 4];
+          int xpos =internal.getX() - 1;
+          int ypos = gameboard.getSizeY() -  internal.getY();
+          int xpos64 = xpos * 64;
+          int ypos64 = ypos * 64;
+          int actx1 = xpos64;
+          int acty1 = ypos64;
+          // direction dependend part:
+      
+          int actx2 = actx1;
+          int acty2 = acty1 + 64;
+          if (MOVE_ROB_ANIMATION_DELAY > 0) {
+              for (int yoffset = 0; yoffset <= 64; yoffset += MOVE_ROB_ANIMATION_OFFSET) {
+                  paintRobotForMoveAnimation(g2, imgRob,
+                         actx1, acty1,
+                         actx2, acty2,
+                          xpos64, ypos64 + yoffset,
+                          ac, ac2);
+                  if (MOVE_ROB_ANIMATION_DELAY > 0)
+                      try {
+                          Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                      } catch (InterruptedException ie) {
+                          CAT.warn("BoardView.paint: wait int moveRobSouth interrupted");
+                      }
+              }
+          } else {
+              for (int yoffset = 0; yoffset <= 64; yoffset += MOVE_ROB_ANIMATION_OFFSET) {
+                  paintRobotForMoveAnimation(g2, imgRob,
+                         actx1, acty1,
+                         actx2, acty2,
+                          xpos64, ypos64 + yoffset,
+                          ac, ac2);
+              }
+          }
+      }
+  }
+
+
+  private void moveRobEast(Bot internal, int robocount) {
+      CAT.debug("moving bot one square to the east");
+      synchronized (this) {
+       Graphics2D g2 = (Graphics2D) this.getGraphics();
+         
+          g2.scale(dScale, dScale);
+          AlphaComposite ac = AC_SRC;
+          AlphaComposite ac2 = null;
+          if (internal.isVirtual())
+              ac2 = AC_SRC_OVER_05;
+          Image imgRob = botImages[internal.getFacing() + internal.getBotVis() * 4];
+          int xpos = internal.getX() - 1;
+          int ypos = gameboard.getSizeY() -internal.getY();
+          int xpos64 = xpos * 64;
+          int ypos64 = ypos * 64;
+          int actx1 = xpos64;
+          int acty1 = ypos64;
+          // direction dependend part:
+          int actx2 = actx1 + 64;
+          int acty2 = acty1;
+          if (MOVE_ROB_ANIMATION_DELAY > 0) {
+              for (int xoffset = 0; xoffset <= 64; xoffset += MOVE_ROB_ANIMATION_OFFSET) {
+                  paintRobotForMoveAnimation(g2, imgRob,
+                         actx1, acty1,
+                       actx2, acty2,
+                          xpos64 + xoffset, ypos64,
+                          ac, ac2);
+                  try {
+                      Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                  } catch (InterruptedException ie) {
+                      CAT.warn("BoardView.paint: wait int moveRobEast interrupted");
+                  }
+              }
+          } else { // loop without sleeping
+              for (int xoffset = 0; xoffset <= 64; xoffset += MOVE_ROB_ANIMATION_OFFSET) {
+                  paintRobotForMoveAnimation(g2, imgRob,
+                         actx1, acty1,
+                          actx2, acty2,
+                          xpos64 + xoffset, ypos64,
+                          ac, ac2);
+              }
+          }
+      }
+
+  }
+
+  private void moveRobWest(Bot internal, int robocount) {
+      CAT.debug("moving bot one square to the west");
+      synchronized (this) {
+    Graphics2D g2 = (Graphics2D) this.getGraphics();
+         
+          g2.scale(dScale, dScale);
+          AlphaComposite ac = AC_SRC;
+          AlphaComposite ac2 = null;
+          if (internal.isVirtual())
+              ac2 = AC_SRC_OVER_05;
+          Image imgRob = botImages[internal.getFacing() + internal.getBotVis() * 4];
+          int xpos =internal.getX() - 1;
+          int ypos = gameboard.getSizeY() -internal.getY();
+          int xpos64 = xpos * 64;
+          int ypos64 = ypos * 64;
+          int actx1 = xpos64;
+          int acty1 = ypos64;
+          // direction dependend part:
+          int actx2 = actx1 - 64;
+          int acty2 = acty1;
+          if (MOVE_ROB_ANIMATION_DELAY > 0) {
+              for (int xoffset = 0; xoffset >= -64; xoffset -= MOVE_ROB_ANIMATION_OFFSET) {
+                  paintRobotForMoveAnimation(g2, imgRob,
+                         actx1, acty1,
+                         actx2, acty2,
+                          xpos64 + xoffset, ypos64,
+                          ac, ac2);
+                  try {
+                      Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);
+                  } catch (InterruptedException ie) {
+                      CAT.warn("BoardView.paint: wait int moveRobWest interrupted");
+                  }
+              }
+          } else {
+              for (int xoffset = 0; xoffset >= -64; xoffset -= MOVE_ROB_ANIMATION_OFFSET) {
+                  paintRobotForMoveAnimation(g2, imgRob,
+                           actx1, acty1,
+                          actx2, acty2,
+                          xpos64 + xoffset, ypos64,
+                          ac, ac2);
+              }
+          }
+      }
+  }
+
+  
+  /** Some performance optimizations..*/
+  private void paintRobotForMoveAnimation(Graphics2D g2d, Image botImage,
+                                         int actx, int acty,
+                                         int actx2, int acty2,
+                                          int xpos64, int ypos64,
+                                          AlphaComposite ac, AlphaComposite ac2) {
+      // erase the old robot image from the square of its original position by
+      // painting it again
+       // XXX HS paintFeldWithElements(g2d, xpos, ypos, actx, acty);
+       
+
+      // calc upper left corner of 
+      int minX = Math.min(actx, actx2);
+      int minY = Math.min(acty, acty2);
+      
+      int dim = 128; // lazy: drawing the 128x128 square instead of the 128x64 rectangle
+      g2d.drawImage(blank, minX, minY, dim, dim, this);
+      
+      // erase the old robot image from the square the robot is moving to
+     // XXX HS  paintFeldWithElements(g2d, x2, y2, actx2, acty2);
+
+
+      if (ac2 != null) {// robot is virtual
+          g2d.setComposite(ac2); // set the robot image to be half transparent
+          g2d.drawImage(botImage, xpos64, ypos64, 64, 64, this); // paint the image
+          g2d.setComposite(ac); // reset the transparency level as the next call
+          // of this method will start with painting the
+          // background again
+      } else // robot is not virtual
+          g2d.drawImage(botImage, xpos64, ypos64, 64, 64, this);
+
+      // for animating we will skip to paint the name of the bot
+
+  }
+
+  private void clear(){
+      Graphics g = getGraphics();
+      paintComponent(g);
+      
   }
   
   //

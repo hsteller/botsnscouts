@@ -12,8 +12,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,10 +24,8 @@ import org.apache.log4j.Category;
 import com.keypoint.PngEncoder;
 
 import de.botsnscouts.board.SimBoard;
-import de.botsnscouts.gui.BoardView.ClickListener;
-import de.botsnscouts.util.Bot;
-import de.botsnscouts.util.BotVis;
 import de.botsnscouts.util.ImageMan;
+import de.botsnscouts.util.Location;
 
 /**
  * @author hendrik
@@ -64,8 +60,8 @@ public class BoardLayers extends JLayeredPane implements DrawingConstants, Scala
   
    
     
-    
-    
+    private Scalable [] layers;
+    private int layerCount=0;
 
 
 
@@ -89,7 +85,7 @@ public class BoardLayers extends JLayeredPane implements DrawingConstants, Scala
         gameboard = sf_neu;
 
         setDoubleBuffered(true);
-        setScale(dScale); // does setSize()
+        setScale(dScale); // does call setSize()
 
         ImageMan.finishLoading();
 
@@ -102,9 +98,15 @@ public class BoardLayers extends JLayeredPane implements DrawingConstants, Scala
         floorCanvas = new FloorCanvas(gameboard, cbeltCrop, ebeltCrop, miscCrop);
         elementCanvas = new ElementCanvas(gameboard, miscCrop);
         botCanvas = new BotCanvas(gameboard, robosCrop); 
-        animationCanvas = new AnimationCanvas(gameboard, botCanvas);
-        topCanvas = new TopCanvas();
-      
+        animationCanvas = new AnimationCanvas(gameboard, botCanvas, robosCrop);
+        topCanvas = new TopCanvas(gameboard, scoutCrop);
+     
+        layers = new Scalable[]{
+                        floorCanvas, elementCanvas,botCanvas, animationCanvas, topCanvas
+        				};        
+        layerCount = layers.length;
+    
+        
     }
     
     
@@ -115,19 +117,18 @@ public class BoardLayers extends JLayeredPane implements DrawingConstants, Scala
         // XXX HS rescaled = true;
        this.scaledFieldWithInPixels = (int) dim.getWidth();
        this.scaledFieldHeightInPixels = (int) dim.getHeight();
-        floorCanvas.setScale(dScale);
-        elementCanvas.setScale(dScale);
-    //    botCanvas.setScale(dScale);
-      
-        animationCanvas.setScale(dScale);
-        setSize(dim);
-        
-        // the preComputed-BoardImage is no longer valid
-       //XXX HS preBoard = null;
-        floorCanvas.setSize(dim);
-        elementCanvas.setSize(dim);
-      //  botCanvas.setSize(dim); 
-        animationCanvas.setSize(dim);
+       
+       
+       
+       for (int i=0; i<layerCount;i++){
+           Scalable s = layers[i];
+           s.setScale(dScale);
+           s.setSize(dim);
+       }
+       
+       Graphics2D g2 = (Graphics2D)getGraphics();
+       g2.scale(dScale, dScale);
+       setSize(dim);                      
        
     }
     
@@ -157,7 +158,7 @@ public class BoardLayers extends JLayeredPane implements DrawingConstants, Scala
  
     protected void paintUnbuffered(Graphics dbg) {
         floorCanvas.paintSpielfeldBoden(dbg);
-       elementCanvas.paintUnbuffered(dbg);
+        elementCanvas.paintUnbuffered(dbg);
       //  paintScout(dbg);->TopCanvas/BoardCanvas
     }
     
@@ -240,8 +241,34 @@ public class BoardLayers extends JLayeredPane implements DrawingConstants, Scala
         return new Dimension(scaledFieldWithInPixels, scaledFieldHeightInPixels);
     }
     
-    
+    protected static  BufferedImage getBlankImage(double dScale, SimBoard gameboard){
+        Dimension dim = BoardLayers.calcBoardDimensionInPixel(dScale,gameboard);
+        int width = (int) dim.getWidth();
+        int height = (int) dim.getHeight();
+        BufferedImage bi = new BufferedImage(width, height,  BufferedImage.TYPE_INT_RGB);
+        Graphics2D g_off = (Graphics2D) bi.getGraphics();
+        g_off.setClip(0, 0, width,height);
+        g_off.scale(dScale, dScale);
+        // XXX g_off.dispose() ???
+        return bi;
+    }
+    public Location point2Ort(Point p, Location ort) {
+        ort.x = (int) (p.x / scaledFeldSize) + 1;
+        ort.y = (int) ((getHeight() - p.y) / scaledFeldSize) + 1;
+        return ort;
+    }
 
+    /** returns left upper point of square*/
+    public Point ort2Point(int ortx, int orty, Point p) {
+        p.x = (int) ((ortx - 1) * scaledFeldSize);
+        p.y = (int) ((gameboard.getSizeY() - orty) * scaledFeldSize);
+        return p;
+    }
+
+    public Point ort2Point(Location ort, Point p) {
+        return ort2Point(ort.x, ort.y, p);
+    }
+    
  /*
     private ClickListener myClickListener;
  

@@ -6,6 +6,8 @@
  */
 package de.botsnscouts.gui.board;
 
+import java.awt.Dimension;
+
 /**
  * @author hendrik
  *
@@ -15,6 +17,8 @@ package de.botsnscouts.gui.board;
 public interface Scalable {
     
     public void setScale( double dscale);
+    
+    public void setSize(Dimension dim);
 
   
     

@@ -70,13 +70,10 @@ public class FloorCanvas extends Canvas implements DrawingConstants, Scalable{
     }
     private BufferedImage getBoardImageFloor() {
         //preBoard = new BufferedImage(x,y, BufferedImage.TYPE_BYTE_INDEXED);
-        Dimension dim = BoardLayers.calcBoardDimensionInPixel(dScale,gameboard);
-        int width = (int) dim.getWidth();
-        int height = (int) dim.getHeight();
-        BufferedImage bi = new BufferedImage(width, height,  BufferedImage.TYPE_INT_RGB);
+   
+        BufferedImage bi = BoardLayers.getBlankImage(dScale, gameboard);
         Graphics2D g_off = (Graphics2D) bi.getGraphics();
-        g_off.setClip(0, 0, width,height);
-        g_off.scale(dScale, dScale);
+        
         paintSpielfeldBoden(g_off);
         g_off.dispose();
         return bi;
@@ -335,6 +332,7 @@ public class FloorCanvas extends Canvas implements DrawingConstants, Scalable{
     
     public void setScale(double scale){
         this.dScale = scale;
+        this.preBoard = null;
     }
     
    

@@ -213,6 +213,8 @@ public class BoardView extends JLayeredPane {
     public synchronized void setScale(double scale) {
         // adapt this Component to the scaling factor
         //dScale = scale;
+      //  Bot preCopy = previewRob;
+      //  previewRob = null;
         deleteScout();
         scaledFeldSize = (int) (scale * FELDSIZE);
        dScale = scaledFeldSize/((double)FELDSIZE);
@@ -225,8 +227,8 @@ public class BoardView extends JLayeredPane {
 
         // the preComputed-BoardImage is no longer valid      
         preBoard = null;
-
-       //paintScout(this.getGraphics());
+      //  previewRob = preCopy;
+       // paintScout(this.getGraphics());
     }
 
     private void init(SimBoard sf_neu, Color[] robColors) {
@@ -1691,7 +1693,7 @@ public class BoardView extends JLayeredPane {
         paintLaserStrahlen(dbg);
         paintWaende(dbg);
         paintFlaggen(dbg);
-        paintScout(dbg);
+      //  paintScout(dbg);
     }
 
     protected void finalize() throws Throwable {
