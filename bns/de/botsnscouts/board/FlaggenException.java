@@ -1,4 +1,4 @@
-package de.botsnscouts.util;
+package de.botsnscouts.board;
 
 /**
  * FlaggenException wird bei Abweichungen vom Spielfelddatenformat geworfen.
