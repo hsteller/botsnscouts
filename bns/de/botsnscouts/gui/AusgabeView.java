@@ -79,9 +79,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private boolean soundOn = false;
 
     // speed-menu
-    protected static final int SLOW = 1000;
-    protected static final int MEDIUM = 500;
-    protected static final int FAST = 100;
+    public static final int SLOW = 1000; // FIXME aus propeties einlesen bzw. fuer Benutzer einstellbar machen
+    public static final int MEDIUM = 500;
+    public static final int FAST = 100;
 
     protected int speed=MEDIUM;
  
