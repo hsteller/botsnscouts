@@ -57,10 +57,7 @@ public class ScoutVertiefung extends JToggleButton {
 
 
     public static void main (String args[]) {
-	try {
-	    Message.setLanguage("deutsch");
-	}
-	catch (Exception e) {e.printStackTrace();}
+	Message.setLanguage("deutsch");
         JFrame f = new JFrame();
 	f.setSize(100,100);
 	f.getContentPane().add(new ScoutVertiefung(null));

@@ -47,10 +47,7 @@ public class View extends JFrame {
 
 
     public static void main (String args[]) {
-	try {
-	    Message.setLanguage("deutsch");
-	}
-	catch (Exception e) {e.printStackTrace();}
+	Message.setLanguage("deutsch");
 	JFrame f = new View();
 	AusgabeView a = new AusgabeView();
 	f.getContentPane().add(a);

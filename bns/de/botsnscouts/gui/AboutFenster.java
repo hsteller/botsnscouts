@@ -55,10 +55,7 @@ public class AboutFenster extends JFrame{
 	}
     
     public static void main (String args[]) {
-	try {
-	   	    Message.setLanguage("deutsch");
-	}
-	catch (Exception e) {e.printStackTrace();}
+	Message.setLanguage("deutsch");
 	AboutFenster f = new AboutFenster();
 	// f.setSize(200,640);
 	f.setVisible(true);

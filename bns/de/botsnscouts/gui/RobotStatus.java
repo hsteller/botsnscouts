@@ -106,10 +106,7 @@ public class RobotStatus extends JPanel {
     
 
     public static void main (String args[]) {
-	try {
-	    Message.setLanguage("deutsch");
-	}
-	catch (Exception e) {e.printStackTrace();}
+	Message.setLanguage("deutsch");
         JWindow f = new JWindow();
 	JPanel pa = new JPanel(new GridLayout(1,4));
 	for (int i=0; i < 4; i++) pa.add(new RobotStatus());

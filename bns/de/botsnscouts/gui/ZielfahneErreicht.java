@@ -36,10 +36,7 @@ public class ZielfahneErreicht extends JPanel{
     }
 
     public static void main (String args[]) {
-	try {
-	    Message.setLanguage("deutsch");
-	}
-	catch (Exception e) {e.printStackTrace();}
+	Message.setLanguage("deutsch");
 	Frame f = new Frame("Test");
 	f.setSize(200,640);
 	ZielfahneErreicht zf = new ZielfahneErreicht();

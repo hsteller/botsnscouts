@@ -59,23 +59,20 @@ public class UserInfo extends JPanel {
     
 
 	public static void main (String args[]) {
-	try {
 	    Message.setLanguage("deutsch");
+	    JWindow f = new JWindow();
+	    MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
+	    
+	    UserInfo ui = new UserInfo();
+	    
+	    f.getContentPane().add(ui);
+	    f.setLocation(100,100);
+	    f.setSize(200,400);
+	    f.setVisible(true);
+	    ui.setInfo("Das ist ein Test.");
+	    ui.setInfo("Und jetzt der Proof, ob es auch ersetzen geht.");
 	}
-	catch (Exception e) {e.printStackTrace();}
-        JWindow f = new JWindow();
-	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
-
-        UserInfo ui = new UserInfo();
-
-	f.getContentPane().add(ui);
-	f.setLocation(100,100);
-	f.setSize(200,400);
-	f.setVisible(true);
-	ui.setInfo("Das ist ein Test.");
-	ui.setInfo("Und jetzt der Proof, ob es auch ersetzen geht.");
-    }
-
+    
     private void d(String s) {
 	System.err.println(s);
     }

@@ -68,12 +68,7 @@ public class ExtendedRobStatus extends JFrame {
 
 
     public static void main (String args[]) {
-	try {
-	    Message.setLanguage("deutsch");
-	}
-	catch (Exception e) {
-	    e.printStackTrace();
-	}
+	Message.setLanguage("deutsch");
         JFrame f = new ExtendedRobStatus();
 	f.setVisible(true);
     }

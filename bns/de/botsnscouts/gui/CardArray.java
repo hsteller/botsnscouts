@@ -89,10 +89,7 @@ public class CardArray extends JPanel {
 
 
     public static void main (String args[]) {
-	try {
-	    Message.setLanguage("deutsch");
-	}
-	catch (Exception e) {e.printStackTrace();}
+	Message.setLanguage("deutsch");
         JWindow f = new JWindow();
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
 
