@@ -2,65 +2,107 @@
 <project name="BotsNScouts" default="compile">
 
   <!-- Global properties for this build -->
-  <property name="src" value="."/>
+  <property name="src" value="src"/>
   <property name="build" value="${basedir}/classes"/>
   <property name="maindir" value="de/botsnscouts"/>
-  <property name="dist"  value="dist"/>
-  <property name="jars"  value="lib/log4j.jar:lib/sixlegs.jar"/>
+  <property name="dist" value="dist"/>
+  <property name="doc" value="docs" />
+  <property name="jars" value="lib/log4j.jar:lib/sixlegs.jar"/>
+  <property name="bns.ver" value="0.8pre" />     
 
   <target name="init">
     <!-- Create the time stamp -->
     <tstamp/>
     <!-- Create the build directory structure used by compile -->
-    <echo message="OS: ${os.name}"/>
-    <echo message="Basedir: ${basedir}"/>
-    <mkdir dir="${build}/${maindir}"/>
-    <exec executable="ln" os="Unix,Linux">
-	    <arg line="-s ${basedir}/${maindir}/sounds ${build}/${maindir}" />
-     </exec>
-    <exec executable="ln" os="Unix,Linux">
-	    <arg line="-s ${basedir}/${maindir}/images ${build}/${maindir}" />
-     </exec>
-    <exec executable="ln" os="Unix,Linux">
-	    <arg line="-s ${basedir}/${maindir}/conf ${build}/${maindir}" />
-     </exec>
+     <copy todir="${build}/${maindir}/conf">
+        <fileset dir="${src}/${maindir}/conf" />
+     </copy>
+     <copy todir="${build}/${maindir}/images">
+        <fileset dir="${src}/${maindir}/images" />
+     </copy>
+     <copy todir="${build}/${maindir}/sounds">
+        <fileset dir="${src}/${maindir}/sounds" />
+     </copy>
   </target>
 
   <target name="compile" depends="init">
     <!-- Compile the java code from ${src} into ${build} -->
     <javac srcdir="${src}" destdir="${build}" 
-	   excludes="de/botsnscouts/old/**,de/botsnscouts/test/**"
-	   classpath="${jars}:${build}"
-	   />
+	   classpath="${jars}:${build}" />
   </target>
 
   <target name="run" depends="compile">
+     <echo message="${jars}:${build}" />
      <java classname="de.botsnscouts.BotsNScouts"
-	   classpath="${jars}:${build}"
-	   />
+	   classpath="${jars}:${build}" fork="true" />
   </target>
 
-  <target name="dist" depends="compile">
-    <!-- To be changed for out needs. -->
-    <!-- Create the distribution directory -->
-    <mkdir dir="${dist}/lib"/>
-
-    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-    <jar jarfile="${dist}/lib/MyProject-${DSTAMP}.jar" basedir="${build}"/>
+  <target name="dist" depends="compile,dist-bin,dist-src,doc">
+    <chmod perm="ugo+x">
+       <fileset dir="${dist}">
+         <include name="**/*.sh" />
+       </fileset>
+    </chmod>
+    <zip zipfile="${dist}/botsnscouts-${DSTAMP}.zip">
+       <zipfileset dir="${dist}/binary" prefix="botsnscouts-${bns.ver}" />
+    </zip>
+    <zip zipfile="${dist}/botsnscouts-${DSTAMP}-src.zip">
+       <zipfileset dir="${dist}/source" prefix="botsnscouts-${bns.ver}" />
+       <zipfileset dir="${doc}" prefix="botsnscouts-${bns.ver}/javadoc" />
+    </zip>
+    <zip zipfile="${dist}/botsnscouts-${DSTAMP}-srconly.zip">
+       <zipfileset dir="${dist}/source" prefix="botsnscouts-${bns.ver}"
+        excludes="classes" />
+    </zip>
   </target>
 
+  <target name="dist-bin">
+    <mkdir dir="${dist}/binary/lib" />
+    <copy todir="${dist}/binary/lib">
+      <fileset dir="${basedir}/lib" />
+    </copy>
+    <copy todir="${dist}/binary">
+      <fileset dir="${basedir}/tools/distrib" excludes="*.nodist" />
+    </copy>
+    <copy todir="${dist}/binary">
+      <fileset dir="${basedir}/tools/distrib.binary" excludes="*.nodist" />
+    </copy>
+    <jar jarfile="${dist}/binary/botsnscouts.jar" manifest="tools/manifest">
+       <fileset dir="${build}" />
+    </jar>
+  </target>
+
+  <target name="dist-src">
+    <mkdir dir="${dist}/source/lib" />
+    <mkdir dir="${dist}/source/classes" />
+    <mkdir dir="${dist}/source/src" />
+    <copy todir="${dist}/source/lib">
+      <fileset dir="${basedir}/lib" />
+    </copy>
+    <copy todir="${dist}/source">
+      <fileset dir="${basedir}/tools/distrib" excludes="*.nodist" />
+    </copy>
+    <copy todir="${dist}/source">
+      <fileset dir="${basedir}/tools/distrib.binary" excludes="*.nodist" />
+    </copy>
+    <copy todir="${dist}/source/classes">
+      <fileset dir="${build}" />
+    </copy>
+    <copy todir="${dist}/source/src" includeEmptyDirs="false">
+      <fileset dir="${src}" />
+    </copy>
+    <copy todir="${dist}/source" file="${basedir}/build.xml" />
+  </target>
+
+  <target name="doc">
+     <mkdir dir="${doc}" />
+     <javadoc sourcepath="${src}" destdir="${doc}" 
+      windowtitle="Bots 'n' Scouts API" packagenames="de.botsnscouts.*"
+      package="yes" />
+  </target>
+  
   <target name="clean">
     <!-- Delete the ${build} and ${dist} directory trees -->
-    <!-- Delete the links first because delete does the wrong thing! -->
-    <exec executable="rm" os="Unix,Linux">
-	    <arg line="${build}/${maindir}/sounds" />
-     </exec>
-    <exec executable="rm" os="Unix,Linux">
-	    <arg line="${build}/${maindir}/images" />
-     </exec>
-    <exec executable="rm" os="Unix,Linux">
-	    <arg line="${build}/${maindir}/conf" />
-     </exec>
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
   </target>
