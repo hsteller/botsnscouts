@@ -40,6 +40,8 @@ import de.botsnscouts.util.*;
 * @see     StartServer
 */
 public class KommStSrv{
+    public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(KommStSrv.class);
+
 
     /**
      * Anmeldetimeout in Sekunden
@@ -103,23 +105,23 @@ public class KommStSrv{
 	    cltIP=clt.getInetAddress().getHostAddress();
 	    //   cltPort=clt.getPort();
 	    //System.out.println("Ein Klient!");
-	} catch (Exception e){System.err.println("StSrv: Kann nicht ACCEPT!");}
+	} catch (Exception e){CAT.error("StSrv: Kann nicht ACCEPT!");}
 
 	try{
 	    pw = new PrintWriter(new OutputStreamWriter(clt.getOutputStream()), true);
 	} catch (Exception e){
-	    System.err.println("StSrv: Kann nicht getOutputStream!");}
+	    CAT.error("StSrv: Kann nicht getOutputStream!");}
 
 	try{
 	    br= new BufferedReader(new InputStreamReader(clt.getInputStream()));
 	} catch (Exception e)
-	    {System.err.println("StSrv: Kann nicht getInputStream!");}
+	    {CAT.error("StSrv: Kann nicht getInputStream!");}
 
 	try{
 	    pw.println("StartServer ist bereit.");
 	    //if(br.ready())
 	    fromclt=br.readLine();
-	} catch (Exception e){System.err.println("StSrv: Kann nicht println/readLine!");}
+	} catch (Exception e){CAT.error("StSrv: Kann nicht println/readLine!");}
 	//System.out.println(fromclt.substring(0,4));
 	try{
 	    if(fromclt.substring(0,4).equals("NSS(")){//neues spiel starten
@@ -182,9 +184,9 @@ public class KommStSrv{
 	    if(fromclt.substring(0,4).equals("back"))
 		return 9999;
 	} catch (Exception e){
-	    System.err.println("Klientenfehler!"+e);
+	    CAT.error("Klientenfehler!"+e);
 	}
-	System.out.println(fromclt);
+	CAT.debug(fromclt);
 	return 0;
     }
 
@@ -200,7 +202,7 @@ public class KommStSrv{
 	    //   srv.close();
 	    clt.close();
 	} catch (Exception e){
-	    System.err.println("Kann die Sockets nicht schliessen!");
+	    CAT.error("Kann die Sockets nicht schliessen!");
 	}
     }
 
@@ -209,7 +211,7 @@ public class KommStSrv{
 	    //   srv.close();
 	    clt.close();
 	} catch (Exception e){
-	    System.err.println("Kann die Sockets nicht schliessen!");
+	    CAT.error("Kann die Sockets nicht schliessen!");
 	}
     }
 
@@ -222,7 +224,7 @@ public class KommStSrv{
 	    // srv.close();
 	    clt.close();
 	} catch (Exception e){
-	    System.err.println("Kann die Sockets nicht schliessen!");
+	    CAT.error("Kann die Sockets nicht schliessen!");
 	}
     }
 

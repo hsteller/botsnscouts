@@ -115,7 +115,6 @@ public class OptionPane extends JPanel {
     }
 
     public void paint(Graphics g) {
-        System.out.println("updating");
         g.setColor(getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());
         super.paint(g);

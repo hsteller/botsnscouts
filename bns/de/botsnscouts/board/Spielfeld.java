@@ -367,14 +367,14 @@ public class Spielfeld implements de.botsnscouts.util.Directions, FloorConstants
     {
       Global.debug(this, s);
     }
-  protected final static void p(String s)
+    protected final static void p(String s)
     {
-      System.out.println(s);
+      CAT.debug(s);
     }
   protected final static void pn(String s)
     {
-      System.out.print(s);
-    }
+      CAT.debug(s);
+      }
     public boolean hasNorthWall( int x,int y) {
         return nw(x,y).isExisting();
     }

@@ -33,7 +33,7 @@ import java.io.*;
 
 public class KommStSrvPass{
 
-
+    public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(KommStSrvPass.class);
 
  private Socket tosrv=null;
 
@@ -54,7 +54,7 @@ public class KommStSrvPass{
    tosrv=new Socket(ip,PORT);
   }
   catch (Exception e){
-   System.err.println("KommStSrvPass: Kann die Verbindung zum Server nicht herstellen!");
+   CAT.error("KommStSrvPass: Kann die Verbindung zum Server nicht herstellen!");
    return false;
   }
 
@@ -65,7 +65,7 @@ public class KommStSrvPass{
   frSrv = new BufferedReader(new InputStreamReader(fr));
   toSrv = new PrintWriter(new OutputStreamWriter(to), true);
  } catch(Exception e){
-   System.err.println("Kann keine Streams öffnen!");
+   CAT.error("Kann keine Streams öffnen!");
    return false;
  }
 
@@ -73,7 +73,7 @@ public class KommStSrvPass{
   if(frSrv.readLine().equals("StartSpielerListener ist bereit."))
    toSrv.println(s);
  } catch(Exception e){
-  System.err.println("Kann nicht zum Server schreiben!");
+  CAT.error("Kann nicht zum Server schreiben!");
   return false;
  }
 
@@ -81,14 +81,14 @@ public class KommStSrvPass{
      if(!frSrv.readLine().equals("OK."))
 	 throw new Exception();
  } catch(Exception e){
-     System.err.println("Keine (richtige) Antwort vom Server!");
+     CAT.error("Keine (richtige) Antwort vom Server!");
      try{
 	 frSrv.close();
 	 toSrv.close();
 	 fr.close();
 	 to.close();
      } catch (Exception ex){
-	 System.out.println("Kann Sockets nicht schließen");
+	 CAT.error("Kann Sockets nicht schließen");
 	 return false;
      }
      return false;
@@ -100,7 +100,7 @@ public class KommStSrvPass{
   fr.close();
   to.close();
  } catch (Exception e){
-  System.out.println("Kann Sockets nicht schließen");
+  CAT.error("Kann Sockets nicht schließen");
   return false;
  }
     return true;
@@ -111,7 +111,7 @@ public class KommStSrvPass{
 	    //   srv.close();
 	    tosrv.close();
 	} catch (Exception e){
-	    System.err.println("Kann die Sockets nicht schliessen!");
+	    CAT.error("Kann die Sockets nicht schliessen!");
 	}
     }
 

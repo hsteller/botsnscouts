@@ -85,7 +85,7 @@
     <copy todir="${dest.bin}">
       <fileset dir="${basedir}/tools/distrib.binary" excludes="*.nodist" />
     </copy>
-    <copy tofile="${build}/${maindir}/conf/log4j.conf" file="${basedir}/tools/log4j.noDebug" />
+    <copy tofile="${build}/${maindir}/conf/log4j.conf" file="${basedir}/tools/log4j.noDebug" overwrite="yes" />
     <jar jarfile="${dest.bin}/botsnscouts.jar" manifest="tools/manifest">
        <fileset dir="${build}" />
     </jar>
@@ -120,7 +120,7 @@
 	</patternset>
       </fileset>
     </copy>
-    <copy tofile="${dest.src}/src/${maindir}/conf/log4j.conf" file="${basedir}/tools/log4j.noDebug" />
+    <copy tofile="${dest.src}/src/${maindir}/conf/log4j.conf" file="${basedir}/tools/log4j.noDebug" overwrite="yes" />
   </target>
 
 </project>

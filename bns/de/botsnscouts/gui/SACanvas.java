@@ -180,7 +180,7 @@ public class SACanvas extends JComponent {
 	x = (int)(sf.getSizeX() * scaledFeldSize );
 	y = (int)(sf.getSizeY() * scaledFeldSize );
 	rescaled = true;
-	System.err.println("dim : " + x + " " + y );
+	CAT.debug("dim : " + x + " " + y );
 	setSize(x,y);
 
 	// the preComputed-BoardImage is no longer valid
@@ -369,7 +369,7 @@ public class SACanvas extends JComponent {
 	    wait (50);
           }
 	  catch (InterruptedException ie){
-	    System.err.println ("SACanvas.paint: wait interrupted");
+	    CAT.error("SACanvas.paint: wait interrupted");
 	  }
         }
 
@@ -385,7 +385,7 @@ public class SACanvas extends JComponent {
 		     wait (1);
 		 }
 		 catch (InterruptedException ie){
-		     System.err.println ("SACanvas.paint: wait interrupted");
+		     CAT.error ("SACanvas.paint: wait interrupted");
 		 }
 	     }
 	}
@@ -398,7 +398,7 @@ public class SACanvas extends JComponent {
 		    wait (200);
 		}
 		catch (InterruptedException ie){
-		    System.err.println ("SACanvas.paint: wait interrupted");
+		    CAT.error ("SACanvas.paint: wait interrupted");
 		}
 	    }
 	}
@@ -472,8 +472,8 @@ public class SACanvas extends JComponent {
 	    break;
 	}
 	default : {
-	    System.err.println("SACanvas.paintActiveRobLaser: ");
-	    System.err.println("Ungueltige Laserrichtung: "+laserFacing);
+	    CAT.error("SACanvas.paintActiveRobLaser: ");
+	    CAT.error("Ungueltige Laserrichtung: "+laserFacing);
 	}
 	}// end switch facing
 	g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
@@ -516,7 +516,7 @@ public class SACanvas extends JComponent {
 	    break;
 	}
 	default: {
-	    System.err.println("SACanvas.calculateLaserLength(): ungueltige Laserrichtung: "+laserFacing);
+	    CAT.error("SACanvas.calculateLaserLength(): ungueltige Laserrichtung: "+laserFacing);
 	}
 	}
 	//System.err.println("calculate Length: ("+source.x+","+source.y+")-"+facing+"->("+target.x+","+target.y+") ist "+laenge+" lang");
@@ -569,8 +569,8 @@ public class SACanvas extends JComponent {
 	    break;
 	}
 	default : {
-	    System.err.println("SACanvas.paintActiveRobLaser: ");
-	    System.err.println("Ungueltige Laserrichtung: "+laserFacing);
+	    CAT.error("SACanvas.paintActiveRobLaser: ");
+	    CAT.error("Ungueltige Laserrichtung: "+laserFacing);
 	}
 	}// end switch facing
 

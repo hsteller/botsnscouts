@@ -137,9 +137,9 @@ public class ImageMan {
 	imageLoader = new BNSThread("imageLoader") {
 	    public void run() {
 		try {
-		    System.err.println("started loading and cropping of images in background");
+		    ImageMan.CAT.debug("started loading and cropping of images in background");
 		    tracker.waitForAll();
-		    System.err.println("images ready");
+		    ImageMan.CAT.debug("images ready");
 		}catch(InterruptedException ie) { System.err.println( ie ); }
 	    }
 	};
