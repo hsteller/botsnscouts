@@ -69,6 +69,8 @@ public class SoundMan {
 
    public static final int BOO = 14;
 
+   public static final int CRUSHED = 15;
+
     /** How to locate the sounds relative to de.botsnscouts.BotsNScouts
      *  Mind the ordering.
      */
@@ -87,7 +89,8 @@ public class SoundMan {
         "sounds/laser_orange.wav",
         "sounds/laser_gray.wav",
         "sounds/laser_violet.wav",
-        "sounds/boo.wav"
+        "sounds/boo.wav",
+        "sounds/crusher.wav"
     };
 
     /** These sounds are robot laser sounds */
