@@ -56,7 +56,7 @@ public class Splash{
 
 	Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 	int x = (screen.width-WIDTH)/2;
-	int y = (screen.height-HEIGHT)/2;
+	int y = (screen.height-HEIGHT)/3;
 	splash.setBounds(x,y,WIDTH,HEIGHT);
 
 	ImageCanvas ic=new ImageCanvas(Toolkit.getDefaultToolkit().getImage(de.botsnscouts.BotsNScouts.class.getResource("images/logosmall.jpg")));
