@@ -7,10 +7,23 @@ import java.awt.event.KeyEvent;
 
 import org.apache.log4j.Category;
 
+
+/** Defines lots of constants that are important for hotkey management
+ *  and also for displaying them in the HotKeyEditorPanel.
+ */
 public class HotKeyConf {
 
   static Category CAT = Category.getInstance(HotKeyConf.class);
 
+  /** Necessary because in IBM JDK1.3 getKeyText(VK_ENTER) will
+   *  return "Unknown keyCode: 0x0" or some similiar crap.
+   *  Interesting: KeyEvent.paramString() will return "*,Enter" anyway..
+   *                                ???
+   *                              ? o o ?
+   *                                 I
+   */
+
+  public static final String SHOW_CHATLINE_TEXT = "Enter";
   public static final int SHOW_CHATLINE = KeyEvent.VK_ENTER;
   public static final String HOTKEY_SHOW_CHATLINE = "reservedKeyShowChat";
 
@@ -19,7 +32,9 @@ public class HotKeyConf {
   }
 
   public static final int [] RESERVED_KEYS = new int [] {
-                                                      SHOW_CHATLINE
+                                                      SHOW_CHATLINE,
+                                                      KeyEvent.VK_BACK_SPACE,
+                                                      KeyEvent.VK_SPACE
                                                       };
 
   public static final String CODE_SUFFIX = "Code";
@@ -30,18 +45,28 @@ public class HotKeyConf {
   public static final String HOTKEY_MSG3 = "keyMsg3";
   public static final String HOTKEY_MSG4 = "keyMsg4";
   public static final String HOTKEY_MSG5 = "keyMsg5";
-  public static final String [] MSGS = {
+
+
+  public static final String HOTKEY_ZOOM_IN =  "keyZoomIn";
+  public static final String HOTKEY_ZOOM_OUT = "keyZoomOut";
+
+
+  // Stuff used for ordering the keys in the keys in the HotKeyEditorpanel:
+   public static final String [] GROUP_MESSAGES = {
                                          HOTKEY_MSG1,
                                          HOTKEY_MSG2,
                                          HOTKEY_MSG3,
                                          HOTKEY_MSG4,
                                          HOTKEY_MSG5
                                         };
+  public static final String [] GROUP_NOT_EDITABLE = new String [] {
+                                                             HOTKEY_SHOW_CHATLINE
+                                                              };
+  public static final String [] GROUP_NORMAL  = new String [] {
+      HOTKEY_ZOOM_IN, HOTKEY_ZOOM_OUT
+    };
 
-  public static final String HOTKEY_ZOOM_IN = "keyZoomIn";
-  public static final String HOTKEY_ZOOM_OUT = "keyZoomOut";
-
-
+  /** Name of the section in the MessagesBundle files */
   public static final String MESSAGE_BUNDLE_SECTION = "HotKeyDescription";
 
   public static String [] getOptinalValues(String keyName) {
@@ -63,7 +88,6 @@ public class HotKeyConf {
      Integer back=null;
      try {
         back = new Integer(Integer.parseInt(s));
-
      }
      catch (NumberFormatException ne){
         char c = s.charAt(0);
@@ -72,12 +96,6 @@ public class HotKeyConf {
      CAT.debug("returning for code: "+keyName+"\tvalue="+back.intValue());
      return back;
 
-    /*int i = Conf.getIntProperty(keyName+CODE_SUFFIX);
-    if (i>-1)
-      return new Integer(i);
-     else
-      return null;
-      */
   }
 
   protected static void setKeyCode (String keyName, Integer i) {

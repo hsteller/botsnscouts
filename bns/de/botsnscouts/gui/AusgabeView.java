@@ -377,11 +377,19 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
           ausgabe.showStats();
         }
       });
+      JMenuItem hotkeyMenu = new JMenuItem(Message.say("AusgabeView", "hotkeyMenu"));
+      hotkeyMenu.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e){
+          showEditHotKeys();
+        }
+      });
 
       JMenu optionsMenu = new JMenu (Message.say("AusgabeFrame","mOptions"));
       optionsMenu.add(new SpeedMenu());
       optionsMenu.add(new SoundMenu());
+      optionsMenu.add(hotkeyMenu);
       optionsMenu.add(stats);
+
 
 
 
@@ -393,6 +401,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       menus.add(optionsMenu);
       menus.add(new HelpMenu());
     }
+
+
+
 
     private class FileMenu extends JMenu {
       FileMenu() {
@@ -685,6 +696,26 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
     }
 
+    private JFrame hotKeyFrame;
+    private void showEditHotKeys() {
+      if (hotKeyFrame == null) {
+            hotKeyFrame = new JFrame(Message.say("AusgabeView", "hotkeyMenu"));
+            hotKeyFrame.getContentPane().add(new HotKeyEditorPanel(keyMan));
+            hotKeyFrame.addWindowListener(new WindowAdapter() {
+		public void windowClosing(WindowEvent e){
+                  hotKeyFrame.setVisible(false);
+                }
+            });
+            hotKeyFrame.pack();
+      }
+
+      if (hotKeyFrame.getState()==JFrame.ICONIFIED)
+        hotKeyFrame.setState(JFrame.NORMAL);
+
+      hotKeyFrame.toFront();
+      hotKeyFrame.setVisible(true);
+      hotKeyFrame.show();
+    }
 
 }
 

@@ -126,8 +126,8 @@ public class View extends JFrame {
     keyMan.setHotKey(k);
 
 
-     String [] preparedChatMessages = HotKeyConf.MSGS;
-      for (int i=0;i<HotKeyConf.MSGS.length;i++) {
+     String [] preparedChatMessages = HotKeyConf.GROUP_MESSAGES;
+      for (int i=0;i<HotKeyConf.GROUP_MESSAGES.length;i++) {
         CAT.debug("creating Hotkey for: "+preparedChatMessages [i]);
         ChatMessageEditor editPanel;
         String [] s = HotKeyConf.getOptinalValues(preparedChatMessages[i]);
@@ -184,43 +184,11 @@ public class View extends JFrame {
 
         // !! IBM's JDK1.3 KeyEvent is buggy/crap, but this this trial&error approach
         // of mixing keyCode/KeyChar seems to work for the beginning !!
-        this.addKeyListener(new KeyAdapter() {
-              public void keyTyped(KeyEvent e) {
-                 if (CAT.isDebugEnabled()) {
-                  CAT.debug("KEYTyped!");
-                  dumpEvent(e);
-                 }
-                  keyMan.invoke(e.getKeyChar());
+        this.addKeyListener(new AbstractHotKeyListener() {
+              public void doStuff(KeyEvent e, int hotkeyCode){
+                keyMan.invoke(hotkeyCode);
               }
-              public void keyPressed(KeyEvent e){
-                 if (CAT.isDebugEnabled()) {
-                   CAT.debug("KEYPressed!");
-                   dumpEvent(e);
-                 }
-                 keyMan.invoke(e.getKeyCode());
-              }
-              public void dumpEvent(KeyEvent e) {
-               CAT.debug(" keychar: "+e.getKeyChar()+"\nkeycode: "+e.getKeyCode()
-                          +"\nnumValue: "+Character.getNumericValue(e.getKeyChar()));
 
-                int mods = e.getModifiers();
-                String ms = e.getKeyModifiersText(mods);
-                CAT.debug("mods="+mods+"\tmodString="+ms);
-                CAT.debug("keyText="+e.getKeyText(e.getKeyCode()));
-                CAT.debug("ID="+e.getID());
-                CAT.debug("paramString="+e.paramString());
-                CAT.debug("consumed?"+e.isConsumed());
-                CAT.debug("actionKey?"+e.isActionKey());
-                KeyStroke stroke = KeyStroke.getKeyStrokeForEvent(e);
-                CAT.debug("stroke stuff: ");
-                CAT.debug("\t"+stroke.getKeyChar());
-                CAT.debug("\t"+stroke.getKeyCode());
-                CAT.debug("\tchar#:"+Character.getNumericValue(stroke.getKeyChar()));
-                CAT.debug("STROKE="+stroke.toString());
-
-
-              }
-              public void keyReleased(KeyEvent e) {}
           });
     }
 

@@ -12,10 +12,11 @@ public class HotKeyMan {
   static Category CAT = Category.getInstance(HotKeyMan.class);
 
   private HashMap hotkeys;
+  private HashMap keysByName;
 
   public HotKeyMan() {
     hotkeys = new HashMap();
-
+    keysByName = new HashMap();
   }
 
 
@@ -28,7 +29,8 @@ public class HotKeyMan {
   public synchronized void setHotKey(HotKey key) {
     CAT.debug("setting hotkey: "+key.toString());
     hotkeys.put(key.getKeyCodeI(), key);
-
+    keysByName.put(key.getName(), key);
+    HotKeyConf.setKeyCode(key.getName(), key.getKeyCodeI());
   }
 
 
@@ -55,6 +57,20 @@ public class HotKeyMan {
 
      return back;
   }
+
+  public synchronized HotKey getHotKey(int keyCode) {
+    return (HotKey) hotkeys.get(new Integer(keyCode));
+  }
+
+  public synchronized HotKey getHotKey(Integer keyCode) {
+    return (HotKey) hotkeys.get(keyCode);
+  }
+
+  public synchronized HotKey getHotKeyByName(String keyName) {
+    return (HotKey) keysByName.get(keyName);
+
+  }
+
 
   public synchronized String dump () {
     HotKey [] all = getHotKeys();

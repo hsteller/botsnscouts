@@ -36,6 +36,10 @@ public abstract class HotKeyAction{
     return optionalValues;
   }
 
+  public String getDescription(){
+    return description;
+  }
+
   protected void setDescription (String desc){
     if (this.description == null)
         this.description = desc;
