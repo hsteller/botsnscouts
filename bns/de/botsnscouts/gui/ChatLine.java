@@ -19,9 +19,21 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
         this.humanPlayer = humanPlayer;
         setLayout( new BorderLayout() );
         add( new JLabel("Chat: "), BorderLayout.WEST );
-        text = new JTextField(45);
+        text = new JTextField(45) {
+          boolean firstCall = true;
+          public void paint (Graphics g) {
+            if (firstCall) {
+              Graphics2D g2 = (Graphics2D) g;
+              g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+              super.paint(g2);
+            }
+            else
+              super.paint(g);
+          }
+        };
         text.setBorder( BorderFactory.createEmptyBorder(0, 10, 0, 10) );
         text.setOpaque( false );
+
         add( text, BorderLayout.CENTER );
         text.addActionListener( this );
         text.addKeyListener( this );
@@ -39,6 +51,7 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
     }
     private boolean autoHide;
     public boolean isAutoHide() {
+        CAT.debug("autohode");
         return autoHide;
     }
     public void setAutoHide(boolean newAutoHide) {
@@ -46,20 +59,21 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
     }
 
     public void actionPerformed(ActionEvent parm1) {
+       CAT.debug("actionPerformed");
         String s = text.getText();
         if( s != null && s.trim().length() > 0)
-            humanPlayer.sendChat( /*filter(s)*/s );
-     // filter not necessary anymore, I hope (Hendrik)
-    // -> Messages will be (URL-)encoded in communication classes
+            humanPlayer.sendChat( s );
         text.setText("");
         setVisible( false );
     }
 
     public void componentShown(ComponentEvent parm1) {
+        CAT.debug("comp shown");
         text.requestFocus();
         timer.start();
     }
     public void componentHidden(ComponentEvent parm1) {
+        CAT.debug("comp hidden");
         ausgabeview.requestFocus();
         text.setText("");
         timer.stop();
@@ -77,14 +91,5 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
     }
     public void keyReleased(KeyEvent parm1) {}
 
-    // not necessary anymore, I hope (Hendrik)
-    // -> Messages will be (URL-)encoded in communication classes
-    private String filter(String in){
-        StringBuffer out=new StringBuffer();
-        StringTokenizer st=new StringTokenizer(in, "$,");
-        while (st.hasMoreTokens())
-            out.append(st.nextToken());
-        return out.toString();
-    }
 
 }
