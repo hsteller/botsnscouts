@@ -255,13 +255,22 @@ public class Ausgabe extends Thread {
 	    try { 
 		String[] playerNames = kommClient.getNamen();
 		String[] playerColors = kommClient.getFarben();
+
+		Hashtable playerColorHash = new Hashtable(playerColors.length);
+		for (int i = 0; i < playerColors.length; i++) {
+		    if (! playerColors[i].equals("0")) {
+			playerColorHash.put(playerColors[i],new Integer(i));
+		    }
+		}
+
 		Ort boardDim = kommClient.getSpielfeldDim();
 		boardDimension = new Dimension(boardDim.x,boardDim.y);
 		flags = kommClient.getFahnenPos();
+		// !!HACK!!
+
 		Color[] robotsDefaultColor = SACanvas.robocolor;
 		Color[] robotsNewColor = new Color[8];
 
-		// !!HACK!!
 		int[] colorMap = new int[8];
 
 		int j=0;
@@ -278,9 +287,7 @@ public class Ausgabe extends Thread {
 		for (int i=0; i < playerNames.length; i++) {
 		    d("Hole Roboterstatus von: "+playerNames[i]);
 		    Roboter tempRob = kommClient.getRobStatus(playerNames[i]);
-		    // !! refecting HACK above !!!
-		    tempRob.setBotVis(colorMap[(i+playerNames.length+1)%playerNames.length]);
-		    // !! end refecting HACK above !!!
+		    tempRob.setBotVis(((Integer)playerColorHash.get(tempRob.getName())).intValue());
 		    robots.put(playerNames[i], tempRob);
 		}
 

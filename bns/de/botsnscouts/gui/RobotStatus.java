@@ -24,21 +24,21 @@ public class RobotStatus extends JPanel {
     Image robotImage[];
     Image flagge = CursorMan.getImages(CursorMan.CURSOR)[0];
     ImageIcon botcenterImage = ImageMan.getPNGImageIcon(ImageMan.ROBOCENTER);
-    Image damageImage = CursorMan.getImages(CursorMan.DAMAGE)[0];
+    ImageIcon damageImage = ImageMan.getPNGImageIcon(ImageMan.BOTDAMAGE);
     Image[] robotImages = CursorMan.getImages(CursorMan.STATUSROBOTS);
     Roboter robot;
 
     public RobotStatus () {
-	this(Roboter.getNewInstance("TestRob"),null);
+	this(Roboter.getNewInstance("TestRob"),null,null);
     }
 
-    public RobotStatus (Roboter r, MouseListener botCenter) {
+    public RobotStatus (Roboter r, MouseListener botCenter, MouseListener flagCenter) {
 	robot = r;
 	name = new JLabel(r.getName());
 	flag = new JLabel(""+r.getNaechsteFlagge(),new ImageIcon(flagge),JLabel.LEFT);
 	lifes = new JLabel(""+r.getLeben(),new ImageIcon(robotImages[r.getBotVis()]),JLabel.RIGHT);
 	d("Visualisierung :"+r.getBotVis()+ " an "+r.getName()+" zugeteilt.");
-	damage = new JLabel(""+r.getSchaden(),new ImageIcon(damageImage),JLabel.LEFT);
+	damage = new JLabel(""+r.getSchaden(),damageImage,JLabel.LEFT);
 	track = new JLabel("F",botcenterImage,JLabel.RIGHT);
 	Font labelFont = new Font("Dialog",Font.PLAIN,8);
 	Font nameFont = new Font("Dialog",Font.BOLD,10);
@@ -62,7 +62,11 @@ public class RobotStatus extends JPanel {
 
 	track.setName(r.getName());
 
+	track.setToolTipText(Message.say("RobotStatus","centerRobToolTip",r.getName()));
+	flag.setToolTipText(Message.say("RobotStatus","centerFlag",flag.getText()));
+
 	track.addMouseListener(botCenter);
+	flag.addMouseListener(flagCenter);
 
 	roboInfo.add(flag);
 	roboInfo.add(lifes);

@@ -42,11 +42,18 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 	// create status panel
 	for (int i=0; i< robots.length; i++) {
-	    RobotStatus r = new RobotStatus(robots[i], new MouseAdapter(){
-		    public void mouseClicked(MouseEvent me) {
-			ausgabe.trackRob(((JLabel)me.getSource()).getName());
-		    }
-		});
+	    RobotStatus r = new RobotStatus(robots[i], 
+					    new MouseAdapter(){
+						    public void mouseClicked(MouseEvent me) {
+							ausgabe.trackRob(((JLabel)me.getSource()).getName());
+						    }
+						}, 
+					    new MouseAdapter(){
+						    public void mouseClicked(MouseEvent me) {
+							ausgabe.scrollFlag(Integer.parseInt(((JLabel)me.getSource()).getText()));
+						    }
+						}
+					    );
 	    robotsStatusContainer.add(r);
 	    robotStatus.put(robots[i].getName(),r);
 
@@ -123,15 +130,15 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 	// soll ich überhaupt scrollen?
 	// in X-Richtung
-	if ((x < spielFeldView.getViewPosition().x) || 
-	    x > (spielFeldView.getViewPosition().x+sz.width)) {
+	if ((x < ( (spielFeldView.getViewPosition().x)+10 ) ) || 
+	    x > ( (spielFeldView.getViewPosition().x+sz.width)-10 )) {
 	    x1 = Math.min( x1, (spielFeld.getWidth() - sz.width) );
 	}
 	else x1 = spielFeldView.getViewPosition().x;
 
 	// in Y-Richtung
-	if ((y < spielFeldView.getViewPosition().y) || 
-	    y > (spielFeldView.getViewPosition().y+sz.height)) {
+	if ((y < ( spielFeldView.getViewPosition().y +10) ) || 
+	    y > ( (spielFeldView.getViewPosition().y+sz.height)-10 )) {
 	    y1 = Math.min( y1, (spielFeld.getHeight() - sz.height) );
 	}
 	else y1 = spielFeldView.getViewPosition().y;

@@ -26,7 +26,8 @@ public class ImageMan {
     // PNG-IDs
     public final static int 
 	ROBOCENTER = 0,
-	REGLOCK =1;
+	REGLOCK =1,
+	BOTDAMAGE =2;
 
 
     static Class c = de.botsnscouts.BotsNScouts.class;
@@ -43,7 +44,8 @@ public class ImageMan {
 	
     public final static String[] PngImages = {
 	"images/robocenter.png",
-	"images/lock.png"
+	"images/lock.png",
+	"images/boom.png"
     };
 
     public static Image[] PNGImages = new Image[PngImages.length];
