@@ -1,6 +1,6 @@
 package de.botsnscouts.gui;
 
-import de.botsnscouts.*;
+import de.botsnscouts.util.*;
 
 import java.awt.*;
 import javax.swing.*;
@@ -30,7 +30,7 @@ public class Splash{
 	int x = (screen.width-width)/2;
 	int y = (screen.height-height)/2;
 	splash.setBounds(x,y,width,height);
-	bildLabel = new JLabel(new ImageIcon("bnslogo.jpg"));
+	bildLabel = new JLabel(ImageMan.getIcon("bnslogo.jpg"));
 	bildLabel.setBorder( new EtchedBorder(8));
 	textLabel = new JLabel("  "+s);
 	textLabel.setBorder( new EtchedBorder(8));
