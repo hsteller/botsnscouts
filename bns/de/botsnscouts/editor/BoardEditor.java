@@ -34,6 +34,7 @@ import javax.swing.*;
 import javax.swing.plaf.metal.*;
 
 import de.botsnscouts.BotsNScouts;
+import de.botsnscouts.autobot.DistanceCalculator;
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.util.*;
@@ -50,7 +51,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 
     public static final Category CAT = Category.getInstance( BoardEditor.class );
 
-    protected BoardPanel sac = null;
+    protected EditorBoardView boardView = null;
     protected ButtonBar dp=null;
     protected JScrollPane sp=null;
     protected JScrollPane sp2=null;
@@ -72,7 +73,6 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
     private int x=800,y=600,x1=500,y1=100;
 
     public BoardEditor(){
-
 	loadImg();
 	initSpF();
 	BorderLayout lay=new BorderLayout();
@@ -84,7 +84,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 	Dimension dim=tk.getScreenSize();
 
 	sp=new JScrollPane();
-	sp.getViewport().setView(sac);
+	sp.getViewport().setView(boardView);
  	getContentPane().add(BorderLayout.CENTER,sp);
 
 	felder=new ButtonGroup();
@@ -160,15 +160,9 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 	    System.err.println("Oups!"+ex);
 	    return false;
 	}
-	sac=new BoardPanel(board,this);
+	boardView=new EditorBoardView(board,this);
 	return true;
     }
-
-//    public void mouseEntered(MouseEvent e){}
-//    public void mouseExited(MouseEvent e){}
-//    public void mousePressed(MouseEvent e){}
-//    public void mouseReleased(MouseEvent e){}
-//    public void mouseClicked(MouseEvent e){}
 
     public void actionPerformed(ActionEvent e){
 	String a=e.getActionCommand();
@@ -182,7 +176,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 
     public void windowDeactivated(WindowEvent e) {}
     public void windowOpened(WindowEvent e)      {}
-    public void windowClosing(WindowEvent e) //{}
+    public void windowClosing(WindowEvent e)
     {
 	this.dispose();
 	System.exit(0);
@@ -228,8 +222,18 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
     }
 
     BufferedImage getBufferedImage() {
-        return sac.getBoardImage();
+        return boardView.getBoardImage();
     }
 
+    DistanceCalculator calc;
+    public void setFlag(int x, int y) {
+        if (dp.advancedFeaturesEnabled()){
+            CAT.debug("setting flag to "+x+", "+y);
+            board.setFlags(new Location[] { new Location(x, y)} );
+            calc=DistanceCalculator.getInstance(board);
+            calc.calculateDistances();
+            boardView.setCalc(calc);
+            repaint();
+        }
+    }
 }//end class BoardEditor
-

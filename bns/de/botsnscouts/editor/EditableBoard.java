@@ -29,9 +29,9 @@ import de.botsnscouts.board.*;
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.FormatException;
 
-class EditableBoard extends de.botsnscouts.board.SimBoard {
+class EditableBoard extends SimBoard {
     EditableBoard(int x, int y, String kacheln, Location[] flaggen) throws FormatException, FlagException {
-        super(x, y, kacheln, flaggen, null);
+        super(x, y, kacheln, flaggen);
     }
 
     void setNorthPusher( int x, int y, int phases ) {
@@ -86,4 +86,9 @@ class EditableBoard extends de.botsnscouts.board.SimBoard {
     void setCrusher( int x, int y, int phases ) {
         setFloor( x, y, getFloor(x,y).getWithCrusher( phases ) );
     }
+
+    public void setFlags(Location[] flags) {
+        this.flags=flags;
+    }
+
 }

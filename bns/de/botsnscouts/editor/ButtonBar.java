@@ -49,6 +49,8 @@ class ButtonBar extends JPanel implements ActionListener{
     private JButton feldClear=null;
     private JButton exit=null;
     private JButton export=null;
+    private JCheckBoxMenuItem advanced=null;
+
     protected BoardEditor editor=null;
     JFileChooser chooser;
     FileFilter rraFilter = new FileFilter() {
@@ -101,12 +103,13 @@ class ButtonBar extends JPanel implements ActionListener{
 	feldClear.setActionCommand("Clear");
 	tb.add(feldClear);
 
-
 	exit= new JButton(Message.say("BoardEditor","bBeenden"));
 	exit.addActionListener(this);
 	exit.setActionCommand("Beenden");
 	tb.add(exit);
+
 	add( tb, BorderLayout.NORTH );
+
 	JMenuBar jb = new JMenuBar();
 	JMenu jm = new JMenu("File");
 	JMenuItem mi;
@@ -119,6 +122,12 @@ class ButtonBar extends JPanel implements ActionListener{
 	mi.setActionCommand("Speichern");
 	jm.add( mi );
 	mi = new JMenuItem(Message.say("BoardEditor","bExport"));
+        jb.add( jm );
+
+        advanced = new JCheckBoxMenuItem(Message.say("BoardEditor","bAdv"));
+        JMenu jm2 = new JMenu(Message.say("BoardEditor", "mOptions"));
+        jm2.add(advanced);
+        jb.add(jm2);
 
         ActionListener exportListener = new ActionListener() {
             public void actionPerformed( ActionEvent ae ) {
@@ -139,12 +148,14 @@ class ButtonBar extends JPanel implements ActionListener{
 	mi.addActionListener(this);
 	mi.setActionCommand("Beenden");
 	jm.add( mi );
-	jb.add( jm );
 	editor.setJMenuBar( jb );
 	makeChooser();
 
     }
 
+    public boolean advancedFeaturesEnabled() {
+        return advanced.getModel().isSelected();
+    }
 
     public void doExport() {
         BufferedImage bi = editor.getBufferedImage();
@@ -247,7 +258,7 @@ class ButtonBar extends JPanel implements ActionListener{
 	else if(e.getActionCommand().compareTo("Clear") == 0){
 	    CAT.debug("Clearing field");
 	    editor.initSpF();
-	    editor.sp.getViewport().setView(editor.sac);
+	    editor.sp.getViewport().setView(editor.boardView);
 	}
 	else if(e.getActionCommand().compareTo("Laden") == 0){
 	    chooser.rescanCurrentDirectory();
@@ -280,11 +291,11 @@ class ButtonBar extends JPanel implements ActionListener{
 		    editor.board=new EditableBoard(12,12,editor.spfString,null);
 		    CAT.debug( "Board erzeugt");
 
-		    editor.sp.remove(editor.sac);
+		    editor.sp.remove(editor.boardView);
 		    CAT.debug( "sac removed");
-		    editor.sac=new BoardPanel(editor.board,editor);
+		    editor.boardView=new EditorBoardView(editor.board,editor);
 		    CAT.debug( "sac neu erzeugt");
-		    editor.sp.getViewport().setView(editor.sac);
+		    editor.sp.getViewport().setView(editor.boardView);
 
 		    CAT.debug( "sac added");
 		}catch(FormatException ex){
@@ -300,10 +311,12 @@ class ButtonBar extends JPanel implements ActionListener{
 		   System.err.println(Message.say("BoardEditor","eDatNotEx")+ex);
 		   }*/
 	    }
-
 	    //new LadenDialog(editor,Message.say("BoardEditor","mKachelSave"),true);
+	} else if (e.getActionCommand().compareTo("Flag") == 0) {
 
-	}
+        } else {
+            CAT.error("unhandled ActionCommand "+e.getActionCommand());
+        }
     }
 
 }//ende class ButtonBar

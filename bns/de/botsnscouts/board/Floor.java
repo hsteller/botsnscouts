@@ -75,7 +75,7 @@ public class Floor implements FloorConstants {
         if (w == null) {
             w = Floor.parseFloor(floorString);
             if (!floorString.equals(w.toString())) {
-                CAT.warn("assertion failed: " + floorString + " == " + w.toString());
+                CAT.warn("getFloor: Assertion failed: " + floorString + " == " + w.toString());
             }
             cache.put(floorString, w);
         }

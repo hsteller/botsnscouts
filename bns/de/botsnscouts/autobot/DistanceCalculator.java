@@ -28,6 +28,7 @@ package de.botsnscouts.autobot;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.Location;
+import de.botsnscouts.util.Directions;
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.board.Board;
@@ -36,12 +37,16 @@ import de.botsnscouts.board.Floor;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Category;
+
 /**
  *  This class can also calculate the distance a robot is from
  *  the next flag. Highly useful for the autobots and the wisenheimer.
  *  Id: $Id$
  */
 public class DistanceCalculator {
+    static final Category CAT=Category.getInstance(DistanceCalculator.class);
+
     private int[][][] distances;
     private Board board;
 
@@ -74,7 +79,6 @@ public class DistanceCalculator {
         return distance;
     }
 
-
     /**
      *  Gives the distance to the next flag, tahes into account neccesary turns.
      */
@@ -91,7 +95,7 @@ public class DistanceCalculator {
             return 0;
         } else {
             switch (facing) {
-                case 0:
+                case Directions.NORTH:
                     if ((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y))) {
                         return distances[m][x][y];
                     } else {
@@ -103,7 +107,7 @@ public class DistanceCalculator {
                         }
                     }
 
-                case 1:
+                case Directions.EAST:
                     if ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) {
                         return distances[m][x][y];
                     } else {
@@ -115,7 +119,7 @@ public class DistanceCalculator {
                         }
                     }
 
-                case 2:
+                case Directions.SOUTH:
                     if ((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y))) {
                         return distances[m][x][y];
                     } else {
@@ -127,7 +131,7 @@ public class DistanceCalculator {
                         }
                     }
 
-                case 3:
+                case Directions.WEST:
                     if ((distances[m][x - 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) {
                         return distances[m][x][y];
                     } else {
@@ -141,6 +145,7 @@ public class DistanceCalculator {
 
             }
         }
+        CAT.error("reached unreachable!");
         return 10000;
         // never reached
     }
@@ -148,7 +153,7 @@ public class DistanceCalculator {
     /**
      * Initializes the distances-Array.
      */
-    private void calculateDistances() {
+    public void calculateDistances() {
         Location[] flags = board.getFlags();
         distances = new int[flags.length][][];
 
@@ -163,7 +168,7 @@ public class DistanceCalculator {
         }
         for (int m = 0; m < flags.length; ++m) {
             distances[m][flags[m].x][flags[m].y] = 0;
-            calculateDistancesForField(distances, flags[m].x, flags[m].y, flags[m].x, flags[m].y, m);
+            calculateDistancesForField(distances[m], flags[m].x, flags[m].y, flags[m].x, flags[m].y);
         }
     }
 
@@ -183,71 +188,69 @@ public class DistanceCalculator {
         return board.floor(x, y);
     }
 
-    private void calculateDistancesForField(int entftab[][][], int u, int v, int x, int y, int m) {
-        int max = 9999;
-
+    private void calculateDistancesForField(int enftab[][], int u, int v, int x, int y) {
         if ((u == x) && (v == y)) {
             if ((!hasNorthWall(x, y)) && !floor(x, y + 1).isPit()) {
-                entftab[m][x][y + 1] = entftab[m][x][y] + 1;
-                calculateDistancesForField(entftab, x, y, x, y + 1, m);
+                enftab[x][y + 1] = enftab[x][y] + 1;
+                calculateDistancesForField(enftab, x, y, x, y + 1);
             }
-            if ((!hasEastWall(x, y)) && !floor(x - 1, y).isPit()) {
-                entftab[m][x - 1][y] = entftab[m][x][y] + 1;
-                calculateDistancesForField(entftab, x, y, x - 1, y, m);
+            if ((!hasWestWall(x, y)) && !floor(x - 1, y).isPit()) {
+                enftab[x - 1][y] = enftab[x][y] + 1;
+                calculateDistancesForField(enftab, x, y, x - 1, y);
             }
             if ((!hasEastWall(x, y)) && !floor(x + 1, y).isPit()) {
-                entftab[m][x + 1][y] = entftab[m][x][y] + 1;
-                calculateDistancesForField(entftab, x, y, x + 1, y, m);
+                enftab[x + 1][y] = enftab[x][y] + 1;
+                calculateDistancesForField(enftab, x, y, x + 1, y);
             }
             if (!(hasSouthWall(x, y)) && !floor(x, y - 1).isPit()) {
-                entftab[m][x][y - 1] = entftab[m][x][y] + 1;
-                calculateDistancesForField(entftab, x, y, x, y - 1, m);
+                enftab[x][y - 1] = enftab[x][y] + 1;
+                calculateDistancesForField(enftab, x, y, x, y - 1);
             }
         }
 
         if ((u == x) && (v != y)) {
             if (!hasNorthWall(x, y) && !floor(x, y + 1).isPit() &&
-                    (entftab[m][x][y + 1] > entftab[m][x][y] + 1)) {
-                entftab[m][x][y + 1] = entftab[m][x][y] + 1;
-                calculateDistancesForField(entftab, x, y, x, y + 1, m);
+                    (enftab[x][y + 1] > enftab[x][y] + 1)) {
+                enftab[x][y + 1] = enftab[x][y] + 1;
+                calculateDistancesForField(enftab, x, y, x, y + 1);
             }
             if (!hasWestWall(x, y) && !floor(x - 1, y).isPit() &&
-                    (entftab[m][x - 1][y] > entftab[m][x][y] + 2)) {
-                entftab[m][x - 1][y] = entftab[m][x][y] + 2;
-                calculateDistancesForField(entftab, x, y, x - 1, y, m);
+                    (enftab[x - 1][y] > enftab[x][y] + 2)) {
+                enftab[x - 1][y] = enftab[x][y] + 2;
+                calculateDistancesForField(enftab, x, y, x - 1, y);
             }
-            if (!!hasEastWall(x, y) && !floor(x + 1, y).isPit() &&
-                    (entftab[m][x + 1][y] > entftab[m][x][y] + 2)) {
-                entftab[m][x + 1][y] = entftab[m][x][y] + 2;
-                calculateDistancesForField(entftab, x, y, x + 1, y, m);
+            if (!hasEastWall(x, y) && !floor(x + 1, y).isPit() &&
+                    (enftab[x + 1][y] > enftab[x][y] + 2)) {
+                enftab[x + 1][y] = enftab[x][y] + 2;
+                calculateDistancesForField(enftab, x, y, x + 1, y);
             }
             if (!hasSouthWall(x, y) && !floor(x, y - 1).isPit() &&
-                    (entftab[m][x][y - 1] > entftab[m][x][y] + 1)) {
-                entftab[m][x][y - 1] = entftab[m][x][y] + 1;
-                calculateDistancesForField(entftab, x, y, x, y - 1, m);
+                    (enftab[x][y - 1] > enftab[x][y] + 1)) {
+                enftab[x][y - 1] = enftab[x][y] + 1;
+                calculateDistancesForField(enftab, x, y, x, y - 1);
             }
         }
 
         if ((u != x) && (v == y)) {
             if (!hasNorthWall(x, y) && !floor(x, y + 1).isPit() &&
-                    (entftab[m][x][y + 1] > entftab[m][x][y] + 2)) {
-                entftab[m][x][y + 1] = entftab[m][x][y] + 2;
-                calculateDistancesForField(entftab, x, y, x, y + 1, m);
+                    (enftab[x][y + 1] > enftab[x][y] + 2)) {
+                enftab[x][y + 1] = enftab[x][y] + 2;
+                calculateDistancesForField(enftab, x, y, x, y + 1);
             }
             if (!hasWestWall(x, y) && !floor(x - 1, y).isPit() &&
-                    (entftab[m][x - 1][y] > entftab[m][x][y] + 1)) {
-                entftab[m][x - 1][y] = entftab[m][x][y] + 1;
-                calculateDistancesForField(entftab, x, y, x - 1, y, m);
+                    (enftab[x - 1][y] > enftab[x][y] + 1)) {
+                enftab[x - 1][y] = enftab[x][y] + 1;
+                calculateDistancesForField(enftab, x, y, x - 1, y);
             }
             if (!hasEastWall(x, y) && !floor(x + 1, y).isPit() &&
-                    (entftab[m][x + 1][y] > entftab[m][x][y] + 1)) {
-                entftab[m][x + 1][y] = entftab[m][x][y] + 1;
-                calculateDistancesForField(entftab, x, y, x + 1, y, m);
+                    (enftab[x + 1][y] > enftab[x][y] + 1)) {
+                enftab[x + 1][y] = enftab[x][y] + 1;
+                calculateDistancesForField(enftab, x, y, x + 1, y);
             }
             if (!hasSouthWall(x, y) && !floor(x, y - 1).isPit() &&
-                    (entftab[m][x][y - 1] > entftab[m][x][y] + 2)) {
-                entftab[m][x][y - 1] = entftab[m][x][y] + 2;
-                calculateDistancesForField(entftab, x, y, x, y - 1, m);
+                    (enftab[x][y - 1] > enftab[x][y] + 2)) {
+                enftab[x][y - 1] = enftab[x][y] + 2;
+                calculateDistancesForField(enftab, x, y, x, y - 1);
             }
         }
     }

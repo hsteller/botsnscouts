@@ -84,7 +84,7 @@ public class BoardView extends JComponent {
     private JScrollPane myScrollPane;
 
    /** size (length and width) of one little field in pixels*/
-    private static final int FELDSIZE = 64;
+    protected static final int FELDSIZE = 64;
 
     /**Number of single steps a laser animation is drawn.*/
     private static final int FULL_LENGTH_INT=30;
@@ -160,7 +160,7 @@ public class BoardView extends JComponent {
     private double dScale = 1.0;
     boolean rescaled = true;
 
-    double scaledFeldSize; // FELDSIZE * scale
+    protected double scaledFeldSize; // FELDSIZE * scale
 
     /** position to highlight*/
     Location highlightPos = new Location(0,0);
@@ -674,7 +674,7 @@ public class BoardView extends JComponent {
     }
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    private void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty) {
+    protected void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty) {
 	Floor floor = sf.floor(xpos, ypos);
 	switch ( floor.getType() ){
 
