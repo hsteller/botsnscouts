@@ -153,6 +153,10 @@ public class Ausgabe extends BNSThread {
                     // paint animation and play sounds
 		    ausgabeView.showRobLaser(r1, r2);
 		}
+                else if (msgId.equals(de.botsnscouts.comm.MessageID.CHAT)){
+                   SoundMan.playSound(SoundMan.MESSAGE);
+                }
+
 
                 else if (msgId.equals(de.botsnscouts.comm.MessageID.BOT_IN_PIT)) {// robot fell into a pit
                     // play the sound for "robot fell into pit"
