@@ -82,6 +82,10 @@ public class Ausgabe extends BNSThread {
     // no comment here ;)
     //LaserHack laserHack = new LaserHack();
 
+    /** Turns animation of robot movement on or off;
+     *  visibility is proteced (not private), because BoardView needs to know about that, too.
+     */
+    protected static boolean enableRobMoveAnimation = false;
 
     public Ausgabe() {
 	this("localhost",8077,false);
@@ -531,17 +535,11 @@ public class Ausgabe extends BNSThread {
   }
 
 
-  private int updateDelay=400;
+
   private void updateBoardView() {
       // telling the display to update itself with the new robot values
       ausgabeView.showUpdatedRobots(getRoboterArray());
 
-      try { // wait a little for the display to update
-          Thread.sleep(updateDelay);
-      }
-      catch (Exception e) {
-          CAT.error(e.getMessage(), e);
-      }
   }
 
 
@@ -837,6 +835,15 @@ public class Ausgabe extends BNSThread {
         });
 
      }
+     else if (msgId.equals(MessageID.BOT_MOVE)) {
+      sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
+              public void invoke(){
+                if (enableRobMoveAnimation)
+                  comMsgHandleRobotMove(kommAntwort);
+              }
+        });
+
+     }
      else { // all the stuff that starts with "mAusw" (==MessageId.AUSWERTUNG)
        sequenzer.addAndDoAction(new UpdateActionAdapter(kommAntwort.messageSequenceNumber){
               public void invoke(){
@@ -1081,11 +1088,11 @@ public class Ausgabe extends BNSThread {
   }
 
 
-  private Object lock = new Object();
-  private int delay = 300;
-  private boolean updating = false;
-  private Vector history = new Vector();
-  private boolean inAction = false;
+  //private Object lock = new Object();
+  //private int delay = 300;
+  //private boolean updating = false;
+  //private Vector history = new Vector();
+  //private boolean inAction = false;
 
   private void comMsgHandleActionStart(ClientAntwort ca) {
 
@@ -1126,7 +1133,26 @@ public class Ausgabe extends BNSThread {
      */
   }
 
+    private void comMsgHandleRobotMove(ClientAntwort kommAntwort) {
 
+      String robname = kommAntwort.namen[1];
+      Bot r = (Bot) robots.get(robname);
+      String direction = kommAntwort.namen[2];
+      if (CAT.isDebugEnabled()){
+        CAT.debug("Got robot move message for robot \""+robname+"\"");
+        CAT.debug("Direction: "+direction);
+      }
+      try {
+        int directionInt = Integer.parseInt(direction);
+        ausgabeView.animateRobMove(r, directionInt);
+      }
+      catch (NumberFormatException nfe){
+        CAT.error("Failed to convert direction for robot \""
+                  +robname+"\"from String to int!");
+        CAT.error("String was: \""+direction+"\"");
+
+      }
+  }
 
  // private int lastMsgProcessed = -1;
  // private int nextMsg=0;

@@ -168,6 +168,21 @@ public class BoardView extends JComponent {
     ClickListener myClickListener;
 
 
+     /** Number of pixels a robot will be moved in a single animation step.
+     *  Has to be between 1 and FELDSIZE.
+     *  => Number of steps a one-field-move is drawn = FELDSIZE/MOVE_ROB_ANIMATION_OFFSET
+     *
+     *   @todo I guess that this must not be final and needs to be scaled so that it works
+     *    with different zoomlevels
+     */
+    private static final int MOVE_ROB_ANIMATION_OFFSET=8;
+    /** Amount of time (in ms) we wait after a single animation step
+     *  of (pixel-)length MOVE_ROB_ANIMATION_OFFSET.
+     */
+    private static final int MOVE_ROB_ANIMATION_DELAY=5;
+
+
+
     public double getScale() {
 	return dScale;
     }
@@ -331,23 +346,211 @@ public class BoardView extends JComponent {
     }
 
 
+    private HashMap internalPositionHash = new java.util.HashMap();
 
+    private static final Location pit = new Location(0,0);
     protected void ersetzeRobos(Bot[] robos_neu){
-         //allDone = false;
-         //synchronized (lock) {
-            if (!gotColors) // jetzt bekomme ich zum erstenmal die Bot
-                setRobColors(robos_neu);
+
+	if (!gotColors) { // jetzt bekomme ich zum erstenmal die Bot
+	    setRobColors(robos_neu);
+	    robos=robos_neu;
+	}
+	// we dont want to overwrite the robots positions, because they
+	// have been updated in animateRobMove() before;
+	// animateRonMove() gets informed earlier, so overwriting the positions
+	// would reset the robot back to a position he has already left
+	else {
+          if (Ausgabe.enableRobMoveAnimation) {
+	    for (int i=0;i<robos.length;i++) // saving my internal robot positions
+		internalPositionHash.put(robos[i].getName(), robos[i].getPos());
+	    robos=robos_neu; // updating all robots
+
+            // replacing robot positions - if it was not destroyed -
+	    // with the positions we saved above
+
+
+	    for (int i=0;i<robos.length;i++) {
+		Bot r = robos[i];
+		Location tmp = (Location) internalPositionHash.get(r.getName());
+
+		if (!(r.getPos().equals(pit) || r.getDamage()>=10 || tmp.equals(pit))){
+		                                                     // ^^^^^^^^^^^^^
+                    		                                     // otherwise we would not show
+ 		                                                     // the destroyed robot ever again
+		                                                     // as we would ignore him if he
+		                                                     // is placed on the board again
+		    if (CAT.isDebugEnabled()){
+			CAT.debug("ignoring server position of robot "+r.getName()
+				  +" as my calculated position will be more accurate");
+		    }
+		    // use the internal kept position of our robot unless it is not
+		    // destroyed
+		    r.setPos(tmp);
+		}
+		else {
+		    if (CAT.isDebugEnabled())
+			CAT.debug ("using server position of robot "+r.getName());
+		}
+
+	    }
+          }
+          else { // no animation
             robos=robos_neu;
-            repaint();
-        //    allDone = true;
-        //    lock.notifyAll();
-       // }
+          }
+	}
+
+	repaint();
+
 
     }
 
 
     /////////////////////////////////////////////////////////////////////
 
+    private void moveRobNorth(Bot internal, int robocount){
+      if (CAT.isDebugEnabled())
+           CAT.debug("Move direction: NORTH");
+      if (MOVE_ROB_ANIMATION_DELAY>0){
+         synchronized (this){
+           for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
+              // paintRobos(this.getGraphics(), internal);
+              paintRobot((Graphics2D)this.getGraphics(), internal, robocount, 0,offset, true);
+                try {wait (MOVE_ROB_ANIMATION_DELAY);}
+               catch (InterruptedException ie){CAT.warn ("SACanvas.paint: wait int moveRobNorth interrupted");}
+           }
+         }
+       }
+       else {// paint without delay
+          for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
+             //paintRobos(this.getGraphics(), internal);
+            paintRobot((Graphics2D)this.getGraphics(), internal, robocount,0, offset,true);
+          }
+       }
+    }
+    private void moveRobSouth(Bot internal, int robocount){
+      if (CAT.isDebugEnabled())
+         CAT.debug("Move direction: SOUTH");
+      if (MOVE_ROB_ANIMATION_DELAY>0){
+         synchronized (this){
+            for (int offset=0;offset<=64;offset+=MOVE_ROB_ANIMATION_OFFSET){
+                // paintRobos(this.getGraphics(), internal);
+                paintRobot((Graphics2D)this.getGraphics(), internal, robocount, 0,offset, true);
+                  try {wait (MOVE_ROB_ANIMATION_DELAY);}
+                  catch (InterruptedException ie){CAT.warn ("SACanvas.paint: wait in moveRobSouthinterrupted");}
+            }
+         }
+      }
+      else {// paint without delay
+        for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
+         //  paintRobos(this.getGraphics(), internal);
+          paintRobot((Graphics2D)this.getGraphics(), internal, robocount,0,offset, true);
+        }
+      }
+    }
+     private void moveRobEast(Bot internal, int robocount){
+      if (CAT.isDebugEnabled())
+                CAT.debug("Move direction: EAST");
+      if (MOVE_ROB_ANIMATION_DELAY>0){
+        synchronized (this){
+           for (int offset=0;offset<=64;offset+=MOVE_ROB_ANIMATION_OFFSET){
+         //     paintRobos(this.getGraphics(), internal);
+              paintRobot((Graphics2D)this.getGraphics(), internal, robocount,offset,0, true);
+                try {wait (MOVE_ROB_ANIMATION_DELAY);}
+                catch (InterruptedException ie){CAT.warn ("SACanvas.paint: wait in moveRobSouthinterrupted");}
+           }
+        }
+      }
+      else {// paint without delay
+        for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
+        //  paintRobos(this.getGraphics(), internal);
+          paintRobot((Graphics2D)this.getGraphics(), internal, robocount,offset,0, true);
+        }
+      }
+    }
+    private void moveRobWest(Bot internal, int robocount){
+      if (CAT.isDebugEnabled())
+         CAT.debug("Move direction: WEST");
+      if (MOVE_ROB_ANIMATION_DELAY>0){
+         synchronized (this){
+           for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
+         //      paintRobos(this.getGraphics(), internal);
+              paintRobot((Graphics2D)this.getGraphics(), internal, robocount,offset,0, true);
+                try {wait (MOVE_ROB_ANIMATION_DELAY);}
+                catch (InterruptedException ie){CAT.warn ("SACanvas.paint: wait int moveRobNorth interrupted");}
+           }
+         }
+      }
+      else { // paint without delay
+        for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
+    //     paintRobos(this.getGraphics(), internal);
+          paintRobot((Graphics2D)this.getGraphics(), internal, robocount,offset,0, true);
+        }
+      }
+    }
+
+
+      protected void animateRobMove(Bot rob, int direction){
+        // important: according to the code on SpielfeldSim we do not get
+        //            the updated robot position;
+        //            the updated position will be the endposition of the total move,
+        //            as ersetzeRobos() will be called when the robot has reached its
+        //            final position
+        //            THIS METHOD will be called for each single step of a move
+        //             (i.e. three times for a "Move 3 forward")
+        //            So we have to update our internal position of the robot in
+        //            between to show an animation that makes sense
+
+        String name = rob.getName();
+        Bot internal = null;
+        int robocount=-1;
+        for (int i=0;i<robos.length;i++){
+          if (robos[i].getName().equals(name)){
+            internal = robos[i];
+            robocount = i;
+            break;
+          }
+        }
+        int oldX = internal.getX();
+        int oldY = internal.getY();
+
+       // paint the move animation  and update the position in my internal robot array
+        switch (direction){
+          case NORTH: {
+              if (oldY<sf.getSizeY()){
+                moveRobNorth(internal, robocount);
+                internal.setPos(oldX, oldY+1);
+              }
+              return;
+          }
+          case EAST: {
+            if (oldX<sf.getSizeX()){
+              moveRobEast(internal, robocount);
+              internal.setPos(oldX+1, oldY);
+            }
+            return;
+          }
+          case WEST:{
+            if (oldX>1) {
+              moveRobWest(internal, robocount);
+              internal.setPos(oldX-1, oldY);
+            }
+            return;
+          }
+          case SOUTH:{
+            if (oldY>1){
+              moveRobSouth(internal, robocount);
+              internal.setPos(oldX, oldY-1);
+            }
+            return;
+          }
+          default:{
+            // this must not happen,
+            // otherwise the whole gui might be useless as it keeps probably
+            // a wrong position for one robot
+            CAT.fatal("Got illgeal direction for animating robot");
+          }
+        }
+    }
 
 
     /**
@@ -377,9 +580,7 @@ public class BoardView extends JComponent {
 	  catch (InterruptedException ie){
 	    CAT.error("BoardView.paint: wait interrupted");
 	  }
-        //}
 
-        //synchronized (lock) {
 
           for(int i=1; i<=FULL_LENGTH_INT; i++) {
               int tmp_laenge=(int) ((((double)i)/FULL_LENGTH_DOUBLE)*laenge);
@@ -411,8 +612,7 @@ public class BoardView extends JComponent {
               }
           }
           repaint();
-         // allDone = true;
-         // lock.notifyAll();
+
 
 
 
@@ -493,7 +693,7 @@ public class BoardView extends JComponent {
 
 
     /**
-       Berechnet die Laenge eines Lasers (in Feldern) zwischen zwei Robotern.
+       Berechnet die Laenge eines Lasers (in Feldern) zwischen zwei Botn.
        Bsp: Schiesst ein Bot an Position (2,2) auf einen Bot an
        Position (5,2), so wird 3 zurueckgegeben
        (=> multipliziert man den Rueckgabewert mit 64, so erhaelt man die
@@ -534,7 +734,7 @@ public class BoardView extends JComponent {
 	return laenge;
     }
     private void paintActiveBordLaser (Graphics g, Color c,int actualLength) {
-       // allDone = false;
+
 	Graphics2D g2d = (Graphics2D) g;
 	AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER/*, 0.5f*/);
 	g2d.setComposite( ac );
@@ -591,7 +791,7 @@ public class BoardView extends JComponent {
     /**
        @param laserPos Die Koordinaten des schiessenden BordLasers
        @param laserDir Die Ausrichtung des Lasers
-       @param targetRob Die Koordinaten des getroffenen Roboters
+       @param targetRob Die Koordinaten des getroffenen Bots
        @param surrounding Das ScrollPane in dem der Canvas dargestellt wird
     */
     protected void doBordLaser(Location laserPos, int laserDir,int strength, Location targetRob,  JViewport surrounding) {
@@ -687,102 +887,107 @@ public class BoardView extends JComponent {
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     protected void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty) {
+       paintFeldBoden(g, xpos, ypos,  actx, acty, 64, 64);
+    }
+
+    protected void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty,
+				  int width, int height) {
         Floor floor = sf.floor(xpos, ypos);
 	switch ( floor.getType() ){
 
 	case (Board.FL_PIT):
-	    g.drawImage(diverseCrop[3],actx,acty,64,64,this);
+	    g.drawImage(diverseCrop[3],actx,acty,width,height,this);
 	    break;
 	case (Board.FL_NORMAL):
-		g.drawImage(diverseCrop[24+((xpos*ypos*19)%17)%4],actx,acty,64,64,this);
+		g.drawImage(diverseCrop[24+((xpos*ypos*19)%17)%4],actx,acty,width,height,this);
 	    break;
 	case (Board.FL_ROTGEAR):
 	    if (floor.getInfo()==0)
-		g.drawImage(diverseCrop[2],actx,acty,64,64,this);
+		g.drawImage(diverseCrop[2],actx,acty,width,height, this);
 	    else
-		g.drawImage(diverseCrop[1],actx,acty,64,64,this);
+		g.drawImage(diverseCrop[1],actx,acty,width,height,this);
 	    break;
 	case (Board.FL_REPAIR):
 	    if (floor.getInfo()==1)
-		g.drawImage(diverseCrop[4],actx,acty,64,64,this);
+		g.drawImage(diverseCrop[4],actx,acty,width,height,this);
 	    else
-		g.drawImage(diverseCrop[5],actx,acty,64,64,this);
+		g.drawImage(diverseCrop[5],actx,acty,width,height,this);
 	    break;
 
 	    // ------------------- normale Fliessbaender -------------------------
 
-	case (Board.FN1):g.drawImage(cbeltCrop[14],actx,acty,64,64,this);break;
-	case (Board.FE1):g.drawImage(cbeltCrop[19],actx,acty,64,64,this);break;
-	case (Board.FW1):g.drawImage(cbeltCrop[9],actx,acty,64,64,this);	break;
-	case (Board.FS1):g.drawImage(cbeltCrop[4],actx,acty,64,64,this);	break;
+	case (Board.FN1):g.drawImage(cbeltCrop[14],actx,acty,width,height,this);break;
+	case (Board.FE1):g.drawImage(cbeltCrop[19],actx,acty,width,height,this);break;
+	case (Board.FW1):g.drawImage(cbeltCrop[9],actx,acty,width,height,this);	break;
+	case (Board.FS1):g.drawImage(cbeltCrop[4],actx,acty,width,height,this);	break;
 
 	case (Board.NFW1): if (abbieger(xpos,ypos-1,Board.NORD))
-	    g.drawImage(cbeltCrop[15],actx,acty,64,64,this);
-	else g.drawImage(cbeltCrop[6],actx,acty,64,64,this);break;
+	    g.drawImage(cbeltCrop[15],actx,acty,width,height,this);
+	else g.drawImage(cbeltCrop[6],actx,acty,width,height,this);break;
 	case (Board.NFE1): if (abbieger(xpos,ypos-1,Board.NORD))
-	    g.drawImage(cbeltCrop[18],actx,acty,64,64,this);
-	else g.drawImage(cbeltCrop[7],actx,acty,64,64,this);break;
+	    g.drawImage(cbeltCrop[18],actx,acty,width,height,this);
+	else g.drawImage(cbeltCrop[7],actx,acty,width,height,this);break;
 	case (Board.SFW1): if (abbieger(xpos,ypos+1,Board.SUED))
-	    g.drawImage(cbeltCrop[13],actx,acty,64,64,this);
-	else g.drawImage(cbeltCrop[3],actx,acty,64,64,this);break;
+	    g.drawImage(cbeltCrop[13],actx,acty,width,height,this);
+	else g.drawImage(cbeltCrop[3],actx,acty,width,height,this);break;
 	case (Board.SFE1):if (abbieger(xpos,ypos+1,Board.SUED))
-			  g.drawImage(cbeltCrop[10],actx,acty,64,64,this);
-	else g.drawImage(cbeltCrop[0],actx,acty,64,64,this);break;
+			  g.drawImage(cbeltCrop[10],actx,acty,width,height,this);
+	else g.drawImage(cbeltCrop[0],actx,acty,width,height,this);break;
 	case (Board.EFN1):if (abbieger(xpos-1,ypos,Board.OST))
-			  g.drawImage(cbeltCrop[16],actx,acty,64,64,this);
-	else g.drawImage(cbeltCrop[5],actx,acty,64,64,this);break;
+			  g.drawImage(cbeltCrop[16],actx,acty,width,height,this);
+	else g.drawImage(cbeltCrop[5],actx,acty,width,height,this);break;
 	case (Board.EFS1):if (abbieger(xpos-1,ypos,Board.OST))
-			  g.drawImage(cbeltCrop[12],actx,acty,64,64,this);
-	else g.drawImage(cbeltCrop[2],actx,acty,64,64,this);break;
+			  g.drawImage(cbeltCrop[12],actx,acty,width,height,this);
+	else g.drawImage(cbeltCrop[2],actx,acty,width,height,this);break;
 	case (Board.WFN1):if (abbieger(xpos+1,ypos,Board.WEST))
-			  g.drawImage(cbeltCrop[17],actx,acty,64,64,this);
-	else g.drawImage(cbeltCrop[8],actx,acty,64,64,this);break;
+			  g.drawImage(cbeltCrop[17],actx,acty,width,height,this);
+	else g.drawImage(cbeltCrop[8],actx,acty,width,height,this);break;
 	case (Board.WFS1):if (abbieger(xpos+1,ypos,Board.WEST))
-			  g.drawImage(cbeltCrop[11],actx,acty,64,64,this);
-	else g.drawImage(cbeltCrop[1],actx,acty,64,64,this);break;
+			  g.drawImage(cbeltCrop[11],actx,acty,width,height,this);
+	else g.drawImage(cbeltCrop[1],actx,acty,width,height,this);break;
 
-	case (Board.NFEW1):g.drawImage(cbeltCrop[22],actx,acty,64,64,this);break;
-	case (Board.SFWE1):g.drawImage(cbeltCrop[20],actx,acty,64,64,this);break;
-	case (Board.EFNS1):g.drawImage(cbeltCrop[23],actx,acty,64,64,this);break;
-	case (Board.WFNS1):g.drawImage(cbeltCrop[21],actx,acty,64,64,this);break;
+	case (Board.NFEW1):g.drawImage(cbeltCrop[22],actx,acty,width,height,this);break;
+	case (Board.SFWE1):g.drawImage(cbeltCrop[20],actx,acty,width,height,this);break;
+	case (Board.EFNS1):g.drawImage(cbeltCrop[23],actx,acty,width,height,this);break;
+	case (Board.WFNS1):g.drawImage(cbeltCrop[21],actx,acty,width,height,this);break;
 
 	    // ------------------------ Expressfliessbaender ---------------------
 
-	case (Board.FN2):g.drawImage(ebeltCrop[14],actx,acty,64,64,this);break;
-	case (Board.FE2):g.drawImage(ebeltCrop[19],actx,acty,64,64,this);break;
-	case (Board.FW2):g.drawImage(ebeltCrop[9],actx,acty,64,64,this);	break;
-	case (Board.FS2):g.drawImage(ebeltCrop[4],actx,acty,64,64,this);	break;
+	case (Board.FN2):g.drawImage(ebeltCrop[14],actx,acty,width,height,this);break;
+	case (Board.FE2):g.drawImage(ebeltCrop[19],actx,acty,width,height,this);break;
+	case (Board.FW2):g.drawImage(ebeltCrop[9],actx,acty,width,height,this);break;
+	case (Board.FS2):g.drawImage(ebeltCrop[4],actx,acty,width,height,this);break;
 
 	case (Board.NFW2): if (abbieger(xpos,ypos-1,Board.NORD))
-	    g.drawImage(ebeltCrop[16],actx,acty,64,64,this);
-	else g.drawImage(ebeltCrop[6],actx,acty,64,64,this);break;
+	    g.drawImage(ebeltCrop[16],actx,acty,width,height,this);
+	else g.drawImage(ebeltCrop[6],actx,acty,width,height,this);break;
 	case (Board.NFE2): if (abbieger(xpos,ypos-1,Board.NORD))
-	    g.drawImage(ebeltCrop[17],actx,acty,64,64,this);
-	else g.drawImage(ebeltCrop[7],actx,acty,64,64,this);break;
+	    g.drawImage(ebeltCrop[17],actx,acty,width,height,this);
+	else g.drawImage(ebeltCrop[7],actx,acty,width,height,this);break;
 	case (Board.SFW2): if (abbieger(xpos,ypos+1,Board.SUED))
-	    g.drawImage(ebeltCrop[13],actx,acty,64,64,this);
-	else g.drawImage(ebeltCrop[3],actx,acty,64,64,this);break;
+	    g.drawImage(ebeltCrop[13],actx,acty,width,height,this);
+	else g.drawImage(ebeltCrop[3],actx,acty,width,height,this);break;
 	case (Board.SFE2):if (abbieger(xpos,ypos+1,Board.SUED))
-			  g.drawImage(ebeltCrop[10],actx,acty,64,64,this);
-	else g.drawImage(ebeltCrop[0],actx,acty,64,64,this);break;
+			  g.drawImage(ebeltCrop[10],actx,acty,width,height,this);
+	else g.drawImage(ebeltCrop[0],actx,acty,width,height,this);break;
 	case (Board.EFN2):if (abbieger(xpos-1,ypos,Board.OST))
-			  g.drawImage(ebeltCrop[15],actx,acty,64,64,this);
-	else g.drawImage(ebeltCrop[5],actx,acty,64,64,this);break;
+			  g.drawImage(ebeltCrop[15],actx,acty,width,height,this);
+	else g.drawImage(ebeltCrop[5],actx,acty,width,height,this);break;
 	case (Board.EFS2):if (abbieger(xpos-1,ypos,Board.OST))
-			  g.drawImage(ebeltCrop[12],actx,acty,64,64,this);
-	else g.drawImage(ebeltCrop[2],actx,acty,64,64,this);break;
+			  g.drawImage(ebeltCrop[12],actx,acty,width,height,this);
+	else g.drawImage(ebeltCrop[2],actx,acty,width,height,this);break;
 	case (Board.WFN2):if (abbieger(xpos+1,ypos,Board.WEST))
-			  g.drawImage(ebeltCrop[18],actx,acty,64,64,this);
-	else g.drawImage(ebeltCrop[8],actx,acty,64,64,this);break;
+			  g.drawImage(ebeltCrop[18],actx,acty,width,height,this);
+	else g.drawImage(ebeltCrop[8],actx,acty,width,height,this);break;
 	case (Board.WFS2):if (abbieger(xpos+1,ypos,Board.WEST))
-			  g.drawImage(ebeltCrop[11],actx,acty,64,64,this);
-	else g.drawImage(ebeltCrop[1],actx,acty,64,64,this);break;
+			  g.drawImage(ebeltCrop[11],actx,acty,width,height,this);
+	else g.drawImage(ebeltCrop[1],actx,acty,width,height,this);break;
 
 
-	case (Board.NFWE2):g.drawImage(ebeltCrop[22],actx,acty,64,64,this);break;
-	case (Board.SFWO2):g.drawImage(ebeltCrop[20],actx,acty,64,64,this);break;
-	case (Board.EFNS2):g.drawImage(ebeltCrop[23],actx,acty,64,64,this);break;
-	case (Board.WFNS2):g.drawImage(ebeltCrop[21],actx,acty,64,64,this);break;
+	case (Board.NFWE2):g.drawImage(ebeltCrop[22],actx,acty,width,height,this);break;
+	case (Board.SFWO2):g.drawImage(ebeltCrop[20],actx,acty,width,height,this);break;
+	case (Board.EFNS2):g.drawImage(ebeltCrop[23],actx,acty,width,height,this);break;
+	case (Board.WFNS2):g.drawImage(ebeltCrop[21],actx,acty,width,height,this);break;
 
 
 	default:
@@ -889,7 +1094,96 @@ public class BoardView extends JComponent {
        dbg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
    }
 
+    /** Paints the wall(s) of a square field at position (xpos, ypos)
+	on board and (pixel-)position (actx, acty)
+    */
+    private void paintWall(Graphics g, int xpos, int ypos, int actx, int acty){
+	// paint wall in the north, if any
+	if (sf.nw(xpos,ypos).isExisting()){
+	    // is there a boardlaser to paint at this wall?
+	    if (sf.nw(xpos,ypos).getSouthDeviceType()==Wall.TYPE_LASER){
+		g.drawImage(diverseCrop[15],actx,acty+5,64,64,this);
+	    }
+	    // is there a pisher?
+	    if (sf.nw(xpos,ypos).getSouthDeviceType()==Wall.TYPE_PUSHER){
+		g.drawImage(diverseCrop[7],actx-1,acty+5,64,64,this);
+		// ------------draw text (phases when active) on pusher --------------------
+		for (int phasecount=1;phasecount<=5;phasecount++){
+		    if (sf.nw(xpos,ypos).isSouthPusherActive(phasecount)){
+			int strx = actx + 10*phasecount;
+			g.setColor( (phasecount % 2) == 0 ?
+				    Color.black : Color.yellow );
+			g.drawString( ""+phasecount, strx-1, acty+29 );
+		    }
+		}
 
+	    }
+	    g.drawImage(diverseCrop[13],actx,acty-6,64,64,this);
+	}
+
+	// paint wall in the south, if any
+	if (sf.sw(xpos,ypos).isExisting()){
+	    if (sf.sw(xpos,ypos).getNorthDeviceType()==Wall.TYPE_LASER){
+		g.drawImage(diverseCrop[17],actx,acty-5,64,64,this);
+	    }
+	    if (sf.sw(xpos,ypos).getNorthDeviceType()==Wall.TYPE_PUSHER){
+		g.drawImage(diverseCrop[8],actx,acty-5,64,64,this);
+		// -----------text on pusher--------------------
+		for (int phasecount=1;phasecount<=5;phasecount++){
+		    if (sf.sw(xpos,ypos).isNorthPusherActive(phasecount)){
+			int strx = actx + 10 * phasecount;
+			g.setColor( (phasecount % 2) == 0 ?
+				    Color.black : Color.yellow );
+			g.drawString( ""+phasecount, strx-1, acty+42 );
+		    }
+		} //for
+	    }
+	    g.drawImage(diverseCrop[13],actx,acty+58,64,64,this);
+	}
+
+	// paint wall in the south, if any
+
+	if (sf.ew(xpos,ypos).isExisting()){
+	    if (sf.ew(xpos,ypos).getWestDeviceType()==Wall.TYPE_LASER){
+		g.drawImage(diverseCrop[14],actx-6,acty,64,64,this);
+	    }
+	    if (sf.ew(xpos,ypos).getWestDeviceType()==Wall.TYPE_PUSHER){
+		g.drawImage(diverseCrop[6],actx-6,acty,64,64,this);
+		// ------------text on pusher --------------------
+		for (int phasecount=1;phasecount<=5;phasecount++){
+		    if (sf.ew(xpos,ypos).isWestPusherActive(phasecount)){
+			int stry = acty + 10 * phasecount;
+			g.setColor( (phasecount % 2) == 0 ?
+				    Color.black : Color.yellow );
+			g.drawString( ""+phasecount, actx+37, stry+4 );
+		    }
+		} //for
+
+	    }
+	    g.drawImage(diverseCrop[12],actx+57,acty,64,64,this);
+	}
+
+	// paint wall in the west, if any
+	if (sf.ww(xpos,ypos).isExisting()){
+	    if (sf.ww(xpos,ypos).getEastDeviceType()==Wall.TYPE_LASER){
+		g.drawImage(diverseCrop[16],actx+5,acty,64,64,this);
+	    }
+	    if (sf.ww(xpos,ypos).getEastDeviceType()==Wall.TYPE_PUSHER){
+		g.drawImage(diverseCrop[9],actx+4,acty,64,64,this);
+		// ------------Beschriftung --------------------
+		for (int phasecount=1;phasecount<=5;phasecount++){
+		    if (sf.ww(xpos,ypos).isEastPusherActive(phasecount)){
+			int stry = acty + 10 * phasecount;
+			g.setColor( (phasecount % 2) == 0 ?
+				    Color.black : Color.yellow );
+			g.drawString( ""+phasecount, actx+24, stry+4 );
+		    }
+		} //for
+
+	    }
+	    g.drawImage(diverseCrop[12],actx-7,acty,64,64,this);
+	}
+    }
 
     private void paintWaende( Graphics g2) {
 
@@ -913,91 +1207,10 @@ public class BoardView extends JComponent {
 		int acty = vert*64-64;
 		int xpos = hori;
 		int ypos = sf.getSizeY()-vert+1;
-
-		// Nordwand
-		if (sf.nw(xpos,ypos).isExisting()){
-		    if (sf.nw(xpos,ypos).getSouthDeviceType()==Wall.TYPE_LASER){
-			g.drawImage(diverseCrop[15],actx,acty+5,64,64,this);
-		    }
-		    if (sf.nw(xpos,ypos).getSouthDeviceType()==Wall.TYPE_PUSHER){
-			g.drawImage(diverseCrop[7],actx-1,acty+5,64,64,this);
-			// ------------Beschriftung --------------------
-			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.nw(xpos,ypos).isSouthPusherActive(phasecount)){
-				int strx = actx + 10*phasecount;
-				g.setColor( (phasecount % 2) == 0 ?
-					    Color.black : Color.yellow );
-				g.drawString( ""+phasecount, strx-1, acty+29 );
-			    }
-			} //for
-
-		    }
-		    g.drawImage(diverseCrop[13],actx,acty-6,64,64,this);
-		}
-
-		// S\uFFFDdwand
-		if (sf.sw(xpos,ypos).isExisting()){
-		    if (sf.sw(xpos,ypos).getNorthDeviceType()==Wall.TYPE_LASER){
-			g.drawImage(diverseCrop[17],actx,acty-5,64,64,this);
-		    }
-		    if (sf.sw(xpos,ypos).getNorthDeviceType()==Wall.TYPE_PUSHER){
-			g.drawImage(diverseCrop[8],actx,acty-5,64,64,this);
-			// ------------Beschriftung --------------------
-			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.sw(xpos,ypos).isNorthPusherActive(phasecount)){
-				int strx = actx + 10 * phasecount;
-				g.setColor( (phasecount % 2) == 0 ?
-					    Color.black : Color.yellow );
-				g.drawString( ""+phasecount, strx-1, acty+42 );
-			    }
-			} //for
-		    }
-		    g.drawImage(diverseCrop[13],actx,acty+58,64,64,this);
-		}
-
-		// Ostwand
-		if (sf.ew(xpos,ypos).isExisting()){
-		    if (sf.ew(xpos,ypos).getWestDeviceType()==Wall.TYPE_LASER){
-			g.drawImage(diverseCrop[14],actx-6,acty,64,64,this);
-		    }
-		    if (sf.ew(xpos,ypos).getWestDeviceType()==Wall.TYPE_PUSHER){
-			g.drawImage(diverseCrop[6],actx-6,acty,64,64,this);
-			// ------------Beschriftung --------------------
-			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.ew(xpos,ypos).isWestPusherActive(phasecount)){
-				int stry = acty + 10 * phasecount;
-				g.setColor( (phasecount % 2) == 0 ?
-					    Color.black : Color.yellow );
-				g.drawString( ""+phasecount, actx+37, stry+4 );
-			    }
-			} //for
-
-		    }
-		    g.drawImage(diverseCrop[12],actx+57,acty,64,64,this);
-		}
-
-		// Westwand
-		if (sf.ww(xpos,ypos).isExisting()){
-		    if (sf.ww(xpos,ypos).getEastDeviceType()==Wall.TYPE_LASER){
-			g.drawImage(diverseCrop[16],actx+5,acty,64,64,this);
-		    }
-		    if (sf.ww(xpos,ypos).getEastDeviceType()==Wall.TYPE_PUSHER){
-			g.drawImage(diverseCrop[9],actx+4,acty,64,64,this);
-			// ------------Beschriftung --------------------
-			for (int phasecount=1;phasecount<=5;phasecount++){
-			    if (sf.ww(xpos,ypos).isEastPusherActive(phasecount)){
-				int stry = acty + 10 * phasecount;
-				g.setColor( (phasecount % 2) == 0 ?
-					    Color.black : Color.yellow );
-				g.drawString( ""+phasecount, actx+24, stry+4 );
-			    }
-			} //for
-
-		    }
-		    g.drawImage(diverseCrop[12],actx-7,acty,64,64,this);
-		}
+		paintWall(g2, xpos, ypos, actx, acty);
 	    }
 	}
+
     }
 
     private void paintFlaggen( Graphics g2 ) {
@@ -1037,9 +1250,8 @@ public class BoardView extends JComponent {
         ort.y = (int)((getHeight() - p.y) / scaledFeldSize) + 1;
         return ort;
     }
-
+    /** returns left upper point of square*/
     public Point ort2Point( int ortx, int orty, Point p ) {
-        // returns left upper point of square
 	p.x = (int) ((ortx - 1) * scaledFeldSize);
 	p.y = (int) ((sf.getSizeY() - orty) * scaledFeldSize);
         return p;
@@ -1122,43 +1334,105 @@ public class BoardView extends JComponent {
 	    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
     }
 
-    private void paintRobos( Graphics g ) {
+
+     private void paintFeldWithElements(Graphics2D g2d, int xpos, int ypos, int actx, int acty){
+      Floor floor = sf.floor(xpos, ypos);
+      paintFeldBoden(g2d,xpos,ypos, actx, acty);
+      if ((floor.isBelt() ) && (floor.getInfo()>0)) // restore possible Crusher
+		    paintCrusher( g2d, floor, actx, acty);
+      // @todo: only repaint the stuff on the field we want to paint
+      paintWall(g2d, xpos, ypos, actx, acty);
+      paintFlaggen(g2d);
+    }
+
+      private void paintRobot(Graphics2D g2d, Bot robot, int robocount,
+                            int xoffset, int yoffset, boolean eraseFloor){
+       g2d.scale(getScale(), getScale());
+
+       int xpos = robot.getX()-1;
+       int ypos = sf.getSizeY()-robot.getY();
+       int xpos64 = xpos*64;
+       int ypos64 = ypos*64;
+       int actx = xpos64;//-64;
+       int acty = ypos64;//-64;
+       //if (CAT.isDebugEnabled()){
+       //  CAT.debug("drawing robot ("+robot.getX()+", "+robot.getY()+"), xpos64="+xpos64+", ypos64="+ypos64);
+       //}
+       if (eraseFloor) {// for animating robot movement
+          int x = xpos+1;
+          int y = robot.getY();
+
+
+          paintFeldWithElements(g2d, x, y, actx, acty);   // erase old robot image
+
+          // we will also have to erase the field the robot enters
+            if (yoffset<0 && y<sf.getSizeY()){ // moving north => erasing field
+                                              // above (if there is)
+              paintFeldWithElements(g2d, x,y+1, actx, acty-64);
+
+            }
+            else if (yoffset>0 && y>1){ // moving south, erasing field below
+              paintFeldWithElements(g2d, x,  y-1, actx, acty+64);
+            }
+            if (xoffset>0 && x<sf.getSizeX()) {// moving east..
+              paintFeldWithElements(g2d,x+1, y, actx+64, acty);
+            }
+            else if (xoffset<0 && x>1){// moving west
+              paintFeldWithElements(g2d,x-1, y, actx-64, acty);
+            }
+       }
+       xpos64 +=xoffset;
+       ypos64 +=yoffset;
+
+       int botVis = robot.getBotVis();
+       Image imgRob = robosCrop[robot.getFacing()+botVis*4];
+       boolean virtuell = robot.isVirtual();
+
+       if( imgRob != null ) {
+          if( virtuell ) {
+	     AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
+	     g2d.setComposite( ac );
+	  }
+	  g2d.drawImage(imgRob,xpos64,ypos64,64,64,this);
+	  if( virtuell ) {
+	    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+	  }
+	  String beschriftung = "" + robot.getName();
+	  g2d.setColor( robocolor[botVis] );
+	  g2d.drawString(beschriftung,xpos64,ypos64+8+robocount*8);
+      }
+    }
+
+     private void paintRobos (Graphics g){
+     paintRobos(g, null);
+    }
+
+    private void paintRobos( Graphics g, Bot dontPaintMe) {
 	Graphics2D g2d = (Graphics2D) g;
-
-        if (robos!=null){
-	    for (int robocount=0;robocount<robos.length;robocount++){
-                Bot robot = robos[robocount];
-		if((robot.getDamage()<10)&&
-		   (robot.getLivesLeft() > 0)) {
-		    int xpos = robot.getX()-1;
-		    int ypos = sf.getSizeY()-robot.getY();
-		    int xpos64 = xpos*64;
-		    int ypos64 = ypos*64;
-		    int actx = xpos64-64;
-		    int acty = ypos64-64;
-                    int botVis = robot.getBotVis();
-		    Image imgRob = robosCrop[robot.getFacing()+botVis*4];
-                    boolean virtuell = robot.isVirtual();
-
-		    if( imgRob != null ) {
-			if( virtuell ) {
-			    AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
-			    g2d.setComposite( ac );
-			}
-                        else
-                           g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-			g2d.drawImage(imgRob,xpos64,ypos64,64,64,this);
-			//if( virtuell ) {
-			 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
-			//}
-			String beschriftung = "" + robot.getName();
-			g2d.setColor( robocolor[botVis] );
-			g2d.drawString(beschriftung,xpos64,ypos64+8+robocount*8);
-                        //g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+	if (dontPaintMe==null) {
+	    if (robos!=null){
+		for (int robocount=0;robocount<robos.length;robocount++){
+		    Bot robot = robos[robocount];
+		    if((robot.getDamage()<10)&&
+		       (robot.getLivesLeft() > 0)) {
+			paintRobot(g2d, robot, robocount, 0, 0, false);
 		    }
 		}
 	    }
 	}
+	else {
+	    if (robos!=null){
+		for (int robocount=0;robocount<robos.length;robocount++){
+		    Bot robot = robos[robocount];
+		    if((robot.getDamage()<10)&&
+		       (robot.getLivesLeft() > 0)&&
+		       !dontPaintMe.getName().equals(robot.getName())) {
+			paintRobot(g2d, robot, robocount, 0, 0, false);
+		    }
+		}
+	    }
+	}
+
     }
 
     protected Image getRobImage(Bot robot, int facing){
@@ -1304,8 +1578,6 @@ public class BoardView extends JComponent {
 
   // Little helper for getting thumbnails of the board
     private static BoardView sac = null;
-
-
     public static Image createThumb(SimBoard sim, int size) {
 	if( sac == null ) {
 	    sac = new BoardView(sim);
@@ -1314,18 +1586,6 @@ public class BoardView extends JComponent {
 	}
 	return sac.getThumb(size);
     }
-
-
-    //private boolean allDone;
-
-    //protected boolean isReady() {
-    //  return allDone;
-    //}
-
-    //Object lock = new Object();
-   // protected Object getLockObj() {
-   //   return lock;
-   // }
 
 }
 

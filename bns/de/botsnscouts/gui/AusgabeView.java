@@ -76,9 +76,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private boolean soundOn = false;
 
     // speed-menu
-    protected final int SLOW = 2000;
-    protected final int MEDIUM = 200;
-    protected final int FAST = 0;
+    protected final int SLOW = 1000;
+    protected final int MEDIUM = 500;
+    protected final int FAST = 100;
 
     protected int speed=MEDIUM;
 
@@ -248,6 +248,13 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	    ((RobotCard) robotCardStatus.get(r[i].getName())).updateRobot(r[i]);
 	    // RobCards aktualisieren TODO
 	}
+
+      try { // wait a little for the display to update
+          Thread.sleep(speed);
+      }
+      catch (Exception e) {
+          CAT.error(e.getMessage(), e);
+      }
     }
 
     public void showPixelPos(int x, int y ) {
@@ -322,17 +329,17 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      */
     public void showBoardLaser(Location laserPos, int facing, int stregth, Location r1Pos){
        gameBoardCanvas.doBordLaser(laserPos, facing, stregth, r1Pos,gameBoardView);
-       //synchronized (gameBoardCanvas.getLockObj()) {
-       // while (!gameBoardCanvas.isReady()) {
-       //   try {
-       //     wait();
-       //   }
-       //   catch (InterruptedException ie) {
-       //     CAT.error(ie.getMessage(), ie);
-       //   }
-       // }
-       //}
     }
+
+    /** bord view is to animate robot movement*/
+    protected void animateRobMove(Bot rob, int direction){
+        gameBoardCanvas.animateRobMove(rob, direction);
+    }
+
+
+    //protected int getDelay() {
+    //  return speed;
+    //}
 
     /**
      *  shows the winner state of the game in the mids of the game
