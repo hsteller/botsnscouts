@@ -997,7 +997,6 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                             *  but at the beginning of the next turn to be
                             *  able to distinguish between bots that were
                             *  already powered down and newly deactivated ones.
-                            *  ABOVE IS NOT NECESSARY?!
                             */
                         }
                      }
