@@ -10,7 +10,7 @@
 <I>An addictive multiplayer networked strategy game inspired by RoboRally, written in Java.</I>
 </CENTER>
 <h2>News</h2>
-Version 0.8.2 is available! Go directly to <a href="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.2.zip">downloading botsnscouts-0.8.2.zip</a>. It includes some smaller optimizations and JDK1.4 compatibility fixes. 
+The newest available version is still 0.8.2. Go directly to <a href="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.2.zip">downloading botsnscouts-0.8.2.zip</a>. It includes some smaller optimizations and JDK1.4 compatibility fixes. 
 <P>
 We still proudly announce what was new in 0.8:
 <ul>
@@ -35,5 +35,5 @@ published in the U.S. from
 <A HREF="http://www.wizards.com/roborally">Wizards of The Coast</A> (TM).
 In Germany it's distributed by <A HREF="http://www.amigo-spiele.de">Amigo-Spiele</A>.
 <BR>
-There're lots of other websites to find out more about Roborally. The best place to start is the one from <A HREF="http://members.xoom.com/eflod/">Eric Floderus</A>.
+There're lots of other websites to find out more about Roborally. Google yourself.
 <?php include('bnsfooter.pht');?>
