@@ -24,12 +24,33 @@ public class CLIStarter {
   private static Locale myLocale;
 
   public static void main (String [] args) {
+    if (args.length==0){
+      handleWizardMode();
+    }
+    else if (args.length==1) {
+      handleConfigFileMode(args[0]);
+    }
+    else {
+      printUsage();
+    }
+
+  }
+
+  /**@todo: implement (or don't..) */
+  private static void printUsage() {
+  }
+
+  private static void handleConfigFileMode(String filepath) {
+
+  }
+
+  private static void handleWizardMode() {
     step0Preparation();
     step0_5SetLocaleIfNeeded();
     step1SelectBoard();
     step2NumberOfPlayers();
     step3configureAutoBots();
-
+    step4StartServer();
   }
 
   private static void exit() {
@@ -106,7 +127,7 @@ public class CLIStarter {
     pln("");
     int greaterThan = 0;
     int smallerThan = 9;
-    numberOfPlayers = H.readInt("Please enter the number of players (including autobots): ",
+    numberOfPlayers = H.readInt("Please enter the number of players (including autobots must be <=8): ",
                           greaterThan, smallerThan);
 
   }
@@ -125,7 +146,7 @@ public class CLIStarter {
     int greaterThan = -1;
     int smallerThan = numberOfPlayers+1;
     numberOfAutobots = H.readInt ("Number of autobots (0<=number<="+numberOfPlayers+"): ",
-                              smallerThan, greaterThan);
+                              greaterThan, smallerThan);
 
 
 
@@ -137,7 +158,7 @@ public class CLIStarter {
       greaterThan = 0;
       smallerThan = 101;
       for (int i=0;i<numberOfAutobots;i++) {
-        autobotIntelligence[i] = H.readInt("Select intelligence of bot #"+(i+1),
+        autobotIntelligence[i] = H.readInt("Select intelligence of bot #"+(i+1)+": ",
                                             greaterThan, smallerThan);
       }
     }
