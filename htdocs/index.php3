@@ -5,12 +5,12 @@
 </head>
 <?php include('bnsheader.pht');?>
 <CENTER>
-<H2>Bots'n'Scouts Version 0.8.1</H2>
+<H2>Bots'n'Scouts Version 0.8.2</H2>
 <P>
 <I>An addictive multiplayer networked strategy game inspired by RoboRally, written in Java.</I>
 </CENTER>
 <h2>News</h2>
-Version 0.8.1 is available! Go directly to <a href="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.1.zip">downloading botsnscouts-0.8.1.zip</a>. It includes some smaller optimizations. 
+Version 0.8.2 is available! Go directly to <a href="http://prdownloads.sourceforge.net/botsnscouts/botsnscouts-0.8.2.zip">downloading botsnscouts-0.8.1.zip</a>. It includes some smaller optimizations and JDK1.4 compatibility fixes. 
 <P>
 We still proudly announce what was new in 0.8:
 <ul>
