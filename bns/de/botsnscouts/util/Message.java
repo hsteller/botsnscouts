@@ -39,7 +39,7 @@ import org.apache.log4j.Category;
  */
 public class Message{
 
-    static Category CAT = Category.getInstance(SoundMan.class);    
+    static Category CAT = Category.getInstance(Message.class);    
 
     private static String language = "empty"; 
     private static String country="empty";
@@ -99,7 +99,7 @@ public class Message{
 	try{
 	    return messages.getString(id);
 	} catch (MissingResourceException e){
-	    CAT.error("Could not find resource for "+id);
+	    CAT.warn("Could not find resource for "+id);
 	    return id;   // so the program doesn't crash and we at least see *something*
 	}
     }
