@@ -74,7 +74,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 					       );
 	AgainPowerDown againPowerDown = new AgainPowerDown(new ActionListener(){
 		public void actionPerformed(ActionEvent ae) {
-		    d("The user clicked: "+ae.getActionCommand());
+		    CAT.debug("The user clicked: "+ae.getActionCommand());
 		    sendAgainPowerDown(ae.getActionCommand().equals("powerdownagain"));
 		}
 	    }
@@ -164,19 +164,21 @@ public class HumanView extends JPanel implements HumanViewInterface {
     public void showMessageToPlayer(String s) {
 	userInfo.setInfo(s);
 	panelSwitcher.show(switcherPanel,"userInfo");
+	invalidate();
     }
 
     /**
      * display the card
      */
     public void showCards(ArrayList humanCards) {
+        CAT.debug("Show cards");
 	cards.setCards(humanCards);
 	panelSwitcher.show(switcherPanel,"regsAndCards");
 	if (registers.allLocked()) {
-	    d("All Registes locked!");
+	    CAT.debug("All Registes locked!");
 	    cards.activateButton();
 	}
-
+	invalidate();
     }
 
 
@@ -206,6 +208,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
      * display the register repair request
      */
     public void showRegisterRepair(Karte[] robRegs, int repairNumber) {
+      CAT.debug("Show Register Repair");
 	registers.updateRegisters(robRegs);
 	repairRegisters.setChoises(registers.getRegisterViewArray(), repairNumber);
 	panelSwitcher.show(switcherPanel,"repairRegisters");
@@ -302,7 +305,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
     protected void updateRegisters(Karte[] robRegs){
 	registers.updateRegisters(robRegs);
-	d("Updating Registers...");
+	CAT.debug("Updating Registers...");
 	registers.resetAll();
     }
 
@@ -322,20 +325,23 @@ public class HumanView extends JPanel implements HumanViewInterface {
     }
 
     private void sendRepairRegisters () {
+      CAT.debug("sendRepairRegisters");
 	showMessageToPlayer(Message.say("SpielerMensch","mkartenMisch"));
 	ArrayList regsRep = repairRegisters.getSelection();
-	human.sendRepair(regsRep);
 	unlockRegisters(regsRep);
+	human.sendRepair(regsRep);
     }
 
     private void unlockRegisters(ArrayList repairRegs){
-	d("Die Register vor dem unlock: "+registers.toString());
+	CAT.debug("Die Register vor dem unlock: "+registers.toString());
 	for (int i =0; i< repairRegs.size(); i++) {
-	    d("Entsperre Register: "+((Integer)repairRegs.get(i)).intValue());
+	    CAT.debug("Entsperre Register: "+((Integer)repairRegs.get(i)).intValue());
 	    registers.unlockRegister(((Integer)repairRegs.get(i)).intValue()-1);
 	}
-	d("Die Register nach dem unlock: "+registers.toString());
-		registers.resetAll();
+
+	CAT.debug("Die Register nach dem unlock: "+registers.toString());
+	registers.resetAll();
+
     }
 
     private void treatCardKlick (CardView cv) {
