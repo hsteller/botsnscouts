@@ -29,6 +29,7 @@ import de.botsnscouts.board.*;
 import de.botsnscouts.comm.MessageID;
 import de.botsnscouts.comm.OtherConstants;
 import de.botsnscouts.util.*;
+
 import org.apache.log4j.Category;
 
 import javax.swing.*;
@@ -640,8 +641,7 @@ public class BoardView extends JLayeredPane {
 	        Bot internal = getBotByName(rob.getName());
 	       
 	        int oldFacing = internal.getFacing();
-	        int animationStepsTurnRob =currentAnimationConfig.getAnimationStepsTurnRob();
-	        int animationDelayTurnRob = currentAnimationConfig.getAnimationDelayTurnRob();
+	        int animationStepsTurnRob =currentAnimationConfig.getAnimationStepsTurnRob();	     
 	        
 	        if (direction == OtherConstants.BOT_TURN_CLOCKWISE){
 	            turnRobot(internal, 90,animationStepsTurnRob, true);
@@ -694,7 +694,7 @@ public class BoardView extends JLayeredPane {
             // painting the animated bot           
             backgroundWithBots.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
             mainGraphics.setComposite(ac);
-            int animationStepsTurnRob =currentAnimationConfig.getAnimationStepsTurnRob();
+            int animationStepsTurnRob =animationSteps;//currentAnimationConfig.getAnimationStepsTurnRob();
             int animationDelayTurnRob = currentAnimationConfig.getAnimationDelayTurnRob();
              for (int step = 0; step<animationStepsTurnRob;step++) {
                  	 backgroundImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
@@ -708,6 +708,85 @@ public class BoardView extends JLayeredPane {
                 mainGraphics.setComposite(oldComposite);
         }
     }
+    
+    
+    protected void animateBotCrushed(Bot b){
+        SoundMan.playSound(SoundMan.CRUSHED);
+        shrinkRobot(b);
+    }
+    
+    protected void animatePitFall(Bot b){
+        SoundMan.playSound(SoundMan.PIT);
+        Location pos = b.getPos();
+        if (pos.x<1 || pos.y<1||pos.x>sf.getSizeX()|| pos.y>sf.getSizeY()){
+            CAT.debug("ignoring pitfall animation for "+pos );
+            //	don't shrink if bot fell from the board
+        }
+        else {
+            if (sf.getFloor(pos.x, pos.y).isPit()){ // don't shrink if bot fell from the board
+                shrinkRobot(b);
+            }
+        }
+
+        synchronized (this){
+            waitSomeTime(currentAnimationConfig.getLaserDelayAfterEndOfAnimation(), null);  
+        }
+    }
+    
+    private void shrinkRobot(Bot internal) {
+       
+       double scalePerStep = 0.9;
+       int numberOfShrinks = 15;
+        AlphaComposite ac = AC_SRC_OVER;         
+        if (internal.isVirtual())
+            ac = AC_SRC_OVER_05;
+        Image cropRobImage = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
+       
+       
+        synchronized (this) {       
+            Graphics2D mainGraphics = (Graphics2D)getGraphics();  
+            Composite oldComposite = mainGraphics.getComposite();
+            int feldSize = scaledFeldSize;           
+            int xposScaled=  (internal.getX()-1) *feldSize;
+            int yposScaled = (sf.getSizeY() - internal.getY())*feldSize;                         
+            int clipLength = feldSize;    
+            int halfSize = feldSize/2;
+            if (preBoard == null)
+                preBoard = getBoardImage();
+            
+            BufferedImage backgroundImage=  preBoard.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
+            Graphics2D background = (Graphics2D) backgroundImage.getGraphics();     
+            background.setComposite(ac);       
+            // saving a copy of the background:
+            Raster blank = backgroundImage.getData();                                          
+          
+                       
+            // painting the animated bot           
+            background.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
+            mainGraphics.setComposite(ac);
+            double doffset=0;
+             for (int step = 0; step<numberOfShrinks;step++) {
+                 	 backgroundImage.setData(blank); // erasing the offscreen image with the boardbackground
+                 	 background.scale(scalePerStep, scalePerStep);
+                 	 doffset += feldSize*(1-scalePerStep);
+                 	 int offset = (int) doffset;                 	
+                     background.drawImage(cropRobImage, 0+offset, 0+offset, feldSize, feldSize, this);                  
+                     // paint the offscreen image on the screen:
+                     
+                     mainGraphics.drawImage(backgroundImage, xposScaled, yposScaled, feldSize, clipLength,this);                
+                     waitSomeTime(100, null);                   
+                }
+                backgroundImage.setData(blank);
+                internal.setPos(pit); 
+                mainGraphics.setComposite(oldComposite);
+        }
+    }
+    
+    
+    
+    
+    
+    
     protected synchronized void animateRobMove(Bot rob, int direction) {
         // important: according to the code on SpielfeldSim we do not get
         //            the updated robot position;

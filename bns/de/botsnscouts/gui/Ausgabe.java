@@ -864,9 +864,9 @@ public class Ausgabe extends BNSThread {
         String botname = kommAntwort.namen[1];
         Bot bot = (Bot) robots.get(botname);
         //updateLaserAnimationHackMessageStuff(bot, false);
-
-        SoundMan.playSound(SoundMan.PIT);
-    }
+        ausgabeView.animatePitFall(bot);
+        
+    } 
 
     private void comMsgHandleRobotReachedFlag(ClientAntwort kommAntwort) {
         SoundMan.playSound(SoundMan.FLAG_REACHED);
@@ -940,8 +940,8 @@ public class Ausgabe extends BNSThread {
         String botName = kommAntwort.namen[1];
         Bot bot = (Bot) robots.get(botName);
         //updateLaserAnimationHackMessageStuff(bot, false);
-
-        SoundMan.playSound(SoundMan.CRUSHED);
+        CAT.debug("XXXXXXXXXXXXXXXXXXXgotCrush");
+        ausgabeView.animateBotCrushed(bot);
     }
 
     private void comMsgHandleSomeoneAskedWisenheimer(ClientAntwort kommAntwort) {
@@ -1144,7 +1144,13 @@ public class Ausgabe extends BNSThread {
                             }
                         });
         
-
+        sequencer.addActionMapping(MessageID.BOT_CRUSHED,
+                        new AbstractMessageAction() {
+                            public void invoke(ClientAntwort msgData) {
+                                comMsgHandleRobotCrushed(msgData);
+                            }
+                        });
+        
         sequencer.addActionMapping(DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {

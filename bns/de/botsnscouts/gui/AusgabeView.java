@@ -362,6 +362,16 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         gameBoardCanvas.animateRobUTurn(rob);
     }
     
+    /** bord view is to animate robot pitfall*/
+    protected void animatePitFall(Bot rob){
+        gameBoardCanvas.animatePitFall(rob);
+    }
+    
+    /** bord view is to animate robot pitfall*/
+    protected void animateBotCrushed(Bot rob){
+        gameBoardCanvas.animateBotCrushed(rob);
+    }
+    
     protected void setInitialFacings(Bot [] botsWithUpdatedFacing){
         gameBoardCanvas.updateFacings(botsWithUpdatedFacing);
     }
