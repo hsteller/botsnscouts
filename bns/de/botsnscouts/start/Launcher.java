@@ -43,7 +43,7 @@ public class Launcher {
     public Thread einemSpielZuschauen(String ip, int port, boolean noSplash) {
         Thread ret;
         try {
-            ret = new BNSThread(new Ausgabe(ip, port, null, noSplash));
+            ret = new BNSThread(new Ausgabe(ip, port, noSplash));
             ret.start();
         } catch (Exception exp) {
             return null;
@@ -83,7 +83,7 @@ public class Launcher {
         return ks;
     }
 
-    public void startGame(de.botsnscouts.start.GameOptions options, StSpListener listener) throws OneFlagException, NonContiguousMapException {
+    public void startGame(GameOptions options, StSpListener listener) throws OneFlagException, NonContiguousMapException {
        server = new Server(options, listener);
        server.start();
    }

@@ -90,6 +90,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 
         sp = new JScrollPane();
         sp.getViewport().setView(boardView);
+        sp.getViewport().setOpaque(false);
         getContentPane().add(BorderLayout.CENTER, sp);
 
         felder = new ButtonGroup();
@@ -113,6 +114,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 
         sp2 = new JScrollPane();
         sp2.getViewport().setView(but);
+        sp2.getViewport().setOpaque(false);
         getContentPane().add(BorderLayout.EAST, sp2);
 
         dp = new ButtonBar(this);

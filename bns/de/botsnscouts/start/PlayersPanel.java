@@ -25,93 +25,71 @@
 
 package de.botsnscouts.start;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.awt.image.*;
-import java.awt.geom.*;
-import javax.swing.border.*;
-import java.net.*;
-import java.io.*;
-import java.util.*;
-import de.botsnscouts.util.*;
-import de.botsnscouts.gui.*;
-import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.gui.BoardView;
+import de.botsnscouts.util.Global;
 import de.botsnscouts.widgets.ColoredPanel;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.TJLabel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Hashtable;
+import java.util.Vector;
 
 
-class PlayersPanel extends ColoredPanel{
-    JList roblist;
+class PlayersPanel extends ColoredPanel {
+    private JList roblist;
     Start parent;
     Vector names = new Vector();
-    Hashtable map = new Hashtable();
+    private Hashtable map = new Hashtable();
 
-    public PlayersPanel(Start par, String title){
-        setLayout( new BorderLayout() );
-	parent=par;
-	roblist = new JList();
-	roblist.setOpaque( false );
-	roblist.setFixedCellWidth(250);
-	roblist.setOpaque( false );
-	roblist.setFont(new Font("Sans", Font.BOLD, 20));
-	roblist.setCellRenderer( new CellRenderer() );
+    public PlayersPanel(Start par) {
+        setLayout(new BorderLayout());
+        parent = par;
+        roblist = new JList();
+        roblist.setOpaque(false);
+        roblist.setFixedCellWidth(250);
+        roblist.setOpaque(false);
+        roblist.setFont(new Font("Sans", Font.BOLD, 20));
+        roblist.setCellRenderer(new CellRenderer());
         roblist.setFixedCellHeight(64);
-        roblist.setBorder( BorderFactory.createEmptyBorder() );
+        roblist.setBorder(BorderFactory.createEmptyBorder());
 
-	JComponent p = new JPanel( new BorderLayout() );
-	p.setOpaque( false );
+        JComponent p = new JPanel(new BorderLayout());
+        p.setOpaque(false);
 
-	JScrollPane sp = new JScrollPane
-	    ( roblist,
-	      JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-	      JScrollPane.HORIZONTAL_SCROLLBAR_NEVER );
-	sp.setOpaque( false );
-        sp.setBorder( OptionPane.niceBorder );
-	add(sp, BorderLayout.CENTER );
-	setOpaque(false);
+        JScrollPane sp = new JScrollPane(roblist, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        sp.setOpaque(false);
+        sp.getViewport().setOpaque(false);
+        sp.setBorder(OptionPane.niceBorder);
+        add(sp, BorderLayout.CENTER);
+        setOpaque(false);
     }
 
-    public void neurob(String name, int farbe){
-	map.put( name, new Integer(farbe) );
-	Global.debug(this,"neuer roboter:"+name+BoardView.ROBOCOLOR[farbe]);
-	names.addElement( name );
-	roblist.setListData( names );
-	parent.show();
+    public void neurob(String name, int farbe) {
+        map.put(name, new Integer(farbe));
+        Global.debug(this, "neuer roboter:" + name + BoardView.ROBOCOLOR[farbe]);
+        names.addElement(name);
+        roblist.setListData(names);
+        parent.show();
     }
 
-    public void spZE(){
-	parent.wth.beende();
-	Global.debug(this,"Spiel ist zu Ende");
-    }
-
-    public void spGL(){
-	Global.debug(this,"Spiel geht los");
-	parent.beenden();
+    public void spGL() {
+        Global.debug(this, "Spiel geht los");
+        parent.beenden();
     }
 
 
-    class CellRenderer extends JLabel implements ListCellRenderer {
-	Dimension size;
-	CellRenderer() {
-	    size=new Dimension(200,48);
-	}
+    class CellRenderer extends TJLabel implements ListCellRenderer {
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            String name = (String) value;
 
-	public Component getListCellRendererComponent
-	    (
-	     JList list,
-	     Object value,            // value to display
-	     int index,               // cell index
-	     boolean isSelected,      // is the cell selected
-	     boolean cellHasFocus)    // the list and the cell have the focus
-	{
-	    String name = (String) value;
-
-	    setText( name );
-	    int farbe = ((Integer)map.get( name )).intValue();
-	    setIcon( MyCellRenderer.robIcons[farbe] );
-	    this.setFont(list.getFont());
-	    this.setOpaque( false );
-	    return this;
-	}
+            setText(name);
+            int farbe = ((Integer) map.get(name)).intValue();
+            setIcon(RoboCellRenderer.robIcons[farbe]);
+            this.setFont(list.getFont());
+            this.setOpaque(false);
+            return this;
+        }
     }
 }

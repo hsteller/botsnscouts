@@ -27,7 +27,7 @@ package de.botsnscouts.start;
 
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.OptionPane;
-import de.botsnscouts.widgets.TransparentButton;
+import de.botsnscouts.widgets.TJButton;
 import org.apache.log4j.Category;
 
 import javax.swing.*;
@@ -38,17 +38,17 @@ import java.awt.event.ActionListener;
 
 
 public class MainMenu extends JPanel implements ActionListener {
-    static Category CAT = Category.getInstance(MainMenu.class.getName());
+    private static Category CAT = Category.getInstance(MainMenu.class.getName());
 
-    Paint paint;
-    JButton gameBut;
-    JButton partBut;
-    JButton watchBut;
-    JButton editBut;
-    JButton endBut;
-    JLabel logo;
+    private Paint paint;
+    private JButton gameBut;
+    private JButton partBut;
+    private JButton watchBut;
+    private JButton editBut;
+    private JButton endBut;
+    private JLabel logo;
 
-    Start parent;
+    private Start parent;
 
     public MainMenu(Start par) {
         parent = par;
@@ -58,8 +58,6 @@ public class MainMenu extends JPanel implements ActionListener {
         GridLayout lay = new GridLayout(6, 1);
         lay.setHgap(170);
         lay.setVgap(20);
-        //lay.setHgap(100);
-        //lay.setVgap(10);
         JPanel buttons = new JPanel(lay);
         setOpaque(false);
         buttons.setOpaque(false);
@@ -72,7 +70,7 @@ public class MainMenu extends JPanel implements ActionListener {
         partBut = OptionPane.getTransparentButton(Message.say("Start", "mTeilnehmen"));
         watchBut = OptionPane.getTransparentButton(Message.say("Start", "mZuschauen"));
         editBut = OptionPane.getTransparentButton(Message.say("Start", "mEdit"));
-        endBut = new TransparentButton(Message.say("Start", "mBeenden"));
+        endBut = new TJButton(Message.say("Start", "mBeenden"));
 
         gameBut.addActionListener(this);
         partBut.addActionListener(this);
@@ -131,13 +129,11 @@ public class MainMenu extends JPanel implements ActionListener {
     }
 
     public void paint(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2 = (Graphics2D) g;
         Dimension d = getSize();
-        g2d.setPaint(paint);
-        g2d.fillRect(0, 0, d.width, d.height);
+        g2.setPaint(paint);
+        g2.fillRect(0, 0, d.width, d.height);
         paintChildren(g);
     }
 
-
-}//class MainMenu end
-
+}

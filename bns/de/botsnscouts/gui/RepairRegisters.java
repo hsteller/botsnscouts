@@ -29,6 +29,7 @@ import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.TJPanel;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.TJLabel;
 
 import javax.swing.plaf.metal.*;
 import java.util.*;
@@ -66,7 +67,7 @@ public class RepairRegisters extends TJPanel implements ActionListener{
     public RepairRegisters(ActionListener al) {
 	setBorder(new EmptyBorder(10,10,10,10));
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-	title = new JLabel();
+	title = new TJLabel();
 	done=OptionPane.getTransparentButton(Message.say("SpielerMensch","ok"), 14);
 	done.addActionListener(al);
 

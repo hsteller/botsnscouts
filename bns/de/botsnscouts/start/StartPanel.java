@@ -25,11 +25,8 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.TJLabel;
-import de.botsnscouts.widgets.TJPanel;
-import de.botsnscouts.widgets.TransparentButton;
+import de.botsnscouts.widgets.*;
 import org.apache.log4j.Category;
 
 import javax.swing.*;
@@ -49,21 +46,20 @@ import java.awt.event.ActionListener;
 public class StartPanel extends JPanel {
 
     private static final Category CAT = Category.getInstance(StartPanel.class);
-    Paint paint;
-    Start parent;
-    Thread thread;
+    private Paint paint;
+    private Start parent;
 
-    JLabel angem;
-    PlayersPanel playersComponent;
-    JComponent okComponent;
-    JComponent autobotComponent;
-    JComponent localComponent;
+    private JLabel angem;
+    private PlayersPanel playersComponent;
+    private JComponent okComponent;
+    private JComponent autobotComponent;
+    private JComponent localComponent;
 
     private StSpListener listener;
 
-    JSlider intel;
-    JTextField name;
-    JComboBox color;
+    private JSlider intel;
+    private JTextField name;
+    private JComboBox color;
 
     public StartPanel(Start par) {
         parent = par;
@@ -76,8 +72,8 @@ public class StartPanel extends JPanel {
         setBorder(new EmptyBorder(50, 50, 50, 50));
         setOpaque(false);
 
-        angem = new JLabel();
-        playersComponent = new PlayersPanel(parent, Message.say("Start", "mAngem"));
+        angem = new TJLabel();
+        playersComponent = new PlayersPanel(parent);
         okComponent = getOkComponent();
         autobotComponent = getABComponent();
         localComponent = getLocalComponent();
@@ -110,8 +106,8 @@ public class StartPanel extends JPanel {
         return listener;
     }
 
-    JComponent getLocalComponent() {
-        JComponent panel = new de.botsnscouts.widgets.ColoredComponent();
+    private JComponent getLocalComponent() {
+        JComponent panel = new ColoredComponent();
 
         panel.setOpaque(false);
 
@@ -137,7 +133,7 @@ public class StartPanel extends JPanel {
         panel.add(label, gc);
 
         // Name-Textfield
-        name = new JTextField(KrimsKrams.randomName(), JTextField.CENTER);
+        name = new TJTextField(KrimsKrams.randomName());
         name.setOpaque(false);
         gc.gridwidth = 2;
         gc.gridx = 1;
@@ -156,7 +152,7 @@ public class StartPanel extends JPanel {
         gc.gridx = 1;
         gc.gridwidth = 2;
         gc.anchor = GridBagConstraints.WEST;
-        color = new RoboBox(true); // mit Egal-Eintrag
+        color = new RoboBox(true);
 
         gc.fill = GridBagConstraints.NONE;
         gc.anchor = GridBagConstraints.CENTER;
@@ -164,7 +160,7 @@ public class StartPanel extends JPanel {
 
         // Go Button
 
-        JButton ok = new TransparentButton(Message.say("Start", "mGoButton"));
+        JButton ok = new TJButton(Message.say("Start", "mGoButton"));
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new Thread() {
@@ -192,7 +188,7 @@ public class StartPanel extends JPanel {
         return panel;
     }
 
-    JComponent getABComponent() {
+    private JComponent getABComponent() {
         JComponent panel = new ColoredComponent();
         panel.setOpaque(false);
         Font font = new Font("Sans", Font.BOLD, 24);
@@ -217,7 +213,7 @@ public class StartPanel extends JPanel {
         panel.add(label, gc);
 
         
-        JLabel nameLabel = new JLabel(Message.say("Start", "mKSName"), JLabel.LEFT);
+        JLabel nameLabel = new TJLabel(Message.say("Start", "mKSName"), JLabel.LEFT);
         gc.weightx = 0.0;
         gc.gridy++; // 3
         gc.gridx = 0;
@@ -227,7 +223,7 @@ public class StartPanel extends JPanel {
         gc.insets = new Insets(0,0,10,5);
         panel.add(nameLabel, gc);
         
-        final JTextField botNameField = new JTextField(KrimsKrams.randomName());
+        final JTextField botNameField = new TJTextField(KrimsKrams.randomName());
         botNameField.setColumns(20);
         gc.gridx = 1;
         gc.gridwidth = 2;
@@ -279,12 +275,8 @@ public class StartPanel extends JPanel {
         lb = new TJLabel(Message.say("Start", "mDumm"), JLabel.RIGHT);
         panel.add(lb, gc);
         
-        
-        
-       
-        
-        // labeled "likes belts"-checkbox 
-        final JCheckBox beltAware = new JCheckBox(Message.say("Start", "beltAware"));
+        // labeled "likes belts"-checkbox
+        final JCheckBox beltAware = new TJCheckBox(Message.say("Start", "beltAware"), false);
         beltAware.setOpaque(false);
         beltAware.setToolTipText(Message.say("Start", "beltTooltip"));     
         gc.gridy++;
@@ -293,10 +285,8 @@ public class StartPanel extends JPanel {
         gc.weightx = 0.0;        
         gc.anchor = GridBagConstraints.NORTHWEST;
         panel.add(beltAware, gc);
-        
-        
-        
-        JButton startAB = new TransparentButton(Message.say("Start", "mKSStarten"));
+
+        JButton startAB = new TJButton(Message.say("Start", "mKSStarten"));
         startAB.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 CAT.debug("intel ist jetzt " + intel.getValue());
@@ -304,8 +294,7 @@ public class StartPanel extends JPanel {
                 if (name == null || name.length() == 0)
                     name = KrimsKrams.randomName();
                 parent.addKS(parent.fassade.kuenstlicheSpielerStarten(intel.getValue(),
-                        beltAware.getModel().isSelected(),
-                        name));
+                        beltAware.getModel().isSelected(), name));
 
                 botNameField.setText(KrimsKrams.randomName());
             }
@@ -324,7 +313,7 @@ public class StartPanel extends JPanel {
         return panel;
     }
 
-    JComponent getOkComponent() {
+    private JComponent getOkComponent() {
         JComponent panel = new JPanel();
         GridLayout lay = new GridLayout(1, 2);
         lay.setHgap(50);
@@ -334,8 +323,8 @@ public class StartPanel extends JPanel {
         panel.setLayout(lay);
         panel.setOpaque(false);
 
-        JButton okBut = new TransparentButton(Message.say("Start", "mLos"));
-        JButton backBut = new TransparentButton(Message.say("Start", "mAbbrechen"));
+        JButton okBut = new TJButton(Message.say("Start", "mLos"));
+        JButton backBut = new TJButton(Message.say("Start", "mAbbrechen"));
 
         okBut.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -370,10 +359,5 @@ public class StartPanel extends JPanel {
         g2d.fillRect(0, 0, d.width, d.height);
         paintChildren(g);
     }
-
-    public void setThreadToWait(Thread th) {
-        thread = th;
-    }
-
 
 }

@@ -27,6 +27,7 @@ package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.TJLabel;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -56,7 +57,7 @@ public class StatusLog  extends JPanel implements ActionListener{
 
     // Objects
     private JTextArea textArea = new JTextArea();
-    private JLabel singleMessage = new JLabel();
+    private JLabel singleMessage = new TJLabel();
 
     private View parent;
     private LogFrame lF;

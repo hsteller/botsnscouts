@@ -29,6 +29,7 @@ import de.botsnscouts.gui.hotkey.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.PaintPanel;
+import de.botsnscouts.widgets.TJLabel;
 import org.apache.log4j.Category;
 
 import javax.swing.*;
@@ -156,9 +157,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 		gameBoardScrollPane.getHorizontalScrollBar().setUnitIncrement(64);
 		gameBoardScrollPane.getVerticalScrollBar().setUnitIncrement(64);
 		gameBoardScrollPane.setViewportView(gameBoardCanvas);
-		gameBoardScrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5,
-				5));
-		//.setScrollPane(gameBoardScrollPane);
+        gameBoardScrollPane.getViewport().setOpaque(false);
+		gameBoardScrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		add(gameBoardScrollPane, BorderLayout.CENTER);
 		gameBoardView = gameBoardScrollPane.getViewport();
 		this.initMenus();
@@ -384,8 +384,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      protected void quit(boolean keepWatching) {
         CAT.debug("AusgabeView starts procedure to quit the client..");
 	JLabel[] msg = new JLabel[2];
-	msg[0] = new JLabel(Message.say("AusgabeView", "reallyQuit1"));
-	msg[1] = new JLabel(Message.say("AusgabeView","reallyQuit2"));
+	msg[0] = new TJLabel(Message.say("AusgabeView", "reallyQuit1"));
+	msg[1] = new TJLabel(Message.say("AusgabeView","reallyQuit2"));
 	if (JOptionPane.showConfirmDialog(this, msg,
 	                Message.say("AusgabeView","reallyQuitTitle"),
 		JOptionPane.OK_CANCEL_OPTION,

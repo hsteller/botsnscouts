@@ -22,34 +22,33 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.start;
 
-import de.botsnscouts.util.*;
-import java.awt.*;
+import de.botsnscouts.util.Message;
+
 import javax.swing.*;
 
 class RoboBox extends JComboBox {
-    boolean withEgal;
+    private boolean withEgal;
 
     public RoboBox(boolean egal) {
-	String[] farben;
-	
-	withEgal = true;
-	setOpaque( false );
-	
-	if( withEgal ) {
-	    farben = new String[] {Message.say("Start","mFarbeEgal"),Message.say("Start","mFarbeGruen"),Message.say("Start","mFarbeGelb"),Message.say("Start","mFarbeRot"),Message.say("Start","mFarbeBlau"),Message.say("Start","mFarbeMagenta"),Message.say("Start","mFarbeOrange"),Message.say("Start","mFarbeGrau"),Message.say("Start","mFarbeDunkelMagenta") };
-	}
-	else {
-	    farben = new String[] {Message.say("Start","mFarbeGruen"),Message.say("Start","mFarbeGelb"),Message.say("Start","mFarbeRot"),Message.say("Start","mFarbeBlau"),Message.say("Start","mFarbeMagenta"),Message.say("Start","mFarbeOrange"),Message.say("Start","mFarbeGrau"),Message.say("Start","mFarbeDunkelMagenta") };
-	}
+        String[] farben;
 
-	setModel( new DefaultComboBoxModel( farben ) );
+        withEgal = egal;
+        setOpaque(false);
 
-	setRenderer( new MyCellRenderer( true ) );
-	setLightWeightPopupEnabled(false);
-	setSelectedIndex(0);
+        if (withEgal) {
+            farben = new String[]{Message.say("Start", "mFarbeEgal"), Message.say("Start", "mFarbeGruen"), Message.say("Start", "mFarbeGelb"), Message.say("Start", "mFarbeRot"), Message.say("Start", "mFarbeBlau"), Message.say("Start", "mFarbeMagenta"), Message.say("Start", "mFarbeOrange"), Message.say("Start", "mFarbeGrau"), Message.say("Start", "mFarbeDunkelMagenta")};
+        } else {
+            farben = new String[]{Message.say("Start", "mFarbeGruen"), Message.say("Start", "mFarbeGelb"), Message.say("Start", "mFarbeRot"), Message.say("Start", "mFarbeBlau"), Message.say("Start", "mFarbeMagenta"), Message.say("Start", "mFarbeOrange"), Message.say("Start", "mFarbeGrau"), Message.say("Start", "mFarbeDunkelMagenta")};
+        }
+
+        setModel(new DefaultComboBoxModel(farben));
+
+        setRenderer(new RoboCellRenderer(true));
+        setLightWeightPopupEnabled(false);
+        setSelectedIndex(0);
     }
 }
 	

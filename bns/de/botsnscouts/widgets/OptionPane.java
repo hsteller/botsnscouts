@@ -34,7 +34,7 @@ public class OptionPane extends JPanel {
         );
 
     public static JButton getButton(String title) {
-        return new TransparentButton(title, 12);
+        return new TJButton(title, 12);
     }
 
     public static JButton getTransparentButton(String title) {
@@ -43,7 +43,7 @@ public class OptionPane extends JPanel {
 
 
     public static JButton getTransparentButton(String title, int fontSize) {
-        return new TransparentButton(title, fontSize);
+        return new TJButton(title, fontSize);
     }
 
     static JCheckBox getCheckBox(String title) {
@@ -102,7 +102,7 @@ public class OptionPane extends JPanel {
         add(dis);
         add( getToggleButton("Sound") );
         add( getCheckBox("Sound") );
-        add( new TransparentButton("Erweitert", 12) );
+        add( new TJButton("Erweitert", 12) );
         add( getSlider("enno") );
 
 //        Box b = new Box( BoxLayout.Y_AXIS );

@@ -29,6 +29,7 @@ import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.TJPanel;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.TJLabel;
 
 import javax.swing.plaf.metal.*;
 import java.awt.*;
@@ -50,8 +51,8 @@ public class AgainPowerDown extends TJPanel {
     }
     public AgainPowerDown(ActionListener al) {
 	BoxLayout b = new BoxLayout(this,BoxLayout.Y_AXIS);
-	JLabel titel = new JLabel(Message.say("SpielerMensch","roboreaktwtitle"));
-	JLabel unter = new JLabel(Message.say("SpielerMensch","powerdownwieder"));
+	JLabel titel = new TJLabel(Message.say("SpielerMensch","roboreaktwtitle"));
+	JLabel unter = new TJLabel(Message.say("SpielerMensch","powerdownwieder"));
 	JButton wieder=OptionPane.getButton(Message.say("SpielerMensch","wiederPowerFrage"));
 	JButton weiter=OptionPane.getButton(Message.say("SpielerMensch","weiterspielen"));
 

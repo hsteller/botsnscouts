@@ -30,7 +30,7 @@ import de.botsnscouts.util.CursorMan;
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.ColoredPanel;
-import de.botsnscouts.widgets.TransparentButton;
+import de.botsnscouts.widgets.TJButton;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -173,12 +173,13 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
         tileListe.setOpaque(false);
         fuerTileListe = new JScrollPane();
         fuerTileListe.getViewport().setView(tileListe);
+        fuerTileListe.getViewport().setOpaque(false);
 
         add(BorderLayout.EAST, fuerTileListe);
         tileListe.addListSelectionListener(this);
 
-        ok = new TransparentButton(Message.say("Start", "mOK"));
-        zurueck = new TransparentButton(Message.say("Start", "mAbbr"));
+        ok = new TJButton(Message.say("Start", "mOK"));
+        zurueck = new TJButton(Message.say("Start", "mAbbr"));
         ok.setActionCommand("ok");
         ok.addActionListener(this);
         zurueck.addActionListener(this);

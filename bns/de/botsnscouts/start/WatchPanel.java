@@ -26,7 +26,9 @@
 package de.botsnscouts.start;
 
 import de.botsnscouts.util.Message;
-import de.botsnscouts.widgets.TransparentButton;
+import de.botsnscouts.widgets.TJButton;
+import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJTextField;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -69,12 +71,12 @@ public class WatchPanel extends JPanel implements ActionListener, MouseListener 
         setLayout(lay);
         setBorder(new EmptyBorder(200, 100, 200, 100));
 
-        server = new JLabel(Message.say("Start", "mServer"));
+        server = new TJLabel(Message.say("Start", "mServer"));
         //port=new JLabel(Message.say("Start","mPort"));
-        serv = new JTextField(Message.say("Start", "mServerInh"));
+        serv = new TJTextField(Message.say("Start", "mServerInh"));
         //prt=new JTextField(Message.say("Start","mPortInh"));
-        TransparentButton go = new TransparentButton(Message.say("Start", "mGoButton"));
-        TransparentButton back = new TransparentButton(Message.say("Start", "mZurueckButton"));
+        TJButton go = new TJButton(Message.say("Start", "mGoButton"));
+        TJButton back = new TJButton(Message.say("Start", "mZurueckButton"));
 
         server.setFont(font);
         //port.setFont(font);

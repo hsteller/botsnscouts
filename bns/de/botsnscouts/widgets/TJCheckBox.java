@@ -7,10 +7,11 @@ import javax.swing.*;
  */
 public class TJCheckBox extends JCheckBox {
 
-    public TJCheckBox(String label, boolean def) {
-        super(label, def);
+    public TJCheckBox(String label, boolean selected) {
+        super(label, selected);
         setOpaque(false);
-        setFont( GreenTheme.getFont());
+        setForeground(GreenTheme.getTextColor());
+        setFont(GreenTheme.getFont());
     }
 
 }

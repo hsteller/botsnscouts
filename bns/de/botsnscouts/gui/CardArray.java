@@ -29,6 +29,7 @@ import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.TJPanel;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.TJCheckBox;
 
 import javax.swing.plaf.metal.*;
 import java.util.*;
@@ -44,7 +45,7 @@ public class CardArray extends TJPanel {
 
     private JButton sendButton = OptionPane.getTransparentButton(Message.say("SpielerMensch","senden"), 14);
     private ArrayList cardsView = new ArrayList(9);
-    private JCheckBox powerDownBox = new JCheckBox(Message.say("SpielerMensch","powerdown"),false);
+    private JCheckBox powerDownBox = new TJCheckBox(Message.say("SpielerMensch","powerdown"),false);
     private int xsize=150, ysize=550;
 
     public CardArray() {

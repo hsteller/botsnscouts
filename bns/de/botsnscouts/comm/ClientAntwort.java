@@ -24,103 +24,135 @@
  *******************************************************************/
 
 package de.botsnscouts.comm;
+
 import de.botsnscouts.util.*;
-public class ClientAntwort implements Comparable{
-    /** Ermoeglicht die Abfrage der Kommunikationsart mittels der Konstanten dieser Klasse
-     *@author Hendrik<BR>*/
+
+public class ClientAntwort implements Comparable {
+    /**
+     * Ermoeglicht die Abfrage der Kommunikationsart mittels der Konstanten dieser Klasse
+     */
     public int typ;
-    /** Container; enthaelt den Location, der bei ROBOTERPOS oder SPIELFELDDIM zurueckgegeben wird.*/
+    /**
+     * Container; enthaelt den Location, der bei ROBOTERPOS oder SPIELFELDDIM zurueckgegeben wird.
+     */
     public Location ort;
-    /** Container; enthaelt die Positionen der Flaggen bei FAHNENPOS*/
-    public Location [] positionen;
-    /** Container; falls ein einzelner String geschickt wurde, ist er in str abgelegt, so zum Beispiel bei 'entfernung': dann steht der Entfernungsgrund in str*/
+    /**
+     * Container; enthaelt die Positionen der Flaggen bei FAHNENPOS
+     */
+    public Location[] positionen;
+    /**
+     * Container; falls ein einzelner String geschickt wurde, ist er in str abgelegt, so zum Beispiel bei 'entfernung': dann steht der Entfernungsgrund in str
+     */
     public String str;
-    /** Container; Falls mehrere Strings (Namen) geschickt wurden, sind diese in ´namen´ abgelegt (bei SPIELERNAMEN, SPIELSTAND) */
-    public String [] namen;
+    /**
+     * Container; Falls mehrere Strings (Namen) geschickt wurden, sind diese in ´namen´ abgelegt (bei SPIELERNAMEN, SPIELSTAND)
+     */
+    public String[] namen;
 
-    // DEPRECATED
-    //  /** Container; wird nicht mehr benoetigt, da wir gibFeldinhalt doch nicht brauchen.*/
-    // public Feld feld;
-
-
-
-
-    /** Container; enthaelt die ausgeteilten Karten bei MACHEZUG*/
-    public Card [] karten;
-    /** Container; wird gesetzt, falls ein bool geschickt wird*/
+    /**
+     * Container; enthaelt die ausgeteilten Karten bei MACHEZUG
+     */
+    public Card[] karten;
+    /**
+     * Container; wird gesetzt, falls ein bool geschickt wird
+     */
     public boolean ok;
-    /** Container; enthaelt bei SPIELSTATUS für jeden Bot ein Statusobjekt*/
-    public Status [] stati;
-    /** Container ; enthaelt bei TIMEOUT das Timeout, bei REPARATUR die Registerzahl */
+    /**
+     * Container; enthaelt bei SPIELSTATUS für jeden Bot ein Statusobjekt
+     */
+    public Status[] stati;
+    /**
+     * Container ; enthaelt bei TIMEOUT das Timeout, bei REPARATUR die Registerzahl
+     */
     public int zahl;
 
-    /** added later to fix some timing bugs in (laser-)animations;
-     *  might be used for synchronizing "notify change"s and
-     *  information messages (i.e. to avoid that a bot is removed from the
-     *  board (triggered by a "notify change") before a possible laser animation
-     *  is shown (triggered by an information message)
+    /**
+     * added later to fix some timing bugs in (laser-)animations;
+     * might be used for synchronizing "notify change"s and
+     * information messages (i.e. to avoid that a bot is removed from the
+     * board (triggered by a "notify change") before a possible laser animation
+     * is shown (triggered by an information message)
      */
-    public int messageSequenceNumber=-1;
+    public int messageSequenceNumber = -1;
 
 
-    /** Used by the MessageSequencer */
+    /**
+     * Used by the MessageSequencer
+     */
     public String specialMessageId;
 
-    public Bot [] updatedBotsForNTC;
+    public Bot[] updatedBotsForNTC;
 
-    /** Used by the Sequencer to sort received messages by their number*/
-    public int compareTo(Object o){
-      ClientAntwort ca = (ClientAntwort) o;
-      int num = ca.messageSequenceNumber;
-      if (messageSequenceNumber==num)
-        return 0;
-      else if (messageSequenceNumber<num)
-        return -1;
-      else
-        return 1;
+    /**
+     * Used by the Sequencer to sort received messages by their number
+     */
+    public int compareTo(Object o) {
+        ClientAntwort ca = (ClientAntwort) o;
+        int num = ca.messageSequenceNumber;
+        return messageSequenceNumber-num;
     }
 
 
-
-    public final static int SPIELFELDDIM=1;
-    public final static int FAHNENPOS=2;
-    public final static int SPIELERNAMEN=3;
-    public final static int ROBOTERPOS=4;
-    public final static int SPIELSTAND=5;
-    public final static int SPIELSTATUS=6;
-    public final static int MACHEZUG=7;
-    public final static int ANGEMELDET=8;
-    public final static int ZERSTOERUNG=9;
-    public final static int REAKTIVIERUNG=10;
-    public final static int REPARATUR=11;
-    public final static int ENTFERNUNG=12;
-    public final static int AENDERUNG=13;
-    public final static int TIMEOUT=14;
-    public final static int SPIELSTART=15;
-    public final static int MESSAGE=16;
+    public final static int SPIELFELDDIM = 1;
+    public final static int FAHNENPOS = 2;
+    public final static int SPIELERNAMEN = 3;
+    public final static int ROBOTERPOS = 4;
+    public final static int SPIELSTAND = 5;
+    public final static int SPIELSTATUS = 6;
+    public final static int MACHEZUG = 7;
+    public final static int ANGEMELDET = 8;
+    public final static int ZERSTOERUNG = 9;
+    public final static int REAKTIVIERUNG = 10;
+    public final static int REPARATUR = 11;
+    public final static int ENTFERNUNG = 12;
+    public final static int AENDERUNG = 13;
+    public final static int TIMEOUT = 14;
+    public final static int SPIELSTART = 15;
+    public final static int MESSAGE = 16;
     public final static int BOOLEAN = 17;
-    /** Liefert den (Konstanten-)Namen des Typs des Antwortobjektes zurück*/
+
+    /**
+     * Liefert den (Konstanten-)Namen des Typs des Antwortobjektes zurück
+     */
     public String getTyp() {
-	switch (this.typ) {
-	case SPIELFELDDIM: return "SPIELFELDDIM";
-	case FAHNENPOS: return "FAHNENPOS";
-	case SPIELERNAMEN: return "SPIELERNAMEN";
-	case ROBOTERPOS: return "ROBOTERPOS";
-	case SPIELSTAND: return "SPIELSTAND";
-	case SPIELSTATUS: return "SPIELSTATUS";
-	case MACHEZUG: return "MACHEZUG";
-	case ANGEMELDET: return "ANGEMELDET";
-	case ZERSTOERUNG: return "ZERSTOERUNG";
-	case REAKTIVIERUNG: return "REAKTIVIERUMG";
-	case REPARATUR: return "REPARATUR";
-	case ENTFERNUNG: return "ENTFERNUNG";
-	case AENDERUNG: return "AENDERUNG";
-	case TIMEOUT: return "TIMEOUT";
-	case SPIELSTART: return "SPIELSTART";
-	case MESSAGE: return "MESSAGE";
-	case BOOLEAN: return "BOOLEAN";
-	default: return "ERROR - UNKNOWN KIND OF COMMUNICATION (Typ: "+this.typ+")";
-	}
+        switch (this.typ) {
+            case SPIELFELDDIM:
+                return "SPIELFELDDIM";
+            case FAHNENPOS:
+                return "FAHNENPOS";
+            case SPIELERNAMEN:
+                return "SPIELERNAMEN";
+            case ROBOTERPOS:
+                return "ROBOTERPOS";
+            case SPIELSTAND:
+                return "SPIELSTAND";
+            case SPIELSTATUS:
+                return "SPIELSTATUS";
+            case MACHEZUG:
+                return "MACHEZUG";
+            case ANGEMELDET:
+                return "ANGEMELDET";
+            case ZERSTOERUNG:
+                return "ZERSTOERUNG";
+            case REAKTIVIERUNG:
+                return "REAKTIVIERUMG";
+            case REPARATUR:
+                return "REPARATUR";
+            case ENTFERNUNG:
+                return "ENTFERNUNG";
+            case AENDERUNG:
+                return "AENDERUNG";
+            case TIMEOUT:
+                return "TIMEOUT";
+            case SPIELSTART:
+                return "SPIELSTART";
+            case MESSAGE:
+                return "MESSAGE";
+            case BOOLEAN:
+                return "BOOLEAN";
+            default:
+                return "ERROR - UNKNOWN KIND OF COMMUNICATION (Typ: " + this.typ + ")";
+        }
     }
 
 }

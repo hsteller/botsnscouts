@@ -36,6 +36,7 @@ import javax.swing.border.*;
 
 
 import de.botsnscouts.util.*;
+import de.botsnscouts.widgets.TJLabel;
 
 /**
  * Fenster, das weitere Statusinfos anzeigt
@@ -77,17 +78,17 @@ public class ExtendedRobStatus extends JFrame {
 	    gelegtKarte += "]";
 	}
 	// ---- Label erzeugen
-	gesperrt = new JLabel(Message.say("Ausgabe","gespReg")+gespReg);
+	gesperrt = new TJLabel(Message.say("Ausgabe","gespReg")+gespReg);
 	hauptPanel.add(gesperrt);
-	gelegt = new JLabel(Message.say("Ausgabe","gelKarte")+gelegtKarte);
+	gelegt = new TJLabel(Message.say("Ausgabe","gelKarte")+gelegtKarte);
 	hauptPanel.add(gelegt);
-	archivpos = new JLabel(Message.say("Ausgabe","archPos")+" x: "+r.getArchiveX()+" y: "+r.getArchiveY());
+	archivpos = new TJLabel(Message.say("Ausgabe","archPos")+" x: "+r.getArchiveX()+" y: "+r.getArchiveY());
 	hauptPanel.add(archivpos);
-	aktiviert = new JLabel(Message.say("Ausgabe","aktiviert")+r.isActivated());
+	aktiviert = new TJLabel(Message.say("Ausgabe","aktiviert")+r.isActivated());
 	hauptPanel.add(aktiviert);
-	virtuell = new JLabel(Message.say("Ausgabe","virtuell")+r.isVirtual());
+	virtuell = new TJLabel(Message.say("Ausgabe","virtuell")+r.isVirtual());
 	hauptPanel.add(virtuell);
-	pos = new JLabel(Message.say("Ausgabe","pos")+" x: "+r.getX()+" y: "+r.getY());
+	pos = new TJLabel(Message.say("Ausgabe","pos")+" x: "+r.getX()+" y: "+r.getY());
 	hauptPanel.add(pos);
 	getContentPane().add(hauptPanel);
     }

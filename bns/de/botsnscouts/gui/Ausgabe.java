@@ -71,7 +71,9 @@ public class Ausgabe extends BNSThread {
     private boolean nosplash = false;
     private boolean registered = false;
 
-    /** the last phase of the current turn */
+    /**
+     * the last phase of the current turn
+     */
     private int lastPhase = 1;
 
 
@@ -81,43 +83,45 @@ public class Ausgabe extends BNSThread {
     // -> see last case in the run()-method and abmelden()
     private boolean quitByMyself = false;
 
-
-    
-    
-    /** A dummy that is used to map various message types to one single AbstractMessageAction
-     *  that does nothing else than displaying the message in the transparent chatpane
+    /**
+     * A dummy that is used to map various message types to one single AbstractMessageAction
+     * that does nothing else than displaying the message in the transparent chatpane
      */
     private static final String DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY = "just show this message in chatpane";
 
-    /** We will receive "notify changes" (NTC) and more detailed information messages
-     *  about what is happening in a f***ed up order.
-     *  To avoid display errors (i.e. removing a killed robot before it was shot),
-     *  we will stuff all messages into this sequencer that will know (because of
-     *  sequence numbers)  when it is time to act.
+    /**
+     * We will receive "notify changes" (NTC) and more detailed information messages
+     * about what is happening in a f***ed up order.
+     * To avoid display errors (i.e. removing a killed robot before it was shot),
+     * we will stuff all messages into this sequencer that will know (because of
+     * sequence numbers)  when it is time to act.
      */
-    private MessageSequencer sequencer = new MessageSequencer();
+    private MessageSequencer sequencer;
 
-
-    /** Turns animation of robot movement on or off;
-     *  visibility is public (not private), because the GUI (BoardView) needs to know about that, too.
+    /**
+     * Turns animation of robot movement on or off;
+     * visibility is public (not private), because the GUI (BoardView) needs to know about that, too.
      */
-   public static final boolean IS_ROB_MOVE_ANIMATION_ENABLED =  new Boolean (System.getProperty("enableRobMoveAnimation","true")).booleanValue();//false;
+    public static final boolean IS_ROB_MOVE_ANIMATION_ENABLED = new Boolean(System.getProperty("enableRobMoveAnimation", "true")).booleanValue();
 
-    public Ausgabe() {
-        this("localhost", 8077, false);
-    }
-
-    public Ausgabe(String host, int port, Object o, boolean nosplash) {
-        this(host, port, nosplash);
-    }
-
-    public Ausgabe(String host, int port, boolean nosplash, /* HumanPlayer human,*/ View v) {
-        this(host, port, nosplash);
-        //this.human = human;
+    /**
+     * Start a new Ausgabe with a View. It will start displaying Message 1.
+     */
+    public Ausgabe(String host, int port, boolean nosplash, View v) {
+        this(host, port, nosplash, false);
         this.view = v;
     }
 
+    /**
+     * Start a new stand-alone Ausgabe. It will start displaying Messages immediately, discarding
+     * earlier ones that arrive out-of-sequence.
+     */
     public Ausgabe(String host, int port, boolean nosplash) {
+        this(host, port, nosplash, true);
+    }
+
+    private Ausgabe(String host, int port, boolean nosplash, boolean lateInit) {
+        sequencer = new MessageSequencer(lateInit);
         this.nosplash = nosplash;
         this.host = host;
         this.port = port;
@@ -127,9 +131,7 @@ public class Ausgabe extends BNSThread {
         kommClient = new KommClientAusgabe();
         initSpecialMessagesSet();
         initMessageToActionMapping();
-
     }
-
 
     public void run() {
 
@@ -138,7 +140,6 @@ public class Ausgabe extends BNSThread {
         }
 
         // ---- entering game  ---------
-
         while (!spielEnde) {
             try {
 // waiting for server messages
@@ -154,7 +155,7 @@ public class Ausgabe extends BNSThread {
             switch (kommAntwort.typ) {
                 case (ClientAntwort.MESSAGE):
                     { // (user information) messages about stuff that happend;
-// for advanced displaying, playing sounds at the right time
+                        // for advanced displaying, playing sounds at the right time
                         comHandleMessages(kommAntwort);
                         break;
                     }
@@ -174,7 +175,7 @@ public class Ausgabe extends BNSThread {
 
                 case (ClientAntwort.ENTFERNUNG):
                     { // we were removed for some reason, i.e. game is over,
-// there was a timeout, we violated some protocol rule
+                        // there was a timeout, we violated some protocol rule
                         CAT.info("Game over.");
                         comHandleWeWereRemoved(kommAntwort);
                     }
@@ -199,7 +200,7 @@ public class Ausgabe extends BNSThread {
             return;
         }
 
-        if (kommAntwort.typ == kommAntwort.SPIELSTART) {
+        if (kommAntwort.typ == ClientAntwort.SPIELSTART) {
             CAT.debug("Server send me: game start.");
 
             // ------- fetching the board -----
@@ -208,10 +209,10 @@ public class Ausgabe extends BNSThread {
                 String[] playerColors = kommClient.getFarben();
                 Hashtable playerColorHash = new Hashtable(playerColors.length);
 
-// some magic for setting the robot colors
+                // some magic for setting the robot colors
                 Color[] robotsNewColor = initRobotColors(playerColorHash, playerColors);
 
-// Initializing the robots an applying the colors to their visualization
+                // Initializing the robots an applying the colors to their visualization
                 for (int i = 0; i < playerNames.length; i++) {
                     d("Hole Roboterstatus von: " + playerNames[i]);
                     Bot tempRob = kommClient.getRobStatus(playerNames[i]);
@@ -513,7 +514,6 @@ public class Ausgabe extends BNSThread {
     }
 
     private void comHandleWeWereRemoved(ClientAntwort kommAntwort) {
-
         // we asked the server to be removed..
         if (quitByMyself) { // hendrik was here..
             CAT.debug("server seems to confirm our request for quitting the game");
@@ -557,8 +557,9 @@ public class Ausgabe extends BNSThread {
     }
 
 
-    /** returns true if the state of the robot <code>robotNew</code>
-     *  has changed from alive to dead or dead to alive.
+    /**
+     * returns true if the state of the robot <code>robotNew</code>
+     * has changed from alive to dead or dead to alive.
      */
     /*private boolean hasCrossedAcheron (Bot robotNew) {
       Bot old = (Bot) robots.get(robotNew.getName());
@@ -579,7 +580,6 @@ public class Ausgabe extends BNSThread {
 
     }
   */
-
 
 
     private void comHandleNotifyChange(ClientAntwort kommAntwort) throws KommException {
@@ -623,13 +623,15 @@ public class Ausgabe extends BNSThread {
 
     // now some methods for fixing an issue that is caused by using the sequencer:
     // <SEQUENCER-FIX>
-    /** contains messages that have special handler methods that also take
-     *  care about displaying them in the chatpane.
+    /**
+     * contains messages that have special handler methods that also take
+     * care about displaying them in the chatpane.
      */
     private HashSet specialMessages = new HashSet();
 
-    /** Add all message ids to <code>specialMessages</code> that have a special
-     *  handler method
+    /**
+     * Add all message ids to <code>specialMessages</code> that have a special
+     * handler method
      */
     private void initSpecialMessagesSet() {
         specialMessages = new HashSet();
@@ -690,9 +692,10 @@ public class Ausgabe extends BNSThread {
     }
 
 
-    /** send response to the server that we got the message
-     and did all the stuff we wanted to do, so the server can
-     send the next message
+    /**
+     * send response to the server that we got the message
+     * and did all the stuff we wanted to do, so the server can
+     * send the next message
      */
     private void acknowledgeMessage() {
         try {
@@ -768,13 +771,14 @@ public class Ausgabe extends BNSThread {
         }
     }
 
-    /** Has to be called if we receive a message about a bot being destroyed.
-     *  As far as I know this is may concern messages for the following events:
-     *  a) bot fell into pit       [done]
-     *  b) bot shot another bot    [done]
-     *  c) boardlaser shot a bot   [done]
-     *  d) bot was crushed         [done]
-     *  e) (???) robot removed from game (???) [--]
+    /**
+     * Has to be called if we receive a message about a bot being destroyed.
+     * As far as I know this is may concern messages for the following events:
+     * a) bot fell into pit       [done]
+     * b) bot shot another bot    [done]
+     * c) boardlaser shot a bot   [done]
+     * d) bot was crushed         [done]
+     * e) (???) robot removed from game (???) [--]
      */
     /*private void updateLaserAnimationHackMessageStuff(Bot bot, boolean botIsUpdated){
 
@@ -914,7 +918,6 @@ public class Ausgabe extends BNSThread {
         Stats actualStats = stats.getStats(r1.getName());
         actualStats.incAskWisenheimer();
     }
-  
 
     private void comMsgHandleActionStart(ClientAntwort ca) {
         CAT.debug("got an action start");
@@ -925,7 +928,6 @@ public class Ausgabe extends BNSThread {
     }
 
     private void comMsgHandleRobotMove(ClientAntwort kommAntwort) {
-
         String robname = kommAntwort.namen[1];
         Bot r = (Bot) robots.get(robname);
         String direction = kommAntwort.namen[2];
@@ -943,9 +945,8 @@ public class Ausgabe extends BNSThread {
 
         }
     }
-    
-    private void comMsgHandleRobotTurn(ClientAntwort kommAntwort) {
 
+    private void comMsgHandleRobotTurn(ClientAntwort kommAntwort) {
         String robname = kommAntwort.namen[1];
         Bot r = (Bot) robots.get(robname);
         String direction = kommAntwort.namen[2];
@@ -967,14 +968,14 @@ public class Ausgabe extends BNSThread {
     private void comMsgHandleRobotUTurn(ClientAntwort kommAntwort) {
 
         String robname = kommAntwort.namen[1];
-        Bot r = (Bot) robots.get(robname);        
+        Bot r = (Bot) robots.get(robname);
         if (CAT.isDebugEnabled()) {
             CAT.debug("Got robot U-Turn message for robot \"" + robname + "\"");
         }
         ausgabeView.animateRobUTurn(r);
-       
+
     }
-    
+
     private String[] extractMessage(ClientAntwort kommAntwort) {
         int size = kommAntwort.namen.length - 1;
 
@@ -985,10 +986,7 @@ public class Ausgabe extends BNSThread {
         return tmpstr;
     }
 
-
     private void initMessageToActionMapping() {
-
-        
         sequencer.addActionMapping(MessageID.SIGNAL_ACTION_START,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {
@@ -1093,21 +1091,21 @@ public class Ausgabe extends BNSThread {
                 });
 
         sequencer.addActionMapping(MessageID.BOT_TURN,
-                        new AbstractMessageAction() {
-                            public void invoke(ClientAntwort msgData) {
-                                if (IS_ROB_MOVE_ANIMATION_ENABLED)
-                                    comMsgHandleRobotTurn(msgData);
-                            }
-                        });
+                new AbstractMessageAction() {
+                    public void invoke(ClientAntwort msgData) {
+                        if (IS_ROB_MOVE_ANIMATION_ENABLED)
+                            comMsgHandleRobotTurn(msgData);
+                    }
+                });
         sequencer.addActionMapping(MessageID.BOT_UTURN,
-                        new AbstractMessageAction() {
-                            public void invoke(ClientAntwort msgData) {
-                                if (IS_ROB_MOVE_ANIMATION_ENABLED)
-                                    comMsgHandleRobotUTurn(msgData);
-                            }
-                        });
+                new AbstractMessageAction() {
+                    public void invoke(ClientAntwort msgData) {
+                        if (IS_ROB_MOVE_ANIMATION_ENABLED)
+                            comMsgHandleRobotUTurn(msgData);
+                    }
+                });
 
-        
+
         sequencer.addActionMapping(DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {
@@ -1129,8 +1127,6 @@ public class Ausgabe extends BNSThread {
                         updateBoardView();
                     }
                 });
-
-
     }
 
 }

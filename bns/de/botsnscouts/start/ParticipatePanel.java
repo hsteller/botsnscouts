@@ -51,8 +51,8 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
 
     public ParticipatePanel(Start par) {
 
-        TransparentButton go;
-        TransparentButton back;
+        TJButton go;
+        TJButton back;
 
         parent = par;
         parent.setTitle(Message.say("Start", "mTeilnehmen"));
@@ -75,8 +75,8 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
         farb = new RoboBox(true);
         farb.setOpaque(false);
         farb.setFont(new Font("Sans", Font.BOLD, 24));
-        go = new TransparentButton(Message.say("Start", "mGoButton"));
-        back = new TransparentButton(Message.say("Start", "mZurueckButton"));
+        go = new TJButton(Message.say("Start", "mGoButton"));
+        back = new TJButton(Message.say("Start", "mZurueckButton"));
 
         go.addActionListener(this);
         back.addActionListener(this);
@@ -97,7 +97,6 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
 
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("go")) {
-
             Thread smth = parent.fassade.amSpielTeilnehmen(serv.getText(), nam.getText(), farb.getSelectedIndex());
             Global.debug(this, "SpielerMensch gestartet");
             parent.addKS(smth);

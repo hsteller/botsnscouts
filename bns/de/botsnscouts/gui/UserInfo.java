@@ -25,16 +25,17 @@
 
 package de.botsnscouts.gui;
 
-import de.botsnscouts.util.*;
-import de.botsnscouts.widgets.TJPanel;
+import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.TJPanel;
+import de.botsnscouts.widgets.TJButton;
+import de.botsnscouts.widgets.TJLabel;
 
-import javax.swing.plaf.metal.*;
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.*;
-import java.util.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 /**
  * ask the user for the direction
  * @author Lukasz Pekacki
@@ -47,9 +48,9 @@ public class UserInfo extends TJPanel {
 
     public UserInfo() {
 	BoxLayout b = new BoxLayout(this,BoxLayout.Y_AXIS);
-	JButton weiter=new JButton(Message.say("SpielerMensch","weiterspielen"));
+	JButton weiter=new TJButton(Message.say("SpielerMensch","weiterspielen"));
 	for (int i =0; i < 10; i++) {
-	    JLabel l = new JLabel("");
+	    JLabel l = new TJLabel("");
 	    labels.add(i,l);
 	    add(l);
 	    add(Box.createVerticalStrut(5));

@@ -333,12 +333,10 @@ public class Start extends JFrame implements WindowListener {
 
 
     public static void main(String[] argv, Splash splash) {
-
         initBasics();
 
         if (argv.length >= 4) {
             try {
-
                 String spielfeld = argv[1];
                 if (spielfeld.toLowerCase().endsWith(".spf")) {
                     spielfeld = spielfeld.substring(0, spielfeld.length() - 4);

@@ -28,58 +28,59 @@ package de.botsnscouts.widgets;
 import javax.swing.*;
 import java.awt.*;
 
-/** Transparent JLabel */
+/**
+ * Transparent JLabel
+ */
 public class TJLabel extends JLabel {
 
     private static Font fontSmall = new Font("Sans", Font.BOLD, 12);
     private static Font fontBig = new Font("Sans", Font.BOLD, 24);
-
+    private static Color textColor = GreenTheme.getTextColor();
 
     public TJLabel() {
+        init();
+    }
+
+    private void init() {
         setOpaque(false);
         setFont(fontSmall);
+        setForeground(textColor);
     }
 
     public TJLabel(String text) {
         super(text);
-        setOpaque(false);
-        setFont(fontSmall);
+        init();
     }
 
     public TJLabel(String text, int align) {
         super(text, align);
-        setOpaque(false);
-        setFont(fontSmall);
-
+        init();
     }
 
-    public TJLabel( String text, Color color ) {
-        super( text );
-        setOpaque( false );
-        setFont( fontSmall );
-        setForeground( color );
+    public TJLabel(String text, Color color) {
+        super(text);
+        init();
+        setForeground(color);
     }
 
-    public TJLabel( String text, Color color, boolean big ) {
-        super( text );
-        setOpaque( false );
-        setForeground( color );
-        if (big)
-            setFont( fontBig );
-        else
-            setFont( fontSmall);
+    public TJLabel(String text, Color color, boolean big) {
+        super(text);
+        init();
+        setForeground(color);
+        if (big) {
+            setFont(fontBig);
+        } else {
+            setFont(fontSmall);
+        }
     }
 
     public TJLabel(Icon icon) {
         super(icon);
-        setOpaque(false);
-        setFont(fontSmall);
-
+        init();
     }
 
     public TJLabel(Icon icon, int align) {
         super(icon, align);
-        setOpaque(false);
-        setFont(fontSmall);
+        init();
     }
 }

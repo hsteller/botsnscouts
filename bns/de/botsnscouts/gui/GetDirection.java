@@ -28,6 +28,7 @@ package de.botsnscouts.gui;
 import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.TJPanel;
 import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.TJLabel;
 
 import javax.swing.plaf.metal.*;
 import java.awt.*;
@@ -53,7 +54,7 @@ public class GetDirection extends TJPanel {
     public GetDirection(ActionListener al) {
 	setLayout(new BorderLayout());
 
-	JLabel titel = new JLabel(Message.say("SpielerMensch","richtungwahl"));
+	JLabel titel = new TJLabel(Message.say("SpielerMensch","richtungwahl"));
 	add(titel,BorderLayout.NORTH);
 	TJPanel p = new TJPanel();
 	p.setBorder(new EtchedBorder(4));

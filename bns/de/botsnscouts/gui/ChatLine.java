@@ -2,6 +2,7 @@ package de.botsnscouts.gui;
 
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.ColoredComponent;
+import de.botsnscouts.widgets.TJLabel;
 import org.apache.log4j.Category;
 
 import javax.swing.*;
@@ -21,7 +22,7 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
         this.view = view;
         this.humanPlayer = humanPlayer;
         setLayout( new BorderLayout() );
-        add( new JLabel("Chat: "), BorderLayout.WEST );
+        add( new TJLabel("Chat: "), BorderLayout.WEST );
         text = new JTextField(45) {
           boolean firstCall = true;
           public void paint (Graphics g) {

@@ -27,6 +27,7 @@ package de.botsnscouts.start;
 
 import de.botsnscouts.util.*;
 import de.botsnscouts.widgets.*;
+import org.apache.log4j.Category;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -41,40 +42,40 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.log4j.Category;
-
 /**
  * You see this panel when you want to host a game.
  * You choose the create the board and choose other game options
  * and then start the server and others can register.
  */
 public class GameFieldPanel extends JPanel {
-    Paint paint;
-    Start parent;
+    private Paint paint;
+    private Start parent;
 
-    FieldGrid spf;
+    private FieldGrid boardGrid;
     JPanel pnl;
-    JScrollPane scrl;
+    private JScrollPane scrl;
 
-    JComponent okPanel;
-    JButton okBut;
-    JButton backBut;
+    private JComponent okPanel;
+    private JButton okBut;
+    private JButton backBut;
 
-    JComponent editPanel;
-    JComboBox spielfelder;
-    JButton save;
-    JButton edit;
-    JTextField nam;
-    JComboBox farben;
-    JCheckBox mitspielen;
-    GameFieldLoader loader = new GameFieldLoader();
-    JFileChooser chooser;
-    JCheckBox allowWisenheimer;
-    JCheckBox allowScout;
+    private JComponent editPanel;
+    private JComboBox spielfelder;
+    private JButton save;
+    private JButton edit;
+    private JTextField nam;
+    private JComboBox colors;
+    private JCheckBox participate;
+    private GameFieldLoader loader = new GameFieldLoader();
+    private JFileChooser chooser;
+    private JCheckBox allowWisenheimer;
+    private JCheckBox allowScout;
 
     private GameOptions gameOptions;
 
-    /** Announce the game at a meta server? */
+    /**
+     * Announce the game at a meta server?
+     */
     private AnnounceGame announceGame = new AnnounceGame();
 
     private final static Category CAT = Category.getInstance(GameFieldPanel.class);
@@ -86,7 +87,7 @@ public class GameFieldPanel extends JPanel {
 
         editPanel = getEditPanel();
         okPanel = getOkPanel();
-        spf = new FieldGrid(par);
+        boardGrid = new FieldGrid(par);
         BorderLayout lay = new BorderLayout();
 
         setLayout(lay);
@@ -97,15 +98,16 @@ public class GameFieldPanel extends JPanel {
         pnl = new TJPanel();
         pnl.setLayout(new FlowLayout());
         pnl.setBorder(new EmptyBorder(50, 50, 50, 50));
-        pnl.add(spf);
+        pnl.add(boardGrid);
 
         scrl.setOpaque(false);
+        scrl.getViewport().setOpaque(false);
         scrl.getViewport().setView(pnl);
 
         add(BorderLayout.SOUTH, okPanel);
         add(BorderLayout.CENTER, scrl);
         add(BorderLayout.EAST, editPanel);
-        spf.rasterChanged();
+        boardGrid.rasterChanged();
 
         gameOptions = parent.fassade.getGameOptions();
     }
@@ -128,8 +130,8 @@ public class GameFieldPanel extends JPanel {
         panel.setLayout(lay);
         panel.setOpaque(false);
 
-        okBut = new TransparentButton(Message.say("Start", "mSpielStarten"));
-        backBut = new TransparentButton(Message.say("Start", "mZurueckButton"));
+        okBut = new TJButton(Message.say("Start", "mSpielStarten"));
+        backBut = new TJButton(Message.say("Start", "mZurueckButton"));
 
         okBut.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -176,8 +178,9 @@ public class GameFieldPanel extends JPanel {
         spielfelder = new JComboBox(spielfeldAr);
         spielfeld.setVisible(false);
         spielfelder.setVisible(true);
+        spielfelder.setOpaque(false);
 
-        save = new TransparentButton(Message.say("Start", "bSave"));
+        save = new TJButton(Message.say("Start", "bSave"));
         save.setVisible(true);
         save.setEnabled(true);
         save.addActionListener(new ActionListener() {
@@ -189,7 +192,9 @@ public class GameFieldPanel extends JPanel {
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = chooser.getSelectedFile();
                     String filename = file.getName();
-                    if (file.getName().equals("")) return;
+                    if (file.getName().equals("")) {
+                        return;
+                    }
                     if (!filename.endsWith(".spf")) {
                         file = new File(file.getParent(), filename + ".spf");
                     }
@@ -209,19 +214,19 @@ public class GameFieldPanel extends JPanel {
             }
         });
 
-        edit = new TransparentButton(Message.say("Start", "mBearbeiten"));
+        edit = new TJButton(Message.say("Start", "mBearbeiten"));
         edit.setVisible(true);
         edit.setEnabled(true);
         edit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                parent.showFieldEditor(spf);
+                parent.showFieldEditor(boardGrid);
                 edit.getModel().setRollover(false);
             }
         });
 
         nam = new TJTextField(Conf.getDefaultRobName());
-        farben = new RoboBox(true);
-        mitspielen = new TJCheckBox(Message.say("Start", "mTeilnehmenBox"), true);
+        colors = new RoboBox(true);
+        participate = new TJCheckBox(Message.say("Start", "mTeilnehmenBox"), true);
 
         allowScout = new TJCheckBox(Message.say("Start", "mAllowScout"), true);
         allowWisenheimer = new TJCheckBox(Message.say("Start", "mAllowWisenheimer"), true);
@@ -230,44 +235,40 @@ public class GameFieldPanel extends JPanel {
         metaServer.setEnabled(announceGame.willBeAnnounced());
         final JCheckBox announce = new TJCheckBox(Message.say("Start", "mAnnounceMetaServer"),
                 announceGame.willBeAnnounced());
-        announce.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        metaServer.setEnabled(announce.isSelected());
-                        metaServer.setEditable(announce.isSelected());
-                        announceGame.setAnnounce(announce.isSelected());
-                    }
+        announce.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                metaServer.setEnabled(announce.isSelected());
+                metaServer.setEditable(announce.isSelected());
+                announceGame.setAnnounce(announce.isSelected());
+            }
+        });
+        metaServer.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    announceGame.parse(((JTextField) e.getSource()).getText());
+                } catch (InvalidInputException ex) {
+                    CAT.debug(ex.getMessage());
+                    //TODO: beep
+                    metaServer.setText(announceGame.getServerString());
                 }
-        );
-        metaServer.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            announceGame.parse(((JTextField) e.getSource()).getText());
-                        } catch (InvalidInputException ex) {
-                            CAT.debug(ex.getMessage());
-                            //TODO: beep
-                            metaServer.setText(announceGame.getServerString());
-                        }
-                    }
-                }
-        );
+            }
+        });
 
         spielfelder.setFont(font);
         save.setFont(font);
         edit.setFont(font);
         spielfelder.setEnabled(true);
 
-        mitspielen.addChangeListener(new ChangeListener() {
+        participate.addChangeListener(new ChangeListener() {
             //changeListener Methode
             //Invoked when the target of the listener has changed its state.
             public void stateChanged(ChangeEvent e) {
-                if (!mitspielen.isSelected()) {
+                if (!participate.isSelected()) {
                     nam.setEnabled(false);
-                    farben.setEnabled(false);
+                    colors.setEnabled(false);
                 } else {
                     nam.setEnabled(true);
-                    farben.setEnabled(true);
+                    colors.setEnabled(true);
                 }
             }
         });
@@ -277,11 +278,11 @@ public class GameFieldPanel extends JPanel {
         inner.add(spielfelder, gc);
         inner.add(save, gc);
         inner.add(edit, gc);
-        inner.add(mitspielen, gc);
+        inner.add(participate, gc);
         inner.add(new TJLabel(Message.say("Start", "mName")), gc);
         inner.add(nam, gc);
         inner.add(new TJLabel(Message.say("Start", "mFarbe")), gc);
-        inner.add(farben, gc);
+        inner.add(colors, gc);
 
         /*    not yet functional
         inner.add(allowWisenheimer, gc);
@@ -295,7 +296,7 @@ public class GameFieldPanel extends JPanel {
         //Add new game options below this one.
 
         //Always load th efirst board
-        Properties spfProp = null;
+        Properties spfProp;
         if (defSpf == null) {
             spfProp = loader.getProperties(spielfeldAr[0]);
         } else {
@@ -309,7 +310,7 @@ public class GameFieldPanel extends JPanel {
                 String spfConf = (String) spielfelder.getSelectedItem();
                 Properties prop = loader.getProperties(spfConf);
                 parent.fassade.loadSpfProp(prop);
-                spf.rasterChanged();
+                boardGrid.rasterChanged();
             }
         });
 
@@ -318,8 +319,9 @@ public class GameFieldPanel extends JPanel {
 
     private void makeChooser() {
         // Initialize only if it doesn't exist yet
-        if (chooser != null)
+        if (chooser != null) {
             return;
+        }
 
         chooser = new JFileChooser("tiles");
         FileFilter filter = new FileFilter() {
@@ -343,33 +345,30 @@ public class GameFieldPanel extends JPanel {
             /* Handig over a postServerStartTask is still a bit weird, but
                it is much more sane and faster than before...
              */
-            parent.showNewStartPanel(
-                    new Task() {
-                        public void doIt() {
+            parent.showNewStartPanel(new Task() {
+                public void doIt() {
 
-                            if (mitspielen.getSelectedObjects() != null) {
-                                Thread smth = parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(), farben.getSelectedIndex());
-                                parent.addKS(smth);
-                                Global.debug(this, "menschlichen spieler gestartet");
-                            } else {//starte einen AusgabeFrame
-                                parent.addKS(parent.fassade.einemSpielZuschauenNoSplash());
-                            }
-                            // Announce game, if we shall do this.
-                            try {
-                                announceGame.announceGame(gameOptions);
-                            } catch (UnableToAnnounceGameException e) {
-                                e.printStackTrace(); //TODO: give info
-                            } catch (YouAreNotReachable youAreNotReachable) {
-                                youAreNotReachable.printStackTrace(); //TODO: give info
-                            }
-                        }
-                    });
+                    if (participate.getSelectedObjects() != null) {
+                        Thread smth = parent.fassade.amSpielTeilnehmenNoSplash(nam.getText(), colors.getSelectedIndex());
+                        parent.addKS(smth);
+                        Global.debug(this, "menschlichen spieler gestartet");
+                    } else {//starte einen AusgabeFrame
+                        parent.addKS(parent.fassade.einemSpielZuschauenNoSplash());
+                    }
+                    // Announce game, if we shall do this.
+                    try {
+                        announceGame.announceGame(gameOptions);
+                    } catch (UnableToAnnounceGameException e) {
+                        e.printStackTrace(); //TODO: give info
+                    } catch (YouAreNotReachable youAreNotReachable) {
+                        youAreNotReachable.printStackTrace(); //TODO: give info
+                    }
+                }
+            });
         } catch (OneFlagException ex) {
             JOptionPane.showMessageDialog(this, Message.say("Start", "mZweiFlaggen"), Message.say("Start", "mError"), JOptionPane.ERROR_MESSAGE);
-
         } catch (NonContiguousMapException exc) {
             JOptionPane.showMessageDialog(this, Message.say("Start", "mNichtZus"), Message.say("Start", "mError"), JOptionPane.ERROR_MESSAGE);
-
         }
     }//okclicked
 
@@ -380,7 +379,4 @@ public class GameFieldPanel extends JPanel {
         edit.getModel().setRollover(false);
     }
 
-}//class GameFieldPanel end
-
-
-
+}

@@ -26,11 +26,16 @@
 package de.botsnscouts.gui;
 
 import de.botsnscouts.BotsNScouts;
-import de.botsnscouts.util.*;
-import java.awt.event.*;
-import java.awt.*;
+import de.botsnscouts.widgets.TJButton;
+import de.botsnscouts.util.Message;
+
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 
 public class AboutFenster extends JFrame{
@@ -56,7 +61,7 @@ public class AboutFenster extends JFrame{
 	text.setEditable(false);
 	inhalt.add(text);
 
-	JButton ok = new JButton(Message.say("AboutFenster","mok"));
+	JButton ok = new TJButton(Message.say("AboutFenster","mok"));
 	ok.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    dispose();

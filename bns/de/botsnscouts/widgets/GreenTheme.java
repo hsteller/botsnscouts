@@ -33,20 +33,23 @@ import java.awt.*;
  * Our default theme. (Not really "greenTheme" anymore...)
  */
 public class GreenTheme extends DefaultMetalTheme {
-	public String getName() {
-		return "botsnscouts";
-	}
+    private static final ColorUIResource black = new ColorUIResource(Color.lightGray);
+    private static final ColorUIResource white = new ColorUIResource(Color.black);
 
-	private final ColorUIResource prim1 = new ColorUIResource( new Color(64,255,64) );
-	private final ColorUIResource prim2 = new ColorUIResource( new Color(64,192,64) );
-	private final ColorUIResource prim3 = new ColorUIResource( new Color(64,128,64) );
-
-	private final ColorUIResource sec1 = new ColorUIResource( new Color(0,128,0) );
-	private final ColorUIResource sec2 = new ColorUIResource( new Color(0,96,0) );
-	private final ColorUIResource sec3 = new ColorUIResource( new Color(0,64,0) );
+    private static final ColorUIResource prim1 = new ColorUIResource(new Color(64, 255, 64));
+    private static final ColorUIResource prim2 = new ColorUIResource(new Color(64, 192, 64));
+    private static final ColorUIResource prim3 = new ColorUIResource(new Color(64, 128, 64));
+              
+    private static final ColorUIResource sec1 = new ColorUIResource(new Color(0, 128, 0));
+    private static final ColorUIResource sec2 = new ColorUIResource(new Color(0, 96, 0));
+    private static final ColorUIResource sec3 = new ColorUIResource(new Color(0, 64, 0));
 
     private final static Font font = new Font("Sans", Font.BOLD, 12);
     private final static Font bigFont = new Font("Sans", Font.BOLD, 24);
+
+    public String getName() {
+        return "botsnscouts";
+    }
 
     static public Font getFont() {
         return font;
@@ -56,17 +59,39 @@ public class GreenTheme extends DefaultMetalTheme {
         return bigFont;
     }
 
-	protected ColorUIResource getPrimary1() { return prim1; }
-	protected ColorUIResource getPrimary2() { return prim2; }
-	protected ColorUIResource getPrimary3() { return prim3; }
-	protected ColorUIResource getSecondary1() { return sec1; }
-	protected ColorUIResource getSecondary2() { return sec2; }
-	protected ColorUIResource getSecondary3() { return sec3; }
+    protected ColorUIResource getPrimary1() {
+        return prim1;
+    }
 
-    private final ColorUIResource black = new ColorUIResource( Color.lightGray );
-	private final ColorUIResource white = new ColorUIResource( Color.black );
-	protected ColorUIResource getBlack() { return black; }
-	protected ColorUIResource getWhite() { return white; }
+    protected ColorUIResource getPrimary2() {
+        return prim2;
+    }
 
+    protected ColorUIResource getPrimary3() {
+        return prim3;
+    }
+
+    protected ColorUIResource getSecondary1() {
+        return sec1;
+    }
+
+    protected ColorUIResource getSecondary2() {
+        return sec2;
+    }
+
+    protected ColorUIResource getSecondary3() {
+        return sec3;
+    }
+
+    protected ColorUIResource getBlack() {
+        return black;
+    }
+
+    protected ColorUIResource getWhite() {
+        return white;
+    }
+
+    public static Color getTextColor() {
+        return black;
+    }
 }
-
