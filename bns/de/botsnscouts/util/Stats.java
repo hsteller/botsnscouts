@@ -1,6 +1,6 @@
 package de.botsnscouts.util; 
 
-public class Stats {
+public class Stats implements Comparable{
     private String name;
     private int hits;
     private int kills;
@@ -75,7 +75,7 @@ public class Stats {
     public String toString () {
 	return ("Robot: "+name+"\tHits: "+hits+"\tKills: "+kills+"\tdamByBoard:"+damageByBoard+"\tdamByRobot:"+this.damageByRobots);
     }
-    public boolean less (Stats s) {
+    private boolean less (Stats s) {
 	if (this.hits<s.getHits())
 	    return true;
 	else if (this.hits==s.getHits()) {
@@ -92,6 +92,23 @@ public class Stats {
 	}
 	else
 	    return false;
+    }
+
+    /** Implementation of the Comparable-interface;
+	two stats-Objects can not be equal.
+	@return -1 if this is less than o
+	         1  otherwise
+    */
+    public int compareTo(Object o) {
+	Stats s = (Stats) o;
+	
+	if (this.less(s)){
+	    return 1;
+	}
+	else {
+	    return -1;
+	}
+	
     }
 
 }

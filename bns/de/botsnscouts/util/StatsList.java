@@ -1,5 +1,9 @@
 package de.botsnscouts.util;
+
 import java.util.Vector;
+import java.util.Arrays;
+
+
 /**@author Hendrik
    Container class for Stats objects.
  */
@@ -35,7 +39,7 @@ public class StatsList {
     }
 
     /** Gets the Statsobject for the robot named <code>name</code>.
-	@param The robot's name
+	@param name The robot's name
 	@return A reference to the robot's Stats-object
 	null, if no robot calles <code>name</code> was found.
     */
@@ -103,47 +107,9 @@ public class StatsList {
        Sorts the list in decreasing order
     */
     private void sort(){
-	sort(0,robots.length-1);
+	Arrays.sort(robots);
     }
-    
-    private void sort(int l, int r) {
-	if (l<r){
-	    // Waehle Pivotelement zufaellig
-	    int pivotindex = (int)(Math.random()*(r-l+1));
-	    // Pivotelement nach vorne vertauschen
-	    Stats pivotelem = robots[l+pivotindex];
-	    robots[l+pivotindex]=robots[l];
-	    robots[l] = pivotelem;
-	    // Alle Elemente, die kleiner als das Pivotelement sind,
-	    // nach links vertauschen,
-	    // die, die groesser als das Pivotelement sind, nach rechts.
-	    int i=l+1;
-	    int j=r;
-	    while (i<=j){
-		Stats swap = robots[i];
-		robots[i] = robots[j];
-		robots[j] = swap;
-		// two robots can't be equal, because they have different names
-		/*	while ((i<=j)&&(robots[i].less(pivotelem))) 
-			i++;
-			while ((i<=j)&&(pivotelem.less(robots[j]))) 
-			j--;
-		*/
-		while ((i<=j)&&(pivotelem.less(robots[i]))) 
-		    i++;
-		while ((i<=j)&&(robots[j].less(pivotelem))) 
-		    j--;
-	    }
-	    i--;
-	    //Pivotelement in die Mitte tauschen
-	    robots[l] = robots[i];
-	    robots[i] = pivotelem;
-	    // Arraybereich links und rechts vom Pivotelement rekursiv
-	    // sortieren
-	    sort(l,i-1);
-	    sort(i+1,r);
-	}
-    } 	
+ 
 }
     
 
