@@ -71,8 +71,8 @@ public class DoingStuffPanel extends JPanel{
 	    this.setOpaque(false);
 	    robs[0]=new Rob(ImageMan.getImage(3,25),0,0);
 	    robs[1]=new Rob(ImageMan.getImage(3,30),50,0);
-	    robs[2]=new Rob(ImageMan.getImage(3,15),0,50);
-	    robs[3]=new Rob(ImageMan.getImage(3,4),50,50);
+	    robs[2]=new Rob(ImageMan.getImage(3,12),0,50);
+	    robs[3]=new Rob(ImageMan.getImage(3,7),50,50);
 	    Dimension inner=new Dimension(64,64);
 	    for (int i=0;i<robs.length;i++)
 	    	robs[i].setDimension(inner);

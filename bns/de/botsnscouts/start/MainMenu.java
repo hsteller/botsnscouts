@@ -118,7 +118,6 @@ public class MainMenu extends JPanel implements  ActionListener{
 			if(parent.gameFieldPanel==null){
 			    parent.gameFieldPanel=new GameFieldPanel(parent);
 			}
-			try{Thread.sleep(5000);}catch(InterruptedException ex){}
 			CAT.debug("setting gameFieldPanel");
 			parent.current=parent.gameFieldPanel;
 			parent.setContentPane(parent.current);

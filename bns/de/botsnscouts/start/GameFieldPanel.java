@@ -202,25 +202,28 @@ public class GameFieldPanel extends JPanel{
 	edit.setEnabled(true);
 	edit.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    if(parent.fieldEditor==null){
-			parent.fieldEditor=new FieldEditor(parent,spf);
-		    }else{
-			parent.fieldEditor.spf.addTileClickListener(parent.fieldEditor);
-			parent.fieldEditor.fuerSpf.add(parent.fieldEditor.spf);
-		    }
-		    parent.fassade.saveTileRaster();
-		    parent.current=parent.fieldEditor;
-		    parent.setContentPane(parent.current);
-		    parent.show();
+		    new Thread(new Runnable(){
+			    public void run(){
+				parent.showBusy(Message.say("Start","mLoadFieldEditor"));			       
+
+				if(parent.fieldEditor==null){
+				    parent.fieldEditor=new FieldEditor(parent,spf);
+				}else{
+				    parent.fieldEditor.spf.addTileClickListener(parent.fieldEditor);
+				    parent.fieldEditor.fuerSpf.add(parent.fieldEditor.spf);
+				}
+				parent.fassade.saveTileRaster();
+				parent.current=parent.fieldEditor;
+				parent.setContentPane(parent.current);
+				parent.stopBusy();
+				parent.show();
+			    }}).start();
+		    edit.getModel().setRollover(false);
 		}});
 
 	name=new JLabel(Message.say("Start","mName"));
-	String n=Conf.getProperty("robot.name");   // Set in bns.config?
-	if (n==null || n.equals(""))
-	    n=Conf.getProperty("user.name");	      // System property
-	if (n==null || n.equals(""))
-	    n=KrimsKrams.randomName();	      // KrimsKrams-Random
-	nam=new JTextField(n);
+
+	nam=new JTextField(Conf.getDefaultRobName());
 	farbe=new JLabel(Message.say("Start","mFarbe"));
 	farben=new RoboBox(true);
 	mitspielen=new JCheckBox(Message.say("Start","mTeilnehmenBox"),true);

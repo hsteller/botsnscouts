@@ -73,12 +73,7 @@ public class ParticipatePanel extends JPanel implements  ActionListener{
 	name=new JLabel(Message.say("Start","mName"));
 	farbe=new JLabel(Message.say("Start","mFarbe"));
         serv=new JTextField(Message.say("Start","mServerInh"),JTextField.CENTER);
-	String n=Conf.getProperty("robot.name");   // Set in bns.config?
-	if (n==null || n.equals(""))
-	    n=Conf.getProperty("user.name");	      // System property
-	if (n==null || n.equals(""))
-	    n=KrimsKrams.randomName();	      // KrimsKrams-Random
-        nam=new JTextField(n,JTextField.CENTER);
+        nam=new JTextField(Conf.getDefaultRobName(),JTextField.CENTER);
 	farb=new RoboBox( true );
         go=new TransparentButton(Message.say("Start","mGoButton"));
         zurueck=new TransparentButton(Message.say("Start","mZurueckButton"));
