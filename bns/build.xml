@@ -23,6 +23,9 @@
         <param name="what" value="conf" />
      </antcall>
      <antcall target="linkOnLin">
+        <param name="what" value="tiles" />
+     </antcall>
+     <antcall target="linkOnLin">
         <param name="what" value="images" />
      </antcall>
      <available property="noNeedToCopy" file="${build}/${maindir}/conf" />
@@ -35,6 +38,9 @@
      </copy>
      <copy todir="${build}/${maindir}/images">
         <fileset dir="${src}/${maindir}/images" />
+     </copy>
+     <copy todir="${build}/${maindir}/tiles">
+        <fileset dir="${src}/${maindir}/tiles" />
      </copy>
      <copy todir="${build}/${maindir}/sounds">
         <fileset dir="${src}/${maindir}/sounds" />
@@ -62,6 +68,9 @@
      </antcall>
      <antcall target="rmOnLin">
         <param name="what" value="images" />
+     </antcall>
+     <antcall target="rmOnLin">
+        <param name="what" value="tiles" />
      </antcall>
      <antcall target="rmOnLin">
         <param name="what" value="sounds" />
