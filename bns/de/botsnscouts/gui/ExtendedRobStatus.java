@@ -66,7 +66,7 @@ public class ExtendedRobStatus extends JFrame {
 	if (r.countLockedRegisters() > 0) {
 	    for (int i = 0; i < r.countLockedRegisters(); i++)
 		if (r.getLockedRegister(i) != null) {
-		    gespReg+= r.getLockedRegisters()[i].getaktion() + " | ";
+		    gespReg+= r.getLockedRegisters()[i].getAction() + " | ";
 		}
 	    gespReg += "]";
 	}
@@ -74,7 +74,7 @@ public class ExtendedRobStatus extends JFrame {
 	String gelegtKarte = "[ ";
 	if (r.getMove() != null) {
 	    for (int i = 0; i < r.getMove().length; i++)
-		if (r.getMove()[i] != null) gelegtKarte+= r.getMove()[i].getaktion() + " | ";
+		if (r.getMove()[i] != null) gelegtKarte+= r.getMove()[i].getAction() + " | ";
 	    gelegtKarte += "]";
 	}
 	// ---- Label erzeugen

@@ -83,7 +83,7 @@ public class RegisterView extends JButton {
     }
 
     public String getCardAction(){
-	return h.getaktion();
+	return h.getAction();
     }
 
     public int getPrio(){
@@ -109,7 +109,7 @@ public class RegisterView extends JButton {
 
     public void setCard(HumanCard h) {
 	this.h = h;
-	String ktyp = h.getaktion();
+	String ktyp = h.getAction();
 	if (ktyp.equals("M1")) cardImage = ImageMan.CardM1;
 	else if (ktyp.equals("M2")) cardImage = ImageMan.CardM2;
 	else if (ktyp.equals("M3")) cardImage = ImageMan.CardM3;

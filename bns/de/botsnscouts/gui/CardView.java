@@ -90,7 +90,7 @@ public class CardView extends JButton {
 
     public void setCard(HumanCard h) {
 	this.h = h;
-	String ktyp = h.getaktion();
+	String ktyp = h.getAction();
 	if (ktyp.equals("M1")) setIcon(ImageMan.CardM1);
 	else if (ktyp.equals("M2")) setIcon(ImageMan.CardM2);
 	else if (ktyp.equals("M3")) setIcon(ImageMan.CardM3);

@@ -968,7 +968,7 @@ public class KommServer {
             if (r.getLockedRegisters() != null) {
                 for (int i = 0; i < 5; i++) {
                     if (r.getLockedRegister(i) != null)
-                        raus = raus + "(" + (i + 1) + "," + "PK(" + r.getLockedRegister(i).getaktion() + ","
+                        raus = raus + "(" + (i + 1) + "," + "PK(" + r.getLockedRegister(i).getAction() + ","
                                         + r.getLockedRegister(i).getprio() + ")" + ")";
 
                 }
@@ -1099,7 +1099,7 @@ public class KommServer {
                 //  System.err.println ("raus aeussere For: "+raus);
                 if (robbis[i].register != null) {
                     for (int j = 0; j < (robbis[i].register.length); j++) {
-                        raus = raus + "PK(" + robbis[i].register[j].getaktion() + "," + robbis[i].register[j].getprio()
+                        raus = raus + "PK(" + robbis[i].register[j].getAction() + "," + robbis[i].register[j].getprio()
                                         + ")";
                         //     System.err.println ("raus innere For: "+raus);
                     }

@@ -153,7 +153,7 @@ public class SearchRecursively {
             recurse(tmp[recursionLevel], ka, recursionLevel + 1);
             ka[i] = cardTemp;
             // Skip cards with identical action
-            while ((i < 8) && ((ka[i + 1] == null) || (ka[i + 1].getaktion().equals(cardTemp.getaktion()))))
+            while ((i < 8) && ((ka[i + 1] == null) || (ka[i + 1].getAction().equals(cardTemp.getAction()))))
                 i++;
 
         }

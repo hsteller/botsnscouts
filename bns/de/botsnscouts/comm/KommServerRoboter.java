@@ -48,7 +48,7 @@ public class KommServerRoboter extends KommServer {
       String raus = "MRP(";
       for (int i=0;i<k.length;i++) {
 	  if (k[i]!=null)
-	      raus = raus+"PK("+k[i].getaktion()+","+k[i].getprio()+")";
+	      raus = raus+"PK("+k[i].getAction()+","+k[i].getprio()+")";
       }
       raus+=")";
       out.println (raus);

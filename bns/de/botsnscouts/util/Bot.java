@@ -565,14 +565,14 @@ public class Bot {
             s+="zug: [p|a]: ";
             for(int i=0;i<move.length;i++)
                 if (move[i]!=null)
-                    s+="["+move[i].getprio()+"|"+move[i].getaktion()+"] ";
+                    s+="["+move[i].getprio()+"|"+move[i].getAction()+"] ";
                 else
                     s+="#";
 
             s+="\ngesperrteRegister: ";
             for(int i=0;i<5;i++)
                 if (lockedRegisters[i])
-                    s+="["+move[i].getprio()+"|"+move[i].getaktion()+"] ";
+                    s+="["+move[i].getprio()+"|"+move[i].getAction()+"] ";
                 else
                     s+="#";
 

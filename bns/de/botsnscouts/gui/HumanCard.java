@@ -58,7 +58,7 @@ public class HumanCard extends Card{
     }
 
     public HumanCard (Card k) {
-	this (k.getprio(), k.getaktion());
+	this (k.getprio(), k.getAction());
     }
 
     public void setState (int newState) {

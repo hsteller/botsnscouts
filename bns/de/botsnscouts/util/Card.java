@@ -66,7 +66,7 @@ public abstract class Card  {
     /** returns the kind of the card in the usual form
 	(M1, M2, M3, UT, BU, RR, RL)
     */
-    public String getaktion() {
+    public String getAction() {
         return action;
     }
 

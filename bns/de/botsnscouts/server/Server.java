@@ -25,93 +25,84 @@
 
 package de.botsnscouts.server;
 
-import java.util.*;
-
-import de.botsnscouts.board.*;
-import de.botsnscouts.comm.*;
-import de.botsnscouts.start.*;
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.board.SimBoard;
+import de.botsnscouts.comm.KommException;
+import de.botsnscouts.comm.KommFutschException;
+import de.botsnscouts.comm.MessageID;
+import de.botsnscouts.comm.OtherConstants;
+import de.botsnscouts.start.GameOptions;
+import de.botsnscouts.start.ServerObserver;
 import de.botsnscouts.util.*;
-
 import org.apache.log4j.Category;
 
-public class Server extends BNSThread implements ModusConstants, ServerOutputThreadMaintainer,
-        InfoRequestAnswerer, OKListener, ServerRobotThreadMaintainer, ThreadMaintainer {
-    static final Category CAT = Category.getInstance(Server.class);
+import java.util.Iterator;
+import java.util.Vector;
+
+public class Server extends BNSThread implements ModusConstants, ServerOutputThreadMaintainer, InfoRequestAnswerer, OKListener, ServerRobotThreadMaintainer, ThreadMaintainer {
+    private static final Category CAT = Category.getInstance(Server.class);
 
     // Vektoren
-    private Vector aThreads = new Vector();	// ServerAusgabeThread
-    private Vector ausgabenEintrittsListe = new Vector();	// ServerAusgabeThread
+    private Vector ausgabeThreads = new Vector() /* of ServerAusgabeThread*/;
+    private Vector ausgabenEnterRequestedThreads = new Vector() /* of ServerAusgabeThread*/;
 
-    private Vector rThreads = new Vector();	// ServerRoboterThread
-    private Vector aktRoboter = new Vector();	// ServerRoboterThread
-    private Vector zerstoerteRoboter = new Vector();	// ServerRoboterThread
-    private Vector roboterEintrittsListe = new Vector();	// ServerRoboterThread
-    private Vector roboterFriedhof = new Vector();	// ServerRoboterThread (endgültig tote)
-    private Vector gewinner = new Vector(); //ServerRoboterThread (Letzte Fahne erreicht)
+    private Vector botThreads = new Vector();	// of ServerRoboterThread
+    private Vector curBotsThreads = new Vector();	// of ServerRoboterThread
+    private Vector destroyedBotsThreads = new Vector();	// of ServerRoboterThread
+    private Vector botEnterRequestedThreads = new Vector();	// of ServerRoboterThread
+    private Vector graveyardThreads = new Vector();	// of ServerRoboterThread
+    private Vector wonThreads = new Vector(); //of ServerRoboterThread
 
     private RegistrationManager registrationManager;
     private MessageThread messageThread;
 
-    private ServerObserver gameStartListener;
+    private ServerObserver serverObserver;
 
-    protected SimBoard feld;
+    protected SimBoard board;
 
-    protected String[] angemeldet = new String[8];
+    protected String[] players = new String[8];
     private boolean gameover = false;
     private boolean gameStarted = false;
-    private int aktPhase = 0; // enthaelt die Nummer der gerade auswertenden Phase. 0 wenn nicht ausgewertet wird
+    /**
+     * The phase currently under execution, or 0 when not executing.
+     */
+    private int curPhase = 0;
 
     // Timeouts
-    private int kommto; //Für Dinge, die nur eine Reaktion erwarten, kein Nachdenken, z.B. Spielstart
-    private final int rundenbeginnto = 60000; // Falls noch zerstoerte Bot fehlen
-    private final int ausgabennotifyto = 60000;
-    protected final int anmeldeto = 60000; // So lange wartet der ServerAnmeldeThread auf eine Aktion
+    private final int startRoundTO = 60000; // Waiting for destroyed bots
+    private final int notifyTO = 60000;
+    private int commTO = 20000;
+    protected final int registerPlayersTO = 60000;
 
-    //Modi, ihre Bearbeitung und Synchronistaion
-
-    private int modus; //Aktueller Bearbeitungsmodus, die Clients haben eigene.
+    private int mode;
     private WaitingForSet waitablesImWaitingFor;
 
-    // um die Statistikdaten zu halten
     protected StatsList stats;
 
     /* Options for this game. */
     private GameOptions options;
 
-    // Modus-Konstanten
-    // 1. Server / ServerRoboterThread
-    // 2. ServerAusgabeThread
-
-    // Mandated by OKListener
-
     /**
      * This constructor is called once per Game by StartServer.
-     *
      */
-    public Server(GameOptions options,
-                  ServerObserver listener)
-    {
-        gameStartListener = listener;
+    public Server(GameOptions options, ServerObserver listener) {
+        serverObserver = listener;
         this.options = options;
         try {
-            feld = new SimBoard(options.getX(),
-                    options.getY(),
-                    options.getBoard(),
-                    options.getFlags(),
-                    this);
+            board = new SimBoard(options.getX(), options.getY(), options.getBoard(), options.getFlags(), this);
         } catch (FormatException e) {
-            System.err.println("Fehler im Spielfeldstring.");
+            CAT.error("Fehler im Spielfeldstring.", e);
             System.exit(5);
         } catch (FlagException e) {
-            System.err.println("Fehler in den Flaggen.");
+            CAT.error("Fehler in den Flaggen.", e);
             System.exit(5);
         }
 
-        CAT.debug("New server with these options: "+options);
+        CAT.debug("New server with these options: " + options);
     }
 
-
-    /** Removes caller from waitablesImWaitingFor
+    /**
+     * Removes caller from waitablesImWaitingFor
      */
     public void notifyDone(Waitable me) {
         CAT.debug("Server: notify done");
@@ -119,37 +110,38 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     }
 
     // Methods needed for ServerRobotThreadMaintainer
-
-    /** Entfernt den Thread, benachrichtigt den Spieler (dessen Kommverbindung moeglicherweise
-     *  abgeschmiert ist!! -> nicht ewig warten), entfernt den Bot aus aktiv, wiederein-
-     *  trittsliste oder friedhof
-     * @param t - der ServerRoboterThread des zu entfernenden Roboters
-     * @param grund - "TO" wegen timeout oder "RV" wg. Regelverletzung oder....
+    /**
+     * Remove the Thread, notify player (if comm is still possible), remove Thread from active / entering /
+     * graveyard.
+     *
+     * @param t     the Thread of the bot to remove
+     * @param reason Reason-String
      */
-    public void deleteRob(ServerRoboterThread t, String grund) {
-        d("deleteRob aufgerufen. robname=" + t.rob.getName() + "; grund=" + grund);
+    public void deleteRob(ServerRoboterThread t, String reason) {
+        CAT.debug("deleteRob aufgerufen. robname=" + t.rob.getName() + "; grund=" + reason);
         waitablesImWaitingFor.removeAndNotify(t);
         try {
             t.rob.setLives(0); // Hendrik: dont know whether this is the right place to do..
-            t.deleteMe(grund);
+            t.deleteMe(reason);
         } catch (KommFutschException ex) {
             new Fehlermeldung(Message.say("Server", "eKommFutschR", t.rob.getName()));
         } catch (KommException ex) {
-            d("Bot " + t.rob.getName() + " konnte nicht mehr von seiner Entfernung wg. " + grund + " benachrichtigt werden: " + ex);
+            CAT.debug("Bot " + t.rob.getName() + " konnte nicht mehr von seiner Entfernung wg. " + reason + " benachrichtigt werden: " + ex);
         }
 
         t.interrupt();     // Beende den Thread bei nächster Gelegenheit
 
-        rThreads.remove(t);
-        aktRoboter.remove(t);
-        roboterFriedhof.add(t);
+        botThreads.remove(t);
+        curBotsThreads.remove(t);
+        graveyardThreads.add(t);
 
         String[] tmpstr = new String[1];
         tmpstr[0] = t.rob.getName();
-        if (grund.startsWith(MessageID.BOT_REMOVED))
-            sendMsg(MessageID.BOT_REMOVED + grund, tmpstr);
-        else if (grund.equals(MessageID.SOMEONE_QUIT))
+        if (reason.startsWith(MessageID.BOT_REMOVED)) {
+            sendMsg(MessageID.BOT_REMOVED + reason, tmpstr);
+        } else if (reason.equals(MessageID.SOMEONE_QUIT)) {
             sendMsg(MessageID.SOMEONE_QUIT, tmpstr);
+        }
 
         gameover = istSpielende();
     }
@@ -164,47 +156,50 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
         sendMsg(id, tmp);
     }
 
-    /** Schickt eine Nachricht an alle Ausgaben >= Version 2.0 */
+    /**
+     * Send a message to all Ausgeaben >= VV2.0
+     */
     public void sendMsg(String id, String[] s) {
         if (id.equals(de.botsnscouts.comm.MessageID.WISE_USED)) {
-// Dirk wants that to be counted :-)
+            // Dirk wants that to be counted :-)
             Stats st = stats.getStats(s[0]);
-            if (st != null)
+            if (st != null) {
                 st.incAskWisenheimer();
+            }
         }
         messageThread.append(id, s);
         Thread.yield();                   // allow the message to be sent
     }
 
     public void reEntry(ServerRoboterThread s) {
-        zerstoerteRoboter.removeElement(s);
-        roboterEintrittsListe.addElement(s);
+        destroyedBotsThreads.removeElement(s);
+        botEnterRequestedThreads.addElement(s);
     }
 
     // Methods mandated by interface ServerOutputThreadMaintainer
 
-    public void deleteOutput(ServerAusgabeThread t, String grund) {
-        synchronized (aThreads) {
-            d("deleteOutput aufgerufen. grund=" + grund);
+    public void deleteOutput(ServerAusgabeThread t, String reason) {
+        synchronized (ausgabeThreads) {
+            CAT.debug("deleteOutput called. Reason:" + reason);
             try {
                 waitablesImWaitingFor.removeAndNotify(t);
-                t.deleteMe(grund);
+                t.deleteMe(reason);
             } catch (KommException ex) {
-                d("Ausgabe konnte nicht mehr von ihrer Entfernung wg. " + grund + " benachrichtigt werden: " + ex);
+                CAT.debug("Could not notify Ausgabe",ex);
             }
 
-            t.interrupt(); // Beende sie
-            aThreads.remove(t);
+            t.interrupt();
+            ausgabeThreads.remove(t);
         }
     }
 
     public int getOutputTimeout() {
-        return ausgabennotifyto;
+        return notifyTO;
     }
 
     // Methods mandated by interface ThreadMaintainer
     public Vector getActiveOutputs() {
-        return aThreads;
+        return ausgabeThreads;
     }
 
     public MOKListener getMOKListener() {
@@ -228,101 +223,99 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     }
 
     public void updateNewBot(String name, int color) {
-        if (gameStartListener != null) {
-            gameStartListener.fireNewBot(name, color);
+        if (serverObserver != null) {
+            serverObserver.fireNewBot(name, color);
         }
     }
 
     public int getSignUpTimeout() {
-        return anmeldeto;
+        return registerPlayersTO;
     }
 
     public int getMaxPlayers() {
         return options.getMaxPlayers();
     }
 
-    public boolean isScoutAllowed (){
+    public boolean isScoutAllowed() {
         return options.isAllowScout();
     }
-    
-    public boolean isWisenheimerAllowed(){
+
+    public boolean isWisenheimerAllowed() {
         return options.isAllowWisenheimer();
     }
-    
+
     int getRegistrationPort() {
         return options.getRegistrationPort();
     }
 
     public void addOutput(ServerAusgabeThread s) {
-        d("Addiere Ausgabe zu Eintrittsliste hinzu");
-        ausgabenEintrittsListe.addElement(s);
+        CAT.debug("Adding output to enterList");
+        ausgabenEnterRequestedThreads.addElement(s);
     }
 
     public void addRobotThread(ServerRoboterThread s) {
-        rThreads.addElement(s);
-        aktRoboter.addElement(s);
+        botThreads.addElement(s);
+        curBotsThreads.addElement(s);
     }
 
     public synchronized int allocateColor(int color, String name) {
-        if ((color > 0) && (angemeldet[color - 1] == null))
+        if ((color > 0) && (players[color - 1] == null)) {
             color--;
-        else {
+        } else {
             color = (int) (Math.random() * 7 + 1);
-            while (angemeldet[color] != null)
+            while (players[color] != null) {
                 color = (color + 1) % 8;
+            }
         }
-        angemeldet[color] = name;
+        players[color] = name;
         return color;
     }
-
-
 
     // Methods mandated by interface InfoRequestAnswerer
 
     public int getFieldSizeX() {
-        return feld.getSizeX();
+        return board.getSizeX();
     }
 
     public int getFieldSizeY() {
-        return feld.getSizeY();
+        return board.getSizeY();
     }
 
     public String getFieldString() {
-        return feld.getBoardAsString();
+        return board.getBoardAsString();
     }
 
     public Location[] getFlags() {
-        return feld.getFlags();
+        return board.getFlags();
     }
 
     public String[] getNames() {
         String[] s;
-        int len = rThreads.size();
+        int len = botThreads.size();
         s = new String[len];
         int i = 0;
-        for (Iterator it = rThreads.iterator(); it.hasNext();)
+        for (Iterator it = botThreads.iterator(); it.hasNext();) {
             s[i++] = ((ServerRoboterThread) it.next()).rob.getName();
+        }
         return s;
     }
 
-    public Location getRobPos(String name) {
-        for (Iterator it = rThreads.iterator(); it.hasNext();) {
+    public Location getRobPos(String botName) {
+        for (Iterator it = botThreads.iterator(); it.hasNext();) {
             ServerRoboterThread srt = (ServerRoboterThread) it.next();
-            if (srt.rob.getName().equals(name))
+            if (srt.rob.getName().equals(botName)) {
                 return srt.rob.getPos();
+            }
         }
         return null;
     }
 
-    public Bot getRobStatus(String robotername) {
-        // durchsucht die aktRoboter-, zerstoerteRoboter-, roboterEintrittsListe-
-        // und roboterFriedhof-Vector nach roboter mit dem name robotername und liefert
-        // eine kopie des entsprechenden roboters zurück, falls kein roboter mit
-        // dem name gefunden wird, wird null zurückgegeben
-        for (Iterator e = rThreads.iterator(); e.hasNext();) {
+    public Bot getRobStatus(String botName) {
+        for (Iterator e = botThreads.iterator(); e.hasNext();) {
             Bot r = ((ServerRoboterThread) e.next()).rob;
-            if (r.getName().equals(robotername))
+            if (r.getName().equals(botName)) {
                 return r;
+            }
         }
         return null;
     }
@@ -334,36 +327,30 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     public String[] getStanding() {
         String[] s = new String[8];
         int i = 0;
-        for (Iterator e = gewinner.iterator(); e.hasNext();) {
+        for (Iterator e = wonThreads.iterator(); e.hasNext();) {
             s[i++] = ((ServerRoboterThread) e.next()).rob.getName();
         }
         return s;
     }
 
-    /**
-     * liefert eine Liste von Statusobjekten.Ein solcher Statusobjekt enthaelt de NAMEN DES Spielers
-     * seine ausgespielten Karten und die Nummer der jetzige Phase.
-     * @return Status[ ]
-     */
     public Status[] getEvalStatus() {
         CAT.debug("276 for rThreads");
         try {
-            synchronized (rThreads) {
+            synchronized (botThreads) {
                 CAT.debug("279: lock rThreads");
-                Status[] s = new Status[rThreads.size()];
+                Status[] s = new Status[botThreads.size()];
                 for (int i = 0; i < s.length; i++) {
                     s[i] = new Status();
-                    ServerRoboterThread tmp = (ServerRoboterThread) rThreads.elementAt(i);
-                    s[i].aktPhase = aktPhase;
+                    ServerRoboterThread tmp = (ServerRoboterThread) botThreads.elementAt(i);
+                    s[i].aktPhase = curPhase;
                     s[i].robName = tmp.rob.getName();
-                    s[i].register = new Card[aktPhase];
-                    for (int j = 0; j < aktPhase; j++)
+                    s[i].register = new Card[curPhase];
+                    for (int j = 0; j < curPhase; j++) {
                         s[i].register[j] = tmp.rob.getMove(j);
+                    }
                 }
                 return s;
-
             }
-
         } finally {
             CAT.debug("279 relesase rThreads");
         }
@@ -371,15 +358,12 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     }
 
     public String[] getNamesByColor() {
-        return angemeldet;
+        return players;
     }
 
     public StatsList getStats() {
         return stats;
     }
-
-    // Konstruktor
-
 
     /*
     * Tell all boards that "something has changed"
@@ -392,32 +376,32 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
     public void notifyViews(int msgNum, String[] robotNames) {
 
-        // PRE: currentThread ist der ServerThread
-        //  ... aber wir pruefen das lieber nochmal :-)
+        // PRE: currentThread is the ServerThread
+        // but let's make sure.
 
         if (Thread.currentThread() != this) {
-            d("sendMsgWennNoetig: DAS IST NICHT DER SERVERTHREAD HIER, sondern " + Thread.currentThread());
-            throw new RuntimeException("nur der Serverthread darf Server.sendMsgWennNoetig aufrufen.");
+            CAT.debug("This method must be called by the ServerThread, not" + Thread.currentThread());
+            throw new RuntimeException();
         }
 
         if (robotNames.length == 0) {
-            CAT.debug("Warning: ausgabenBenachrichtigen called with 0-size array. Returning.");
+            CAT.debug("0-size array");
             return;
         }
 
-        d("Größe der eintrittsliste: " + ausgabenEintrittsListe.size() + "; aThreads: " + aThreads.size());
-        setzeAusgaben();         // neue Ausgaben begrüßen
-        d("Größe der eintrittsliste: " + ausgabenEintrittsListe.size() + "; aThreads: " + aThreads.size());
+        CAT.debug("Size of enterList:" + ausgabenEnterRequestedThreads.size() + "; aThreads: " + ausgabeThreads.size());
+        setzeAusgaben();
+        CAT.debug("Size of enterList:" + ausgabenEnterRequestedThreads.size() + "; aThreads: " + ausgabeThreads.size());
 
         CAT.debug("372 wait For athreads");
-        synchronized (aThreads) {
+        synchronized (ausgabeThreads) {
             CAT.debug("374 lock aThreads");
-            waitablesImWaitingFor = new WaitingForSet(aThreads);
+            waitablesImWaitingFor = new WaitingForSet(ausgabeThreads);
 
-            for (Iterator it = aThreads.iterator(); it.hasNext();) {
+            for (Iterator it = ausgabeThreads.iterator(); it.hasNext();) {
                 ServerAusgabeThread tmp = (ServerAusgabeThread) it.next();
                 if (!tmp.isAlive()) {
-                    it.remove(); //aus aThreads
+                    it.remove();
                     waitablesImWaitingFor.remove(tmp);
                     continue;
                 }
@@ -429,19 +413,21 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                 } catch (KommFutschException ex) {
                     new Fehlermeldung(Message.say("Server", "eKommFutschA"));
                 } catch (KommException ex) {
-                    d("ausgabenBenachrichtigen: Es ist eine KommException aufgetreten.");
+                    CAT.error("while notifying", ex);
                 }
-            } //for
-            d("Alle AusgabeThreads benachrichtigt und in den richtigen Modus versetzt.");
+            }
+            CAT.debug("updated all ausgabeThreads");
 
-            if (aThreads.size() == 0)
-                return;              // die Muehe koennen wir uns dann auch gerade schenken...
+            if (ausgabeThreads.size() == 0) {
+                return;
+            }
 
-            d("Der Server wartet jetzt " + ausgabennotifyto + " Millisek. auf seine AusgabenThreads (aenderung()).");
-            Iterator it = waitablesImWaitingFor.waitFor(ausgabennotifyto);
+            CAT.debug("Now waiting " + notifyTO + " msec for AusgabeThreads");
+            Iterator it = waitablesImWaitingFor.waitFor(notifyTO);
 
-            while (it.hasNext())
+            while (it.hasNext()) {
                 deleteOutput((ServerAusgabeThread) it.next(), "TO");
+            }
         }
         CAT.debug("374 release aThread");
         // allow possibly generated messages to be sent
@@ -452,16 +438,17 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
     // Private methods needed by run()
 
-    /** Modus in ServerRoboterThreads setzen und warten, bis sie zu Potte kommen.
-     *  Wird bei allen Modi außer ZERSTÖRT benutzt.
-     *  PRE: Attribute rThreadsAufDieIchWarte und modus sind korrekt belegt,
-     *       außerdem muessen die Bot korrekt initialisiert sein,
-     *       konkret: Bei Programmierungsmodus wird auf die Karten zugegriffen.
-     *  POST: Der Modus wurde von unseren entsprechenden Threads bearbeitet
+    /**
+     * Modus in ServerRoboterThreads setzen und warten, bis sie zu Potte kommen.
+     * Wird bei allen Modi außer ZERSTÖRT benutzt.
+     * PRE: Attribute rThreadsAufDieIchWarte und modus sind korrekt belegt,
+     * außerdem muessen die Bot korrekt initialisiert sein,
+     * konkret: Bei Programmierungsmodus wird auf die Karten zugegriffen.
+     * POST: Der Modus wurde von unseren entsprechenden Threads bearbeitet
      */
     private void broadcastUndWarteAufRoboter() {
 
-        for (Iterator iter = rThreads.iterator(); iter.hasNext();) {
+        for (Iterator iter = botThreads.iterator(); iter.hasNext();) {
             ServerRoboterThread tmp = (ServerRoboterThread) iter.next();
             if (!tmp.isAlive()) {
                 iter.remove();  // aus waitablesImWaitingFor (also aktRoboter, etc)
@@ -473,8 +460,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             }
         }
 
-        if (waitablesImWaitingFor.isEmpty())
+        if (waitablesImWaitingFor.isEmpty()) {
             return;
+        }
 
         //Broadcast an die betroffenen Threads, Inhalt je nach Modus
         CAT.debug("442 wait for waitablesImWaitingFor");
@@ -484,7 +472,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                 ServerRoboterThread srt = (ServerRoboterThread) e.next();
 
                 try {
-                    switch (modus) {
+                    switch (mode) {
                         case SPIELSTART:
                             srt.startGame();
                             break;
@@ -520,23 +508,24 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
         //Falls welche nicht fertig geworden, entfernen
         while (it.hasNext()) {
             ServerRoboterThread tmp = (ServerRoboterThread) it.next();
-            d("!!!ServerRoboterThread " + tmp.rob.getName() + " rauswerfen wegen Timeout!!!");
+            CAT.debug("!!!ServerRoboterThread " + tmp.rob.getName() + " rauswerfen wegen Timeout!!!");
             it.remove();
             deleteRob(tmp, OtherConstants.REASON_TIMEOUT);
         }
     }
 
-    /** Wartet -- je nach Modus -- eine bestimmte Zeit auf wiederkehrende
-     *  ServerRoboterThreads oder eben bis alle ferig sind.
+    /**
+     * Wartet -- je nach Modus -- eine bestimmte Zeit auf wiederkehrende
+     * ServerRoboterThreads oder eben bis alle ferig sind.
      * PRE: rThreadsAufDieIchWarte und modus ist korrekt gesetzt
      */
     private synchronized Iterator warteAufRoboter() {
         CAT.debug("498 lock Server");
         int to;
 
-        switch (modus) {
+        switch (mode) {
             case SPIELSTART:
-                to = kommto;
+                to = commTO;
                 break;
             case INITAUSR:
             case PROGRAMMIERUNG:
@@ -547,19 +536,21 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                 break;
             case ZERSTOERT_SYNC:
             case ZERSTOERT_ASYNC:
-                to = rundenbeginnto;
+                to = startRoundTO;
                 break;
             default:
                 to = 0;
 
         }
         CAT.debug("498 release Server");
-        d("Der Server wartet jetzt " + to + " Millisek. auf seine RoboterThreads (" + modus + ").");
+        CAT.debug("Der Server wartet jetzt " + to + " Millisek. auf seine RoboterThreads (" + mode + ").");
         return waitablesImWaitingFor.waitFor(to);
     }
 
-    /** Setzt Modus in ServerRoboterThreads um
-     * @param it  umzusetzenden ServerRoboterThreads
+    /**
+     * Setzt Modus in ServerRoboterThreads um
+     *
+     * @param it      umzusetzenden ServerRoboterThreads
      * @param newMode Modus in den die Threads gesetzt werden sollen
      */
     private void wechselModus(Iterator it, int newMode) {
@@ -569,22 +560,25 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
         }
     }
 
-    /** Uebertraegt ausgabeneintrittsliste in offizielle Ausgabenliste */
+    /**
+     * Uebertraegt ausgabeneintrittsliste in offizielle Ausgabenliste
+     */
     private void setzeAusgaben() {
-        d("setzeAusgaben");
-        d("539 wait for aThreads");
-        synchronized (aThreads) {
-            d("541 lock on aThreads\nwait for ausgabenEL");
-            synchronized (ausgabenEintrittsListe) {
-                d("543 lock on ausgabenEintrittsListe");
-                if (ausgabenEintrittsListe.size() == 0)
+        CAT.debug("setzeAusgaben");
+        CAT.debug("539 wait for aThreads");
+        synchronized (ausgabeThreads) {
+            CAT.debug("541 lock on aThreads\nwait for ausgabenEL");
+            synchronized (ausgabenEnterRequestedThreads) {
+                CAT.debug("543 lock on ausgabenEintrittsListe");
+                if (ausgabenEnterRequestedThreads.size() == 0) {
                     return;
-                else
-                    d("Es gibt neue Ausgaben. Begrüße sie.");
+                } else {
+                    CAT.debug("Es gibt neue Ausgaben. Begrüße sie.");
+                }
 
-                waitablesImWaitingFor = new WaitingForSet(ausgabenEintrittsListe);
+                waitablesImWaitingFor = new WaitingForSet(ausgabenEnterRequestedThreads);
 
-                for (Iterator e = ausgabenEintrittsListe.iterator(); e.hasNext();) {
+                for (Iterator e = ausgabenEnterRequestedThreads.iterator(); e.hasNext();) {
                     ServerAusgabeThread tmp = (ServerAusgabeThread) e.next();
                     tmp.setMode(FRAGENERLAUBT);
                     try {
@@ -592,24 +586,25 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                     } catch (KommFutschException ex) {
                         new Fehlermeldung(Message.say("Server", "eKummFutschA"));
                     } catch (KommException ex) {
-                        d("setzeAusgaben: Es ist eine KommException aufgetreten.");
+                        CAT.debug("setzeAusgaben: Es ist eine KommException aufgetreten.");
                     }
                     tmp.start();
                 } //for
-                d("Alle ael-s benachrichtigt und in den richtigen Modus versetzt.");
+                CAT.debug("Alle ael-s benachrichtigt und in den richtigen Modus versetzt.");
 
-                Iterator it = waitablesImWaitingFor.waitFor(ausgabennotifyto);
+                Iterator it = waitablesImWaitingFor.waitFor(notifyTO);
 
-                while (it.hasNext())
-                    ausgabenEintrittsListe.remove(it.next());
+                while (it.hasNext()) {
+                    ausgabenEnterRequestedThreads.remove(it.next());
+                }
 
-                d("Kopiere ael: " + ausgabenEintrittsListe.size());
-                for (Iterator iter = ausgabenEintrittsListe.iterator(); iter.hasNext();) {
+                CAT.debug("Kopiere ael: " + ausgabenEnterRequestedThreads.size());
+                for (Iterator iter = ausgabenEnterRequestedThreads.iterator(); iter.hasNext();) {
                     ServerAusgabeThread tmp = (ServerAusgabeThread) iter.next();
                     tmp.setMode(KEINEFRAGEN);
                     iter.remove();     // aus ael
-                    d("Addiere einen zu aThreads hinzu");
-                    aThreads.addElement(tmp);
+                    CAT.debug("Addiere einen zu aThreads hinzu");
+                    ausgabeThreads.addElement(tmp);
                 }
             } // synchronized ausgabenEL
             CAT.debug("543 release ausgabenEl");
@@ -624,8 +619,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             registrationManager = new RegistrationManager(this);
             registrationManager.beginRegistration();
             CAT.debug("registrationManager gestartet");
-            if (isInterrupted())
+            if (isInterrupted()) {
                 return false;
+            }
             try {
                 wait();                       // supposed to be notified from startGame()
             } catch (InterruptedException e) {
@@ -634,8 +630,8 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                 return false;
             }
             //Spiel starts!
-            if (gameStartListener != null){
-                gameStartListener.fireGameStarted();
+            if (serverObserver != null) {
+                serverObserver.fireGameStarted();
             }
             return true;
         } finally {
@@ -646,37 +642,39 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     private void setzeStartPunkt() {
         // setzen der x-, y-, archivX- und archivY-Koordinaten in den Robots auf
         // die Koordinaten der ersten Flagge
-        if (feld == null)
+        if (board == null) {
             CAT.error("feld ist null");
-        d("setze x und archivX in robots auf " + feld.getFlags()[0].getX());
-        d("setze y und archivY in robots auf " + feld.getFlags()[0].getY());
-        for (int i = 0; i < aktRoboter.size(); i++) {
-            ((ServerRoboterThread) (aktRoboter.elementAt(i))).rob.setPos(feld.getFlags()[0]);
-            ((ServerRoboterThread) (aktRoboter.elementAt(i))).rob.touchArchive();
+        }
+        CAT.debug("setze x und archivX in robots auf " + board.getFlags()[0].getX());
+        CAT.debug("setze y und archivY in robots auf " + board.getFlags()[0].getY());
+        for (int i = 0; i < curBotsThreads.size(); i++) {
+            ((ServerRoboterThread) (curBotsThreads.elementAt(i))).rob.setPos(board.getFlags()[0]);
+            ((ServerRoboterThread) (curBotsThreads.elementAt(i))).rob.touchArchive();
         }
     }
 
     private void roboterThreadStart() {
-        for (int i = 0; i < rThreads.size(); i++) {
-            ((ServerRoboterThread) (rThreads.elementAt(i))).start();
+        for (int i = 0; i < botThreads.size(); i++) {
+            ((ServerRoboterThread) (botThreads.elementAt(i))).start();
         }
-        d("ServerRoboterThreads wurden gestartet");
+        CAT.debug("ServerRoboterThreads wurden gestartet");
     }
 
-    /** Sind noch Bot dabei?
+    /**
+     * Sind noch Bot dabei?
      */
     private boolean istSpielende() {
-        return (rThreads.size() == 0) || ((aktRoboter.size() == 0)
-                && (zerstoerteRoboter.size() == 0)
-                && (roboterEintrittsListe.size() == 0));
+        return (botThreads.size() == 0) || ((curBotsThreads.size() == 0) && (destroyedBotsThreads.size() == 0) && (botEnterRequestedThreads.size() == 0));
     }
 
-    /** Repariere Schaden, falls auf Reparaturfeld oder Flagge
+    /**
+     * Repariere Schaden, falls auf Reparaturfeld oder Flagge
      * Liefert true, falls erst erfragt werden muss, welche  Register entsperren.werden sollen.
      */
     private boolean repariereGgf(ServerRoboterThread t) {
-        if (t.rob.countLockedRegisters() == 0)
+        if (t.rob.countLockedRegisters() == 0) {
             return false;
+        }
         if ((t.rob.countLockedRegisters() > 0) && (t.rob.getDamage() < 5)) {
             t.rob.unlockAllRegisters();
             return false;
@@ -693,64 +691,66 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             setName("ServerThread");
 
             CAT.debug("MsgThreadStart");
-             messageThread = new MessageThread(this, kommto);
-             messageThread.start();
+            messageThread = new MessageThread(this, commTO);
+            messageThread.start();
 
-             CAT.debug("anmeldung()");
-             boolean spielgestartet = anmeldung();
-             if (!spielgestartet) {
-                 messageThread.interrupt();
-                 return;
-             }
+            CAT.debug("anmeldung()");
+            boolean spielgestartet = anmeldung();
+            if (!spielgestartet) {
+                messageThread.interrupt();
+                return;
+            }
 
             CAT.debug("setzeStartPunkt()");
             setzeStartPunkt();
             CAT.debug("roboterThreadStart()");
             roboterThreadStart();
             // warten auf NTS von Ausgabekanaelen und Robotern
-// 1. Ausgaben NTSen und NTCen, damit Location schonmal stimmt
+            // 1. Ausgaben NTSen und NTCen, damit Location schonmal stimmt
             // kreiere String[] mit allen Namen
             String[] alleN;
             CAT.debug("wait for rThreads");
-            synchronized (rThreads) {
+            synchronized (botThreads) {
                 CAT.debug("have rThreads");
-                alleN = new String[rThreads.size()];
+                alleN = new String[botThreads.size()];
                 int i = 0;
-                for (Iterator e = rThreads.iterator(); e.hasNext();)
+                for (Iterator e = botThreads.iterator(); e.hasNext();) {
                     alleN[i++] = ((ServerRoboterThread) e.next()).rob.getName();
+                }
             }
             CAT.debug("released rThreads");
             //Init Statistics.
             stats = new StatsList(alleN);
-            feld.initStats(stats);
+            board.initStats(stats);
 
-            notifyViews(alleN); 
+            notifyViews(alleN);
 
-// 2. Bot
+            // 2. Bot
             sendMsg("mWelcome", "");
-           
-            d("Spiel starten.");
-            modus = SPIELSTART;
-            waitablesImWaitingFor = new WaitingForSet(rThreads);
+
+            CAT.debug("Spiel starten.");
+            mode = SPIELSTART;
+            waitablesImWaitingFor = new WaitingForSet(botThreads);
             wechselModus(waitablesImWaitingFor.iterator(), SPIELSTART);
             broadcastUndWarteAufRoboter();
-            d("Spiel ist gestartet.");
-// schicken des ersten MNR an alle Bot ohne die Anzahl der Leben zu reduzieren
-            d("Initiale Ausrichtung holen.");
-            modus = INITAUSR;
-            waitablesImWaitingFor = new WaitingForSet(aktRoboter);
+            CAT.debug("Spiel ist gestartet.");
+            // schicken des ersten MNR an alle Bot ohne die Anzahl der Leben zu reduzieren
+            CAT.debug("Initiale Ausrichtung holen.");
+            mode = INITAUSR;
+            waitablesImWaitingFor = new WaitingForSet(curBotsThreads);
             wechselModus(waitablesImWaitingFor.iterator(), INITAUSR);
             broadcastUndWarteAufRoboter();
-            d("InitialeAusrichtung ist geholt.");
+            CAT.debug("InitialeAusrichtung ist geholt.");
             // Ausgabekanaele von Initialausrichtung benachrichtigen
             // kreiere String[] mit allen Namen
             CAT.debug("708 wait for rthreads");
-            synchronized (rThreads) {
+            synchronized (botThreads) {
                 CAT.debug("710 lock rthreads");
-                alleN = new String[rThreads.size()];
+                alleN = new String[botThreads.size()];
                 int i = 0;
-                for (Iterator e = rThreads.iterator(); e.hasNext();)
+                for (Iterator e = botThreads.iterator(); e.hasNext();) {
                     alleN[i++] = ((ServerRoboterThread) e.next()).rob.getName();
+                }
             }
             CAT.debug("716 release rthreads");
             notifyViews(alleN); // HS: HIERHIERHIER initiale Ausrichtungen
@@ -765,61 +765,66 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                 tmpstr[0] = "" + iRunde;
                 sendMsg("mNeueRunde", tmpstr);
 
-// Evtl. auf wiedereintretende Bot warten
-                for (Iterator iter = zerstoerteRoboter.iterator(); iter.hasNext();)
-                    if (!(((ServerRoboterThread) iter.next()).isAlive()))
+                // Evtl. auf wiedereintretende Bot warten
+                for (Iterator iter = destroyedBotsThreads.iterator(); iter.hasNext();) {
+                    if (!(((ServerRoboterThread) iter.next()).isAlive())) {
                         iter.remove();
+                    }
+                }
 
-                if (zerstoerteRoboter.size() > 0) {
+                if (destroyedBotsThreads.size() > 0) {
 
-                    d("Warte kurz auf zerstoerte Bot.");
-                    modus = ZERSTOERT_SYNC;
+                    CAT.debug("Warte kurz auf zerstoerte Bot.");
+                    mode = ZERSTOERT_SYNC;
 
                     tmpstr = new String[1];
-                    Iterator iter = zerstoerteRoboter.iterator();
+                    Iterator iter = destroyedBotsThreads.iterator();
                     tmpstr[0] = (((ServerRoboterThread) iter.next()).rob.getName());
-                    while (iter.hasNext())
+                    while (iter.hasNext()) {
                         tmpstr[0] = tmpstr[0] + ", " + (((ServerRoboterThread) iter.next()).rob.getName());
+                    }
                     sendMsg("mZerstSync", tmpstr);
 
-                    waitablesImWaitingFor = new WaitingForSet(zerstoerteRoboter);
+                    waitablesImWaitingFor = new WaitingForSet(destroyedBotsThreads);
                     wechselModus(waitablesImWaitingFor.iterator(), ZERSTOERT_SYNC);
                     warteAufRoboter();
-                    wechselModus(zerstoerteRoboter.iterator(), ZERSTOERT_ASYNC);
+                    wechselModus(destroyedBotsThreads.iterator(), ZERSTOERT_ASYNC);
                     CAT.debug("wait for roboterEL");
-                    synchronized (roboterEintrittsListe) {
+                    synchronized (botEnterRequestedThreads) {
                         CAT.debug("have roboterEL");
-                        alleN = new String[roboterEintrittsListe.size()];
+                        alleN = new String[botEnterRequestedThreads.size()];
                         int i = 0;
-                        for (Iterator e = roboterEintrittsListe.iterator(); e.hasNext();)
+                        for (Iterator e = botEnterRequestedThreads.iterator(); e.hasNext();) {
                             alleN[i++] = ((ServerRoboterThread) e.next()).rob.getName();
+                        }
                     }
                     CAT.debug("release roboterEL");
-                    if (alleN.length > 0)
-                        notifyViews(alleN); 
+                    if (alleN.length > 0) {
+                        notifyViews(alleN);
+                    }
                 }
-                d("Es werden " + roboterEintrittsListe.size() + " nach ihrer Zerstörung wieder eingesetzt");
+                CAT.debug("Es werden " + botEnterRequestedThreads.size() + " nach ihrer Zerstörung wieder eingesetzt");
 
                 String[] namen;   // fuer notifyChange
                 Vector toBeAsked = new Vector();
                 CAT.debug("wait for roboterEL");
-                synchronized (roboterEintrittsListe) {
+                synchronized (botEnterRequestedThreads) {
                     CAT.debug("have roboterEL");
-                    d("Lasse Bot wieder eintreten.");
-                    for (Iterator e = roboterEintrittsListe.iterator(); e.hasNext();) {
-// Alle wiedereinzusetzenden Bot auf ihre Archivpos setzen.
+                    CAT.debug("Lasse Bot wieder eintreten.");
+                    for (Iterator e = botEnterRequestedThreads.iterator(); e.hasNext();) {
+                        // Alle wiedereinzusetzenden Bot auf ihre Archivpos setzen.
                         // In eigener while-Schleife, damit danach wiedereinsetzen korrekt geprueft
                         // wird!
                         ServerRoboterThread tmp = ((ServerRoboterThread) e.next());
                         tmp.rob.toArchive();
                     }
-                    for (Iterator e = roboterEintrittsListe.iterator(); e.hasNext();) {
+                    for (Iterator e = botEnterRequestedThreads.iterator(); e.hasNext();) {
                         ServerRoboterThread tmp = ((ServerRoboterThread) e.next());
                         // Ggf. devirtualisieren.
                         // Achtung, auch aktRoboter beruecksichtigen, die aber reell bleiben.
                         tmp.rob.setVirtual(false);  //Default: Real einsetzen, ABER....
                         // Virtuell, wenn ein aktiver auch da steht
-                        for (Iterator f = aktRoboter.iterator(); f.hasNext();) {
+                        for (Iterator f = curBotsThreads.iterator(); f.hasNext();) {
                             Bot anderer = ((ServerRoboterThread) f.next()).rob;
                             if (tmp.rob.getX() == anderer.getX() && tmp.rob.getY() == anderer.getY()) {
                                 tmp.rob.setVirtual();
@@ -828,7 +833,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                         }
                         // oder noch ein anderer der wiedereinzusetzenden auch da steht
                         if (!tmp.rob.isVirtual()) {
-                            for (Iterator f = roboterEintrittsListe.iterator(); f.hasNext();) {
+                            for (Iterator f = botEnterRequestedThreads.iterator(); f.hasNext();) {
                                 Bot anderer = ((ServerRoboterThread) f.next()).rob;
                                 if (anderer != tmp.rob && anderer.getX() == tmp.rob.getX() && anderer.getY() == tmp.rob.getY()) {
                                     tmp.rob.setVirtual();
@@ -837,30 +842,30 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                         }
                     }
 
-                    namen = new String[roboterEintrittsListe.size()];
+                    namen = new String[botEnterRequestedThreads.size()];
                     int idx = 0;
                     // Jetzt wirklich wieder einteten lassen
-                    for (Iterator e = roboterEintrittsListe.iterator(); e.hasNext();) {
+                    for (Iterator e = botEnterRequestedThreads.iterator(); e.hasNext();) {
                         ServerRoboterThread tmp = ((ServerRoboterThread) e.next());
-                        aktRoboter.add(tmp);
+                        curBotsThreads.add(tmp);
                         toBeAsked.add(tmp);
                         CAT.debug("Adding " + tmp.rob + " to toBeAsked 1");
                         namen[idx++] = tmp.rob.getName();
                     }
-                    roboterEintrittsListe.removeAllElements();
+                    botEnterRequestedThreads.removeAllElements();
                 }
                 CAT.debug("have roboterEL");
 
                 notifyViews(namen);
 
-/* Power Up!
-                *  Ask just entering bots whether they want to be powered up again.
-                */
-                for (Iterator e = aktRoboter.iterator(); e.hasNext();) {
+                /* Power Up!
+                                *  Ask just entering bots whether they want to be powered up again.
+                                */
+                for (Iterator e = curBotsThreads.iterator(); e.hasNext();) {
                     ServerRoboterThread robThread = ((ServerRoboterThread) e.next());
                     if (!robThread.rob.isActivated()) {
                         if (robThread.rob.isPoweredDownNextTurn()) {
-//This bot just chose PowerDown.
+                            //This bot just chose PowerDown.
                             robThread.rob.setNextTurnPoweredDown(false);
                             robThread.rob.setDamage(0);
                         } else {
@@ -872,94 +877,98 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                     }
                 }
                 if (toBeAsked.size() > 0) {
-                    d("Ich frage " + toBeAsked.size() + " nach Powerup.");
+                    CAT.debug("Ich frage " + toBeAsked.size() + " nach Powerup.");
 
                     tmpstr = new String[1];
                     Iterator iter = toBeAsked.iterator();
                     tmpstr[0] = (((ServerRoboterThread) iter.next()).rob.getName());
-                    while (iter.hasNext())
+                    while (iter.hasNext()) {
                         tmpstr[0] = tmpstr[0] + ", " + (((ServerRoboterThread) iter.next()).rob.getName());
+                    }
                     sendMsg("mPowUpFrage", tmpstr);
 
-                    modus = POWERUP;
+                    mode = POWERUP;
                     wechselModus(toBeAsked.iterator(), POWERUP);
                     waitablesImWaitingFor = new WaitingForSet(toBeAsked);
                     broadcastUndWarteAufRoboter();
-                    d("Powerup fertig.");
+                    CAT.debug("Powerup fertig.");
 
                     namen = new String[toBeAsked.size()];
                     int idx = 0;
-                    for (Iterator e = toBeAsked.iterator(); e.hasNext();)
+                    for (Iterator e = toBeAsked.iterator(); e.hasNext();) {
                         namen[idx++] = ((ServerRoboterThread) e.next()).rob.getName();
+                    }
                     notifyViews(namen);
 
                     for (Iterator it = toBeAsked.iterator(); it.hasNext();) {
                         ServerRoboterThread srt = ((ServerRoboterThread) it.next());
-                        if (!srt.rob.isActivated())
+                        if (!srt.rob.isActivated()) {
                             srt.rob.setDamage(0);
+                        }
                     }
                 }
 
-// Karten an die Bot verteilen die nicht zerstoert oder deaktiviert sind
-// warten auf die Karten der Bot (Timeout)
+                // Karten an die Bot verteilen die nicht zerstoert oder deaktiviert sind
+                // warten auf die Karten der Bot (Timeout)
                 Card[] cards = new Card[gesperrteKarten.size()];
-                for (int i = 0; i < gesperrteKarten.size(); i++)
+                for (int i = 0; i < gesperrteKarten.size(); i++) {
                     cards[i] = (Card) gesperrteKarten.get(i);
+                }
 
                 Deck stapel = new Deck(cards);
-                d("Neuer Stapel: " + stapel);
+                CAT.debug("Neuer Stapel: " + stapel);
                 Vector activeThisRound = new Vector();
-                for (Iterator e = aktRoboter.iterator(); e.hasNext();) {
+                for (Iterator e = curBotsThreads.iterator(); e.hasNext();) {
                     ServerRoboterThread tmp = ((ServerRoboterThread) e.next());
                     if (tmp.rob.isActivated()) {
                         activeThisRound.addElement(tmp);
-//Karten geben und dabei *beruecksichtigen*, wie viele der Bot kriegt!
+                        //Karten geben und dabei *beruecksichtigen*, wie viele der Bot kriegt!
                         tmp.rob.setCards(stapel.handOutCards(tmp.rob.cardsToGive()));
                     }
                 }
                 if (activeThisRound.size() > 0) {
-                    d("Ich verteile an " + activeThisRound.size() + " Karten.");
-                    modus = PROGRAMMIERUNG;
+                    CAT.debug("Ich verteile an " + activeThisRound.size() + " Karten.");
+                    mode = PROGRAMMIERUNG;
                     waitablesImWaitingFor = new WaitingForSet(activeThisRound);
                     wechselModus(activeThisRound.iterator(), PROGRAMMIERUNG);
                     waitablesImWaitingFor.addRemovalListener(robProgListener);
                     broadcastUndWarteAufRoboter();
-                    d("Programmierung zurueckerhalten");
+                    CAT.debug("Programmierung zurueckerhalten");
                 }
 
                 CAT.debug("890 locke aktRoboter..");
                 // Auswertung beginnt
-                synchronized (aktRoboter) {
+                synchronized (curBotsThreads) {
                     CAT.debug("893 habe aktRoboter");
-                    wechselModus(aktRoboter.iterator(), NIX);
-                    modus = NIX;
+                    wechselModus(curBotsThreads.iterator(), NIX);
+                    mode = NIX;
                 }
                 CAT.debug("890 frei: aktRoboter");
                 // Loop for the five phases.
-                for (aktPhase = 1; aktPhase != 0; aktPhase = (aktPhase + 1) % 6) {
-                    CAT.info("Evaluation phase " + aktPhase + ", turn " + iRunde + " starts.");
-// Am Spiel beteiligte Bot in Array kopieren (aus technischen Gruenden)
+                for (curPhase = 1; curPhase != 0; curPhase = (curPhase + 1) % 6) {
+                    CAT.info("Evaluation phase " + curPhase + ", turn " + iRunde + " starts.");
+                    // Am Spiel beteiligte Bot in Array kopieren (aus technischen Gruenden)
                     Bot[] robs;
                     CAT.debug("903 wait for aktRoboter");
-                    synchronized (aktRoboter) {
+                    synchronized (curBotsThreads) {
                         CAT.debug("903 have aktRoboter");
                         CAT.debug("");
-//<hendrik was here>
+                        //<hendrik was here>
                         int removedBots = 0;
-                        for (Iterator e = aktRoboter.iterator(); e.hasNext();) {
+                        for (Iterator e = curBotsThreads.iterator(); e.hasNext();) {
                             ServerRoboterThread t = ((ServerRoboterThread) e.next());
                             if (t.isAlive()) {
                                 CAT.debug(t.getName() + " IS ALIVE");
                             } else {
                                 CAT.error(t.getName() + " IS !!NOT!! ALIVE");
-//aktRoboter.remove(t);
+                                //aktRoboter.remove(t);
                                 removedBots++;
                             }
                         }
 
-                        robs = new Bot[aktRoboter.size() - removedBots];
+                        robs = new Bot[curBotsThreads.size() - removedBots];
                         int i = 0;
-                        for (Iterator e = aktRoboter.iterator(); e.hasNext(); i++) {
+                        for (Iterator e = curBotsThreads.iterator(); e.hasNext(); i++) {
                             ServerRoboterThread t = ((ServerRoboterThread) e.next());
                             if (t.isAlive() && t.isThere()) {
                                 CAT.debug(t.getName() + " IS ALIVE");
@@ -973,35 +982,35 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                     CAT.debug("903 release  aktRoboter");
                     // (doPhase())
                     //DEBUG
-                    d("feld.doPhase(" + aktPhase + ") mit ");
-                    for (int i = 0; i < aktRoboter.size(); i++) {
-                        d(((ServerRoboterThread) aktRoboter.elementAt(i)).rob.getName() + ": " + ((ServerRoboterThread) aktRoboter.elementAt(i)).rob);
+                    CAT.debug("feld.doPhase(" + curPhase + ") mit ");
+                    for (int i = 0; i < curBotsThreads.size(); i++) {
+                        CAT.debug(((ServerRoboterThread) curBotsThreads.elementAt(i)).rob.getName() + ": " + ((ServerRoboterThread) curBotsThreads.elementAt(i)).rob);
                     }
-                    feld.doPhase(aktPhase, robs);
+                    board.doPhase(curPhase, robs);
 
                     // Evaluate what has happends.
                     CAT.debug("945 wait aktRoboter");
-                    synchronized (aktRoboter) {
+                    synchronized (curBotsThreads) {
                         CAT.debug("945 have aktRoboter");
-                        for (Iterator e = aktRoboter.listIterator(); e.hasNext();) {
+                        for (Iterator e = curBotsThreads.listIterator(); e.hasNext();) {
                             ServerRoboterThread tmp = (ServerRoboterThread) e.next();
                             // Gewinner?
-                            if (tmp.rob.getNextFlag() == feld.getFlags().length + 1) {
+                            if (tmp.rob.getNextFlag() == board.getFlags().length + 1) {
                                 //raus aus aktiven Robos, in Gewinnerliste,
                                 // vom Plan nehmen, ausgabenbenachrichtigen
                                 tmp.setMode(SPIELENDE);
-                                gewinner.addElement(tmp);
+                                wonThreads.addElement(tmp);
                                 e.remove(); //aus aktRoboter
                                 // Messages....................
                                 tmpstr = new String[2];
                                 tmpstr[0] = tmp.rob.getName();
-                                tmpstr[1] = "" + gewinner.size();
+                                tmpstr[1] = "" + wonThreads.size();
                                 sendMsg("mGewinn", tmpstr);
                                 // ...........................
                                 try {
                                     tmp.deleteMe("GO");
                                 } catch (KommException ex) {
-                                    d("Bot " + tmp.rob.getName() + " konnte nicht mehr von seiner Entfernung wg. GO(Gewinn) benachrichtigt werden: " + ex);
+                                    CAT.debug("Bot " + tmp.rob.getName() + " konnte nicht mehr von seiner Entfernung wg. GO(Gewinn) benachrichtigt werden: " + ex);
                                 }
 
                                 tmp.rob.setInvalidPos();
@@ -1026,7 +1035,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                                     tmp.rob.unlockAllRegisters();
                                     tmp.rob.setNextTurnPoweredDown(false);
 
-                                    zerstoerteRoboter.addElement(tmp);
+                                    destroyedBotsThreads.addElement(tmp);
                                     tmp.setMode(ZERSTOERT_ASYNC);
                                     try {
                                         tmp.killed();
@@ -1036,12 +1045,12 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                                         System.err.println("Mit Spieler " + tmp.rob.getName() + "ist ein Kommunikationsfehler aufgetreten.");
                                     }
                                 } else {
-                                    roboterFriedhof.addElement(tmp);
+                                    graveyardThreads.addElement(tmp);
                                     tmp.setMode(SPIELENDE);
                                     try {
                                         tmp.deleteMe("LL");
                                     } catch (KommException ex) {
-                                        d("Kommunikationsfehler beim Entfernen eines Roboters");
+                                        CAT.debug("Kommunikationsfehler beim Entfernen eines Roboters");
                                     }
                                     gameover = istSpielende();
                                 }
@@ -1061,60 +1070,62 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     Relevant for all bots on flags and repair fields.
     */
                 Vector repairing = new Vector();
-                for (Iterator e = aktRoboter.iterator(); e.hasNext();) {
+                for (Iterator e = curBotsThreads.iterator(); e.hasNext();) {
                     ServerRoboterThread tmp = (ServerRoboterThread) e.next();
                     if (repariereGgf(tmp)) {
-                        d("Addiere einen zu repairing hinzu.");
+                        CAT.debug("Addiere einen zu repairing hinzu.");
                         repairing.addElement(tmp);
                     }
                 }
                 if (repairing.size() > 0) {
-                    d("Reparaturanfrage stellen an " + repairing.size());
-                    modus = ENTSPERREN;
+                    CAT.debug("Reparaturanfrage stellen an " + repairing.size());
+                    mode = ENTSPERREN;
                     wechselModus(repairing.iterator(), ENTSPERREN);
                     waitablesImWaitingFor = new WaitingForSet(repairing);
                     broadcastUndWarteAufRoboter();
-                    d("Reparaturanfragen sind beantwortet.");
+                    CAT.debug("Reparaturanfragen sind beantwortet.");
                 }
 
                 // gesperrte Register einsammeln
-                d("Gesperrte Register einsammeln.");
+                CAT.debug("Gesperrte Register einsammeln.");
                 gesperrteKarten.removeAllElements();
                 CAT.debug("1050 wait rThreads");
-                synchronized (rThreads) {
+                synchronized (botThreads) {
                     CAT.debug("1050 have rThreads");
-                    for (Iterator e = rThreads.iterator(); e.hasNext();) {
+                    for (Iterator e = botThreads.iterator(); e.hasNext();) {
                         ServerRoboterThread tmp = ((ServerRoboterThread) e.next());
-                        for (int i = 0; i < 5; i++)
-                            if (tmp.rob.getLockedRegister(i) != null)
+                        for (int i = 0; i < 5; i++) {
+                            if (tmp.rob.getLockedRegister(i) != null) {
                                 gesperrteKarten.addElement(tmp.rob.getLockedRegister(i));
+                            }
+                        }
                     }
                 }
                 CAT.debug("1050 release rThreads");
-                d("Habe " + gesperrteKarten.size() + " gesperrte Karten gefunden und gespeichert.");
+                CAT.debug("Habe " + gesperrteKarten.size() + " gesperrte Karten gefunden und gespeichert.");
 
-/* End-of-turn-evaluation:
-                   2.) Set bots to deactivated if they chose power down
-                 */
+                /* End-of-turn-evaluation:
+                                   2.) Set bots to deactivated if they chose power down
+                                 */
                 Vector changedBots = new Vector();
                 CAT.debug("1066 wait rThreads");
-                synchronized (rThreads) {
+                synchronized (botThreads) {
                     CAT.debug("1066 have rThreads");
-                    for (Iterator it = rThreads.iterator(); it.hasNext();) {
+                    for (Iterator it = botThreads.iterator(); it.hasNext();) {
                         Bot bot = ((ServerRoboterThread) it.next()).rob;
                         if (bot.isPoweredDownNextTurn()) {
                             bot.setActivated(false);
                             changedBots.add(bot.getName());
-/* NextTurnPowerDown is not set to false here,
-                            *  but at the beginning of the next turn to be
-                            *  able to distinguish between bots that were
-                            *  already powered down and newly deactivated ones.
-                            */
+                            /* NextTurnPowerDown is not set to false here,
+                                                        *  but at the beginning of the next turn to be
+                                                        *  able to distinguish between bots that were
+                                                        *  already powered down and newly deactivated ones.
+                                                        */
                         }
                     }
                 }
                 CAT.debug("1066 release rThreads");
-/* Tell the clients if someone powered down. */
+                /* Tell the clients if someone powered down. */
                 if (changedBots.size() > 0) {
                     String[] changedBotsArray = new String[changedBots.size()];
                     changedBots.toArray(changedBotsArray);
@@ -1123,50 +1134,50 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
             } // Rundenschleife ende
 
-            d("Das Spiel ist jetzt zu Ende. (Rundenschleife verlassen.)");
+            CAT.debug("Das Spiel ist jetzt zu Ende. (Rundenschleife verlassen.)");
 
-/* Falls wir jemals ein anderes Ende haben wollen, muß man sich hier nochmal Gedanken
-	       machen (eines, bei dem nicht alle Bot auf der letzten Flagge angekommen sind.
+            /* Falls wir jemals ein anderes Ende haben wollen, muß man sich hier nochmal Gedanken
+                       machen (eines, bei dem nicht alle Bot auf der letzten Flagge angekommen sind.
 
-	       if (rThreads.size()>0){
-	       modus = SPIELENDE;
-	       rThreadsAufDieIchWarte = rThreads;
-	       wechselModus(rThreadsAufDieIchWarte, SPIELENDE);
-	       broadcastUndWarteAufRoboter();
-	       }
-	       d("Alle Bot sind vom Spielende benachrichtet worden.");
+                       if (rThreads.size()>0){
+                       modus = SPIELENDE;
+                       rThreadsAufDieIchWarte = rThreads;
+                       wechselModus(rThreadsAufDieIchWarte, SPIELENDE);
+                       broadcastUndWarteAufRoboter();
+                       }
+                       d("Alle Bot sind vom Spielende benachrichtet worden.");
 
-	       d("Jetzt noch "+rThreads.size()+ "Bot hinrichten!");
-	       while (rThreads.size()>0){
-	       ServerRoboterThread tmp=(ServerRoboterThread)rThreads.elementAt(0);
-	       deleteRoby(tmp, "GO");
-	       }*/
+                       d("Jetzt noch "+rThreads.size()+ "Bot hinrichten!");
+                       while (rThreads.size()>0){
+                       ServerRoboterThread tmp=(ServerRoboterThread)rThreads.elementAt(0);
+                       deleteRoby(tmp, "GO");
+                       }*/
 
-            d("Es sind noch " + aThreads.size() + " Ausgaben da.");
-            if (aThreads.size() > 0) {
+            CAT.debug("Es sind noch " + ausgabeThreads.size() + " Ausgaben da.");
+            if (ausgabeThreads.size() > 0) {
                 CAT.debug("1114 wait aThreads");
-                synchronized (aThreads) {
+                synchronized (ausgabeThreads) {
                     CAT.debug("1114 have raThreads");
-                    for (Iterator e = aThreads.iterator(); e.hasNext();) {
+                    for (Iterator e = ausgabeThreads.iterator(); e.hasNext();) {
                         ServerAusgabeThread tmp = (ServerAusgabeThread) e.next();
                         tmp.setMode(FRAGENERLAUBT);
                         try {
                             tmp.deleteMe("GO");
                         } catch (KommException ex) {
-                            d("ausgabenBenachrichtigen: Es ist eine KommException aufgetreten.");
+                            CAT.debug("ausgabenBenachrichtigen: Es ist eine KommException aufgetreten.");
                         }
                     } //for
-                    d("Alle AusgabeThreads vom Spielende benachrichtigt und in den richtigen Modus versetzt.");
+                    CAT.debug("Alle AusgabeThreads vom Spielende benachrichtigt und in den richtigen Modus versetzt.");
 
-                    waitablesImWaitingFor = new WaitingForSet(aThreads);
-                    waitablesImWaitingFor.waitFor(ausgabennotifyto);
+                    waitablesImWaitingFor = new WaitingForSet(ausgabeThreads);
+                    waitablesImWaitingFor.waitFor(notifyTO);
 
-                    for (Iterator e = aThreads.iterator(); e.hasNext();) {
+                    for (Iterator e = ausgabeThreads.iterator(); e.hasNext();) {
                         ServerAusgabeThread tmp = (ServerAusgabeThread) e.next();
                         try {
                             tmp.endGame();
                         } catch (java.io.IOException ex) {
-                            d("IOException aufgetreten.");
+                            CAT.debug("IOException aufgetreten.");
                         }
                     }
                 } // synchronized aThreads
@@ -1177,24 +1188,20 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             try {
                 registrationManager.seso.close();
             } catch (java.io.IOException ex) {
-                d("IOException beim AnmeldeThreadKillen.");
+                CAT.debug("IOException beim AnmeldeThreadKillen.");
             }
 
             // MessageThread killen
             messageThread.interrupt();
 
-            if (gameStartListener != null) {
-                gameStartListener.fireGameFinished();
+            if (serverObserver != null) {
+                serverObserver.fireGameFinished();
             }
         } catch (Throwable t) {
             CAT.fatal("Exception:", t);
         }
-        d("Ende meiner run()-Methode erreicht!!!");
+        CAT.debug("Ende meiner run()-Methode erreicht!!!");
     }// run() ende
-
-    private void d(String s) {
-        CAT.debug(s);
-    }
 
     private RobProgListener robProgListener = new RobProgListener();
 

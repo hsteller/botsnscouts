@@ -142,7 +142,7 @@ public class AutoBot extends BNSThread {
                 case (ClientAntwort.MACHEZUG):
                     boolean powerdown = false;
                     for (int i = 0; i < answer.karten.length; i++)
-                        CAT.debug("Card " + i + " is " + answer.karten[i].getprio() + "|" + answer.karten[i].getaktion());
+                        CAT.debug("Card " + i + " is " + answer.karten[i].getprio() + "|" + answer.karten[i].getAction());
                     updateBot();
                     Bot simRob = Bot.getCopy(myBot);  // Kopieren fuer spaetere Powerdown-Simulationen
 
