@@ -1,7 +1,7 @@
 package de.botsnscouts.autobot;
 
-import de.botsnscouts.comm.KommClientSpieler;
-import de.botsnscouts.board.SpielfeldKS;
+import de.botsnscouts.comm.*;
+import de.botsnscouts.board.*;
 import de.botsnscouts.util.*;
 
 /** SpielerKuenstlich implementiert den kuenstlichen Spieler
@@ -34,7 +34,7 @@ public class SpielerKuenstlich extends Thread {
     Ort [] fahnen;
     Ort robbiPos;
 		
-    Roboter	meinRobbi = new Roboter ("OrgRobbi");
+    Roboter	meinRobbi = Roboter.getNewInstance("OrgRobbi");
     KommClientSpieler meinKomm = new KommClientSpieler();
     ClientAntwort antwort = new ClientAntwort();
 	
@@ -83,7 +83,7 @@ public class SpielerKuenstlich extends Thread {
                         if (meinSpielfeld==null) {
                             spielfeldkreieren();
                             wirbel = new Permu(meinSpielfeld,malus);
-			    meinSpielfeld.debugmeldungen=false; //Wollen wir garantiert hier nicht hören :)
+			    meinSpielfeld.setDebug(false); //Wollen wir garantiert hier nicht hören :)
                         }
                         d("Robbi fuellen");
                         robbifuellen();
@@ -108,12 +108,12 @@ public class SpielerKuenstlich extends Thread {
                         for (int i = 0; i < antwort.karten.length; i++)
                             d("Karte "+i+" ist "+antwort.karten[i].getprio()+"|"+antwort.karten[i].getaktion());
                         robbifuellen();
-                        Roboter simRob=new Roboter(meinRobbi);  // Kopieren fuer spaetere Powerdown-Simulationen
+                        Roboter simRob= Roboter.getCopy(meinRobbi);  // Kopieren fuer spaetere Powerdown-Simulationen
 		    
                         Karte[] vollKA = new Karte[9];
 
                         for ( int i = 0; i < antwort.karten.length; i++) vollKA[i] = antwort.karten[i];
-                        Roboter pRob = new Roboter(meinRobbi);
+                        Roboter pRob = Roboter.getCopy(meinRobbi);
                             // gesperrte Register in pRob.zug schreiben
                         for (int i = 0; i < pRob.getGesperrteRegister().length; i++)
                             pRob.setZug(i, pRob.getGesperrteRegister(i));
@@ -276,7 +276,7 @@ public class SpielerKuenstlich extends Thread {
          */
     public void antwortaufZerstoerung() {
         int richtung=0;
-        Roboter testRobbi = new Roboter(meinRobbi);
+        Roboter testRobbi = Roboter.getCopy(meinRobbi);
 
         testRobbi.zumArchiv();
 

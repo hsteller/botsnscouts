@@ -87,7 +87,7 @@ class Permu {
             if (sf.bo(r.getX(),r.getY()).typ>=100){ // Fliessband
                 Roboter[] tmp=new Roboter[1];
                 for (int i=0;i<zuege.length;i++){
-                    tmp[0] = new Roboter(r);
+                    tmp[0] = Roboter.getCopy(r);
                     tmp[0].setZug(0,new Karte(110,zuege[i]));
                     sf.doPhase(1,tmp);
                     if(tmp[0].getSchaden()==10) // wenn wir naechste Runde sterben ...
@@ -109,7 +109,7 @@ class Permu {
 	    if (ka[i] == null) 
                 continue;
 	    Karte katemp = ka[i];
-	    Roboter rtemp = new Roboter(r);
+	    Roboter rtemp = Roboter.getCopy(r);
 	    ka[i] = null; // ausspielen
 	    int j = 0;
 	    while (r.getZug(j) != null) j++;

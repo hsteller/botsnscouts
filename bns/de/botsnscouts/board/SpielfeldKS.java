@@ -194,6 +194,10 @@ public class SpielfeldKS extends SpielfeldSim  {
             }
     } 
      
+    public void setDebug(boolean b){
+	debugmeldungen = b;
+    }
+
     public void pr()  {   // nur für Testzwecke
 	String wert;
 	int laenge;
