@@ -135,7 +135,12 @@ public class Ausgabe extends BNSThread {
 
                 else if (msgId.equals("mGrubenopfer")) {// robot fell into a pit
                     // play the sound for "robot fell into pit"
-                    SoundMan.playPitFallSound();
+                    SoundMan.playSound(SoundMan.PIT);
+                }
+
+                else if (msgId.equals("mNextFlag")) {// robot fell into a pit
+                    // play the sound for "robot fell into pit"
+                    SoundMan.playSound(SoundMan.FLAG_REACHED);
                 }
 
 		else if (msgId.equals("mBoardLaser")){ // boardlaser shooting
