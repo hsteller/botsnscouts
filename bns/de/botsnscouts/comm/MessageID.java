@@ -14,5 +14,7 @@ public interface MessageID {
 
   public static final String AUSWERTUNG      = "mAusw";
 
+  public static final String SOMEONE_QUIT    = "mAbmeldung";
+  public static final String BOT_REMOVED     = "mHinr";
 
 }
