@@ -238,6 +238,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 
     private void initMenus() {
+      menus.add(new FileMenu());
       menus.add(new ZoomMenu());
       menus.add(new OptionsMenu());
       menus.add(new HelpMenu());
