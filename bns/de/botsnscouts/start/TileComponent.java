@@ -28,7 +28,7 @@ public class TileComponent extends JComponent implements  MouseListener, MouseMo
     public TileComponent(Facade fas, int x, int y){
 	setOpaque(false);
 	fassade=fas;
-	W=H=Tile.THUMBNAIL_SIZE;
+	W=H=fas.getThumbnailSize();
 	myX=x;
 	myY=y;
 	paint=new GradientPaint(0,0, Color.lightGray, W, H, Color.darkGray);

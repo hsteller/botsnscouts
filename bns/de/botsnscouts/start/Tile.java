@@ -12,22 +12,23 @@ public class Tile extends SpielfeldSim{
 
   public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Tile.class);
 
-    public static int THUMBNAIL_SIZE = 180;
+    private int thumbnailsize;
+    private Image img;
 
     String kName;
     int rotat;
 
     //create new tile
-    public Tile(String name, String field) throws FormatException, FlaggenException{
+    public Tile(String name, String field, int thumbnailsize) throws FormatException, FlaggenException{
 	super(12,12,field,null);
+	this.thumbnailsize=thumbnailsize;
 	kName=name;
 	rotat=0;
     }
 
     //create rotated tile
-    public Tile(String name, String field, int rot, Image im) throws FormatException, FlaggenException{
-	super(12,12,field,null);
-	kName=name;
+    public Tile(String name, String field, int rot, Image im, int thumbnailsize) throws FormatException, FlaggenException{
+	this(name, field, thumbnailsize);
 	rotat=rot;
 	img=im;
     }
@@ -35,7 +36,7 @@ public class Tile extends SpielfeldSim{
     public Image getImage(){
 	if (img==null){
 	    CAT.debug("creating image on-demand.");
-	    img=SACanvas.createThumb(this,THUMBNAIL_SIZE);
+	    img=SACanvas.createThumb(this,thumbnailsize);
 	}
 	return img;
     }
@@ -53,7 +54,7 @@ public class Tile extends SpielfeldSim{
 	String gedrTile=get90GradGedreht();
 	Tile drTile = null;
 	try{
-	    drTile =new Tile(kName,gedrTile,(rotat+1)%4,img);
+	    drTile =new Tile(kName,gedrTile,(rotat+1)%4,img,thumbnailsize);
 	}catch(FlaggenException e){
 	    System.err.println(e);
 	}catch(FormatException e){

@@ -11,6 +11,7 @@ import de.botsnscouts.gui.*;
 
 public class Facade{
 
+    private int thumbnailsize;
     private TileRaster tileRaster, tileRasterSave;
     private Launcher launcher;
     private KommSpPr com;
@@ -39,13 +40,20 @@ public class Facade{
     }
 
 ////////////////////////////////////////
-    // instanziiert alle benötigten Klassen
     public Facade(){
-	tileFactory = new TileFactory();
+	this(180);
+    }
+    public Facade(int thumbnailsize){
+	this.thumbnailsize=thumbnailsize;
+	tileFactory = new TileFactory(thumbnailsize);
 	//tileFactory.start();
 	tileRaster = new TileRaster(tileFactory);
 	launcher = new Launcher();
 	com=new KommSpPr();
+    }
+
+    public int getThumbnailSize(){
+	return thumbnailsize;
     }
 
    //*TileRaster*//
@@ -285,7 +293,6 @@ public class Facade{
 
     // launch the game
     public boolean startGame() throws OneFlagException, NichtZusSpfException{
-        tileFactory.forgetTiles();
 	return startGame(DIP, DPORT, DPLAYERS, DTO, LPORT);
     }
 
@@ -296,12 +303,12 @@ public class Facade{
     public boolean startGame(String ip, int port, int pnum, int timeOut, int lisPort) throws OneFlagException, NichtZusSpfException{
 	boolean ret;
 	ret=launcher.startGame(com, tileRaster, ip, port, pnum, timeOut, lisPort);
-        tileFactory.forgetTiles();
 	return ret;
     }
 
     //startet das Spiel tatsächlich
     public boolean spielGehtLos(){
+        tileFactory.forgetTiles();
 	return launcher.spielGehtLos(com,DIP,DPORT);
     }
 

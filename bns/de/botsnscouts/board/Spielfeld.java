@@ -131,9 +131,6 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 
   /***** protected Instanzenvariablen *****/
 
-  /** Preview-Image is possibly saved along with the tile */
-  protected java.awt.Image img;
-
   /** Die Spielfeldgroesse */
   protected int sizeX,sizeY;
 
@@ -299,8 +296,6 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	strpos=parseWand(strpos,kacheln,neu);
 	hWand[spalte][0]=neu;                     // Ende parsen
       }
-
-      CAT.debug("left of the spielfeldstring: "+kacheln.substring(strpos,kacheln.length()));
 
       checkFlaggen(f);
       flaggen=f;
