@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.comm;
 
 import java.io.*;
 /** Klasse fuer die Dinge, die nicht in 'KommClient' vorkommen und die die Ausgabe nix angehen

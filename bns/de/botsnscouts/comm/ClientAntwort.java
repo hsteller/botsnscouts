@@ -1,5 +1,5 @@
-package de.spline.rr;
-
+package de.botsnscouts.comm;
+import de.botsnscouts.util.*; 
 public class ClientAntwort {
     /** Ermoeglicht die Abfrage der Kommunikationsart mittels der Konstanten dieser Klasse
      *@author Hendrik<BR>*/
@@ -12,8 +12,12 @@ public class ClientAntwort {
     public String str;
     /** Container; Falls mehrere Strings (Namen) geschickt wurden, sind diese in ´namen´ abgelegt (bei SPIELERNAMEN, SPIELSTAND) */
     public String [] namen;
-    /** Container; wird nicht mehr benoetigt, da wir gibFeldinhalt doch nicht brauchen.*/
-    public Feld feld; 
+
+    // DEPRECATED
+    //  /** Container; wird nicht mehr benoetigt, da wir gibFeldinhalt doch nicht brauchen.*/
+    // public Feld feld; 
+
+
     /** wohl doch nicht benoetigt*/
     public Roboter roboter; 
     /** Container; enthaelt die ausgeteilten Karten bei MACHEZUG*/

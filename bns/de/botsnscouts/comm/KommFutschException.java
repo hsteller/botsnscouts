@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.comm;
 
 /** KommFutschExceptions werden von den Komm-Klassen geworfen, falls
 a) mehrmals hintereinander "null" ueber den BufferedReader kommt

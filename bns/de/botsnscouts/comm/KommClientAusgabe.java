@@ -1,5 +1,4 @@
-package de.spline.rr;
-
+package de.botsnscouts.comm;
 import java.io.*;
 /** Diese Klasse enthaelt die Methoden, Objekte usw., die nicht in KommClient enthalten sind und vom Spieler nicht benoetigt werden
 *@author Hendrik<BR>*/

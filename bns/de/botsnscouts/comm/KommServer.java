@@ -1,5 +1,6 @@
-package de.spline.rr;
+package de.botsnscouts.comm;
 
+import de.botsnscouts.util.*;
 import java.io.*;
 /* STAND 20.7.99 2:55 ; sendFeldinhalt fehlt noch; 
    getestet: - warte
@@ -902,255 +903,258 @@ public class KommServer {
    
   } 
   
+    /**
+       DEPRECATED - has never beem used
+     */
+    //  public void sendFeldinhalt (de.botsnscouts.old.Feld f)  throws KommException{}
   
        
-  
 
-    /**Zur Antwort auf Info-Request 'gibFeldinhalt'.
-   * erhält ein Objekt des Typs Feld, das dem Feld an der gewünschten Stelle entspricht
-   * Feld enthält den Bodeninhalt und die Wandgeräte.
- @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
-   */ 
-  public void sendFeldinhalt (Feld f)  throws KommException{
-    // IST NOCH NICHT FERTIG    
-try {
-      String raus="(";    
-      String boden = "";
-      String wandLinks="";
-      String wandRechts="";
-      String wandUnten="";
-      String wandOben="";      
+//     /**Zur Antwort auf Info-Request 'gibFeldinhalt'.
+//    * erhält ein Objekt des Typs Feld, das dem Feld an der gewünschten Stelle entspricht
+//    * Feld enthält den Bodeninhalt und die Wandgeräte.
+//  @exception KommException wird geworfen, falls beim Senden ein Fehler (z.B. IOException) auftrat
+//    */ 
+//   public void sendFeldinhalt (Feld f)  throws KommException{
+//     // IST NOCH NICHT FERTIG    
+// try {
+//       String raus="(";    
+//       String boden = "";
+//       String wandLinks="";
+//       String wandRechts="";
+//       String wandUnten="";
+//       String wandOben="";      
       
 
-      // DIE WAENDE:
-      // obere Wand:
-      if (f.o_exist) { // gibt es eine Wamd ?
-	String oben = wandgeraet (f.o_WandEl2,f.o_WandEl2Spez);
-	String unten =  wandgeraet (f.o_WandEl1, f.o_WandEl1Spez);
+//       // DIE WAENDE:
+//       // obere Wand:
+//       if (f.o_exist) { // gibt es eine Wamd ?
+// 	String oben = wandgeraet (f.o_WandEl2,f.o_WandEl2Spez);
+// 	String unten =  wandgeraet (f.o_WandEl1, f.o_WandEl1Spez);
 	
-	if (oben.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-	  oben = "["+oben;
-	if (unten.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-	  unten = unten + "]";
-	wandOben=oben+"#"+unten;	// zusammensetzen der oberen Wand
-      }
-      else {
-	wandOben="_"; // keine Wand
-      }
+// 	if (oben.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+// 	  oben = "["+oben;
+// 	if (unten.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+// 	  unten = unten + "]";
+// 	wandOben=oben+"#"+unten;	// zusammensetzen der oberen Wand
+//       }
+//       else {
+// 	wandOben="_"; // keine Wand
+//       }
      
-      // rechte Wand:
-      if (f.r_exist) {
-	String links = wandgeraet (f.r_WandEl1, f.r_WandEl1Spez);
-	String rechts = wandgeraet (f.r_WandEl2, f.r_WandEl2Spez);
+//       // rechte Wand:
+//       if (f.r_exist) {
+// 	String links = wandgeraet (f.r_WandEl1, f.r_WandEl1Spez);
+// 	String rechts = wandgeraet (f.r_WandEl2, f.r_WandEl2Spez);
        	
-	if (links.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-	  links = "["+links;
-	if (rechts.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-	  rechts = rechts + "]";
+// 	if (links.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+// 	  links = "["+links;
+// 	if (rechts.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+// 	  rechts = rechts + "]";
 	
-	wandRechts = links+"#"+rechts;
-      }
-      else {
-	wandRechts="_";
-      }
+// 	wandRechts = links+"#"+rechts;
+//       }
+//       else {
+// 	wandRechts="_";
+//       }
       
-      // untere Wand:
-      if (f.u_exist) {
-	String oben = wandgeraet (f.u_WandEl1, f.u_WandEl1Spez);
-	String unten = wandgeraet (f.u_WandEl2, f.u_WandEl2Spez);
+//       // untere Wand:
+//       if (f.u_exist) {
+// 	String oben = wandgeraet (f.u_WandEl1, f.u_WandEl1Spez);
+// 	String unten = wandgeraet (f.u_WandEl2, f.u_WandEl2Spez);
 	
-	if (oben.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-	  oben = "["+oben;
-	if (unten.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-	  unten = unten + "]";
+// 	if (oben.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+// 	  oben = "["+oben;
+// 	if (unten.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+// 	  unten = unten + "]";
 	
-	wandUnten = oben+"#"+unten;
-      }
-      else {
-	wandUnten="_";
-      }
+// 	wandUnten = oben+"#"+unten;
+//       }
+//       else {
+// 	wandUnten="_";
+//       }
       
-      // linke Wand
-      if (f.l_exist) {
-	String links = wandgeraet (f.l_WandEl2, f.l_WandEl2Spez);
-	String rechts = wandgeraet (f.l_WandEl1 ,f.l_WandEl1Spez );
+//       // linke Wand
+//       if (f.l_exist) {
+// 	String links = wandgeraet (f.l_WandEl2, f.l_WandEl2Spez);
+// 	String rechts = wandgeraet (f.l_WandEl1 ,f.l_WandEl1Spez );
 	
-	if (links.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-	  links = "["+links;
-	if (rechts.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-	   rechts = rechts + "]";
+// 	if (links.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+// 	  links = "["+links;
+// 	if (rechts.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+// 	   rechts = rechts + "]";
 	
-	wandLinks = links+"#"+rechts;	
-      }
-      else {
-	wandLinks="_";
-      }
-      // Die vier Waende wurden erstellt
+// 	wandLinks = links+"#"+rechts;	
+//       }
+//       else {
+// 	wandLinks="_";
+//       }
+//       // Die vier Waende wurden erstellt
       
-      // jetzt folgt DER BODEN:
+//       // jetzt folgt DER BODEN:
       
-      boden = bodeninhalt(f.bodenTyp, f.bodenSpez);
+//       boden = bodeninhalt(f.bodenTyp, f.bodenSpez);
       
-      // raus zuEnde basteln 
-      raus+=boden+","+wandOben+wandRechts+wandUnten+wandLinks;       
-      raus+=")";
-      out.println (raus);
-    }
-    catch (Exception e) {
-      throw new KommException ("sendFeldinhalt fuehrte zu einer Exception:"+e.getMessage()); 
-    }
+//       // raus zuEnde basteln 
+//       raus+=boden+","+wandOben+wandRechts+wandUnten+wandLinks;       
+//       raus+=")";
+//       out.println (raus);
+//     }
+//     catch (Exception e) {
+//       throw new KommException ("sendFeldinhalt fuehrte zu einer Exception:"+e.getMessage()); 
+//     }
     
-  }
-  /** liefert die Richtung (N,E,S,W) zurueck, die vom Wert x beschrieben wird(zwischen 0 und 3); die Methode haette sich vor zwei Wochen schon eher gelohnt :-)
-   */
-  private static String getRichtung (int x) {
-    x%=4; // nur zur Sicherheit
-   if (x==0)
-     return "N";
-   else if (x==1)
-     return "E";
-   else if (x==2)
-     return "S";
-   else 
-     return "W";    
-  }
+//   }
+//   /** liefert die Richtung (N,E,S,W) zurueck, die vom Wert x beschrieben wird(zwischen 0 und 3); die Methode haette sich vor zwei Wochen schon eher gelohnt :-)
+//    */
+//   private static String getRichtung (int x) {
+//     x%=4; // nur zur Sicherheit
+//    if (x==0)
+//      return "N";
+//    else if (x==1)
+//      return "E";
+//    else if (x==2)
+//      return "S";
+//    else 
+//      return "W";    
+//   }
 
-  /** Hilfsmethode, die für ein abbiegendes Fliessband das ´woher´ ermittelt. 
-    Dieses müsste irgendwie mithilfe der Richtung und der Drehrichtung möglich sein 
-    */
-  private static String fromDirection (int richtung, int art) {
-    // art=2 => Linksdrehung; art=3 => rechtsdrehung
-    int from = richtung;
-    if ((art==2)&&(richtung>0))
-      from--;
-    else if ((art==2)&&(richtung==0))
-      from=3;
-    if (art==3) {
-      from++;
-      from%=4;
-    }
+//   /** Hilfsmethode, die für ein abbiegendes Fliessband das ´woher´ ermittelt. 
+//     Dieses müsste irgendwie mithilfe der Richtung und der Drehrichtung möglich sein 
+//     */
+//   private static String fromDirection (int richtung, int art) {
+//     // art=2 => Linksdrehung; art=3 => rechtsdrehung
+//     int from = richtung;
+//     if ((art==2)&&(richtung>0))
+//       from--;
+//     else if ((art==2)&&(richtung==0))
+//       from=3;
+//     if (art==3) {
+//       from++;
+//       from%=4;
+//     }
     
-    return getRichtung(from);      
-  }
+//     return getRichtung(from);      
+//   }
 
-  /** Hilfsmethode, die einen <Bodeninhalt>-String laut "Protokolle und Datenformate" zurückgibt.
-    typ und spez sind der Typ und die Spezifikationszahl (siehe Klasse Feld) des Boden(feldes)
-   */
+//   /** Hilfsmethode, die einen <Bodeninhalt>-String laut "Protokolle und Datenformate" zurückgibt.
+//     typ und spez sind der Typ und die Spezifikationszahl (siehe Klasse Feld) des Boden(feldes)
+//    */
 
-    private static String bodeninhalt (int typ, int spez)throws KommException {
-    Feld f = new Feld();
-    String boden = ""; // soll zurueckgegeben werden
-    boolean set=false;
-    if (typ>=100) {// dann Fliessband
-      boolean crusher=false;
-      if (spez>0)
-	crusher=true;
-      int tempo=typ/100; // hunderter-Stelle
-      int richtung=typ%10; // einer-Stelle
-      int art =(typ/10)%10; // zehner-Stelle
+//     private static String bodeninhalt (int typ, int spez)throws KommException {
+//     Feld f = new Feld();
+//     String boden = ""; // soll zurueckgegeben werden
+//     boolean set=false;
+//     if (typ>=100) {// dann Fliessband
+//       boolean crusher=false;
+//       if (spez>0)
+// 	crusher=true;
+//       int tempo=typ/100; // hunderter-Stelle
+//       int richtung=typ%10; // einer-Stelle
+//       int art =(typ/10)%10; // zehner-Stelle
      
-      	boden = "F(";
-	boden+=getRichtung(richtung)+","+tempo+",";
-      if (art==0) { // band geradeaus
-	boden+="()"; // kein Dreher
-      }
-      /*      // GIBTS NICHT MEHR! Feld-Spezifikation falsch!
-	      else if (art==1) { // band mit crusher
-	System.out.println("CRUSHER !!!");
-	boden+="()"+"("; // kein Dreher
-	for (int i=1;i<6;i++) {
-	  if (f.isCrusherActive(spez, i))
-	    boden+=i+","; // aktive Phasen anhaengen
-	}
-	boden += "))"; // Crusher zu, Fliessband zu
-      }
-      */
-      else if (art==2) { // linkskurve
-	boden+="(("+fromDirection(richtung, art)+","+"D(L)))"; // dreher nach links
+//       	boden = "F(";
+// 	boden+=getRichtung(richtung)+","+tempo+",";
+//       if (art==0) { // band geradeaus
+// 	boden+="()"; // kein Dreher
+//       }
+//       /*      // GIBTS NICHT MEHR! Feld-Spezifikation falsch!
+// 	      else if (art==1) { // band mit crusher
+// 	System.out.println("CRUSHER !!!");
+// 	boden+="()"+"("; // kein Dreher
+// 	for (int i=1;i<6;i++) {
+// 	  if (f.isCrusherActive(spez, i))
+// 	    boden+=i+","; // aktive Phasen anhaengen
+// 	}
+// 	boden += "))"; // Crusher zu, Fliessband zu
+//       }
+//       */
+//       else if (art==2) { // linkskurve
+// 	boden+="(("+fromDirection(richtung, art)+","+"D(L)))"; // dreher nach links
 	
-      } 
-      else if (art==3) { // rechtskurve
-	boden+="(("+fromDirection(richtung, art)+","+"D(R)))"; // dreher nach rechts	
-      }
-      else if (art==5) { // einbiegen aus zwei Richtungen => zwei Dreher, aus jeder Richtung einer
-	boden+="(("+fromDirection(richtung, 2)+","+"D(L))"; // erster Dreher
-	boden+="("+fromDirection(richtung, 3)+","+"D(R)))"; // zweiter Dreher
-      }
-      else {
-	throw new KommException ("sendeFeldInhalt: kein gueltiger Bodeninhalt");
-      }
+//       } 
+//       else if (art==3) { // rechtskurve
+// 	boden+="(("+fromDirection(richtung, art)+","+"D(R)))"; // dreher nach rechts	
+//       }
+//       else if (art==5) { // einbiegen aus zwei Richtungen => zwei Dreher, aus jeder Richtung einer
+// 	boden+="(("+fromDirection(richtung, 2)+","+"D(L))"; // erster Dreher
+// 	boden+="("+fromDirection(richtung, 3)+","+"D(R)))"; // zweiter Dreher
+//       }
+//       else {
+// 	throw new KommException ("sendeFeldInhalt: kein gueltiger Bodeninhalt");
+//       }
       
-      if (crusher) {
-	boden+="(";
-	for (int i=1;i<6;i++) {
-	  if (f.isCrusherActive(spez, i))
-	    boden+=i+","; // aktive Phasen anhaengen
-	}
-	boden += "))"; // Crusher zu, Fliessband zu
-      }
-      else //kein Crusher
-	boden+="())"; // kein Crusher, Fliessband zu
+//       if (crusher) {
+// 	boden+="(";
+// 	for (int i=1;i<6;i++) {
+// 	  if (f.isCrusherActive(spez, i))
+// 	    boden+=i+","; // aktive Phasen anhaengen
+// 	}
+// 	boden += "))"; // Crusher zu, Fliessband zu
+//       }
+//       else //kein Crusher
+// 	boden+="())"; // kein Crusher, Fliessband zu
       
-      return boden;  
-    } // Ende Fall Fliessband
-    else {
-      switch (typ) {
-      case Feld.BDGRUBE: {
-	boden="G";
-	break;
-      }
-      case Feld.BDNORMAL: {
-	boden="B";
-	break;
-      }
-      case Feld.BDREPA: {
-	boden="R("+spez+")";
-	break;
-    }
-      case Feld.BDDREHEL: {
-	boden ="D(";
-	if (spez==Feld.DUHRZ)
-	  boden+="R";
-	else 
-	  boden+="L";
-	boden+=")";
-	break;
-      }
-      default: {throw new KommException ("sendeFeldInhlt: bodentyp <100 und nicht definiert");
-      }
-      }
-    }
-    return boden;
-  }
+//       return boden;  
+//     } // Ende Fall Fliessband
+//     else {
+//       switch (typ) {
+//       case Feld.BDGRUBE: {
+// 	boden="G";
+// 	break;
+//       }
+//       case Feld.BDNORMAL: {
+// 	boden="B";
+// 	break;
+//       }
+//       case Feld.BDREPA: {
+// 	boden="R("+spez+")";
+// 	break;
+//     }
+//       case Feld.BDDREHEL: {
+// 	boden ="D(";
+// 	if (spez==Feld.DUHRZ)
+// 	  boden+="R";
+// 	else 
+// 	  boden+="L";
+// 	boden+=")";
+// 	break;
+//       }
+//       default: {throw new KommException ("sendeFeldInhlt: bodentyp <100 und nicht definiert");
+//       }
+//       }
+//     }
+//     return boden;
+//   }
 
 
-  /** Hilfsmethode für sendFeldInhalt, die das durch elem und spez definierte Wandgerät (siehe Klasse Feld) in Form eines Strings laut "Protokolle und Datenformate" zurückgibt.
-   */
-  private static String wandgeraet (int elem, int spez) throws KommException{
-    Feld f=new Feld();
-    String back="";
-    switch (elem) {
-    case Feld.WKEINS: {
-      back="";
-      break;
-    }
-    case Feld.WLASER:{
-      back="L("+spez+")";
-      break;
-    }
-    case Feld.WPUSHER: {
-      back="S(";
-      for (int i=1;i<6;i++) {
-	if (f.isPusherActive(spez,i))
-	    back+=i+",";
-      }
-      back+=")";
-      break;
-    }
-    default: throw new KommException ("SFI-Antwort: Weder 'Laser', 'Pusher' noch 'kein' Wandelement");
-    }
-   return back; 
-  } 
+//   /** Hilfsmethode für sendFeldInhalt, die das durch elem und spez definierte Wandgerät (siehe Klasse Feld) in Form eines Strings laut "Protokolle und Datenformate" zurückgibt.
+//    */
+//   private static String wandgeraet (int elem, int spez) throws KommException{
+//     Feld f=new Feld();
+//     String back="";
+//     switch (elem) {
+//     case Feld.WKEINS: {
+//       back="";
+//       break;
+//     }
+//     case Feld.WLASER:{
+//       back="L("+spez+")";
+//       break;
+//     }
+//     case Feld.WPUSHER: {
+//       back="S(";
+//       for (int i=1;i<6;i++) {
+// 	if (f.isPusherActive(spez,i))
+// 	    back+=i+",";
+//       }
+//       back+=")";
+//       break;
+//     }
+//     default: throw new KommException ("SFI-Antwort: Weder 'Laser', 'Pusher' noch 'kein' Wandelement");
+//     }
+//    return back; 
+//   } 
 
     /** Finalizer, der die Streams zu macht.
      * (Wird vom garbage collector aufgerufen.)

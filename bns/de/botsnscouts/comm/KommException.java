@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.comm;
 
 /** KommExceptions werden von den Komm-Klassen geworfen, falls diese einen String nicht parsen können oder eine Exception beim Parsen auftritt.
   @author Hendrik

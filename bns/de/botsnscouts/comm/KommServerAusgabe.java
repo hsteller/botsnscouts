@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.comm;
 
 import java.io.*;
 // STAND : fertig 

@@ -1,5 +1,6 @@
-package de.spline.rr;
+package de.botsnscouts.comm;
 
+import de.botsnscouts.util.*;
 import java.io.*;
 // STAND: 2.7.99. 15:40 ; fertig
 /**

@@ -1,4 +1,5 @@
-package de.spline.rr;
+package de.botsnscouts.comm;
+import de.botsnscouts.util.*;
 
 /** Hilfsklasse zum String-Entschluesseln
 *@author Hendrik<BR>

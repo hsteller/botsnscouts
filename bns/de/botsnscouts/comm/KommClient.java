@@ -1,31 +1,44 @@
-package de.spline.rr;
-
+package de.botsnscouts.comm;
+import de.botsnscouts.util.*;
 import java.io.*;
 import java.util.*;
 import java.net.*;
-/** Die Oberklasse f&uuml;r die Client-Kommunikation; enth&auml;lt Methoden, die sowohl Spieler als auch Ausgabekan&auml;le benoetigen
-*@author Hendrik & Ourima<BR> 
-*@version 13.7.99 00:23
+/** The parent class for all clientside communication.
+    Very 'advanced' parsing of Strings.
+ *@author Hendrik  
 */
 
 public class KommClient {
-  /** Über in kommt der Input, d.h. die Nachrichten vom Server.
+  /** The client reads  messages of the server using this BufferedReader 
    */
-  public BufferedReader in;
-  /** Über out werden die Nachrichten zum Server geschickt
+  protected BufferedReader in;
+  /** The client sends messages to the server using this PrintWriter
    */
-  public PrintWriter out;
-  /** Flag, das angibt, ob ein InfoRequest statt einer Antwort ein NTC vom Server erhielt
+  protected PrintWriter out;
+  /** Needed for a maybe deprecated hotfix.
+      This is a flag that is set if the server sent an 'NTC' (notify change)
+      at an unexpected time (while waiting for a request's response).
    */
   protected boolean gotNTC;
-  /** Ein 'zur falschen Zeit' gesendeter NTC wird hier gespeichert.
+  /** 
+     Needed for a maybe deprecated hotfix.
+     Saves the NTC-String sent at a wrong time.
+     Together with 'gotNTC' it represensts a kind of one-element-queue ;-)
    */ 
   protected String strNTC;
-  /** Der Name des Clients zu Debug-Zwecken
+  /** The name of the client that owns this KommClient object.
+      For debugging purposes.
    */
   protected String cn;
+    /** For debugging purposes: if set to true,
+	a logfile "<clientname>'s.Kommlog" will be created, 
+	saving all Strings the client sent or got.
+	Can be changed in source code only => For activating/deactivating you'll have to
+	recompile this class.
+    */
   protected final boolean log=false;
-  public KommClient (){
+  
+    public KommClient (){
     gotNTC=false;
     strNTC="";
     cn="";
@@ -40,8 +53,10 @@ public class KommClient {
     }
     }
   }
-  /** Diese Methode sendet den uebergebenen String an den Server.
-   */
+  
+    /** This method sents a String to the server.
+	@param s The String to be sent.
+     */
   protected  void senden (String s) throws KommFutschException {
     PrintWriter debug=null;
     if (log) {
@@ -71,15 +86,13 @@ public class KommClient {
   }
 
     /** 
-	Diese Methode ist zum Einlesen von Serverantworten gedacht, falls
-	eine bestimmte Antwort erwartet wird.
-	Sie ist an Stelle der warte-Methohde (btw. genauer: wait2) zu verwenden.
-	Hier werden gegebenenfalls zur falschen Zeit eintreffende RENs und NTCs abgefangen.
-	Bei REN wird eine KommFutschException geworfen, 
-	bei NTC der String in strNTC gespeichert und beim nächsten Aufruf von warte benutzt;
-	stattdessen gibt die Methode den naechsten String, der kommt, zurueck. 
-	
-	
+	This method reads messages sent by the server, if a special request has been sent
+	(i.e. used in all non-void get-Methods).
+	It is to be used instead of 'warte' (or 'wait2').
+	Unexpected sent 'REN' or 'NTC' will be treated here.
+	If 'REN' (Client removed by server)  was read, a KommFutschException will be thrown;
+	if 'NTC' was read, gotNTC will be set to true, the NTC-String will be saved and the next
+	incoming String will be returned.
     */
   protected String einlesen() throws KommFutschException, KommException{
     PrintWriter debug=null;
@@ -102,14 +115,14 @@ public class KommClient {
     catch (IOException ioe) {
       throw new KommFutschException ("Einlesen: IOException augetreten; Message: "+ioe.getMessage()); 
     }
-    // teste, ob gelesener String==null
+    // 
     if (back==null) {
-      try {// wenn null lese nochmal
+      try {// if null, try again
 	back = in.readLine();
 	if ((debug!=null)&&(log))
 	  Global.debug(this,"einlesen (2.Versuch) erhielt: "+back);
 	
-	if (back==null)// wenn immernoch null, wirf Exception
+	if (back==null)// read null the second time => no connection anymore => exception
 	  throw new KommFutschException("Einlesen: zweimal hintereinander null gelesen");
 
       }
@@ -117,10 +130,10 @@ public class KommClient {
 	throw new KommFutschException ("Einlesen: IOException beim 2ten Leseversuch (1ter = null)augetreten; Message: "+ioe2.getMessage()); 
       } 
     }
-    // Habe jetzt zweimal probiert, einen String ungleich null einzulesen
-    // Wenn man hier ankommt: back!=null
+    // Tried two times to read the String
     
-    // Teste nun back auf REN-Kommunikation
+    
+    // Now checking whether the server removed the client
     if ((back.length()>=3)&&(back.substring(0,3).equals("REN"))) {
       ClientAntwort xyz= new ClientAntwort();
       try {
@@ -132,15 +145,16 @@ public class KommClient {
       if (xyz.typ==xyz.ENTFERNUNG)
 	throw new KommFutschException ("Der Client wurde entfernt;\n Grund: "+xyz.str);
     }
-    
-    // Teste nun back auf NTC-Kommunikation
+    // Hey, we made nothing wrong. The client is still alive :-)
+
+    // Now checking whether we got a bad timed NTC (notify change)
     else if ((back.length()>=3)&&(back.substring(0,3).equals("NTC"))) {
-      // speichere String
-      gotNTC=true;
-      strNTC=new String(back);
-      // hole vermutlich richtige Antwort
       
-      back = einlesen(); // uiuiui, eine Rekursion beim Lesen, wenn das mal gutgeht
+	gotNTC=true; // changing state; indicating that there is an NTC waiting
+	strNTC=new String(back); // saving the message of the server
+      
+	// now we will read the answer we are waiting for
+      back = einlesen(); 
       if ((debug!=null)&&(log))
 	debug.close();
       return back;
@@ -152,7 +166,7 @@ public class KommClient {
     }
     if ((debug!=null)&&(log))
       debug.close();
-    return back; // kann eigentlich nicht erreicht werden
+    return back; // statement shouldn't be reached, but you (I) never know.
     
   }
 
@@ -773,7 +787,7 @@ public class KommClient {
   }
 
  /** Zur Frage nach den Farben der Spieler.
-	Ein Array-Element ist entweder null oder einer der Namen
+	Ein Array-Element ist entweder null oder einer der Namen.
     */
     public String [] getFarben() throws KommException{
 	this.senden("GSF");
