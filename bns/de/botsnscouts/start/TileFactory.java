@@ -24,15 +24,15 @@ public class TileFactory extends Thread{
 // 	File kd=new File(kurl.getFile());
 
 	File kd=null;
-	try{
+	//	try{
 	    kd=new File(Conf.getBnsHome()+System.getProperty("file.separator")+"kacheln");
-	}catch(Exception e){
+	    /*}catch(Exception e){
 	    try{
 		kd=new File(Conf.getBnsHome()+System.getProperty("file.separator")+"tiles");
 	    }catch (Exception ee){
 		return;
-	    }
-	}
+		}
+		}*/
 	// 	File kdj=new File(de.botsnscouts.BotsNScouts.class.getResource("kacheln").getFile());
 	File[] all = kd.listFiles(new RRAFilter());
 	//File[] allj = kdj.listFiles(new RRAFilter());
