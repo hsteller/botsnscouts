@@ -135,11 +135,11 @@ public class StatisticPanel extends JPanel implements ActionListener {
       desc [row] [3].setForeground(c);
       desc [row] [3].setText(s.getHits()+"");
 
-      int foo = 0 - s.getDamageByBoard();
+      int foo =  s.getDamageByBoard();
       desc [row] [4].setForeground(c);
       desc [row] [4].setText(foo+"");
 
-      foo = 0 -s.getDamageByRobots();
+      foo = s.getDamageByRobots();
       desc [row] [5].setForeground(c);
       desc [row] [5].setText(foo+"");
    }
