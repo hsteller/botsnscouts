@@ -113,6 +113,7 @@ public class Server extends Thread implements ModusConstants, ServerOutputThread
     /** Schickt eine Nachricht an alle Ausgaben >= Version 2.0 */
     public void sendMsg(String id,String[] s){
 	messageThread.append(id,s);
+	Thread.yield();                   // allow the message to be sent
     }
 
     public void reEntry(ServerRoboterThread s){
@@ -314,6 +315,11 @@ public class Server extends Thread implements ModusConstants, ServerOutputThread
 	    throw new RuntimeException("nur der Serverthread darf Server.sendMsgWennNoetig aufrufen.");
 	}
 
+	if (s.length == 0){
+	    CAT.debug("Warning: ausgabenBenachrichtigen called with 0-size array. Returning.");
+	    return;
+	}
+
 	d("Größe der eintrittsliste: "+ausgabenEintrittsListe.size()+"; aThreads: "+aThreads.size());
 	setzeAusgaben();         // neue Ausgaben begrüßen
 	d("Größe der eintrittsliste: "+ausgabenEintrittsListe.size()+"; aThreads: "+aThreads.size());
@@ -352,6 +358,8 @@ public class Server extends Thread implements ModusConstants, ServerOutputThread
 	    while (it.hasNext())
 		deleteOutput((ServerAusgabeThread)it.next(),"TO");
 	}
+	Thread.yield();                 // allow possibly generated messages to be sent
+                                        // synchronizes laser-fire-animations.
     }
 
     // Private methods needed by run()
