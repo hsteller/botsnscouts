@@ -32,13 +32,26 @@ import javax.swing.*;
 
 import de.botsnscouts.util.StatsList;
 import de.botsnscouts.util.Stats;
+import de.botsnscouts.util.Message;
+
 
 public class StatisticPanel extends JPanel implements ActionListener {
 
     private StatsList list;
     private JLabel [] [] desc;
+    private static JLabel [] headings;
 
     private static final int COL_COUNT=6;
+    private static final String MESSAGE_SECTION="StatisticPanel";
+    private static final JLabel [] COL_HEADINGS = {
+      new JLabel("foo"),// robot icon
+      new JLabel(Message.say(MESSAGE_SECTION, "name"), SwingConstants.CENTER),// robot name
+      new JLabel(Message.say(MESSAGE_SECTION, "kills"), SwingConstants.CENTER),
+      new JLabel(Message.say(MESSAGE_SECTION, "hits"), SwingConstants.CENTER),
+      new JLabel(Message.say(MESSAGE_SECTION, "damage_by_board"), SwingConstants.CENTER),
+      new JLabel(Message.say(MESSAGE_SECTION, "damage_by_robots"), SwingConstants.CENTER)
+
+    };
 
     public StatisticPanel (StatsList stats){
       super();
@@ -58,11 +71,17 @@ public class StatisticPanel extends JPanel implements ActionListener {
 
    private void init() {
       int l = list.size();
+
       desc = new JLabel [l] [COL_COUNT];
-      this.setLayout(new GridLayout(l, COL_COUNT));
-      for (int i=0;i<l;i++){
-          for (int j=0;j<COL_COUNT;j++){
-            desc [i] [j] = new JLabel();
+      this.setLayout(new GridLayout(l+1, COL_COUNT));
+
+      // add colum titles
+      for (int i=0;i<COL_COUNT;i++)
+        this.add (COL_HEADINGS[i]);
+
+      for (int i=0;i<l;i++){ // lines for robots
+          for (int j=0;j<COL_COUNT;j++){ //colum values for robot l
+            desc [i] [j] = new JLabel("", SwingConstants.CENTER);
             this.add (desc[i][j]);
           }
       }
