@@ -31,9 +31,7 @@ public class Splash{
 	int y = (screen.height-height)/2;
 	splash.setBounds(x,y,width,height);
 	try{
-	    // XXX: move to ImageMan
-	    URL url = Class.forName("de.botsnscouts.util.BotsnScouts").getResource("images/bnslogo.jpg");
-	    bildLabel = new JLabel(new ImageIcon(url));
+	    bildLabel = new JLabel(new ImageIcon("bnslogo.jpg"));
 	    bildLabel.setBorder( new EtchedBorder(8));
 	}
 	catch(ClassNotFoundException cnfe) {System.err.println("splash: kaputt "+cnfe.getMessage()); System.exit(0);}
