@@ -34,6 +34,10 @@ public class SpielfeldSim extends Spielfeld
 
     private BoardRoboter[] br=new BoardRoboter[1]; /* Singleton-Array um einen Robi effizient casten zu können*/
 
+    public Vector getLasers(){
+	return lasers;
+    }
+
   private void bewegt2false()
     {
       for (int i=0;i<bewegt.length;i++)
