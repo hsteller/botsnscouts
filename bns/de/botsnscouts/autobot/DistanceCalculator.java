@@ -23,29 +23,31 @@
 
  *******************************************************************/
 
-package de.botsnscouts.board;
+package de.botsnscouts.autobot;
 
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.Location;
+import de.botsnscouts.board.SimBoard;
+import de.botsnscouts.board.FlagException;
+import de.botsnscouts.board.Board;
+import de.botsnscouts.board.Floor;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  This class can also calculate the distance a robot is from
  *  the next flag. Highly useful for the autobots and the wisenheimer.
  *  Id: $Id$
  */
-public class DistanceCalculatingBoard extends SimBoard {
+public class DistanceCalculator {
     private int[][][] distances;
-    private static DistanceCalculatingBoard uniqueInstance;
+    private Board board;
 
-    private DistanceCalculatingBoard(int x, int y, String kacheln, Location[] f) throws FormatException, FlagException {
-        super(x, y, kacheln, f);
-        calculateDistances(x, y, f);
-    }
-
-    public void setDebug(boolean b) {
-        // a little kludge for the case of more than one autobot in a vm
-        debugMessages = b;
+    private DistanceCalculator(Board board) {
+        this.board=board;
+        calculateDistances();
     }
 
     /*
@@ -54,7 +56,7 @@ public class DistanceCalculatingBoard extends SimBoard {
      */
     public int getDistance(Bot robbi, int malus) {
         // If this path leads to winning -> do it!
-        if (robbi.getNextFlag() == flags.length + 1) {
+        if (robbi.getNextFlag() == board.getFlags().length + 1) {
             return 0;
         }
         int distance = getDistance(robbi);
@@ -67,7 +69,7 @@ public class DistanceCalculatingBoard extends SimBoard {
             distance -= (robbi.getDamage());
         }
         // Playing strength
-        distance += (int) java.lang.Math.floor(java.lang.Math.random() * malus);
+        distance += (int) Math.floor(Math.random() * malus);
 
         return distance;
     }
@@ -146,22 +148,39 @@ public class DistanceCalculatingBoard extends SimBoard {
     /**
      * Initializes the distances-Array.
      */
-    private void calculateDistances(int sizeX, int sizeY, Location fahnen[]) {
-        distances = new int[fahnen.length][][];
+    private void calculateDistances() {
+        Location[] flags = board.getFlags();
+        distances = new int[flags.length][][];
 
-        for (int m = 0; m < fahnen.length; ++m) {
-            distances[m] = new int[sizeX + 2][sizeY + 2];
+        for (int m = 0; m < flags.length; ++m) {
+            distances[m] = new int[board.getSizeX() + 2][board.getSizeY() + 2];
 
-            for (int i = 0; i < sizeX + 2; ++i) {
-                for (int j = 0; j < sizeY + 2; ++j) {
+            for (int i = 0; i < board.getSizeX() + 2; ++i) {
+                for (int j = 0; j < board.getSizeY() + 2; ++j) {
                     distances[m][i][j] = 9999;
                 }
             }
         }
-        for (int m = 0; m < fahnen.length; ++m) {
-            distances[m][fahnen[m].x][fahnen[m].y] = 0;
-            calculateDistancesForField(distances, fahnen[m].x, fahnen[m].y, fahnen[m].x, fahnen[m].y, m);
+        for (int m = 0; m < flags.length; ++m) {
+            distances[m][flags[m].x][flags[m].y] = 0;
+            calculateDistancesForField(distances, flags[m].x, flags[m].y, flags[m].x, flags[m].y, m);
         }
+    }
+
+    private boolean hasNorthWall(int x, int y) {
+        return board.hasNorthWall(x, y);
+    }
+    private boolean hasEastWall(int x, int y) {
+        return board.hasEastWall(x, y);
+    }
+    private boolean hasSouthWall(int x, int y) {
+        return board.hasSouthWall(x, y);
+    }
+    private boolean hasWestWall(int x, int y) {
+        return board.hasWestWall(x, y);
+    }
+    private Floor floor(int x, int y) {
+        return board.floor(x, y);
     }
 
     private void calculateDistancesForField(int entftab[][][], int u, int v, int x, int y, int m) {
@@ -234,16 +253,16 @@ public class DistanceCalculatingBoard extends SimBoard {
     }
 
 
+    private static Map uniqueInstances = new HashMap();
     /**
-     * Returnns a reference to a DistanceCalculatingBoard. To be used instead
+     * Returnns a reference to a DistanceCalculator. To be used instead
      * of constructor. Guarantees only one DCB (which is reusable) is initialized
      * per vm.
      */
-    public static synchronized DistanceCalculatingBoard getInstance(int x, int y, String kacheln, Location[] flaggen) throws FormatException, FlagException {
-        if (uniqueInstance == null) {
-            uniqueInstance = new DistanceCalculatingBoard(x, y, kacheln, flaggen);
-        }
-        return uniqueInstance;
+    public static synchronized DistanceCalculator getInstance(Board board) {
+        if (uniqueInstances.get(board) == null)
+            uniqueInstances.put(board, new DistanceCalculator(board));
+        return (DistanceCalculator)uniqueInstances.get(board);
     }
 
 }

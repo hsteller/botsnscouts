@@ -30,6 +30,8 @@ import de.botsnscouts.util.*;
 
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * This board is also able to do phases.
@@ -39,6 +41,10 @@ import java.util.Vector;
 public class SimBoard extends Board implements Directions {
     protected boolean debugMessages = true; // Damit mehrere KIs auf einem
     // Rechner sich synchronisieren
+    public void setDebug(boolean b) {
+        //TODO: use log4j Categories!
+        debugMessages=b;
+    }
 
     protected Vector /* of LaserDef */ lasers;
 
@@ -921,7 +927,11 @@ public class SimBoard extends Board implements Directions {
         }
     }
 
+    private static Map instances = new HashMap();
+    public static SimBoard getInstance(int x, int y, String field, Location[] flags) throws FormatException, FlagException{
+        if (instances.get(field) == null)
+            instances.put(field, new SimBoard(x, y, field, flags));
+        return (SimBoard)instances.get(field);
+    }
+
 } // spielfeldsim ende
-
-
-

@@ -26,7 +26,8 @@
 package de.botsnscouts.autobot;
 
 import de.botsnscouts.board.FlagException;
-import de.botsnscouts.board.DistanceCalculatingBoard;
+import de.botsnscouts.board.Board;
+import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.comm.ClientAntwort;
 import de.botsnscouts.comm.KommClientSpieler;
 import de.botsnscouts.comm.KommException;
@@ -68,7 +69,7 @@ public class AutoBot extends BNSThread {
     KommClientSpieler myComm = new KommClientSpieler();
     ClientAntwort answer = new ClientAntwort();
 
-    DistanceCalculatingBoard myMap;
+    SimBoard myMap;
 
     /**
      * run-Methode erzeugt zufaelligen Namen fuer den kuenstlichen Spieler, meldet ihn an
@@ -224,7 +225,7 @@ public class AutoBot extends BNSThread {
     /**
      * erzeugt mit der Spielfelddimension, den Fahnenpositionen und dem
      * Spielfeldstring das Board des kuenstlichen Spielers, ruft
-     * ausserdem die Entfernungsberechnung in DistanceCalculatingBoard auf
+     * ausserdem die Entfernungsberechnung in DistanceCalculator auf
      */
     public void initField() {
         cat.debug("initializing field...");
@@ -242,8 +243,7 @@ public class AutoBot extends BNSThread {
             //d(spielfeldstring);
 
             try {
-                myMap = DistanceCalculatingBoard.getInstance(dimx, dimy, fieldAsString, flags);
-
+                myMap = SimBoard.getInstance(dimx, dimy, fieldAsString, flags);
             } catch (FlagException fe) {
                 cat.warn("Flag on pit", fe);
             } catch (FormatException e) {
@@ -281,7 +281,7 @@ public class AutoBot extends BNSThread {
         cat.debug("Bot destroyed. Looking for new facing.");
         for (int i = 0; i < 4; i++) {
             testRobbi.setAusrichtung(i);
-            newDistance = myMap.getDistance(testRobbi);
+            newDistance = DistanceCalculator.getInstance(myMap).getDistance(testRobbi);
             if (newDistance < bestDistance) {
                 bestDistance = newDistance;
                 direction = i;

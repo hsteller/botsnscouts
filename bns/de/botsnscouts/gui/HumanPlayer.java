@@ -58,7 +58,7 @@ public class HumanPlayer extends BNSThread {
     private KommClientSpieler comm;
     private View view;
     private ClientAntwort commAnswer = new ClientAntwort();
-    private DistanceCalculatingBoard intelliBoard;
+    private SimBoard intelliBoard;
 
     private ArrayList cards = new ArrayList(9);
     private String host, name;
@@ -443,7 +443,7 @@ public class HumanPlayer extends BNSThread {
 	    Location[] fahnen=comm.getFahnenPos();
 	    String spielfeldstring=comm.getSpielfeld();
 	    try{
-		intelliBoard = DistanceCalculatingBoard.getInstance(dimx,dimy,spielfeldstring,fahnen);
+		intelliBoard = SimBoard.getInstance(dimx,dimy,spielfeldstring,fahnen);
 	    }
 
 	    catch(Exception e){

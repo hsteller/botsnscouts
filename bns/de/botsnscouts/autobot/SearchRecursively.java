@@ -34,7 +34,7 @@ package de.botsnscouts.autobot;
  */
 
 import de.botsnscouts.board.BoardBot;
-import de.botsnscouts.board.DistanceCalculatingBoard;
+import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.server.KartenStapel;
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Bot;
@@ -44,7 +44,8 @@ import java.util.Arrays;
 public class SearchRecursively {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(SearchRecursively.class);
 
-    private DistanceCalculatingBoard sf;
+    private SimBoard sf;
+    private DistanceCalculator calc;
     private Card[] bestCards;
     private int bestScore;
     private int malus;
@@ -57,8 +58,9 @@ public class SearchRecursively {
     private static final int[] mali = {25, 15, 15, 15, 10};
     private static final int maliSum = 80;
 
-    public SearchRecursively(DistanceCalculatingBoard s, int m) {
+    public SearchRecursively(SimBoard s, int m) {
         sf = s;
+        calc = DistanceCalculator.getInstance(sf);
         malus = m;
     }
 
@@ -121,7 +123,7 @@ public class SearchRecursively {
                     return; // we die surely, discard this choice
             }
 
-            int score = sf.getDistance(r, malus) + diemalus;
+            int score = calc.getDistance(r, malus) + diemalus;
             if (score <= bestScore) {
                 bestScore = score;
                 for (int i = 0; i < 5; i++)
