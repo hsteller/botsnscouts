@@ -81,6 +81,8 @@ eKommFutschR Es ist ein Kommunikationsfehler mit Spieler $1 aufgetreten. (Netzwe
 [SpielerKuenstlich]
 
 [SpielerMensch]
+mkartenMisch Mische die Karten.
+mbitteWarten Bitte warten...
 gameName Bots´n´Scouts
 legalZug Timeout ist eingetreten - habe irgendeinen Zug abgegeben...
 zeitAblauf Die Zeit läuft ab: 
