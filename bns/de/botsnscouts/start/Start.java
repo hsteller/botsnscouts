@@ -17,11 +17,11 @@ public class Start extends JFrame implements WindowListener{
     Facade fassade;
 
     Paint paint;
-    StartAnfang startAnfang;                //startbildschirm
+    MainMenu mainMenu;                //startbildschirm
     StartSpielfeld startSpielfeld;          //spielfeld zusammenstellen
     StartTeilnehmen startTeilnehmen;        //am spiel teilnehmen
     StartZuschauen startZuschauen;          //einem spiel zuschauen
-    StartStart startStart;                  //bildschirm mit anmeldeinfos und LOS button
+    StartPanel startPanel;                  //bildschirm mit anmeldeinfos und LOS button
     StartSpielfeldEditor startSpielfeldEditor;
 
     JPanel current;         //was in moment angezeigt wird
@@ -29,25 +29,17 @@ public class Start extends JFrame implements WindowListener{
     
     public Start(){  
 	super(Message.say("Start","mStartTitel"));
-	//System.out.println(Message.say("Start","mBla"));
 	wth=new WaiterThread(this);
-
 	Toolkit tk=Toolkit.getDefaultToolkit();
-
 	if(tk.getScreenSize().height<600){
 	    fassade=new Facade(150);
 	}else{
 	    fassade=new Facade();
 	}
-
-	Global.debug(this,tk.getScreenSize().width+"x"+tk.getScreenSize().height);
 	setSize(tk.getScreenSize());
 	setLocation(0,0);
-//	requestFocus();
-
 
 	ImageIcon icon = ImageMan.getIcon( "garage2.jpg");
-//	ImageIcon icon = ImageMan.getIcon( Message.say("Start","mBG"));
 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 	Graphics g = bgimg.getGraphics();
 	icon.paintIcon(this, g, 0,0);
@@ -55,20 +47,20 @@ public class Start extends JFrame implements WindowListener{
 	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
 	paint = new TexturePaint( bgimg, anchor );
 
-
-	startAnfang=new StartAnfang(this);
-	current=startAnfang;
-//	startStart=new StartStart(this);
-//	current=startStart;
+	mainMenu=new MainMenu(this);
+	current=mainMenu;
 	setContentPane(current);
 
-//	Global.verbose=true;
-
 	addWindowListener(this);
-
 	show();
     }
 
+    public void toMainMenu(){
+	current=mainMenu;
+	setContentPane(current);
+	mainMenu.unrollOverButs();
+	setTitle(Message.say("Start","mStartTitel"));
+    }
 
     public void windowDeactivated(WindowEvent e) {}
     public void windowOpened(WindowEvent e)      {}
@@ -108,66 +100,11 @@ public class Start extends JFrame implements WindowListener{
 	}catch(IllegalThreadStateException e){
 	    System.err.println(Message.say("Start","eSpielEnde"));
 	}
-	//nullen();
-//	dispose();
-    }
-
-    public void nullen(){
-	if(startAnfang!=null){
-	    startAnfang.parent=null;
-	    startAnfang=null;
-	}
-	if(startSpielfeld!=null){
-	    startSpielfeld.parent=null;
-	    startSpielfeld.buttons.parent=null;
-	    startSpielfeld.buttons=null;
-	    startSpielfeld.unten.parent=null;
-	    startSpielfeld.unten=null;
-	    startSpielfeld.spf.parent=null;
-	    startSpielfeld.spf.kachP=null;
-	    startSpielfeld.spf.fassade=null;
-	    startSpielfeld.spf=null;
-	    startSpielfeld=null;
-	}
-	if(startTeilnehmen!=null){
-	    startTeilnehmen.parent=null;
-	    startTeilnehmen=null;
-	}
-	if(startZuschauen!=null){
-	    startZuschauen.parent=null;
-	    startZuschauen=null;
-	}
-	if(startStart!=null){
-	    //startStart.parent=null;
-	    //startStart.anmeldung.parent=null;
-	    //startStart.anmeldung=null;
-	    startStart.unten.parent=null;
-	    startStart.unten=null;
-	    startStart.ks.parent=null;	    
-	    startStart.ks=null;	    
-	    //startStart.listen=null;	    
-	    //startStart=null;
-	}
-	if(startSpielfeldEditor!=null){
-	    startSpielfeldEditor.parent=null;
-	    startSpielfeldEditor.spf=null;
-	    startSpielfeldEditor.images=null;
-	    startSpielfeldEditor.tileInfos=null;
-	    startSpielfeldEditor.cursors=null;
-	}
-	
     }
 
 
     public static void main(String[] argv){
 	Global.verbose=true;
-	/*String lang="english";
-	if (argv.length>=1){
-	    if (argv[0].equals("english")||argv[0].equals("deutsch")){
-		lang=argv[0];
-	    }
-	    }*/
-
 	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
 
 	//language conf
@@ -204,9 +141,9 @@ public class Start extends JFrame implements WindowListener{
 		    spielfeld=spielfeld.substring(0,spielfeld.length()-4);
 		}
 		Global.debug("Spielfeld "+spielfeld);
-		StartSpielfeldLoadHelfer helfer=new StartSpielfeldLoadHelfer();
+		GameFieldLoader loader=new GameFieldLoader();
 		Facade fassade=new Facade();
-		Properties prop = helfer.getProperties(spielfeld);
+		Properties prop = loader.getProperties(spielfeld);
 		Global.debug("Properties "+prop);
 		fassade.loadSpfProp(prop);
 		Global.debug("Spielfed loaded");

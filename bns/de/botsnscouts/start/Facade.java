@@ -246,6 +246,10 @@ public class Facade{
     public Thread amSpielTeilnehmen(String ip, int port, String name, int farbe){
 	return launcher.amSpielTeilnehmen(ip, port, name, farbe,false);
     }
+    // startet einen SpielerMensch with default port num
+    public Thread amSpielTeilnehmen(String ip, String name, int farbe){
+	return launcher.amSpielTeilnehmen(ip, DPORT, name, farbe,false);
+    }
 
     // startet einen SpielerMensch mit default parameter
     public Thread amSpielTeilnehmen(String name, int farbe){

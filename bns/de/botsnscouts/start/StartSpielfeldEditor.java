@@ -29,7 +29,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Til
 	CURSOR_FLAGGE_LOESCHEN = 5;
 
 
-    StartSpielfeldSpf spf;
+    GameFieldPanel spf;
     Start parent;
     Paint paint;
 
@@ -67,7 +67,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Til
     TileInfo[] tileInfos;
     Cursor[] cursors;
 
-    public StartSpielfeldEditor(Start par,StartSpielfeldSpf spf){
+    public StartSpielfeldEditor(Start par,GameFieldPanel spf){
 	parent=par;
 	paint=parent.paint;
 	this.spf=spf;
@@ -169,20 +169,10 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Til
 	fuerfuerSpf.setOpaque(false);
 	fuerfuerSpf.getViewport().setView(fuerSpf);
 	fuerfuerSpf.getViewport().scrollRectToVisible(new Rectangle(0,540,10,530));
-// 	JViewport vp=fuerfuerSpf.getViewport();
-// 	Dimension ddd=vp.getExtentSize();
-// 	vp.toViewCoordinates(new Point());
 	add(BorderLayout.CENTER,fuerfuerSpf);
 
 	spf.addTileClickListener(this);
 
-// 	ImageIcon icon = ImageMan.getIcon(Message.say("Start","mBG"));
-// 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-// 	Graphics g = bgimg.getGraphics();
-// 	icon.paintIcon(this, g, 0,0);
-// 	g.dispose();
-// 	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
-// 	paint = new TexturePaint( bgimg, anchor );
     }
 
     public void actionPerformed(ActionEvent e){ 
@@ -216,11 +206,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Til
 	    parent.setContentPane(parent.current);
 	    spf.rasterChanged();
 
-	    parent.startSpielfeld.buttons.save.getModel().setRollover(false);
-	    parent.startSpielfeld.buttons.bearbeiten.getModel().setRollover(false);
-	    parent.startSpielfeld.unten.ok.getModel().setRollover(false);
-	    parent.startSpielfeld.unten.zurueck.getModel().setRollover(false);
-	    
+	    parent.startSpielfeld.unrollOverButs();
 	    parent.show();
 	}else if(e.getActionCommand().equals("flSetzen")){
 	    currentMode=MODE_FLAGGE_SETZEN;
@@ -421,9 +407,6 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Til
     }
 
 }
-
-
-
 
 
 

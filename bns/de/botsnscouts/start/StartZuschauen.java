@@ -100,14 +100,7 @@ public class StartZuschauen extends JPanel implements  ActionListener, MouseList
 	    parent.dispose();
 	    parent.beenden();
 	}else if(e.getActionCommand().equals("zurueck")){
-	    parent.setContentPane(parent.startAnfang);
-	    parent.setTitle(Message.say("Start","mStartTitel"));
-
-	    parent.startAnfang.starten.getModel().setRollover(false);
-	    parent.startAnfang.teilnehmen.getModel().setRollover(false);
-	    parent.startAnfang.zuschauen.getModel().setRollover(false);
-	    parent.startAnfang.beenden.getModel().setRollover(false);
-
+	    parent.toMainMenu();
 	    parent.show();
 	}
 

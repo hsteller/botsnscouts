@@ -50,7 +50,6 @@ public class TileRaster{
 	//entferne Flaggen falls vorhanden
 	for (int i=flaggenN-1;i>=0;i--){
 	    if ((flaggen[i].x-1)/12==x&&(flaggen[i].y-1)/12==y){
-		//Global.debug(this,"Entferne Flagge nr "+i);
 		delFlagge(i);
 	    }
 	}
@@ -102,7 +101,6 @@ public class TileRaster{
 	int kx=(x-1)/12;
 	int ky=(y-1)/12;
 	//fals keine Tile drunter
-	//Global.debug(this, "kx: "+kx+" ky: "+ky+" x: "+x+" y: "+y);
 	if (tiles[kx][ky]==null){
 	    return false;
 	}
@@ -116,7 +114,6 @@ public class TileRaster{
 	flag[0]=new Ort((x-1)%12+1,(y-1)%12+1);
 
 	boolean testFl=tiles[kx][ky].testFlagge(flag);
-	//Global.debug(this, "testFlagge "+kx+","+ky+" "+testFl+" Flagge:"+flag[0].x+","+flag[0].y);
 	return testFl;
     }
 

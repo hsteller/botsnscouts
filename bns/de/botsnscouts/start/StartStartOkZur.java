@@ -49,23 +49,23 @@ public class StartStartOkZur extends JPanel implements  ActionListener, MouseLis
 	    Global.debug(this,"server gekilled!");
 	    //resete anzeige der angemeldeten roboter
 	    parent.resetWaiter();  
-	    parent.startStart.anmeldung.reset();
-	    parent.startStart.listen.closeSock();
+	    parent.startPanel.anmeldung.reset();
+	    parent.startPanel.listen.closeSock();
 	    //schalte auf Spielfeld um
 	    parent.current=parent.startSpielfeld;
-	    parent.startStart=null;
+	    parent.startPanel=null;
 	    parent.setContentPane(parent.current);
 	    parent.show();
 	    Global.debug(this,"zum Spielfeld zurückgekehrt!");
-	}else if(e.getActionCommand().equals("ok")&&(parent.startStart.anmeldung.names.size()!=8)){
+	}else if(e.getActionCommand().equals("ok")&&(parent.startPanel.anmeldung.names.size()!=8)){
 	    parent.fassade.spielGehtLos();
 	    Global.debug(this,"ok, Spiel ging los");
 	    parent.hide();
 	    parent.beenden();
 //	    parent.nullen();
-	    /*if(parent.startStart.thread!=null){
+	    /*if(parent.startPanel.thread!=null){
 		try{
-		    parent.startStart.thread.join();
+		    parent.startPanel.thread.join();
 		}catch(InterruptedException ex){
 		    System.err.println(ex);
 		}
