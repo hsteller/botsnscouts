@@ -39,8 +39,8 @@ import java.net.*;
 */
 
 public class KommClient {
-    static final boolean LOG_RECEIVE = false;
-    static final boolean LOG_SEND    = false;
+    static final boolean LOG_RECEIVE = true;
+    static final boolean LOG_SEND    = true;
 
     /** The client reads  messages of the server using this BufferedReader
      */
@@ -106,7 +106,8 @@ public class KommClient {
 	    }
 	}
 	try {
-	    if( LOG_SEND ) Global.debug(this, "CLIENT "+cn+" sendet: "+s);
+	    if( LOG_SEND )
+              Global.debug(this, "CLIENT "+cn+" sendet: "+s);
 	    out.println (s);
 	}
 	catch (NullPointerException npe) {
@@ -141,7 +142,8 @@ public class KommClient {
 	String back="";
 	try {
 	    back = in.readLine();
-	    if( LOG_RECEIVE ) Global.debug(this, "CLIENT(einlesen) "+cn+" erhaelt: "+back);
+	    if( LOG_RECEIVE )
+              Global.debug(this, "CLIENT(einlesen) "+cn+" erhaelt: "+back);
 	    if ((debug!=null)&&(log))
 		debug.println("einlesen erhielt: "+back);
 	}
