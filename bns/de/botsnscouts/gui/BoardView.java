@@ -523,11 +523,9 @@ public class BoardView extends JComponent {
     }
     private void paintActiveBordLaser (Graphics g, Color c,int actualLength) {
 
-
-
 	Graphics2D g2d = (Graphics2D) g;
-	//AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
-	//	g2d.setComposite( ac );
+	AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER/*, 0.5f*/);
+	g2d.setComposite( ac );
 	g2d.setColor(c);
 
 	int breite=4; // Die Breite des Lasers, sollte gerade sein
@@ -675,7 +673,7 @@ public class BoardView extends JComponent {
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     protected void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty) {
-	Floor floor = sf.floor(xpos, ypos);
+        Floor floor = sf.floor(xpos, ypos);
 	switch ( floor.getType() ){
 
 	case (Board.FL_PIT):
@@ -780,9 +778,14 @@ public class BoardView extends JComponent {
     // for painting crushers
     private static final int[] crushlb_x = { 20, 30, 30, 30, 40 };
     private static final int[] crushlb_y = { 35, 25, 35, 45, 35 };
-    private void paintCrusher(Graphics g, Floor floor,
+    private void paintCrusher(Graphics g2, Floor floor,
 		      int actx, int acty)
     {
+         // dont know what I'm doing (graphics stuff, not coding!), but we
+        // have to set this somewhere otherwise transparent stuff (gifs) will
+        // not be displayed in a correct manner (only a problem since jdk1.4)
+        Graphics2D g = (Graphics2D) g2;
+        g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 	g.drawImage(diverseCrop[10],actx,acty,64,64,this);
 	g.setColor(Color.white);
 	for (int phasecount=1;phasecount<=5;phasecount++){
@@ -795,8 +798,12 @@ public class BoardView extends JComponent {
     }
 
     /** paints the (back-)ground of the board*/
-    private void paintSpielfeldBoden( Graphics g ) {
-
+    private void paintSpielfeldBoden( Graphics g2 ) {
+             // dont know what I'm doing (graphics stuff, not coding!), but we
+        // have to set this somewhere otherwise transparent stuff (gifs) will
+        // not be displayed in a correct manner (only a problem since jdk1.4)
+        Graphics2D g = (Graphics2D) g2;
+        g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 	// Grenzen des zu zeichnenden Bereichs berechnen:
 	Rectangle clip = g.getClipBounds();
 	int x0 = clip.x / 64 + 1;
@@ -875,8 +882,16 @@ public class BoardView extends JComponent {
 
 
 
-    private void paintWaende( Graphics g ) {
-	// Grenzen des zu zeichnenden Bereichs berechnen:
+    private void paintWaende( Graphics g2) {
+
+        // dont know what I'm doing (graphics stuff, not coding!), but we
+        // have to set this somewhere otherwise transparent stuff (gifs) will
+        // not be displayed in a correct manner (only a problem since jdk1.4)
+        Graphics2D g = (Graphics2D) g2;
+        g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+
+
+        // Grenzen des zu zeichnenden Bereichs berechnen:
 	Rectangle clip = g.getClipBounds();
 	int x0 = clip.x / 64 + 1;
 	int y0 = clip.y / 64 + 1;
@@ -979,8 +994,14 @@ public class BoardView extends JComponent {
 	}
     }
 
-    private void paintFlaggen( Graphics g ) {
-	if(sf.getFlags()!=null){
+    private void paintFlaggen( Graphics g2 ) {
+        // dont know what I'm doing (graphics stuff, not coding!), but we
+        // have to set this somewhere otherwise transparent stuff (gifs) will
+        // not be displayed in a correct manner (only a problem since jdk1.4)
+        Graphics2D g = (Graphics2D) g2;
+        g.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+
+        if(sf.getFlags()!=null){
 	    Location[] flaggen = sf.getFlags();
 	    for (int flaggencount = 0; flaggencount<flaggen.length;flaggencount++){
 		int xflagge = flaggen[flaggencount].x-1;
@@ -1082,6 +1103,7 @@ public class BoardView extends JComponent {
 
     protected void paintScout( Graphics g ) {
 	Graphics2D g2d = (Graphics2D) g;
+
 	if( vorschauRob == null )
 	    return;
 
@@ -1098,7 +1120,8 @@ public class BoardView extends JComponent {
 
     private void paintRobos( Graphics g ) {
 	Graphics2D g2d = (Graphics2D) g;
-	if (robos!=null){
+
+        if (robos!=null){
 	    for (int robocount=0;robocount<robos.length;robocount++){
                 Bot robot = robos[robocount];
 		if((robot.getDamage()<10)&&
@@ -1111,20 +1134,23 @@ public class BoardView extends JComponent {
 		    int acty = ypos64-64;
                     int botVis = robot.getBotVis();
 		    Image imgRob = robosCrop[robot.getFacing()+botVis*4];
-		    boolean virtuell = robot.isVirtual();
+                    boolean virtuell = robot.isVirtual();
 
 		    if( imgRob != null ) {
 			if( virtuell ) {
 			    AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
 			    g2d.setComposite( ac );
 			}
+                        else
+                           g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 			g2d.drawImage(imgRob,xpos64,ypos64,64,64,this);
-			if( virtuell ) {
-			    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
-			}
+			//if( virtuell ) {
+			 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+			//}
 			String beschriftung = "" + robot.getName();
 			g2d.setColor( robocolor[botVis] );
 			g2d.drawString(beschriftung,xpos64,ypos64+8+robocount*8);
+                        //g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
 		    }
 		}
 	    }
@@ -1192,6 +1218,7 @@ public class BoardView extends JComponent {
 
 
     public void paintComponent(Graphics g) {
+
 	// Blit the board (it's already scaled)
 	if( preBoard == null ) {
 	    prepareBoardImage();
@@ -1203,7 +1230,7 @@ public class BoardView extends JComponent {
 	paintHighlight( dbg );
 
 	dbg.scale( dScale, dScale );
-
+        dbg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
 	paintScout( dbg );
 	paintRobos( dbg );
     }
