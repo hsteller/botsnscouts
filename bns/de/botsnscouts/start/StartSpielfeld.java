@@ -22,6 +22,7 @@ public class StartSpielfeld extends JPanel implements  ActionListener{
     public StartSpielfeld(Start par){
 	parent=par;
 	parent.setTitle(Message.say("Start","mSpielStarten"));
+	paint=parent.paint;
 
 	buttons=new StartSpielfeldBut(par);
 	unten=new StartSpielfeldOkZur(par);
@@ -49,14 +50,13 @@ public class StartSpielfeld extends JPanel implements  ActionListener{
  	add(BorderLayout.EAST,buttons);
 
 
-	URL url = de.botsnscouts.BotsNScouts.class.getResource(Message.say("Start","mBG"));
-	ImageIcon icon = new ImageIcon( url );
-	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-	Graphics g = bgimg.getGraphics();
-	icon.paintIcon(this, g, 0,0);
-	g.dispose();
-	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
-	paint = new TexturePaint( bgimg, anchor );
+// 	ImageIcon icon = ImageMan.getIcon( Message.say("Start","mBG"));
+// 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+// 	Graphics g = bgimg.getGraphics();
+// 	icon.paintIcon(this, g, 0,0);
+// 	g.dispose();
+// 	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
+// 	paint = new TexturePaint( bgimg, anchor );
 
    	spf.rasterChanged();
  }

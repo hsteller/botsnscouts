@@ -2,9 +2,12 @@ package de.botsnscouts.start;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
+import java.awt.image.*;
 import javax.swing.*;
 import javax.swing.plaf.metal.*;
 import java.util.*;
+import java.net.*;
 import de.botsnscouts.util.*;
 
 
@@ -12,6 +15,7 @@ public class Start extends JFrame implements WindowListener{
 
     StSpFassade fassade;
 
+    Paint paint;
     StartAnfang startAnfang;                //startbildschirm
     StartSpielfeld startSpielfeld;          //spielfeld zusammenstellen
     StartTeilnehmen startTeilnehmen;        //am spiel teilnehmen
@@ -39,6 +43,17 @@ public class Start extends JFrame implements WindowListener{
 	setSize(tk.getScreenSize());
 	setLocation(0,0);
 //	requestFocus();
+
+
+	ImageIcon icon = ImageMan.getIcon( "garage2.jpg");
+//	ImageIcon icon = ImageMan.getIcon( Message.say("Start","mBG"));
+	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+	Graphics g = bgimg.getGraphics();
+	icon.paintIcon(this, g, 0,0);
+	g.dispose();
+	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
+	paint = new TexturePaint( bgimg, anchor );
+
 
 	startAnfang=new StartAnfang(this);
 	current=startAnfang;

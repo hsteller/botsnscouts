@@ -29,6 +29,8 @@ public class StartZuschauen extends JPanel implements  ActionListener, MouseList
     public StartZuschauen(Start par){
 	parent=par;
 	parent.setTitle(Message.say("Start","mZuschauen"));
+	paint=parent.paint;
+
 	String[] farben={Message.say("Start","mFarbeEgal"),Message.say("Start","mFarbeGruen"),Message.say("Start","mFarbeGelb"),Message.say("Start","mFarbeRot"),Message.say("Start","mFarbeBlau"),Message.say("Start","mFarbeMagenta"),Message.say("Start","mFarbeOrange"),Message.say("Start","mFarbeGrau"),Message.say("Start","mFarbeDunkelMagenta")};
 	font=new Font("Sans", Font.BOLD, 24);
 
@@ -71,14 +73,14 @@ public class StartZuschauen extends JPanel implements  ActionListener, MouseList
         add(zurueck);
 
 
-	URL url = getClass().getResource(Message.say("Start","mBG"));
-	ImageIcon icon = new ImageIcon( url );
-	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-	Graphics g = bgimg.getGraphics();
-	icon.paintIcon(this, g, 0,0);
-	g.dispose();
-	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
-	paint = new TexturePaint( bgimg, anchor );
+// 	URL url = getClass().getResource(Message.say("Start","mBG"));
+// 	ImageIcon icon = new ImageIcon( url );
+// 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+// 	Graphics g = bgimg.getGraphics();
+// 	icon.paintIcon(this, g, 0,0);
+// 	g.dispose();
+// 	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
+// 	paint = new TexturePaint( bgimg, anchor );
 
     }
 

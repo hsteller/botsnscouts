@@ -69,6 +69,7 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 
     public StartSpielfeldEditor(Start par,StartSpielfeldSpf spf){
 	parent=par;
+	paint=parent.paint;
 	this.spf=spf;
 	currentMode=3;
 	flaggeGewaehlt=false;
@@ -187,13 +188,13 @@ public class StartSpielfeldEditor extends JPanel implements  ActionListener, Kac
 
 	spf.addKachelClickListener(this);
 
-	ImageIcon icon = ImageMan.getIcon(Message.say("Start","mBG"));
-	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-	Graphics g = bgimg.getGraphics();
-	icon.paintIcon(this, g, 0,0);
-	g.dispose();
-	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
-	paint = new TexturePaint( bgimg, anchor );
+// 	ImageIcon icon = ImageMan.getIcon(Message.say("Start","mBG"));
+// 	BufferedImage bgimg = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+// 	Graphics g = bgimg.getGraphics();
+// 	icon.paintIcon(this, g, 0,0);
+// 	g.dispose();
+// 	Rectangle2D anchor = new Rectangle2D.Float(0f,0f, icon.getIconWidth(), icon.getIconHeight());
+// 	paint = new TexturePaint( bgimg, anchor );
     }
 
     public void actionPerformed(ActionEvent e){ 

@@ -3,7 +3,7 @@ package de.botsnscouts.old;
 import java.util.*;  
 import java.io.*;
 import java.net.*;
-
+ 
 class RRDummyAusgabeKommError extends RuntimeException {
 
 }
