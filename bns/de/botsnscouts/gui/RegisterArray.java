@@ -38,25 +38,51 @@ public class RegisterArray extends JPanel {
 
     }
 
-    private void resetAll() {
+    protected void resetAll() {
 	for (int i=0; i < registerView.size(); i++) {
 	    ((RegisterView) registerView.get(i)).reset();
 	}
     }
 
-    public void addCard(HumanCard hc) {	
-	//
+    protected ArrayList getCards() {
+	ArrayList regs = new ArrayList(programmed());
+	for (int i=0; i < registerView.size(); i++) {
+	    if ( ! ((RegisterView) registerView.get(i)).locked()  ) {
+	    regs.add(((RegisterView) registerView.get(i)).getCard());
+	    }
 	}
-    
+	return regs;
+    }
+
+    protected ArrayList getAlreadyChosen() {
+	int ap = alreadyProgrammed();
+	d("already Programmed Registers: "+ap);
+	ArrayList regs = new ArrayList(ap);
+	for (int i=0; i < ap ; i++) {
+	    regs.add(((RegisterView) registerView.get(i)).getCard());
+	}
+	return regs;
+	
+    }
+
+    public void addCard(HumanCard hc) {	
+	for (int i=0; i < registerView.size(); i++) {
+	    if (((RegisterView) registerView.get(i)).getCard() == null) {
+		((RegisterView) registerView.get(i)).setCard(hc);
+		break;
+	    }
+	}
+    }
 
 
     public boolean allOcupied() {
 	int ocupied=0;
 	for (int i=0; i < registerView.size(); i++) {
-	    if (((CardView) registerView.get(i)).getCard() != null) {
+	    if (((RegisterView) registerView.get(i)).getCard() != null) {
 		ocupied++;
 	    }
 	}
+	d("Alle Register sind voll: "+(ocupied == 5));
 	return (ocupied == 5);
     }
 
@@ -82,6 +108,32 @@ public class RegisterArray extends JPanel {
 	f.setVisible(true);
     }
 
+    private int programmed() {
+	int oc = 0;
+	for (int i =0; i < registerView.size(); i++) {
+	    if ( ((RegisterView)registerView.get(i)).locked()  ) {
+		oc++;
+	    }
+	}
+	return (5-oc);
+    }
+
+    private int alreadyProgrammed() {
+	int oc = 0;
+	for (int i =0; i < registerView.size(); i++) {
+	    if ( ((RegisterView)registerView.get(i)).free()  ) {
+		break;
+	    }
+	    else {
+		oc++;
+	    }
+	}
+	return oc;
+    }
+
+    private void d(String s) {
+	Global.debug(this,s);
+    }
 
     
 }

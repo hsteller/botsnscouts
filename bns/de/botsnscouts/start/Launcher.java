@@ -24,7 +24,8 @@ public class Launcher{
     public Thread amSpielTeilnehmen(String ip, int port, String name, int farbe, boolean noSplash){
 	Thread ret;
 	try {
-	    ret=(Thread) new SpielerMensch(ip,port,name,farbe,noSplash);
+	    Global.debug(this,"Trying to start human player...");
+	    ret=(Thread) new HumanPlayer(ip,port,name,farbe,noSplash);
 	    ret.start();
 	} catch (Exception u){
 	    return null;

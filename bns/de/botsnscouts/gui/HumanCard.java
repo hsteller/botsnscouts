@@ -44,6 +44,10 @@ public class HumanCard implements Karte{
 	return state;
     }
 
+    public boolean free() {
+	return (state == FREE);
+    }
+
     public boolean locked() {
 	return (state == LOCKED);
     }
@@ -62,9 +66,19 @@ public class HumanCard implements Karte{
     }
 
     
-    /** returns the priority */
+    /** returns the compare */
     public int compareTo(Object c) {
-	return 0;
+	if ((this.getaktion() == ((Karte) c).getaktion()) && ((this.getprio() == ((Karte) c).getprio() ) ) ) {
+	    return 0;
+	}
+	else {
+	    return 1;
+	}
+    }
+
+
+    public boolean equals(Karte c) {
+	return ( compareTo(c) == 0);
     }
 
 

@@ -151,9 +151,9 @@ public class SpielerMensch extends Thread {
 	f.statusLine.SsSC.addMouseListener(scoutKlickListener);
 	f.statusLine.Sschlaf.add(f.statusLine.SsSC);
 	*/
-	klugscheisserLatte = new KlugscheisserLatte(this);
+	klugscheisserLatte = new KlugscheisserLatte(null);
 	f.statusLine.schlaf.add(klugscheisserLatte);
-	f.statusLine.schlaf.add(new ScoutVertiefung(this));
+	f.statusLine.schlaf.add(new ScoutVertiefung(null));
 	f.statusLine.add(f.statusLine.schlaf);
 	// f.setVisible(true);
     }
@@ -252,6 +252,7 @@ public class SpielerMensch extends Thread {
      * Setzt den Scout für das Feld, das den gelegten Karten entspricht
      **/
     Roboter[] doPhaseRob = new Roboter[1];
+
     private void doScout() {
 	if (scoutAktiv) {
 	    // ------- Scout tanzen lassen

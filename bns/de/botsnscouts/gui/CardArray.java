@@ -38,8 +38,8 @@ public class CardArray extends JPanel {
 	setLayout(new GridLayout(5,2));
 
 	sendButton.setEnabled(false);
+	powerDownBox.setEnabled(true);
 	sendButton.addActionListener(send);
-	powerDownBox.setEnabled(false);
 	powerDownBox.setVerticalTextPosition(AbstractButton.BOTTOM);
 	powerDownBox.setHorizontalTextPosition(AbstractButton.CENTER);
 	powerDownBox.setFont(new Font("Dialog",Font.BOLD,8));
@@ -57,26 +57,40 @@ public class CardArray extends JPanel {
 	
     }
 
-    private void resetAll() {
+    protected void resetAll() {
 	powerDownBox.setSelected(false);
-	powerDownBox.setEnabled(false);
 	sendButton.setEnabled(false);
 	for (int i=0; i < cardsView.size(); i++) {
 	    ((CardView) cardsView.get(i)).reset();
 	}
     }
 
-
-    public void addCard(HumanCard hc) {
-	//
+    protected boolean wishesPowerDown() {
+	return powerDownBox.isSelected();
     }
 
+    public void addCard(HumanCard hc) {	
+	for (int i=0; i < cardsView.size(); i++) {
+	    if (((CardView) cardsView.get(i)).getCard() == null) {
+		((CardView) cardsView.get(i)).setCard(hc);
+		break;
+	    }
+	}
+    }
 
     public void setCards(ArrayList cards) {	
 	resetAll();
 	for (int i=0; i < cards.size(); i++) {
 	    ((CardView) cardsView.get(i)).setCard((HumanCard)cards.get(i));
 	}
+    }
+
+    protected void activateButton() {
+	sendButton.setEnabled(true);
+    }
+
+    protected void deActivateButton() {
+	sendButton.setEnabled(false);
     }
 
     public Dimension getMinimumSize() {

@@ -18,9 +18,8 @@ public class KlugscheisserLatte extends JToggleButton {
     Image klugSchlaf[];
     Image klugWach[];
 
-    public KlugscheisserLatte(SpielerMensch spielerMensch) {
+    public KlugscheisserLatte(ActionListener al) {
 	// Referenz holen
-	mensch = spielerMensch;
 	klugSchlaf=ImageMan.getImages(ImageMan.KSCHLAF);
 	klugWach=ImageMan.getImages(ImageMan.KWACH);
 	setContentAreaFilled(false);
@@ -28,17 +27,7 @@ public class KlugscheisserLatte extends JToggleButton {
 	setToolTipText(Message.say("KlugscheisserLatte","mtooltip"));
 	setIcon(new ImageIcon(klugSchlaf[0]));
 	setSelectedIcon(new ImageIcon(klugWach[0]));
-	addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    if (isSelected()) {
-			//			Global.debug(this,"Klugscheisser, wach auf!");
-			mensch.klugscheisserClicked(true);
-		    }
-		    else {
-			//			Global.debug(this,"Klugscheisser, geh schlafen!");
-			mensch.klugscheisserClicked(false);
-		    }
-		}});
+	addActionListener(al);
 	
     }
 
@@ -50,10 +39,13 @@ public class KlugscheisserLatte extends JToggleButton {
 	return new Dimension(xsize,ysize);
     }
 
-    public void reset() {
+    protected void reset() {
 	setSelected(false);
     }
 
+    protected boolean selected() {
+	return isSelected();
+    }
 
     public static void main (String args[]) {
 	Message.setLanguage("deutsch");

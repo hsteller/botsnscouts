@@ -32,26 +32,36 @@ public class RegisterView extends JButton {
 	setContentAreaFilled(false);
 	setBorder(null);
 	setIcon(registerFree);
-	setEnabled(false);
+	setEnabled(true);
 	addActionListener(al);
     }
 
     public void reset() {
 	setSelected(false);
-	setEnabled(false);
 	setIcon(registerFree);
+	if (!locked()) {
 	h = null;
+	}
     }
 
     public boolean locked() {
+	if (h != null) {
 	return h.locked();
+	}
+	else return false;
+    }
+
+    public boolean free() {
+	if (h != null) {
+	return h.free();
+	}
+	else return true;
     }
 
     public void setLocked(boolean b){
 	if(b) h.setState(HumanCard.LOCKED);
 	else  h.setState(HumanCard.FREE);
     }
-
 
     public void setCard(HumanCard h) {
 	this.h = h;
@@ -65,6 +75,7 @@ public class RegisterView extends JButton {
 	else if (ktyp.equals("UT")) cardImage = ImageMan.CardUT;
 	else System.err.println("CardView: the card is bad.");
 	setIcon(cardImage);
+	h.setState(HumanCard.FILLED);
 	setEnabled(true);
     }
 

@@ -54,7 +54,7 @@ public class View extends JFrame {
 	f.setVisible(true);
    }
 
-    private void initView() {
+    synchronized private void initView() {
 	// Fenstergröße auf Vollbild setzen
 	Toolkit tk=Toolkit.getDefaultToolkit();
 	setSize(tk.getScreenSize().width-8,tk.getScreenSize().height-8);

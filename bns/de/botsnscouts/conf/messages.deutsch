@@ -110,7 +110,7 @@ mcregister Register $1
 mregrep Register reparieren
 mregwahl Repariere $1 Register.
 mwartereg Warte auf Registerprogrammierung...
-istPowerDown Power Down Modus
+istPowerDown Power Down Modus aktiviert
 istPowerDownZusatz aktiviert
 mflagreached Ziel erreicht
 mkilled Robi zerstört

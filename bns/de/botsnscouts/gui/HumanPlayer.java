@@ -103,8 +103,9 @@ public class HumanPlayer extends Thread {
 				// ----- Karten einsortieren  -----
 		    cards.clear();
 		    for (int i = 0; i < commAnswer.karten.length; i++) {
-			cards.set(i, new HumanCard(commAnswer.karten[i]));
+			cards.add(i, new HumanCard(commAnswer.karten[i]));
 		    }
+		    humanView.showCards(cards);
 		    //		scoutAllowed=true;
 
 		    // --- ist der Klugscheisser aktiv?
@@ -216,12 +217,16 @@ public class HumanPlayer extends Thread {
 	    case (commAnswer.ENTFERNUNG): {
 		// ------- Habe ich gewonnen / bin ich gestorben ----------
 		boolean dead = true;
+		int rating=0;
 		try {
 		    String[] gewinnerListe = comm.getSpielstand();
 		    if(gewinnerListe != null) {
 			showMessage(Message.say("SpielerMensch","spielende")); 
 			for (int i = 0; i < gewinnerListe.length; i++) {
-			    if (gewinnerListe[i].equals(name)) dead=false;
+			    if (gewinnerListe[i].equals(name)) {
+				dead=false;
+				rating=(i+1);
+			    }
 			}
 		    }
 		    else {
@@ -231,12 +236,7 @@ public class HumanPlayer extends Thread {
 		}
 		catch (KommException e) {Global.debug(this, e.getMessage());}
 		gameOver=true;
-		if (dead) {
-		    // shwo YOU lost!
-		}
-		else {
-		    // show: your finished
-		}
+		humanView.showGameOver(dead, rating);
 		break;
 	    }
 	    default : {
@@ -316,6 +316,25 @@ public class HumanPlayer extends Thread {
 	(new SpielerMensch(host,port,name,farbe)).start();
     }
 
+    protected void sendCards(ArrayList registerCards, boolean nextTurnPowerDown) {
+	int sendProg[] = new int[registerCards.size()];
+	int index=0;
+	
+	d("meine Registerkarten: "+registerCards);
+	d("die Karten, die der Server ausgeteilt hat:"+cards);
+	
+
+	for (int i=0; i < registerCards.size(); i++) {
+	    for (int j=0; j < cards.size(); j++) {
+		if ( ((HumanCard) registerCards.get(i)).equals((HumanCard)cards.get(j)) ) {
+		    sendProg[index]=(j+1);
+		    index++;
+		    continue;
+		}
+	    }
+	}
+	comm.registerProg(name,sendProg,nextTurnPowerDown);
+    }
     
     private boolean registerAtServer() {
 	boolean anmeldungErfolg = false;
@@ -344,8 +363,12 @@ public class HumanPlayer extends Thread {
 	System.exit(0);
     }
 
+    protected void passUpdatedScout(int chosen, Roboter[] robs) {
+	ausgabe.showScout(chosen,robs);
+    }
 
-    private void sendRepair() {
+
+    protected void sendRepair(ArrayList respReparatur) {
 	/*
 		int[] repa = new int[reparaturPunkte];
 		for (int i = 0; i < repa.length; i++) {
@@ -356,6 +379,11 @@ public class HumanPlayer extends Thread {
 	// show wait message
     }
     
+    protected Roboter getRob() {
+	return ausgabe.getRob(name);
+
+    }
+
 
     protected void sendDirection(int r) {
 		comm.respZerstoert(name,r); 
@@ -363,16 +391,8 @@ public class HumanPlayer extends Thread {
     }
 
 
-    private void sendAgainPowerDown(boolean down) {
+    protected void sendAgainPowerDown(boolean down) {
 		comm.respReaktivierung(name,down);
-		// show right message
-		if (!down) {
-		    // wait
-		}
-		else {
-		    // am power down
-		}
-
     }
 
 
@@ -381,7 +401,7 @@ public class HumanPlayer extends Thread {
      */
     private void showMessage(String s){
 	// Logframe instanziieren, falls nötig
-	humanView.showMessageToPlayer(s);
+	ausgabe.showActionMessage(s);
     }
 
 
@@ -410,15 +430,16 @@ public class HumanPlayer extends Thread {
     
 
     private void initView() {
-	humanView = new HumanView();
+	humanView = new HumanView(this);
 	view=new View(humanView);
 	ausgabe = new Ausgabe(host, port, nosplash, this, view);
-	view.addAusgabeView(ausgabe.getAusgabeView());
+	ausgabe.initialize();
+	ausgabe.start();
     }
 
-    private void sendCards() {
-	//		comm.registerProg(name,uI.getProg(),uI.powerDown);
-	//
+
+    private void d(String s) {
+	Global.debug(this,s);
     }
 
 }

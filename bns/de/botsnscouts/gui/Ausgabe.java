@@ -36,6 +36,7 @@ public class Ausgabe extends Thread {
     private int port;
     private boolean spielEnde = false;
     private boolean nosplash = false;
+    private boolean registered = false;
     /** the last phase of the current turn */
     private int lastPhase=1;
 
@@ -65,18 +66,9 @@ public class Ausgabe extends Thread {
 
 
     public void run() {
-	// --- registering for game ---
-	if (registerAtServer()) {
-	    Global.debug(this,"registered for game as new view with name: "+name);
-	}
-	else {
-	    Global.debug(this, "could not register at the server: "+host);  
-	    showSplash(Message.say("AusgabeFrame","msplashEnde"));
-	    try {Thread.sleep(2000);} catch (Exception e) {System.err.println(e.getMessage());}
-	    removeSplash();
-	    return;
-	}
 	
+	if (! registered) {initialize();} 
+
 	// ---- entering game  ---------
 
 	while (!spielEnde) {
@@ -93,78 +85,6 @@ public class Ausgabe extends Thread {
 	    }
 	    // what did the server send?
 	    switch (kommAntwort.typ) {
-
-	    case (kommAntwort.SPIELSTART): { 
-		Global.debug(this,"Server send me: game start.");
-
-		// ------- fetching the board -----
-		try { 
-		    String[] playerNames = kommClient.getNamen();
-		    String[] playerColors = kommClient.getFarben();
-		    Ort boardDim = kommClient.getSpielfeldDim();
-		    boardDimension = new Dimension(boardDim.x,boardDim.y);
-		    flags = kommClient.getFahnenPos();
-		    Color[] robotsDefaultColor = SACanvas.robocolor;
-		    Color[] robotsNewColor = new Color[8];
-
-		    // !!HACK!!
-		    int[] colorMap = new int[8];
-
-		    int j=0;
-		    for (int i=0;i<8;i++) {
-			if(!playerColors[i].equals("0")) {
-			    robotsNewColor[j]=robotsDefaultColor[i];
-			    colorMap[j]=i;
-			    j++;
-			}
-		    }
-
-		    // !! END OF HACK !!
-
-		    for (int i=0; i < playerNames.length; i++) {
-			d("Hole Roboterstatus von: "+playerNames[i]);
-			Roboter tempRob = kommClient.getRobStatus(playerNames[i]);
-			// !! refecting HACK above !!!
-			tempRob.setBotVis(colorMap[(i+playerNames.length+1)%playerNames.length]);
-			// !! end refecting HACK above !!!
-			robots.put(playerNames[i], tempRob);
-		    }
-
-
-		    SpielfeldSim sim = new SpielfeldSim(boardDimension.width,
-							boardDimension.height,
-							kommClient.getSpielfeld(),
-							flags);
-		    
-
-		    ausgabeView = new AusgabeView(new SACanvas(sim,robotsNewColor),getRoboterArray());
-
-		    if (view == null) {
-		    view=new View(ausgabeView);
-		    }
-		    else view.makeVisible();
-		    removeSplash();
-
-		    // send OK to server
-		    kommClient.spielstart(); 
-		    
-		    scrollFlag(1);
-
-		}
-		catch (KommException kE) {
-		    System.err.println("Ausgabe: Beim Versuch, die Roboter zu holen, erhalte ich: "+
-				       kE.getMessage());
-		    return;
-		}
-		catch (FormatException e) {
-		    System.err.println(e.getMessage());
-		}
-		catch (FlaggenException e){
-		    System.err.println(e.getMessage());
-		}
-		break;
-	    }
-
 	    case (kommAntwort.MESSAGE):{
 		Global.debug(this,"Server send me: some messsage.");
 		String[] tmpstr=new String[kommAntwort.namen.length-1];
@@ -172,8 +92,10 @@ public class Ausgabe extends Thread {
 		for (int i=0;i<tmpstr.length;i++)
 		    tmpstr[i]=kommAntwort.namen[i+1];
 
-		if (!(kommAntwort.namen[0].substring(0,5).equals("mAusw")))
+		if (!(kommAntwort.namen[0].substring(0,5).equals("mAusw"))) {
+		    d("kommAntowrtnamen[0] ist: "+kommAntwort.namen[0]+ "tmpstr ist: "+tmpstr[0]);
 		    showActionMessage(Message.say("MSG",kommAntwort.namen[0],tmpstr));
+		}
 
 		if (kommAntwort.namen[0].equals("mRobLaser")){
 		    Roboter r1=null;
@@ -312,6 +234,122 @@ public class Ausgabe extends Thread {
     }
 
 
+    protected void initialize() {
+	registerAtServer();
+	try {
+	    kommAntwort = kommClient.warte();
+	}
+	catch (KommFutschException kE) {
+	    System.err.println("KE: "+kE.getMessage());
+	    return;
+	}
+	catch (KommException ke) {
+	    System.err.println("ke: "+ke.getMessage());
+	    return;
+	}
+
+	if (kommAntwort.typ == kommAntwort.SPIELSTART) { 
+	    Global.debug(this,"Server send me: game start.");
+
+	    // ------- fetching the board -----
+	    try { 
+		String[] playerNames = kommClient.getNamen();
+		String[] playerColors = kommClient.getFarben();
+		Ort boardDim = kommClient.getSpielfeldDim();
+		boardDimension = new Dimension(boardDim.x,boardDim.y);
+		flags = kommClient.getFahnenPos();
+		Color[] robotsDefaultColor = SACanvas.robocolor;
+		Color[] robotsNewColor = new Color[8];
+
+		// !!HACK!!
+		int[] colorMap = new int[8];
+
+		int j=0;
+		for (int i=0;i<8;i++) {
+		    if(!playerColors[i].equals("0")) {
+			robotsNewColor[j]=robotsDefaultColor[i];
+			colorMap[j]=i;
+			j++;
+		    }
+		}
+
+		// !! END OF HACK !!
+
+		for (int i=0; i < playerNames.length; i++) {
+		    d("Hole Roboterstatus von: "+playerNames[i]);
+		    Roboter tempRob = kommClient.getRobStatus(playerNames[i]);
+		    // !! refecting HACK above !!!
+		    tempRob.setBotVis(colorMap[(i+playerNames.length+1)%playerNames.length]);
+		    // !! end refecting HACK above !!!
+		    robots.put(playerNames[i], tempRob);
+		}
+
+
+		SpielfeldSim sim = new SpielfeldSim(boardDimension.width,
+						    boardDimension.height,
+						    kommClient.getSpielfeld(),
+						    flags);
+		    
+
+		ausgabeView = new AusgabeView(new SACanvas(sim,robotsNewColor),getRoboterArray());
+
+		if (view == null) {
+		    view=new View(ausgabeView);
+		}
+		else {
+		    view.addAusgabeView(ausgabeView);
+		    view.makeVisible();
+		}
+		removeSplash();
+
+		// send OK to server
+		kommClient.spielstart(); 
+		    
+		scrollFlag(1);
+
+	    }
+	    catch (KommException kE) {
+		System.err.println("Ausgabe: Beim Versuch, die Roboter zu holen, erhalte ich: "+
+				   kE.getMessage());
+		return;
+	    }
+	    catch (FormatException e) {
+		System.err.println(e.getMessage());
+	    }
+	    catch (FlaggenException e){
+		System.err.println(e.getMessage());
+	    }
+	}
+	else {
+	    // Problem: the server sends shit
+	    Global.debug(this, "server does not send a game start at game start... fui!");
+	}
+
+	registered = true;
+	
+    }
+
+
+
+    /**
+     * Fordert die View auf, eine ActionMessage anzuzeigen
+     */
+    protected void showActionMessage(String s){
+	if (ausgabeView !=null) {
+	    ausgabeView.showActionMessage(s);
+	}
+    }
+
+    protected Roboter getRob(String name){
+	return (Roboter) robots.get(name);
+    }
+
+
+    protected void showScout(int chosen, Roboter[] robs) {
+	ausgabeView.showScout(chosen,robs);
+    }
+
+
     /**
      * Zeigt einen Text im Splashscreen an
      * (erzeugt den Splashscreen, falls nötig)
@@ -349,9 +387,10 @@ public class Ausgabe extends Thread {
     }
 
 
-    private boolean registerAtServer() {
+    private void registerAtServer() {
 	boolean anmeldungErfolg = false;
 	int versuche = 0;
+
 	
 	showActionMessage(Message.say("AusgabeFrame","Anmeldung"));
 	while ((!anmeldungErfolg)&&(versuche < 3)) { 
@@ -365,19 +404,23 @@ public class Ausgabe extends Thread {
 		try {Thread.sleep(3000);} catch (Exception e) {System.err.println(e.getMessage());}
 	    }
 	}
-	return anmeldungErfolg;
+
+
+	if (anmeldungErfolg) {
+	    Global.debug(this,"registered for game as new view with name: "+name);
+	}
+	else {
+	    Global.debug(this, "could not register at the server: "+host);  
+	    showSplash(Message.say("AusgabeFrame","msplashEnde"));
+	    try {Thread.sleep(2000);} catch (Exception e) {System.err.println(e.getMessage());}
+	    removeSplash();
+	}
+
+
+
 	
     }
 
-
-    /**
-     * Fordert die View auf, eine ActionMessage anzuzeigen
-     */
-    protected void showActionMessage(String s){
-	if (ausgabeView !=null) {
-	    ausgabeView.showActionMessage(s);
-	}
-    }
 
     /**
      * Zentriert den Robi und folgt ihm.

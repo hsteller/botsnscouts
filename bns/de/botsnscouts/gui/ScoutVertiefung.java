@@ -21,9 +21,7 @@ public class ScoutVertiefung extends JToggleButton {
     Image imageDream[];
     //    Image scoutImages[];
 
-    public ScoutVertiefung(SpielerMensch spielerMensch) {
-	// Referenz holen
-	mensch = spielerMensch;
+    public ScoutVertiefung(ActionListener al) {
 	imageActive=ImageMan.getImages(ImageMan.SCHLAFPLATZ);
 	imageDream=ImageMan.getImages(ImageMan.SCHLAFSCOUT);
 	//	scoutImages=ImageMan.getImages(ImageMan.SCOUT);
@@ -33,17 +31,7 @@ public class ScoutVertiefung extends JToggleButton {
 	setIcon(new ImageIcon(imageActive[0]));
 	//	setPressedIcon(new ImageIcon(scoutImages[2]));
 	setSelectedIcon(new ImageIcon(imageDream[0]));
-	addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    if (isSelected()) {
-			//			Global.debug(this,"Scout, wach auf!");
-			mensch.scoutClicked(true);
-		    }
-		    else {
-			//			Global.debug(this,"Scout, geh schlafen!");
-			mensch.scoutClicked(false);
-		    }
-		}});
+	addActionListener(al);
 	
     }
 
@@ -64,4 +52,8 @@ public class ScoutVertiefung extends JToggleButton {
 	f.setVisible(true);
     }
 
+
+    protected boolean selected() {
+	return isSelected();
+    }
 }

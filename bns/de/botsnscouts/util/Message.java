@@ -43,6 +43,8 @@ public class Message{
     public static void setLanguage(Locale loc){
 	Locale myLocale=loc;
 	messages=ResourceBundle.getBundle("de/botsnscouts/conf/MessagesBundle",myLocale);
+	formatter = new MessageFormat("");
+	formatter.setLocale(myLocale);
     } // Ende setLanguage
     
     //gibt alle vorhandene Localisierungen
@@ -93,6 +95,7 @@ public class Message{
 	return messages.getString(callerSection+"."+id);
     }
     public static String say(String callerSection,String id,String P1){ // Parameter String
+	Global.debug(Message.class,"Messages ist: "+messages+ "formatter : "+formatter);
 	formatter.applyPattern(messages.getString(callerSection+"."+id));
 	Object[] params={P1};
 	return formatter.format(params);

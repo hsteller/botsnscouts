@@ -163,6 +163,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	validate();
     }
 
+    protected void showScout(int chosen, Roboter[] robs) {
+	spielFeld.vorschau(chosen,robs);
+    }
+
+
 
     private void d(String s){
 	Global.debug(this, s);

@@ -38,7 +38,7 @@ public class CardView extends JButton {
 
     public void reset() {
 	setSelected(false);
-	setEnabled(false);
+	//	setEnabled(false);
 	setIcon(cardFree);
 	h = null;
     }

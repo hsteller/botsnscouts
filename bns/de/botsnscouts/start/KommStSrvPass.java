@@ -29,7 +29,7 @@ public class KommStSrvPass{
    tosrv=new Socket(ip,PORT);
   }
   catch (Exception e){
-   System.err.println("Kann die Verbindung zum Server nicht herstellen!");
+   System.err.println("KommStSrvPass: Kann die Verbindung zum Server nicht herstellen!");
    return false;
   }
 
