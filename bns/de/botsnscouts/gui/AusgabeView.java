@@ -11,18 +11,13 @@ import javax.swing.border.*;
 
 import org.apache.log4j.Category;
 
-/**
- * Zeigt das Spielfeld und alle Statusmeldungen an
- * @author Lukasz Pekacki
- */
-
 public class AusgabeView extends JPanel implements AusgabeViewInterface {
     static Category CAT = Category.getInstance(AusgabeView.class);
 
     // --- objects
-    private JScrollPane spielFeldScrollFenster;
-    private JViewport spielFeldView;
-    private SACanvas  spielFeld;
+    private JScrollPane gameBoardScrollPane;
+    private JViewport gameBoardView;
+    private SACanvas  gameBoardCanvas;
     private Ausgabe   ausgabe;
     private Hashtable robotStatus = new Hashtable(8);
     private Hashtable robotCardStatus = new Hashtable(8);
@@ -50,7 +45,6 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 
 
-
     /** @args SpielerMensch spielerref ist Referenz auf umgebenden
      *  MenschlichenSpieler, falls Ausgabe zu einem Spieler gehoert,
      *  null sonst.
@@ -62,7 +56,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
     public AusgabeView(SACanvas sa, Roboter[] robots, Ausgabe aus) {
 	ausgabe = aus;
-	spielFeld=sa;
+	gameBoardCanvas=sa;
+
 	JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	JPanel robotsCardContainer = new JPanel(new GridLayout(8,1));
 
@@ -102,13 +97,13 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	add(statusLog,BorderLayout.SOUTH);
 
 	// create scroll panel
-	spielFeldScrollFenster = new JScrollPane();
-	spielFeldScrollFenster.getHorizontalScrollBar().setUnitIncrement(64);
-	spielFeldScrollFenster.getVerticalScrollBar().setUnitIncrement(64);
-	spielFeldScrollFenster.setViewportView(spielFeld);
-	spielFeld.setScrollPane(spielFeldScrollFenster);
-	add(spielFeldScrollFenster,BorderLayout.CENTER);
-	spielFeldView = spielFeldScrollFenster.getViewport();
+	gameBoardScrollPane = new JScrollPane();
+	gameBoardScrollPane.getHorizontalScrollBar().setUnitIncrement(64);
+	gameBoardScrollPane.getVerticalScrollBar().setUnitIncrement(64);
+	gameBoardScrollPane.setViewportView(gameBoardCanvas);
+	gameBoardCanvas.setScrollPane(gameBoardScrollPane);
+	add(gameBoardScrollPane,BorderLayout.CENTER);
+	gameBoardView = gameBoardScrollPane.getViewport();
         this.initMenus();
 
     }
@@ -139,7 +134,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      * Shows the new Positions of the Robots
      */
     public void showUpdatedRobots(Roboter[] r){
-	spielFeld.ersetzeRobos(r);
+	gameBoardCanvas.ersetzeRobos(r);
 	for (int i = 0; i < r.length; i++) {
 	    ((RobotStatus) robotStatus.get(r[i].getName())).updateRobot(r[i]);
 	    ((RobotCard) robotCardStatus.get(r[i].getName())).updateRobot(r[i]);
@@ -151,9 +146,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     public void showPos(int robix, int robiy) {
 
 	int x = robix*64;
-	int y = spielFeld.getHeight()-(robiy*64);
+	int y = gameBoardCanvas.getHeight()-(robiy*64);
 
-	Dimension sz = spielFeldView.getExtentSize();
+	Dimension sz = gameBoardView.getExtentSize();
 	int w2 = sz.width/2;
 	int h2 = sz.height/2;
 
@@ -165,20 +160,24 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 	// soll ich überhaupt scrollen?
 	// in X-Richtung
-	if ((x < ( (spielFeldView.getViewPosition().x)+10 ) ) ||
-	    x > ( (spielFeldView.getViewPosition().x+sz.width)-10 )) {
-	    x1 = Math.min( x1, (spielFeld.getWidth() - sz.width) );
+	if ((x < ( (gameBoardView.getViewPosition().x)+10 ) ) ||
+	    x > ( (gameBoardView.getViewPosition().x+sz.width)-10 )) {
+	    x1 = Math.min( x1, (gameBoardCanvas.getWidth() - sz.width) );
 	}
-	else x1 = spielFeldView.getViewPosition().x;
+	else x1 = gameBoardView.getViewPosition().x;
 
 	// in Y-Richtung
-	if ((y < ( spielFeldView.getViewPosition().y +10) ) ||
-	    y > ( (spielFeldView.getViewPosition().y+sz.height)-10 )) {
-	    y1 = Math.min( y1, (spielFeld.getHeight() - sz.height) );
+	if ((y < ( gameBoardView.getViewPosition().y +10) ) ||
+	    y > ( (gameBoardView.getViewPosition().y+sz.height)-10 )) {
+	    y1 = Math.min( y1, (gameBoardCanvas.getHeight() - sz.height) );
 	}
-	else y1 = spielFeldView.getViewPosition().y;
+	else y1 = gameBoardView.getViewPosition().y;
 
-	spielFeldView.setViewPosition(new Point(x1, y1));
+
+	gameBoardView.setViewPosition(new Point(x1, y1));
+        this.gameBoardCanvas.highlight(x, y);
+
+
     }
 
 
@@ -186,14 +185,14 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      * board view is to paint robolaser activity
      */
     public void showRobLaser(Roboter von, Roboter nach){
-	spielFeld.doRobLaser(von, nach);
+	gameBoardCanvas.doRobLaser(von, nach);
     }
 
     /**
      * board view is to paint bord laser activity
      */
     public void showBoardLaser(Ort laserPos, int facing, int stregth, Ort r1Pos){
-	spielFeld.doBordLaser(laserPos, facing, stregth, r1Pos,spielFeldView);
+	gameBoardCanvas.doBordLaser(laserPos, facing, stregth, r1Pos,gameBoardView);
     }
 
     /**
@@ -214,18 +213,18 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
      *  shows the winner list at game over
      */
     public void showWinnerlist (String[] winners) {
-	spielFeld.setVisible(false);
+	gameBoardCanvas.setVisible(false);
 	add(new Abspann(winners),BorderLayout.CENTER);
 	validate();
     }
 
     protected void showScout(int chosen, Roboter[] robs) {
-	spielFeld.vorschau(chosen,robs);
+	gameBoardCanvas.vorschau(chosen,robs);
     }
 
 
     public SACanvas getSpielfeld() {
-      return spielFeld;
+      return gameBoardCanvas;
     }
 
     /** parameter will be ignored*/
@@ -246,11 +245,22 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 
     private void initMenus() {
+      JMenu trackMenu = new JMenu(Message.say("AusgabeView", "trackMenu"));
+      if (gameBoardCanvas!=null)
+        trackMenu.add(new ShowFlagMenu(gameBoardCanvas.getFlags()));
+
+
+      trackMenu.add(new ShowRobMenu());
+
+      JMenu optionsMenu = new JMenu (Message.say("AusgabeFrame","mOptions"));
+      optionsMenu.add(new SpeedMenu());
+      optionsMenu.add(new SoundMenu());
+
       menus.add(new FileMenu());
       menus.add(new ZoomMenu());
-      menus.add(new OptionsMenu());
+      menus.add(trackMenu);
+      menus.add(optionsMenu);
       menus.add(new HelpMenu());
-
     }
 
     private class FileMenu extends JMenu {
@@ -277,17 +287,6 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       }
     }
 
-
-
-
-    private class OptionsMenu extends JMenu {
-       OptionsMenu () {
-        super(Message.say("AusgabeFrame","mOptions"));
-        //add(new ZoomMenu());
-        add(new SpeedMenu());
-        add(new SoundMenu());
-       }
-    }
 
     private class ZoomMenu extends JMenu implements ActionListener {
 	ZoomMenu() {
@@ -316,7 +315,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	    final double sc = iScale / 100.0;
 	    SwingUtilities.invokeLater( new Runnable() {
 		    public void run() {
-			 spielFeld.setScale( sc );
+			 gameBoardCanvas.setScale( sc );
 		    }
 		});
 	}
@@ -329,7 +328,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	soundBox.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e){
 		    soundOn = !soundOn;
-		    spielFeld.setSoundActive(soundOn);
+		    gameBoardCanvas.setSoundActive(soundOn);
                     String status = Message.say("AusgabeView","mSoundChange")+" ";
                     if (soundOn)
                       status += Message.say("AusgabeView","mSoundOn");
@@ -389,11 +388,97 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 		    new AboutFenster();
 		}
 	    });
+        add(about);
       }
 
     }
 
 
+
+
+   private class ShowFlagMenu extends JMenu {
+      ShowFlagMenu(Ort [] flagPos) {
+        super(Message.say("AusgabeView", "flag"));
+        init (flagPos);
+      }
+
+      void init(Ort [] flags) {
+        if (flags!=null){
+          for (int i=0;i<flags.length;i++){
+            JMenuItem flag = new JMenuItem(" #"+(i+1));
+            flag.addActionListener(new ShowFlagListener(flags[i].x, flags[i].y));
+            this.add(flag);
+            if (CAT.isDebugEnabled()){
+              CAT.debug("ScrollFlag - added flag: #"+(i+1)+" x:"+flags[i].x+" y:"+flags[i].y);
+            }
+          }
+        }
+        else
+          CAT.debug("flag array for ScrollFlagMenu was null!");
+      }
+
+   }
+
+    private class ShowFlagListener implements ActionListener {
+        int xpos, ypos;
+        public ShowFlagListener(int x, int y){
+          this.xpos = x;
+          this.ypos = y;
+        }
+
+        public void actionPerformed(ActionEvent e){
+          if (CAT.isDebugEnabled())
+            CAT.debug("Showing Pos at x:"+xpos+" y:"+ypos);
+          showPos(xpos, ypos);
+        }
+    }
+
+   private class ShowRobMenu extends JMenu {
+      ShowRobMenu() {
+        super(Message.say("AusgabeView", "rob"));
+        init ();
+      }
+
+      void init() {
+        if (robotStatus!=null){
+          int l = robotStatus.size();
+         Enumeration e = robotStatus.elements();
+         while (e.hasMoreElements()){
+            RobotStatus rs = (RobotStatus) e.nextElement();
+            JMenuItem rob = new JMenuItem(rs.robot.getName());
+            rob.addActionListener(new ShowRobListener(rs));
+            this.add(rob);
+          }
+        }
+        else
+          CAT.debug("robotstatus was null! Failed to create ShowRobMenu items");
+      }
+
+   }
+
+    private class ShowRobListener implements ActionListener {
+        RobotStatus rob;
+        public ShowRobListener(RobotStatus r){
+          rob = r;
+        }
+
+        public void actionPerformed(ActionEvent e){
+          if (CAT.isDebugEnabled())
+            CAT.debug("Showing robot \""+rob.robot.getName()+"\" at x:"+rob.robot.getX()+" y:"+rob.robot.getY());
+          int x = rob.robot.getX();
+          int y = rob.robot.getY();
+          if (x<1 && y<1){ // robot destroyed, not on board
+
+              String s = Message.say("AusgabeView", "robotNotOnBoard", rob.robot.getName());
+              JOptionPane.showMessageDialog(null,s, "Ooops!",JOptionPane.INFORMATION_MESSAGE,
+                                             new ImageIcon(rob.robotImages[rob.robot.getBotVis()]));
+              CAT.debug("Showing popup instead of robot, because robot is not on board..");
+          }
+          else {
+            showPos(x, y);
+          }
+        }
+    }
 
 
 
