@@ -337,9 +337,10 @@ public class SpielerKuenstlich extends Thread {
         }
 
     private void hotfix(){
+      /*
 	try{
 	    sleep(500);
-	}catch(InterruptedException e){}
+	    }catch(InterruptedException e){}*/
     }
 
     private void d(String s)
