@@ -62,7 +62,7 @@ public class StatusLog  extends JPanel implements ActionListener{
 
     public void addMessage(String s) {
 	singleMessage.setText(s);
-        ta.append(s+"\n");
+        ta.insert(s+"\n", 0);
     }
 
 
