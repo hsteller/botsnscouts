@@ -72,13 +72,13 @@ public class BoardView extends JComponent {
     }
 
     /** Constant for direction/facing north*/
-    protected static final int NORTH=0;
+    protected static final int NORTH=Directions.NORTH;
     /** Constant for direction/facing east*/
-    protected static final int EAST=1;
+    protected static final int EAST=Directions.EAST;
     /** Constant for direction/facing south*/
-    protected static final int SOUTH=2;
+    protected static final int SOUTH=Directions.SOUTH;
     /** Constant for direction/facing west*/
-    protected static final int WEST=3;
+    protected static final int WEST=Directions.WEST;
 
 
     private JScrollPane myScrollPane;
@@ -173,11 +173,11 @@ public class BoardView extends JComponent {
      *   @todo I guess that this must not be final and needs to be scaled so that it works
      *    with different zoomlevels
      */
-    private static final int MOVE_ROB_ANIMATION_OFFSET=8;
+    private static final int MOVE_ROB_ANIMATION_OFFSET=4;
     /** Amount of time (in ms) we wait after a single animation step
      *  of (pixel-)length MOVE_ROB_ANIMATION_OFFSET.
      */
-    private static final int MOVE_ROB_ANIMATION_DELAY=5;
+    private static final int MOVE_ROB_ANIMATION_DELAY=1;
 
 
     private static final AlphaComposite AC_SRC = AlphaComposite.getInstance(AlphaComposite.SRC);
@@ -402,35 +402,8 @@ public class BoardView extends JComponent {
 
     /////////////////////////////////////////////////////////////////////
 
-   /** private void moveRobNorth(Bot internal, int robocount){
-      if (CAT.isDebugEnabled())
-           CAT.debug("Move direction: NORTH");
-      if (MOVE_ROB_ANIMATION_DELAY>0){
-         Graphics2D g2 = (Graphics2D) this.getGraphics();
-         synchronized (this){
-           for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
-              // paintRobos(this.getGraphics(), internal);
-              paintRobot(g2, internal, robocount, 0,offset, true);
-                try {wait (MOVE_ROB_ANIMATION_DELAY);}
-               catch (InterruptedException ie){CAT.warn ("SACanvas.paint: wait int moveRobNorth interrupted");}
-           }
-         }
-       }
-       else {// paint without delay
-          for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
-             //paintRobos(this.getGraphics(), internal);
-            paintRobot((Graphics2D)this.getGraphics(), internal, robocount,0, offset,true);
-          }
-       }
-    }
-    */
-
     private void moveRobNorth(Bot internal, int robocount){
-        //   int xpos = robot.getY()-1;
-    //   int ypos = sf.getSizeY()-robot.getY();
-    //   int xpos64 = xpos*64;
-    //   int ypos64 = ypos*64;
-
+      CAT.debug("moving bot one square to the north");
             synchronized (this){
                Graphics2D g2 = (Graphics2D) this.getGraphics();
                g2.scale(dScale, dScale);
@@ -451,14 +424,26 @@ public class BoardView extends JComponent {
                int y2= y1+1;
                int actx2= actx1;
                int acty2= acty1-64;
-               for (int yoffset=0;yoffset>=-64;yoffset-=MOVE_ROB_ANIMATION_OFFSET){
-                  paintRobotForMoveAnimation(g2, imgRob,
-                                              x1, y1, actx1, acty1,
-                                              x2, y2, actx2, acty2,
-                                              xpos64, ypos64+yoffset,
-                                              ac,  ac2);
-                    try {wait (MOVE_ROB_ANIMATION_DELAY);}
-                    catch (InterruptedException ie){CAT.warn ("BoardView.paint: wait int moveRobNorth interrupted");}
+               if (MOVE_ROB_ANIMATION_DELAY>0){
+                 for (int yoffset=0;yoffset>=-64;yoffset-=MOVE_ROB_ANIMATION_OFFSET){
+                    paintRobotForMoveAnimation(g2, imgRob,
+                                                x1, y1, actx1, acty1,
+                                                x2, y2, actx2, acty2,
+                                                xpos64, ypos64+yoffset,
+                                                ac,  ac2);
+
+                      try {Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);}
+                      catch (InterruptedException ie){CAT.warn ("BoardView.paint: wait int moveRobNorth interrupted");}
+                 }
+               }
+               else { // loop without sleeping
+                  for (int yoffset=0;yoffset>=-64;yoffset-=MOVE_ROB_ANIMATION_OFFSET){
+                    paintRobotForMoveAnimation(g2, imgRob,
+                                                x1, y1, actx1, acty1,
+                                                x2, y2, actx2, acty2,
+                                                xpos64, ypos64+yoffset,
+                                                ac,  ac2);
+                  }
                }
             }
     }
@@ -466,78 +451,143 @@ public class BoardView extends JComponent {
 
 
     private void moveRobSouth(Bot internal, int robocount){
-      if (CAT.isDebugEnabled())
-         CAT.debug("Move direction: SOUTH");
-      if (MOVE_ROB_ANIMATION_DELAY>0){
-          Graphics2D g2 = (Graphics2D) this.getGraphics();
-          g2.scale(dScale, dScale);
-         synchronized (this){
-            for (int offset=0;offset<=64;offset+=MOVE_ROB_ANIMATION_OFFSET){
-                // paintRobos(this.getGraphics(), internal);
-                paintRobot(g2, internal, robocount, 0,offset, true);
-                  try {wait (MOVE_ROB_ANIMATION_DELAY);}
-                  catch (InterruptedException ie){CAT.warn ("SACanvas.paint: wait in moveRobSouthinterrupted");}
+      CAT.debug("moving bot one square to the south");
+       synchronized (this){
+               Graphics2D g2 = (Graphics2D) this.getGraphics();
+               g2.scale(dScale, dScale);
+               AlphaComposite ac = AC_SRC;
+               AlphaComposite ac2=null;
+               if( internal.isVirtual() )
+                  ac2 = AC_SRC_OVER_05;
+               Image imgRob = robosCrop[internal.getFacing()+internal.getBotVis()*4];
+               int x1 = internal.getX();
+               int y1 = internal.getY();
+               int xpos = x1-1;
+               int ypos = sf.getSizeY()-y1;
+               int xpos64 = xpos*64;
+               int ypos64 = ypos*64;
+               int actx1 = xpos64;
+               int acty1 = ypos64;
+               // direction dependend part:
+               int x2= x1;
+               int y2= y1-1;
+               int actx2= actx1;
+               int acty2= acty1+64;
+               if ( MOVE_ROB_ANIMATION_DELAY > 0 ) {
+                 for (int yoffset=0;yoffset<=64;yoffset+=MOVE_ROB_ANIMATION_OFFSET){
+                    paintRobotForMoveAnimation(g2, imgRob,
+                                                x1, y1, actx1, acty1,
+                                                x2, y2, actx2, acty2,
+                                                xpos64, ypos64+yoffset,
+                                                ac,  ac2);
+                      if (MOVE_ROB_ANIMATION_DELAY>0)
+                        try {Thread.currentThread().sleep(MOVE_ROB_ANIMATION_DELAY);}
+                        catch (InterruptedException ie){CAT.warn ("BoardView.paint: wait int moveRobSouth interrupted");}
+                 }
+               }
+               else {
+                  for (int yoffset=0;yoffset<=64;yoffset+=MOVE_ROB_ANIMATION_OFFSET){
+                    paintRobotForMoveAnimation(g2, imgRob,
+                                                x1, y1, actx1, acty1,
+                                                x2, y2, actx2, acty2,
+                                                xpos64, ypos64+yoffset,
+                                                ac,  ac2);
+                  }
+               }
             }
-         }
-      }
-      else {// paint without delay
-        Graphics2D g2 = (Graphics2D) this.getGraphics();
-        g2.scale(dScale, dScale);
-        for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
-         //  paintRobos(this.getGraphics(), internal);
-          paintRobot(g2, internal, robocount,0,offset, true);
-        }
-      }
     }
+
+
      private void moveRobEast(Bot internal, int robocount){
-      if (CAT.isDebugEnabled())
-                CAT.debug("Move direction: EAST");
-      if (MOVE_ROB_ANIMATION_DELAY>0){
+       CAT.debug("moving bot one square to the east");
         synchronized (this){
-           Graphics2D g2 = (Graphics2D) this.getGraphics();
-           g2.scale(dScale, dScale);
-           for (int offset=0;offset<=64;offset+=MOVE_ROB_ANIMATION_OFFSET){
-         //     paintRobos(this.getGraphics(), internal);
-              paintRobot(g2, internal, robocount,offset,0, true);
-                try {wait (MOVE_ROB_ANIMATION_DELAY);}
-                catch (InterruptedException ie){CAT.warn ("SACanvas.paint: wait in moveRobSouthinterrupted");}
-           }
-        }
-      }
-      else {// paint without delay
-        Graphics2D g2 = (Graphics2D) this.getGraphics();
-        g2.scale(dScale, dScale);
-        for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
-        //  paintRobos(this.getGraphics(), internal);
-          paintRobot(g2, internal, robocount,offset,0, true);
-        }
-      }
+               Graphics2D g2 = (Graphics2D) this.getGraphics();
+               g2.scale(dScale, dScale);
+               AlphaComposite ac = AC_SRC;
+               AlphaComposite ac2=null;
+               if( internal.isVirtual() )
+                  ac2 = AC_SRC_OVER_05;
+               Image imgRob = robosCrop[internal.getFacing()+internal.getBotVis()*4];
+               int x1 = internal.getX();
+               int y1 = internal.getY();
+               int xpos = x1-1;
+               int ypos = sf.getSizeY()-y1;
+               int xpos64 = xpos*64;
+               int ypos64 = ypos*64;
+               int actx1 = xpos64;
+               int acty1 = ypos64;
+               // direction dependend part:
+               int x2= x1+1;
+               int y2= y1;
+               int actx2= actx1+64;
+               int acty2= acty1;
+               if (MOVE_ROB_ANIMATION_DELAY>0) {
+                 for (int xoffset=0;xoffset<=64; xoffset+=MOVE_ROB_ANIMATION_OFFSET){
+                    paintRobotForMoveAnimation(g2, imgRob,
+                                                x1, y1, actx1, acty1,
+                                                x2, y2, actx2, acty2,
+                                                xpos64+xoffset, ypos64,
+                                                ac,  ac2);
+                        try {Thread.currentThread().sleep (MOVE_ROB_ANIMATION_DELAY);}
+                        catch (InterruptedException ie){CAT.warn ("BoardView.paint: wait int moveRobEast interrupted");}
+                 }
+               }
+               else { // loop without sleeping
+                  for (int xoffset=0;xoffset<=64; xoffset+=MOVE_ROB_ANIMATION_OFFSET){
+                      paintRobotForMoveAnimation(g2, imgRob,
+                                                x1, y1, actx1, acty1,
+                                                x2, y2, actx2, acty2,
+                                                xpos64+xoffset, ypos64,
+                                                ac,  ac2);
+                  }
+               }
+          }
+
     }
     private void moveRobWest(Bot internal, int robocount){
-      if (CAT.isDebugEnabled())
-         CAT.debug("Move direction: WEST");
-      if (MOVE_ROB_ANIMATION_DELAY>0){
-         synchronized (this){
-           Graphics2D g2 = (Graphics2D) this.getGraphics();
-           g2.scale(dScale, dScale);
-
-           for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
-         //      paintRobos(this.getGraphics(), internal);
-              paintRobot(g2, internal, robocount,offset,0, true);
-                try {wait (MOVE_ROB_ANIMATION_DELAY);}
-                catch (InterruptedException ie){CAT.warn ("SACanvas.paint: wait int moveRobNorth interrupted");}
-           }
-         }
-      }
-      else { // paint without delay
-        Graphics2D g2 = (Graphics2D) this.getGraphics();
-        g2.scale(dScale, dScale);
-
-        for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
-    //     paintRobos(this.getGraphics(), internal);
-          paintRobot(g2, internal, robocount,offset,0, true);
-        }
-      }
+        CAT.debug("moving bot one square to the west");
+        synchronized (this){
+               Graphics2D g2 = (Graphics2D) this.getGraphics();
+               g2.scale(dScale, dScale);
+               AlphaComposite ac = AC_SRC;
+               AlphaComposite ac2=null;
+               if( internal.isVirtual() )
+                  ac2 = AC_SRC_OVER_05;
+               Image imgRob = robosCrop[internal.getFacing()+internal.getBotVis()*4];
+               int x1 = internal.getX();
+               int y1 = internal.getY();
+               int xpos = x1-1;
+               int ypos = sf.getSizeY()-y1;
+               int xpos64 = xpos*64;
+               int ypos64 = ypos*64;
+               int actx1 = xpos64;
+               int acty1 = ypos64;
+               // direction dependend part:
+               int x2= x1-1;
+               int y2= y1;
+               int actx2= actx1-64;
+               int acty2= acty1;
+               if ( MOVE_ROB_ANIMATION_DELAY > 0) {
+                 for (int xoffset=0;xoffset>=-64;xoffset-=MOVE_ROB_ANIMATION_OFFSET){
+                    paintRobotForMoveAnimation(g2, imgRob,
+                                                x1, y1, actx1, acty1,
+                                                x2, y2, actx2, acty2,
+                                                xpos64+xoffset, ypos64,
+                                                ac,  ac2);
+                      try {Thread.currentThread().sleep (MOVE_ROB_ANIMATION_DELAY);}
+                      catch (InterruptedException ie){CAT.warn ("BoardView.paint: wait int moveRobWest interrupted");}
+                 }
+               }
+               else {
+                  for (int xoffset=0;xoffset>=-64;xoffset-=MOVE_ROB_ANIMATION_OFFSET){
+                     paintRobotForMoveAnimation(g2, imgRob,
+                                                x1, y1, actx1, acty1,
+                                                x2, y2, actx2, acty2,
+                                                xpos64+xoffset, ypos64,
+                                                ac,  ac2);
+                  }
+               }
+          }
     }
 
 
@@ -950,11 +1000,7 @@ public class BoardView extends JComponent {
         for (int y=1;y<=sizeY;y++){
           Location l = new Location (x, y);
           Image img = getFloorImage(x, y);
-          CAT.debug("init: ("+x+","+y+")="+img);
-          CAT.debug("hash="+l.hashCode());
           floorElementHash.put(l, img);
-
-          CAT.debug("got: "+floorElementHash.get(new Location(x,y)));
         }
       }
     }
@@ -1063,9 +1109,8 @@ public class BoardView extends JComponent {
     protected void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty,
 				  int width, int height) {
 
-        CAT.debug("xpos="+xpos+" ypos="+ypos+"actx="+actx+"acty="+acty);
+      //  CAT.debug("xpos="+xpos+" ypos="+ypos+"actx="+actx+"acty="+acty);
         Location l = new Location(xpos, ypos);
-        CAT.debug("hash="+l.hashCode());
         Image img = (Image) floorElementHash.get(l);
         g.drawImage(img,actx,acty,width,height,this);
 
@@ -1525,44 +1570,7 @@ public class BoardView extends JComponent {
       paintFlaggen(g2d);
     }
 
-    //needs to be done before:
-    //
-    //   Image imgRob = robosCrop[robot.getFacing()+robot.getBotVis()*4];
-    //   int xpos = robot.getY()-1;
-    //   int ypos = sf.getSizeY()-robot.getY();
-    //   int xpos64 = xpos*64;
-    //   int ypos64 = ypos*64;
-    //   int actx = xpos64;
-    //   int acty = ypos64;
-    //   g2d.scale(getScale(), getScale());
-    //   AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC);
-    //   AlphaComposite ac2=null;
-    //   if( robot.isVirtual() ) {
-    //	     ac2 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
-    //   }
-    //
-    //   Graphics2D g2 = (Graphics2D) this.getGraphics();
-    //      synchronized (this){
-    //       for (int offset=0;offset>=-64;offset-=MOVE_ROB_ANIMATION_OFFSET){
-    //          // paintRobos(this.getGraphics(), internal);
-    //          paintRobotForMoveAnimation(g2, imgRob,
-    //                                      xpos, ypos, actx, acty
-    //                                      x2, y2, actx2, acty2,
-    //                                      xpos64+xoffset, ypos64+yoffset,
-    //                                      ac,  ac2);
-    //            try {wait (MOVE_ROB_ANIMATION_DELAY);}
-    //           catch (InterruptedException ie){CAT.warn ("SACanvas.paint: wait int moveRobNorth interrupted");}
-    //       }
-    //    }
-    //
-    //   <moveNorth>
-    //   int xoffset=
-    //   int yoffset=
-    //   int x2=
-    //   int y2=
-    //   int actx2=
-    //   int acty2=
-    //   </moveNorth>
+
     /** Some performance optimizations..*/
     private void paintRobotForMoveAnimation(Graphics2D g2d, Image botImage,
                                            int xpos, int ypos, int actx, int acty,
@@ -1590,40 +1598,12 @@ public class BoardView extends JComponent {
 
     }
 
-      private void paintRobot(Graphics2D g2d, Bot robot, int robocount,
-                            int xoffset, int yoffset, boolean eraseFloor){
-       int sfX = sf.getSizeX();
-       int sfY = sf.getSizeY();
+      private void paintRobot(Graphics2D g2d, Bot robot, int robocount){
+
        int xpos = robot.getX()-1;
-       int ypos = sfY-robot.getY();
+       int ypos = sf.getSizeY()-robot.getY();
        int xpos64 = xpos*64;
        int ypos64 = ypos*64;
-       int actx = xpos64;//-64;
-       int acty = ypos64;//-64;
-
-       if (eraseFloor) {// for animating robot movement
-          int x = xpos+1;
-          int y = robot.getY();
-          paintFeldWithElements(g2d, x, y, actx, acty);   // erase old robot image
-
-          // we will also have to erase the field the robot enters
-            if (yoffset<0 && y<sfY){ // moving north => erasing field
-                                              // above (if there is)
-              paintFeldWithElements(g2d, x,y+1, actx, acty-64);
-
-            }
-            else if (yoffset>0 && y>1){ // moving south, erasing field below
-              paintFeldWithElements(g2d, x,  y-1, actx, acty+64);
-            }
-            if (xoffset>0 && x<sfX) {// moving east..
-              paintFeldWithElements(g2d,x+1, y, actx+64, acty);
-            }
-            else if (xoffset<0 && x>1){// moving west
-              paintFeldWithElements(g2d,x-1, y, actx-64, acty);
-            }
-       }
-       xpos64 +=xoffset;
-       ypos64 +=yoffset;
 
        int botVis = robot.getBotVis();
        Image imgRob = robosCrop[robot.getFacing()+botVis*4];
@@ -1656,7 +1636,7 @@ public class BoardView extends JComponent {
 		    Bot robot = robos[robocount];
 		    if((robot.getDamage()<10)&&
 		       (robot.getLivesLeft() > 0)) {
-			paintRobot(g2d, robot, robocount, 0, 0, false);
+			paintRobot(g2d, robot, robocount);
 		    }
 		}
 	    }
@@ -1668,7 +1648,7 @@ public class BoardView extends JComponent {
 		    if((robot.getDamage()<10)&&
 		       (robot.getLivesLeft() > 0)&&
 		       !dontPaintMe.getName().equals(robot.getName())) {
-			paintRobot(g2d, robot, robocount, 0, 0, false);
+			paintRobot(g2d, robot, robocount);
 		    }
 		}
 	    }
