@@ -23,8 +23,10 @@ public class HotKeyConf {
    *                                 I
    */
 
+  public static final int MAGIC_OFFSET_HACK = 10000;
+
   public static final String SHOW_CHATLINE_TEXT = "Enter";
-  public static final int SHOW_CHATLINE = KeyEvent.VK_ENTER;
+  public static final int SHOW_CHATLINE = KeyEvent.VK_ENTER+MAGIC_OFFSET_HACK;
   public static final String HOTKEY_SHOW_CHATLINE = "reservedKeyShowChat";
 
   static {
@@ -120,7 +122,7 @@ public class HotKeyConf {
 
   protected static void setHotKey (HotKey k, boolean save){
    Integer code =  k.getKeyCodeI();
-   if (code!=null && isReserved(code.intValue()))
+   if (code == null || isReserved(code.intValue()))
       return;
    HotKeyAction act = k.getAction();
    String [] opts = act.getOptionalValues();

@@ -226,7 +226,7 @@ public class HotKeyEditorPanel extends JPanel {
     final JTextField keyedit = new JTextField(KEY_FIELD_SIZE);
       keyedit.addKeyListener (new AbstractHotKeyListener(k.getName()){
         public void doStuff (KeyEvent e, int hotKeyCode) {
-          CAT.debug(keyman.dump());
+          //CAT.debug(keyman.dump());
           String oldText = keyedit.getText();
           keyedit.setText("");
           CAT.debug("oldText="+oldText);
@@ -244,7 +244,7 @@ public class HotKeyEditorPanel extends JPanel {
             else {
               keyedit.setText(oldText);
             }
-            CAT.debug(keyman.dump());
+            //CAT.debug(keyman.dump());
           }
           catch (KeyReserved kr) {
              CAT.debug("reserved key!");

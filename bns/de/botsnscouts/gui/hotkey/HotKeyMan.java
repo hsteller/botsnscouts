@@ -31,6 +31,7 @@ public class HotKeyMan {
         hotkeys.put(newkeyCode, k);
         HotKeyConf.setHotKey(k);
       }
+      CAT.debug(dump());
   }
 
 
@@ -39,6 +40,7 @@ public class HotKeyMan {
     hotkeys.put(key.getKeyCodeI(), key);
     keysByName.put(key.getName(), key);
    // HotKeyConf.setKeyCode(key); // necessary??
+   CAT.debug(dump());
   }
 
 
@@ -48,11 +50,15 @@ public class HotKeyMan {
   }
 
   public synchronized void invoke (Integer keyCode) {
+    long start = System.currentTimeMillis();
     HotKey k = (HotKey) hotkeys.get(keyCode);
     CAT.debug("invoking code: "+keyCode==null?null:keyCode.intValue()+"("+keyCode.byteValue()+")");
 
     if ( k != null )
       k.executeAction();
+    long end = System.currentTimeMillis();
+    long total = end - start;
+    CAT.debug("needed "+total+"ms for executing Hotkey-action");
   }
 
   public synchronized HotKey [] getHotKeys() {
@@ -98,6 +104,9 @@ public class HotKeyMan {
     return sb.toString();
   }
 
+  private boolean check() {
+    return hotkeys.size() == keysByName.size();
+  }
 
 
 }

@@ -38,7 +38,7 @@ public class HotKey{
 
 
   protected void setKeyCode(Integer key) throws KeyReserved{
-      if (keyCode.equals(key))
+      if (keyCode != null && keyCode.equals(key))
         return;
       if (key != null && HotKeyConf.isReserved(key.intValue()))
         throw new KeyReserved();

@@ -102,8 +102,9 @@ public class View extends JFrame {
   }
 
   private void showChatLine() {
-     chatLine.setVisible( true );
      chatLine.text.requestFocus();
+     chatLine.setVisible( true );
+
   }
 
   /** Create hotkeys that will be enabled if this is a GUI of a
@@ -188,7 +189,19 @@ public class View extends JFrame {
         // of mixing keyCode/KeyChar seems to work for the beginning !!
         this.addKeyListener(new AbstractHotKeyListener() {
               public void doStuff(KeyEvent e, int hotkeyCode){
-                keyMan.invoke(hotkeyCode);
+                CAT.debug("KEYEVENT:");
+                CAT.debug("code="+e.getKeyCode()+"\tchar="+e.getKeyChar()
+                          +"\t="+e.getKeyText(e.getKeyCode()));
+
+
+
+                CAT.debug("chatline showing?"+chatLine.isShowing());
+
+                if (chatLine.text.hasFocus() && chatLine.isShowing()) {
+                  CAT.debug("chatline has focus, ignoring event");
+                }
+                else
+                  keyMan.invoke(hotkeyCode);
               }
 
           });

@@ -20,16 +20,31 @@ public abstract class AbstractHotKeyListener implements KeyListener {
   public void keyTyped(KeyEvent e) {
      if (CAT.isDebugEnabled()) {
       CAT.debug("KEYTyped!");
-      CAT.debug(HotKey.dumpEvent(e));
+    //  CAT.debug(HotKey.dumpEvent(e));
      }
-      doStuff(e, e.getKeyChar());
+     int code = e.getKeyCode();
+     // <HACK ALERT>
+     if (code == 0) {
+      CAT.warn("HACK ALERT! keycode was 0, so Im using ((int)keyChar)+offset as keycode");
+      code = e.getKeyChar()+HotKeyConf.MAGIC_OFFSET_HACK;
+      CAT.debug("code="+code);
+      doStuff(e, code);
+     }
+     else
+      CAT.debug("ignoring key typed, hoping for key pressed..");
+     // </HACK ALERT>
+    //  doStuff(e, e.getKeyChar());
   }
 
   public void keyPressed(KeyEvent e){
      if (CAT.isDebugEnabled()) {
        CAT.debug("KEYPressed!");
-       CAT.debug(HotKey.dumpEvent(e));
+       CAT.debug("using keycode: "+e.getKeyCode());
+     //  CAT.debug(HotKey.dumpEvent(e));
+       Object o = e.getSource();
+       CAT.debug("source: class="+o.getClass()+"\t"+o.toString());
      }
+
      doStuff(e, e.getKeyCode());
   }
 

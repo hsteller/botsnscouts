@@ -81,8 +81,14 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
     public void componentResized(ComponentEvent parm1) {    }
     public void componentMoved(ComponentEvent parm1) {    }
 
-    public void keyTyped(KeyEvent parm1) {}
+    public void keyTyped(KeyEvent parm1) {
+      text.requestFocus();
+      CAT.debug("keyTyped!");
+    }
     public void keyPressed(KeyEvent parm1) {
+      text.requestFocus();
+      CAT.debug("keyPressed");
+
         if( parm1.getKeyCode() == KeyEvent.VK_ESCAPE ) {
             setVisible( false );
         }
@@ -91,5 +97,8 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
     }
     public void keyReleased(KeyEvent parm1) {}
 
+
+    private void cleanUp (){
+    }
 
 }
