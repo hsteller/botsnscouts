@@ -1004,8 +1004,8 @@ public class BoardView extends JComponent {
         paintFeldBoden(g, xpos, ypos, actx, acty, 64, 64);
     }
 
-
-    private void initFloorHashMap() {
+   //TODO: Make method private again and find a proper way to update the hash map if nec.
+   public void initFloorHashMap() {
         int sizeX = sf.getSizeX();
         int sizeY = sf.getSizeY();
         for (int x = 1; x <= sizeX; x++) {
@@ -1016,6 +1016,7 @@ public class BoardView extends JComponent {
             }
         }
     }
+
 
     private Image getFloorImage(int xpos, int ypos) {
         Floor floor = sf.floor(xpos, ypos);

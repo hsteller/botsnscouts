@@ -100,10 +100,12 @@ class EditMouseListener extends MouseAdapter{
 	}
 	else{ //fliessband etc.
 	    editor.board.setFloor(editor.spfX+1,12-editor.spfY, editor.elemTyp[editor.indx], editor.elemSpez[editor.indx] );
+        editor.boardView.initFloorHashMap();
+
 	}
 	CAT.debug("hab' ich");
 
-        editor.repaint();
+    editor.repaint();
     }
 
 }
