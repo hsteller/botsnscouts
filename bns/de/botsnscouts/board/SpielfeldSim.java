@@ -12,26 +12,6 @@ import de.botsnscouts.server.Server;
  */
 public class SpielfeldSim extends Spielfeld
 {
-  /** Laser-Definition
-   */
-  protected class LaserDef {
-    int strength;  // Staerke des Lasers
-    int facing;    // generische Konstanten, s.u.
-    int x;         // erstes bestrahltes Feld, x-Koordinate
-    int y;         // erstes bestrahltes Feld, y-Koordinate
-    int length;    // Anz. der Felder bis zur ersten Wand (Maximallaenge des Laserstrahls)
-        
-    public LaserDef(int xx,int yy,int f,int s,int l)
-      {
-	x=xx;
-	y=yy;
-	facing=f;
-	strength=s;
-	length=l;
-      }
-  }
-
-
   protected boolean debugmeldungen=true; // Damit mehrere KIs auf einem
                                          // Rechner sich synchronisieren
 
