@@ -114,12 +114,3 @@ public class MainMenu extends JPanel implements  ActionListener{
 
 }//class MainMenu end
 
-class Logo extends JLabel {
-    public Logo() {
-	super();
-	Icon icon = ImageMan.getIcon("bnslogo.jpg");
-	setIcon( icon );
-	setBackground(Color.gray);
-	setBorder( new EtchedBorder(8) );
-    }
-}

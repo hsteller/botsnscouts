@@ -39,8 +39,10 @@ public class Launcher{
 	if (local){
 	    Thread ks;
 	    ks = new SpielerKuenstlich(ip,port,iq);
-	    ks.start();
-	    ks.setPriority(java.lang.Thread.MIN_PRIORITY);
+	    if(ks!=null){
+		ks.start();
+		ks.setPriority(java.lang.Thread.MIN_PRIORITY);
+	    }
 	    return ks;
 	}else{
 	    if(com.newKS(ip,port,1,iq))

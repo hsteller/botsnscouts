@@ -261,4 +261,4 @@ public class StartPanel extends JPanel{
 	thread=th;
     }
 
-}//class StartStart end
+}
