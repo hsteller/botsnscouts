@@ -19,6 +19,7 @@ import org.apache.log4j.Category;
 public class View extends JFrame {
     static Category CAT = Category.getInstance(View.class);
 
+    private ChatPane chatpane;
     private JMenuBar menus;
 
     AusgabeView ausgabeView;
@@ -121,19 +122,28 @@ public class View extends JFrame {
     }
 
     public void addChatPane(ChatPane cp){
+        chatpane = cp;
 	getContentPane().add(cp, BorderLayout.SOUTH);
     }
 
+    public void removeChatPane() {
+        getContentPane().remove(chatpane);
+        chatpane = null;
+    }
 
     protected void quitHumanPlayer() {
          CAT.debug("Telling the human player to quit..");
         if (humanView!=null) {
           humanView.quitHumanPlayer();
+          humanView=null;
           CAT.debug(".. done");
         }
         else {
           CAT.debug("There seems to be no human player, I'm propably a standalone Ausgabe(view)..");
         }
+        CAT.debug("Disposing the frame..");
+        dispose();
+
     }
 
 

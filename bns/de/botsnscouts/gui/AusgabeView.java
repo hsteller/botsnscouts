@@ -223,8 +223,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       return spielFeld;
     }
 
-     private void quit() {
-        ausgabe.quit();
+    /** parameter will be ignored*/
+     private void quit(boolean keepWatching) {
+        ausgabe.quit(keepWatching);
     }
 
     private void d(String s){
@@ -232,6 +233,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     }
 
 
+    /** Ugly; the menubar will be displayed in View*/
     protected JMenuBar getMenuBar() {
       return menus;
     }
@@ -247,13 +249,25 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
     private class FileMenu extends JMenu {
       FileMenu() {
-          super(Message.say("AusgabeFrame", "mFile"));
-          JMenuItem mQuit = new JMenuItem((Message.say("AusgabeFrame","mFinish")));
+          super(Message.say("AusgabeView", "mFile"));
+          JMenuItem mQuit = new JMenuItem((Message.say("AusgabeView","mFinish")));
           mQuit.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e){
-                  quit();
+                  quit(false);
                 }
 	    });
+
+          /*
+          JMenuItem mQuitWatch = new JMenuItem((Message.say("AusgabeView","mFinishButWatch")));
+          mQuit.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e){
+                  quit(true);
+                }
+	    });
+
+          this.add(mQuitWatch);
+          */
+          this.add(mQuit);
       }
     }
 

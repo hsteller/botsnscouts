@@ -480,10 +480,12 @@ public class Ausgabe extends Thread {
       kommClient.abmelden( name );
     }
 
-    protected void quit () {
-        abmelden();
+    protected void quit (boolean keepWatching) {
         view.quitHumanPlayer(); // Tell the view to tell the HumanPlayer to quit, if there is any
-        spielEnde=true;
+      //  if (!keepWatching){
+          abmelden();
+          spielEnde=true;
+       // }
     }
 
 /*

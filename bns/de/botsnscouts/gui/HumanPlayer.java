@@ -216,11 +216,15 @@ public class HumanPlayer extends Thread {
 	    }
 	}
 
-	Global.debug(this," this is my end");
-	try {
-	    ausgabe.join();
+	CAT.debug("Human Player finishes");
+        //view.removeChatPane();
+
+        try {
+         ausgabe.join();
 	} catch(InterruptedException e){e.printStackTrace();}
+
 	return;
+
     }
 
     /**
@@ -415,7 +419,6 @@ public class HumanPlayer extends Thread {
 	ausgabe.start();
 	ChatPane chatpane=new ChatPane(this);
 	view.addChatPane(chatpane);
-        CAT.debug("calling addMenuBar()");
     }
 
 
