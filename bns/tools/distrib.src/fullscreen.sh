@@ -18,7 +18,7 @@
 # X-Display that will be used
 ONDISPLAY=1 
 BASENAME=$PWD/`dirname $0`
-CLASSPATH=$BASENAME/classes:$BASENAME/lib/sixlegs.jar:$BASENAME/lib/log4j.jar:$BASENAME/lib/jakarta-regexp-1.2.jar
+CLASSPATH=$BASENAME/classes:$BASENAME/lib/sixlegs.jar:$BASENAME/lib/log4j.jar:$BASENAME/lib/jakarta-regexp-1.2.jar:$BASENAME/lib/pngenc.jar
 # where your java-VM is
 JAVAPATH=/usr/local/jdk1.3/bin 
 # ----------- don't change anything from here on
