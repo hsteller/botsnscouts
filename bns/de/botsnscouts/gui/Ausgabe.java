@@ -99,7 +99,7 @@ public class Ausgabe extends BNSThread {
     /** Turns animation of robot movement on or off;
      *  visibility is proteced (not private), because BoardView needs to know about that, too.
      */
-    protected static boolean enableRobMoveAnimation = false;
+    protected static boolean enableRobMoveAnimation =  new Boolean (System.getProperty("enableRobMoveAnimation")).booleanValue();//false;
 
     public Ausgabe() {
         this("localhost", 8077, false);
