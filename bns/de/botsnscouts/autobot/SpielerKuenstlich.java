@@ -29,25 +29,25 @@ public class SpielerKuenstlich extends Thread {
     int malus;
 
     String realname;
-    Permu wirbel;  
+    Permu wirbel;
     String spielfeldstring;
     Ort [] fahnen;
     Ort robbiPos;
-		
+
     Roboter	meinRobbi = Roboter.getNewInstance("OrgRobbi");
     KommClientSpieler meinKomm = new KommClientSpieler();
     ClientAntwort antwort = new ClientAntwort();
-	
+
     SpielfeldKS meinSpielfeld;
 
         /**
          * run-Methode erzeugt zufaelligen Namen fuer den kuenstlichen Spieler, meldet ihn an
          * und wartet dann auf Nachrichten vom Server, die entsprechend beantwortet werden
          */
-    public void run() 
-        {  
+    public void run()
+        {
             boolean spielLaeuft;
-    
+
             try{
                 realname=KrimsKrams.randomName();
                 meinKomm.anmelden(ip, port,realname);
@@ -66,7 +66,7 @@ public class SpielerKuenstlich extends Thread {
 		return;
             }
             spielLaeuft=true;
-	
+
             while (spielLaeuft) {
                 d("Warte auf Servermitteilung...");
                 try {
@@ -78,9 +78,9 @@ public class SpielerKuenstlich extends Thread {
                 }
 
                 d("Vom Server erhalten: "+antwort.getTyp());
-		
+
                 switch(antwort.typ) {
-                    case(antwort.ZERSTOERUNG):
+                    case(ClientAntwort.ZERSTOERUNG):
                         if (meinSpielfeld==null) {
                             spielfeldkreieren();
                             wirbel = new Permu(meinSpielfeld,malus);
@@ -95,22 +95,22 @@ public class SpielerKuenstlich extends Thread {
                         antwortaufZerstoerung();
                         break;
 
-                    case(antwort.REPARATUR):
+                    case(ClientAntwort.REPARATUR):
                         d("answer auf Reparatur");
                         robbifuellen();
-			
+
 			hotfix();
 
                         antwortaufReparatur(antwort.zahl);
                         break;
 
-                    case(antwort.MACHEZUG):
+                    case(ClientAntwort.MACHEZUG):
                         boolean powerdown=false;
                         for (int i = 0; i < antwort.karten.length; i++)
                             d("Karte "+i+" ist "+antwort.karten[i].getprio()+"|"+antwort.karten[i].getaktion());
                         robbifuellen();
                         Roboter simRob= Roboter.getCopy(meinRobbi);  // Kopieren fuer spaetere Powerdown-Simulationen
-		    
+
                         Karte[] vollKA = new Karte[9];
 
                         for ( int i = 0; i < antwort.karten.length; i++) vollKA[i] = antwort.karten[i];
@@ -119,7 +119,7 @@ public class SpielerKuenstlich extends Thread {
                         for (int i = 0; i < pRob.getGesperrteRegister().length; i++)
                             pRob.setZug(i, pRob.getGesperrteRegister(i));
                         pRob.zeige_Roboter();
-		    
+
                         Karte[] vonPermut = wirbel.permutiere(vollKA, pRob);
 
                             // Absende-Karten vorbereiten
@@ -142,9 +142,9 @@ public class SpielerKuenstlich extends Thread {
                                 i--;
                             }
                         }
-	  
+
                         Roboter[] simRobs=new Roboter[1];         // Powerdown !?
-                        simRobs[0]=simRob;                        // 
+                        simRobs[0]=simRob;                        //
                         int schadenAlt=simRob.getSchaden();            //
                         for (int i=1;i<6;i++){                        //
                             simRobs[0].setZug(i-1, vonPermut[i-1]);     //
@@ -155,25 +155,25 @@ public class SpielerKuenstlich extends Thread {
                         {
                             simRobs[0].setAktiviert(false);
                             simRobs[0].setSchaden(0);                     //
-                            for (int i=1;i<6;i++){                    // die Phase mit powerdown simulieren 
+                            for (int i=1;i<6;i++){                    // die Phase mit powerdown simulieren
                                 meinSpielfeld.doPhase(i,simRobs);       //
                             }                                         //
                             if (simRobs[0].getSchaden()<=schadenAlt)       //
                                 powerdown=true;                         //
                         }
-	  	  
+
                             // Karten senden
                         meinKomm.registerProg(realname,anServer,powerdown);
                         break;
 
-                    case(antwort.REAKTIVIERUNG):                    // Anfrage vom Server ob Roboter wieder eingesetzt werden möchte
+                    case(ClientAntwort.REAKTIVIERUNG):                    // Anfrage vom Server ob Roboter wieder eingesetzt werden möchte
 
 			hotfix();
 
                         meinKomm.respReaktivierung (realname,false); // Anwort: Roboter wiedereinsetzen
                         break;
 
-                    case(antwort.ENTFERNUNG):
+                    case(ClientAntwort.ENTFERNUNG):
                         d("Wurde aus Spiel entfernt! Grund:"+antwort.str+"\nSende OK an Server.");
                         spielLaeuft=false;
 
@@ -181,7 +181,7 @@ public class SpielerKuenstlich extends Thread {
 
 			meinKomm.bestaetigung();
                         break;
-			
+
                     default:
                         d("Warnung: Ungueltige Serverantwort."+antwort.getTyp());
                         break;
@@ -192,7 +192,7 @@ public class SpielerKuenstlich extends Thread {
 
 
 
-       
+
         /**
          * fuellt einen Roboter meinRobbi mit dem aktuellen RobStatus
          */
@@ -206,12 +206,12 @@ public class SpielerKuenstlich extends Thread {
             }
             return meinRobbi;
         }
-    
+
         /**
-         * erzeugt mit der Spielfelddimension, den Fahnenpositionen und dem 
-         * Spielfeldstring das Spielfeld des kuenstlichen Spielers, ruft 
+         * erzeugt mit der Spielfelddimension, den Fahnenpositionen und dem
+         * Spielfeldstring das Spielfeld des kuenstlichen Spielers, ruft
          * ausserdem die Entfernungsberechnung in SpielfeldKS auf
-         */ 
+         */
     public void spielfeldkreieren()
         {
             d("Spielfeld erzeugen");
@@ -224,7 +224,7 @@ public class SpielerKuenstlich extends Thread {
                 dimy=dimension.y;
 
                 fahnen=meinKomm.getFahnenPos();
-				
+
                 spielfeldstring=meinKomm.getSpielfeld();
                     //d(spielfeldstring);
 
@@ -235,7 +235,7 @@ public class SpielerKuenstlich extends Thread {
                 catch (FlaggenException fe){
                     Global.debug(this,"Flagge auf Grube"+fe);
                 }
-		
+
                 catch (FormatException e){
                     Global.debug(this,"Kein Spielfeld bekommen!"+e);
                 }
@@ -243,12 +243,12 @@ public class SpielerKuenstlich extends Thread {
 
             catch(KommException e){
                 Global.debug(this,"Kein Spielfeld bekommen!"+e);
-            }			
+            }
         }
 
         /**
          * bestimmt und uebermittelt das zu reparierende Register als Antwort auf Reparaturangebot
-         * des Servers 
+         * des Servers
          */
     public void antwortaufReparatur(int reparatur)
         {
@@ -287,7 +287,7 @@ public class SpielerKuenstlich extends Thread {
         for (int i=0;i<4;i++){
             testRobbi.setAusrichtung(i);
             entfernungNeu=meinSpielfeld.getEntfernung(testRobbi);
-            if (entfernungNeu < entfernungBeste) 
+            if (entfernungNeu < entfernungBeste)
             {
                 entfernungBeste = entfernungNeu;
                 richtung=i;
@@ -308,7 +308,7 @@ public class SpielerKuenstlich extends Thread {
             String host="";
 
                 // Kommandozeilenparameter auswerten
-            
+
             try{
                 switch(args.length){
                     case 3:
@@ -325,7 +325,7 @@ public class SpielerKuenstlich extends Thread {
             catch (Exception e) {
                 System.err.println("Usage: java de.botsnscouts.autobot.SpielerKuenstlich <host> <port>");
             }
-            
+
             if (host.equals(""))
                 host="localhost";
             if (sPort==0)

@@ -54,13 +54,13 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
     private String roboOnTrack ="";
 
     private boolean aeFertig,spielFeldErhalten = false;
-    
+
     // --- Objekte
 
     // Statistik-Verwaltung
     StatsList stats;
     Stats actualStats;
-    
+
     // Das Log-Fenster
     LogFrame lF;
     // Komm-Objekt der Ausgabe
@@ -90,16 +90,16 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
     protected JScrollPane mP;
     protected SACanvas spielFeld;
     // Objekt, das Warte-Splash-Screen anzeigt, bevor die Ausgabe angemeldet ist
-    Splash warteSplashScreen; 
+    Splash warteSplashScreen;
     // Kommunikation und Authentifizierung mit dem Server
     private String host, name;
     private int port;
     private boolean nosplash = false;
     private SpielerMensch spieler;
-	
+
     protected boolean spielEnde = false;
 
-    /** @args SpielerMensch spielerref ist Referenz auf umgebenden 
+    /** @args SpielerMensch spielerref ist Referenz auf umgebenden
      *  MenschlichenSpieler, falls Ausgabe zu einem Spieler gehoert,
      *  null sonst.
      */
@@ -112,7 +112,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	super(Message.say("AusgabeFrame","gameName"));
 	this.nosplash=nosplash;
 	// Splash-Screen anzeigen
-	if (!nosplash) { 
+	if (!nosplash) {
 	    warteSplashScreen=new Splash();
 	    warteSplashScreen.showSplash(Message.say("AusgabeFrame","msplashWarte"));
 	}
@@ -125,7 +125,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	    this.ausgabeTyp = false;
 	// Namen ausdenken
 	name = createName();
-	
+
 	// Fenstergröße auf Vollbild setzen
 
 	Toolkit tk=Toolkit.getDefaultToolkit();
@@ -147,7 +147,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 		public void windowClosing(WindowEvent e){
 		    if (spieler!=null)
 			spieler.abmelden();
-		    if (kCA!=null) 
+		    if (kCA!=null)
 			kCA.abmelden(name);
 
 		    dispose();
@@ -231,9 +231,9 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
     }
 
 
-    /** 
+    /**
      * Konstruktor  zum Testen der Ausgabe
-     */ 
+     */
     public AusgabeFrame(){
 	this ("localhost",8077,null);
     }
@@ -268,7 +268,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	return getSize();
     }
 
-    /** 
+    /**
      * needed for beeing used as a SACanvas.ClickListener
      * @see SACanvas.ClickListener, MouseEvent.getModifiers()
      */
@@ -279,13 +279,13 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 
 
     public void trackRob (String rName) {
-	
+
 	    JViewport jV= mP.getViewport();
-	    
+
 	    //	    Global.debug(this,"Versuche, Robi zu tracken: "+rName);
 	    int robix=0;
 	    int robiy=0;
-	    
+
 	    for (int i = 0; i < statusLine.sC.length; i++) {
 		if (rName.equals(statusLine.sC[i].r.getName())) {
 		    if(statusLine.sC[i].r.getSchaden() < 10) {
@@ -317,7 +317,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	Dimension sz = view.getExtentSize();
 	int w2 = sz.width/2;
 	int h2 = sz.height/2;
-	
+
 
 	// make sure we dont want to scoll 'out' to
 	// the left and top
@@ -339,15 +339,15 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
     public void trackPos (int robix, int robiy) {
 
 	    JViewport jV= mP.getViewport();
-	    
+
 	    //	Global.debug(this,"Er steht an Pos x: "+robix+" y: "+robiy);
 	    int x = robix*64;
 	    int y = spielFeld.getHeight()-(robiy*64);
-		
+
 	    Dimension sz = jV.getExtentSize();
 	    int w2 = sz.width/2;
 	    int h2 = sz.height/2;
-	
+
 
 	    // make sure we dont want to scoll 'out' to
 	    // the left and top
@@ -356,19 +356,19 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 
 	    // soll ich überhaupt scrollen?
 	    // in X-Richtung
-	    if ((x < jV.getViewPosition().x) || 
+	    if ((x < jV.getViewPosition().x) ||
 		x > (jV.getViewPosition().x+sz.width)) {
 		x1 = Math.min( x1, (spielFeld.getWidth() - sz.width) );
 	    }
 	    else x1 = jV.getViewPosition().x;
 
 	    // in Y-Richtung
-	    if ((y < jV.getViewPosition().y) || 
+	    if ((y < jV.getViewPosition().y) ||
 		y > (jV.getViewPosition().y+sz.height)) {
 		y1 = Math.min( y1, (spielFeld.getHeight() - sz.height) );
 	    }
 	    else y1 = jV.getViewPosition().y;
-	
+
 	    jV.setViewPosition(new Point(x1, y1));
 	    spielFeld.highlight(robix, robiy);
     }
@@ -378,21 +378,21 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
      * Statusleiste der spielenden Roboter
      */
     protected class StatusPanel extends TJPanel {
-	StatusCanvas[] sC = new StatusCanvas[8];	  
+	StatusCanvas[] sC = new StatusCanvas[8];
 	TJPanel schlaf = new TJPanel(new FlowLayout(FlowLayout.RIGHT));
 	TJPanel stat = new TJPanel(new FlowLayout(FlowLayout.LEFT));
-	
+
 	public StatusPanel(){
 	    this.setSize(ausgabeFrameSize().width,60);
 	    this.setLayout(new BorderLayout());
 	    for (int i = 0; i < sC.length; i++) {
-		sC[i] = new StatusCanvas(robocolor[i]); 
+		sC[i] = new StatusCanvas(robocolor[i]);
 		stat.add(sC[i]);
 	    }
 	    this.add(stat,BorderLayout.WEST);
 	}
 	public void setRobStatus(String rname, Roboter rob) {
-	    for (int i = 0; i < sC.length; i++) 
+	    for (int i = 0; i < sC.length; i++)
 		if (rname.equals(sC[i].r.getName())) {
 		    sC[i].setRob(rob,i);
 		}
@@ -413,7 +413,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	Color robcolor;
 	int gewinnerNr = 0;
 	int xsize=75, ysize=60;
-	
+
 	StatusCanvas () {
 	    this.addMouseListener(this);
 	    r = Roboter.getNewInstance("foobar");
@@ -432,16 +432,16 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	    r = rin;
 	    robcolor = c;
 	}
-	
-	
+
+
 	public Dimension getMinimumSize() {
 	    return new Dimension(xsize,ysize);
 	}
-	
+
 	public Dimension getPreferredSize() {
 	    return new Dimension(xsize,ysize);
 	}
-	
+
 
 	public void setName (String s) {
 	    //	    r.setName(s);
@@ -450,7 +450,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 
 	public void setRob (Roboter rob,int color) {
 	    // --- hat sich wirklich was veraendert?
-	    if ((r.getLeben() != rob.getLeben()) || 
+	    if ((r.getLeben() != rob.getLeben()) ||
 		(r.getNaechsteFlagge() != rob.getNaechsteFlagge()) ||
 		(r.getSchaden() != rob.getSchaden()) ||
 		(r.istAktiviert() != rob.istAktiviert())) {
@@ -460,7 +460,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	    }
 	    else {r=rob;}
 	}
-	
+
 	// Malt die Gewinnernummer für diesen Rob, falls er
 	// das Spiel schon beendet hat
 	public void setGewinnerNr(int n){
@@ -507,11 +507,11 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 		g.drawString(Message.say("AusgabeFrame","goalFlag")+r.getNaechsteFlagge(),2,28);
 		g.drawString(Message.say("AusgabeFrame","lifes")+r.getLeben(),2,40);
 		g.drawString(Message.say("AusgabeFrame","hurt")+r.getSchaden(),2,53);
-		
-	       
+
+
 	    }
 	}
-    
+
 	public void mouseClicked(MouseEvent e){
 	    int mods = e.getModifiers();
 	    // mouse button 3: scroll to  clicked rob
@@ -519,12 +519,12 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 		System.out.println("robbifinder" + r.getName());
 		trackRob( r.getName() );
 		return;
-	    } 
-	    if(stc==null) stc = new ScopeStat(r); 
+	    }
+	    if(stc==null) stc = new ScopeStat(r);
 	    else {
 		stc.dispose();
 		stc=null;
-	    } 
+	    }
 	}
 	public void mouseEntered(MouseEvent e){}
 	public void mouseExited(MouseEvent e){
@@ -554,11 +554,11 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	public Dimension getMinimumSize() {
 	    return new Dimension(xsize,ysize);
 	}
-	
+
 	public Dimension getPreferredSize() {
 	    return new Dimension(xsize,ysize);
 	}
-	
+
 
 
 	public void paint(Graphics g) {
@@ -603,7 +603,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	public Dimension getMinimumSize() {
 	    return new Dimension(xsize,ysize);
 	}
-	
+
 	public Dimension getPreferredSize() {
 	    return new Dimension(xsize,ysize);
 	}
@@ -640,7 +640,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
      */
     protected class SchlafScoutCanvas extends Canvas {
 	int xsize=60, ysize=60;
-	
+
 	SchlafScoutCanvas() {
 	    super();
 	    this.setName(Message.say("AusgabeFrame","scout"));
@@ -650,7 +650,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	public Dimension getMinimumSize() {
 	    return new Dimension(xsize,ysize);
 	}
-	
+
 	public Dimension getPreferredSize() {
 	    return new Dimension(xsize,ysize);
 	}
@@ -678,7 +678,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	public Dimension getMinimumSize() {
 	    return new Dimension(xsize,ysize);
 	}
-	
+
 	public Dimension getPreferredSize() {
 	    return new Dimension(xsize,ysize);
 	}
@@ -720,7 +720,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	public void windowDeiconified(WindowEvent e) {}
 	public void windowActivated(WindowEvent e)   {}
 	public void windowClosed(WindowEvent e)   { this.setVisible(false);}
-	
+
 	public void mouseClicked(MouseEvent e){this.setVisible(false);}
 	public void mouseEntered(MouseEvent e){}
 	public void mouseExited(MouseEvent e){this.setVisible(false);}
@@ -747,7 +747,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
     /**
      * Fenster, das weitere Statusinfos anzeigt
      */
-    
+
     protected class ScopeStat extends Frame {
 
 	Label name, gesperrt, gelegt, archivpos, aktiviert, virtuell, pos;
@@ -766,15 +766,15 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 
 	    // ---- gesperrte Regisster toString
 	    String gespReg = "[ ";
-	    if (r.gesperrteRegs() > 0) 
-		for (int i = 0; i < r.gesperrteRegs(); i++) 
+	    if (r.gesperrteRegs() > 0)
+		for (int i = 0; i < r.gesperrteRegs(); i++)
 		    if (r.getGesperrteRegister()[i] != null) gespReg+= r.getGesperrteRegister()[i].getaktion() + " | ";
 	    gespReg += "]";
 
 	    // ---- gelegte Karten toString
 	    String gelegtKarte = "[ ";
-	    if (r.getZug() != null) 
-		for (int i = 0; i < r.getZug().length; i++) 
+	    if (r.getZug() != null)
+		for (int i = 0; i < r.getZug().length; i++)
 		    if (r.getZug()[i] != null) gelegtKarte+= r.getZug()[i].getaktion() + " | ";
 	    gelegtKarte += "]";
 
@@ -808,7 +808,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	}
 
     }
-    
+
 
     /*+
      * Panel für die Statuszeile
@@ -864,7 +864,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 		group.setSelected( item.getModel(), true );
 	    }
 	}
-			
+
 	public void actionPerformed(ActionEvent e) {
 	    int iScale;
 	    try {
@@ -909,7 +909,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	RoboTrackListener(Roboter r) {
 	    this.r = r;
 	}
-	
+
 	public void actionPerformed(ActionEvent e) {
 	    roboOnTrack=r.getName();
 	    trackRob( r.getName() );
@@ -926,35 +926,35 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 
 	//	setStatus(Message.say("AusgabeFrame","Anmeldung"));
 	int versuche = 0;
-	while ((!anmeldungErfolg)&&(versuche < 3)) { 
+	while ((!anmeldungErfolg)&&(versuche < 3)) {
 	    try{
-		anmeldungErfolg = kCA.anmelden2(host,port,name); 
-	    } 
+		anmeldungErfolg = kCA.anmelden2(host,port,name);
+	    }
 	    catch (KommException kE) {
-		System.err.println(kE.getMessage()); 
+		System.err.println(kE.getMessage());
 		if(!nosplash)warteSplashScreen.setText(Message.say("AusgabeFrame","msplashFehlerAnmeldung"));
-		Global.debug("Ausgabe: Anmeldung fehlgeschlagen."); } 
-	    versuche++; 
+		Global.debug("Ausgabe: Anmeldung fehlgeschlagen."); }
+	    versuche++;
 	    try {Thread.sleep(3000);} catch (Exception e) {System.err.println(e.getMessage());}
 	}
 	if (!anmeldungErfolg) {
 	    new Fehlermeldung(Message.say("AusgabeFrame","eAnmeldung"));
-	    Global.debug(this, "Ausgabe: Beende Versuche.");  
+	    Global.debug(this, "Ausgabe: Beende Versuche.");
 	    // entferne das Splash-Screen
 	    if(!nosplash)warteSplashScreen.setText(Message.say("AusgabeFrame","msplashEnde"));
 	    try {Thread.sleep(1000);} catch (Exception e) {System.err.println(e.getMessage());}
 	    if(!nosplash)warteSplashScreen.noSplash();
-	    
+
 	    return;
 	}
 	else {Global.debug("Ausgabe: Anmeldung erfolgt.");
 	}
 
 
-	
+
 	// ---- Einstieg in die grosse Schleife ---------
 	while (!spielEnde) {
-	    
+
 	    // ------- Empfang einer Server-Meldung  -------
 	    try {
 		cA = kCA.warte();
@@ -966,15 +966,15 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	    catch (KommException ke) {
 		System.err.println("ke: "+ke.getMessage());
 	    }
-	
+
 	    switch (cA.typ) {
-		
+
 				// ---------- Das Spiel beginnt ------
-	    case (cA.SPIELSTART): { 
+	    case (ClientAntwort.SPIELSTART): {
 		break;
 	    }
 
-	    case (cA.MESSAGE):{
+	    case (ClientAntwort.MESSAGE):{
 		String[] tmpstr=new String[cA.namen.length-1];
 		for (int i=0;i<tmpstr.length;i++)
 		    tmpstr[i]=cA.namen[i+1];
@@ -988,12 +988,12 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 		    try {
 			r1=kCA.getRobStatus(cA.namen[1]);// schiessender Roboter
 			r2=kCA.getRobStatus(cA.namen[2]);// getroffener Roboter
-			
+
 			actualStats=stats.getStats(r1.getName());
 			actualStats.incHits();
 			if (r2.getSchaden()>=10)
 			    actualStats.incKills();
-		  
+
 			actualStats=stats.getStats(r2.getName());
 			actualStats.incDamageByRobots();
 		    }
@@ -1022,7 +1022,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 	 		strength   = Integer.parseInt(cA.namen[2]);
 			laserPos.x = Integer.parseInt(cA.namen[3]);
 			laserPos.y = Integer.parseInt(cA.namen[4]);
-			facing     = Integer.parseInt(cA.namen[5]); 
+			facing     = Integer.parseInt(cA.namen[5]);
        		    }
 		    catch (NumberFormatException nfe) {
 			//System.err.println("AusgabeFrame: BoardLaser: NumberFormatException:");
@@ -1042,14 +1042,14 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 			System.err.println("strength: "+strength);
 		    }
 		}
-		
-		
+
+
 		kCA.aenderungFertig();
                 Global.debug(this,"Nachricht bearbeitet.");
 		break;
 	    }
 		// --------- Aenderung eingetroffen -----------
-	    case (cA.AENDERUNG): {
+	    case (ClientAntwort.AENDERUNG): {
 		Global.debug("Ausgabe: Aenderung eingetroffen.");
 
 
@@ -1057,23 +1057,23 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 		Global.debug("Ausgabe: Bei "+cA.namen.length+" Robotern hat sich was geändert.");
 		try { String[] spNamen = cA.namen;
 		Roboter robsAnSpielfeld[] = new Roboter[statusLine.stat.getComponentCount()];
-		
+
 		for (int i = 0; i < spNamen.length; i++) {
 		    if (spNamen[i].equals(roboOnTrack)) {
 			trackRob(roboOnTrack);
 		    }
 		    statusLine.setRobStatus(spNamen[i],kCA.getRobStatus(spNamen[i]));
-		}    
+		}
 		for (int i = 0; i < statusLine.stat.getComponentCount(); i++) {
 		    robsAnSpielfeld[i] = statusLine.sC[i].r;
 		}
 		Global.debug("Ausgabe: Habe"+robsAnSpielfeld.length+" Roboter an Spielfeld geschickt.");
-		
-		
+
+
 		// --------- Neue Roboter-Position an Spielfeld senden ---------
 		try {Thread.sleep(speed);} // Verzögerung der Ausgabegeschwindigkeit
-		catch (Exception e) {System.err.println(e.getMessage());} 
-		
+		catch (Exception e) {System.err.println(e.getMessage());}
+
 		// --------- weitere Aenderungen einholen
 		Global.debug("Ausgabe: Hole Spielstatus...");
 		try {
@@ -1089,7 +1089,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 
 		    // --------- hat schon jemand seine Zielfahne erreicht?
 		    String[] spStand = kCA.getSpielstand();
-		    
+
 		    if (spStand != null) {
 			Global.debug(this,"Es gibt schon Spieler, die am Ziel sind; hole Gewinnerliste...");
 			for (int j = 0; j < spStand.length; j++) {
@@ -1101,28 +1101,28 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 			}
 		    }
 
-		    
+
 		}
 		//	catch (KommException kE) {System.err.println(kE.getMessage());}
 		catch (KommFutschException ke) {System.err.println("kE3: "+ke.getMessage());return;}
 		catch (KommException kE) {System.err.println(kE.getMessage());}
-		
+
 		spielFeld.ersetzeRobos(robsAnSpielfeld);
 		}
 		catch (KommFutschException ke) {System.err.println("ke2: "+ke.getMessage());
 		return;}
 		catch (KommException kE) {System.err.println(kE.getMessage());}
-		
-	
+
+
 		// Info-Requests beenden
 		Global.debug(this, "Ausgabe: Sende Aenderung fertig an Server.");
 		kCA.aenderungFertig();
 		break;
 	    }
-	    case (cA.ENTFERNUNG): { 
-		
+	    case (ClientAntwort.ENTFERNUNG): {
+
 		Global.debug(this,"Das Spiel ist beendet.");
-		
+
 		// Gewinnerliste ausgeben
 		mP.setVisible(false);
 		mP.removeAll();
@@ -1147,14 +1147,14 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 		spielEnde = true;
 	    }
 	    }
-	    
+
 	    // ------- Einmaliges Holen des Spielfeldes und ermitteln der Spieler -----
-	    // ...und holen der Statistik.. 
-	    
+	    // ...und holen der Statistik..
+
 	    if (!spielFeldErhalten) {
 
 				// ------------- Spieler erfragen und den Status anlegen ------------
-		try { 
+		try {
 		    Global.debug(this,"Versuche, Namen zu holen...");
 		    String[] spNamen = kCA.getNamen();
 		    String[] spColor = kCA.getFarben();
@@ -1191,7 +1191,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 		    // ------------- unnoetige entfernen -------------
 		    for (int i = 8; i > spNamen.length; i--) statusLine.stat.remove(statusLine.stat.getComponentCount()-1);
 		    Roboter robsAnSpielfeld[] = new Roboter[statusLine.stat.getComponentCount()];
-		    
+
 		    // --------- Status erzeugen  und RoboTrack-Menü erweitern  -----------------
 		    JMenuItem trackItem = new JMenuItem(Message.say("AusgabeFrame","trackAus"));
 		    trackItem.addActionListener( new ActionListener() {
@@ -1205,7 +1205,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 			trackItem = new JMenuItem(spNamen[i]);
 			trackItem.addActionListener( new RoboTrackListener(statusLine.sC[i].r));
 			optTrack.add(trackItem);
-		    }    
+		    }
 
 		    spielFeld.addClickListener( this );
 
@@ -1223,8 +1223,8 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 			flagPos[i].addActionListener(flagListener);
 			scrollFlag.add(flagPos[i]);
 		    }
-		    
-		    
+
+
 		    // ------ Roboter an das Spielfeld senden und Listener aktivieren --------
 		    for (int i = 0; i < statusLine.stat.getComponentCount(); i++) {
 			robsAnSpielfeld[i] = statusLine.sC[i].r;
@@ -1248,7 +1248,7 @@ public class AusgabeFrame extends JFrame implements Runnable, SACanvas.ClickList
 		mP.repaint();
 		// entferne das Splash-Screen
 		if(!nosplash)warteSplashScreen.noSplash();
-		
+
 		setVisible(true);
 		scrollFlag(1);
 

@@ -5,7 +5,7 @@ import  de.botsnscouts.util.*;
 import  de.botsnscouts.comm.*;
 import  de.botsnscouts.autobot.*;
 import  de.botsnscouts.board.*;
-import de.botsnscouts.server.KartenStapel; 
+import de.botsnscouts.server.KartenStapel;
 
 import java.awt.*;
 import java.io.*;
@@ -109,11 +109,11 @@ public class SpielerMensch extends Thread {
 		public Dimension getMaximumSize() {
 		    return new Dimension(220,550);
 		}
-		
+
 		public Dimension getPreferredSize() {
 		    return new Dimension(220,550);
 	}
-		
+
 	    };
 	uI = new UserInterfacePanel();
 	gR = new GebeRichtung();
@@ -163,17 +163,17 @@ public class SpielerMensch extends Thread {
     private void sendeReparaturWunsch() {
 		int[] repa = new int[reparaturPunkte];
 		for (int i = 0; i < repa.length; i++) {
-		    repa[i] = uI.regZuReparieren[i]; 
+		    repa[i] = uI.regZuReparieren[i];
 		    uI.register[(repa[i]-1)].status = FREI;
 		}
 		kCS.respReparatur(name,repa);
 		setStatus(Message.say("SpielerMensch","sendregrep"));
 		uICardLayout.show(userInterfaceContainer,"leer");
     }
-    
+
 
     private void sendeWunschRichtung(int r) {
-		kCS.respZerstoert(name,r); 
+		kCS.respZerstoert(name,r);
 		uICardLayout.show(userInterfaceContainer,"warten");
 
     }
@@ -211,10 +211,10 @@ public class SpielerMensch extends Thread {
 		//		Global.debug("Klugscheisser geh schlafen...");
 		wegMitKlug();
 	    }
-	    
+
     }
-	
-    
+
+
 
 
     public void scoutClicked(boolean scoutWecken) {
@@ -230,8 +230,8 @@ public class SpielerMensch extends Thread {
 		if(!spielEnde) removeScout();
 	    }
     }
-    
-    
+
+
 
 
 
@@ -292,7 +292,7 @@ public class SpielerMensch extends Thread {
      * Setzt den Scout für das Feld, das den gelegten Karten entspricht
      **/
     private void removeScout() {
-	// -------- entferne Scout 
+	// -------- entferne Scout
 	Roboter[] doPhaseRob = new Roboter[1];
 
 	doPhaseRob[0] = Roboter.getCopy(f.statusLine.sC[myRobIndex].r);
@@ -300,7 +300,7 @@ public class SpielerMensch extends Thread {
 	int moeglichePhasen = 0;
 	f.spielFeld.vorschau(moeglichePhasen,doPhaseRob);
     }
-    
+
 
 
     // aktivert den Klugscheisser
@@ -324,7 +324,7 @@ public class SpielerMensch extends Thread {
 	// gelegte Karten in das enstprechende gesperrte Register des Robis packen
 	for (int l = 0; l<5;l++) {
 	    if (!uI.register[l].istFrei()) {
-		r.sperreRegister(l,  KartenStapel.get(uI.register[l].kartePrio,uI.register[l].karteName));       
+		r.sperreRegister(l,  KartenStapel.get(uI.register[l].kartePrio,uI.register[l].karteName));
 	    }
 	}
 	// gesperrte Register in r.zug schreiben
@@ -338,24 +338,24 @@ public class SpielerMensch extends Thread {
 	// in vonPermut steht die vorgeschlagene Registerprogrammierung, so wie sie ggf. z.T.schon
 	// in den Registern steht
 	int nextprio =-1;
-	for (int su=0; su<5;su++) 
+	for (int su=0; su<5;su++)
 	    if ((uI.register[su].kartePrio) != (vonPermut[su].getprio())){
                 nextprio = vonPermut[su].getprio();
                 break;
             }
-	
-	for (int ka=0; ka<9;ka++) 
+
+	for (int ka=0; ka<9;ka++)
             if (uI.karten[ka].prio == nextprio) {uI.karten[ka].setKlug(true);break;}
     }
 
     // entfernt den Klugscheisser
     private void wegMitKlug() {
-	for (int weg=0; weg<9;weg++) 
-	    if(uI.karten[weg].klugScheisser) uI.karten[weg].setKlug(false); 
+	for (int weg=0; weg<9;weg++)
+	    if(uI.karten[weg].klugScheisser) uI.karten[weg].setKlug(false);
 	// f.statusLine.Kschlaf.removeAll();
 	// f.statusLine.Kschlaf.add(f.statusLine.SkSC);
 	//	klugAktiv = false;
-	
+
     }
 
     // ------------ Innere Klassen -------------
@@ -385,7 +385,7 @@ public class SpielerMensch extends Thread {
 		    boolean alleBelegt = true;
 		    for (int j = 0; j < 5; j++) {
 			if (uI.register[j].status == FREI) {
-			    alleBelegt = false; 
+			    alleBelegt = false;
 			    break;
 			}
 		    }
@@ -400,7 +400,7 @@ public class SpielerMensch extends Thread {
 	}
 
     }
-    
+
     /**
      * Wartet auf einen Mausklick auf einem Register
      */
@@ -457,7 +457,7 @@ public class SpielerMensch extends Thread {
 
     /**
      * Verwaltet und stellt dar die Benutzerschnittstelle
-     */    
+     */
     private class UserInterfacePanel extends JPanel {
 
 	KarteCanvas karten[] = new KarteCanvas[9];
@@ -501,7 +501,7 @@ public class SpielerMensch extends Thread {
 	    int j = 0;
 	    for (int i = 0; i < 5; i++) {
 		if (register[i].status != GESPERRT) {
-		    prog[j] = register[i].karteAusteilNum; 
+		    prog[j] = register[i].karteAusteilNum;
 		    j++; }
 	    }
 	    return prog;
@@ -515,9 +515,9 @@ public class SpielerMensch extends Thread {
     private class UserPanel extends JPanel {
 	JButton absenden;
 	JCheckBox powerDownBox;
-	
+
 	UserPanel() {
-	    setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));		
+	    setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 	    powerDownBox = new JCheckBox(Message.say("SpielerMensch","powerdown"),false);
 	    powerDownBox.setFont(new Font("Sans",0,8));
 	    powerDownBox.addItemListener(pDL);
@@ -530,7 +530,7 @@ public class SpielerMensch extends Thread {
       	    absenden.setVisible(false);
 	    add(absenden);
 	}
-	
+
 
     }
 
@@ -562,7 +562,7 @@ public class SpielerMensch extends Thread {
 	    status = FREI;
 	    born = img;
 	}
-	
+
 
 	public void paint(Graphics g)
 	{
@@ -578,7 +578,7 @@ public class SpielerMensch extends Thread {
 	/**
 	 * Hat der Benutzer diese Karte in ein Register gelegt, dann wir diese Methode aufgerufen
 	 * Sie "dreht" die Karte auf den Ruecken und markiert sie als "gelegt".
-	 */	
+	 */
 	public void umdrehen() {
 	     img = RUECK;
 	     //	     prio = 0;
@@ -589,13 +589,13 @@ public class SpielerMensch extends Thread {
 
 	/**
 	 * Wurden Karten < 9 ausgeteilt, dann wir diese Methode aufgerufen
-	 */  
+	 */
 	public void sperren() {
 	     born = RUECK;
 	     bornprio = 0;
 	     img = RUECK;
 	     prio = 0;
-	    
+
 	     status = GESPERRT;
 	     repaint();
 	 }
@@ -636,7 +636,7 @@ public class SpielerMensch extends Thread {
 	    repaint();
 	}
     }
- 
+
     /**
      * Verwaltet und stellt dar die Register
      */
@@ -730,7 +730,7 @@ public class SpielerMensch extends Thread {
 
 	public GebeRichtung() {
 	    setLayout(new BorderLayout());
-	    
+
 	    JLabel titel = new JLabel(Message.say("SpielerMensch","richtungwahl"));
 	    add(titel,BorderLayout.NORTH);
 	    TJPanel p = new TJPanel();
@@ -765,7 +765,7 @@ public class SpielerMensch extends Thread {
 	    uICardLayout.show(userInterfaceContainer,"leer");
 	    sendeWunschRichtung(((PfeilC) e.getSource()).richt);
 	}
-	
+
 	private class PfeilC extends JButton {
 	    private int richt = NORD;
 	    PfeilC(String s, int r){
@@ -830,7 +830,7 @@ public class SpielerMensch extends Thread {
 	    add(l);
 	}
     }
-    
+
 
 
 
@@ -852,7 +852,7 @@ public class SpielerMensch extends Thread {
 	    add(titel);
 	    JLabel unter = new JLabel(Message.say("SpielerMensch","powerdownwieder"));
 
-	    add(unter); 
+	    add(unter);
 	    add(Box.createVerticalStrut(10));
 	    wieder=new JButton(Message.say("SpielerMensch","wiederPowerFrage"));
 	    wieder.addActionListener(this);
@@ -946,14 +946,14 @@ public class SpielerMensch extends Thread {
 			    uI.regZuReparieren[i]=5;i++;
 			}
 			sendeReparaturWunsch();
-			
+
 		    }
 		});
 	    add(fertig);
 	    setVisible(true);
 	}
 
-	private void zeigeAuswahl() {	
+	private void zeigeAuswahl() {
 	    zuVerteilen = reparaturPunkte;
 	    titel.setText(Message.say("SpielerMensch","mregwahl",reparaturPunkte)+" SIND:"+reparaturPunkte);
 
@@ -990,11 +990,11 @@ public class SpielerMensch extends Thread {
 	}
 
 	public void actionPerformed (ActionEvent e) {
-	    if ( ((JCheckBox) e.getSource()).getModel().isSelected()) { 
-		if (zuVerteilen > 0) { 
-		    zuVerteilen--; 
+	    if ( ((JCheckBox) e.getSource()).getModel().isSelected()) {
+		if (zuVerteilen > 0) {
+		    zuVerteilen--;
 		}
-		else { 
+		else {
 		    ((JCheckBox) e.getSource()).getModel().setSelected(false);
 		}
 	    }
@@ -1004,10 +1004,10 @@ public class SpielerMensch extends Thread {
 	}
     }
     /**
-     * erzeugt mit der Spielfelddimension, den Fahnenpositionen und dem 
-     * Spielfeldstring das Spielfeld des kuenstlichen Spielers, ruft 
+     * erzeugt mit der Spielfelddimension, den Fahnenpositionen und dem
+     * Spielfeldstring das Spielfeld des kuenstlichen Spielers, ruft
      * ausserdem die Entfernungsberechnung in SpielfeldKS auf
-     */ 
+     */
     private void spielfeldkreieren()
     {
 	int dimx, dimy;
@@ -1021,29 +1021,29 @@ public class SpielerMensch extends Thread {
 	    try{
 		meinSpielfeld = SpielfeldKS.getInstance(dimx,dimy,spielfeldstring,fahnen);
 	    }
-		
+
 	    catch(Exception e){
 		System.err.println("Kein Spielfeld bekommen!"+e);
-	    }			
+	    }
 	}
 	catch(Exception e){
 	    System.err.println("Kein Spielfeld bekommen!"+e);
 	}
     }
-    
+
     /** meldet den Spieler beim Server ab und beendet diesen Thread.
 	(TODO)
     */
     protected void abmelden() {
 	Global.debug(this, "Roboter "+name+" meldet sich ab.");
 	kCS.abmelden(name);
-	//Dafuer sorgen, dass Thread aufhoert 
+	//Dafuer sorgen, dass Thread aufhoert
 	spielEnde = true; //War's das etwa?
     }
 
     /**
      * Start des Menschlichen Spielers
-     */ 
+     */
     public void run(){
 	Global.debug(this,"SpielerMensch run() angefangen!");
 	Thread th = new Thread(f);
@@ -1056,24 +1056,24 @@ public class SpielerMensch extends Thread {
 	while ((!anmeldungErfolg)&&(versuche < 5)) {
 	    Global.debug(this,(versuche+1) + ".ter Versuch an "+host+" an Port "+port);
 	    try {sleep(500);} catch (Exception e) {}
-	    
+
 	    // hies früher - ohne Farbe
 	    try{
 		anmeldungErfolg = kCS.anmelden2(host,port,name,myColor);
-	    } 
+	    }
 	    catch (KommException kE){
-		Global.debug(this,kE.getMessage()); 
-	    } 
-	    versuche++; 
+		Global.debug(this,kE.getMessage());
+	    }
+	    versuche++;
 	    try {sleep(100);} catch (Exception e) {}
 	}
 	if (!anmeldungErfolg) {
-	    Global.debug(this,"Beende Versuche, mich anzumelden.");  
+	    Global.debug(this,"Beende Versuche, mich anzumelden.");
 	    try{
 		th.join();
 	    }catch(InterruptedException e){}
 	    return;
-	    
+
 	}
 
 	// ----------- Ausgabe als Thread starten
@@ -1109,7 +1109,7 @@ public class SpielerMensch extends Thread {
 	    switch (cA.typ) {
 
 				// Servermeldung: Karten wurden ausgeteilt
-	    case (cA.MACHEZUG): {
+	    case (ClientAntwort.MACHEZUG): {
 		Global.debug(this,"Ich bekomme MACHEZUG");
 		uICardLayout.show(userInterfaceContainer,"karten");
 		klugscheisserLatte.reset();
@@ -1159,7 +1159,7 @@ public class SpielerMensch extends Thread {
 		}
 
 				// ----- Karten umdrehen --------
-		for (int i = cA.karten.length; i < 9; i++) uI.karten[i].umdrehen(); 
+		for (int i = cA.karten.length; i < 9; i++) uI.karten[i].umdrehen();
 
 		for (int i = 0; i < 5; i++) uI.register[i].addMouseListener(rKL);
 		scoutAllowed=true;
@@ -1171,7 +1171,7 @@ public class SpielerMensch extends Thread {
 		abgabeFertig = false; // Kartenabgeabe fuer das naechste Mal zureucksetzen
 		int temptimeout = globalTimeout-5;
 		while ((!abgabeFertig) && (temptimeout > 0)) {
-		    try { 
+		    try {
 			sleep(1000);
 			temptimeout--;
 
@@ -1179,7 +1179,7 @@ public class SpielerMensch extends Thread {
 						       Message.say("SpielerMensch","zeitAblauf")
 						       +temptimeout+ Message.say("SpielerMensch","sekunden")
 						       );
-		    } catch (Exception e) {System.err.println(e.getMessage());}		
+		    } catch (Exception e) {System.err.println(e.getMessage());}
 		}
 
 				// -------- falls Timeout -> gueltigen Zug abgeben
@@ -1199,13 +1199,13 @@ public class SpielerMensch extends Thread {
 		if (uI.powerDown) {
 		    uICardLayout.show(userInterfaceContainer,"istpowerdown");
 		}
-		
+
 		// Button deaktivieren
 		uI.uP.absenden.setVisible(false);
 
 				// ------- Mouse Listener entfernen  -------
 		scoutAllowed=false;
-		for (int i = 0; i < uI.karten.length; i++) uI.karten[i].removeMouseListener(KListener); 
+		for (int i = 0; i < uI.karten.length; i++) uI.karten[i].removeMouseListener(KListener);
 		for (int i = 0; i < 5; i++) uI.register[i].removeMouseListener(rKL);
 
 				// ------- PowerDown Box auf false setzen ----------
@@ -1213,16 +1213,16 @@ public class SpielerMensch extends Thread {
 
 		break;
 	    }
-		
+
 	    // Servermeldung: Spielbegin
-	    case (cA.SPIELSTART): {
+	    case (ClientAntwort.SPIELSTART): {
 		setStatus(Message.say("SpielerMensch","spielgehtlos"));
 		kCS.spielstart(); // ok an den Server senden
 		break;
 	    }
 
 	    // Servermeldung: Robter zerstoert (bzw. bei Spielbegin aufs Feld gesetzt)
-	    case (cA.ZERSTOERUNG): {
+	    case (ClientAntwort.ZERSTOERUNG): {
 		uICardLayout.show(userInterfaceContainer,"richtung");
 		Global.debug(this,"Habe einer Zerstörung bekommen.");
 		setStatus(Message.say("SpielerMensch","roboauffeld"));
@@ -1242,14 +1242,14 @@ public class SpielerMensch extends Thread {
 		}
 		Global.debug(this,"Timeout ist: "+globalTimeout);
 		//----- Ausrichtung abfragen und senden ----
-		
+
 		uI.wunschRichtung = -1;
 		break;
 	    }
 
 
 	    // Servermeldung: Robter nach Power-Down reaktiviert
-	    case (cA.REAKTIVIERUNG): { 
+	    case (ClientAntwort.REAKTIVIERUNG): {
 		setStatus(Message.say("SpielerMensch","roboreaktiviert"));
 				// -------- Nochmaliges PowerDown abfragen und senden ------
 		uICardLayout.show(userInterfaceContainer,"wiederpowerdown");
@@ -1257,7 +1257,7 @@ public class SpielerMensch extends Thread {
 	    }
 
 	    // Servermeldung: Register wurden Repariert
-	    case (cA.REPARATUR):{ 
+	    case (ClientAntwort.REPARATUR):{
 		    Global.debug(this,"Reparatur erhalten");
 
 				// ---------- gesperrte Register nachfragen
@@ -1277,22 +1277,22 @@ public class SpielerMensch extends Thread {
 			    Global.debug(this,"Server sagt: Register gesperrt: "+i);
 			}
 			else {
-			    uI.register[i].status=FREI; 
-			uI.register[i].resetRegister(); 
+			    uI.register[i].status=FREI;
+			uI.register[i].resetRegister();
 			}
 		    }
-		
+
 		}
 		catch (KommException kE) {
 		System.err.println("SpielerMensch: "+kE.getMessage());
 		}
 
-		  for (int i = 0; i < uI.register.length; i++) 
-		  Global.debug(this,"SpM: Register "+i+" hat Status: "+uI.register[i].status);	
+		  for (int i = 0; i < uI.register.length; i++)
+		  Global.debug(this,"SpM: Register "+i+" hat Status: "+uI.register[i].status);
 
 		setStatus(Message.say("SpielerMensch","registerrep"));
 		Global.debug(this,"Anzahln der Reparaturpunkte: "+reparaturPunkte);
-		
+
 		// ----- Abfrage und Senden der Register, die repariert werden sollen ---
 
 		// ergebnisArray auf null setzen
@@ -1305,13 +1305,13 @@ public class SpielerMensch extends Thread {
 	    }
 
 	    // Servermeldung: Spielder wurde entfernt
-	    case (cA.ENTFERNUNG): {
+	    case (ClientAntwort.ENTFERNUNG): {
 		// ------- Habe ich gewonnen / bin ich gestorben ----------
 		boolean ichTot = true;
 		try {
 		    String[] gewinnerListe = kCS.getSpielstand();
 		    if(gewinnerListe != null) {
-			setStatus(Message.say("SpielerMensch","spielende")); 
+			setStatus(Message.say("SpielerMensch","spielende"));
 			for (int i = 0; i < gewinnerListe.length; i++) {
 			    if (gewinnerListe[i].equals(name)) ichTot=false;
 			}
@@ -1337,16 +1337,16 @@ public class SpielerMensch extends Thread {
 		Global.debug(this,"Habe vom Server Zeug bekommen, das ich nicht kenne");
 		    uICardLayout.show(userInterfaceContainer,"leer");
 	    }
-	    }	
+	    }
 	}
-	
+
 	Global.debug(this," ende meiner run-Methode erreicht!");
 	try{
 	    th.join();
 	}catch(InterruptedException e){}
 	return;
     }
-    
+
     /**
      * Main-Methode, die den menschlichen Spieler von der Shell aus als Thread startet
      */
@@ -1410,7 +1410,7 @@ public class SpielerMensch extends Thread {
 	(new SpielerMensch(host,port,name,farbe)).start();
     }
 
-    
+
     public class KartenMisch extends JPanel {
 	   public KartenMisch(){
 	       setBorder(new EmptyBorder(0,40,0,0));
@@ -1422,8 +1422,8 @@ public class SpielerMensch extends Thread {
 		    add(new JLabel(Message.say("SpielerMensch","mbitteWarten")));
 	   }
     }
-    
-    
-    
+
+
+
 
 }

@@ -13,7 +13,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 /**
- * view logic 
+ * view logic
  * @author Lukasz Pekacki
  */
 public class Ausgabe extends Thread {
@@ -27,7 +27,7 @@ public class Ausgabe extends Thread {
     private View view;
 
     // ---------- class variables ------------
-    
+
     // game constants
     private Dimension boardDimension;
     private Ort[] flags;
@@ -66,8 +66,8 @@ public class Ausgabe extends Thread {
 
 
     public void run() {
-	
-	if (! registered) {initialize();} 
+
+	if (! registered) {initialize();}
 
 	// ---- entering game  ---------
 
@@ -85,7 +85,7 @@ public class Ausgabe extends Thread {
 	    }
 	    // what did the server send?
 	    switch (kommAntwort.typ) {
-	    case (kommAntwort.MESSAGE):{
+	    case (ClientAntwort.MESSAGE):{
 		Global.debug(this,"Server send me: some messsage.");
 		String[] tmpstr=new String[kommAntwort.namen.length-1];
 
@@ -133,7 +133,7 @@ public class Ausgabe extends Thread {
 	 		strength   = Integer.parseInt(kommAntwort.namen[2]);
 			laserPos.x = Integer.parseInt(kommAntwort.namen[3]);
 			laserPos.y = Integer.parseInt(kommAntwort.namen[4]);
-			facing     = Integer.parseInt(kommAntwort.namen[5]); 
+			facing     = Integer.parseInt(kommAntwort.namen[5]);
        		    }
 		    catch (NumberFormatException nfe) {
 			System.err.println("Ausgabe: BoardLaser: NumberFormatException:");
@@ -149,23 +149,23 @@ public class Ausgabe extends Thread {
 			System.err.println("strength: "+strength);
 		    }
 		}
-		
+
 
 		kommClient.bestaetigung();
 		break;
 	    }
 
-	    case (kommAntwort.AENDERUNG): {
+	    case (ClientAntwort.AENDERUNG): {
 		Global.debug(this,"Server send me: change occured.");
 
 		// ------- get changes  -----------
 		Global.debug(this,kommAntwort.namen.length+" robs have been updated.");
-		try { 
+		try {
 		    String[] playerNames = kommAntwort.namen;
 		    for (int i=0; i < playerNames.length; i++) {
 			robots.put(playerNames[i],kommClient.getRobStatus(playerNames[i]));
 		    }
-		
+
 		    ausgabeView.showUpdatedRobots(getRoboterArray());
 
 		    // --------- Neue Roboter-Position an Spielfeld senden ---------
@@ -174,8 +174,8 @@ public class Ausgabe extends Thread {
 		    } // Verzögerung der Ausgabegeschwindigkeit
 		    catch (Exception e) {
 			System.err.println(e.getMessage());
-		    } 
-		    
+		    }
+
 		    // --------- get other information from the server
 		    Status[] stArray = kommClient.getSpielstatus();
 		    if (stArray != null) {
@@ -183,7 +183,7 @@ public class Ausgabe extends Thread {
 			    showActionMessage(Message.say("AusgabeFrame","phase")+stArray[0].aktPhase);
 			    lastPhase = stArray[0].aktPhase;
 			}
-		    }  
+		    }
 		    // --------- has somebody already reached the final flag?
 		    String[] winnerStateList = kommClient.getSpielstand();
 		    ausgabeView.showWinnerState(winnerStateList);
@@ -196,12 +196,12 @@ public class Ausgabe extends Thread {
 		    System.err.println(kE.getMessage());
 		    return;
 		}
-	
+
 		kommClient.aenderungFertig();
 		break;
 	    }
 
-	    case (kommAntwort.ENTFERNUNG): { 
+	    case (ClientAntwort.ENTFERNUNG): {
 		Global.debug(this,"the game is over");
 
 		try {
@@ -222,11 +222,11 @@ public class Ausgabe extends Thread {
 		catch (InterruptedException e) {
 		    System.err.println("Ausgabe: Interrupted by "+e.toString());
 		}
-		kommClient.spielstart(); 
+		kommClient.spielstart();
 		spielEnde = true;
 	    }
 	    }
-	    
+
 	}
 	Global.debug(this,"I reached the end of my run() method");
 	showActionMessage(Message.say("AusgabeFrame","spielende"));
@@ -248,11 +248,11 @@ public class Ausgabe extends Thread {
 	    return;
 	}
 
-	if (kommAntwort.typ == kommAntwort.SPIELSTART) { 
+	if (kommAntwort.typ == kommAntwort.SPIELSTART) {
 	    Global.debug(this,"Server send me: game start.");
 
 	    // ------- fetching the board -----
-	    try { 
+	    try {
 		String[] playerNames = kommClient.getNamen();
 		String[] playerColors = kommClient.getFarben();
 
@@ -296,7 +296,7 @@ public class Ausgabe extends Thread {
 						    boardDimension.height,
 						    kommClient.getSpielfeld(),
 						    flags);
-		    
+
 
 		ausgabeView = new AusgabeView(new SACanvas(sim,robotsNewColor),getRoboterArray(),this);
 
@@ -310,8 +310,8 @@ public class Ausgabe extends Thread {
 		removeSplash();
 
 		// send OK to server
-		kommClient.spielstart(); 
-		    
+		kommClient.spielstart();
+
 		scrollFlag(1);
 
 	    }
@@ -333,7 +333,7 @@ public class Ausgabe extends Thread {
 	}
 
 	registered = true;
-	
+
     }
 
 
@@ -363,12 +363,12 @@ public class Ausgabe extends Thread {
      */
     private void showSplash(String s) {
 	if(!nosplash) {
-	    if (splashScreen==null){ 
+	    if (splashScreen==null){
 		splashScreen = new Splash();
 	    }
 	    splashScreen.showSplash(s);
 	}
-	
+
     }
 
     /**
@@ -379,7 +379,7 @@ public class Ausgabe extends Thread {
 	if(!nosplash) {
 	    splashScreen.noSplash();
 	}
-	
+
     }
 
     private Roboter[] getRoboterArray(){
@@ -398,16 +398,16 @@ public class Ausgabe extends Thread {
 	boolean anmeldungErfolg = false;
 	int versuche = 0;
 
-	
+
 	showActionMessage(Message.say("AusgabeFrame","Anmeldung"));
-	while ((!anmeldungErfolg)&&(versuche < 3)) { 
+	while ((!anmeldungErfolg)&&(versuche < 3)) {
 	    try{
-		anmeldungErfolg = kommClient.anmelden2(host,port,name); 
-	    } 
+		anmeldungErfolg = kommClient.anmelden2(host,port,name);
+	    }
 	    catch (KommException kE) {
-		System.err.println(kE.getMessage()); 
+		System.err.println(kE.getMessage());
 		showSplash(Message.say("AusgabeFrame","msplashFehlerAnmeldung"));
-		versuche++; 
+		versuche++;
 		try {Thread.sleep(3000);} catch (Exception e) {System.err.println(e.getMessage());}
 	    }
 	}
@@ -417,7 +417,7 @@ public class Ausgabe extends Thread {
 	    Global.debug(this,"registered for game as new view with name: "+name);
 	}
 	else {
-	    Global.debug(this, "could not register at the server: "+host);  
+	    Global.debug(this, "could not register at the server: "+host);
 	    showSplash(Message.say("AusgabeFrame","msplashEnde"));
 	    try {Thread.sleep(2000);} catch (Exception e) {System.err.println(e.getMessage());}
 	    removeSplash();
@@ -425,7 +425,7 @@ public class Ausgabe extends Thread {
 
 
 
-	
+
     }
 
 

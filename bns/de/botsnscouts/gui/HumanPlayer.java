@@ -5,7 +5,7 @@ import  de.botsnscouts.util.*;
 import  de.botsnscouts.comm.*;
 import  de.botsnscouts.autobot.*;
 import  de.botsnscouts.board.*;
-import  de.botsnscouts.server.KartenStapel; 
+import  de.botsnscouts.server.KartenStapel;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -57,7 +57,7 @@ public class HumanPlayer extends Thread {
 
     /**
      * Start des Menschlichen Spielers
-     */ 
+     */
     public void run(){
 
 	// --- registering for game ---
@@ -65,7 +65,7 @@ public class HumanPlayer extends Thread {
 	    Global.debug(this,"registered for game as new humanplayer with name: "+name);
 	}
 	else {
-	    Global.debug(this, "could not register at the server: "+host);  
+	    Global.debug(this, "could not register at the server: "+host);
 	    try {Thread.sleep(2000);} catch (Exception e) {System.err.println(e.getMessage());}
 	    return;
 	}
@@ -84,10 +84,10 @@ public class HumanPlayer extends Thread {
 	    }
 
 	    switch (commAnswer.typ) {
-	    case (commAnswer.MACHEZUG): {
+	    case (ClientAntwort.MACHEZUG): {
 		mode=MODE_PROGRAM;
 		Global.debug(this,"I am requested to send cards");
-		// card 
+		// card
 		showMessage(Message.say("SpielerMensch","mwartereg"));
 
 		try{
@@ -99,7 +99,7 @@ public class HumanPlayer extends Thread {
 		catch (KommException kE) {
 		    System.err.println("SpielerMenschERROR: "+kE.getMessage());
 		}
-		
+
 				// ----- Karten einsortieren  -----
 		cards.clear();
 		for (int i = 0; i < commAnswer.karten.length; i++) {
@@ -122,14 +122,14 @@ public class HumanPlayer extends Thread {
 	    }
 
 	    // start of the game
-	    case (commAnswer.SPIELSTART): {
+	    case (ClientAntwort.SPIELSTART): {
 		showMessage(Message.say("SpielerMensch","spielgehtlos"));
 		comm.spielstart();
 		break;
 	    }
 
 	    // robot destroyed or initally set on the board
-	    case (commAnswer.ZERSTOERUNG): {
+	    case (ClientAntwort.ZERSTOERUNG): {
 		humanView.showGetDirection();
 		Global.debug(this,"Habe einee Zerstörung bekommen.");
 		showMessage(Message.say("SpielerMensch","roboauffeld"));
@@ -151,7 +151,7 @@ public class HumanPlayer extends Thread {
 		break;
 	    }
 	    // robot reaktivated
-	    case (commAnswer.REAKTIVIERUNG): { 
+	    case (ClientAntwort.REAKTIVIERUNG): {
 		showMessage(Message.say("SpielerMensch","roboreaktiviert"));
 		// ask for powerDownagain
 		humanView.showRePowerDown();
@@ -161,7 +161,7 @@ public class HumanPlayer extends Thread {
 	    }
 
 	    // repair your registers
-	    case (commAnswer.REPARATUR):{ 
+	    case (ClientAntwort.REPARATUR):{
 		Global.debug(this,"Reparatur erhalten");
 
 		   try {
@@ -178,14 +178,14 @@ public class HumanPlayer extends Thread {
 	    }
 
 	    // removed from game
-	    case (commAnswer.ENTFERNUNG): {
+	    case (ClientAntwort.ENTFERNUNG): {
 		// ------- Habe ich gewonnen / bin ich gestorben ----------
 		boolean dead = true;
 		int rating=0;
 		try {
 		    String[] gewinnerListe = comm.getSpielstand();
 		    if(gewinnerListe != null) {
-			showMessage(Message.say("SpielerMensch","spielende")); 
+			showMessage(Message.say("SpielerMensch","spielende"));
 			for (int i = 0; i < gewinnerListe.length; i++) {
 			    if (gewinnerListe[i].equals(name)) {
 				dead=false;
@@ -206,16 +206,16 @@ public class HumanPlayer extends Thread {
 	    default : {
 		Global.debug(this,"Unkonown message form server.");
 	    }
-	    }	
+	    }
 	}
-	
+
 	Global.debug(this," this is my end");
 	try {
 	    ausgabe.join();
 	} catch(InterruptedException e){e.printStackTrace();}
 	return;
     }
-    
+
     /**
      * Main-Methode, die den menschlichen Spieler von der Shell aus als Thread startet
      */
@@ -284,10 +284,10 @@ public class HumanPlayer extends Thread {
 	mode=MODE_OTHER;
 	int sendProg[] = new int[registerCards.size()];
 	int index=0;
-	
+
 	d("meine Registerkarten: "+registerCards);
 	d("die Karten, die der Server ausgeteilt hat:"+cards);
-	
+
 
 	for (int i=0; i < registerCards.size(); i++) {
 	    for (int j=0; j < cards.size(); j++) {
@@ -300,23 +300,23 @@ public class HumanPlayer extends Thread {
 	}
 	comm.registerProg(name,sendProg,nextTurnPowerDown);
     }
-    
+
     private boolean registerAtServer() {
 	boolean anmeldungErfolg = false;
 	int versuche = 0;
-	
-	while ((!anmeldungErfolg)&&(versuche < 3)) { 
+
+	while ((!anmeldungErfolg)&&(versuche < 3)) {
 	    try{
-		anmeldungErfolg = comm.anmelden2(host,port,name,myColor); 
-	    } 
+		anmeldungErfolg = comm.anmelden2(host,port,name,myColor);
+	    }
 	    catch (KommException kE) {
-		System.err.println(kE.getMessage()); 
-		versuche++; 
+		System.err.println(kE.getMessage());
+		versuche++;
 		try {Thread.sleep(1000);} catch (Exception e) {System.err.println(e.getMessage());}
 	    }
 	}
 	return anmeldungErfolg;
-	
+
     }
 
     /** meldet den Spieler beim Server ab und beendet diesen Thread.
@@ -324,7 +324,7 @@ public class HumanPlayer extends Thread {
     private void quit() {
 	Global.debug(this, "Roboter "+name+" is leaving the party.");
 	comm.abmelden(name);
-	//Dafuer sorgen, dass Thread aufhoert 
+	//Dafuer sorgen, dass Thread aufhoert
 	System.exit(0);
     }
 
@@ -351,7 +351,7 @@ public class HumanPlayer extends Thread {
 	tmp[1]=msg;
 	comm.message("mChat",tmp);
     }
-    
+
     protected Roboter getRob() {
 	return ausgabe.getRob(name);
 
@@ -359,7 +359,7 @@ public class HumanPlayer extends Thread {
 
 
     protected void sendDirection(int r) {
-	comm.respZerstoert(name,r); 
+	comm.respZerstoert(name,r);
 	// show wait message
     }
 
@@ -397,16 +397,16 @@ public class HumanPlayer extends Thread {
 	    try{
 		intelliBoard = SpielfeldKS.getInstance(dimx,dimy,spielfeldstring,fahnen);
 	    }
-		
+
 	    catch(Exception e){
 		System.err.println("HumanPlayer has a problem: No Board"+e);
-	    }			
+	    }
 	}
 	catch(Exception e){
 	    System.err.println("HumanPlayer has a problem: No Board!"+e);
 	}
     }
-    
+
 
     private void initView() {
 	humanView = new HumanView(this);

@@ -11,7 +11,7 @@ class ServerAusgabeThread extends Thread
     Integer modus;
     boolean fertig;
     float version;
-    
+
     public ServerAusgabeThread(KommServerAusgabe ksa, Server s)
         {
             server=s;
@@ -43,33 +43,33 @@ class ServerAusgabeThread extends Thread
 			      d("Keine Fragen erlaubt. Ausgabe entstoepseln."+this);
 			      server.ausgabeEntstoepseln(this,"RV");
 			      break outer;
-			  } else 
+			  } else
 			      return;
                       }
-                        
+
                       switch (ans.typ){
-                          case ans.AENDERUNGFERTIG:
+                          case ServerAntwort.AENDERUNGFERTIG:
                               d("Aenderungfertig erhalten.");
 			      notifyServer();
                               break;
 
-                          case ans.GIBSPIELFELDDIM: 
+                          case ServerAntwort.GIBSPIELFELDDIM:
                               komm.sendSpielfeldDim(server.feld.getSizeX(),server.feld.getSizeY());
                               break;
-                            
-                          case ans.GIBSPIELFELD:
+
+                          case ServerAntwort.GIBSPIELFELD:
                               komm.sendSpielfeld(server.feld.getSpielfeldString());
                               break;
-                            
-                          case ans.GIBFAHNENPOS:
+
+                          case ServerAntwort.GIBFAHNENPOS:
                               komm.sendFahnenpos(server.feld.getFlaggen());
                               break;
-                            
-                          case ans.GIBNAMEN:
+
+                          case ServerAntwort.GIBNAMEN:
 			      komm.sendNamen(server.gibNamen());
                               break;
-                            
-                          case ans.GIBROBOTERPOS:
+
+                          case ServerAntwort.GIBROBOTERPOS:
 			      Ort o=server.gibRobPos(ans.name);
 			      if (o!=null)
 				  komm.sendRobpos(o);
@@ -78,17 +78,17 @@ class ServerAusgabeThread extends Thread
                                   ende=true;
                               }
                               break;
-                            
-                          case ans.GIBROBSTATUS:
+
+                          case ServerAntwort.GIBROBSTATUS:
                               Roboter r = server.roboterStatus(ans.name);
                               if(r != null){
                                   komm.sendRobStatus(r);
                               }else{
-                                  komm.sendRobStatus(); 
-                              }       
+                                  komm.sendRobStatus();
+                              }
                               break;
 
-                          case ans.GIBSPIELSTAND:
+                          case ServerAntwort.GIBSPIELSTAND:
                               if(server.spiellaeuft()){
                                   komm.spielstand(new Boolean(true),  server.auswertung());
                               }else{
@@ -96,23 +96,23 @@ class ServerAusgabeThread extends Thread
 				  notifyServer();
                               }
                               break;
-                            
-                          case ans.GIBAUSWERTUNGSSTATUS:
+
+                          case ServerAntwort.GIBAUSWERTUNGSSTATUS:
                               d("in GibAuswertungsStatus");
                               komm.spielStatus(server.gibAuswertungsStatus());
                               break;
-                            
-		          case ans.GIBTIMEOUT:
-                              komm.sendTimeOut(server.zugto/1000); 
+
+		          case ServerAntwort.GIBTIMEOUT:
+                              komm.sendTimeOut(server.zugto/1000);
                               break;
-		          case ans.GIBFARBEN:
+		          case ServerAntwort.GIBFARBEN:
 			      komm.sendFarben(server.angemeldet);
 		              break;
-		          case ans.STATS:
+		          case ServerAntwort.STATS:
 			      komm.sendStats(server.stats);
 			      break;
-			      
-		          case ans.ABMELDUNG:
+
+		          case ServerAntwort.ABMELDUNG:
 			      ende=true;
 			      notifyServer();
 			      return;
@@ -132,7 +132,7 @@ class ServerAusgabeThread extends Thread
                   ende=true;
               }
           } //"Endlos"schleife
-        } // run() 
+        } // run()
 
     private void d(String s)
         {
