@@ -48,11 +48,11 @@ public class Start extends JFrame implements WindowListener{
     Facade fassade;
 
     Paint paint;
-    MainMenu mainMenu;                //startbildschirm
-    GameFieldPanel gameFieldPanel;          //spielfeld zusammenstellen
-    ParticipatePanel partPanel;        //am spiel teilnehmen
-    WatchPanel watchPanel;          //einem spiel zuschauen
-    StartPanel startPanel;                  //bildschirm mit anmeldeinfos und LOS button
+    MainMenu mainMenu;                // Start screen
+    GameFieldPanel gameFieldPanel;          //build your board
+    ParticipatePanel partPanel;        //participate
+    WatchPanel watchPanel;          //watch
+    StartPanel startPanel;                  //Screen with all information and start button
     FieldEditor fieldEditor;
 
     JPanel current;         //was in moment angezeigt wird

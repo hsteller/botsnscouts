@@ -36,7 +36,10 @@ import java.net.*;
 import javax.swing.filechooser.FileFilter;
 import java.util.*;
 import java.io.*;
+
 import de.botsnscouts.util.*;
+import de.botsnscouts.gui.ColoredComponent;
+import de.botsnscouts.gui.ColoredPanel;
 
 public class GameFieldPanel extends JPanel{
     Paint paint;
@@ -46,11 +49,11 @@ public class GameFieldPanel extends JPanel{
     JPanel pnl;
     JScrollPane scrl;
 
-    JPanel okPanel;
+    JComponent okPanel;
     JButton okBut;
     JButton backBut;
 
-    JPanel editPanel;
+    JComponent editPanel;
     JLabel spielfeld;
     JComboBox spielfelder;
     JButton save;
@@ -100,8 +103,8 @@ public class GameFieldPanel extends JPanel{
 	paintChildren(g);
     }
 
-    private JPanel getOkPanel(){
-	JPanel panel=new JPanel();
+    private JComponent getOkPanel(){
+	JComponent panel=new ColoredComponent();
 
 	GridLayout lay=new GridLayout(1,2);
 	lay.setHgap(50);
@@ -128,10 +131,10 @@ public class GameFieldPanel extends JPanel{
 	return panel;
     }
 
-    private JPanel getEditPanel(){
-	JPanel panel=new JPanel();
+    private JComponent getEditPanel(){
+      JComponent panel=new ColoredPanel();
 
-	JPanel inner = new JPanel();
+	JComponent inner = new JPanel();
 	GridBagLayout lay=new GridBagLayout();
 	GridBagConstraints gc = new GridBagConstraints();
 	gc.fill = GridBagConstraints.HORIZONTAL;

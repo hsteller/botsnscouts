@@ -38,7 +38,7 @@ import de.botsnscouts.util.*;
 import de.botsnscouts.gui.*;
 
 
-class PlayersPanel extends JPanel{
+class PlayersPanel extends ColoredPanel{
     JList roblist;
     Start parent;
     Vector names = new Vector();
@@ -55,7 +55,7 @@ class PlayersPanel extends JPanel{
 	roblist.setFont(new Font("Sans", Font.BOLD, 24));
 	roblist.setCellRenderer( new CellRenderer() );
 
-	JPanel p = new JPanel();
+	JComponent p = new JPanel();
 	p.setOpaque( false );
 
 	JScrollPane sp = new JScrollPane
@@ -66,9 +66,7 @@ class PlayersPanel extends JPanel{
 	sp.setOpaque( false );
 	p.add(sp);
 	p.setBorder( new CompoundBorder( new EtchedBorder(8),
-				       new EmptyBorder(10, 10, 10, 10) ));
-
-
+					 new EmptyBorder(10, 10, 10, 10) ));
 	add(p);
 	setOpaque(false);
     }

@@ -43,10 +43,10 @@ public class StartPanel extends JPanel{
     Thread thread;
 
     JLabel angem;
-    PlayersPanel playersPanel;
-    JPanel okPanel;
-    JPanel autobotPanel;
-    JPanel localPanel;
+    PlayersPanel playersComponent;
+    JComponent okComponent;
+    JComponent autobotComponent;
+    JComponent localComponent;
     StSpListener listen;
 
     JSlider intel;
@@ -65,20 +65,20 @@ public class StartPanel extends JPanel{
 	setOpaque( false );
 
 	angem=new JLabel(Message.say("Start","mAngem"));
-	playersPanel=new PlayersPanel(parent);
-	okPanel=getOkPanel();
-        autobotPanel=getABPanel();
-        localPanel=getLocalPanel();
-	listen=new StSpListener(playersPanel);
+	playersComponent=new PlayersPanel(parent);
+	okComponent=getOkComponent();
+        autobotComponent=getABComponent();
+        localComponent=getLocalComponent();
+	listen=new StSpListener(playersComponent);
 	listen.start();
 
 	angem.setFont(font);
 	JPanel p = new JPanel(new BorderLayout());
 	p.setOpaque( false );
 	p.add( angem, BorderLayout.NORTH );
-	p.add( playersPanel, BorderLayout.CENTER );
+	p.add( playersComponent, BorderLayout.CENTER );
 	add(BorderLayout.WEST,p);
-	add(BorderLayout.SOUTH,okPanel);
+	add(BorderLayout.SOUTH,okComponent);
 	JPanel panel=new TJPanel();
 
 	panel.setLayout( new GridBagLayout() );
@@ -89,13 +89,13 @@ public class StartPanel extends JPanel{
 	gc.gridy = GridBagConstraints.RELATIVE;
 	gc.insets = new Insets(30, 30, 30, 30);
 
-	panel.add(autobotPanel, gc);
-	panel.add(localPanel, gc);
+	panel.add(autobotComponent, gc);
+	panel.add(localComponent, gc);
 	add(BorderLayout.EAST,panel);
     }
 
-    JPanel getLocalPanel(){
-	JPanel panel = new JPanel();
+    JComponent getLocalComponent(){
+      JComponent panel = new de.botsnscouts.gui.ColoredComponent();
 
 	panel.setOpaque(false);
 	String[] farben={Message.say("Start","mFarbeEgal"),Message.say("Start","mFarbeGruen"),Message.say("Start","mFarbeGelb"),Message.say("Start","mFarbeRot"),Message.say("Start","mFarbeBlau"),Message.say("Start","mFarbeMagenta"),Message.say("Start","mFarbeOrange"),Message.say("Start","mFarbeGrau"),Message.say("Start","mFarbeDunkelMagenta")};
@@ -170,8 +170,8 @@ public class StartPanel extends JPanel{
 	return panel;
     }
 
-    JPanel getABPanel(){
-	JPanel panel = new JPanel();
+    JComponent getABComponent(){
+	JComponent panel = new ColoredComponent();
 	panel.setOpaque(false);
 	Font font=new Font("Sans", Font.BOLD, 24);
 
@@ -237,8 +237,8 @@ public class StartPanel extends JPanel{
 					     new EmptyBorder(10, 10, 10, 10)) );
 	return panel;
     }
-    JPanel getOkPanel(){
-	JPanel panel=new JPanel();
+    JComponent getOkComponent(){
+	JComponent panel=new JPanel();
 	GridLayout lay=new GridLayout(1,2);
 	lay.setHgap(50);
 	lay.setVgap(50);
@@ -252,7 +252,7 @@ public class StartPanel extends JPanel{
 
 	okBut.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    if(playersPanel.names.size()!=8){
+		    if(playersComponent.names.size()!=8){
 			parent.fassade.spielGehtLos();
 			parent.hide();
 			//parent.beenden(); // will be done in playerspanel

@@ -35,6 +35,7 @@ import javax.swing.border.*;
 import java.net.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.board.*;
+import de.botsnscouts.gui.ColoredPanel;
 
 public class FieldEditor extends JPanel implements  ActionListener, TileClickListener,ListSelectionListener{
 
@@ -150,7 +151,7 @@ public class FieldEditor extends JPanel implements  ActionListener, TileClickLis
 	tilesGroup.add(modeFlaggeVerschieben);
 	tilesGroup.setSelected(modeTileSetzen.getModel(),true);
 
-	flaggenButtons=new JPanel();
+	flaggenButtons=new ColoredPanel();
 	flaggenButtons.setLayout(new FlowLayout());
 	flaggenButtons.setOpaque(false);
 	flaggenButtons.add(modeFlaggeSetzen);
@@ -179,7 +180,7 @@ public class FieldEditor extends JPanel implements  ActionListener, TileClickLis
 	zurueck.addActionListener(this);
 	zurueck.setActionCommand("abbrechen");
 
-	okZur=new JPanel();
+	okZur=new ColoredPanel();
 	okZur.setLayout(new FlowLayout());
 	okZur.setOpaque(false);
 	okZur.add(ok);
