@@ -1,6 +1,7 @@
 package de.botsnscouts.gui;
 
 import de.botsnscouts.util.*;
+import javax.swing.plaf.metal.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -10,6 +11,17 @@ import javax.swing.border.*;
  * @author Lukasz Pekacki
  */
 public class GetDirection extends JPanel {
+
+    public GetDirection() {
+	this(new ActionListener() {
+		public void actionPerformed(ActionEvent ae) {
+		    System.err.println("Pressed: "+ae.getActionCommand());
+		}
+	    }
+	     );
+    }
+
+
     public GetDirection(ActionListener al) {
 	setLayout(new BorderLayout());
 	    
@@ -47,6 +59,7 @@ public class GetDirection extends JPanel {
 	PfeilC(String s, int r){
 	    this.setOpaque(false);
 	    richt = r;
+	    setActionCommand(""+r);
 	}
 
 	public Dimension getPreferredSize() {
@@ -58,8 +71,6 @@ public class GetDirection extends JPanel {
 	}
 
 	public void paintComponent(Graphics g){
-	    g.setColor(Color.lightGray);
-	    g.setColor(this.getForeground());
 	    if (richt == Directions.NORD){
 		int[] x = {5,55,30};
 		int[] y = {55,55,5};
@@ -83,6 +94,21 @@ public class GetDirection extends JPanel {
 
 	}
     }
+
+    public static void main (String args[]) {
+	try {
+	    Message.setLanguage("deutsch");
+	}
+	catch (Exception e) {e.printStackTrace();}
+        JWindow f = new JWindow();
+        GetDirection g = new GetDirection();
+	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
+	f.getContentPane().add(g);
+	f.pack();
+	f.setLocation(100,100);
+	f.setVisible(true);
+    }
+
 }
 
 

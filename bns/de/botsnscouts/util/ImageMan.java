@@ -21,7 +21,19 @@ public class ImageMan {
 	SCHLAFSCOUT = 7,
 	KSCHLAF = 8,
 	KWACH = 9;
+
+    static Class c = de.botsnscouts.BotsNScouts.class;
+
     
+    public final static  ImageIcon CardRUECK = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/karterueck.gif")));
+    public final static  ImageIcon CardM1 = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/m1.gif")));
+    public final static  ImageIcon CardM2 = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/m2.gif")));
+    public final static  ImageIcon CardM3 = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/m3.gif")));
+    public final static  ImageIcon CardBU = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/bu.gif")));
+    public final static  ImageIcon CardRL = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/rl.gif")));
+    public final static  ImageIcon CardRR = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/rr.gif")));
+    public final static  ImageIcon CardUT = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/ut.gif")));
+    public final static  ImageIcon CardRLEER = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/register-leer.gif")));
 	
 
 	
@@ -55,16 +67,6 @@ public class ImageMan {
 	    return;
 	imagesLoading = true;
 
-	//Miriam: Bilder werden relativ zum Klassenpfad gesucht	
-	Class c = de.botsnscouts.BotsNScouts.class;
-	/*
-	try {
-	    c = Class.forName("de.spline.rr.ImageMan");
-	} catch(ClassNotFoundException e) {
-	    System.out.println( e );
-	    throw new RuntimeException("ImageMan nicht gefunden");
-	}
-	*/
 	tracker = new MediaTracker(new Button());
 	Toolkit tk = Toolkit.getDefaultToolkit();
 	CropperField gridCropper = new CropperField(8, 8, 64, tk);

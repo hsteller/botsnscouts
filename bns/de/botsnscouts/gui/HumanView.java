@@ -9,24 +9,37 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 /**
- * all methods a view for the human player must implement
+ * view for the human player
  * @author Lukasz Pekacki
  */
 
 public class HumanView extends JPanel implements HumanViewInterface {
     
-    private Hashtable registers = new Hashtable(5);
-    private Hashtable cards = new Hashtable(9);
+    private ArrayList registers = new ArrayList(5);
     private CardLayout panelSwitcher = new CardLayout();
-
+    private JPanel scoutNFriends = new JPanel();
+    private RepairRegisters repairRegisters;
+    
     public HumanView() {
+	setLayout(panelSwitcher);
 	GetDirection getDir = new GetDirection(new ActionListener(){
 	    public void actionPerformed(ActionEvent ae) {
-		// sendDirection(((PfeilC) e.getSource()).richt);
+		sendDirection(Integer.parseInt(ae.getActionCommand()));
+	    }
+	    }
+					       );
+	AgainPowerDown againPowerDown = new AgainPowerDown(new ActionListener(){
+	    public void actionPerformed(ActionEvent ae) {
+		sendAgainPowerDown(ae.getActionCommand().equals("againpowerdown"));
 	    }
 	}
-								  
 					       );
+	repairRegisters = new RepairRegisters(new ActionListener(){
+	    public void actionPerformed(ActionEvent ae) {
+		sendRepairRegisters();
+	    }
+	    });
+	
 	
     }
 
@@ -103,6 +116,19 @@ public class HumanView extends JPanel implements HumanViewInterface {
      */
     public void shutup() {}
 
+
+    private void sendDirection (int d) {
+	// TODO
+    }
+
+    private void sendAgainPowerDown (boolean again) {
+	// TODO
+    }
+
+    private void sendRepairRegisters () {
+	ArrayList a = repairRegisters.getSelection();
+	// TODO
+    }
 
 }
 
