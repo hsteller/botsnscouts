@@ -86,6 +86,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     /** Removes caller from waitablesImWaitingFor
      */
     public void notifyDone(Waitable me){
+        CAT.debug("Server: notify done");
 	waitablesImWaitingFor.removeAndNotify(me);
     }
 
@@ -114,6 +115,8 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	t.interrupt();     // Beende den Thread bei nächster Gelegenheit
 
 	rThreads.remove(t);
+        aktRoboter.remove(t);
+        roboterFriedhof.add(t);
 
 	String[] tmpstr=new String[1];
 	tmpstr[0]=t.rob.getName();
@@ -166,6 +169,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	}
 
 	t.interrupt(); // Beende sie
+        aThreads.remove(t);
     }
 
     public int getOutputTimeout(){ return ausgabennotifyto; }
@@ -271,7 +275,10 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
      * @return Status[ ]
      */
     public Status[] getEvalStatus(){
-	synchronized(rThreads){
+        CAT.debug("276 for rThreads");
+	try {
+        synchronized(rThreads){
+            CAT.debug("279: lock rThreads");
 	    Status[] s = new Status[rThreads.size()];
 	    for (int i=0;i<s.length;i++){
 		s[i]=new Status();
@@ -283,7 +290,14 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    s[i].register[j]=tmp.rob.getMove(j);
 	    }
 	    return s;
-	}
+
+        }
+
+        }
+        finally{
+        CAT.debug("279 relesase rThreads");
+        }
+
     }
 
     public String[] getNamesByColor(){ return angemeldet; }
@@ -357,7 +371,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	setzeAusgaben();         // neue Ausgaben begrüßen
 	d("Größe der eintrittsliste: "+ausgabenEintrittsListe.size()+"; aThreads: "+aThreads.size());
 
+        CAT.debug("372 wait For athreads");
 	synchronized(aThreads){
+            CAT.debug("374 lock aThreads");
 	    waitablesImWaitingFor=new WaitingForSet(aThreads);
 
 	    for (Iterator it=aThreads.iterator();it.hasNext();){
@@ -391,6 +407,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	    while (it.hasNext())
 		deleteOutput((ServerAusgabeThread)it.next(),"TO");
 	}
+        CAT.debug("374 release aThread");
 	// allow possibly generated messages to be sent
 	// synchronizes laser-fire-animations.
 	messageThread.blockUntilQEmpty();
@@ -424,7 +441,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	    return;
 
 	//Broadcast an die betroffenen Threads, Inhalt je nach Modus
+        CAT.debug("442 wait for waitablesImWaitingFor");
 	synchronized (waitablesImWaitingFor){
+            CAT.debug("444 lock waitablesImWaitingFor");
 	    for (Iterator e=waitablesImWaitingFor.iterator();e.hasNext();) {
 		ServerRoboterThread srt = (ServerRoboterThread )e.next();
 
@@ -460,7 +479,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		}
 	    }//for Iterator
 	}//synch
-
+        CAT.debug("444 release waitablesImWaitingFor");
 	//Schlafen bis TO oder alle fertig
 	Iterator it = warteAufRoboter();
 
@@ -478,7 +497,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
      * PRE: rThreadsAufDieIchWarte und modus ist korrekt gesetzt
      */
     private synchronized Iterator warteAufRoboter() {
-
+        CAT.debug("498 lock Server");
 	int to;
 
 	switch (modus) {
@@ -498,8 +517,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             break;
 	default:
 	    to = 0;
-	}
 
+        }
+         CAT.debug("498 release Server");
 	d("Der Server wartet jetzt "+to+" Millisek. auf seine RoboterThreads ("+modus+").");
 	return waitablesImWaitingFor.waitFor(to);
     }
@@ -518,10 +538,11 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     /** Uebertraegt ausgabeneintrittsliste in offizielle Ausgabenliste */
     private void setzeAusgaben(){
 	d("setzeAusgaben");
+        d("539 wait for aThreads");
 	synchronized (aThreads){
-	    d("lock on aThreads");
+	    d("541 lock on aThreads\nwait for ausgabenEL");
 	    synchronized (ausgabenEintrittsListe){
-		d("lock on ausgabenEintrittsListe");
+		d("543 lock on ausgabenEintrittsListe");
 		if (ausgabenEintrittsListe.size()==0)
 		    return;
 		else
@@ -559,11 +580,15 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    aThreads.addElement(tmp);
 		}
 	    } // synchronized ausgabenEL
+            CAT.debug("543 release ausgabenEl");
 	} // sync aThreads
+        CAT.debug("541 release aThreads");
     }
 
     // returns false if interrupted, true if all is ok
     private synchronized boolean anmeldung(){
+        CAT.debug("588 lock on Server");
+        try {
 	registrationManager = new RegistrationManager(this);
 	registrationManager.beginRegistration();
 	CAT.debug("registrationManager gestartet");
@@ -579,6 +604,8 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	//Spiel geht los
 	startServer.spielGehtLos(this);
 	return true;
+      }
+      finally{CAT.debug("588 release Server");}
     }
 
     private void setzeStartPunkt(){
@@ -649,12 +676,15 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             // 1. Ausgaben NTSen und NTCen, damit Location schonmal stimmt
 	    // kreiere String[] mit allen Namen
 	    String[] alleN;
+            CAT.debug("wait for rThreads");
 	    synchronized(rThreads){
+                CAT.debug("have rThreads");
 		alleN=new String[rThreads.size()];
 		int i=0;
 		for(Iterator e=rThreads.iterator();e.hasNext();)
 		    alleN[i++]=((ServerRoboterThread)e.next()).rob.getName();
 	    }
+            CAT.debug("released rThreads");
 	    //Init Statistics.
 	    stats = new StatsList(alleN);
 	    feld.initStats(stats);
@@ -677,12 +707,15 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 	    d("InitialeAusrichtung ist geholt.");
 	    // Ausgabekanaele von Initialausrichtung benachrichtigen
 	    // kreiere String[] mit allen Namen
+            CAT.debug("708 wait for rthreads");
 	    synchronized(rThreads){
+                  CAT.debug("710 lock rthreads");
 		alleN=new String[rThreads.size()];
 		int i=0;
 		for(Iterator e=rThreads.iterator();e.hasNext();)
 		    alleN[i++]=((ServerRoboterThread)e.next()).rob.getName();
 	    }
+              CAT.debug("716 release rthreads");
 	    notifyViews(alleN);
 
 	    // Loop for all turns.
@@ -715,12 +748,15 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		  wechselModus(waitablesImWaitingFor.iterator(), ZERSTOERT_SYNC);
 		  warteAufRoboter();
 		  wechselModus(zerstoerteRoboter.iterator(), ZERSTOERT_ASYNC);
-		  synchronized(roboterEintrittsListe){
+		  CAT.debug("wait for roboterEL");
+                  synchronized(roboterEintrittsListe){
+                     CAT.debug("have roboterEL");
 		    alleN=new String[roboterEintrittsListe.size()];
 		    int i=0;
 		    for(Iterator e=roboterEintrittsListe.iterator();e.hasNext();)
 		      alleN[i++]=((ServerRoboterThread)e.next()).rob.getName();
 		  }
+                   CAT.debug("release roboterEL");
 		  if (alleN.length > 0)
 		    notifyViews(alleN);
 		}
@@ -728,7 +764,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 		String[] namen;   // fuer notifyChange
 		Vector toBeAsked = new Vector();
+                 CAT.debug("wait for roboterEL");
 		synchronized(roboterEintrittsListe) {
+                     CAT.debug("have roboterEL");
 		    d("Lasse Bot wieder eintreten.");
 		    for(Iterator e=roboterEintrittsListe.iterator();e.hasNext();) {
                         // Alle wiedereinzusetzenden Bot auf ihre Archivpos setzen.
@@ -773,6 +811,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    }
 		    roboterEintrittsListe.removeAllElements();
 		}
+                 CAT.debug("have roboterEL");
 
 		notifyViews(namen);
 
@@ -850,22 +889,52 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    d("Programmierung zurueckerhalten");
 		}
 
+                CAT.debug("890 locke aktRoboter..");
 		// Auswertung beginnt
-		wechselModus(aktRoboter.iterator(),NIX);
-		modus = NIX;
-
+                synchronized (aktRoboter) {
+                  CAT.debug("893 habe aktRoboter");
+        		wechselModus(aktRoboter.iterator(),NIX);
+	        	modus = NIX;
+                }
+                CAT.debug("890 frei: aktRoboter");
 		// Loop for the five phases.
 		for (aktPhase=1; aktPhase!=0; aktPhase = (aktPhase+1)%6) {
 		    CAT.info("Evaluation phase "+aktPhase+", turn "+iRunde +" starts.");
                     // Am Spiel beteiligte Bot in Array kopieren (aus technischen Gruenden)
 		    Bot[] robs;
+                    CAT.debug("903 wait for aktRoboter");
 		    synchronized(aktRoboter) {
-			robs = new Bot[aktRoboter.size()];
+                    CAT.debug("903 have aktRoboter");
+                      CAT.debug("");
+                    //<hendrik was here>
+                        int removedBots = 0;
+                        for(Iterator e=aktRoboter.iterator(); e.hasNext(); ) {
+			    ServerRoboterThread t = ((ServerRoboterThread )e.next());
+                            if (t.isAlive()){
+                              CAT.debug(t.getName()+" IS ALIVE");
+                            }
+                            else {
+                              CAT.error(t.getName()+" IS !!NOT!! ALIVE");
+                              //aktRoboter.remove(t);
+                              removedBots++;
+                            }
+			}
+
+                        robs = new Bot[aktRoboter.size()-removedBots];
 			int i=0;
 			for(Iterator e=aktRoboter.iterator(); e.hasNext(); i++) {
-			    robs[i] = ((ServerRoboterThread )e.next()).rob;
+                            ServerRoboterThread t = ((ServerRoboterThread )e.next());
+                            if (t.isAlive() && t.isThere()){
+                              CAT.debug(t.getName()+" IS ALIVE");
+                              robs[i] = t.rob;
+                            }
+                            else {
+                              CAT.error(t.getName()+" IS !!NOT!! ALIVE");
+                            }
+
 			}
 		    }
+                     CAT.debug("903 release  aktRoboter");
 		    // (doPhase())
 		    //DEBUG
 		    d("feld.doPhase("+aktPhase+") mit ");
@@ -875,7 +944,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		    feld.doPhase(aktPhase,robs);
 
 		    // Evaluate what has happends.
+                     CAT.debug("945 wait aktRoboter");
 		    synchronized(aktRoboter) {
+                         CAT.debug("945 have aktRoboter");
 			for (Iterator e=aktRoboter.listIterator(); e.hasNext();) {
 			    ServerRoboterThread tmp = (ServerRoboterThread )e.next();
 			    // Gewinner?
@@ -950,6 +1021,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			    }
 			}
 		    }
+                     CAT.debug("945 release aktRoboter");
 
 		} // End phase evaluation
 
@@ -977,7 +1049,9 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 		// gesperrte Register einsammeln
 		d("Gesperrte Register einsammeln.");
 		gesperrteKarten.removeAllElements();
+                CAT.debug("1050 wait rThreads");
 		synchronized(rThreads){
+                CAT.debug("1050 have rThreads");
 		    for (Iterator e=rThreads.iterator();e.hasNext();){
 			ServerRoboterThread tmp=((ServerRoboterThread)e.next());
 			for (int i=0;i<5;i++)
@@ -985,13 +1059,16 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 				gesperrteKarten.addElement(tmp.rob.getLockedRegister(i));
 		    }
 		}
+                 CAT.debug("1050 release rThreads");
 		d("Habe "+gesperrteKarten.size()+" gesperrte Karten gefunden und gespeichert.");
 
                 /* End-of-turn-evaluation:
                    2.) Set bots to deactivated if they chose power down
                  */
                 Vector changedBots = new Vector();
+                 CAT.debug("1066 wait rThreads");
                 synchronized(rThreads){
+                 CAT.debug("1066 have rThreads");
                      for (Iterator it=rThreads.iterator(); it.hasNext();){
                         Bot bot = ((ServerRoboterThread )it.next()).rob;
                         if (bot.isPoweredDownNextTurn()){
@@ -1005,6 +1082,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
                         }
                      }
                 }
+                 CAT.debug("1066 release rThreads");
                 /* Tell the clients if someone powered down. */
                 if (changedBots.size()>0){
                     String[] changedBotsArray = new String[changedBots.size()];
@@ -1035,8 +1113,10 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
 	    d("Es sind noch "+aThreads.size()+" Ausgaben da.");
 	    if (aThreads.size()>0){
+             CAT.debug("1114 wait aThreads");
 		synchronized(aThreads){
-		    for (Iterator e=aThreads.iterator();e.hasNext();){
+		     CAT.debug("1114 have raThreads");
+                    for (Iterator e=aThreads.iterator();e.hasNext();){
 			ServerAusgabeThread tmp=(ServerAusgabeThread)e.next();
 			tmp.setMode(FRAGENERLAUBT);
 			try{
@@ -1061,6 +1141,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 			}
 		    }
 		} // synchronized aThreads
+                 CAT.debug("1114 release raThreads");
 	    } // if aThreads > 0
 
 	    // AnmeldeThread killen
@@ -1090,6 +1171,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     private RobProgListener robProgListener = new RobProgListener();
     private class RobProgListener implements RemovalListener{
 	public void waitableRemoved(Waitable w){
+            CAT.debug("RobProgListener: waitable removed");
 	    sendMsg("mProgReceived", new String[] { ((ServerRoboterThread)w).rob.getName() } );
 	    if (waitablesImWaitingFor.size()==1) {
 		String robName = ((ServerRoboterThread)waitablesImWaitingFor.getElement()).rob.getName();
@@ -1100,11 +1182,22 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     }
 
     synchronized boolean isGameStarted() {
+        try {
+        CAT.debug("1183 wait for server") ;
         return gameStarted;
+
+        }finally{
+          CAT.debug("1183 release server");
+        }
     }
 
     synchronized public void startGame() {
+    try {
+        CAT.debug("1193 wait for server");
 	gameStarted = true;
 	notify();
+         }catch(Exception e){
+          CAT.debug("1197 release server");
+        }
     }
 }// class Server ende

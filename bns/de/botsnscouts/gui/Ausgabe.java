@@ -72,6 +72,13 @@ public class Ausgabe extends BNSThread {
     /** the last phase of the current turn */
     private int lastPhase=1;
 
+
+    // this flag tells us to ignore a "removed from game" message if we
+    // requested the removal; in this case we don't want to get any status
+    // information like we are doing it in case of a regular "game over"
+    // -> see last case in the run()-method and abmelden()
+    private boolean quitByMyself = false;
+
     public Ausgabe() {
 	this("localhost",8077,false);
     }
@@ -302,6 +309,12 @@ public class Ausgabe extends BNSThread {
 
 	    case (ClientAntwort.ENTFERNUNG): {
 		CAT.info("Game over.");
+
+                if (quitByMyself) { // hendrik was here..
+                  CAT.debug("server seems to confirm our request for quitting the game");
+                  CAT.debug("this is great because chances are that server is not deadlocked now! :)");
+                  return;
+                }
 
 		try {
 		    String[] spielErgebnis = kommClient.getSpielstand();
@@ -580,7 +593,7 @@ public class Ausgabe extends BNSThread {
     public void scrollFlag (int nr) {
 	if (nr > 0 && nr <= flags.length) {
 	    trackPos(flags[(nr-1)].getX(),flags[(nr-1)].getY());
-	} 
+	}
     }
 
     public void trackPos (int x, int y) {
@@ -601,6 +614,8 @@ public class Ausgabe extends BNSThread {
 
 
     private void abmelden() {
+      quitByMyself = true;
+      spielEnde=true;
       kommClient.abmelden( name );
     }
 
@@ -608,7 +623,8 @@ public class Ausgabe extends BNSThread {
        // CAT.debug("Ausgabe sends quit..");
        // abmelden();
         CAT.debug("Ausgabe sets condition for exiting its run method..");
-        spielEnde=true;
+
+        abmelden();
         CAT.debug("Ausgabe tells the view to propagate quitting..");
         view.quitHumanPlayer(); // Tell the view to tell the HumanPlayer to quit, if there is any
     }

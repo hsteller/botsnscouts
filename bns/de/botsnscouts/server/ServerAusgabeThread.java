@@ -74,6 +74,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 	    outer: while((!ende)&&(!isInterrupted())){
 		try{
 		    ans=komm.warte();
+                    CAT.debug("77 lock auf mir");
 		    synchronized(this){
 			int m=mode;
 			if (m==Server.KEINEFRAGEN){ // dumm gelaufen...
@@ -151,8 +152,10 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 			    break;
 
 			case ServerAntwort.ABMELDUNG:
+                            CAT.debug("received abmeldung!");
 			    ende=true;
 			    notifyServer();
+                            outMaint.deleteOutput(this, "bla");
 			    return;
 
 			case ServerAntwort.MSG_ACK:
@@ -175,6 +178,9 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 		    outMaint.deleteOutput(this,"RV");
 		    ende=true;
 		}
+                finally {
+                  CAT.debug("?? auf mir verlassen");
+                }
 	    } //"Endlos"schleife
 	} catch( Throwable t ) {
 	    CAT.fatal("Exception:", t);
