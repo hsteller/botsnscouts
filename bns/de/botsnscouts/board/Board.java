@@ -171,7 +171,6 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
 
         int strpos = 0;            // Current pos in the String
 
-        Floor nbo;
         for (int zeile = sizeY; zeile > 0; zeile--) {
             //parse ZwischenReihe (Nordwaende)
             for (int spalte = 0; spalte < sizeX; spalte++) {

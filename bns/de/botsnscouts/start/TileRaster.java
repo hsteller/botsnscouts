@@ -138,7 +138,7 @@ public class TileRaster{
 	Location[] flag=new Location[1];
 	flag[0]=new Location((x-1)%12+1,(y-1)%12+1);
 
-	boolean testFl=tiles[kx][ky].testFlagge(flag);
+	boolean testFl=tiles[kx][ky].areFlagPositionsValid(flag);
 	return testFl;
     }
 
