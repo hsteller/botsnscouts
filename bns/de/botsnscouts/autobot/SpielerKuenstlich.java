@@ -57,7 +57,7 @@ public class SpielerKuenstlich extends Thread {
 
             try{
                 antwort=meinKomm.warte();
-		hotfix();
+		//hotfix();
                 if (antwort.typ==antwort.SPIELSTART){
                     meinKomm.spielstart();
                 }
@@ -89,7 +89,7 @@ public class SpielerKuenstlich extends Thread {
                         d("Robbi fuellen");
                         robbifuellen();
 
-			hotfix();
+			//hotfix();
 
                         d("antwortaufZerstoerung");
                         antwortaufZerstoerung();
@@ -99,7 +99,7 @@ public class SpielerKuenstlich extends Thread {
                         d("answer auf Reparatur");
                         robbifuellen();
 
-			hotfix();
+			//hotfix();
 
                         antwortaufReparatur(antwort.zahl);
                         break;
@@ -168,7 +168,7 @@ public class SpielerKuenstlich extends Thread {
 
                     case(ClientAntwort.REAKTIVIERUNG):                    // Anfrage vom Server ob Roboter wieder eingesetzt werden möchte
 
-			hotfix();
+			//hotfix();
 
                         meinKomm.respReaktivierung (realname,false); // Anwort: Roboter wiedereinsetzen
                         break;
@@ -177,7 +177,7 @@ public class SpielerKuenstlich extends Thread {
                         d("Wurde aus Spiel entfernt! Grund:"+antwort.str+"\nSende OK an Server.");
                         spielLaeuft=false;
 
-			hotfix();
+			//hotfix();
 
 			meinKomm.bestaetigung();
                         break;
