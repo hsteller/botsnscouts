@@ -42,7 +42,7 @@ import de.botsnscouts.gui.Splash;
 
 public class Start extends JFrame implements WindowListener{
 
-    static Category CAT = Category.getInstance(Start.class);
+    private static final Category CAT = Category.getInstance(Start.class);
 
     Facade fassade;
 
@@ -321,28 +321,28 @@ public class Start extends JFrame implements WindowListener{
 		if (spielfeld.endsWith(".spf")){
 		    spielfeld=spielfeld.substring(0,spielfeld.length()-4);
 		}
-		Global.debug("Spielfeld "+spielfeld);
+		CAT.debug("Spielfeld "+spielfeld);
 		GameFieldLoader loader=new GameFieldLoader();
 		Facade fassade=new Facade();
 		Properties prop = loader.getProperties(spielfeld);
-		Global.debug("Properties "+prop);
+		CAT.debug("Properties "+prop);
 		fassade.loadSpfProp(prop);
-		Global.debug("Spielfed loaded");
+		CAT.debug("Spielfed loaded");
 		fassade.startGame();
-		Global.debug("Server gestartet");
+		CAT.debug("Server gestartet");
 		if (argv[2].equals("yes")){
 		    fassade.amSpielTeilnehmen(KrimsKrams.randomName(),0);
-		    Global.debug("Menschlichen Spieler gestartet");
+		    CAT.debug("Menschlichen Spieler gestartet");
 		}else{
 		    fassade.einemSpielZuschauen();
-		    Global.debug("Ausgabe gestartet");
+		    CAT.debug("Ausgabe gestartet");
 		}
 		int anzKS=0;
 		try{
 		    anzKS=Integer.parseInt(argv[3]);
 		    for (int i=0;i<anzKS;i++){
 			fassade.kuenstlicheSpielerStarten(100);
-		    Global.debug("K\uFFFDnstlichen Spieler gestartet");
+		    CAT.debug("Künstlichen Spieler gestartet");
 		    }
 		}catch(NumberFormatException e){
 		}
@@ -352,7 +352,7 @@ public class Start extends JFrame implements WindowListener{
 		    System.err.println(e);
 		}
 		fassade.spielGehtLos();
-		Global.debug("Spiel geht los");
+		CAT.debug("Spiel geht los");
 		return;
 	    }catch(Exception e){
 		System.err.println(e);

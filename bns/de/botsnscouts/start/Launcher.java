@@ -54,7 +54,8 @@ public class Launcher{
 	    ret=(Thread) new HumanPlayer(ip,port,name,farbe,noSplash);
 	    ret.start();
 	} catch (Exception u){
-	    return null;
+	  CAT.error("Error while starting the game for player "+name+": "+u.getMessage());
+	  return null;
 	}
 	return ret;
     }

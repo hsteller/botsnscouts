@@ -34,10 +34,15 @@ import javax.swing.border.*;
 import java.net.*;
 import java.io.*;
 import java.util.*;
+
 import de.botsnscouts.util.*;
 import de.botsnscouts.gui.*;
 
+import org.apache.log4j.Category;
+
 public class StartPanel extends JPanel{
+
+    private static final Category CAT = Category.getInstance(StartPanel.class);
     Paint paint;
     Start parent;
     Thread thread;
@@ -152,9 +157,15 @@ public class StartPanel extends JPanel{
         JButton ok=new TransparentButton(Message.say("Start","mGoButton"));
 	ok.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    Thread player=parent.fassade.amSpielTeilnehmenNoSplash(name.getText(),color.getSelectedIndex());
-		    parent.addKS(player);
-		    name.setText(KrimsKrams.randomName());
+		  new Thread(){
+		      public void run(){
+			CAT.debug("Button pressed. Going to register "+name.getText());
+			Thread player=parent.fassade.amSpielTeilnehmenNoSplash(name.getText(),color.getSelectedIndex());
+			parent.addKS(player);
+			//Generate a new name for the (potential) next local player
+			name.setText(KrimsKrams.randomName());
+		      }
+		    }.start();
 		}});
 
 	gc.gridx = 0;
