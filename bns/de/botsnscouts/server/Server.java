@@ -159,17 +159,19 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
 
     public void deleteOutput(ServerAusgabeThread t, String grund)
     {
-	d("deleteOutput aufgerufen. grund="+grund);
-	try{
-	    waitablesImWaitingFor.removeAndNotify(t);
-	    t.deleteMe(grund);
-	}
-	catch(KommException ex) {
-	    d("Ausgabe konnte nicht mehr von ihrer Entfernung wg. "+grund+" benachrichtigt werden: "+ex);
-	}
+        synchronized (aThreads) {
+          d("deleteOutput aufgerufen. grund="+grund);
+          try{
+              waitablesImWaitingFor.removeAndNotify(t);
+              t.deleteMe(grund);
+          }
+          catch(KommException ex) {
+              d("Ausgabe konnte nicht mehr von ihrer Entfernung wg. "+grund+" benachrichtigt werden: "+ex);
+          }
 
-	t.interrupt(); // Beende sie
-        aThreads.remove(t);
+          t.interrupt(); // Beende sie
+          aThreads.remove(t);
+        }
     }
 
     public int getOutputTimeout(){ return ausgabennotifyto; }

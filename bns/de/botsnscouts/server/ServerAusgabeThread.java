@@ -155,6 +155,8 @@ class ServerAusgabeThread extends BNSThread implements Waitable
                             CAT.debug("received abmeldung!");
 			    ende=true;
 			    notifyServer();
+                            mok.notifyDone(this);// otherwise the sever will deadlock
+                                                 // if ABMELDUNG occurs while doing the phases
                             outMaint.deleteOutput(this, "bla");
 			    return;
 
