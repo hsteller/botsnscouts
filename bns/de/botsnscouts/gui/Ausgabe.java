@@ -80,7 +80,7 @@ public class Ausgabe extends BNSThread {
     private boolean quitByMyself = false;
 
     // no comment here ;)
-    LaserHack laserHack = new LaserHack();
+    //LaserHack laserHack = new LaserHack();
 
 
     public Ausgabe() {
