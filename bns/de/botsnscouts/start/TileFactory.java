@@ -184,9 +184,14 @@ public class TileFactory {
     }
 
     private void checkLadeStatus() {
-        if (!workerStarted) prepareTiles();
+    
+            if (!workerStarted)
+                prepareTiles();
+      
         try {
-            worker.join();
+            synchronized (worker){ // FIXME vielleicht hilft das syncen hier gegen die NPE in prepareTiles?
+                worker.join();
+            }
         } catch (InterruptedException e) {
             System.err.println(e);
         }
@@ -196,7 +201,7 @@ public class TileFactory {
         synchronized (worker) {
             if (workerStarted) return;
             worker.start();
-            worker.setPriority(Thread.MIN_PRIORITY);
+            worker.setPriority(Thread.MIN_PRIORITY); // FIXME hier gibts NullPoin
             workerStarted = true;
         }
     }
