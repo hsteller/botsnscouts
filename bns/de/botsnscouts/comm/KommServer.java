@@ -1147,12 +1147,7 @@ public class KommServer {
 
     }
 
-    /**
-     * Finalizer, der die Streams zu macht. (Wird vom garbage collector
-     * aufgerufen.)
-     * 
-     * @author Miriam
-     */
+
     protected void finalize() throws Throwable {
         super.finalize();
         if (in != null)

@@ -68,13 +68,14 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 
     public void run()
     {
+        CAT.debug("Running...");
 	try{
             ende=false;
             ServerAntwort ans;
 	    outer: while((!ende)&&(!isInterrupted())){
 		try{
 		    ans=komm.warte();
-                    CAT.debug("77 lock auf mir");
+            CAT.debug("77 lock auf mir");
 		    synchronized(this){
 			int m=mode;
 			if (m==Server.KEINEFRAGEN){ // dumm gelaufen...
@@ -152,7 +153,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 			    break;
 
 			case ServerAntwort.ABMELDUNG:
-                            CAT.debug("received abmeldung!");
+                CAT.debug("received abmeldung!");
 			    ende=true;
 			    notifyServer();
                             mok.notifyDone(this);// otherwise the sever will deadlock

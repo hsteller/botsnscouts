@@ -108,7 +108,6 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
         }
 
         CAT.debug("New server with these options: "+options);
-
     }
 
 
@@ -694,15 +693,15 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
             setName("ServerThread");
 
             CAT.debug("MsgThreadStart");
-            messageThread = new MessageThread(this, kommto);
-            messageThread.start();
+             messageThread = new MessageThread(this, kommto);
+             messageThread.start();
 
-            CAT.debug("anmeldung()");
-            boolean spielgestartet = anmeldung();
-            if (!spielgestartet) {
-                messageThread.interrupt();
-                return;
-            }
+             CAT.debug("anmeldung()");
+             boolean spielgestartet = anmeldung();
+             if (!spielgestartet) {
+                 messageThread.interrupt();
+                 return;
+             }
 
             CAT.debug("setzeStartPunkt()");
             setzeStartPunkt();
@@ -1193,7 +1192,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
     }// run() ende
 
     private void d(String s) {
-        Global.debug(this, s);
+        CAT.debug(s);
     }
 
     private RobProgListener robProgListener = new RobProgListener();
