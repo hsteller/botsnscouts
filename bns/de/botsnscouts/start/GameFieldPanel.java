@@ -25,12 +25,10 @@
 
 package de.botsnscouts.start;
 
-import de.botsnscouts.widgets.ColoredComponent;
-import de.botsnscouts.widgets.ColoredPanel;
 import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Message;
-import de.botsnscouts.widgets.TransparentButton;
+import de.botsnscouts.widgets.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -58,13 +56,10 @@ public class GameFieldPanel extends JPanel {
     JButton backBut;
 
     JComponent editPanel;
-    JLabel spielfeld;
     JComboBox spielfelder;
     JButton save;
     JButton edit;
-    JLabel name;
     JTextField nam;
-    JLabel farbe;
     JComboBox farben;
     JCheckBox mitspielen;
     GameFieldLoader loader = new GameFieldLoader();
@@ -91,9 +86,8 @@ public class GameFieldPanel extends JPanel {
 
         scrl = new JScrollPane();
 
-        pnl = new JPanel();
+        pnl = new TJPanel();
         pnl.setLayout(new FlowLayout());
-        pnl.setOpaque(false);
         pnl.setBorder(new EmptyBorder(50, 50, 50, 50));
         pnl.add(spf);
 
@@ -161,7 +155,7 @@ public class GameFieldPanel extends JPanel {
 
         Font font = new Font("Sans", Font.BOLD, 12);
 
-        spielfeld = new JLabel(Message.say("Start", "mSpielfeld"));
+        JLabel spielfeld = new TJLabel(Message.say("Start", "mSpielfeld"));
         String[] spielfeldAr = loader.getSpielfelder();
         String defSpf = null;
         for (int i = 0; i < spielfeldAr.length; i++) {
@@ -215,18 +209,15 @@ public class GameFieldPanel extends JPanel {
             }
         });
 
-        name = new JLabel(Message.say("Start", "mName"));
-
-        nam = new JTextField(Conf.getDefaultRobName());
-        farbe = new JLabel(Message.say("Start", "mFarbe"));
+        nam = new TJTextField(Conf.getDefaultRobName());
         farben = new RoboBox(true);
-        mitspielen = new JCheckBox(Message.say("Start", "mTeilnehmenBox"), true);
+        mitspielen = new TJCheckBox(Message.say("Start", "mTeilnehmenBox"), true);
 
-        allowScout = new JCheckBox(Message.say("Start", "mAllowScout"), true);
-        allowWisenheimer = new JCheckBox(Message.say("Start", "mAllowWisenheimer"), true);
+        allowScout = new TJCheckBox(Message.say("Start", "mAllowScout"), true);
+        allowWisenheimer = new TJCheckBox(Message.say("Start", "mAllowWisenheimer"), true);
 
         boolean defaultAnnounceGame = false;
-        announceGame = new JCheckBox(Message.say("Start", "mAnnounceMetaServer"),
+        announceGame = new TJCheckBox(Message.say("Start", "mAnnounceMetaServer"),
                 defaultAnnounceGame);
         announceGame.addActionListener(
                 new ActionListener() {
@@ -237,29 +228,13 @@ public class GameFieldPanel extends JPanel {
         }
 
         );
-        metaServer = new JTextField(Conf.getDefaultMetaServer());
+        metaServer = new TJTextField(Conf.getDefaultMetaServer());
         metaServer.setEnabled(defaultAnnounceGame);
 
-        spielfeld.setFont(font);
         spielfelder.setFont(font);
         save.setFont(font);
         edit.setFont(font);
-        name.setFont(font);
-        nam.setFont(font);
-        farbe.setFont(font);
-        mitspielen.setFont(font);
-        allowWisenheimer.setFont(font);
-        allowScout.setFont(font);
-        announceGame.setFont(font);
-        metaServer.setFont(font);
-
         spielfelder.setEnabled(true);
-        spielfelder.setOpaque(false);
-        mitspielen.setOpaque(false);
-        allowWisenheimer.setOpaque(false);
-        allowScout.setOpaque(false);
-        announceGame.setOpaque(false);
-        metaServer.setOpaque(false);
 
         mitspielen.addChangeListener(new ChangeListener() {
             //changeListener Methode
@@ -275,18 +250,15 @@ public class GameFieldPanel extends JPanel {
             }
         });
 
-        nam.setEditable(true);
-        nam.setEnabled(true);
-        nam.setOpaque(false);
 
         inner.add(spielfeld, gc);
         inner.add(spielfelder, gc);
         inner.add(save, gc);
         inner.add(edit, gc);
         inner.add(mitspielen, gc);
-        inner.add(name, gc);
+        inner.add(new TJLabel(Message.say("Start", "mName")), gc);
         inner.add(nam, gc);
-        inner.add(farbe, gc);
+        inner.add(new TJLabel(Message.say("Start", "mFarbe")), gc);
         inner.add(farben, gc);
         inner.add(allowWisenheimer, gc);
         //gc.fill = GridBagConstraints.NONE;

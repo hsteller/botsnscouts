@@ -45,6 +45,12 @@ public class GreenTheme extends DefaultMetalTheme {
 	private final ColorUIResource sec2 = new ColorUIResource( new Color(0,96,0) );
 	private final ColorUIResource sec3 = new ColorUIResource( new Color(0,64,0) );
 
+    private final static Font font = new Font("Sans", Font.BOLD, 12);
+
+    static public Font getFont() {
+        return font;
+    }
+
 	protected ColorUIResource getPrimary1() { return prim1; }
 	protected ColorUIResource getPrimary2() { return prim2; }
 	protected ColorUIResource getPrimary3() { return prim3; }

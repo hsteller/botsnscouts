@@ -26,30 +26,42 @@
 package de.botsnscouts.widgets;
 
 import javax.swing.*;
+import java.awt.*;
 
 /** Transparent JLabel */
 public class TJLabel extends JLabel {
+
+    private static Font font = new Font("Sans", Font.BOLD, 12);
+
+
     public TJLabel() {
-	setOpaque( false );
+        setOpaque(false);
+        setFont(font);
     }
 
     public TJLabel(String text) {
-	super(text);
-	setOpaque(false);
+        super(text);
+        setOpaque(false);
+        setFont(font);
     }
 
     public TJLabel(String text, int align) {
-	super(text, align);
-	setOpaque(false);
+        super(text, align);
+        setOpaque(false);
+        setFont(font);
+
     }
 
     public TJLabel(Icon icon) {
-	super(icon);
-	setOpaque(false);
+        super(icon);
+        setOpaque(false);
+        setFont(font);
+
     }
 
     public TJLabel(Icon icon, int align) {
-	super(icon, align);
-	setOpaque(false);
+        super(icon, align);
+        setOpaque(false);
+        setFont(font);
     }
 }
