@@ -12,6 +12,8 @@ import de.botsnscouts.util.*;
 public class Spielfeld implements de.botsnscouts.util.Directions
 {
 
+  public static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Spielfeld.class);
+
   /***** Public Konstanten *****/
 
   // Wandgerätetypen
@@ -164,6 +166,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
    */
     // UNGETESTET!!!
     public Spielfeld(Spielfeld s1, Spielfeld s2, boolean nebeneinander) throws FormatException{
+      CAT.debug("new Spielfeld called");
 	if (nebeneinander){
 	    sizeX=s1.sizeX+s2.sizeX;
 	    sizeY=s1.sizeY;
@@ -250,6 +253,7 @@ public class Spielfeld implements de.botsnscouts.util.Directions
     */
   public Spielfeld(int x, int y, String kacheln, Ort[] f) throws FormatException, FlaggenException
     {
+      CAT.debug("new Spielfeld called");
       sizeX=x;
       sizeY=y;
       SpielfeldString=kacheln;
@@ -363,131 +367,156 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 /** Deep Magic */
   public String get90GradGedreht()
     {
-      String s="";
+      CAT.debug("get90GradGedreht() called");
+      StringBuffer s=new StringBuffer();
       for (int x=sizeX;x>0;x--){
 	for (int y=sizeY;y>0;y--){
 	  // "obere" ZwischenReihe
 	  Wand w = ow(x,y);
-	  s=writeWandH(w,s);
+	  writeWandH(w,s);
 	}
-	s+="\n";
-	s=writeWand(nw(x,sizeX),s);
+	s.append('\n');
+	writeWand(nw(x,sizeX),s);
 	for (int y=sizeY;y>0;y--){
 	  //Boden
-	  s=writeBoden(bo(x,y),s,true);
-	  s=writeWand(sw(x,y),s);
+	  writeBoden(bo(x,y),s,true);
+	  writeWand(sw(x,y),s);
 	}
-	s+="\n";
+	s.append("\n");
       } //for x
       // unterste ZwischenReihe
       for (int y=sizeY;y>0;y--)
-	s=writeWandH(ww(1,y),s);
-      s+="\n.\n";
-      return s;
+	writeWandH(ww(1,y),s);
+      s.append("\n.\n");
+      return new String(s);
     }
 
 /* Well, and I hoped I'd never have to do this one -right- :-) */
     public String getComputedString()
         {
-            String s="";
+	  CAT.debug("getComputedString called");
+            StringBuffer s=new StringBuffer();
             for (int y=sizeY;y>0;y--){
                 for (int x=1;x<=sizeX;x++){
                         // obere ZwischenReihe
                     Wand w = nw(x,y);
-                    s=writeWand(w,s);
+                    writeWand(w,s);
                 }
-                s+="\n";
-                s=writeWand(ww(1,y),s);
+                s.append("\n");
+                writeWand(ww(1,y),s);
                 for (int x=1;x<=sizeX;x++){
                         //Boden
-                    s=writeBoden(bo(x,y),s,false);
-                    s=writeWand(ow(x,y),s);
+                    writeBoden(bo(x,y),s,false);
+                    writeWand(ow(x,y),s);
                 }
-                s+="\n";
+                s.append("\n");
             } //for y
                 // unterste ZwischenReihe
             for (int x=1;x<=sizeX;x++)
-                s=writeWand(sw(x,1),s);
-            s+="\n.\n";
-            return s;
+                writeWand(sw(x,1),s);
+            s.append("\n.\n");
+	    return new String(s);
         }
 
-  private String writeWandH(Wand w,String s)
+  private void writeWandH(Wand w,StringBuffer s)
     {
 	switch (w.wandEl[1]){
 	case WLASER:
-	    s=s+"[L("+w.spez[1]+")";
+	    s.append("[L(");
+	    s.append(w.spez[1]);
+	    s.append(")");
 	    break;
 	case WPUSHER:
-	    s=s+"[S(";
-	    for (int i=1;i<6;i++)
-	  if (isPusherActive(w.spez[1],i))
-	    s=s+i+",";
-	s=s+")";
+	    s.append("[S(");
+	    for (int i=1;i<6;i++){
+	      if (isPusherActive(w.spez[1],i)){
+		s.append(i);
+		s.append(',');
+	      }
+	    }
+	s.append(')');
 	break;
       }
-      s=s+(w.da?"#":"_");
+      s.append(w.da?'#':'_');
       switch (w.wandEl[0]){
       case WLASER:
-	s=s+"L("+w.spez[0]+")]";
+	s.append("L(");
+	s.append(w.spez[0]);
+	s.append(")]");
 	break;
       case WPUSHER:
-	s=s+"S(";
-	for (int i=1;i<6;i++)
-	  if (isPusherActive(w.spez[0],i))
-	    s=s+i+",";
-	s=s+")]";
+	s.append("S(");
+	for (int i=1;i<6;i++){
+	  if (isPusherActive(w.spez[0],i)){
+	    s.append(i);
+	    s.append(',');
+	  }
+	}
+	s.append(")]");
+	
 	break;
       }
-      return s;
     }
 
-  private String writeWand(Wand w,String s)
+  private void writeWand(Wand w,StringBuffer s)
     {
       switch (w.wandEl[0]){
       case WLASER:
-	s=s+"[L("+w.spez[0]+")";
+	s.append("[L(");
+	s.append(w.spez[0]);
+	s.append(')');
 	break;
       case WPUSHER:
-	s=s+"[S(";
-	for (int i=1;i<6;i++)
-	  if (isPusherActive(w.spez[0],i))
-	    s=s+i+",";
-	s=s+")";
+	s.append("[S(");
+	for (int i=1;i<6;i++){
+	  if (isPusherActive(w.spez[0],i)){
+	    s.append(i);
+	    s.append(',');
+	  }
+	}
+	s.append(')');
 	break;
       }
-      s=s+(w.da?"#":"_");
+      s.append(w.da?'#':'_');
       switch (w.wandEl[1]){
       case WLASER:
-	s=s+"L("+w.spez[1]+")]";
+	s.append("L(");
+	s.append(w.spez[1]);
+	s.append(")]");
 	break;
       case WPUSHER:
-	s=s+"S(";
-	for (int i=1;i<6;i++)
-	  if (isPusherActive(w.spez[1],i))
-	    s=s+i+",";
-	s=s+")]";
+	s.append("S(");
+	for (int i=1;i<6;i++){
+	  if (isPusherActive(w.spez[1],i)){
+	    s.append(i);
+	    s.append(',');
+	  }
+	}
+	s.append(")]");
 	break;
       }
-      return s;
     }
 
-  private String writeBoden(Boden b,String s,boolean drehen)
+  private void writeBoden(Boden b,StringBuffer s,boolean drehen)
     {
       final String[] RUECK={ "N", "E", "S", "W" };
 
       switch (b.typ){
       case BDGRUBE:
-	s+="G";
+	s.append('G');
 	break;
       case BDNORMAL:
-	s+="B";
+	s.append('B');
 	break;
       case BDREPA:
-	s+="R("+b.spez+")";
+	s.append("R(");
+	s.append(b.spez);
+	s.append(')');
 	break;
       case BDDREHEL:
-	s+="D("+((b.spez==DUHRZ)?"R":"L")+")";
+	s.append("D(");
+	s.append((b.spez==DUHRZ)?'R':'L');
+	s.append(')');
 	break;
       default:
 	  int typ=b.typ;
@@ -495,44 +524,61 @@ public class Spielfeld implements de.botsnscouts.util.Directions
 	      typ=(b.typ/10)*10;
 	      typ+=(((b.typ%10)+3)%4);
 	  }
-	s+="F(";
+	s.append("F(");
 	switch (typ%10){
 	case FNORD:
-	  s+="N,";
+	  s.append("N,");
 	  break;
 	case FOST:
-	  s+="E,";
+	  s.append("E,");
 	  break;
 	case FSUED:
-	  s+="S,";
+	  s.append("S,");
 	  break;
 	case FWEST:
-	  s+="W,";
+	  s.append("W,");
 	  break;
 	} //switch richtung
-	s=s+(typ/100)+",(";
-	if (((typ/10)%10)==2) // gegen den Uhrzeigersinn
-	  s+="("+RUECK[((typ%10)+3)%4]+",D(L))";
-	else if (((typ/10)%10)==3) // im Uhrzeigersinn
-	  s+="("+RUECK[((typ%10)+1)%4]+",D(R))";
+	s.append(typ/100);
+	s.append(",(");
+	if (((typ/10)%10)==2) {// gegen den Uhrzeigersinn
+	  s.append('(');
+	  s.append(RUECK[((typ%10)+3)%4]);
+	  s.append(",D(L))");
+	}
+	else if (((typ/10)%10)==3){ // im Uhrzeigersinn
+	  s.append('(');
+	  s.append(RUECK[((typ%10)+1)%4]);
+	  s.append(",D(R))");
+	}
 	else if (((typ/10)%10)==5){ // beides 
 	    if (drehen){
-		s+="("+RUECK[((typ%10)+3)%4]+",D(R))";
-		s+="("+RUECK[((typ%10)+1)%4]+",D(L))";
+		s.append('(');
+		s.append(RUECK[((typ%10)+3)%4]);
+		s.append(",D(R))");
+		s.append('(');
+		s.append(RUECK[((typ%10)+1)%4]);
+		s.append(",D(L))");
 	    } else {
-		s+="("+RUECK[((typ%10)+1)%4]+",D(R))";
-		s+="("+RUECK[((typ%10)+3)%4]+",D(L))";
+		s.append("(");
+		s.append(RUECK[((typ%10)+1)%4]);
+		s.append(",D(R))");
+		s.append('(');
+		s.append(RUECK[((typ%10)+3)%4]);
+		s.append(",D(L))");
 	    }
 	}
-	s+=")("; //crushers
+	s.append(")("); //crushers
 	if (b.spez>0)
-	  for (int i=1;i<6;i++)
-	    if (isCrusherActive(b.spez,i))
-	      s=s+i+",";
-	s+="))";
+	  for (int i=1;i<6;i++){
+	    if (isCrusherActive(b.spez,i)){
+	      s.append(i);
+	      s.append(',');
+	    }
+	  }
+	s.append("))");
 	break;
       } //switch typ
-      return s;
     }
   
   private int parseBoden(int pos,String s,Boden neu) throws FormatException
