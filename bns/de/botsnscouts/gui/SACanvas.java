@@ -85,14 +85,14 @@ public class SACanvas extends JComponent {
     private int laserWavCount;
 
     private Image dbi;
-    private Image[] cbeltCrop,ebeltCrop,diverseCrop,robosCrop,scoutCrop,robosCrop2;
+    private Image[] cbeltCrop,ebeltCrop,diverseCrop,robosCrop,scoutCrop;//,robosCrop2;
 
     private int x,y;
 
 
     private Roboter[] robos;
     private Roboter vorschauRob;
-    private Color[] robocolor2;
+    //private Color[] robocolor2;
     private Ort lastScoutPos = new Ort();
 
     public static final Color GREEN  = new Color(4,156,52);
@@ -152,6 +152,7 @@ public class SACanvas extends JComponent {
 	init( sf_neu, robColors );
         // jetzt: robocolor2 == robColors
 
+        /*
 	robosCrop2 = new Image[32];
 
 	// umkopieren der Roboterbilder
@@ -191,6 +192,7 @@ public class SACanvas extends JComponent {
 		    robosCrop2[4*i+j]=robosCrop[j+28];
 	    }
 	}
+        */
 	mouseInit();
     }
 
@@ -198,7 +200,7 @@ public class SACanvas extends JComponent {
 
     private void init(SpielfeldSim sf_neu, Color [] robColors) {
 	soundActive=Boolean.getBoolean("sound");
-	robocolor2=robColors;
+	//robocolor2=robColors;
 	//	drawRobLaser=false;
 	//drawBordLaser=false;
 	activeBordLasers=false;
@@ -227,7 +229,7 @@ public class SACanvas extends JComponent {
 	cbeltCrop   = ImageMan.getImages( ImageMan.CBELTS );
 	diverseCrop = ImageMan.getImages( ImageMan.DIVERSE );
 	robosCrop   = ImageMan.getImages( ImageMan.ROBOS );
-	robosCrop2  = robosCrop;
+	//robosCrop2  = robosCrop;
 	scoutCrop   = ImageMan.getImages( ImageMan.SCOUT );
     }
 
