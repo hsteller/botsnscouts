@@ -67,7 +67,7 @@ public class Scout {
 	doPhaseRob[0] = Bot.getCopy(f.statusLine.sC[myRobIndex].r);
 	doPhaseRob[0].zeige_Roboter();
 	int moeglichePhasen = 0;
-	f.spielFeld.vorschau(moeglichePhasen,doPhaseRob);
+	f.spielFeld.preview(moeglichePhasen,doPhaseRob);
 	*/
     }
     

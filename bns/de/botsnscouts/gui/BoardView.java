@@ -191,6 +191,15 @@ public class BoardView extends JComponent {
         mouseInit();
     }
 
+    /** Get a simple board view loaded from one tile file.
+     *  This is not the way to do this in general since boards may
+     *  consist of serveral tiles and each tile may be rotated.
+     * @param boardFile The board file to load.
+     */
+    public BoardView(File boardFile) throws IOException, FormatException, FlagException {
+        this(new SimBoard(12, 12, Board.readMagicString(boardFile)));
+    }
+
 
     public double getScale() {
         return dScale;

@@ -365,7 +365,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     }
 
     protected void showScout(int chosen, Bot[] robs) {
-	gameBoardCanvas.vorschau(chosen,robs);
+	gameBoardCanvas.preview(chosen,robs);
     }
 
 
