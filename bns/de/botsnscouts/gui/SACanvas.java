@@ -13,6 +13,7 @@ import javax.swing.*;
 
 import de.botsnscouts.board.*;
 import de.botsnscouts.util.*;
+import de.botsnscouts.*;
 /**
  * Spielfeld-Ausgabe-Canvas ist das Objekt, das der Ausgabe und dem menschlichen Spieler das Spielfeld grafisch darstellt und verwaltet
  * @author ursprünglich Daniel Holtz
@@ -196,10 +197,10 @@ public class SACanvas extends Component {
 	if (soundActive) {
 	    laserWavCount=0;
 	    String s ="sounds/laserhit.wav"; 
-	    URL u = this.getClass().getResource(s);
+	    URL u = BotsNScouts.class.getResource(s);
 	    mLaserWav [0] = Applet.newAudioClip(u);
 	    s="sounds/laser2.wav";
-	    u = this.getClass().getResource(s);
+	    u = BotsNScouts.class.getResource(s);
 	    mLaserWav [1] = Applet.newAudioClip(u);
 	    
 	}
