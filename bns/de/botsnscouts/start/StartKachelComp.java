@@ -14,7 +14,7 @@ public class StartKachelComp extends JComponent implements  MouseListener, Mouse
 
     Image kachImage;
     int drehung;
-    StSpFassade fassade;
+    Facade fassade;
     int myX,myY;
     Paint paint;
     int W=150, H=150;
@@ -25,7 +25,7 @@ public class StartKachelComp extends JComponent implements  MouseListener, Mouse
 
     KachelClickListener kachelClickListener;
 
-    public StartKachelComp(StSpFassade fas, int x, int y){
+    public StartKachelComp(Facade fas, int x, int y){
 	setOpaque(false);
 	fassade=fas;
 	W=H=fassade.getThumbGR();
@@ -51,7 +51,7 @@ public class StartKachelComp extends JComponent implements  MouseListener, Mouse
 	Kachel tmpKachel=fassade.getKachelAt(myX, myY);
 	if (tmpKachel!=null){
 	    Image newKachelImage=tmpKachel.getImage();
-	    int newDrehung=tmpKachel.getDrehung();
+	    int newDrehung=tmpKachel.getRotation();
 	    kachelChanged=(kachImage!=newKachelImage||drehung!=newDrehung);
 	    kachImage=newKachelImage;
 	    drehung=newDrehung;

@@ -26,7 +26,7 @@ public class KachelRaster{
     public void rotKachel(int x, int y){
 	if (kacheln[x][y]==null) return;
 	//hole rotierte Kachel
-	kacheln[x][y]=kachFactory.getKachel(kacheln[x][y].getName(), (kacheln[x][y].getDrehung()+1)%4);
+	kacheln[x][y]=kachFactory.getKachel(kacheln[x][y].getName(), (kacheln[x][y].getRotation()+1)%4);
 	//rotiere Flaggen, falls vorhanden
 	int kx,ky,fx,fy;
 	for (int j=0;j<flaggenN;j++){

@@ -13,7 +13,7 @@ import de.botsnscouts.board.*;
 public class StartSpielfeldSpf extends JPanel{
     Start parent;
     StartKachelComp[][] kachP;
-    StSpFassade fassade;
+    Facade fassade;
 
     public StartSpielfeldSpf(Start par){
 	parent=par;

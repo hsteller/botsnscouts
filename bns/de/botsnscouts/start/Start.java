@@ -14,7 +14,7 @@ import de.botsnscouts.util.*;
 
 public class Start extends JFrame implements WindowListener{
 
-    StSpFassade fassade;
+    Facade fassade;
 
     Paint paint;
     StartAnfang startAnfang;                //startbildschirm
@@ -35,9 +35,9 @@ public class Start extends JFrame implements WindowListener{
 	Toolkit tk=Toolkit.getDefaultToolkit();
 
 	if(tk.getScreenSize().height<600){
-	    fassade=new StSpFassade(150);
+	    fassade=new Facade(150);
 	}else{
-	    fassade=new StSpFassade();
+	    fassade=new Facade();
 	}
 
 	Global.debug(this,tk.getScreenSize().width+"x"+tk.getScreenSize().height);
@@ -205,7 +205,7 @@ public class Start extends JFrame implements WindowListener{
 		}
 		Global.debug("Spielfeld "+spielfeld);
 		StartSpielfeldLoadHelfer helfer=new StartSpielfeldLoadHelfer();
-		StSpFassade fassade=new StSpFassade();
+		Facade fassade=new Facade();
 		Properties prop = helfer.getProperties(spielfeld);
 		Global.debug("Properties "+prop);
 		fassade.loadSpfProp(prop);

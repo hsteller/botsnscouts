@@ -5,29 +5,28 @@ import de.botsnscouts.board.*;
 import de.botsnscouts.gui.*;
 import de.botsnscouts.util.*;
 
-//Die Klasse die zu Kachel Image und name speichert,
-//ein gedrehtes Clone zurück gibt
+//saves image and name of tiles
+//gives rotated image
 
 public class Kachel extends SpielfeldSim{
 
     Image img;
     String kName;
-    int drehung;
-    //    int GR=150;
+    int rotat;
 
-    //Der Konstruktor zum erzeugen einer neuen Kachel
-    public Kachel(String name, String feld, int GR) throws FormatException, FlaggenException{
-	super(12,12,feld,null);
+    //create new tile
+    public Kachel(String name, String field, int GR) throws FormatException, FlaggenException{
+	super(12,12,field,null);
 	kName=name;
-	drehung=0;
+	rotat=0;
 	img=SACanvas.createThumb(this,GR);
     }
 
-    //Konstruktor zum erzeugen einer gedrehten Kachel
-    public Kachel(String name, String feld, int dr, Image im) throws FormatException, FlaggenException{
-	super(12,12,feld,null);
+    //create rotated tile
+    public Kachel(String name, String field, int rot, Image im) throws FormatException, FlaggenException{
+	super(12,12,field,null);
 	kName=name;
-	drehung=dr;
+	rotat=rot;
 	img=im;
     }
 
@@ -39,8 +38,8 @@ public class Kachel extends SpielfeldSim{
 	return kName;
     }
 
-    public int getDrehung(){
-	return drehung;
+    public int getRotation(){
+	return rotat;
     }
 
     //gibt um 90° gedrehtes Clone
@@ -48,7 +47,7 @@ public class Kachel extends SpielfeldSim{
 	String gedrKachel=get90GradGedreht();
 	Kachel drKachel = null;
 	try{
-	    drKachel =new Kachel(kName,gedrKachel,(drehung+1)%4,img);
+	    drKachel =new Kachel(kName,gedrKachel,(rotat+1)%4,img);
 	}catch(FlaggenException e){
 	    System.err.println(e);
 	}catch(FormatException e){

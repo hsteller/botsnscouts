@@ -2,16 +2,17 @@ package de.botsnscouts.start;
 import de.botsnscouts.gui.*;
 import de.botsnscouts.util.*;
 import de.botsnscouts.autobot.*;
+import org.apache.log4j.Category;
 
-// startet SpielerMensch, AusgabeFrame u.s.w.
+// launches human player, output ...
 
 public class Launcher{
 
-    // startet ein AusgabeKanal
+    static final Category CAT = Category.getInstance( Launcher.class );
+    // launches output
     public Thread einemSpielZuschauen(String ip, int port, boolean noSplash){
 	Thread ret;
 	try{
-	    //	    ret=new Thread(new AusgabeFrame(ip, port,null,noSplash));
 	    ret=new Thread(new Ausgabe(ip, port,null,noSplash));
 	    ret.start();
 	}catch(Exception exp){
@@ -20,11 +21,11 @@ public class Launcher{
 	return ret;
     }
 
-    // startet einen SpielerMensch
+    // launches human player
     public Thread amSpielTeilnehmen(String ip, int port, String name, int farbe, boolean noSplash){
 	Thread ret;
 	try {
-	    Global.debug(this,"Trying to start human player...");
+	    if( CAT.isDebugEnabled() ) CAT.debug("Trying to start human player...");
 	    ret=(Thread) new HumanPlayer(ip,port,name,farbe,noSplash);
 	    ret.start();
 	} catch (Exception u){
@@ -33,15 +34,13 @@ public class Launcher{
 	return ret;
     }
 
-    // startet Künstliche Spieler
+    // launch autobots
     public Thread  kuenstlicheSpielerStarten(String ip, int port, boolean local, int iq, KommSpPr com){
 	if (local){
 	    Thread ks;
-	    //for (int i=0;i<anzahl;i++){
 	    ks = new SpielerKuenstlich(ip,port,iq);
 	    ks.start();
 	    ks.setPriority(java.lang.Thread.MIN_PRIORITY);
-		//}
 	    return ks;
 	}else{
 	    if(com.newKS(ip,port,1,iq))
@@ -49,7 +48,6 @@ public class Launcher{
 	    else
 		return null;
 	}
-	//	return true;
     }
 
 
