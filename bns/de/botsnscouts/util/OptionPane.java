@@ -51,7 +51,7 @@ public class OptionPane extends JPanel {
         button.setBorderPainted(false);
         button.setFocusPainted(false);
         button.setContentAreaFilled(false);
-        button.setBorderPaintedFlat(true);
+        //button.setBorderPaintedFlat(true); JDK1.3 only!
         button.setOpaque(false);
         return button;
     }

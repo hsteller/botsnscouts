@@ -209,7 +209,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         JFrame frame = new JFrame("damage");
         frame.setSize(500, 100);
         frame.getContentPane().setLayout( new BorderLayout() );
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         Box b = Box.createHorizontalBox();
         for(int i=0; i<6; i++) {
             Roboter robot = Roboter.getNewInstance("TestRob " + i);
