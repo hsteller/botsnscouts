@@ -118,25 +118,17 @@ public class Ausgabe extends BNSThread {
                     Roboter r1,r2;
                     r1=r2=null; //temp. variables
 
-		    //                    try {
-                        // gettin information about involved robots
-                        //r1 = kommClient.getRobStatus(kommAntwort.namen[1]);// firing robot
-                        //r2 = kommClient.getRobStatus(kommAntwort.namen[2]);// robot hit
-			r1 =(Roboter )robots.get(kommAntwort.namen[1]);
-			r2 =(Roboter )robots.get(kommAntwort.namen[2]);
+		    r1 =(Roboter )robots.get(kommAntwort.namen[1]);
+		    r2 =(Roboter )robots.get(kommAntwort.namen[2]);
 
-                        // updating statistics
-                        Stats actualStats=stats.getStats(r1.getName());
-			actualStats.incHits();
-			if (r2.getSchaden()>=10) // was the robot r2(hit) killed ny r1?
-			    actualStats.incKills();
-			actualStats=stats.getStats(r2.getName());
-			actualStats.incDamageByRobots();
-			//    }
-		//		    catch (KommException k) {
-		//                        CAT.error("Error getting information for laser animation and stats");
-		//			CAT.error(k);
-		//		    }
+		    // updating statistics
+		    Stats actualStats=stats.getStats(r1.getName());
+		    actualStats.incHits();
+		    if (r2.getSchaden()>=10) // was the robot r2(hit) killed ny r1?
+			actualStats.incKills();
+		    actualStats=stats.getStats(r2.getName());
+		    actualStats.incDamageByRobots();
+
                     // paint animation and play sounds
 		    ausgabeView.showRobLaser(r1, r2);
 		}
@@ -147,17 +139,10 @@ public class Ausgabe extends BNSThread {
                 }
 
 		else if (msgId.equals("mBoardLaser")){ // boardlaser shooting
-		    Roboter r1=null;
-		    Ort r1Pos = null;
-		    // get damaged robot
-		    try {
-			r1=kommClient.getRobStatus(kommAntwort.namen[1]);
-			r1Pos= new Ort (r1.getX(), r1.getY());
-		    }
-		    catch (KommException k) {
-			k.printStackTrace();
-		    }
 
+		    // get damaged robot
+		    Roboter r1= (Roboter )robots.get(kommAntwort.namen[1]);
+		    Ort r1Pos = r1.getPos();
 
                     // updating statistics for the robot hit
                     Stats actualStats=stats.getStats(r1.getName());
@@ -249,11 +234,11 @@ public class Ausgabe extends BNSThread {
 		    ausgabeView.showWinnerState(winnerStateList);
 		}
 		catch (KommFutschException ke) {
-		    System.err.println("ke2: "+ke.getMessage());
+		    CAT.error("ke2: "+ke.getMessage());
 		    return;
 		}
 		catch (KommException kE) {
-		    System.err.println(kE.getMessage());
+		    CAT.error(kE.getMessage());
 		    return;
 		}
 
@@ -262,25 +247,25 @@ public class Ausgabe extends BNSThread {
 	    }
 
 	    case (ClientAntwort.ENTFERNUNG): {
-		Global.debug(this,"the game is over");
+		CAT.info("Game over.");
 
 		try {
 		    String[] spielErgebnis = kommClient.getSpielstand();
 		    if (spielErgebnis != null) {
-			Global.debug(this,"We have "+spielErgebnis.length+" winners");
+			CAT.debug("We have "+spielErgebnis.length+" winners");
 			ausgabeView.showWinnerlist(spielErgebnis);
 		    }
-		    else Global.debug(this,"No winner exists");
+		    else CAT.debug("No winner exists");
 		}
 		catch (KommException e) {
-		    System.err.println(e.getMessage());
+		    CAT.error(e.getMessage());
 		    return;
 		}
 		try {
 		    Thread.sleep(2000);
 		}
 		catch (InterruptedException e) {
-		    System.err.println("Ausgabe: Interrupted by "+e.toString());
+		    CAT.error("Ausgabe: Interrupted by "+e.toString());
 		}
 		kommClient.spielstart();
 		spielEnde = true;
@@ -300,11 +285,11 @@ public class Ausgabe extends BNSThread {
 	    kommAntwort = kommClient.warte();
 	}
 	catch (KommFutschException kE) {
-	    System.err.println("KE: "+kE.getMessage());
+	    CAT.error("KE: "+kE.getMessage());
 	    return;
 	}
 	catch (KommException ke) {
-	    System.err.println("ke: "+ke.getMessage());
+	    CAT.error("ke: "+ke.getMessage());
 	    return;
 	}
 
@@ -409,7 +394,7 @@ public class Ausgabe extends BNSThread {
 
 	    }
 	    catch (KommException kE) {
-		System.err.println("Ausgabe: Beim Versuch, die Roboter zu holen, erhalte ich: "+
+		CAT.error("Ausgabe: Beim Versuch, die Roboter zu holen, erhalte ich: "+
 				   kE.getMessage());
 		return;
 	    }
@@ -498,7 +483,7 @@ public class Ausgabe extends BNSThread {
 		anmeldungErfolg = kommClient.anmelden2(host,port,name);
 	    }
 	    catch (KommException kE) {
-		System.err.println(kE.getMessage());
+		CAT.error(kE.getMessage());
 		showSplash(Message.say("AusgabeFrame","msplashFehlerAnmeldung"));
 		versuche++;
 		try {Thread.sleep(3000);} catch (Exception e) {System.err.println(e.getMessage());}
