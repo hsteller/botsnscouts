@@ -606,10 +606,12 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
          final int tmpScale = iScale;
 	    SwingUtilities.invokeLater( new Runnable() {
 		    public void run() {
-			 gameBoardCanvas.setScale( sc );
+		         gameBoardCanvas.setScale( sc );
+		         CAT.info("GARBAGE COLLECTION");
+		         System.gc();
 		         actualScale = tmpScale;
-                          zoomMenu.select(actualScale);
-                    }
+                 zoomMenu.select(actualScale);
+            }
 		});
 
     }
