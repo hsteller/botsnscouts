@@ -599,6 +599,10 @@ public class Ausgabe extends BNSThread {
 
 */
 
+  protected View getView() {
+    return view;
+  }
+
 
   protected void showStats() {
     if (statsWindow==null) {
