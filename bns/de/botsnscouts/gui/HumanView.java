@@ -361,6 +361,9 @@ public class HumanView extends JPanel implements HumanViewInterface {
     }
 
 
+    protected void quitHumanPlayer() {
+      human.quit();
+    }
 
     private void d(String s) {
 	Global.debug(this,s);

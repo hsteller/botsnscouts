@@ -64,6 +64,7 @@ public class Ausgabe extends Thread {
 
 	showSplash(Message.say("AusgabeFrame","msplashWarte"));
 	kommClient = new KommClientAusgabe();
+
     }
 
 
@@ -474,8 +475,15 @@ public class Ausgabe extends Thread {
 	Global.debug(this, s);
     }
 
-    public void abmelden() {
+
+    private void abmelden() {
       kommClient.abmelden( name );
+    }
+
+    protected void quit () {
+        abmelden();
+        view.quitHumanPlayer(); // Tell the view to tell the HumanPlayer to quit, if there is any
+        spielEnde=true;
     }
 
 /*
@@ -510,28 +518,10 @@ public class Ausgabe extends Thread {
 	dateiMenu.add (mBeenden);
 	hauptMenu.add(dateiMenu);
 
-	JMenu optionenMenu = new JMenu((Message.say("AusgabeFrame","mOptions")));
-	JMenu optSpeed = new JMenu((Message.say("AusgabeFrame","mSpeed")));
 
 
-	optionenMenu.add(soundMenu);
-	SpeedMenuListener speedListener= new SpeedMenuListener();
 
-	ButtonGroup speedGroup = new ButtonGroup();
 
-	lSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mSlow"),false);
-	lSpeed.addActionListener(speedListener);
-	speedGroup.add(lSpeed);
-	optSpeed.add(lSpeed);
-	mSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mMiddle"),true);
-	mSpeed.addActionListener(speedListener);
-	speedGroup.add(mSpeed);
-	optSpeed.add(mSpeed);
-	hSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mFast"),false);
-	hSpeed.addActionListener(speedListener);
-	optSpeed.add(hSpeed);
-	speedGroup.add(hSpeed);
-	optionenMenu.add(optSpeed);
 
 	JMenu scrollFlag = new JMenu (Message.say("AusgabeFrame","mflagMenu"));
 	optionenMenu.add(scrollFlag);
@@ -539,20 +529,6 @@ public class Ausgabe extends Thread {
 	//JMenu optTrack = new JMenu((Message.say("AusgabeFrame","mRoboTrack")));
 	optionenMenu.add(trackMenu);
 
-	hauptMenu.add(optionenMenu);
-	hauptMenu.add( new ZoomMenu() );
-	JMenu help = new JMenu(Message.say("AusgabeFrame","mHelpMenuName"));
-	JMenuItem about = new JMenuItem(Message.say("AusgabeFrame","mAbout"));
-	about.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    new AboutFenster();
-		}
-	    });
-	help.add(about);
-	hauptMenu.add(help);
-
-
-	view.setJMenuBar(hauptMenu);
     }
 */
 }

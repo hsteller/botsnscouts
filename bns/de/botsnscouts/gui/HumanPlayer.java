@@ -53,7 +53,7 @@ public class HumanPlayer extends Thread {
 	this (host, port, name, color, false);
     }
     public HumanPlayer(String host, int port, String name, int color, boolean nosplash) {
-	this.host = host;
+        this.host = host;
 	this.port = port;
 	this.name = name;
 	this.nosplash=nosplash;
@@ -328,11 +328,12 @@ public class HumanPlayer extends Thread {
 
     /** meldet den Spieler beim Server ab und beendet diesen Thread.
      */
-    private void quit() {
+    protected void quit() {
 	Global.debug(this, "Roboter "+name+" is leaving the party.");
 	comm.abmelden(name);
+        gameOver=true;
 	//Dafuer sorgen, dass Thread aufhoert
-	System.exit(0);
+	//System.exit(0);
     }
 
     protected void passUpdatedScout(int chosen, Roboter[] robs) {
@@ -445,6 +446,7 @@ private void showMessage(String foo){
     private void abmelden() {
       comm.abmelden(name);
     }
+
 
 
     private void d(String s) {

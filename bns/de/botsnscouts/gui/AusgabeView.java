@@ -23,7 +23,6 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private Hashtable robotStatus = new Hashtable(8);
     private Hashtable robotCardStatus = new Hashtable(8);
     private StatusLog statusLog = new StatusLog();
-    private JMenu optTrack = new JMenu("Track");
     private JMenuBar menus = new JMenuBar();
 
     // settings for Zoom-Menu
@@ -83,9 +82,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	    robotStatus.put(robots[i].getName(),r);
 
             // add entry to track menu
-            JMenuItem trackItem = new JMenuItem( r.getName() );
-            trackItem.addActionListener( new HumanPlayer.RoboTrackListener(robots[i]) );
-    	    optTrack.add(trackItem);
+          //  JMenuItem trackItem = new JMenuItem( r.getName() );
+           // trackItem.addActionListener( new HumanPlayer.RoboTrackListener(robots[i]) );
+    	   // optTrack.add(trackItem);
 
 	    RobotCard rc= new RobotCard(robots[i]);
 	    robotsCardContainer.add(rc);
@@ -224,13 +223,14 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       return spielFeld;
     }
 
+     private void quit() {
+        ausgabe.quit();
+    }
+
     private void d(String s){
 	Global.debug(this, s);
     }
 
-    JMenu getTrackMenu() {
-      return optTrack;
-    }
 
     protected JMenuBar getMenuBar() {
       return menus;
@@ -243,6 +243,21 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       menus.add(new HelpMenu());
 
     }
+
+    private class FileMenu extends JMenu {
+      FileMenu() {
+          super(Message.say("AusgabeFrame", "mFile"));
+          JMenuItem mQuit = new JMenuItem((Message.say("AusgabeFrame","mFinish")));
+          mQuit.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e){
+                  quit();
+                }
+	    });
+      }
+    }
+
+
+
 
     private class OptionsMenu extends JMenu {
        OptionsMenu () {

@@ -125,7 +125,16 @@ public class View extends JFrame {
     }
 
 
-
+    protected void quitHumanPlayer() {
+         CAT.debug("Telling the human player to quit..");
+        if (humanView!=null) {
+          humanView.quitHumanPlayer();
+          CAT.debug(".. done");
+        }
+        else {
+          CAT.debug("There seems to be no human player, I'm propably a standalone Ausgabe(view)..");
+        }
+    }
 
 
 
