@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.gui;
 
 import java.awt.*;
 import java.net.*;

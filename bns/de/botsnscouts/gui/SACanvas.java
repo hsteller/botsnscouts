@@ -1,5 +1,4 @@
-
-package de.spline.rr;
+package de.botsnscouts.gui;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -11,6 +10,9 @@ import java.net.*;
 import java.applet.*;
 import java.awt.geom.*;
 import javax.swing.*;
+
+import de.botsnscouts.board.*;
+import de.botsnscouts.util.*;
 /**
  * Spielfeld-Ausgabe-Canvas ist das Objekt, das der Ausgabe und dem menschlichen Spieler das Spielfeld grafisch darstellt und verwaltet
  * @author ursprünglich Daniel Holtz
@@ -33,7 +35,11 @@ import javax.swing.*;
  */
 
 public class SACanvas extends Component {
- 
+    // inner classes
+    public static interface ClickListener {
+	void feldClicked( int x, int y, int modifiers );
+    }
+
     // directions
     private static final int NORTH=0;
     private static final int EAST=1;
@@ -42,6 +48,7 @@ public class SACanvas extends Component {
 
 
     private JScrollPane myScrollPane;
+    private static final int FELDSIZE = 64; // Grösse der Felder in Pixeln
 
     /** Anzahl der Schritte in denen der Laser gezeichnet wird.
      */
@@ -49,6 +56,7 @@ public class SACanvas extends Component {
     /** Anzahl der Schritte in denen der Laser gezeichnet wird. 
      */
     private static final double FULL_LENGTH_DOUBLE=30.0;
+
 
     // for painting active Lasers
     // private boolean drawRobLaser;
@@ -69,7 +77,7 @@ public class SACanvas extends Component {
 
     // Ueberbleibsel zum bestimmen der Laserfarbe fuer statische Laser;
     // koennte wegoptimiert werden
-    private SpielfeldSim.LaserDef actuallaser;
+    private LaserDef actuallaser;
 
     private AudioClip [] mLaserWav = new AudioClip[2];
     public boolean soundActive;
@@ -102,6 +110,26 @@ public class SACanvas extends Component {
 
     
     SpielfeldSim sf;
+    private double dScale = 1.0;
+    boolean rescaled = true;
+
+    ClickListener myClickListener;
+
+
+    public double getScale() {
+	return dScale;
+    }
+
+    public void setScale( double scale ) {
+	// adapt this Component to the scaling factor
+	dScale = scale;
+	x = (int)(sf.getSizeX() * dScale * FELDSIZE);
+	y = (int)(sf.getSizeY() * dScale * FELDSIZE);
+	rescaled = true;
+	System.err.println("dim : " + x + " " + y );
+	setSize(x,y);
+    }
+
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     public SACanvas(SpielfeldSim sf_neu){
@@ -163,8 +191,8 @@ public class SACanvas extends Component {
 	activeBordLasers=false;
 	gotColors=false;
 	sf=sf_neu;
-	x=(sf.boden.length-2)*64;
-	y=(sf.boden[0].length-2)*64;
+	//x=(sf.boden.length-2)*64;
+	//y=(sf.boden[0].length-2)*64;
 	if (soundActive) {
 	    laserWavCount=0;
 	    String s ="sounds/laserhit.wav"; 
@@ -175,7 +203,8 @@ public class SACanvas extends Component {
 	    mLaserWav [1] = Applet.newAudioClip(u);
 	    
 	}
-	setSize(x,y);
+	setScale( dScale ); // does setSize()
+	//setSize(x,y);
 
 	
 	ImageMan.finishLoading();
@@ -193,9 +222,39 @@ public class SACanvas extends Component {
 	myScrollPane = j;
     }
 
+    Point calcKachelPos(int mx, int my) {
+	int sfh = sf.getSizeY();
+	int sfw = sf.getSizeX();
+	double scaledSize = FELDSIZE * getScale();
+	
+	Point p = new Point();
+	p.x = 1 + (int) (mx / scaledSize );
+	p.y = sfh - (int) (my / scaledSize );
+
+	// sicherstellen, dass 1 <= p.x <= sfw
+	// und  1 <= p.y <= sfy
+	
+	p.x = Math.min( Math.max(1, p.x), sfw );
+	p.y = Math.min( Math.max(1, p.y), sfh );
+	return p;
+    }
+
+
+
+    public void addClickListener( ClickListener listener ) {
+	myClickListener = listener;
+    }
+
+    
     void mouseInit() {
 	addMouseListener( new MouseAdapter() {
 	    public void mouseClicked(MouseEvent me) {
+		Point feld = calcKachelPos( me.getX(), me.getY() );
+		if( myClickListener != null ) {
+		    myClickListener.feldClicked( feld.x, feld.y, me.getModifiers() );
+		}
+
+		/*
 		int mods = me.getModifiers();
 	 	if( (mods & MouseEvent.BUTTON3_MASK) == 0 ) 
 		     return;
@@ -214,7 +273,7 @@ public class SACanvas extends Component {
 		y1 = Math.min( y1, y - sz.height );
 		
 		myScrollPane.getViewport().setViewPosition(new Point(x1, y1));
-
+		*/
     
 	    }
 	});
@@ -284,7 +343,7 @@ public class SACanvas extends Component {
 	int laenge = calculateLaserLength(source, target, laserFacing); 
 	laenge*=64;
 
-	Color c = getRobColor(sourceRob.name);
+	Color c = getRobColor(sourceRob.getName());
 	if (soundActive) {
 	    mLaserWav[laserWavCount%(mLaserWav.length)].play();
 	    synchronized(this){
@@ -299,7 +358,9 @@ public class SACanvas extends Component {
 
 	for(int i=1; i<=FULL_LENGTH_INT; i++) {
 	    int tmp_laenge=(int) ((((double)i)/FULL_LENGTH_DOUBLE)*laenge);
-	    paintActiveRobLaser(getGraphics(), tmp_laenge, c);	
+	    Graphics2D g2 = (Graphics2D) getGraphics();
+	    g2.scale( dScale, dScale );
+	    paintActiveRobLaser(g2, tmp_laenge, c);	
 		    
 	     synchronized(this){
 		 try {
@@ -337,7 +398,7 @@ public class SACanvas extends Component {
 	private Ort mapC2PixelNorthWest (int x, int y) {
 	Ort pixel=new Ort();
 	pixel.x=(x-1)*64;
-	pixel.y=(sf.sizeY-y)*64;
+	pixel.y=(sf.getSizeY()-y)*64;
 	return pixel;
     }
     /** Berechnet die (Java-)Pixelwerte fuer den Mittelpunkt des Feldes.
@@ -522,7 +583,9 @@ public class SACanvas extends Component {
 	// paint lasers step by step
 	for(int i=1; i<=FULL_LENGTH_INT; i++) {
 	    int tmp_laenge=(int) ((((double)i)/FULL_LENGTH_DOUBLE)*laenge);    		    
-	    paintActiveBordLaser(getGraphics(), c, tmp_laenge);
+	    Graphics2D g2 = (Graphics2D) getGraphics();
+	    g2.scale( dScale, dScale );
+	    paintActiveBordLaser(g2, c, tmp_laenge);
 	    /*  synchronized(this){
 		try {
 		    wait (1);
@@ -542,13 +605,6 @@ public class SACanvas extends Component {
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    protected void ersetzeSpielfeld(SpielfeldSim sfs){
-	sf = sfs;
-	x=(sf.boden.length-2)*64;
-	y=(sf.boden[0].length-2)*64;
-	setSize(x,y);
-	repaint();
-    }
 	
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -578,22 +634,22 @@ public class SACanvas extends Component {
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     private void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty) {
-	Spielfeld.Boden boden = sf.bo(xpos, ypos);
+	Boden boden = sf.bo(xpos, ypos);
 	switch (boden.typ){
 	    
-	case (sf.BDGRUBE):
+	case (Spielfeld.BDGRUBE):
 	    g.drawImage(diverseCrop[3],actx,acty,64,64,this);
 	    break;
-	case (sf.BDNORMAL):
+	case (Spielfeld.BDNORMAL):
 		g.drawImage(diverseCrop[24+((xpos*ypos*19)%17)%4],actx,acty,64,64,this);
 	    break;
-	case (sf.BDDREHEL):
+	case (Spielfeld.BDDREHEL):
 	    if (boden.spez==0)
 		g.drawImage(diverseCrop[2],actx,acty,64,64,this);
 	    else
 		g.drawImage(diverseCrop[1],actx,acty,64,64,this);		
 	    break;
-	case (sf.BDREPA):
+	case (Spielfeld.BDREPA):
 	    if (boden.spez==1)
 		g.drawImage(diverseCrop[4],actx,acty,64,64,this);
 	    else
@@ -602,78 +658,78 @@ public class SACanvas extends Component {
 	    
 	    // ------------------- normale Fliessbaender -------------------------
 	    
-	case (sf.FN1):g.drawImage(cbeltCrop[14],actx,acty,64,64,this);break;
-	case (sf.FO1):g.drawImage(cbeltCrop[19],actx,acty,64,64,this);break;
-	case (sf.FW1):g.drawImage(cbeltCrop[9],actx,acty,64,64,this);	break;
-	case (sf.FS1):g.drawImage(cbeltCrop[4],actx,acty,64,64,this);	break;
+	case (Spielfeld.FN1):g.drawImage(cbeltCrop[14],actx,acty,64,64,this);break;
+	case (Spielfeld.FO1):g.drawImage(cbeltCrop[19],actx,acty,64,64,this);break;
+	case (Spielfeld.FW1):g.drawImage(cbeltCrop[9],actx,acty,64,64,this);	break;
+	case (Spielfeld.FS1):g.drawImage(cbeltCrop[4],actx,acty,64,64,this);	break;
 	    
-	case (sf.NVW1): if (abbieger(xpos,ypos-1,sf.NORD))
+	case (Spielfeld.NVW1): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
 	    g.drawImage(cbeltCrop[15],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[6],actx,acty,64,64,this);break;
-	case (sf.NVO1): if (abbieger(xpos,ypos-1,sf.NORD))
+	case (Spielfeld.NVO1): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
 	    g.drawImage(cbeltCrop[18],actx,acty,64,64,this);						
 	else g.drawImage(cbeltCrop[7],actx,acty,64,64,this);break;
-	case (sf.SVW1): if (abbieger(xpos,ypos+1,sf.SUED))
+	case (Spielfeld.SVW1): if (abbieger(xpos,ypos+1,Spielfeld.SUED))
 	    g.drawImage(cbeltCrop[13],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[3],actx,acty,64,64,this);break;
-	case (sf.SVO1):if (abbieger(xpos,ypos+1,sf.SUED))
+	case (Spielfeld.SVO1):if (abbieger(xpos,ypos+1,Spielfeld.SUED))
 			  g.drawImage(cbeltCrop[10],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[0],actx,acty,64,64,this);break;
-	case (sf.OVN1):if (abbieger(xpos-1,ypos,sf.OST))
+	case (Spielfeld.OVN1):if (abbieger(xpos-1,ypos,Spielfeld.OST))
 			  g.drawImage(cbeltCrop[16],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[5],actx,acty,64,64,this);break;
-	case (sf.OVS1):if (abbieger(xpos-1,ypos,sf.OST))
+	case (Spielfeld.OVS1):if (abbieger(xpos-1,ypos,Spielfeld.OST))
 			  g.drawImage(cbeltCrop[12],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[2],actx,acty,64,64,this);break;
-	case (sf.WVN1):if (abbieger(xpos+1,ypos,sf.WEST))
+	case (Spielfeld.WVN1):if (abbieger(xpos+1,ypos,Spielfeld.WEST))
 			  g.drawImage(cbeltCrop[17],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[8],actx,acty,64,64,this);break;
-	case (sf.WVS1):if (abbieger(xpos+1,ypos,sf.WEST))
+	case (Spielfeld.WVS1):if (abbieger(xpos+1,ypos,Spielfeld.WEST))
 			  g.drawImage(cbeltCrop[11],actx,acty,64,64,this);
 	else g.drawImage(cbeltCrop[1],actx,acty,64,64,this);break;
 	
-	case (sf.NVWO1):g.drawImage(cbeltCrop[22],actx,acty,64,64,this);break;
-	case (sf.SVWO1):g.drawImage(cbeltCrop[20],actx,acty,64,64,this);break;
-	case (sf.OVNS1):g.drawImage(cbeltCrop[23],actx,acty,64,64,this);break;
-	case (sf.WVNS1):g.drawImage(cbeltCrop[21],actx,acty,64,64,this);break;
+	case (Spielfeld.NVWO1):g.drawImage(cbeltCrop[22],actx,acty,64,64,this);break;
+	case (Spielfeld.SVWO1):g.drawImage(cbeltCrop[20],actx,acty,64,64,this);break;
+	case (Spielfeld.OVNS1):g.drawImage(cbeltCrop[23],actx,acty,64,64,this);break;
+	case (Spielfeld.WVNS1):g.drawImage(cbeltCrop[21],actx,acty,64,64,this);break;
 	    
 	    // ------------------------ Expressfliessbaender ---------------------
 	    
-	case (sf.FN2):g.drawImage(ebeltCrop[14],actx,acty,64,64,this);break;
-	case (sf.FO2):g.drawImage(ebeltCrop[19],actx,acty,64,64,this);break;
-	case (sf.FW2):g.drawImage(ebeltCrop[9],actx,acty,64,64,this);	break;
-	case (sf.FS2):g.drawImage(ebeltCrop[4],actx,acty,64,64,this);	break;				
+	case (Spielfeld.FN2):g.drawImage(ebeltCrop[14],actx,acty,64,64,this);break;
+	case (Spielfeld.FO2):g.drawImage(ebeltCrop[19],actx,acty,64,64,this);break;
+	case (Spielfeld.FW2):g.drawImage(ebeltCrop[9],actx,acty,64,64,this);	break;
+	case (Spielfeld.FS2):g.drawImage(ebeltCrop[4],actx,acty,64,64,this);	break;				
 	    
-	case (sf.NVW2): if (abbieger(xpos,ypos-1,sf.NORD))
+	case (Spielfeld.NVW2): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
 	    g.drawImage(ebeltCrop[16],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[6],actx,acty,64,64,this);break;
-	case (sf.NVO2): if (abbieger(xpos,ypos-1,sf.NORD))
+	case (Spielfeld.NVO2): if (abbieger(xpos,ypos-1,Spielfeld.NORD))
 	    g.drawImage(ebeltCrop[17],actx,acty,64,64,this);						
 	else g.drawImage(ebeltCrop[7],actx,acty,64,64,this);break;
-	case (sf.SVW2): if (abbieger(xpos,ypos+1,sf.SUED))
+	case (Spielfeld.SVW2): if (abbieger(xpos,ypos+1,Spielfeld.SUED))
 	    g.drawImage(ebeltCrop[13],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[3],actx,acty,64,64,this);break;
-	case (sf.SVO2):if (abbieger(xpos,ypos+1,sf.SUED))
+	case (Spielfeld.SVO2):if (abbieger(xpos,ypos+1,Spielfeld.SUED))
 			  g.drawImage(ebeltCrop[10],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[0],actx,acty,64,64,this);break;
-	case (sf.OVN2):if (abbieger(xpos-1,ypos,sf.OST))
+	case (Spielfeld.OVN2):if (abbieger(xpos-1,ypos,Spielfeld.OST))
 			  g.drawImage(ebeltCrop[15],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[5],actx,acty,64,64,this);break;
-	case (sf.OVS2):if (abbieger(xpos-1,ypos,sf.OST))
+	case (Spielfeld.OVS2):if (abbieger(xpos-1,ypos,Spielfeld.OST))
 			  g.drawImage(ebeltCrop[12],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[2],actx,acty,64,64,this);break;
-	case (sf.WVN2):if (abbieger(xpos+1,ypos,sf.WEST))
+	case (Spielfeld.WVN2):if (abbieger(xpos+1,ypos,Spielfeld.WEST))
 			  g.drawImage(ebeltCrop[18],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[8],actx,acty,64,64,this);break;
-	case (sf.WVS2):if (abbieger(xpos+1,ypos,sf.WEST))
+	case (Spielfeld.WVS2):if (abbieger(xpos+1,ypos,Spielfeld.WEST))
 			  g.drawImage(ebeltCrop[11],actx,acty,64,64,this);
 	else g.drawImage(ebeltCrop[1],actx,acty,64,64,this);break;
 	
 	
-	case (sf.NVWO2):g.drawImage(ebeltCrop[22],actx,acty,64,64,this);break;
-	case (sf.SVWO2):g.drawImage(ebeltCrop[20],actx,acty,64,64,this);break;
-	case (sf.OVNS2):g.drawImage(ebeltCrop[23],actx,acty,64,64,this);break;
-	case (sf.WVNS2):g.drawImage(ebeltCrop[21],actx,acty,64,64,this);break;
+	case (Spielfeld.NVWO2):g.drawImage(ebeltCrop[22],actx,acty,64,64,this);break;
+	case (Spielfeld.SVWO2):g.drawImage(ebeltCrop[20],actx,acty,64,64,this);break;
+	case (Spielfeld.OVNS2):g.drawImage(ebeltCrop[23],actx,acty,64,64,this);break;
+	case (Spielfeld.WVNS2):g.drawImage(ebeltCrop[21],actx,acty,64,64,this);break;
 		
 		
 	default:
@@ -682,7 +738,7 @@ public class SACanvas extends Component {
 
     private static final int[] crushlb_x = { 20, 30, 30, 30, 40 };
     private static final int[] crushlb_y = { 35, 25, 35, 45, 35 };
-    private void paintCrusher(Graphics g, Spielfeld.Boden boden, 
+    private void paintCrusher(Graphics g, Boden boden, 
 		      int actx, int acty) 
     {
 	g.drawImage(diverseCrop[10],actx,acty,64,64,this);
@@ -704,16 +760,16 @@ public class SACanvas extends Component {
 	int y0 = clip.y / 64 + 1;
 	int x1 = (clip.x + clip.width - 1) / 64 + 1;
 	int y1 = (clip.y + clip.height - 1) / 64 + 1;
-	x1 = Math.min(x1, sf.boden.length-2);
-	y1 = Math.min(y1, sf.boden[0].length-2);
+	x1 = Math.min(x1, sf.getSizeX() );
+	y1 = Math.min(y1, sf.getSizeY() );
 
 	for(int hori=x0; hori <= x1; hori++) {
 	    for(int vert = y0; vert <= y1; vert++) { 
 		int actx = (hori-1) * 64;
 		int acty = (vert-1) * 64;
 		int xpos = hori;
-		int ypos = sf.boden[0].length-vert-1;
-		Spielfeld.Boden boden = sf.bo(xpos, ypos);
+		int ypos = sf.getSizeY() + 1 - vert;
+		Boden boden = sf.bo(xpos, ypos);
 
 		paintFeldBoden( g, xpos, ypos, actx, acty );
 		if ((boden.typ>=100) && (boden.spez>0))
@@ -737,8 +793,8 @@ public class SACanvas extends Component {
        dbg.setComposite( ac );
        
 	
-       for (Enumeration e = sf.lasers.elements(); e.hasMoreElements();){
-	   actuallaser = ((SpielfeldSim.LaserDef) e.nextElement());
+       for (Enumeration e = sf.getLasers().elements(); e.hasMoreElements();){
+	   actuallaser = ((LaserDef) e.nextElement());
 	   int lx = actuallaser.x-1;
 	   int ly = sf.boden[0].length-actuallaser.y-2;
 	   int lf = actuallaser.facing;
@@ -943,30 +999,23 @@ public class SACanvas extends Component {
     }
 
     private void createOffscreenImage() {
-	//System.err.println("Creating image: " + x + " " + y);
+	// XXX vielleicht besser das skalieren erst beim reinkopieren 
 	dbi = createImage(x,y);
-	//System.err.println("g_off: " + g_off + " " + dbi);
-	g_off = dbi.getGraphics();
+	g_off = (Graphics2D)dbi.getGraphics();
 	g_off.setFont(new Font(g_off.getFont().getName(),g_off.getFont().getStyle(),8));
+	g_off.setClip(0,0,x,y);
+	g_off.scale( dScale, dScale );
     }
 
-
-    Graphics g_off;
-
+    Graphics2D g_off;
     public void paint(Graphics g) {
-	//	Global.debug(this,"REPAINT SACAnvas.");
-	if(dbi == null) {
+	if(dbi == null || rescaled ) {
 	    createOffscreenImage();
-	    /*
-	    System.err.println("Creating image: " + x + " " + y);
-	    dbi = createImage(x,y);
-	    g_off = dbi.getGraphics();
-	    g_off.setFont(new Font(g_off.getFont().getName(),g_off.getFont().getStyle(),8));
-	    */
+	    rescaled = false;
 	}
-	Graphics dbg = g_off;
+	Graphics2D dbg = (Graphics2D)g_off;
 	Rectangle clip = g.getClipBounds();
-	dbg.setClip( clip );
+	//dbg.setClip( clip );
 
 	paintSpielfeldBoden( dbg );
 	paintLaserStrahlen( dbg );
@@ -980,7 +1029,8 @@ public class SACanvas extends Component {
 	    y0 = rc.y,
 	    x1 = rc.x + rc.width,
 	    y1 = rc.y + rc.height;
-	g.drawImage(dbi, x0, y0, x1, y1, x0, y0, x1, y1, this);
+	g.drawImage( dbi, 0, 0, this );
+	//g.drawImage(dbi, x0, y0, x1, y1, x0, y0, x1, y1, this);
     }
 
     private void paintUnbuffered(Graphics dbg) {
@@ -992,28 +1042,18 @@ public class SACanvas extends Component {
 	paintRobos( dbg );
     }
 
-
-    protected void  finalize() {
+    protected void finalize() {
 	g_off.dispose();
     }
-
-
 
     public void update(Graphics g){
 	paint(g);
     }
 
     public Image getThumb(int size) {
-
+	/*
 	BufferedImage bi = new BufferedImage(x, y, BufferedImage.TYPE_INT_RGB);
 	
-	/*
-	if( g_off == null ) 
-	    createOffscreenImage();
-	
-
-	g_off.setClip( 0, 0, x, y);
-	*/
 	Graphics2D g2 = bi.createGraphics();
 	g2.setClip(0,0,x,y);
 	//paint( g_off );
@@ -1029,45 +1069,33 @@ public class SACanvas extends Component {
 	//Image thumb=createImage(new FilteredImageSource(dbi.getSource(), new AreaAveragingScaleFilter(size, size)));
 	g2.dispose();
 	return thumb;
+	*/
+
+	BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+	
+	Graphics2D g2 = bi.createGraphics();
+	g2.setClip(0,0,size,size);
+	g2.scale( ((double) size) / x, ((double) size) / y );
+	paintUnbuffered( g2 );
+	g2.dispose();
+
+	return bi;
     }
 
-
-    public Image getThumb() {
-	return getThumb(150);
+    private void ersetzeSpielfeld(SpielfeldSim sfs){
+	sf = sfs;
+	x = (int) (sf.getSizeX() * FELDSIZE * dScale);
+	y = (int) (sf.getSizeY() * FELDSIZE * dScale);
+	setSize(x,y);
     }
 
-    public void createThumb(String filename) {
-	Image thumb = getThumb(150);
-
-	int w=150,h=150;
-	int[] pixels = new int[w * h];
-	PixelGrabber pg = new PixelGrabber(thumb, 0, 0, w, h, pixels, 0, w);
-	try {
-	    pg.grabPixels();
-	} catch (InterruptedException e) {
-	    System.err.println("interrupted waiting for pixels!");
-	    //  return;
-	}
-	if ((pg.getStatus() & ImageObserver.ABORT) != 0) {
-	    System.err.println("image fetch aborted or errored");
-	    //  return;
-	}
-	
-	try{
-	    FileOutputStream ostream = new FileOutputStream(filename);
-	    GZIPOutputStream gz=new GZIPOutputStream(ostream);
-	    ObjectOutputStream p = new ObjectOutputStream(gz);
-	    p.writeObject(pixels);
-	    p.flush();
-	    p.close();
-	    gz.close();
-	    ostream.close();
-	}catch(Exception e){System.out.println(e+"\n Fehler beim Schreiben.");}
-	
-    }//ende if makePixelArray
-    
+    private static SACanvas sac = null;
     public static Image createThumb(SpielfeldSim sim, int size) {
-	SACanvas sac = new SACanvas(sim);
+	if( sac == null ) {
+	    sac = new SACanvas(sim); 
+	} else {
+	    sac.ersetzeSpielfeld( sim );
+	}
 	return sac.getThumb(size);
     }
 

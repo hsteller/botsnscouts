@@ -48,7 +48,7 @@ public class ImageMan {
     static Thread imageLoader;
     static MediaTracker tracker;
 
-    synchronized static void loadImages() {
+    public synchronized static void loadImages() {
 	if( imagesLoading )
 	    return;
 	imagesLoading = true;
@@ -97,7 +97,7 @@ public class ImageMan {
     // Achtung: ein Aufruf dieser Methode triggert auch dann das Laden 
     // ALLER Bilder (im Hintergrund) falls man nur einen Satz davon
     // haben will - aber sie wartet eben nur auf diesen einen Satz
-    static Image[] waitForImages(int id) {
+    public static Image[] waitForImages(int id) {
 	if( id < 0 || id >= IMGSETCOUNT ) {
 	    throw new RuntimeException("ImageMan: invalid id");
 	}
@@ -123,7 +123,7 @@ public class ImageMan {
 	return imgSets[id];
     }
 
-    static void finishLoading() {
+    public static void finishLoading() {
 	if(! imagesLoading ) 
 	    loadImages();
 	

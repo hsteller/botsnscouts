@@ -1,11 +1,12 @@
-package de.spline.rr;
+package de.botsnscouts.gui;
+
 import java.awt.*;
 import javax.swing.*;
 
 
 public class ZielfahneErreicht extends JPanel{
   
-	private static final Color backColor = new Color(4,64,4);
+    private static final Color backColor = new Color(4,64,4);
     private static final Color foreColor2 = new Color(140,255,140);
 
     public ZielfahneErreicht() {
@@ -30,8 +31,8 @@ public class ZielfahneErreicht extends JPanel{
     }
     
     public Dimension getPreferredSize() {
-		    return new Dimension(180,550);
-		}
+	return new Dimension(180,550);
+    }
 
     public static void main (String args[]) {
 	try {
@@ -43,5 +44,5 @@ public class ZielfahneErreicht extends JPanel{
 	ZielfahneErreicht zf = new ZielfahneErreicht();
 	f.add(zf);
 	f.setVisible(true);
-   }
+    }
 }	

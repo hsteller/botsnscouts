@@ -1,4 +1,4 @@
-package de.spline.rr;
+package de.botsnscouts.gui;
 
 import java.awt.*;
 import javax.swing.*;
@@ -29,7 +29,8 @@ public class Splash{
 	int y = (screen.height-height)/2;
 	splash.setBounds(x,y,width,height);
 	try{
-	    URL url = Class.forName("de.spline.rr.ImageMan").getResource("images/bnslogo.jpg");
+	    // XXX: move to ImageMan
+	    URL url = Class.forName("de.botsnscouts.util.BotsnScouts").getResource("images/bnslogo.jpg");
 	    bildLabel = new JLabel(new ImageIcon(url));
 	    bildLabel.setBorder( new EtchedBorder(8));
 	}
