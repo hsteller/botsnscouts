@@ -177,9 +177,9 @@ public class Start extends JFrame implements WindowListener{
 	    FileInputStream istream=new FileInputStream("language.conf");
 	    locProp.load(istream);
 	}catch(FileNotFoundException e){
-	    myLocale=new Locale("en","US");
+	    locProp.setProperty("isSet","no");
 	}catch(IOException e){
-	    myLocale=new Locale("en","US");
+	    locProp.setProperty("isSet","no");
 	}
 	if (locProp.getProperty("isSet").equals("yes")){
 	    myLocale=new Locale(locProp.getProperty("language"),locProp.getProperty("country"));
