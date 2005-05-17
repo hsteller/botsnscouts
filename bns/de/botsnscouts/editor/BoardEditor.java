@@ -259,7 +259,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 
     public void windowClosing(WindowEvent e) {
         this.dispose();
-        System.exit(0);
+        //System.exit(0);
     }
 
     public void windowClosed(WindowEvent e) {

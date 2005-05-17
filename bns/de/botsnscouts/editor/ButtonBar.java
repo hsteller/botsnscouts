@@ -52,6 +52,8 @@ import de.botsnscouts.util.Message;
 class ButtonBar extends JPanel implements ActionListener {
     static final Category CAT = Category.getInstance(ButtonBar.class);
 
+    private final static String DEFAULT_SAVE_DIR = "tiles";
+    
     private JButton feldSpeich = null;
     private JButton feldLaden = null;
     private JButton feldClear = null;
@@ -85,7 +87,7 @@ class ButtonBar extends JPanel implements ActionListener {
 
 
     void makeChooser() {
-        chooser = new JFileChooser("kacheln");
+        chooser = new JFileChooser(DEFAULT_SAVE_DIR);
         chooser.setFileFilter(rraFilter);
     }
 
@@ -190,9 +192,8 @@ class ButtonBar extends JPanel implements ActionListener {
                     return;
                 }
             }
-
-            CAT.debug("Speichere " + file + " " + file.getName() + " (" + file.getName() + ")");
-            //File to=new File("kacheln/"+name.getText()+".rra");
+            
+            CAT.debug("Speichere " + file + " " + file.getName() + " (" + file.getName() + ")");         
             CAT.debug("File opened");
             try {
                 editor.dumpPngImage(file);
@@ -236,8 +237,7 @@ class ButtonBar extends JPanel implements ActionListener {
                     }
                 }
 
-                CAT.debug("Speichere " + file + " " + file.getName() + " (" + "kacheln/" + file.getName() + ")");
-                //File to=new File("kacheln/"+name.getText()+".rra");
+                CAT.debug("Speichere " + file + " " + file.getName() + " (" + DEFAULT_SAVE_DIR+"/" + file.getName() + ")");             
                 CAT.debug("File opened");
                 try {
                     FileOutputStream fop = new FileOutputStream(file);
@@ -254,7 +254,8 @@ class ButtonBar extends JPanel implements ActionListener {
             }
         } else if (e.getActionCommand().compareTo("Beenden") == 0) {
             editor.dispose();
-            System.exit(0);
+            
+            //System.exit(0);
         } else if (e.getActionCommand().compareTo("Clear") == 0) {
             CAT.debug("Clearing field");
             editor.initSpF();
