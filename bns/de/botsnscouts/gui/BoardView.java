@@ -809,7 +809,7 @@ public class BoardView extends JComponent{
             return;
         }
             
-        Bot internal = getBotByName(rob.getName());
+        Bot internal = (Bot) internalBotHash.get(rob.getName());// getBotByName(rob.getName());
         turnRobot(internal, 180, 2* currentAnimationConfig.getAnimationStepsTurnRob(), true);
         internal.turnClockwise();
         internal.turnClockwise();
@@ -834,7 +834,7 @@ public class BoardView extends JComponent{
             return;
         }
         try {
-	        Bot internal = getBotByName(rob.getName());
+	        Bot internal = (Bot) internalBotHash.get(rob.getName());// getBotByName(rob.getName());
 	       
 	        int oldFacing = internal.getFacing();
 	        int animationStepsTurnRob =currentAnimationConfig.getAnimationStepsTurnRob();	     
@@ -876,7 +876,7 @@ public class BoardView extends JComponent{
             int yposScaled = (sf.getSizeY() - internal.getY())*feldSize;                         
             int clipLength = feldSize;    
             int halfSize = feldSize/2;
-           
+           // TODO rasterFormatException 
             BufferedImage offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
             Graphics2D offScreenClip = (Graphics2D) offScreenClipImage.getGraphics();     
             offScreenClip.setComposite(ac);       
@@ -2154,22 +2154,20 @@ public class BoardView extends JComponent{
         //g.setClip(rect);
         if (useStaticBg) { // 100% doublebuffered
             Graphics2D offG = (Graphics2D) offScreenImage.getGraphics();
-           offG.setClip(oldClip);
+            offG.setClip(oldClip);
             offG.drawImage(staticBackground,0,0,widthInPixel,heightInPixel,this);
            // draw the active elements (robos)
             paintHighlight(offG);
             paintScout(offG);
           
-           paintRobos(offG);
+            paintRobos(offG);
           
         }
-      //  
-        // Blit the board (it's already scaled)
-      
+  
         
        //  synchronized (rescaleLock) {
         
-       
+       // BufferedImage clip = offScreenImage.getSubimage(oldClip.x, oldClip.y,oldClip.width, oldClip.height);
         g.drawImage(offScreenImage, 0, 0, this);
         
         //}
