@@ -97,8 +97,10 @@ public class View extends JFrame {
 
     public View(HumanView hv) {
         this.setContentPane( contentpane );
-		this.setTitle(Message.say("AusgabeFrame","gameName"));
-		humanView = hv;
+        humanView = hv;
+        String playerName = hv.getHumanPlayer().getPlayerName();
+        this.setTitle(playerName+" - "+Message.say("AusgabeFrame","gameName"));
+		
 		initView();
         hv.setMinimumSize(new Dimension(0, 0));
         sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);

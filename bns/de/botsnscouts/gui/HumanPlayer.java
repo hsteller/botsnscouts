@@ -103,6 +103,10 @@ public class HumanPlayer extends BNSThread {
     }
 
 
+    	public String getPlayerName(){
+    	    return name;
+    	}
+    
     /**
      * Start des Menschlichen Spielers
      */
