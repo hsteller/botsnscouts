@@ -71,6 +71,7 @@ import de.botsnscouts.util.Message;
 import de.botsnscouts.util.Task;
 import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.widgets.ColoredPanel;
+import de.botsnscouts.widgets.TJNumberField;
 import de.botsnscouts.widgets.TJButton;
 import de.botsnscouts.widgets.TJCheckBox;
 import de.botsnscouts.widgets.TJLabel;
@@ -105,6 +106,7 @@ public class GameFieldPanel extends JPanel {
     private JFileChooser chooser;
     private JCheckBox allowWisenheimer;
     private JCheckBox allowScout;
+    private TJNumberField timeoutInput;
 
     private GameOptions gameOptions;
 
@@ -265,6 +267,10 @@ public class GameFieldPanel extends JPanel {
 
         allowScout = new TJCheckBox(Message.say("Start", "mAllowScout"), true);
         allowWisenheimer = new TJCheckBox(Message.say("Start", "mAllowWisenheimer"), true);
+        
+        
+        timeoutInput = new TJNumberField(0, Integer.MAX_VALUE, 10);
+        timeoutInput.setValue(GameOptions.DTO);
 
         final JTextField metaServer = new TJTextField(announceGame.getServerString());
         metaServer.setEnabled(announceGame.willBeAnnounced());
@@ -325,7 +331,9 @@ public class GameFieldPanel extends JPanel {
 
         inner.add(allowWisenheimer, gc);
         inner.add(allowScout, gc);
-        inner.add(announce, gc);
+        inner.add(new TJLabel(Message.say("Start", "mHandInTimeOut")), gc);
+        inner.add(timeoutInput, gc);
+        inner.add(announce, gc);   
         inner.add(metaServer, gc);
 
         gc.fill = GridBagConstraints.HORIZONTAL;
@@ -379,6 +387,7 @@ public class GameFieldPanel extends JPanel {
         gameOptions.setAllowWisenheimer(allowWisenheimer.isSelected());
         gameOptions.setAllowScout(allowScout.isSelected());
         gameOptions.setInvitor(nam.getText());
+        gameOptions.setHandInTimeout(timeoutInput.getValue());
         try {
             parent.facade.updateGameOptions();
             /* Handig over a postServerStartTask is still a bit weird, but
