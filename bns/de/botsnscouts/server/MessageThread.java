@@ -85,17 +85,18 @@ class MessageThread extends de.botsnscouts.util.BNSThread
 	    CAT.debug("85 Got lock ausgabeThreads");
 	    wait = new WaitingForSet(v);
 	    for (Iterator it=v.iterator();it.hasNext();){
-		ServerAusgabeThread tmp=(ServerAusgabeThread)it.next();
-		if (!tmp.isAlive())
-		    it.remove();
-		else
-		    tmp.sendMsg(msg.id,msg.args);
+	        ServerAusgabeThread tmp=(ServerAusgabeThread)it.next();
+			if (!tmp.isAlive())
+			    it.remove();
+			else
+			    tmp.sendMsg(msg.id,msg.args);
 	    }
 	    CAT.debug("94 now starting wait");
-	    Iterator it=wait.waitFor(timeout);
+	    Iterator it= wait.waitFor(timeout);
 	    CAT.debug("94 end of wait");
-	    while(it.hasNext())
-		server.deleteOutput((ServerAusgabeThread)it.next(),"TO");
+	    while(it.hasNext()) {
+	        server.deleteOutput((ServerAusgabeThread)it.next(),"TO");
+	    }
 	}
 	CAT.debug("85 released lock");
     }

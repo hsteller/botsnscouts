@@ -88,9 +88,9 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
 
     // Timeouts
     private final int startRoundTO = 60000; // Waiting for destroyed bots
-    private final int notifyTO = 60000;
-    private int commTO = 20000;
-    protected final int registerPlayersTO = 60000;
+    private final int notifyTO = 60000; // the time views get for updating
+    private int commTO = 20000; // MessageThreads wait this long for ACK; Server waits this long for robots at game start("SPIELSTART")
+    private final int registerPlayersTO = 60000; // we wait this time for players to join the game
 
     private int mode;
     private WaitingForSet waitablesImWaitingFor;

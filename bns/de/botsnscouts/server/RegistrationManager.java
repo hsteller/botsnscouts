@@ -208,11 +208,12 @@ class RegistrationManager implements Runnable, Shutdownable {
                         }
         }
         catch (Exception ee) {
-            CAT.debug(ee);
+            CAT.warn(ee);
             try {
                 in.close();
             }
             catch (IOException e) {
+                CAT.warn(e);
             }
             out.close();
         }
