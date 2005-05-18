@@ -387,7 +387,7 @@ public class GameFieldPanel extends JPanel {
         gameOptions.setAllowWisenheimer(allowWisenheimer.isSelected());
         gameOptions.setAllowScout(allowScout.isSelected());
         gameOptions.setInvitor(nam.getText());
-        gameOptions.setHandInTimeout(timeoutInput.getValue());
+        gameOptions.setHandInTimeout(timeoutInput.getValue()*1000);
         try {
             parent.facade.updateGameOptions();
             /* Handig over a postServerStartTask is still a bit weird, but
