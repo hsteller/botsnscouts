@@ -50,6 +50,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.JComponent;
 import javax.swing.JViewport;
@@ -104,9 +105,13 @@ public class BoardView extends JComponent{
      * if true, we will not only have an offScreenImage for doublebuffering but _also_ another 
      * BufferedImage ("staticBackground") of the board that will contain the background without 
      * any dynamic components (bots, scout,highlight) drawn on it.
-     * If false, this second BufferedImage will be null and another was to paint the background will be used. 
+     * Without increasing the JVM heapsize on startup, using bigger boards/more autobots while 
+     *  useStaticBg=true will create an OutOfMemoryError.
+     * 
+     * 
+     * If false, this second BufferedImage will be null and another way to paint the background will be used. 
      */
-    private final boolean useStaticBg = true;
+    private final boolean useStaticBg = false;
     
     
     // inner classes
@@ -156,7 +161,7 @@ public class BoardView extends JComponent{
     private int heightInPixel;
 
     /** Stores data of the robots.*/
-    private Bot[] robos;
+    //private Bot[] robos;
     
     /** This robot is used for calculations,
      *  like making a suggestion for the next move.
@@ -382,7 +387,7 @@ public class BoardView extends JComponent{
     private static final Location pit = new Location(0, 0);
 
     
-    
+    /* XXX HS 19.5.2005
     protected void ersetzeRobos(Bot[] robos_neu) {
 
         if (!gotColors) { // this is the first time I get the robots
@@ -443,6 +448,76 @@ public class BoardView extends JComponent{
         
 
     }
+    */
+    
+    private void replaceInternalRobots( Bot[] robos_neu){
+        int count = robos_neu!=null?robos_neu.length:0;
+        synchronized (internalBotHash) {
+            for (int i = 0; i < count; i++) { // initalizing my internal hash
+                internalBotHash.put(robos_neu[i].getName(), robos_neu[i]);
+            }
+    	}
+    }
+    
+    protected void ersetzeRobos(Bot[] robos_neu) {
+  
+        if (!gotColors) { // this is the first time I get the robots
+            setRobColors(robos_neu);
+            replaceInternalRobots(robos_neu);
+            repaint();
+            return;
+        }
+        // we dont want to overwrite the robots positions/facings, because they
+        // have been updated in animateRobMove()/animateRobTurn() before;
+        // animateRobMove()/animateRobTurn() gets informed earlier, so overwriting the positions/facings
+        // would reset a robot back to a position/facing he has already left
+        else {
+            if (AnimationConfig.areMovementAnimationsEnabled()) {
+                int count = robos_neu!=null?robos_neu.length:0;
+                for (int i = 0; i < count; i++) { 
+                    Bot serverBot = robos_neu[i];
+                    String botName = serverBot.getName();
+                    Bot ourBot = (Bot) internalBotHash.get(botName);                    
+                    Location ourPos = ourBot.getPos();
+                    if (!(serverBot.getPos().equals(pit) || serverBot.getDamage() >= 10 || ourPos.equals(pit))) {
+                        // ^^^^^^^^^^^^^
+                        // otherwise we would not show
+                        // the destroyed robot ever again
+                        // as we would ignore him if he
+                        // is placed on the board again
+                        if (CAT.isDebugEnabled()) {
+                            CAT.debug("ignoring server values of robot " + serverBot.getName()
+                                    + " as my calculated values will be more accurate");
+                        }
+                        // use the internal kept values of our robot if it is not destroyed
+                        serverBot.setPos(ourPos);
+                        serverBot.setFacing(ourBot.getFacing());                    
+//                      TODO robot virtuality might need the same treatment as position and facing?                  
+                    } 
+                    else {
+                        if (CAT.isDebugEnabled())
+                            CAT.debug("using server values for position/facing of robot " + serverBot.getName());
+                       
+                    }
+                    
+                    synchronized (internalBotHash) {
+                        internalBotHash.put(botName, serverBot);
+                    }
+                    repaint();
+               } // end for                                            
+            } // end if (animations enabled)
+            else { // no animation, simply replace all robots
+                replaceInternalRobots(robos_neu);
+                repaint();
+                waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), this);
+            }
+        }
+
+        
+
+    }
+    
+    
     
     /** This method was added so that we can get the initial facings of the robots.
      * ersetzeRobos(Bot[]) doesn't work if animations are enabled (if animations are enabled
@@ -456,9 +531,9 @@ public class BoardView extends JComponent{
      * @param updated the facing of these Bots will be updated 
      */
     protected void updateFacings (Bot [] updated){
-        if (robos == null ){ // just in case, probably unnecessary
-            CAT.warn("updateFacings called but we didn't even no the robots!");
-            robos = updated;
+        if (internalBotHash.isEmpty() ){ // just in case, probably unnecessary
+            CAT.warn("updateFacings called but we haven't got the robots yet!");
+            replaceInternalRobots(updated);
             repaint();
             return;
         }
@@ -466,34 +541,38 @@ public class BoardView extends JComponent{
         int count = updated!=null?updated.length:0;
         for (int i=0;i<count;i++){
             Bot tmp = updated[i];
-            Bot internal = getBotByName(tmp.getName());
+            Bot internal = (Bot) internalBotHash.get(tmp.getName());
             internal.setFacing(tmp.getFacing());
         }
         repaint();
     }
     
     private void paintBotsOnPositionButNotMe(Location position, Bot me, Graphics2D g2d, int xoffset, int yoffset){       
-       int botCount = robos.length;
+     
        int acht = (int)(8*dScale);
        Composite old = g2d.getComposite();
-        for (int i = 0; i < botCount; i++) {
-            Bot bot = robos[i];
-            if (!bot.getName().equals(me.getName()) && bot.getPos().equals(position) ){
-                if (bot.isVirtual())
-                    g2d.setComposite(AC_SRC_OVER_05);
-                else
-                    g2d.setComposite(AC_SRC_OVER);               
-                g2d.setColor(ROBOCOLOR[bot.getBotVis()]);
-                g2d.drawString(bot.getName(),xoffset,yoffset + acht + i * acht);
-                g2d.drawImage(getRobImage(bot, bot.getFacing()), xoffset, yoffset,scaledFeldSize, scaledFeldSize,this );                
-                
-            }
-        }
-        
+       synchronized ( internalBotHash) {
+           Iterator it = internalBotHash.values().iterator();
+           int roboCounter=0;
+           while (it.hasNext()) {
+               Bot bot = (Bot) it.next();
+               if (!bot.getName().equals(me.getName()) && bot.getPos().equals(position) ){
+                   if (bot.isVirtual())
+                       g2d.setComposite(AC_SRC_OVER_05);
+                   else
+                       g2d.setComposite(AC_SRC_OVER);               
+                   g2d.setColor(ROBOCOLOR[bot.getBotVis()]);
+                   g2d.drawString(bot.getName(),xoffset,yoffset + acht + roboCounter * acht);
+                   g2d.drawImage(getRobImage(bot, bot.getFacing()), xoffset, yoffset,scaledFeldSize, scaledFeldSize,this );                
+                   
+               }
+               roboCounter++;
+           }
+       }                  
         g2d.setComposite(old);
     }
     
-    private void moveRobNorth(Bot internal, int robocount, Graphics2D g2) {    
+    private void moveRobNorth(Bot internal, Graphics2D g2) {    
         CAT.debug("moving bot one square to the north");
         AlphaComposite ac = AC_SRC_OVER;         
         if (internal.isVirtual())
@@ -574,7 +653,7 @@ public class BoardView extends JComponent{
   
    
    
-    private void moveRobSouth(Bot internal, int robocount,Graphics2D g2) {
+    private void moveRobSouth(Bot internal,Graphics2D g2) {
         CAT.debug("moving bot one square to the south");
         AlphaComposite ac = AC_SRC_OVER;         
         if (internal.isVirtual())
@@ -647,7 +726,7 @@ public class BoardView extends JComponent{
     }
 
 
-    private void moveRobEast(Bot internal, int robocount, Graphics2D g2) {
+    private void moveRobEast(Bot internal, Graphics2D g2) {
         CAT.debug("moving bot one square to the east");
         AlphaComposite ac = AC_SRC_OVER;         
         if (internal.isVirtual())
@@ -721,7 +800,7 @@ public class BoardView extends JComponent{
 
     }
 
-    private void moveRobWest(Bot internal, int robocount, Graphics2D g2) {    
+    private void moveRobWest(Bot internal, Graphics2D g2) {    
         CAT.debug("moving bot one square to the west");
         AlphaComposite ac = AC_SRC_OVER;         
         if (internal.isVirtual())
@@ -815,7 +894,7 @@ public class BoardView extends JComponent{
         internal.turnClockwise();
         waitSomeTime(currentAnimationConfig.getDelayBetweenActions(),this);
     }
-    
+    /* XXX HS 19.5.2005
     private Bot getBotByName (String botName){
        // return internalBotHash.get(botName);
          int count = robos.length;
@@ -826,7 +905,7 @@ public class BoardView extends JComponent{
         }
         return null;
     
-    }
+    }*/
     
     /** @param direction either BOT_TURN_CLOCKWISE or BOT_TURN_COUNTER_CLOCKWISE in MessageID*/
     protected /* synchronized*/ void animateRobTurn(Bot rob, int direction) {
@@ -1017,7 +1096,7 @@ public class BoardView extends JComponent{
     
     
     protected /*synchronized*/ void animateRobMove(Bot rob, int direction) {
-        // important: according to the code on SpielfeldSim we do not get
+        // important: according to the code in SpielfeldSim we do not get
         //            the updated robot position;
         //            the updated position will be the endposition of the total move,
         //            as ersetzeRobos() will be called when the robot has reached its
@@ -1028,8 +1107,11 @@ public class BoardView extends JComponent{
         //            between to show an animation that makes sense
         try {
         String name = rob.getName();
-        Bot internal = null;
-        int robocount = -1;
+        
+        Bot internal = (Bot) internalBotHash.get(name);
+        /* XXX HS 19.5.2005
+        Bot internal = null;        
+        int robocount = -1;         
         for (int i = 0; i < robos.length; i++) {
             if (robos[i].getName().equals(name)) {
                 internal = robos[i];
@@ -1037,6 +1119,10 @@ public class BoardView extends JComponent{
                 break;
             }
         }
+        */
+        
+        
+        
         int oldX = internal.getX();
         int oldY = internal.getY();
      
@@ -1045,7 +1131,7 @@ public class BoardView extends JComponent{
             case NORTH:
                 {
                     if (oldY < sf.getSizeY()) {
-                        moveRobNorth(internal, robocount, (Graphics2D)getGraphics());
+                        moveRobNorth(internal,(Graphics2D)getGraphics());
                         internal.setPos(oldX, oldY + 1);
                     }
                     return;
@@ -1053,7 +1139,7 @@ public class BoardView extends JComponent{
             case EAST:
                 {
                     if (oldX < sf.getSizeX()) {
-                        moveRobEast(internal, robocount,(Graphics2D)getGraphics());
+                        moveRobEast(internal, (Graphics2D)getGraphics());
                         internal.setPos(oldX + 1, oldY);
                     }
                     return;
@@ -1061,7 +1147,7 @@ public class BoardView extends JComponent{
             case WEST:
                 {
                     if (oldX > 1) {
-                        moveRobWest(internal, robocount,(Graphics2D)getGraphics());
+                        moveRobWest(internal,(Graphics2D)getGraphics());
                         internal.setPos(oldX - 1, oldY);
                     }
                     return;
@@ -1069,7 +1155,7 @@ public class BoardView extends JComponent{
             case SOUTH:
                 {
                     if (oldY > 1) {
-                        moveRobSouth(internal, robocount,(Graphics2D)getGraphics());
+                        moveRobSouth(internal,(Graphics2D)getGraphics());
                         internal.setPos(oldX, oldY - 1);
                     }
                     return;
@@ -2029,7 +2115,7 @@ public class BoardView extends JComponent{
     private void paintRobos(Graphics g) {
         paintRobos(g, null);
     }
-
+/* XXX HS 19.5.2005
     private void paintRobos(Graphics g, Bot dontPaintMe) {
         CAT.debug("...painting Robots..");
         Graphics2D g2d = (Graphics2D) g;
@@ -2059,7 +2145,28 @@ public class BoardView extends JComponent{
         }
 
     }
-
+*/
+    
+    private void paintRobos(Graphics g, Bot dontPaintMe) {
+        CAT.debug("...painting Robots..");
+        Graphics2D g2d = (Graphics2D) g;          
+        Iterator it = internalBotHash.values().iterator();
+        // roboCounter will be used in paintRobot() as an offset for writing the robot's name on the
+        // screen so that the names won't be written over each other if some (virtual) robots
+        // have the same position on the board  
+        for (int roboCounter=0;it.hasNext();roboCounter++) {
+            Bot robot = (Bot) it.next();
+            if (!robot.equals(dontPaintMe)) {                   
+                if ((robot.getDamage() < 10) && (robot.getLivesLeft() > 0)) {
+                    paintRobot(g2d, robot, roboCounter);
+                }
+            }
+            else {
+                CAT.debug("skipping painting of 'dontPaintMeBot': "+dontPaintMe);                
+            }                                     
+        }            
+    }
+    
     protected Image getRobImage(Bot robot, int facing) {
         int botVis = robot.getBotVis();
         return robosCrop[facing + botVis * 4];
@@ -2269,6 +2376,7 @@ public class BoardView extends JComponent{
         }
         */            
     }
+    
     
 }
 
