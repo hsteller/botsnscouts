@@ -331,8 +331,8 @@ public class SimBoard extends Board implements Directions {
 
     private void doPhaseReal(int phase, BoardBot[] bots) {
         for (int i = 0; i < bots.length; i++) {  // potential direction to -1
-            bots[i].aa = -1;
-        }
+            bots[i].setTempFacing(DUMMY_DIRECTION,DUMMY_DIRECTION) ;
+        } 
 
         moved = new boolean[bots.length];
         moved2false();
@@ -410,23 +410,42 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void moveRob(BoardBot[] robbis, int rob, String aktion) {
+        
+        BoardBot bot = robbis[rob];
+        int facing = bot.getFacing();
+        String name = bot.getName();
         if (aktion.equals("M1")) {
-            moveRobOne(robbis, rob, robbis[rob].getFacing(), true);
+            if (moveRobOne(robbis, rob, facing, true)){
+                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
+            }
             checkForPitVictims(robbis, false);
         } else if (aktion.equals("M2")) {
-            moveRobOne(robbis, rob, robbis[rob].getFacing(), true);
+            if (moveRobOne(robbis, rob, facing, true)){
+                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
+            }
             checkForPitVictims(robbis, false);
-            moveRobOne(robbis, rob, robbis[rob].getFacing(), true);
+            if (moveRobOne(robbis, rob, facing, true)){
+                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
+            }
             checkForPitVictims(robbis, false);
         } else if (aktion.equals("M3")) {
-            moveRobOne(robbis, rob, robbis[rob].getFacing(), true);
+            if (moveRobOne(robbis, rob, facing, true)){
+                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
+            }
             checkForPitVictims(robbis, false);
-            moveRobOne(robbis, rob, robbis[rob].getFacing(), true);
+            if (moveRobOne(robbis, rob, facing, true)){
+                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
+            }
             checkForPitVictims(robbis, false);
-            moveRobOne(robbis, rob, robbis[rob].getFacing(), true);
+            if (moveRobOne(robbis, rob, facing, true)){
+                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
+            }
             checkForPitVictims(robbis, false);
         } else if (aktion.equals("BU")) {  // Back Up
-            moveRobOne(robbis, rob, (robbis[rob].getFacing() + 2) % 4, true);
+            int trueDirection = (facing+ 2) % 4;
+            if (moveRobOne(robbis, rob, trueDirection, true)){           
+                    ausgabenMsgString2(MessageID.BOT_MOVE, name,   trueDirection + "");           
+            }
             checkForPitVictims(robbis, false);
         } else if (aktion.equals("RL")) {  // Rotate Left
             turnBot(robbis[rob], GEAR_COUNTERCLOCKWISE);
@@ -443,30 +462,37 @@ public class SimBoard extends Board implements Directions {
         }
     }
 
+    
     private boolean moveRobOne(BoardBot[] robbis, int rob, int direction, boolean pushOthers) {
-        if (robbis[rob].getDamage() >= 10) {
+        return  moveRobOne(robbis, rob, direction, pushOthers, false);
+    }
+    
+    private boolean moveRobOne(BoardBot[] robbis, int rob, int direction, boolean pushOthers, boolean hack_isCollisionMove) {
+        BoardBot currentBot = robbis[rob];
+        
+        if (currentBot.getDamage() >= 10) {
             return false;
         }
 
         // first, check for Wall
         switch (direction) {
             case NORTH:
-                if (nw(robbis[rob].getX(), robbis[rob].getY()).isExisting()) {
+                if (nw(currentBot.getX(), currentBot.getY()).isExisting()) {
                     return (false);
                 }
                 break;
             case EAST:
-                if (ew(robbis[rob].getX(), robbis[rob].getY()).isExisting()) {
+                if (ew(currentBot.getX(), currentBot.getY()).isExisting()) {
                     return (false);
                 }
                 break;
             case SOUTH:
-                if (sw(robbis[rob].getX(), robbis[rob].getY()).isExisting()) {
+                if (sw(currentBot.getX(), currentBot.getY()).isExisting()) {
                     return (false);
                 }
                 break;
             case WEST:
-                if (ww(robbis[rob].getX(), robbis[rob].getY()).isExisting()) {
+                if (ww(currentBot.getX(), currentBot.getY()).isExisting()) {
                     return (false);
                 }
                 break;
@@ -474,8 +500,8 @@ public class SimBoard extends Board implements Directions {
 
         if (pushOthers) {
             // second, do a "virtual" move to be able to collision-check
-            int xx = robbis[rob].getX();
-            int yy = robbis[rob].getY();
+            int xx = currentBot.getX();
+            int yy = currentBot.getY();
             switch (direction) {
                 case NORTH:
                     yy++;
@@ -493,56 +519,62 @@ public class SimBoard extends Board implements Directions {
 
             //third, check for collision with other robbis
             for (int i = 0; i < robbis.length; i++) {
-                if ((i != rob) && (robbis[i].getX() == xx) && (robbis[i].getY() == yy) && (!robbis[i].isVirtual()) && (!robbis[rob].isVirtual())) {
-                    if (!moveRobOne(robbis, i, direction, true)) {
+                if ((i != rob) && (robbis[i].getX() == xx) && (robbis[i].getY() == yy) && (!robbis[i].isVirtual()) && (!currentBot.isVirtual())) {
+                    if (!moveRobOne(robbis, i, direction, true, true)) {
                         return (false);
                     }
                 }
             }
-
+          
             //fourth, commit the change if we reach this point
-            robbis[rob].setPos(xx, yy);
+            currentBot.setPos(xx, yy);
             //in that case, the robot has actually moved a square
             moved[rob] = true;
+            if (hack_isCollisionMove) {                
+                ausgabenMsgString2(MessageID.BOT_MOVE, "" + currentBot.getName(), direction + "");
+            }
+            
+            
         } //if pushOthers
         else {
             switch (direction) {
                 case NORTH:
-                    robbis[rob].yy = robbis[rob].getY() + 1;
-                    robbis[rob].xx = robbis[rob].getX();
+                    currentBot.yy = currentBot.getY() + 1;
+                    currentBot.xx = currentBot.getX();
                     break;
                 case EAST:
-                    robbis[rob].yy = robbis[rob].getY();
-                    robbis[rob].xx = robbis[rob].getX() + 1;
+                    currentBot.yy = currentBot.getY();
+                    currentBot.xx = currentBot.getX() + 1;
                     break;
                 case SOUTH:
-                    robbis[rob].yy = robbis[rob].getY() - 1;
-                    robbis[rob].xx = robbis[rob].getX();
+                    currentBot.yy = currentBot.getY() - 1;
+                    currentBot.xx = currentBot.getX();
                     break;
                 case WEST:
-                    robbis[rob].yy = robbis[rob].getY();
-                    robbis[rob].xx = robbis[rob].getX() - 1;
+                    currentBot.yy = currentBot.getY();
+                    currentBot.xx = currentBot.getX() - 1;
                     break;
             }
         }
-        ausgabenMsgString2(MessageID.BOT_MOVE, "" + robbis[rob].getName(), direction + "");
+     // XXX HS this is the wrong place..  ausgabenMsgString2(MessageID.BOT_MOVE, "" + robbis[rob].getName(), direction + "");
         return (true);
     }
 
     private void checkForPitVictims(BoardBot[] robbis, boolean xxyy) {
         for (int rob = 0; rob < robbis.length; rob++) {
+            BoardBot currentBot = robbis[rob];
             if (!xxyy) {
-                if (floor(robbis[rob].getX(), robbis[rob].getY()).isPit()) {
-                    if (!robbis[rob].isInPit()) {
-                        ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_IN_PIT, robbis[rob].getName());
+                if (floor(currentBot.getX(), currentBot.getY()).isPit()) {
+                    if (!currentBot.isInPit()) {
+                        ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_IN_PIT, currentBot.getName());
                     }
-                    destroyBot(robbis[rob]);
+                    destroyBot(currentBot);
                 }
-            } else if (floor(robbis[rob].xx, robbis[rob].yy).isPit()) {
-                if (!robbis[rob].isInPit()) {
-                    ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_IN_PIT, robbis[rob].getName());
+            } else if (floor(currentBot.xx, currentBot.yy).isPit()) {
+                if (!currentBot.isInPit()) {
+                    ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_IN_PIT, currentBot.getName());
                 }
-                destroyBot(robbis[rob]);
+                destroyBot(currentBot);
             }
         }
     }
@@ -572,21 +604,20 @@ public class SimBoard extends Board implements Directions {
         ausgabenMsgString2(MessageID.BOT_TURN, robbi.getName(), direction + "");
     }
 
-    private void turnBotIntended(BoardBot robbi, int drehR) {
-        int direction = OtherConstants.BOT_TURN_CLOCKWISE;
-        switch (drehR) {
-            case GEAR_CLOCKWISE:
-                robbi.aa = (robbi.getFacing() + 1) % 4;
-                break;
-            case GEAR_COUNTERCLOCKWISE:
-                direction = OtherConstants.BOT_TURN_COUNTER_CLOCKWISE;
-                robbi.aa = (robbi.getFacing() - 1);
-                if (robbi.aa == -1) {
-                    robbi.aa = 3;
-                }
-                break;
-        } // switch
-        ausgabenMsgString2(MessageID.BOT_TURN, robbi.getName(), direction + "");
+    private void turnBotIntended(BoardBot robbi, int drehR) {        
+       if (drehR== GEAR_CLOCKWISE) {
+           robbi.setTempFacing((robbi.getFacing() + 1) % 4, BOT_TURN_CLOCKWISE);                      
+       }
+       else if (drehR ==  GEAR_COUNTERCLOCKWISE){
+           		int oldFacing = robbi.getFacing();
+           		int newFacing = WEST;
+           		if (oldFacing != NORTH) {
+           		    newFacing = oldFacing -1 ;
+           		}
+                robbi.setTempFacing(newFacing, BOT_TURN_COUNTER_CLOCKWISE);
+        } 
+       // XXX HS this is wrong if there is a case where turn doesn't get executed later..  
+       // ausgabenMsgString2(MessageID.BOT_TURN, robbi.getName(), direction + "");
     }
 
     private void doExpressBelts(BoardBot[] bots) {
@@ -602,7 +633,7 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void doBelts(BoardBot[] bots) {
-        initIntendedValues(bots);
+        initIntendedValues(bots); // saving current location and facing to BoarBot.xx, BoardBot.yy, BoardBot.aa
         for (int i = 0; i < bots.length; i++) {
             Floor floor = floor(bots[i].getX(), bots[i].getY());
             if (floor.isBelt()) {
@@ -613,6 +644,13 @@ public class SimBoard extends Board implements Directions {
         doIntended(bots);
     }
 
+    /**
+     * Tries do execute the influence of a conveyor belt on a robot's location and facing.
+     * 
+     * @param robbis all robots
+     * @param rob offset in robbis for the robot we try to "influence"
+     * @param typ the kind of belt as returned by Floor.getBeltInfo()
+     */
     private void doBelts(BoardBot[] robbis, int rob, int typ) {
         switch (typ % 10) {
             case BELT_NORTH:
@@ -654,10 +692,12 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void initIntendedValues(BoardBot[] robbis) {
-        for (int i = 0; i < robbis.length; i++) {
-            robbis[i].xx = robbis[i].getX();
-            robbis[i].yy = robbis[i].getY();
-            robbis[i].aa = robbis[i].getFacing();
+        int rsize = robbis.length;
+        for (int i = 0; i < rsize; i++) {
+            BoardBot bot = robbis[i];
+            bot.xx = bot.getX();
+            bot.yy = bot.getY();
+            bot.setTempFacing( bot.getFacing(), DUMMY_DIRECTION);
         }
     }
 
@@ -688,30 +728,65 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void doIntended(BoardBot[] robbis) {
-        boolean[] robmove = new boolean[robbis.length];
-        for (int i = 0; i < robmove.length; i++) {
+        int roboCount = robbis.length;
+        boolean[] robmove = new boolean[roboCount];
+        for (int i = 0; i < roboCount; i++) {
             robmove[i] = true;
         }
-        for (int rob1 = 0; rob1 < robbis.length; rob1++) {
-            for (int rob2 = rob1 + 1; rob2 < robbis.length; rob2++) {
-                if ((!robbis[rob1].isVirtual()) && (!robbis[rob2].isVirtual())) {
+        for (int rob1 = 0; rob1 < roboCount; rob1++) {
+            for (int rob2 = rob1 + 1; rob2 < roboCount; rob2++) {
+                if ((!robbis[rob1].isVirtual()) && (!robbis[rob2].isVirtual())) { 
+                    // both are non-virtual
                     if ((robbis[rob1].xx == robbis[rob2].xx) && (robbis[rob1].yy == robbis[rob2].yy)) {
+                        // both non-virtuals would have the same position after intended move->not good
                         robmove[rob1] = false;
                         robmove[rob2] = false;
                     }
-                    if ((robbis[rob1].getX() == robbis[rob2].xx) && (robbis[rob1].getY() == robbis[rob2].yy) && (robbis[rob2].getX() == robbis[rob1].xx) && (robbis[rob2].getY() == robbis[rob1].yy)) {
+                    if ((robbis[rob1].getX() == robbis[rob2].xx) && (robbis[rob1].getY() == robbis[rob2].yy)
+                           && (robbis[rob2].getX() == robbis[rob1].xx) && (robbis[rob2].getY() == robbis[rob1].yy)) {
+                        // um, not sure what happens here...
+                        // looks like a check to avoid robots switching their positions 
+                        // (I guess to avoid a non-virtual bot moving through another non-virtual?!?) 
                         robmove[rob1] = false;
                         robmove[rob2] = false;
                     }
                 }
             }
         }
-        for (int i = 0; i < robbis.length; i++) {
-            if (robmove[i]) {
-                robbis[i].setPos(robbis[i].xx, robbis[i].yy);
-                if (robbis[i].aa > -1) {
-                    robbis[i].setFacing(robbis[i].aa);
-                    robbis[i].aa = -1;
+        for (int i = 0; i < roboCount; i++) {
+            if (robmove[i]) { 
+                // if there are no objections we can execute the intended move 
+                BoardBot currentBot = robbis[i];
+                
+                // XXX HS right place?
+                
+                int direction = DUMMY_DIRECTION;
+                if (currentBot.yy> currentBot.getY()){
+                    direction = NORTH;
+                }                
+                else if (currentBot.yy < currentBot.getY()) {
+                    direction = SOUTH;
+                }
+                else if (currentBot.xx<currentBot.getX()){
+                    direction = WEST;
+                }
+                else if (currentBot.xx>currentBot.getX()){
+                    direction = EAST;
+                }
+                currentBot.setPos(currentBot.xx, currentBot.yy);
+                if (direction != DUMMY_DIRECTION) {
+                    ausgabenMsgString2(MessageID.BOT_MOVE, "" + currentBot.getName(), direction + "");
+                }
+                
+                
+                if (currentBot.getTempFacing() != DUMMY_DIRECTION) {
+                    currentBot.setFacing(currentBot.getTempFacing());
+                  // XXX HS right place?
+                    int turnDirection = currentBot.getLastTempRotateDirection();       
+                    if (turnDirection != DUMMY_DIRECTION) {
+                        ausgabenMsgString2(MessageID.BOT_TURN,currentBot.getName(), ""+turnDirection);
+                    }
+                    currentBot.setTempFacing(DUMMY_DIRECTION, DUMMY_DIRECTION);
                 }
                 moved[i] = true;
             }

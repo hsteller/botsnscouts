@@ -26,6 +26,7 @@
 package de.botsnscouts.board;
 
 import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Directions;
 
 public class BoardBot extends Bot {
 
@@ -65,7 +66,35 @@ public class BoardBot extends Bot {
     protected int xx;
     protected int yy;
     /** Temporary facing */
-    protected int aa;
+    private  int aa;
+    private int lastRotateDirection;
+    /**
+     *  
+     * @param newFacing SimBoard uses constants as specified in Directions class (example: Directions.NORTH) 
+     * @param rotateDirection SimBoard uses constants as defined in Directions (example: OtherConstants.BOT_TURN_CLOCKWISE) 
+     */
+    protected void setTempFacing(int newFacing, int rotateDirection){
+        lastRotateDirection = rotateDirection;
+        aa = newFacing;
+    }
+    /**
+     * 
+     * @return SimBoard uses constants as specified in Directions class (example: Directions.NORTH) 
+     */
+    protected int getTempFacing(){
+        return aa;
+    }
+    
+    
+    /**
+     * 
+     * @return SimBoard uses constants as defined in OtherConstants (example: OtherConstants.BOT_TURN_CLOCKWISE)
+     */
+    protected int getLastTempRotateDirection(){
+        return lastRotateDirection;
+    }
+    
+    
 
     public void dumpZug() {
         for (int i = 0; i < move.length; i++) {
