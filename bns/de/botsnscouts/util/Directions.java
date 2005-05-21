@@ -27,9 +27,19 @@ package de.botsnscouts.util;
 
 public interface Directions {
 
+    // Don't change this values! Sadly, lots of code depends on them being 0,1,2,3
+    /** Multi-purpose direction with the value 0 */
     public static final int NORTH=0;  
+    /** Multi-purpose direction with the value 1 */
     public static final int EAST=1;
+    /** Multi-purpose direction with the value 2 */
     public static final int SOUTH=2;
+    /** Multi-purpose direction with the value 3 */
     public static final int WEST=3;
+    
+    public static final int BOT_TURN_CLOCKWISE = 1;
+    public static final int BOT_TURN_COUNTER_CLOCKWISE=2;
+    
+    public static final int DUMMY_DIRECTION = -1;
     
 }

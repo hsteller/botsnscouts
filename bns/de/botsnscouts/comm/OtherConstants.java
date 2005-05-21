@@ -1,5 +1,7 @@
 package de.botsnscouts.comm;
 
+import de.botsnscouts.util.Directions;
+
 public interface OtherConstants {
 
    // public static final String REASON_QUIT           = "GONE";
@@ -14,7 +16,7 @@ public interface OtherConstants {
   //                                     appended part: ^^^^^^^^^^^^^^^^^^^^
   public static final String MESSAGE_NUMBER = "message_number";
 
-public static final int BOT_TURN_CLOCKWISE = 1;
-public static final int BOT_TURN_COUNTER_CLOCKWISE=2;
+public static final int BOT_TURN_CLOCKWISE = Directions.BOT_TURN_CLOCKWISE;
+public static final int BOT_TURN_COUNTER_CLOCKWISE=Directions.BOT_TURN_COUNTER_CLOCKWISE;
 
 }
