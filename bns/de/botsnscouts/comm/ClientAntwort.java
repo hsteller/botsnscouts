@@ -142,7 +142,7 @@ public class ClientAntwort implements Comparable {
             case REPARATUR:
                 return "REPAIR";
             case ENTFERNUNG:
-                return "DISTANCE";
+                return "REMOVED_FROM_GAME";
             case AENDERUNG:
                 return "CHANGE";
             case TIMEOUT:
