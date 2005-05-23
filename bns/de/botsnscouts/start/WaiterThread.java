@@ -131,7 +131,7 @@ public class WaiterThread extends BNSThread {
         beendemich = true;
     }
     
-    public void shutdown(){
+    public void doShutdown(){
         stopAllWaitingThreads();
         reset();    
     }

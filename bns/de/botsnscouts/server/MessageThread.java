@@ -111,8 +111,7 @@ class MessageThread extends de.botsnscouts.util.BNSThread
 	}
     }
     
-    public void shutdown() {
-        
+    public void doShutdown() {       
         this.interrupt();
     }
 

@@ -99,6 +99,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
 
     /* Options for this game. */
     private GameOptions options;
+    
 
     /**
      * This constructor is called once per Game by StartServer.
@@ -1224,8 +1225,9 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
         } catch (Throwable t) {
             CAT.fatal("Exception:", t);
         }
-        finally {
+        finally {            
             CAT.info("SERVER REACHED END OF RUN METHOD");
+            doShutdown();
         }
     }// run() ende
 
@@ -1263,7 +1265,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
         }
     }
     
-    public void shutdown() {
+    public void doShutdown() {
  
         	if (messageThread != null){
         	    messageThread.shutdown();

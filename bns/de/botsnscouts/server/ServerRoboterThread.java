@@ -331,7 +331,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
     }
     
     
-    public void shutdown() {
+    public void doShutdown() {
         try {
             komm.entfernen(OtherConstants.REASON_SERVER_SHUTDOWN);
             komm.out.close();

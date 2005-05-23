@@ -46,7 +46,9 @@ import de.botsnscouts.util.Encoder;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Message;
+import de.botsnscouts.util.ShutdownListener;
 import de.botsnscouts.util.Shutdownable;
+import de.botsnscouts.util.ShutdownableSupport;
 import de.botsnscouts.util.Status;
 
 
@@ -1412,6 +1414,7 @@ public class KommClient implements Shutdownable{
                 CAT.debug(ioe);
             }
         }
+        shutdownSupport.shutdown();
     }
     
     /** Finalizer closes the streams.
@@ -1419,6 +1422,17 @@ public class KommClient implements Shutdownable{
     protected void finalize() throws Throwable {
       super.finalize();
 	  shutdown();
+    }
+    
+    
+    private ShutdownableSupport shutdownSupport = new  ShutdownableSupport(this);
+    
+    public void addShutdownListener(ShutdownListener l){
+        shutdownSupport.addShutdownListener(l);
+    }  
+    
+    public boolean removeShutdownListener(ShutdownListener l){ 
+        return shutdownSupport.removeShutdownListener(l);
     }
 }
 

@@ -4,15 +4,15 @@
  */
 package de.botsnscouts.widgets;
 
-import de.botsnscouts.util.RangeFilter;
-
 import javax.swing.JTextField;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.PlainDocument;
+
+import de.botsnscouts.util.RangeFilter;
 
 /**
  * @author hendrik

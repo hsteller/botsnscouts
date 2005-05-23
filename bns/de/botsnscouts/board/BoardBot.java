@@ -26,7 +26,6 @@
 package de.botsnscouts.board;
 
 import de.botsnscouts.util.Bot;
-import de.botsnscouts.util.Directions;
 
 public class BoardBot extends Bot {
 

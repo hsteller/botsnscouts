@@ -223,7 +223,7 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 	komm.message(id,args);
     }
     
-    public void shutdown() {
+    public void doShutdown() {
         try {
             komm.entfernen(OtherConstants.REASON_SERVER_SHUTDOWN);
             komm.out.close();

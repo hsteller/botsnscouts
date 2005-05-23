@@ -45,7 +45,9 @@ import de.botsnscouts.comm.KommServerRoboter;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Encoder;
+import de.botsnscouts.util.ShutdownListener;
 import de.botsnscouts.util.Shutdownable;
+import de.botsnscouts.util.ShutdownableSupport;
 
 /**
  * Erlaubt die nebenlaeufige Anmeldung von Robotern und Ausgaben Startet fuer
@@ -59,14 +61,16 @@ class RegistrationManager implements Runnable, Shutdownable {
     
     Server server;
     
-    ServerSocket seso;
+    ServerSocket seso; 
     
     Set names = new HashSet();
     
     int anzSpieler = 0;
     
+    private ShutdownableSupport shutdownSupport = new ShutdownableSupport(this);
+    
     BNSThread workingThread = new BNSThread(this, "RegMan"){
-        public void shutdown(){
+        public void doShutdown(){
             this.shutdown();
         }
     };
@@ -96,6 +100,14 @@ class RegistrationManager implements Runnable, Shutdownable {
                 CAT.warn(e);
             }
         }
+    }
+    
+    public void addShutdownListener(ShutdownListener l){
+        shutdownSupport.addShutdownListener(l);
+    }
+    
+    public boolean removeShutdownListener(ShutdownListener l){
+        return shutdownSupport.removeShutdownListener(l);
     }
     
     public void run() {

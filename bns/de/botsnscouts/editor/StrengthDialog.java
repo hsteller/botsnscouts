@@ -25,7 +25,7 @@
  
 package de.botsnscouts.editor;
 
-import java.awt.Button; 
+import java.awt.Button;
 import java.awt.Checkbox;
 import java.awt.CheckboxGroup;
 import java.awt.GridLayout;

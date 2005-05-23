@@ -77,9 +77,11 @@ public class HumanPlayer extends BNSThread {
     
     private Timer timeoutWatcher;
     private volatile boolean cardsSent;
-   private static final int bufferSecondsBeforeTimeout = 25;
-   private static final int bufferSecondsBeforeSendingCards = bufferSecondsBeforeTimeout-5;
+    private static final int bufferSecondsBeforeTimeout = 25;
+    private static final int bufferSecondsBeforeSendingCards = bufferSecondsBeforeTimeout-5;
 
+    
+    
     public HumanPlayer(String host, int port, String name) {
         this(host, port, name, -1);
     }
@@ -280,6 +282,7 @@ public class HumanPlayer extends BNSThread {
             e.printStackTrace();
         }
         CAT.info("HUMANPLAYER FINISHED!");
+        doShutdown();
         return;
 
     }
@@ -407,7 +410,7 @@ public class HumanPlayer extends BNSThread {
 
     /** meldet den Spieler beim Server ab und beendet diesen Thread.
      */
-    public void shutdown() {
+    public void doShutdown() {
         if (CAT.isDebugEnabled()) {
             CAT.debug(name + "was called to quit");
             CAT.debug("sending quit to server..");

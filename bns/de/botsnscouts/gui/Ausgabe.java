@@ -115,13 +115,10 @@ public class Ausgabe extends BNSThread {
      * sequence numbers)  when it is time to act.
      */
     private MessageSequencer sequencer;
+    
+    
 
-    /**
-     * Turns animation of robot movement on or off;
-     * visibility is public (not private), because the GUI (BoardView) needs to know about that, too.
-     */
-  //  public static final boolean IS_ROB_MOVE_ANIMATION_ENABLED = new Boolean(System.getProperty("enableRobMoveAnimation", "true")).booleanValue();
-
+  
     /**
      * Start a new Ausgabe with a View. It will start displaying Message 1.
      */
@@ -499,7 +496,7 @@ public class Ausgabe extends BNSThread {
         }
      }
     
-    public void shutdown() {
+    public void doShutdown() {
         CAT.debug("starting shutdown..");
         quit(false, false);
         try {
@@ -514,7 +511,6 @@ public class Ausgabe extends BNSThread {
         view.dispose();
         view = null;
         CAT.debug("reached end of shutdown");
-       
     }
 
 

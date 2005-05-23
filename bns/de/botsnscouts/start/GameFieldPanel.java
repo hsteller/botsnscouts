@@ -71,10 +71,10 @@ import de.botsnscouts.util.Message;
 import de.botsnscouts.util.Task;
 import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.widgets.ColoredPanel;
-import de.botsnscouts.widgets.TJNumberField;
 import de.botsnscouts.widgets.TJButton;
 import de.botsnscouts.widgets.TJCheckBox;
 import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJNumberField;
 import de.botsnscouts.widgets.TJPanel;
 import de.botsnscouts.widgets.TJTextField;
 

@@ -41,10 +41,11 @@ import de.botsnscouts.util.Location;
 
 /** AutoBot implements the computer-controlled robots.
  */
-public class AutoBot extends BNSThread {
 
+public class AutoBot extends BNSThread  {
+  
     static final Category CAT = Category.getInstance(AutoBot.class);
-
+       
     public AutoBot(String ip, int port) {
         this(ip, port, 0);
     }
@@ -62,8 +63,7 @@ public class AutoBot extends BNSThread {
         ip = i;
         port = p;
         this.malus = malus;
-        this.beltAware=beltAware;
-        
+        this.beltAware=beltAware;        
         
     }
 
@@ -238,7 +238,7 @@ public class AutoBot extends BNSThread {
       } // Ende of first "try" 
       finally {
         CAT.debug("End of run()...calling shutdown in case there is sime IO left to clean up..");
-        shutdown();
+        doShutdown();
         CAT.info("Autobot "+realname+" finished");
       }
      }
@@ -358,7 +358,7 @@ public class AutoBot extends BNSThread {
         spK.start();
     }
     
-    public void shutdown() {
+    public void doShutdown() {
         	CAT.debug("shutting down..");
         	gameRunning = false;
         	try {
@@ -374,7 +374,11 @@ public class AutoBot extends BNSThread {
         	}
         	catch (Exception e){
         	    CAT.debug(e);
-        	}
-        
+        	}        
+        	
     }
+     
+   
+    
+    
 }

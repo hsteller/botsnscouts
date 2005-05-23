@@ -33,6 +33,7 @@ import de.botsnscouts.gui.HumanPlayer;
 import de.botsnscouts.server.Server;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.KrimsKrams;
+import de.botsnscouts.util.Registry;
 
 // launches human player, output ...
 
@@ -40,6 +41,8 @@ public class Launcher {
 
     static final Category CAT = Category.getInstance(Launcher.class);
 
+    private static Registry gameRegistry = Registry.getSingletonInstance();
+    
     private Server server;
 
     // launches output
@@ -47,9 +50,9 @@ public class Launcher {
         BNSThread ret;
         try {
             ret = new BNSThread(new Ausgabe(ip, port, noSplash)){
-                public void shutdown() {
+                public void doShutdown() {
                     // TODO maybe kill the Ausgabe?
-                }
+                }               
             };
             ret.start();
         } catch (Exception exp) {
@@ -65,6 +68,7 @@ public class Launcher {
             if (CAT.isDebugEnabled()) CAT.debug("Trying to start human player...");
             ret = new HumanPlayer(ip, port, name, farbe, noSplash);
             ret.start();
+            gameRegistry.addClient(ip, port, ret);
         } catch (Exception u) {
             CAT.error("Error while starting the game for player " + name + ": " + u.getMessage());
             return null;
@@ -88,6 +92,7 @@ public class Launcher {
         ks = new AutoBot(ip, port, iq, beltAware, botName);       
         ks.setPriority(java.lang.Thread.MIN_PRIORITY);
         ks.start();
+        gameRegistry.addClient(ip, port, ks);
         CAT.debug(botName+" started");
         return ks;
     }
@@ -95,6 +100,7 @@ public class Launcher {
     public Server startGame(GameOptions options, ServerObserver listener) throws OneFlagException, NonContiguousMapException {
        server = new Server(options, listener);
        server.start();
+       gameRegistry.addGame(server, options.getHost(), options.getRegistrationPort());
        return server;
    }
 
@@ -110,5 +116,11 @@ public class Launcher {
         server = null;
         System.gc();
     }
+    
+    
+
+    
+    
+  
 
 }

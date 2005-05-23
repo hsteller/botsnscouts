@@ -137,8 +137,8 @@ public class ImageMan {
 
 	// start loading in a different thread
 	imageLoader = new BNSThread("imageLoader") {
-	    public void shutdown() {
-	        ImageMan.CAT.debug("ImageMan's empty shutdown() called");
+	    public void doShutdown() {
+	        ImageMan.CAT.debug("ImageMan's empty doShutdown() called");
 	    }
 	    public void run() {
 		try {

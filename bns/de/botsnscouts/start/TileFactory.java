@@ -68,8 +68,8 @@ public class TileFactory {
 
     boolean workerStarted = false;
     private Thread worker = new BNSThread("TileWorker") {
-        public void shutdown(){
-            CAT.debug ("TileFactory's workerThread: empty shutdown() called");
+        public void doShutdown(){
+            CAT.debug ("TileFactory's workerThread: empty doShutdown() called");
         }
         
         public void run() {

@@ -157,8 +157,8 @@ public class SoundMan {
             return;
 
         Thread t = new BNSThread("SoundMan") {
-            public void shutdown() {
-                SoundMan.CAT.debug("SoundMan's empty shutdown() called");
+            public void doShutdown() {
+                SoundMan.CAT.debug("SoundMan's empty doShutdown() called");
             }
             
             public void run() {

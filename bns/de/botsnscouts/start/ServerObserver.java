@@ -194,7 +194,7 @@ public class ServerObserver extends BNSThread {
         
     }
     
-    public void shutdown(){
+    public void doShutdown(){
         torun = false;
         fireGameFinished();
         closeSock();
