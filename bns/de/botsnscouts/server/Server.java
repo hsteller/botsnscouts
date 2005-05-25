@@ -447,8 +447,11 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
             }
 
             CAT.debug("Now waiting " + notifyTO + " msec for AusgabeThreads");
+            
+            // FIXME TODO XXX 
+            // there can be ConcurrentModificationExceptions (deleting something from a Vector
+            // that we are iterating)
             Iterator it = waitablesImWaitingFor.waitFor(notifyTO);
-
             while (it.hasNext()) {
                 deleteOutput((ServerAusgabeThread) it.next(), "TO");
             }
@@ -1227,7 +1230,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
         }
         finally {            
             CAT.info("SERVER REACHED END OF RUN METHOD");
-            doShutdown();
+            shutdown();
         }
     }// run() ende
 
