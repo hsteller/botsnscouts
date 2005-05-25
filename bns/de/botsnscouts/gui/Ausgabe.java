@@ -201,7 +201,7 @@ public class Ausgabe extends BNSThread {
         }
         CAT.debug("Ausgabe reached end of its run method");
         //showActionMessage(Message.say("AusgabeFrame","spielende"));
-        shutdown();
+        // TODO shutdown of Views only via menu or closing of a window?  shutdown();
         return;
     }
 
