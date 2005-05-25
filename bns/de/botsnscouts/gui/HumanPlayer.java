@@ -45,11 +45,13 @@ import de.botsnscouts.util.Global;
 import de.botsnscouts.util.KrimsKrams;
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Message;
+import de.botsnscouts.util.Registry;
 import de.botsnscouts.widgets.GreenTheme;
 
 /**
  * logic for the human player
  * @author Lukasz Pekacki
+ *  @version $Id$
  */
 public class HumanPlayer extends BNSThread {
     static Category CAT = Category.getInstance(HumanPlayer.class);
@@ -79,8 +81,8 @@ public class HumanPlayer extends BNSThread {
     private volatile boolean cardsSent;
     private static final int bufferSecondsBeforeTimeout = 25;
     private static final int bufferSecondsBeforeSendingCards = bufferSecondsBeforeTimeout-5;
-
-    
+    /** If set to true, we will do a System.exit(0) on the end of the run() method*/
+    private boolean killJVMonceFinished = false;
     
     public HumanPlayer(String host, int port, String name) {
         this(host, port, name, -1);
@@ -275,14 +277,17 @@ public class HumanPlayer extends BNSThread {
         //view.removeChatPane();
 
         try {
-            CAT.debug("Waiting for Ausgabe (join())..");
-            ausgabe.join();
-            CAT.debug("Ausgabe is now ready,,");
+            CAT.debug("Waiting 10 seconds for Ausgabe (join())..");
+            ausgabe.join(10000);
+            CAT.debug("Ausgabe is now ready (well, or hangs..)");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         CAT.info("HUMANPLAYER FINISHED!");
-        doShutdown();
+        shutdown();
+        if (killJVMonceFinished){
+            System.exit(0);
+        }
         return;
 
     }
@@ -291,27 +296,44 @@ public class HumanPlayer extends BNSThread {
      * Main-Methode, die den menschlichen Spieler von der Shell aus als Thread startet
      */
     public static void main(String[] args) {
-        //1. name (optional)
-        //2. host (optional)
-        //3. port  "
-        //4. farbe "
-        /*	int sPort = 0;
-            SpielerMensch spM;
-            if ((args.length > 0) &&(args[0] != "") && (args[1]) !="") {
-            try {sPort = Integer.parseInt(args[1]); } catch (Exception e) {System.err.println(e.getMessage());}
-            spM = new SpielerMensch(args[0],sPort,createName());
-            }
-            else spM = new SpielerMensch();
-            spM.run();*/
-        String name, host = "127.0.0.1";
-        int port = 8077, farbe = 0;
-        if (args[0] == null)
-            name = KrimsKrams.randomName();
-        else
-            name = args[0];
+        //1. name
+        //2. host 
+        //3. port
+        //4. farbe 
+        // 5. killJVM 
+        String name  = KrimsKrams.randomName();
+        String host = "127.0.0.1";
+        int port = 8077, farbe = 0; 
+        boolean killJVM = true;       
         int tmpInt;
         switch (args.length) {
-            case 2:
+            case 5: { // JVM
+                killJVM = new Boolean(args[4]).booleanValue();
+            }
+            case 4: { // color
+                try {
+                    farbe = Integer.parseInt(args[3]);
+                }
+                catch (NumberFormatException nfe){
+                    System.err.println("illegal color value:\"" +args[3]+"\"; using '0' instead");
+                    farbe = 0;
+                }
+            }
+            case 3: { // serverPort 
+                try {
+                    tmpInt = Integer.parseInt(args[2]);
+                    if (tmpInt < 9) {
+                        farbe = tmpInt;
+                        port = 8077;
+                    } else {
+                        port = tmpInt;
+                        farbe = 0;
+                    }
+                } catch (NumberFormatException e) {
+                    System.err.println("number parse error on \""+args[2]+"\"");
+                }
+            }
+            case 2: {// serverIp 
                 try {
                     tmpInt = Integer.parseInt(args[1]);
                     if (tmpInt < 9) {
@@ -327,33 +349,18 @@ public class HumanPlayer extends BNSThread {
                     port = 8077;
                     farbe = 0;
                 }
-                break;
-            case 3:
-                host = args[1];
-                try {
-                    tmpInt = Integer.parseInt(args[2]);
-                    if (tmpInt < 9) {
-                        farbe = tmpInt;
-                        port = 8077;
-                    } else {
-                        port = tmpInt;
-                        farbe = 0;
-                    }
-                } catch (NumberFormatException e) {
-                    System.err.println(e);
-                }
-                break;
-            case 4:
-                host = args[1];
-                try {
-                    port = Integer.parseInt(args[2]);
-                    farbe = Integer.parseInt(args[3]);
-                } catch (NumberFormatException e) {
-                    System.err.println(e);
-                }
+            }
+           case 1: { // name     
+               if (args[0] != null){                  
+                   name = args[0];
+               }
+           }
         }
+                                
         MetalLookAndFeel.setCurrentTheme(new GreenTheme());
-        (new HumanPlayer(host, port, name, farbe)).start();
+        HumanPlayer hp = new HumanPlayer(host, port, name, farbe);
+        hp.killJVMonceFinished = killJVM;
+        hp.start();
     }
 
     protected void sendCards(ArrayList registerCards, boolean nextTurnPowerDown) {
@@ -428,14 +435,9 @@ public class HumanPlayer extends BNSThread {
             CAT.warn("in shutdown", e);
         }
             CAT.debug("setting condition for leaving the run()-method");
-        gameOver = true;
-        CAT.debug("shutting down my output channel "); 
-        if (ausgabe != null ){
-            ausgabe.shutdown(); // will kill the view
-        }
+        gameOver = true;       
         view = null;
-        //Dafuer sorgen, dass Thread aufhoert
-        //System.exit(0);
+        
     }
 
 
@@ -542,6 +544,7 @@ public class HumanPlayer extends BNSThread {
         view = new View(humanView);          // adds the humanView to the JFrame
         ausgabe = new Ausgabe(host, port, nosplash, view);   //adds the AusgabeView to the JFrame
         ausgabe.initialize();
+        Registry.getSingletonInstance().addClient(ausgabe, host, port);
         ausgabe.start();
 //	ChatPane chatpane=new ChatPane(this);
 //	view.addChatPane(chatpane);
