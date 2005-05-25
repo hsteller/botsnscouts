@@ -567,12 +567,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       locateMenu.add(new ShowRobMenu());
     //  locateMenu.add(new TrackMenu());
       
-      JMenuItem stats = new JMenuItem(Message.say("AusgabeView", "stats"));
-      stats.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e){
-          ausgabe.showStats();
-        }
-      });
+      
       JMenuItem hotkeyMenu = new JMenuItem(Message.say("AusgabeView", "hotkeyMenu"));
       hotkeyMenu.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e){
@@ -584,8 +579,6 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       optionsMenu.add(new SpeedMenu());
       optionsMenu.add(new SoundMenu());
       optionsMenu.add(hotkeyMenu);
-      optionsMenu.add(stats);
-
 
 
 
@@ -611,7 +604,12 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
                   quit(false);
                 }
 	    });
-
+          JMenuItem stats = new JMenuItem(Message.say("AusgabeView", "stats"));
+          stats.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+              ausgabe.showStats();
+            }
+          });
           /*
           JMenuItem mQuitWatch = new JMenuItem((Message.say("AusgabeView","mFinishButWatch")));
           mQuit.addActionListener(new ActionListener() {
@@ -622,6 +620,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
           this.add(mQuitWatch);
           */
+          this.add(stats);
+          this.addSeparator();
           this.add(mQuit);
       }
     }
