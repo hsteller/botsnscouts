@@ -47,28 +47,31 @@ public class Launcher {
 
     // launches output
     public static BNSThread watchAGame(String ip, int port, boolean noSplash) {
-        BNSThread ret;
+       
         try {
-            ret = new BNSThread(new Ausgabe(ip, port, noSplash)){
+            Ausgabe view = new Ausgabe(ip, port, noSplash){
                 public void doShutdown() {
                     // TODO maybe kill the Ausgabe?
-                }               
+                }     
             };
-            ret.start();
+            gameRegistry.addClient(view, ip, port);
+            view .start();
+            return view;
+           
         } catch (Exception exp) {
             return null;
         }
-        return ret;
+        
     }
 
     // launches human player
     public static BNSThread participateInAGame(String ip, int port, String name, int farbe, boolean noSplash) {
-        BNSThread ret;
+        HumanPlayer ret;
         try {
             if (CAT.isDebugEnabled()) CAT.debug("Trying to start human player...");
             ret = new HumanPlayer(ip, port, name, farbe, noSplash);
             ret.start();
-            gameRegistry.addClient(ip, port, ret);
+            gameRegistry.addClient(ret, ip, port);
         } catch (Exception u) {
             CAT.error("Error while starting the game for player " + name + ": " + u.getMessage());
             return null;
@@ -88,11 +91,13 @@ public class Launcher {
     public static BNSThread startAutoBot(String ip, int port, int iq, boolean beltAware,
                                       String botName) {
         CAT.debug("creating AutoBot-BNSThread for "+botName);
-        BNSThread ks;
-        ks = new AutoBot(ip, port, iq, beltAware, botName);       
+        if (ip == null) { 
+            ip=GameOptions.DHOST; 
+        }
+        AutoBot ks = new AutoBot(ip, port, iq, beltAware, botName);       
         ks.setPriority(java.lang.Thread.MIN_PRIORITY);
         ks.start();
-        gameRegistry.addClient(ip, port, ks);
+        gameRegistry.addClient(ks, ip, port);
         CAT.debug(botName+" started");
         return ks;
     }
@@ -100,7 +105,11 @@ public class Launcher {
     public Server startGame(GameOptions options, ServerObserver listener) throws OneFlagException, NonContiguousMapException {
        server = new Server(options, listener);
        server.start();
-       gameRegistry.addGame(server, options.getHost(), options.getRegistrationPort());
+       String ip = options.getHost();
+       if (ip == null){
+           ip = GameOptions.DHOST;
+       }
+       gameRegistry.addGame(server, ip, options.getRegistrationPort());
        return server;
    }
 

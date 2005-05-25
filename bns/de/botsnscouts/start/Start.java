@@ -46,6 +46,7 @@ import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.KrimsKrams;
 import de.botsnscouts.util.Message;
+import de.botsnscouts.util.Registry;
 import de.botsnscouts.util.SoundMan;
 import de.botsnscouts.util.Task;
 import de.botsnscouts.widgets.GreenTheme;
@@ -321,6 +322,9 @@ public class Start extends JFrame implements WindowListener {
     protected static void initBasics() {
         MetalLookAndFeel.setCurrentTheme(new GreenTheme());
 
+        // enabling registry
+        Registry.getSingletonInstance().setEnabled(true);
+        
         //load Sounds
         CAT.debug("starting soundman..");
         SoundMan.loadSounds();
