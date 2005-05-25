@@ -32,6 +32,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Category;
@@ -157,7 +158,22 @@ public class HumanView extends JPanel implements HumanViewInterface {
         }
 
         );
-        userInfo = new UserInfo();
+        JButton emergencyButton = new JButton(Message.say("SpielerMensch","forceCardDisplayButton"));
+		emergencyButton.addActionListener(new ActionListener(){
+		    public void actionPerformed(ActionEvent e){
+		        ArrayList oldCards = cards.getCards();
+		        
+	            int cartCount = oldCards==null?0:oldCards.size();
+	            for (int i=0;i<cartCount;i++){
+	                if (oldCards.get(i)==null) { // got no cards
+	                    return; // otherwise NullPointerException in "showCards"
+	                }
+	            }
+		        
+		        showCards(oldCards);
+		    }
+		});
+        userInfo = new UserInfo(emergencyButton);
 
         wiseAndScout.add(wisenheimerView);
         wiseAndScout.add(scoutView);
@@ -173,7 +189,7 @@ public class HumanView extends JPanel implements HumanViewInterface {
         switcherPanel.add(reachedEndWinner, "reachedEndWinner");
         //add(wiseAndScout);
         add(switcherPanel);
-       
+        
        
     }
 
