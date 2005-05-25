@@ -46,6 +46,9 @@ public class AutoBot extends BNSThread  {
   
     static final Category CAT = Category.getInstance(AutoBot.class);
        
+    /** If set to true, we will do a System.exit(0) on the end of the run() method*/
+    private boolean killJVMonceFinished = false;
+    
     public AutoBot(String ip, int port) {
         this(ip, port, 0);
     }
@@ -237,9 +240,16 @@ public class AutoBot extends BNSThread  {
         }         //Ende while
       } // Ende of first "try" 
       finally {
-        CAT.debug("End of run()...calling shutdown in case there is sime IO left to clean up..");
-        doShutdown();
+          // don't call shutdown: it will remove the robot from the game and (ATM) result in the GUI
+          // removing the  "ranking-picture" (so the robot reached the end of "run" by finishing the game)
+          // When the Registry works, it should cleanup everything when it's time to shutdowm the server
+        //CAT.debug("End of run()...calling shutdown in case there is some IO left to clean up..");
+        //shutdown();
         CAT.info("Autobot "+realname+" finished");
+        if (killJVMonceFinished){
+            CAT.info("As I was started via my main method (and so very likely via CLI), I will kill the JVM now!" );
+            System.exit(0);
+        }
       }
      }
 
@@ -323,7 +333,10 @@ public class AutoBot extends BNSThread  {
         }
         myComm.respZerstoert(realname, direction);
     }
-
+/**
+ * Attention: if the bot is started by calling the main method, it will kill the JVM once it reached the end of its run() method!
+ * 
+ */
     public static void main(String[] args) {
         int sPort = 0;
         AutoBot spK;
@@ -332,8 +345,11 @@ public class AutoBot extends BNSThread  {
 
         // Kommandozeilenparameter auswerten
 
+        boolean killJVM = true;
         try {
             switch (args.length) {
+                case 4: 
+                    killJVM = new Boolean (args[3]).booleanValue();
                 case 3:
                     malus = Integer.parseInt(args[2]);
                 case 2:
@@ -345,7 +361,7 @@ public class AutoBot extends BNSThread  {
                     throw new IllegalArgumentException();
             } // switch
         } catch (Exception e) {
-            System.err.println("Usage: java de.botsnscouts.autobot.AutoBot <host> <port>");
+            System.err.println("Usage: java de.botsnscouts.autobot.AutoBot <host> <port> [kill JVM on exit; default=true]");
         }
 
         if (host.equals(""))
@@ -354,11 +370,16 @@ public class AutoBot extends BNSThread  {
             sPort = 8077;
 
         spK = new AutoBot(host, sPort, malus);
-
+        spK.killJVMonceFinished = killJVM;
         spK.start();
     }
     
-    public void doShutdown() {
+   
+    public void doShutdown(){
+        doShutdown(true);
+    }
+    
+    public void doShutdown(boolean deregister) {
         	CAT.debug("shutting down..");
         	gameRunning = false;
         	try {
@@ -374,7 +395,9 @@ public class AutoBot extends BNSThread  {
         	}
         	catch (Exception e){
         	    CAT.debug(e);
-        	}        
+        	}       
+        	
+        	
         	
     }
      
