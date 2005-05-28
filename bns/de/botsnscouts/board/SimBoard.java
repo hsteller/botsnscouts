@@ -555,8 +555,7 @@ public class SimBoard extends Board implements Directions {
                     currentBot.xx = currentBot.getX() - 1;
                     break;
             }
-        }
-     // XXX HS this is the wrong place..  ausgabenMsgString2(MessageID.BOT_MOVE, "" + robbis[rob].getName(), direction + "");
+        }    
         return (true);
     }
 
@@ -615,9 +614,7 @@ public class SimBoard extends Board implements Directions {
            		    newFacing = oldFacing -1 ;
            		}
                 robbi.setTempFacing(newFacing, BOT_TURN_COUNTER_CLOCKWISE);
-        } 
-       // XXX HS this is wrong if there is a case where turn doesn't get executed later..  
-       // ausgabenMsgString2(MessageID.BOT_TURN, robbi.getName(), direction + "");
+        }        
     }
 
     private void doExpressBelts(BoardBot[] bots) {
@@ -757,9 +754,7 @@ public class SimBoard extends Board implements Directions {
             if (robmove[i]) { 
                 // if there are no objections we can execute the intended move 
                 BoardBot currentBot = robbis[i];
-                
-                // XXX HS right place?
-                
+    
                 int direction = DUMMY_DIRECTION;
                 if (currentBot.yy> currentBot.getY()){
                     direction = NORTH;
@@ -781,7 +776,6 @@ public class SimBoard extends Board implements Directions {
                 
                 if (currentBot.getTempFacing() != DUMMY_DIRECTION) {
                     currentBot.setFacing(currentBot.getTempFacing());
-                  // XXX HS right place?
                     int turnDirection = currentBot.getLastTempRotateDirection();       
                     if (turnDirection != DUMMY_DIRECTION) {
                         ausgabenMsgString2(MessageID.BOT_TURN,currentBot.getName(), ""+turnDirection);

@@ -386,70 +386,7 @@ public class BoardView extends JComponent{
     private HashMap internalBotHash = new java.util.HashMap();
     private static final Location pit = new Location(0, 0);
 
-    
-    /* XXX HS 19.5.2005
-    protected void ersetzeRobos(Bot[] robos_neu) {
 
-        if (!gotColors) { // this is the first time I get the robots
-            setRobColors(robos_neu);
-            robos = robos_neu;
-            int count = robos!=null?robos.length:0;
-            for (int i = 0; i < count; i++) // initalizing my internal hash
-                internalBotHash.put(robos[i].getName(), robos[i]);
-        }
-        // we dont want to overwrite the robots positions/facings, because they
-        // have been updated in animateRobMove()/animateRobTurn() before;
-        // animateRobMove()/animateRobTurn() gets informed earlier, so overwriting the positions/facings
-        // would reset a robot back to a position/facing he has already left
-        else {
-            if (AnimationConfig.areMovementAnimationsEnabled()) {
-                int count = robos!=null?robos.length:0;
-                for (int i = 0; i < count; i++) // saving my internal robot values
-                    internalBotHash.put(robos[i].getName(), robos[i]);
-                robos = robos_neu; // updating all robots
-
-                // replacing robot values - if it was not destroyed -
-                // with the values we saved above
-                for (int i = 0; i < count; i++) {
-                    Bot r = robos[i];
-                    Bot tmpBot  = (Bot) internalBotHash.get(r.getName());
-                    Location tmp = tmpBot.getPos();
-                    //Location tmp = (Location) internalBotHash.get(r.getName());
-
-                    if (!(r.getPos().equals(pit) || r.getDamage() >= 10 || tmp.equals(pit))) {
-                        // ^^^^^^^^^^^^^
-                        // otherwise we would not show
-                        // the destroyed robot ever again
-                        // as we would ignore him if he
-                        // is placed on the board again
-                        if (CAT.isDebugEnabled()) {
-                            CAT.debug("ignoring server values of robot " + r.getName()
-                                    + " as my calculated values will be more accurate");
-                        }
-                        // use the internal kept values of our robot if it is not destroyed
-                        r.setPos(tmp);
-                        r.setFacing(tmpBot.getFacing());
-                    } 
-                    else {
-                        if (CAT.isDebugEnabled())
-                            CAT.debug("using server values of robot " + r.getName());
-                       
-                    }
-                    repaint();
-                }                
-                            
-            } else { // no animation
-                robos = robos_neu;
-                repaint();
-                waitSomeTime(currentAnimationConfig.getDelayBetweenActions(), this);
-            }
-        }
-
-        
-
-    }
-    */
-    
     private void replaceInternalRobots( Bot[] robos_neu){
         int count = robos_neu!=null?robos_neu.length:0;
         synchronized (internalBotHash) {
@@ -894,18 +831,7 @@ public class BoardView extends JComponent{
         internal.turnClockwise();
         waitSomeTime(currentAnimationConfig.getDelayBetweenActions(),this);
     }
-    /* XXX HS 19.5.2005
-    private Bot getBotByName (String botName){
-       // return internalBotHash.get(botName);
-         int count = robos.length;
-        for (int i = 0; i < count; i++) {
-            if (robos[i].getName().equals(botName)) {
-                return robos[i];              
-            }
-        }
-        return null;
-    
-    }*/
+   
     
     /** @param direction either BOT_TURN_CLOCKWISE or BOT_TURN_COUNTER_CLOCKWISE in MessageID*/
     protected /* synchronized*/ void animateRobTurn(Bot rob, int direction) {
@@ -1109,17 +1035,7 @@ public class BoardView extends JComponent{
         String name = rob.getName();
         
         Bot internal = (Bot) internalBotHash.get(name);
-        /* XXX HS 19.5.2005
-        Bot internal = null;        
-        int robocount = -1;         
-        for (int i = 0; i < robos.length; i++) {
-            if (robos[i].getName().equals(name)) {
-                internal = robos[i];
-                robocount = i;
-                break;
-            }
-        }
-        */
+        
         
         
         
@@ -2115,38 +2031,7 @@ public class BoardView extends JComponent{
     private void paintRobos(Graphics g) {
         paintRobos(g, null);
     }
-/* XXX HS 19.5.2005
-    private void paintRobos(Graphics g, Bot dontPaintMe) {
-        CAT.debug("...painting Robots..");
-        Graphics2D g2d = (Graphics2D) g;
-        int numOfBots = robos!=null?robos.length:0;
-        if (dontPaintMe == null) {
 
-                for (int robocount = 0; robocount < numOfBots; robocount++) {
-                    Bot robot = robos[robocount];
-                    if ((robot.getDamage() < 10) &&
-                            (robot.getLivesLeft() > 0)) {
-                        paintRobot(g2d, robot, robocount);
-                    }
-                }
-       
-        } 
-        else {
-           
-                for (int robocount = 0; robocount < numOfBots; robocount++) {
-                    Bot robot = robos[robocount];
-                    if ((robot.getDamage() < 10) &&
-                            (robot.getLivesLeft() > 0) &&
-                            !dontPaintMe.getName().equals(robot.getName())) {
-                        paintRobot(g2d, robot, robocount);
-                    }
-                }
-           
-        }
-
-    }
-*/
-    
     private void paintRobos(Graphics g, Bot dontPaintMe) {
         CAT.debug("...painting Robots..");
         Graphics2D g2d = (Graphics2D) g;          
