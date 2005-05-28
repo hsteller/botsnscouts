@@ -5,6 +5,7 @@
  */
 package de.botsnscouts.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,7 +39,8 @@ public class Registry implements ShutdownListener {
     	
         private Collection games;
         private Game dummyCompareGame = new Game(null,"DUMMY",-1);
-        private HashMap clientsToGames = new HashMap();
+        private HashMap shutdownablesToGames = new HashMap();
+        private HashMap serversToGames = new HashMap();
         private boolean isEnabled = false;
         
         
@@ -71,10 +73,11 @@ public class Registry implements ShutdownListener {
             if (!isEnabled) {
                 return;
             }
-            Game game = new Game(server, serverIp, serverPort);
+            Game game = new Game(server, serverIp, serverPort);          
             synchronized (games) {
                 games.add(game);
             }
+            
         }
         
         private Game findGame(String serverIp, int port){           
@@ -92,8 +95,8 @@ public class Registry implements ShutdownListener {
             return null;
         }
         
-        private Game findGame(Shutdownable client) {
-            return (Game) clientsToGames.get(client);
+        private Game findGame(Shutdownable clientOrServer) {
+            return (Game) shutdownablesToGames.get(clientOrServer);
         }
         
         
@@ -121,7 +124,7 @@ public class Registry implements ShutdownListener {
             }            
             ClientInfo info = new ClientInfo( client, clientInfoClientType);
             game.addClient(info);
-            clientsToGames.put(client, game);            
+            shutdownablesToGames.put(client, game);            
         }
         
         public boolean isEmpty() {                
@@ -144,6 +147,51 @@ public class Registry implements ShutdownListener {
         }
         */
         
+        private void redisplayMenu(){
+            // TODO implement
+        }
+        
+       
+        
+        private boolean areThereAnyLocalViews_killGamesWithoutThem(){
+            // checking the other local game(s) and if someone local is still watching 
+            boolean foundHumanClient = false;
+            synchronized(games){
+                Iterator it = games.iterator();
+                while ( it.hasNext()){
+                    Game g = (Game) it.next();
+                    if (g.hasHumanView()){
+                        foundHumanClient = true;
+                    }
+                    else {                             
+                        Server server = g.getServer();
+                        CAT.debug("found other game; Serverthread: "+server);
+                        // we found a local server with no local (human) players or views..
+                        // TODO think about whether there might be cases where shutting 
+                        // down is wrong..local server, no local GUI, but someone called shutdown..
+                        //..hmm.. can this happen with AutoBots?!? Probably not as long as they
+                        // don't call their "shutdown()" method themselves
+                        if (server != null ){
+                            server.shutdown();;
+                        }
+                        else {
+                            CAT.error("This is strange; there is a serverless game registered but noone "+
+                                            "(local) seems to play..WTF? How get remote playing Autobots "+
+                                            "added to this registry object?");
+                            CAT.error("\t GAME DUMP for this strange game:\n"+g.dump());
+                        }
+                    }
+                }
+                return foundHumanClient;        
+            }
+        }
+        
+        /** Note: This method is supposed to be called by Shutdownables in their shutdown() method.
+         *  It will NOT shut down <code>someThread</code> or we might get an infinite loop.
+         * It is supposed to notify the registry that someThread has killed off its communications.
+         * HOWEVER: This method WILL KILL other threads/players/views/servers and redisplay
+         * the main menu if <code>someThread</code> was the last view of a (local) game.. 
+         */
         public void shutdown(Shutdownable someThread){           
             if (!isEnabled){
                 // this is supposed to catch the case where someone (probably developer..)  starts a client via CLI
@@ -154,38 +202,66 @@ public class Registry implements ShutdownListener {
                 // program by launching the main application sounds somewhat wrong..
                 return;
             }
-            if (someThread instanceof Server) {
-                // TODO wait some time and then shut down all clients associated with this server;
-                // then redisplay the launcher app
+            
+            Game someThreadsGame = findGame(someThread);
+            if (someThreadsGame == null) {              
+                CAT.debug("didn't find a game for Thread: "+someThread);
+                CAT.debug("no game found for the client that is going down, hmm, let's see what there is to do..");
+                if (isEmpty()) {
+                   CAT.debug ("\tsince there seems to be nothing else runnig, we will redisplay the main menu");
+                   	redisplayMenu();
+                }
+                else {
+                    CAT.warn("\tThere seems to be another game running..");
+                    boolean foundView = areThereAnyLocalViews_killGamesWithoutThem();
+                    if (foundView){
+                        CAT.debug("a local view is still active=>keep main menu hidden");
+                    }
+                    else{
+                        redisplayMenu();
+                    }                                                               
+                }
+                return;
             }
             else {
-                // some client
-                // TODO 
-                // 1. remove the client from the game
-                // 2. check the game; 
-                //     if other clients are associated with the game {
-                //        if there is no other View/HumanPlayer {
-                //            ??? hmm, kill the server and all other clients, then redisplay launcher?
-                //        }
-                //     }
-                //    else {
-                //			redisplay launcher??
-                //    }
-                Game clientsGame = findGame(someThread);
-                if (clientsGame == null){
-                    CAT.error("no game found for the client that is going down, hmm, let's see what there is to do..");
-                    if (isEmpty()) {
-                       CAT.error ("\tsince there seems to be nothing else runnig, we will redisplay the main menu");
-                        // TODO if Registry contains no other game, redisplay launcher; HMM, there might
-                    }
-                    else {
-                        CAT.error("\tThere seems to be another game running..");
-                        // TODO if there is a game with a server or another GUI (HumanPlayer/View client), do nothing
-                        //          otherwise: redisplay (??hmm, then it must be AutoBots..simply killing them should be ok
-                        //          as the only way to start them is AFAIK AutoBot.main so 
-                    }
-                }
-                //removeClient(someThread);
+                // found the game; as we are about to clean up "someThread",
+                // we will remove the "someThread->game" reference from the lookup table              
+                    shutdownablesToGames.remove(someThreadsGame);                
+            }
+            if (someThread instanceof Server) {
+                 CAT.debug("There is a server going down: "+someThread);
+                // TODO Do I really want this? A server calling its own shutdown itself (and subsequently
+                // this method here) might also kill all views that might still be connected (by closing the sockets)
+                // => last robot reaches final flag or gets killed 
+                // => view might hang or vanishe without displaying the results..
+                someThreadsGame.removeAndKillAllAutoBots();                
+            }
+            else {
+                // some client         
+                boolean removeSuccessful = someThreadsGame.removeClient(someThread);
+                if (removeSuccessful) {
+	                if (!someThreadsGame.hasHumanView()){
+	                    CAT.debug("removed "+someThread+"; no local view connected anymore");
+	                     // there is no local view left so we kill the server (if it exists) and all
+	                    // AutoBots and then redisplay the main menu
+	                    Server localServer = someThreadsGame.getServer();
+	                    someThreadsGame.removeAndKillAllAutoBots();
+	                    if (localServer == null) {
+	                        // this probably means that we had a human playing/watching a game 
+	                        // hosted on another computer;
+	                        // to be on the safe side, we still try to kill all the (if I am right: not existing) 
+	                        // AutoBots
+	                       CAT.debug("no local server found for this game");
+	                    }
+	                    else {
+	                      CAT.debug("shutting down the server: "+localServer);
+	                      localServer.shutdown();  
+	                    }
+	                }	           
+                } // successful removal "someThread"       
+            } // "someThread" was not a server
+            if (!someThreadsGame.hasHumanView()){                  
+                redisplayMenu();
             }
             
         }
@@ -204,7 +280,8 @@ public class Registry implements ShutdownListener {
         private int serverPort;
         /** May be null, only exists for local games */
         private Server server;        
-        private Collection clients;
+        private ArrayList clients;
+        
         
         public Game (Server serv, String ip, int serverPort){
             this.server = serv;
@@ -228,11 +305,12 @@ public class Registry implements ShutdownListener {
          */
         public void addClient(ClientInfo client){
            if (clients == null) {
-               clients = new LinkedList();
+               clients = new ArrayList();
            }
            synchronized (clients){
                clients.add(client);
            }
+           
         }
         
         /** Somewhat ugly that 'addClient()' has a 'ClientInfo' as parameter and 
@@ -243,7 +321,7 @@ public class Registry implements ShutdownListener {
          *   and without using lots of 'instanceof' or a client-type field in BNSThread we don't know
          *   how to create a proper ClientInfo-object to pass to removeClient.
          *   And even IF we create it, we still need to modify ClientInfo.equals() so it is somewhat simpler
-         *   to modify ClientInfo.equals() in a way that it works with CllientInfos AND Shutdownables.
+         *   to modify ClientInfo.equals() in a way that it works with ClientInfos AND Shutdownables.
          * 
          *  ..or this is simply crazy 3:00 AM thinking ;-)
          * 
@@ -251,12 +329,67 @@ public class Registry implements ShutdownListener {
         public boolean removeClient (Shutdownable client){
             synchronized (clients) {
                 if (clients != null) {
-                    boolean success = clients.remove(client);
+                    boolean success = clients.remove(client);                                       
                     CAT.debug("removing of 'Shutdownable' from the 'ClientInfo' collection was "+(success?"":"NOT ")+"successful");
-                    return success;
+                    CAT.debug("\tShutdownable: "+client);
+                    return success;                    
                 }
             }
             return false;
+        }
+        
+        public boolean hasHumanView() {
+            boolean foundHuman = false;
+            synchronized(clients){
+                if (clients != null) {
+                    Iterator it = clients.iterator();
+                    while (!foundHuman && it.hasNext()){
+                        ClientInfo client = (ClientInfo) it.next();
+                        int type = client.getClientType();
+                        if (/*type == CLIENT_TYPE_HUMANPLAYER || */type == CLIENT_TYPE_VIEW){
+                          // a local human player without a local view doesn't make sense  
+                           // as long as we don't  implement the option to start and register a telnet-client
+                           // via the launcher app ;-)
+                            foundHuman = true;
+                        }
+                    }
+                }
+            }
+            return foundHuman;
+        }
+        
+        
+        /** Removes all clients of type <code>type</code> that are associated
+         * with this game and returns them
+         * @param type a client type as specified by the constants in this class 
+         * @return All ClientInfos of type <code>type</code> that were removed (currently in a LinkedList)
+         */
+        public Collection removeClients(int type) {
+            LinkedList remClients = new LinkedList();
+            synchronized (clients) {
+                int size = clients!=null?clients.size():0;
+                for (int i =size-1;i>=0;i--){ 
+                    //iterating backwards because removing Objects from "clients"
+                    // will change clients.size() and Ojects indices during iteration 
+                    ClientInfo info = (ClientInfo) clients.get(i);
+                    if (info.getClientType() == type){
+                        remClients.add(clients.remove(i));
+                    }
+                }
+            }
+            return remClients;
+        }
+        
+        public int removeAndKillAllAutoBots(){
+            Collection autoBots = this.removeClients(Game.CLIENT_TYPE_AUTOBOT);
+            int numOfBots = autoBots!=null?autoBots.size():0;
+            Iterator it = autoBots.iterator();
+            while (it.hasNext()){
+                ClientInfo bot = (ClientInfo) it.next();
+                bot.getClient().shutdown();
+            }
+            return numOfBots;
+            
         }
             
          public String dump() {                 
@@ -293,6 +426,13 @@ public class Registry implements ShutdownListener {
         protected void setServerPort(int port){
             this.serverPort = port;
         }
+        /** 
+         * 
+         * @return the server if this Game object has one or <code>null</code> otherwise 
+         */
+        protected Server getServer(){
+            return server;
+        }
                                     
 }
         
@@ -327,6 +467,7 @@ class ClientInfo {
     public Shutdownable getClient() {
         return client;
     }
+    
 
     public void setClientType(int clientType) {
         this.clientType = clientType;
