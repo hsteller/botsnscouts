@@ -488,17 +488,24 @@ public class Ausgabe extends BNSThread {
     }
 
     protected void quit(boolean keepWatching, boolean quitHumanPlayer) {
-       
+        quit(keepWatching, quitHumanPlayer, false);
+     }
+    
+    private void quit (boolean keepWatching, boolean quitHumanPlayer, boolean calledByShutdown){
+        
         abmelden();        
         if (quitHumanPlayer) {
             CAT.debug("Ausgabe tells the view to propagate quitting..");
             view.quitHumanPlayer(); // Tell the view to tell the HumanPlayer to quit, if there is any
         }
-     }
+        if (!calledByShutdown){
+            shutdown();
+        }
+    }
     
     public void doShutdown() {
         CAT.debug("starting shutdown..");
-        quit(false, false);
+        quit(false, false, true);
         try {
             CAT.debug("killing communication..");
             kommClient.shutdown();
