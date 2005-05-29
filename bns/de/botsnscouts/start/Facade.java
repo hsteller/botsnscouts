@@ -281,7 +281,9 @@ public class Facade {
     }
 
     public void gameStarts() {
-        tileFactory.forgetTiles();
+        // TODO I keep them as I haven't figured out a nice way to reload
+    	// them if the user wants to play another game
+    	// tileFactory.forgetTiles();
         launcher.gameStarts(GameOptions.DHOST, GameOptions.DPORT);
     }
 
