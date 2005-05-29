@@ -12,10 +12,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.apache.log4j.Category;
+import org.omg.PortableInterceptor.SUCCESSFUL;
+
 import de.botsnscouts.autobot.AutoBot;
 import de.botsnscouts.gui.Ausgabe;
 import de.botsnscouts.gui.HumanPlayer;
 import de.botsnscouts.server.Server;
+import de.botsnscouts.start.Facade;
+import de.botsnscouts.start.Start;
 
 
 /**
@@ -73,6 +77,7 @@ public class Registry implements ShutdownListener {
             if (!isEnabled) {
                 return;
             }
+            CAT.debug("addGame:server="+server+"; ip="+serverIp+"; port="+serverPort);
             Game game = new Game(server, serverIp, serverPort);          
             synchronized (games) {
                 games.add(game);
@@ -83,20 +88,27 @@ public class Registry implements ShutdownListener {
         private Game findGame(String serverIp, int port){           
             dummyCompareGame.setServerIp(serverIp);
             dummyCompareGame.setServerPort(port);
+            CAT.debug("findGame: ip="+serverIp+"; port="+port);
             synchronized (games) {
 	            Iterator it = games.iterator();
 	            while (it.hasNext()){
 	                Object game = it.next();
 	                if (game.equals(dummyCompareGame)){
-	                    return (Game) game;
+	                	CAT.debug("\treturning game: "+game);
+	                	return (Game) game;
 	                }
 	            }
             }
+            CAT.debug("\treturning NULL");
             return null;
         }
         
         private Game findGame(Shutdownable clientOrServer) {
-            return (Game) shutdownablesToGames.get(clientOrServer);
+        	
+        	Game g = (Game) shutdownablesToGames.get(clientOrServer);
+        	CAT.debug("findGame for: "+clientOrServer);
+        	CAT.debug("returning game: "+g);
+        	return g;
         }
         
         
@@ -116,6 +128,8 @@ public class Registry implements ShutdownListener {
             if (!isEnabled) {
                 return;
             }
+            CAT.debug("addClient: serverIp="+serverIp+";port="+port+";type="+clientInfoClientType
+            		+"; client="+client);
             Game game = findGame(serverIp, port);
             if (game == null) {
                 CAT.info("Registry: Tried to add a client to a non-existing game on "
@@ -124,7 +138,8 @@ public class Registry implements ShutdownListener {
             }            
             ClientInfo info = new ClientInfo( client, clientInfoClientType);
             game.addClient(info);
-            shutdownablesToGames.put(client, game);            
+            shutdownablesToGames.put(client, game);     
+            client.addShutdownListener(this);
         }
         
         public boolean isEmpty() {                
@@ -148,7 +163,19 @@ public class Registry implements ShutdownListener {
         */
         
         private void redisplayMenu(){
-            // TODO implement
+        
+        	CAT.debug("redisplayMenu");
+        	Start mainMenu = Start.getLauncherAppSingleton();
+        	if (mainMenu != null){
+        		//mainMenu.setVisible(true);
+        		//mainMenu.resetWaiter();        		
+        		mainMenu.show();
+        		mainMenu.showMainMenu();
+        	}
+        	else {
+        		CAT.error("the main menu/launcher application was null");
+        	}
+        	
         }
         
        
@@ -202,8 +229,9 @@ public class Registry implements ShutdownListener {
                 // program by launching the main application sounds somewhat wrong..
                 return;
             }
-            
+            CAT.debug("shutdown called; thread: "+someThread);
             Game someThreadsGame = findGame(someThread);
+            CAT.debug("shutdwon: game="+someThreadsGame);
             if (someThreadsGame == null) {              
                 CAT.debug("didn't find a game for Thread: "+someThread);
                 CAT.debug("no game found for the client that is going down, hmm, let's see what there is to do..");
@@ -226,7 +254,8 @@ public class Registry implements ShutdownListener {
             else {
                 // found the game; as we are about to clean up "someThread",
                 // we will remove the "someThread->game" reference from the lookup table              
-                    shutdownablesToGames.remove(someThreadsGame);                
+                CAT.debug("removing the game from thread->game lookup table ");   
+            	shutdownablesToGames.remove(someThreadsGame);                
             }
             if (someThread instanceof Server) {
                  CAT.debug("There is a server going down: "+someThread);
@@ -239,6 +268,8 @@ public class Registry implements ShutdownListener {
             else {
                 // some client         
                 boolean removeSuccessful = someThreadsGame.removeClient(someThread);
+                CAT.debug("remove of Thread "+someThread+(removeSuccessful?"":"NOT ")
+                		+"successful");
                 if (removeSuccessful) {
 	                if (!someThreadsGame.hasHumanView()){
 	                    CAT.debug("removed "+someThread+"; no local view connected anymore");
@@ -270,8 +301,9 @@ public class Registry implements ShutdownListener {
 
 
     class Game {
-        private static Category CAT = Category.getInstance(Game.class);
+        private static Category CAT =  Category.getInstance(Game.class);
         
+        private static final int CLIENT_TYPE_DUMMY = -1;
         public static final int CLIENT_TYPE_HUMANPLAYER = 1;
         public static final int CLIENT_TYPE_VIEW             = 2;
         public static final int CLIENT_TYPE_AUTOBOT       = 3; 
@@ -325,14 +357,22 @@ public class Registry implements ShutdownListener {
          * 
          *  ..or this is simply crazy 3:00 AM thinking ;-)
          * 
+         *  
          */
         public boolean removeClient (Shutdownable client){
+        	
             synchronized (clients) {
                 if (clients != null) {
-                    boolean success = clients.remove(client);                                       
+                	// NOTE: see "NOTE" in ClientInfo.equals() why we need
+                	// the "dummy" ClientInfo
+                	ClientInfo dummy = new ClientInfo(client, CLIENT_TYPE_DUMMY);
+                	boolean success = clients.remove(dummy);                                       
                     CAT.debug("removing of 'Shutdownable' from the 'ClientInfo' collection was "+(success?"":"NOT ")+"successful");
                     CAT.debug("\tShutdownable: "+client);
                     return success;                    
+                }
+                else {
+                	CAT.debug("remove: clients collection is null");
                 }
             }
             return false;
@@ -441,6 +481,8 @@ public class Registry implements ShutdownListener {
  * */
 class ClientInfo {
    
+	Category CAT = Category.getInstance(ClientInfo.class);
+	
     public static final int CLIENT_TYPE_UNKNOWN      = -1;
     public static final int CLIENT_TYPE_HUMANPLAYER = 1;
     public static final int CLIENT_TYPE_VIEW              = 2;
@@ -486,10 +528,37 @@ class ClientInfo {
      * @return (this == o OR this.getClient() == o)  
      */
         public boolean equals(Object o ){
-            	return this == o || this.getClient() == o;
-            
+        	// NOTE: This is not enough because of the way ArrayList.remove()
+        	// is implemented: it calls o.equals(this) instead of
+        	// this.equals(o)
+        	// => need to override the "equals" of a ShutDownable or stuff it
+        	// into a ClientInfos
+        	CAT.debug("equals(Object) called");
+        	boolean equal = this == o || this.client == o;
+        	if (o != null) {
+        		if (o instanceof ClientInfo){
+        			Shutdownable oc = ((ClientInfo)o).getClient();
+        			equal = this.client == oc;
+        			if (!equal && this.client != null){
+        				equal = this.client.equals(oc);
+        			}
+        		}
+        	}
+        	return equal;
         }
-   
+        /*
+        public int hashCode(){
+        	CAT.debug ("hashCode called");
+        	Shutdownable mine = this.getClient();
+        	if (mine != null){
+        		return mine.hashCode();
+        	}
+        	else {
+        		return super.hashCode();
+        	}
+        	
+        }
+   */
         public String toString(){
             String name = null;
             if (client instanceof BNSThread) {
