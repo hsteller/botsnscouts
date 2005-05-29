@@ -236,6 +236,7 @@ public class Start extends JFrame implements WindowListener {
                     gameFieldPanel = new GameFieldPanel(Start.this);
                     getContentPane().add(gameFieldPanel, GAME_FIELD);
                 }
+                
                 CAT.debug("setting gameFieldPanel");
                 switchCard(GAME_FIELD);
                 stopBusy();
@@ -372,6 +373,17 @@ public class Start extends JFrame implements WindowListener {
         
     }
 
+    private static Start globalStart;
+    /** 
+     * To obtain the global "Start" object;
+     * will exist after Start.main(String[]) was called. 
+     * 
+     * @return The global "Start" object
+     */
+    public static Start getLauncherAppSingleton(){
+    	return globalStart;
+    }
+    
     public static void main(String[] argv, Splash splash) {
         initBasics();
 
@@ -418,9 +430,12 @@ public class Start extends JFrame implements WindowListener {
                 System.err.println(e);
             }
         } else {
-            new Start(splash);
+            globalStart = new Start(splash);
         }
     }
 
+    public void dispose(){
+    	super.dispose();
+    }
     
 }//class Start end
