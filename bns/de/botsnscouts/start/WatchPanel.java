@@ -126,8 +126,8 @@ public class WatchPanel extends JPanel implements ActionListener, MouseListener 
             BNSThread ausgabe = Facade.watchAGame(serv.getText(), portnr);
             parent.addKS(ausgabe);
             parent.hide();
-            parent.dispose();
-            parent.beenden();
+//          XXX HS 28.05.2005 parent.dispose();
+//          XXX HS 28.05.2005 parent.beenden();
         } else if (e.getActionCommand().equals("back")) {
             parent.showMainMenu();
         }

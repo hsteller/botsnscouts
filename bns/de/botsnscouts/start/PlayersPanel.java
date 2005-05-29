@@ -86,7 +86,8 @@ class PlayersPanel extends ColoredPanel {
 
     public void gameStarted() {
         Global.debug(this, "Spiel geht los");
-        parent.beenden();
+//      XXX HS 28.05.2005 parent.beenden();
+        parent.hide();
     }
 
 

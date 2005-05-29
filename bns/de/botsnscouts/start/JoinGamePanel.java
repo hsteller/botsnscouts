@@ -105,8 +105,8 @@ public class JoinGamePanel extends ColoredComponent {
                 Global.debug(this, "SpielerMensch gestartet");
                 parent.addKS(smth);
                 parent.hide();
-                parent.dispose();
-                parent.beenden();
+//              XXX HS 28.05.2005  parent.dispose();
+//              XXX HS 28.05.2005 parent.beenden();
             }
         });
         confirmPanel.addBackListener(new ActionListener() {
