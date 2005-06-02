@@ -67,6 +67,8 @@ class RegistrationManager implements Runnable, Shutdownable {
     
     int anzSpieler = 0;
     
+    private boolean isShutDown = false;
+    
     private ShutdownableSupport shutdownSupport = new ShutdownableSupport(this);
     
     BNSThread workingThread = new BNSThread(this, "RegMan"){
@@ -100,6 +102,11 @@ class RegistrationManager implements Runnable, Shutdownable {
                 CAT.warn(e);
             }
         }
+        isShutDown = true;
+    }
+    
+    public boolean isShutDown(){
+        return isShutDown;        
     }
     
     public void addShutdownListener(ShutdownListener l){

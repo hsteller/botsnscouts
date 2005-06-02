@@ -104,6 +104,10 @@ public class KommClient implements Shutdownable{
     */
     protected final boolean log=false;
 
+    
+    /** To implement the Shutdownable interface; will be set to true on the end of the shutdown() method */
+    private boolean isShutDown = false; 
+    
     public KommClient (){
 	gotNTC=false;
 	strNTC="";
@@ -1415,6 +1419,11 @@ public class KommClient implements Shutdownable{
             }
         }
         shutdownSupport.shutdown();
+        isShutDown = true;
+    }
+    
+    public boolean isShutDown() {
+        return isShutDown();
     }
     
     /** Finalizer closes the streams.
