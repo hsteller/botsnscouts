@@ -78,6 +78,8 @@ public class HumanPlayer extends BNSThread {
     private boolean isWisenheimerAllowed = true;
     
     private Timer timeoutWatcher;
+    private EmergencyCardSubmitter emergencyCardSubmitter;
+    
     private volatile boolean cardsSent;
     private static final int bufferSecondsBeforeTimeout = 25;
     private static final int bufferSecondsBeforeSendingCards = bufferSecondsBeforeTimeout-5;
@@ -140,21 +142,21 @@ public class HumanPlayer extends BNSThread {
             switch (commAnswer.typ) {
                 case (ClientAntwort.MACHEZUG):
                     {
-                    	
-                    	mode = MODE_PROGRAM;
-                    	Global.debug(this, "I am requested to send cards");
-                    	if (timeoutWatcher != null){
-                    	    try {
-                    	        timeoutWatcher.cancel();
-                    	    }
-                    	    catch (Exception e){
-                    	        CAT.error("exception canceling the old timeout watcher", e);
-                    	    }
-                    	}                    	   
-                    	timeoutWatcher = new Timer();
                     	synchronized(comm) {
                     	    cardsSent = false;
-                    	    timeoutWatcher.schedule(new EmergencyCardSubmitter(), (globalTimeout-bufferSecondsBeforeTimeout)*1000);                    	    
+	                    	mode = MODE_PROGRAM;
+	                    	Global.debug(this, "I am requested to send cards");
+	                    	if (timeoutWatcher != null){
+	                    	    try {
+	                    	        timeoutWatcher.cancel();
+	                    	    }
+	                    	    catch (Exception e){
+	                    	        CAT.error("exception canceling the old timeout watcher", e);
+	                    	    }
+	                    	}                    	   
+	                    	timeoutWatcher = new Timer();    
+	                    	emergencyCardSubmitter = new EmergencyCardSubmitter();
+                    	    timeoutWatcher.schedule(emergencyCardSubmitter, (globalTimeout-bufferSecondsBeforeTimeout)*1000);                    	    
                     	}
                     	
                         // card
@@ -426,17 +428,35 @@ public class HumanPlayer extends BNSThread {
             comm.abmelden(name); // notify server
         }
         catch (Exception e){
-            CAT.warn("in shutdown", e);
+            CAT.warn("in shutdown (deregistering)", e);
         }
         try {
             comm.shutdown(); // close socket and streams
         }
         catch (Exception e){
-            CAT.warn("in shutdown", e);
+            CAT.warn("in shutdown (killing communication)", e);
         }
-            CAT.debug("setting condition for leaving the run()-method");
-        gameOver = true;       
+        CAT.debug("setting condition for leaving the run()-method");
+        gameOver = true;              
         view = null;
+        CAT.debug("killing/interrupting potential EmergenyCardSubmitter:");
+        if (timeoutWatcher != null){
+            try {
+                timeoutWatcher.cancel();
+            }
+            catch (Exception e){
+                CAT.warn("in shutdown (timeoutWatcher)", e);
+            }              
+        }
+        if (emergencyCardSubmitter != null){
+            try {
+                emergencyCardSubmitter.cancel();
+            }
+            catch (Exception e){
+                CAT.warn("in shutdown (emergencyCardSubmitter)", e);
+            }              
+        }
+
         
     }
 
@@ -616,7 +636,7 @@ public class HumanPlayer extends BNSThread {
                 }
             }
             synchronized (comm) {
-                if (!cardsSent) {
+                if (!gameOver && !cardsSent) {
                     mode = MODE_OTHER;
                     showMessage(Message.say("SpielerMensch","legalZug"));
                     // TODO use wisenheimer instead of the first available cards..
