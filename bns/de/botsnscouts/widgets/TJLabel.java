@@ -65,6 +65,11 @@ public class TJLabel extends JLabel {
         init();
         setForeground(color);
     }
+    
+    public TJLabel(String text, int align, Color color) {
+        this(text,align);
+        setForeground(color);
+    }
 
     public TJLabel(String text, Color color, boolean big) {
         super(text);

@@ -29,7 +29,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JLabel;
 
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.TJLabel;
@@ -41,36 +48,70 @@ public class ZielfahneErreicht extends TJPanel{
     private static final Color backColor = new Color(4,64,4);
     private static final Color foreColor2 = new Color(140,255,140);
 
+  
     public ZielfahneErreicht() {
-	this("",false);
+        //this("",false);
     }
 
+    
+    public void setMessage(String bigVerticalMessage, boolean isDead, String removalReason){
+    	boolean haveReason = removalReason != null && removalReason.trim().length()>1;
+        int numOfChars = bigVerticalMessage != null?bigVerticalMessage.length():0;
+        setLayout(new GridBagLayout());
+        
+        GridBagConstraints gcs = new GridBagConstraints();        
+        gcs.anchor = GridBagConstraints.CENTER;
+        gcs.gridx = 0;
+        gcs.gridy = 0;
+        gcs.insets = new Insets(10,10,10,10);
+        gcs.gridheight = 1;
+        gcs.gridwidth = 1;
+        gcs.fill = GridBagConstraints.HORIZONTAL;
+        add(new TJLabel(""), gcs); // space on the top
+        Font big = new Font("Sans", Font.BOLD, 24);
+        Color col = isDead?Color.RED:Color.YELLOW;
+        gcs.insets.bottom = 5;        
+        gcs.insets.top = 0;
+        gcs.fill = GridBagConstraints.NONE;    
+        int align = JLabel.CENTER;
+        for (int i=0;i<numOfChars;i++){            
+            TJLabel l = new TJLabel(""+bigVerticalMessage.charAt(i),align,col);        
+            l.setFont(big);
+            gcs.anchor=GridBagConstraints.CENTER;
+            gcs.gridy++;            
+            add(l, gcs);            
+        }
+        if (haveReason) {
+            gcs.gridy++;
+            gcs.gridx=0;
+            gcs.insets.top = 20;
+            Font small = new Font("Sans",Font.PLAIN, 10);
+            TJLabel l = new TJLabel(removalReason,JLabel.CENTER);
+            l.setFont(small);   
+            add(l, gcs);
+        }
+        
 
-    public ZielfahneErreicht(String inhalt, boolean tot) {
-	setLayout(new GridLayout((inhalt.length()+6),3));
-	for (int i = 0; i < 9; i++) add(new TJLabel(""));
-	for (int i = 0; i < inhalt.length(); i++) {
-	    TJLabel l = new TJLabel(inhalt.substring(i,i+1));
-	    l.setFont(new Font("Sans", Font.BOLD, 24));
-	    // ist der Robi tot, dann schreibe rot
-	    if (tot) l.setForeground(Color.red);
-	    else l.setForeground(foreColor2);
-	    add(new TJLabel(""));
-	    add(l);
-	    add(new TJLabel(""));
-	}
+        
     }
-
+    
+   
     public Dimension getPreferredSize() {
 	return new Dimension(180,550);
     }
 
     public static void main (String args[]) {
-	Message.setLanguage("deutsch");
-	Frame f = new Frame("Test");
-	f.setSize(200,640);
-	ZielfahneErreicht zf = new ZielfahneErreicht();
-	f.add(zf);
-	f.setVisible(true);
+		Message.setLanguage("deutsch");
+		Frame f = new Frame("Test");
+		f.setSize(350,640);
+		ZielfahneErreicht zf = new ZielfahneErreicht();
+		zf.setMessage("Robot destroyed", true, "Rule violation - probably a program error");
+		f.add(zf);
+		f.setVisible(true);
+		f.addWindowListener(new WindowAdapter(){
+		    public void windowClosing(WindowEvent e){
+		        System.exit(0);
+		    }
+		});
     }
 }

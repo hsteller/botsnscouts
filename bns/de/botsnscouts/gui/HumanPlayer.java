@@ -246,6 +246,7 @@ public class HumanPlayer extends BNSThread {
                     {
                         // ------- Habe ich gewonnen / bin ich gestorben ----------
                         boolean dead = true;
+                        
                         int rating = 0;
                         try {
                             String[] gewinnerListe = comm.getSpielstand();
@@ -264,8 +265,9 @@ public class HumanPlayer extends BNSThread {
                         } catch (KommException e) {
                             Global.debug(this, e.getMessage());
                         }
+                        String removalReason = commAnswer.str;
                         gameOver = true;
-                        humanView.showGameOver(dead, rating);
+                        humanView.showGameOver(dead, rating, removalReason);
                         break;
                     }
                 default :

@@ -98,7 +98,7 @@ public interface HumanViewInterface {
      * two types: a) winner + winner no.
      *            b) dead
      */
-    public void showGameOver(boolean dead, int winnerNumber);
+    public void showGameOver(boolean dead, int winnerNumber, String removalReason);
 
 
     /**

@@ -75,10 +75,12 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
     private JPanel wiseAndScout;
 
+    private ZielfahneErreicht gameOverPanel = null;
+    
     public HumanView(HumanPlayer hp) {
         human = hp;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        switcherPanel = new PaintPanel(OptionPane.getBackgroundPaint(this), true);
+        switcherPanel = new PaintPanel(OptionPane.getBackgroundPaint(this), true); 
         JPanel regsAndCards = new TJPanel();
         wiseAndScout = new TJPanel();
 
@@ -99,8 +101,9 @@ public class HumanView extends JPanel implements HumanViewInterface {
                 setDialogInSidebarActive(false);
             }
         });
-        ZielfahneErreicht reachedEndDead = new ZielfahneErreicht(Message.say("SpielerMensch", "mkilled"), true);
-        ZielfahneErreicht reachedEndWinner = new ZielfahneErreicht(Message.say("SpielerMensch", "mflagreached"), false);
+        gameOverPanel = new ZielfahneErreicht();
+        //ZielfahneErreicht reachedEndDead = new ZielfahneErreicht(Message.say("SpielerMensch", "mkilled"), true);
+        //ZielfahneErreicht reachedEndWinner = new ZielfahneErreicht(Message.say("SpielerMensch", "mflagreached"), false);
 
         wisenheimerView = new KlugscheisserLatte(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -185,8 +188,9 @@ public class HumanView extends JPanel implements HumanViewInterface {
         switcherPanel.add(againPowerDown, "againPowerDown");
         switcherPanel.add(repairRegisters, "repairRegisters");
         switcherPanel.add(regsAndCards, "regsAndCards");
-        switcherPanel.add(reachedEndDead, "reachedEndDead");
-        switcherPanel.add(reachedEndWinner, "reachedEndWinner");
+        //switcherPanel.add(reachedEndDead, "reachedEndDead");
+       // switcherPanel.add(reachedEndWinner, "reachedEndWinner");
+        switcherPanel.add(gameOverPanel, "reachedEnd");
         //add(wiseAndScout);
         add(switcherPanel);
         
@@ -334,21 +338,15 @@ public class HumanView extends JPanel implements HumanViewInterface {
 
     /**
      * show game over two types: a) winner + winner no. b) dead
+     *
      */
-    public void showGameOver(boolean dead, int winnerNumber) {
-        if (dead) {
-            panelSwitcher.show(switcherPanel, "reachedEndDead");
-        }
-        else {
-            panelSwitcher.show(switcherPanel, "reachedEndWinner");
-        }
+    public void showGameOver(boolean dead, int winnerNumber, String removalReason) {        
+        String bigVerticalMessage=dead?Message.say("SpielerMensch", "mkilled"):Message.say("SpielerMensch", "mflagreached");       
+        gameOverPanel.setMessage(bigVerticalMessage,dead,removalReason);
+        panelSwitcher.show(switcherPanel, "reachedEnd");        
     }
 
-    /**
-     * exit the programm eihter by game over or by user request
-     */
-    // public void shutup() {}
-
+    
     protected void updateRegisters(Card[] robRegs) {
         registers.updateRegisters(robRegs);
         CAT.debug("Updating Registers...");
