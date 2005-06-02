@@ -1,11 +1,13 @@
 Things to do after fixing the more-or-less clean shutdown and
 restart issue
 
-- !!!!!!BUG: while playing in background:
+[ **** might be fixed ******
+  - !!!!!!BUG: while playing in background:
   there is something wrong with resetting the timer for emergency
   card submit if it gets to close (I sent the cards mysek just in time
   and the new cards in the next(!) round were immediately submitted by
   the emergency submit..)
+]
 
 - pusher pushing robots not animated (anymore): missing message?
 - show big "goal reached" message long enough to be seen
