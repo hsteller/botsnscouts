@@ -87,9 +87,15 @@ class PlayersPanel extends ColoredPanel {
     public void gameStarted() {
         Global.debug(this, "Spiel geht los");
 //      XXX HS 28.05.2005 parent.beenden();
+        map.clear();
+        names.clear();
+        roblist.removeAll();
+        
         parent.hide();
     }
 
+    
+    
 
     class CellRenderer extends TJLabel implements ListCellRenderer {
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
