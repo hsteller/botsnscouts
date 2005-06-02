@@ -107,6 +107,7 @@ public class Start extends JFrame implements WindowListener {
 
         addWindowListener(this);
         show();
+        this.toFront();
     }
 
     
