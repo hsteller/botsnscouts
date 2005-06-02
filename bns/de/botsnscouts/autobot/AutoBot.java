@@ -380,7 +380,7 @@ public class AutoBot extends BNSThread  {
     }
     
     public void doShutdown(boolean deregister) {
-        	CAT.debug("shutting down..");
+        	CAT.debug(realname+": shutting down..");
         	gameRunning = false;
         	try {
         	    CAT.debug("deregistering from server if still possible..");
