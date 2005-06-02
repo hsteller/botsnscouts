@@ -376,7 +376,7 @@ public class KommClient implements Shutdownable{
 		char rd = com.charAt(2);
 		switch (st){
 		case 'T': {
-		    if (nd=='O') {
+		    if (nd=='O') { // Timeout
 			try {
 			    int klammerauf=com.indexOf('(');
 			    int klammerzu= com.indexOf (')');
@@ -410,7 +410,7 @@ public class KommClient implements Shutdownable{
 		    }
 		}
 		case 'M': {
-		    if ((nd=='S')&&(rd=='G')) {
+		    if ((nd=='S')&&(rd=='G')) { // some generic info message
 			back.typ=ClientAntwort.MESSAGE;
 			int k1 = com.indexOf('(');
 			com = com.substring (k1+1,com.length()-1);
@@ -448,7 +448,7 @@ public class KommClient implements Shutdownable{
 			break;
 		    }
 		    else if (nd=='R'){
-			if (rd=='P') {
+			if (rd=='P') { // got cards 
 			    try {
 				try {
 				    Card [] karten1 = new Card [9]; // max. number of cards
@@ -497,7 +497,7 @@ public class KommClient implements Shutdownable{
 			    }
 			    break;
 			}
-			else if (rd=='R') {
+			else if (rd=='R') { // may repair a locked register
 			    try {
 				int klauf=com.indexOf('(');
 				int klzu=com.indexOf(')');
@@ -526,7 +526,7 @@ public class KommClient implements Shutdownable{
 
 		    }
 		    else if (nd=='N') {
-			if (rd=='R') {
+			if (rd=='R') { // robbot destroyed, have to send a new direction for reentering 
 			    back.typ=ClientAntwort.ZERSTOERUNG;
 			    break;
 			}
@@ -537,7 +537,7 @@ public class KommClient implements Shutdownable{
 			}
 		    }
 		    else if (nd=='B') {
-			if (rd=='D') {
+			if (rd=='D') { // power up  again?
 			    back.typ=ClientAntwort.REAKTIVIERUNG;
 			    break;
 			}
@@ -556,12 +556,12 @@ public class KommClient implements Shutdownable{
 		}
 		case 'N': {
 		    if (nd=='T') {
-			if (rd=='S'){
+			if (rd=='S'){ // game starts
 			    back.typ=ClientAntwort.SPIELSTART;
 			    back.ok=true;
 
 			}
-			else if (rd=='C'){
+			else if (rd=='C'){ // something has changed for one or more robots
 			    try {
 				back.typ=ClientAntwort.AENDERUNG;
 				int klauf=com.indexOf('(');
@@ -587,7 +587,7 @@ public class KommClient implements Shutdownable{
 		    break;
 		}
 		case 'S' : {
-		    if (nd=='S') {
+		    if (nd=='S') { // current standings
 			try {
 			    back.typ=ClientAntwort.SPIELSTAND;
 			    if (com.length()==7){
@@ -610,7 +610,7 @@ public class KommClient implements Shutdownable{
 			}
 			break;
 		    }
-		    else if (nd=='A') {
+		    else if (nd=='A') { // game status, which phase are we in
 			try {
 			    back.typ=ClientAntwort.SPIELSTATUS;
 			    if (com.length()<=4)
@@ -673,19 +673,20 @@ public class KommClient implements Shutdownable{
 			    int klauf = com.indexOf('(');
 			    int klazu = com.lastIndexOf(')');
 			    String work = com.substring(klauf+1,klazu);
+		
 			    if (work.length()<=2) {
 			        if (work.equals("LL")) // lost all lives
-			            back.str="Alle Leben verloren";
+			            back.str=Message.say("comm", "removalReasonLL");
 			        else if (work.equals("TO"))
-			            back.str="Das TimeOut wurde ueberschritten"; // timeout
+			            back.str=Message.say("comm", "removalReasonTO"); // timeout
 			        else if (work.equals("GO"))
-			            back.str="Das Spiel ist vorbei"; // game is over
+			            back.str=Message.say("comm", "removalReasonGO"); // game is over
 			        else if (work.equals("RV"))
-			            back.str="Es trat eine Regelverletzung auf"; // rule violation
+			            back.str=Message.say("comm", "removalReasonRV"); // rule violation
 			        else if (work.equals("ZS"))
-			            back.str="Die Anmeldung erfolgte zu spaet"; // to late registered
+			            back.str=Message.say("comm", "removalReasonZS"); // to late registered
 			        else
-			            back.str="unbekannter Grund fuer Entfernung: \""+work+"\""; // unknown reason
+			            back.str=Message.say("comm", "removalReasonOther", work); // unknown reason
 			    }
 			    else {
 			        //klauf = work.indexOf ('(');
