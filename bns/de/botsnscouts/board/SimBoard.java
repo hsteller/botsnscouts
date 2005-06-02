@@ -625,8 +625,9 @@ public class SimBoard extends Board implements Directions {
                 doBelts(bots, i, floor.getBeltInfo());
             }
         }
-        checkForPitVictims(bots, true);
+      //  checkForPitVictims(bots, true);
         doIntended(bots);
+        checkForPitVictims(bots, false);
     }
 
     private void doBelts(BoardBot[] bots) {
@@ -637,8 +638,9 @@ public class SimBoard extends Board implements Directions {
                 doBelts(bots, i, floor.getBeltInfo());
             }
         }
-        checkForPitVictims(bots, true);
+        //checkForPitVictims(bots, true);
         doIntended(bots);
+        checkForPitVictims(bots, false);
     }
 
     /**
@@ -720,8 +722,9 @@ public class SimBoard extends Board implements Directions {
                 moveRobOne(robbis, i, EAST, false);
             }
         } //for
-        checkForPitVictims(robbis, true);
+        
         doIntended(robbis);
+        checkForPitVictims(robbis, false);
     }
 
     private void doIntended(BoardBot[] robbis) {
