@@ -11,6 +11,9 @@ package de.botsnscouts.util;
 public interface Shutdownable {
     
    public void shutdown(); 
+   
+   /** Should be set to true once shutdown() got called */
+   public boolean isShutDown();
 
    public void addShutdownListener(ShutdownListener listener);
    

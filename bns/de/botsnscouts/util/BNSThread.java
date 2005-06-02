@@ -28,8 +28,11 @@ package de.botsnscouts.util;
 public abstract class BNSThread extends Thread implements Shutdownable {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( BNSThread.class );
 
-    private static int count =  0;
-
+    /** boolean is set to true once this BNSThread's shutdown() method has been called*/ 
+    private boolean hasBeenShutDown = false;
+    
+    private static int count =  0;    
+    
     private static ThreadGroup threadGroup = new ThreadGroup("BNS Threads") {
         public void uncaughtException( Thread t, Throwable e ) {
             if( e instanceof ThreadDeath )
@@ -78,7 +81,12 @@ public abstract class BNSThread extends Thread implements Shutdownable {
         }
         finally {
             shutdownSupport.shutdown();
+            hasBeenShutDown = true;
         }
+    }
+    
+    public boolean isShutDown(){
+        return hasBeenShutDown;
     }
     
     public void addShutdownListener(ShutdownListener l){
