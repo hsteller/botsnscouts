@@ -203,7 +203,7 @@ public class Registry implements ShutdownListener, GameOverListener {
         	CAT.debug(dump());
         	CAT.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         	Start mainMenu = Start.getLauncherAppSingleton();
-        	if (mainMenu != null && !mainMenu.isVisible()){
+        	if (mainMenu != null ){
         		//mainMenu.setVisible(true);
         		//mainMenu.resetWaiter();        		
         		mainMenu.show();
@@ -345,24 +345,46 @@ public class Registry implements ShutdownListener, GameOverListener {
                 if (removeSuccessful) {                   
 	                if (!someThreadsGame.hasHumanView()){
 	                    CAT.debug("removed "+someThread+"; no local view connected anymore");	                    
+	                     boolean probablyFinisheDshutdownNicely;
 	                   
-	                   
-	                     // there is no local view left so we kill the server (if it exists) and all
-	                    // AutoBots and then redisplay the main menu
-	                    Server localServer = someThreadsGame.getServer();	                   
-	                    if (localServer == null) {
-	                        // this probably means that we had a human playing/watching a game 
-	                        // hosted on another computer;
-	                        // to be on the safe side, we still try to kill all the (if I am right: not existing) 
-	                        // AutoBots
-	                       CAT.debug("no local server found for this game");
+	                    final Game stg = someThreadsGame;
+	                    final Object [] pseudoBoolean = new Object[1]; 
+	                    Runnable farkingDeadLocks = new Runnable() {
+	                        public void run() {
+	                    
+			                     // there is no local view left so we kill the server (if it exists) and all
+			                    // AutoBots and then redisplay the main menu
+			                    Server localServer = stg.getServer();	                   
+			                    if (localServer == null) {
+			                        // this probably means that we had a human playing/watching a game 
+			                        // hosted on another computer;
+			                        // to be on the safe side, we still try to kill all the (if I am right: not existing) 
+			                        // AutoBots
+			                       CAT.debug("no local server found for this game");
+			                    }
+			                    else {
+			                       //CAT.debug("XXX shutting down the server: "+localServer);	  	                      
+			                     shutdownServer(localServer,stg, true);
+			                    }
+			                    registryRemoveAndKillAutobots(stg);
+			                    pseudoBoolean[0] = "probably clean shutdown";
+	                        }
+	                    };
+	                    Thread temp = new Thread(farkingDeadLocks);
+	                    temp.start();
+	                    try {
+	                        temp.join(5000);
 	                    }
-	                    else {
-	                       //CAT.debug("XXX shutting down the server: "+localServer);	  	                      
-	                     shutdownServer(localServer, someThreadsGame, true);
+	                    catch (InterruptedException ie){
+	                        CAT.warn(ie);
 	                    }
-	                    registryRemoveAndKillAutobots(someThreadsGame); 
-	                   
+	                    if (pseudoBoolean[0] == null){ // Thread "temp" seems not to have finished
+	                                                               // we are only here because of the join-timeout
+	                        CAT.info("Sorry I'm not sure that everything (the server)  shut down nicely,\n"
+	                                        +" so I end the program as starting a new server probably won't work..");
+	                        bruteRestart();
+	                    }
+	                    redisplayMenu();
 	                    
 	                    
 	                }	           
@@ -378,6 +400,10 @@ public class Registry implements ShutdownListener, GameOverListener {
               
             
         }
+        
+       private void bruteRestart(){
+           System.exit(0);
+       }
         
        private void registryRemoveAndKillAutobots (Game game) {
            Collection bots = game.removeAndKillAllAutoBots();
