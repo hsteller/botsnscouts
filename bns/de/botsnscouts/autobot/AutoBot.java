@@ -379,19 +379,21 @@ public class AutoBot extends BNSThread  {
         doShutdown(true);
     }
     
-    public void doShutdown(boolean deregister) {
+    private void doShutdown(boolean deregister) {
         	CAT.debug(realname+": shutting down..");
         	gameRunning = false;
-        	try {
-        	    CAT.debug("deregistering from server if still possible..");
-        	    myComm.abmelden(realname);
-        	}
-        	catch (Exception e){
-        	    CAT.debug("during deregister", e);
+        	if (deregister) {
+	        	try {
+	        	    CAT.debug("deregistering from server if still possible..");
+	        	    myComm.abmelden(realname);
+	        	}
+	        	catch (Exception e){
+	        	    CAT.debug("during deregister", e);
+	        	}
         	}
         	try {
         	    CAT.debug("killing communication..");
-        	    myComm.shutdown();
+        	    myComm.shutdown(true);
         	}
         	catch (Exception e){
         	    CAT.debug(e);

@@ -10,7 +10,9 @@ package de.botsnscouts.util;
  */
 public interface Shutdownable {
     
-   public void shutdown(); 
+   //public void shutdown(); 
+   
+   public void shutdown(boolean notifyRegistry);
    
    /** Should be set to true once shutdown() got called */
    public boolean isShutDown();
@@ -18,6 +20,8 @@ public interface Shutdownable {
    public void addShutdownListener(ShutdownListener listener);
    
    public boolean removeShutdownListener(ShutdownListener listener);
+   
+   
    
    
    

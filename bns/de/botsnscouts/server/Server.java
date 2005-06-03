@@ -358,10 +358,10 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
     }
 
     public Status[] getEvalStatus() {
-        CAT.debug("276 for rThreads");
-        try {
+     
+ 
             synchronized (botThreads) {
-                CAT.debug("279: lock rThreads");
+    
                 Status[] s = new Status[botThreads.size()];
                 for (int i = 0; i < s.length; i++) {
                     s[i] = new Status();
@@ -375,11 +375,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                 }
                 return s;
             }
-        } finally {
-            CAT.debug("279 relesase rThreads");
-        }
-
-    }
+     }
 
     public String[] getNamesByColor() {
         return players;
@@ -417,9 +413,9 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
         setzeAusgaben();
         CAT.debug("Size of enterList:" + ausgabenEnterRequestedThreads.size() + "; aThreads: " + ausgabeThreads.size());
 
-        CAT.debug("372 wait For athreads");
+      //  CAT.debug("372 wait For athreads");
         synchronized (ausgabeThreads) {
-            CAT.debug("374 lock aThreads");
+       //     CAT.debug("374 lock aThreads");
             waitablesImWaitingFor = new WaitingForSet(ausgabeThreads);
 
             for (Iterator it = ausgabeThreads.iterator(); it.hasNext();) {
@@ -456,7 +452,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                 deleteOutput((ServerAusgabeThread) it.next(), "TO");
             }
         }
-        CAT.debug("374 release aThread");
+      //  CAT.debug("374 release aThread");
         // allow possibly generated messages to be sent
         // synchronizes laser-fire-animations.
         messageThread.blockUntilQEmpty();
@@ -492,9 +488,9 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
         }
 
         //Broadcast an die betroffenen Threads, Inhalt je nach Modus
-        CAT.debug("442 wait for waitablesImWaitingFor");
+     //   CAT.debug("442 wait for waitablesImWaitingFor");
         synchronized (waitablesImWaitingFor) {
-            CAT.debug("444 lock waitablesImWaitingFor");
+      //      CAT.debug("444 lock waitablesImWaitingFor");
             for (Iterator e = waitablesImWaitingFor.iterator(); e.hasNext();) {
                 ServerRoboterThread srt = (ServerRoboterThread) e.next();
 
@@ -528,7 +524,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                 }
             }//for Iterator
         }//synch
-        CAT.debug("444 release waitablesImWaitingFor");
+      //  CAT.debug("444 release waitablesImWaitingFor");
         //Schlafen bis TO oder alle fertig
         Iterator it = warteAufRoboter();
 
@@ -547,7 +543,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
      * PRE: rThreadsAufDieIchWarte und modus ist korrekt gesetzt
      */
     private synchronized Iterator warteAufRoboter() {
-        CAT.debug("498 lock Server");
+      //  CAT.debug("498 lock Server");
         int to;
 
         switch (mode) {
@@ -569,7 +565,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                 to = 0;
 
         }
-        CAT.debug("498 release Server");
+     //   CAT.debug("498 release Server");
         CAT.debug("Der Server wartet jetzt " + to + " Millisek. auf seine RoboterThreads (" + mode + ").");
         return waitablesImWaitingFor.waitFor(to);
     }
@@ -592,15 +588,15 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
      */
     private void setzeAusgaben() {
         CAT.debug("setzeAusgaben");
-        CAT.debug("539 wait for aThreads");
+      //  CAT.debug("539 wait for aThreads");
         synchronized (ausgabeThreads) {
-            CAT.debug("541 lock on aThreads\nwait for ausgabenEL");
+     //       CAT.debug("541 lock on aThreads\nwait for ausgabenEL");
             synchronized (ausgabenEnterRequestedThreads) {
-                CAT.debug("543 lock on ausgabenEintrittsListe");
+       //         CAT.debug("543 lock on ausgabenEintrittsListe");
                 if (ausgabenEnterRequestedThreads.size() == 0) {
                     return;
                 } else {
-                    CAT.debug("Es gibt neue Ausgaben. Begr��e sie.");
+                    CAT.debug("There are new views. Welcoming them");
                 }
 
                 waitablesImWaitingFor = new WaitingForSet(ausgabenEnterRequestedThreads);
@@ -634,14 +630,14 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                     ausgabeThreads.addElement(tmp);
                 }
             } // synchronized ausgabenEL
-            CAT.debug("543 release ausgabenEl");
+         //   CAT.debug("543 release ausgabenEl");
         } // sync aThreads
-        CAT.debug("541 release aThreads");
+   //     CAT.debug("541 release aThreads");
     }
 
     // returns false if interrupted, true if all is ok
     private synchronized boolean anmeldung() {
-        CAT.debug("588 lock on Server");
+ //       CAT.debug("588 lock on Server");
         try {
             registrationManager = new RegistrationManager(this);
             registrationManager.beginRegistration();
@@ -661,7 +657,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
             }
             return true;
         } finally {
-            CAT.debug("588 release Server");
+           // CAT.debug("588 release Server");
         }
     }
 
@@ -770,16 +766,16 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
             CAT.debug("InitialeAusrichtung ist geholt.");
             // Ausgabekanaele von Initialausrichtung benachrichtigen
             // kreiere String[] mit allen Namen
-            CAT.debug("708 wait for rthreads");
+       //     CAT.debug("708 wait for rthreads");
             synchronized (botThreads) {
-                CAT.debug("710 lock rthreads");
+       //         CAT.debug("710 lock rthreads");
                 alleN = new String[botThreads.size()];
                 int i = 0;
                 for (Iterator e = botThreads.iterator(); e.hasNext();) {
                     alleN[i++] = ((ServerRoboterThread) e.next()).rob.getName();
                 }
             }
-            CAT.debug("716 release rthreads");
+         //   CAT.debug("716 release rthreads");
             notifyViews(alleN); // HS: HIERHIERHIER initiale Ausrichtungen
             sendMsg(MessageID.INITIAL_FACINGS, alleN);
             
@@ -963,23 +959,23 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                     CAT.debug("Programmierung zurueckerhalten");
                 }
 
-                CAT.debug("890 locke aktRoboter..");
+  //              CAT.debug("890 locke aktRoboter..");
                 // Auswertung beginnt
                 synchronized (curBotsThreads) {
-                    CAT.debug("893 habe aktRoboter");
+      //              CAT.debug("893 habe aktRoboter");
                     wechselModus(curBotsThreads.iterator(), NIX);
                     mode = NIX;
                 }
-                CAT.debug("890 frei: aktRoboter");
+//                CAT.debug("890 frei: aktRoboter");
                 // Loop for the five phases.
                 for (curPhase = 1; curPhase != 0; curPhase = (curPhase + 1) % 6) {
                     CAT.info("Evaluation phase " + curPhase + ", turn " + iRunde + " starts.");
                     // Am Spiel beteiligte Bot in Array kopieren (aus technischen Gruenden)
                     Bot[] robs;
-                    CAT.debug("903 wait for aktRoboter");
+       //             CAT.debug("903 wait for aktRoboter");
                     synchronized (curBotsThreads) {
-                        CAT.debug("903 have aktRoboter");
-                        CAT.debug("");
+    //                    CAT.debug("903 have aktRoboter");
+    //                    CAT.debug("");
                         //<hendrik was here>
                         int removedBots = 0;
                         for (Iterator e = curBotsThreads.iterator(); e.hasNext();) {
@@ -1006,7 +1002,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
 
                         }
                     }
-                    CAT.debug("903 release  aktRoboter");
+    //                CAT.debug("903 release  aktRoboter");
                     // (doPhase())
                     //DEBUG
                     CAT.debug("feld.doPhase(" + curPhase + ") mit ");
@@ -1016,9 +1012,9 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                     board.doPhase(curPhase, robs);
 
                     // Evaluate what has happends.
-                    CAT.debug("945 wait aktRoboter");
+       //             CAT.debug("945 wait aktRoboter");
                     synchronized (curBotsThreads) {
-                        CAT.debug("945 have aktRoboter");
+       //                 CAT.debug("945 have aktRoboter");
                         for (Iterator e = curBotsThreads.listIterator(); e.hasNext();) {
                             ServerRoboterThread tmp = (ServerRoboterThread) e.next();
                             // Gewinner?
@@ -1088,7 +1084,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                             }
                         }
                     }
-                    CAT.debug("945 release aktRoboter");
+    //                CAT.debug("945 release aktRoboter");
                     
                 } // End phase evaluation
 
@@ -1116,9 +1112,9 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                 // gesperrte Register einsammeln
                 CAT.debug("Gesperrte Register einsammeln.");
                 gesperrteKarten.removeAllElements();
-                CAT.debug("1050 wait rThreads");
+ //               CAT.debug("1050 wait rThreads");
                 synchronized (botThreads) {
-                    CAT.debug("1050 have rThreads");
+      //              CAT.debug("1050 have rThreads");
                     for (Iterator e = botThreads.iterator(); e.hasNext();) {
                         ServerRoboterThread tmp = ((ServerRoboterThread) e.next());
                         for (int i = 0; i < 5; i++) {
@@ -1128,16 +1124,16 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                         }
                     }
                 }
-                CAT.debug("1050 release rThreads");
+      //          CAT.debug("1050 release rThreads");
                 CAT.debug("Habe " + gesperrteKarten.size() + " gesperrte Karten gefunden und gespeichert.");
 
                 /* End-of-turn-evaluation:
                                    2.) Set bots to deactivated if they chose power down
                                  */
                 Vector changedBots = new Vector();
-                CAT.debug("1066 wait rThreads");
+       //         CAT.debug("1066 wait rThreads");
                 synchronized (botThreads) {
-                    CAT.debug("1066 have rThreads");
+ //                   CAT.debug("1066 have rThreads");
                     for (Iterator it = botThreads.iterator(); it.hasNext();) {
                         Bot bot = ((ServerRoboterThread) it.next()).rob;
                         if (bot.isPoweredDownNextTurn()) {
@@ -1151,7 +1147,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                         }
                     }
                 }
-                CAT.debug("1066 release rThreads");
+   //             CAT.debug("1066 release rThreads");
                 /* Tell the clients if someone powered down. */
                 if (changedBots.size() > 0) {
                     String[] changedBotsArray = new String[changedBots.size()];
@@ -1182,9 +1178,9 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
 
             CAT.debug("Es sind noch " + ausgabeThreads.size() + " Ausgaben da.");
             if (ausgabeThreads.size() > 0) {
-                CAT.debug("1114 wait aThreads");
+             //   CAT.debug("1114 wait aThreads");
                 synchronized (ausgabeThreads) {
-                    CAT.debug("1114 have raThreads");
+             //       CAT.debug("1114 have raThreads");
                     for (Iterator e = ausgabeThreads.iterator(); e.hasNext();) {
                         ServerAusgabeThread tmp = (ServerAusgabeThread) e.next();
                         tmp.setMode(FRAGENERLAUBT);
@@ -1208,7 +1204,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                         }
                     }
                 } // synchronized aThreads
-                CAT.debug("1114 release raThreads");
+           //     CAT.debug("1114 release raThreads");
             } // if aThreads > 0
 
             // AnmeldeThread killen
@@ -1230,7 +1226,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
         }
         finally {            
             CAT.info("SERVER REACHED END OF RUN METHOD");
-            shutdown();
+           shutdown();
         }
     }// run() ende
 
@@ -1250,55 +1246,74 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
 
     synchronized boolean isGameStarted() {
         try {
-            CAT.debug("1183 wait for server");
+      //     CAT.debug("1183 wait for server");
             return gameStarted;
 
         } finally {
-            CAT.debug("1183 release server");
+       //     CAT.debug("1183 release server");
         }
     }
 
     synchronized public void startGame() {
         try {
-            CAT.debug("1193 wait for server");
+      //      CAT.debug("1193 wait for server");
             gameStarted = true;
             notify();
         } catch (Exception e) {
-            CAT.debug("1197 release server");
+       //     CAT.debug("1197 release server");
         }
     }
     
+   
     public void doShutdown() {
- 
-        	if (messageThread != null){
-        	    messageThread.shutdown();
-        	}
-        	
+        if (messageThread != null){
+    	    CAT.debug("messageThread");
+    	    messageThread.shutdown();      
+    	    try {
+    	        messageThread.join(2000);
+    	    }
+    	    catch (Exception e){
+    	        CAT.warn(e);
+    	    }
+    	}
+        
+        CAT.debug("doShutdown..");
         	int count = shutdownableCollections.length;
+        	CAT.debug("count="+count);
         	for (int i=0;i<count;i++){
+        	    CAT.debug("blubb");
         	    Vector v = shutdownableCollections[i];
+        	    CAT.debug("Vector #"+i+": "+v);
         	    if (v != null) {
+        	        CAT.debug("\tbefore synchronized");
         	        synchronized(v){
         	            Iterator it = v.iterator();
+        	            CAT.debug("have iterator");
         	            while (it.hasNext()){
         	                try {        	                    
-        	                    Shutdownable thread = (Shutdownable) it.next();
+        	                    Shutdownable thread = (Shutdownable) it.next();        	       
         	                    CAT.debug("shutting down: "+thread);
-        	                    thread.shutdown();
+        	                    thread.shutdown(true);
         	                }
         	                catch (Exception e){
         	                    CAT.error("error killing thread: "+e.getMessage(), e);
         	                }
         	            }
         	        }
+        	        CAT.debug("after synchronized");
         	    }
         	}
-           	if (registrationManager != null) {
-        	    registrationManager.shutdown();
+        	
+        	if (registrationManager != null) {
+           	    CAT.debug("regMan");
+        	    registrationManager.shutdown(true);
         	}
         	if (serverObserver != null){
+        	    CAT.debug("serverObserver");
         	    serverObserver.shutdown();        	    
         	}
+            
+           	
         	this.interrupt();
     }
     

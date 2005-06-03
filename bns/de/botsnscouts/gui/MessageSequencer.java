@@ -21,6 +21,11 @@ public class MessageSequencer {
         nextMsg = lateStart ? LATESTART : 1;
     }
 
+    public synchronized void clear(){
+        messages.clear();
+        eventToActionMap.clear();
+    }
+    
     public synchronized void addActionMapping(String messageEventID, AbstractMessageAction action) {
         eventToActionMap.put(messageEventID, action);
     }

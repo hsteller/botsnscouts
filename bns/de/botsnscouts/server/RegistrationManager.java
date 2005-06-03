@@ -92,7 +92,7 @@ class RegistrationManager implements Runnable, Shutdownable {
         workingThread.interrupt();            
     }
     
-    public void shutdown() {
+    public void shutdown(boolean notifyListeners) {
         endRegistration();
         if (seso != null){
             try {

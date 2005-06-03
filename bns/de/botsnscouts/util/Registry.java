@@ -114,7 +114,7 @@ public class Registry implements ShutdownListener, GameOverListener {
         }
         
         
-        public void addClient (HumanPlayer player, String serverIp, int port){
+        public  void addClient (HumanPlayer player, String serverIp, int port){
             addClient(serverIp, port, player, ClientInfo.CLIENT_TYPE_HUMANPLAYER);
         }
         
@@ -122,7 +122,7 @@ public class Registry implements ShutdownListener, GameOverListener {
             addClient(serverIp, port, player, ClientInfo.CLIENT_TYPE_AUTOBOT);
         }
         
-        public void addClient (Ausgabe view, String serverIp, int port){
+        public  void addClient (Ausgabe view, String serverIp, int port){
             addClient(serverIp, port, view, ClientInfo.CLIENT_TYPE_VIEW);
         }
         
@@ -217,7 +217,7 @@ public class Registry implements ShutdownListener, GameOverListener {
         
        
         
-        private boolean areThereAnyLocalViews_killGamesWithoutThem(){
+        private  boolean areThereAnyLocalViews_killGamesWithoutThem(){
             // checking the other local game(s) and if someone local is still watching 
             boolean foundHumanClient = false;
             synchronized(games){
@@ -237,10 +237,7 @@ public class Registry implements ShutdownListener, GameOverListener {
                         //..hmm.. can this happen with AutoBots?!? Probably not as long as they
                         // don't call their "shutdown()" method themselves
                         if (server != null ){
-                           CAT.debug("shutting down server: "+server); 
-                           if (!server.isShutDown()) { 
-                               server.shutdown();
-                           }
+                            shutdownServer(server, g, true);
                         }
                         else {
                             CAT.error("This is strange; there is a serverless game registered but noone "+
@@ -252,6 +249,32 @@ public class Registry implements ShutdownListener, GameOverListener {
                 }
                 return foundHumanClient;        
             }
+        }
+        
+        private synchronized void shutdownServer (Server serv, Game game, boolean callShutdown){
+            CAT.debug("shutting down server: "+serv); 
+            
+            if (callShutdown && !serv.isShutDown()){	               
+                	serv.shutdown(false);	    
+            }
+            try {
+                int seconds = 7;
+                CAT.info("Registry waits at max. "+seconds+" seconds for the server to sort things out..");
+                serv.join(seconds*1000);
+            }
+            catch (Exception e){
+                	CAT.warn(e);
+            }
+            
+           
+            if (game != null) {           
+                synchronized (games) {
+                    games.remove(game);
+                }
+                game.setServerToNULL();
+            }
+            shutdownablesToGames.remove(serv);  
+            
         }
         
         private void checkForGamesAndMaybeRedisplay() {
@@ -278,7 +301,7 @@ public class Registry implements ShutdownListener, GameOverListener {
          * the main menu if <code>someThread</code> was the last view of a (local) game.. 
          */
         public void shutdown(Shutdownable someThread){           
-            if (!isEnabled){
+            if (!isEnabled || (someThread != null && someThread.isShutDown()) ){
                 // this is supposed to catch the case where someone (probably developer..)  starts a client via CLI
                 // in this case, the client will not be bound to the Registry as it wasn't started via start.Launcher;
                 // depending on the not-yet existing implementation of shutdwon() it is very likely that we will
@@ -292,8 +315,10 @@ public class Registry implements ShutdownListener, GameOverListener {
             CAT.debug("shutdown: game="+someThreadsGame);
             if (someThreadsGame == null) {              
                 CAT.debug("didn't find a game for Thread: "+someThread);
-                CAT.debug("no game found for the client that is going down, hmm, let's see what there is to do..");              
-                checkForGamesAndMaybeRedisplay();
+                CAT.debug("no game found for the client that is going down, hmm, let's see what there is to do..");   
+                if (!someThread.isShutDown()) {
+                    checkForGamesAndMaybeRedisplay();
+                }
                 return; // otherwise NullpointerEx. below
             }            
             else {
@@ -305,21 +330,12 @@ public class Registry implements ShutdownListener, GameOverListener {
             
             
             if (someThread instanceof Server) {
-                 CAT.debug("There is a server going down: "+someThread);
-                // TODO Do I really want this? A server calling its own shutdown itself (and subsequently
-                // this method here) might also kill all views that might still be connected (by closing the sockets)
-                // => last robot reaches final flag or gets killed 
-                // => view might hang or vanishe without displaying the results..
-                 Server serv = (Server) someThread;
-                 try {
-                     int seconds = 7;
-                     CAT.info("Registry waits at max. "+seconds+" seconds for the server to sort things out..");
-                     serv.join(seconds*1000);
-                 }
-                 catch (Exception e) {
-                     CAT.warn("while waiting for the Server to join: ",e);
-                 }
-                 someThreadsGame.removeAndKillAllAutoBots();                
+                 CAT.debug("There is a server going down: "+someThread);               
+                 Server serv = (Server) someThread;            
+                 
+                 shutdownServer(serv, someThreadsGame, false);
+                 registryRemoveAndKillAutobots(someThreadsGame);
+                                 
             }
             else {
                 // some client         
@@ -328,7 +344,9 @@ public class Registry implements ShutdownListener, GameOverListener {
                 		+"successful");
                 if (removeSuccessful) {                   
 	                if (!someThreadsGame.hasHumanView()){
-	                    CAT.debug("removed "+someThread+"; no local view connected anymore");
+	                    CAT.debug("removed "+someThread+"; no local view connected anymore");	                    
+	                   
+	                   
 	                     // there is no local view left so we kill the server (if it exists) and all
 	                    // AutoBots and then redisplay the main menu
 	                    Server localServer = someThreadsGame.getServer();	                   
@@ -340,13 +358,12 @@ public class Registry implements ShutdownListener, GameOverListener {
 	                       CAT.debug("no local server found for this game");
 	                    }
 	                    else {
-	                      CAT.debug("shutting down the server: "+localServer);
-	                      if (!localServer.isShutDown()) {
-	                          localServer.shutdown();
-	                      }
+	                       //CAT.debug("XXX shutting down the server: "+localServer);	  	                      
+	                     shutdownServer(localServer, someThreadsGame, true);
 	                    }
+	                    registryRemoveAndKillAutobots(someThreadsGame); 
+	                   
 	                    
-	                    someThreadsGame.removeAndKillAllAutoBots();
 	                    
 	                }	           
                 } // successful removal "someThread"       
@@ -356,11 +373,28 @@ public class Registry implements ShutdownListener, GameOverListener {
             if (!someThreadsGame.hasHumanView()){                  
                  redisplayMenu();
             }
-           
+           CAT.debug("end of shutdown: ");
+           CAT.debug(dump());
+              
             
         }
         
-        public void gameIsOver (Game game){
+       private void registryRemoveAndKillAutobots (Game game) {
+           Collection bots = game.removeAndKillAllAutoBots();
+           if (bots != null ){
+               synchronized (bots) {
+	               Iterator it = bots.iterator();
+	               while (it.hasNext()){
+	                   ClientInfo ci = (ClientInfo) it.next();
+	                   synchronized (shutdownablesToGames){
+	                       shutdownablesToGames.remove(ci.getClient());
+	                   }
+	               }
+               }
+           }
+       }
+        
+      public void gameIsOver (Game game){
             CAT.debug("gameIsOver(): "+game);
             if (games != null) {
 	            synchronized (games) {
@@ -368,15 +402,7 @@ public class Registry implements ShutdownListener, GameOverListener {
 	               CAT.debug("\tremoving of game was "+(foo?"":"NOT ")+"successful");
 	               Server serv = game.getServer();
 	               if (serv != null) {
-	                  if (!serv.isShutDown()){	               
-	                      serv.shutdown();	    
-	                  }
-	                  try {
-	                      serv.join(7000);
-	                  }
-	                  catch (Exception e){
-	                      CAT.warn(e);
-	                  }
+	                  shutdownServer(serv, game,true);
 	              }	               	              
 	            }
             }
@@ -492,6 +518,10 @@ public class Registry implements ShutdownListener, GameOverListener {
            
         }
         
+        protected void setServerToNULL(){
+            server = null;
+        }
+        
         public boolean hasClients(){
             return clients != null &&  !clients.isEmpty();//  (server == null || server.isShutDown());
         }
@@ -536,8 +566,9 @@ public class Registry implements ShutdownListener, GameOverListener {
                     ClientInfo info = (ClientInfo) clients.get(i);
                     CAT.debug("checking client "+info);
                     if (info.getClientType() == type){
-                        CAT.debug("calling remove for: "+info.getClient());
+                        CAT.debug("calling remove for: "+info.getClient());                       
                         remClients.add(clients.remove(i));
+                        
                     }
                 }
             }
@@ -547,7 +578,8 @@ public class Registry implements ShutdownListener, GameOverListener {
             return remClients;
         }
         
-        public int removeAndKillAllAutoBots(){
+        /** @return the ClientInfos of the removed bots*/
+        protected Collection removeAndKillAllAutoBots(){
             CAT.debug("removeAndKillAutoBots");
             Collection autoBots = this.removeClients(Game.CLIENT_TYPE_AUTOBOT);
             int numOfBots = autoBots!=null?autoBots.size():0;
@@ -556,13 +588,20 @@ public class Registry implements ShutdownListener, GameOverListener {
             while (it.hasNext()){
                 ClientInfo bot = (ClientInfo) it.next();
                 CAT.debug("calling shutdown for "+bot.getClient());
-                Shutdownable client = bot.getClient();
+                Shutdownable client = bot.getClient();               
                 if (client != null && !client.isShutDown()) {
-                   client.shutdown();
+                   client.shutdown(false);
+                   try {
+                       BNSThread a = (BNSThread) client;
+                       a.join(2000);
+                   }
+                   catch (Exception e){
+                       CAT.warn(e);
+                   }
                 }
+                
             }
-            return numOfBots;
-            
+            return autoBots;           
         }
             
         public String toString(){
@@ -718,6 +757,6 @@ class ClientInfo {
 
 interface GameOverListener{
 
-    public void gameIsOver(Game game);
+     void gameIsOver(Game game);
     
 }

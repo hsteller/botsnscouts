@@ -40,6 +40,8 @@ class MessageThread extends de.botsnscouts.util.BNSThread
     private MessageQ msgQ;
     private int timeout;
 
+    private ServerAusgabeThread currentAusgabe;
+    
     public MessageThread(ThreadMaintainer m, int timeout){
 	super("MessageThread");
 	server=m;
@@ -82,23 +84,25 @@ class MessageThread extends de.botsnscouts.util.BNSThread
 	// Vector that contains them all.
 	CAT.debug("Sending msg: "+msg.id);
 	synchronized(v){
-	    CAT.debug("85 Got lock ausgabeThreads");
+	  //  CAT.debug("85 Got lock ausgabeThreads");
 	    wait = new WaitingForSet(v);
 	    for (Iterator it=v.iterator();it.hasNext();){
 	        ServerAusgabeThread tmp=(ServerAusgabeThread)it.next();
+	        currentAusgabe = tmp;
 			if (!tmp.isAlive())
 			    it.remove();
 			else
 			    tmp.sendMsg(msg.id,msg.args);
 	    }
-	    CAT.debug("94 now starting wait");
+	   // CAT.debug("94 now starting wait");
 	    Iterator it= wait.waitFor(timeout);
-	    CAT.debug("94 end of wait");
+	  // CAT.debug("94 end of wait");
 	    while(it.hasNext()) {
 	        server.deleteOutput((ServerAusgabeThread)it.next(),"TO");
 	    }
+	    currentAusgabe = null;
 	}
-	CAT.debug("85 released lock");
+	//CAT.debug("85 released lock");
     }
 
     public void run(){
@@ -113,6 +117,9 @@ class MessageThread extends de.botsnscouts.util.BNSThread
     
     public void doShutdown() {       
         this.interrupt();
+        if (currentAusgabe != null){
+            currentAusgabe.interrupt();
+        }
     }
 
     /** Just a struct, really. */

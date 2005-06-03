@@ -157,16 +157,16 @@ public class Ausgabe extends BNSThread {
         }
 
         // ---- entering game  ---------
-        while (!spielEnde) {
+        while (!spielEnde && !isShutDown()) {
             try {
                 // waiting for server messages
                 kommAntwort = kommClient.warte();
-            } catch (KommFutschException kE) {  // lost network communication with server
-                CAT.error("KE: " + kE.getMessage());
-                return;
-            } catch (KommException ke) { // something went wrong parsing the server's message
-                CAT.error("ke: " + ke.getMessage());
-                return;
+       
+            } catch (Exception ke) { // something went wrong parsing the server's message
+                CAT.error(ke);
+                if (!isShutDown()){
+                    shutdown(true);
+                }
             }
             // what did the server send?
             switch (kommAntwort.typ) {
@@ -180,11 +180,11 @@ public class Ausgabe extends BNSThread {
                 {// notify change; something happened (to a robot);
                     try {
                         comHandleNotifyChange(kommAntwort);
-                    } catch (KommFutschException ke) {
-                        CAT.error("ke2: " + ke.getMessage(), ke);
-                        return;
-                    } catch (KommException kE) {
-                        CAT.error(kE.getMessage(), kE);
+                    } catch (Exception ke) {
+                        CAT.error(ke);
+                        if (!isShutDown()){
+                            shutdown(true);
+                        }
                         return;
                     }
                     break;
@@ -194,7 +194,15 @@ public class Ausgabe extends BNSThread {
                 { // we were removed for some reason, i.e. game is over,
                     // there was a timeout, we violated some protocol rule
                     CAT.info("Game over.");
-                    comHandleWeWereRemoved(kommAntwort);
+                    try {
+                        comHandleWeWereRemoved(kommAntwort);
+                    }
+                    catch (Exception e){
+                        CAT.error(e);
+                        if (!isShutDown()){
+                            shutdown(true);
+                        }
+                    }
                 }
             }
 
@@ -491,32 +499,44 @@ public class Ausgabe extends BNSThread {
         quit(keepWatching, quitHumanPlayer, false);
      }
     
-    private void quit (boolean keepWatching, boolean quitHumanPlayer, boolean calledByShutdown){
-        
-        abmelden();        
-        if (quitHumanPlayer) {
+    private void quit (boolean keepWatching, boolean quitHumanPlayer, boolean calledByShutdown){        
+       
+        if (!keepWatching && kommClient!=null){
+	        abmelden();      
+	        try {
+	            CAT.debug("killing communication..");
+	            kommClient.shutdown(true);
+	        }
+	        catch (Exception ioe ){
+	            CAT.warn("during communication shutdown", ioe);
+	         }
+        }
+        if (quitHumanPlayer && view != null) {
             CAT.debug("Ausgabe tells the view to propagate quitting..");
-            view.quitHumanPlayer(); // Tell the view to tell the HumanPlayer to quit, if there is any
+            view.quitHumanPlayer(true); // Tell the view to tell the HumanPlayer to quit, if there is any
+            
+        }
+        
+        if (!keepWatching && view != null){
+            CAT.debug("removing View");
+            view.setVisible(false);
+            view.dispose();
+            view = null;
         }
         if (!calledByShutdown){
             shutdown();
+            
         }
+        
+        
     }
     
     public void doShutdown() {
         CAT.debug("starting shutdown..");
-        quit(false, false, true);
-        try {
-            CAT.debug("killing communication..");
-            kommClient.shutdown();
-        }
-        catch (Exception ioe ){
-            CAT.warn("during communication shutdown", ioe);
-         }
-        CAT.debug("removing View");
-        view.setVisible(false);
-        view.dispose();
-        view = null;
+       
+        
+        sequencer.clear();               
+        quit(false, true, true);
         CAT.debug("reached end of shutdown");
     }
 
@@ -711,26 +731,32 @@ public class Ausgabe extends BNSThread {
     //</SEQUENCER-FIx>
 
     private void comHandleMessages(ClientAntwort kommAntwort) {
-        String msgId = kommAntwort.namen[0];
+        try {
+            String msgId = kommAntwort.namen[0];
+        
 
-        if (CAT.isDebugEnabled())
-            CAT.debug("Server sent me: " + msgId);
-
-        // check whether we have to display an information message in the transparent
-        // chat- and actionlog on the bottomline of the board:
-        // don't show if message is a "mAusw*"-message or it
-        // is a SIGNAL_ACTION_[START|STOP]-message
-        if (isActionToBeDisplayedInInfopanelOnly(msgId)) {
-            // this is a little dirty; we will override the message id so that will
-            // be mapped to an action that does nothing else than displaying this
-            // (status) message in the transparent chatpane on the bottom of the
-            // display
-            sequencer.invoke(DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY, kommAntwort);
-        } else {
-            sequencer.invoke(kommAntwort);
+	        if (CAT.isDebugEnabled())
+	            CAT.debug("Server sent me: " + msgId);
+	
+	        // check whether we have to display an information message in the transparent
+	        // chat- and actionlog on the bottomline of the board:
+	        // don't show if message is a "mAusw*"-message or it
+	        // is a SIGNAL_ACTION_[START|STOP]-message
+	        if (isActionToBeDisplayedInInfopanelOnly(msgId)) {
+	            // this is a little dirty; we will override the message id so that will
+	            // be mapped to an action that does nothing else than displaying this
+	            // (status) message in the transparent chatpane on the bottom of the
+	            // display
+	            sequencer.invoke(DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY, kommAntwort);
+	        } else {
+	            sequencer.invoke(kommAntwort);
+	        }
+		
+	        acknowledgeMessage();
         }
-
-        acknowledgeMessage();
+        catch (Exception e){
+            CAT.error(e);
+        }
     }
 
 

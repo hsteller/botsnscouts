@@ -74,18 +74,40 @@ public abstract class BNSThread extends Thread implements Shutdownable {
     
     /** Override this method instead of "shutdown()" */
     public abstract void doShutdown();
+    
+   /* public void doShutdown(boolean notifyListeners){
+        if (notifyListeners){ //
+            doShutdown();
+        }       
+    }
+      */  
+   
  
     public final void shutdown(){
+        shutdown(true);
+    }
+    
+    public  void shutdown(boolean notifyListeners){
+        if (isShutDown()){
+            CAT.debug("XXXXXXXXXXXXXXXXX is already shut down:"+getName());
+            return;
+        }
+        
         try {
+         //   doShutdown(notifyListeners);
             doShutdown();
         }
-        finally {
-            shutdownSupport.shutdown();
+        finally {            
+           
+            if (notifyListeners) {
+                shutdownSupport.shutdown();
+            }
             hasBeenShutDown = true;
+            
         }
     }
     
-    public boolean isShutDown(){
+    public  boolean isShutDown(){
         return hasBeenShutDown;
     }
     

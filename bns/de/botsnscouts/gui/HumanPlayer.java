@@ -235,7 +235,7 @@ public class HumanPlayer extends BNSThread {
                             int repPoints = commAnswer.zahl;
                             humanView.showRegisterRepair(tempRob.getLockedRegisters(), repPoints);
                         } catch (KommException kE) {
-                            System.err.println("SpielerMensch: " + kE.getMessage());
+                            CAT.error(kE);
                         }
 
                         break;
@@ -279,19 +279,21 @@ public class HumanPlayer extends BNSThread {
 
         CAT.debug("Human Player reached end of run-method");
         //view.removeChatPane();
-
+/*
         try {
             CAT.debug("Waiting 10 seconds for Ausgabe (join())..");
             ausgabe.join(10000);
             CAT.debug("Ausgabe is now ready (well, or hangs..)");
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
-        CAT.info("HUMANPLAYER FINISHED!");
-        shutdown();
+        }*/
+       
+       shutdown(true);
+   
         if (killJVMonceFinished){
             System.exit(0);
         }
+        CAT.info("HUMANPLAYER FINISHED!");
         return;
 
     }
@@ -433,14 +435,13 @@ public class HumanPlayer extends BNSThread {
             CAT.warn("in shutdown (deregistering)", e);
         }
         try {
-            comm.shutdown(); // close socket and streams
+            comm.shutdown(true); // close socket and streams
         }
         catch (Exception e){
             CAT.warn("in shutdown (killing communication)", e);
         }
         CAT.debug("setting condition for leaving the run()-method");
-        gameOver = true;              
-        view = null;
+        gameOver = true;               
         CAT.debug("killing/interrupting potential EmergenyCardSubmitter:");
         if (timeoutWatcher != null){
             try {
@@ -459,6 +460,13 @@ public class HumanPlayer extends BNSThread {
             }              
         }
 
+        if (view != null){
+            // in view.showGameOver() a timer Thread gets started that will call view.wait() for atm 8 seconds 
+            synchronized (view){
+                view.notifyAll();
+            }
+        }
+        view = null;
         
     }
 

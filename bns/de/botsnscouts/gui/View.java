@@ -348,10 +348,12 @@ public class View extends JFrame {
         initHotKeys(av);
     }
 
-    protected void quitHumanPlayer() {
+   
+    
+    protected void quitHumanPlayer(boolean joinHPThread) {
         CAT.debug("View is telling the human player to quit..");
         if (humanView!=null) {
-          humanView.quitHumanPlayer();
+          humanView.quitHumanPlayer(joinHPThread);
           humanView=null;
           CAT.debug(".. done");
         }

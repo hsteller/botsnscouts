@@ -30,6 +30,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.TimerTask;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -340,10 +341,30 @@ public class HumanView extends JPanel implements HumanViewInterface {
      * show game over two types: a) winner + winner no. b) dead
      *
      */
-    public void showGameOver(boolean dead, int winnerNumber, String removalReason) {        
+    public synchronized void showGameOver(boolean dead, int winnerNumber, String removalReason) {        
         String bigVerticalMessage=dead?Message.say("SpielerMensch", "mkilled"):Message.say("SpielerMensch", "mflagreached");       
         gameOverPanel.setMessage(bigVerticalMessage,dead,removalReason);
-        panelSwitcher.show(switcherPanel, "reachedEnd");        
+        panelSwitcher.show(switcherPanel, "reachedEnd");      
+        // little not-so-nice hack:
+        // we are not a dialog but pretend to be one, so nobody immediately replaces the reachedEnd-Panel        
+        //  The Runnable/Thread only ensures that we are show at least 8 seconds 
+        setDialogInSidebarActive(true);
+         Runnable foo = new Runnable(){
+             public void run(){                 
+                 synchronized (this){
+                     try {
+                         wait (8000);
+                     }
+                     catch (InterruptedException ie){
+                         CAT.error("interrupted while giving user a last chance for sending cards himself", ie);
+                     }
+                     setDialogInSidebarActive(false);
+                 }
+             }
+         };
+         Thread t = new Thread(foo);
+         t.start();
+        //}
     }
 
     
@@ -450,9 +471,17 @@ public class HumanView extends JPanel implements HumanViewInterface {
         }
     }
 
-    protected void quitHumanPlayer() {
-        CAT.debug("HumanView asks the HumanPLayer to quit..");
+    protected void quitHumanPlayer(boolean joinHPThread) {
+        CAT.debug("HumanView asks the HumanPLayer to quit..");        
         human.shutdown();
+        if (joinHPThread){
+            try {
+                human.join(3000);
+            }
+            catch (InterruptedException dontCare){
+                CAT.warn(dontCare);
+            }
+        }
     }
 
     private void d(String s) {

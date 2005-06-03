@@ -1394,7 +1394,7 @@ public class KommClient implements Shutdownable{
 	return back;
     }
     
-    public void shutdown() {
+    public void shutdown(boolean notifyListeners) {
         if (socket != null) {
             try {
                 socket.close();
@@ -1419,8 +1419,11 @@ public class KommClient implements Shutdownable{
                 CAT.debug(ioe);
             }
         }
-        shutdownSupport.shutdown();
         isShutDown = true;
+        if (notifyListeners) {
+            shutdownSupport.shutdown();
+        }
+        
     }
     
     public boolean isShutDown() {
@@ -1431,7 +1434,7 @@ public class KommClient implements Shutdownable{
      */
     protected void finalize() throws Throwable {
       super.finalize();
-	  shutdown();
+	  shutdown(true);
     }
     
     

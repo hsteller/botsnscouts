@@ -525,7 +525,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       return gameBoardCanvas;
     }
 
-    /** parameter will be ignored*/
+    
      protected void quit(boolean keepWatching) {
         CAT.debug("AusgabeView starts procedure to quit the client..");
 	JLabel[] msg = new JLabel[2];
