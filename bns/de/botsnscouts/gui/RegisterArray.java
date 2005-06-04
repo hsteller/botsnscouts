@@ -75,6 +75,10 @@ public class RegisterArray extends TJPanel {
         }
     }
 
+    /** 
+     * 
+     * @return a list containing all cards that already were chosen for the move (doesn't contain content of lockes registers).
+     */
     protected ArrayList getCards() {
         ArrayList regs = new ArrayList(programmed());
         for (int i = 0; i < registerView.size(); i++) {
@@ -85,6 +89,10 @@ public class RegisterArray extends TJPanel {
         return regs;
     }
 
+    /**
+     * 
+     * @return the cards in the registers atm, including content of locked registers 
+     */
     protected ArrayList getWisenheimerCards() {
         ArrayList regs = new ArrayList(programmed());
         for (int i = 0; i < registerView.size(); i++) {
@@ -179,6 +187,10 @@ public class RegisterArray extends TJPanel {
         return true;
     }
 
+    /**
+     * 
+     * @return The number of registers to be programmed for the current move (5 - number of locked registers)
+     */
     private int programmed() {
         int oc = 0;
         for (int i = 0; i < registerView.size(); i++) {
