@@ -113,7 +113,7 @@ public class TJNumberField extends JTextField implements DocumentListener {
 
     // Ueberschreiben wohl nicht mehr noetig, dank eigenem Dokument
     public void setText(String str) {
-		if (str != null && str.length() > 0) {
+		if (str != null && str.trim().length() > 0) {
 			try {
 				Integer.parseInt(str);
 			} catch (NumberFormatException nfe) {
@@ -190,12 +190,17 @@ public class TJNumberField extends JTextField implements DocumentListener {
             filter = ra;
         }
 
+
+        // TODO remove() needs to be overwritten..
+        
         public void insertString(int offs, String str, AttributeSet a)
                 throws BadLocationException {
 
             if (str == null) {
                 return;
-            }
+            }             
+          
+            
             char[] upper = str.toCharArray();
 
             if (filter == null || filter.isTypInfinite()) {
@@ -206,23 +211,55 @@ public class TJNumberField extends JTextField implements DocumentListener {
                     }
                 }
                 super.insertString(offs, new String(upper), a);
-            } else {
+            }
+            else {
+                // FIXME (by now) the whole single digit seems more complicated/buggy than necessary
+                // (or had I a reason for doing it that way in the program I originally made this class for?
+                //  hmm..)
+                
+                // The first half of the current content
                 StringBuffer tmp1 = new StringBuffer(super.getText(0, offs));
+                // The second half
                 StringBuffer s2 = new StringBuffer(super.getText(offs, getLength() - offs));
 
+                int maxValue = Integer.MIN_VALUE;
+                try {
+                    maxValue = Integer.parseInt(tmp1.toString()+str+s2.toString());
+                }
+                catch (NumberFormatException ne){
+                    // in this case: there was a non digit in "str"
+                    TJNumberField.beeep();
+                    return;
+                }
+                boolean getsBigEnough = maxValue >= filter.getMinimum();
+                
                 int l2 = s2.length();
                 for (int i = 0; i < upper.length; i++) {
-                    int ende = tmp1.length();
-                    if (!Character.isDigit(upper[i])) {
+                    int ende = tmp1.length();                    
+                    if (!Character.isDigit(upper[i])) { // TODO obsolete with the maxValue-block above?
+                        // not a number -> stop inserting
                         TJNumberField.beeep();
                         return;
-                    } else {
+                    } 
+                    else {
+                       
+                                                  
+                        // appending the next digit 
                         tmp1.append(upper[i]);
-                        ende = tmp1.length() - 1;
+                        ende = tmp1.length() - 1; // position of the new char
                         tmp1.append(s2);
                         try {
+                            // the new value of the content:
                             int foo = Integer.parseInt(tmp1.toString());
-                            if (!filter.isInRange(foo)) {
+                           
+                            // needed for initialising fields with a minimum value:
+                            // in this case filter.isInRange() wil return false as soon a one (single!) digit of "upper"
+                            // is smaller as the whole value of minimum 
+                            // (for example: => false for sure for every non-single-digit minimum..)
+                            if (getsBigEnough && foo < filter.getMaximum() ) {
+                             
+                            }                            
+                            else if (!filter.isInRange(foo)) {
                                 TJNumberField.beeep();
                                 return;
                             }
