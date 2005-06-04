@@ -81,11 +81,15 @@ public class HumanPlayer extends BNSThread {
     private EmergencyCardSubmitter emergencyCardSubmitter;
     
     private volatile boolean cardsSent;
-    private static final int bufferSecondsBeforeTimeout = 25;
-    private static final int bufferSecondsBeforeSendingCards = bufferSecondsBeforeTimeout-5;
+    /** Starting the EmergencyCardSubmitter that many seconds before the global timeout expires*/
+    public static final int bufferSecondsBeforeTimeout = 25;
+    /** This is the number of seconds we show to the user; after this many seconds the
+     *   EmergencyCardSubmitter will kick into action, blocking the user and getting the
+     *   Wisenheimer's prediction to send*/
+    public static final int bufferSecondsBeforeSendingCards = bufferSecondsBeforeTimeout-5;
     /** If set to true, we will do a System.exit(0) on the end of the run() method*/
     private boolean killJVMonceFinished = false;
-    
+       
     public HumanPlayer(String host, int port, String name) {
         this(host, port, name, -1);
     }
@@ -157,19 +161,22 @@ public class HumanPlayer extends BNSThread {
 	                    	timeoutWatcher = new Timer();    
 	                    	emergencyCardSubmitter = new EmergencyCardSubmitter();
                     	    timeoutWatcher.schedule(emergencyCardSubmitter, (globalTimeout-bufferSecondsBeforeTimeout)*1000);                    	    
-                    	}
-                    	
+                    	}                    	
                         // card
                         showMessage(Message.say("SpielerMensch", "mwartereg"));
 
                         try {
-                            Bot tempRob = comm.getRobStatus(name);
-                            d("rob has the following locked registers: ");
-                            for (int i = 0; i < tempRob.getLockedRegisters().length; i++) 
-                                d("index: " + i + " ist " + tempRob.getLockedRegisters()[i]);
-                            humanView.updateRegisters(tempRob.getLockedRegisters());
-                        } catch (KommException kE) {
-                            System.err.println("SpielerMenschERROR: " + kE.getMessage());
+                            Bot meAtStartOfRound = comm.getRobStatus(name);                                                       
+                            if (CAT.isDebugEnabled()) {
+                                CAT.debug("rob has the following locked registers: ");
+                                for (int i = 0; i < meAtStartOfRound.getLockedRegisters().length; i++) { 
+	                                CAT.debug("index: " + i + " ist " + meAtStartOfRound.getLockedRegister(i));
+	                            }
+                            }
+                            humanView.updateRegisters(meAtStartOfRound.getLockedRegisters());
+                        } 
+                        catch (KommException kE) {
+                            CAT.error("SpielerMenschERROR: " + kE.getMessage());
                         }
 
                         // ----- Karten einsortieren  -----
@@ -522,12 +529,52 @@ public class HumanPlayer extends BNSThread {
     }
 
     protected int getNextPrediction(ArrayList registerList, ArrayList cardList) {
-        return wisenheimer.getNextPrediction(registerList, cardList);
+        synchronized (wisenheimer) {
+            return wisenheimer.getNextPrediction(registerList, cardList);
+        }
     }
 
     protected int getPrediction(ArrayList registerList, ArrayList cardList) {
-        return wisenheimer.getPrediction(registerList, cardList, ausgabe.getBot(name));
+        synchronized (wisenheimer) {
+            return wisenheimer.getPrediction(registerList, cardList, ausgabe.getBot(name));
+        }
     }
+    
+    protected int [] getCompleteWisenheimerMove(){
+        // RegisterArray.resetAll(); // resetting move so far
+        // RegisterArray.getWisenheimerCards(); // getting possible locked registers
+        	//wisenheimer.getPrediction(cardList, ausgabe.getBot(name));
+        Bot me = ausgabe.getBot(name);       
+        ArrayList myRegs = new ArrayList(Bot.NUM_REG);
+        int numOfCardsNeeded = Bot.NUM_REG;       
+        for (int i=0;i<Bot.NUM_REG;i++){
+            Object card = me.getLockedRegister(i);            
+            myRegs.add(card);
+            if (card != null) { // register was locked, one turn less to predict
+                numOfCardsNeeded--;
+            }
+        }
+      
+        int [] predictions = new int[numOfCardsNeeded];
+        if (numOfCardsNeeded > 0 ) {
+            synchronized (wisenheimer) {
+	            // getting initial prediction/resetting prediction, probably doing the same work
+	            // twice if the wisenheimer was already called in this round 
+	            predictions [0] = wisenheimer.getPrediction(myRegs, cards, me);	         
+	            for (int i=1;i<numOfCardsNeeded;i++) {
+	                predictions[i] = wisenheimer.getNextPrediction(myRegs, cards);	                
+	            }
+            }
+        }
+        return predictions;
+	            
+        
+        	
+        
+        
+    }
+    
+    
 
     private void initScoutAndWisenheimerPermissions() {
         try {
@@ -649,15 +696,16 @@ public class HumanPlayer extends BNSThread {
                 if (!gameOver && !cardsSent) {
                     mode = MODE_OTHER;
                     showMessage(Message.say("SpielerMensch","legalZug"));
-                    // TODO use wisenheimer instead of the first available cards..
-                    Bot rob = getRob();
-                
-                    int lockedRegisterCount =rob.countLockedRegisters();
-                
+                   
+                    /*
+                    Bot rob = getRob();                
+                    int lockedRegisterCount =rob.countLockedRegisters();                
                     int[] prog = new int[(5-lockedRegisterCount)];
                     for (int i = 0; i < prog.length; i++) {
                         prog[i] = (i+1);
                     }
+                    */
+                    int [] prog = getCompleteWisenheimerMove();
                     comm.registerProg(name,prog,false);
                     cardsSent = true;
                    
