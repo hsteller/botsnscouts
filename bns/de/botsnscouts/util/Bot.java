@@ -33,8 +33,8 @@ package de.botsnscouts.util;
 
 public class Bot {
 
-    final static int NUM_CARDS = 9;
-    final static int NUM_REG = 5;
+    public final static int NUM_CARDS = 9;
+    public final static int NUM_REG = 5;
 
    // private static Category CAT = Category.getInstance(Bot.class);
     
@@ -309,14 +309,14 @@ public class Bot {
 	This method is to be eliminated!
     */
     public Card[] getLockedRegisters() {
-	Card[] regs = new Card[NUM_REG];
-	for (int i=0; i < NUM_REG; i++){
-	    if (lockedRegisters[i])
-		regs[i]=move[i];
-	    else
-		regs[i]=null;
-	}
-	return regs;
+		Card[] regs = new Card[NUM_REG];
+		for (int i=0; i < NUM_REG; i++){
+		    if (lockedRegisters[i])
+		        regs[i]=move[i];
+		    else
+		        regs[i]=null;
+		}
+		return regs;
     }
 
     public Card getMove(int i){
