@@ -51,96 +51,118 @@ public class Wisenheimer{
 	wirbel = new SearchRecursively(board, 0);
     }
 
-    //berechnet den zug neu und gibt index der Card zur�ck
+   
+    /**
+     *  Calculates the move and returns the index of the recommended card.
+     *  @param cards ArrayList of HumanCards we can use for this move
+     *   @param registers ArrayList of HumanCards that are already programmed
+     * @param robi current values of the bot we want to do the oredicition for 
+     */
+
     protected int getPrediction(ArrayList registers, ArrayList cards, Bot robi){
         CAT.debug("Wisenheimer.getPrediction() called.");
-	//teste ob alle register belegt sind
-	int t=0;
-	for (t=0;t<5;t++){
-	    if (registers.get(t)==null)
-		break;
-	}
-	if (t==5)
-	    return -1;
+		//teste ob alle register belegt sind
+		int t=0;
+		for (t=0;t<5;t++){
+		    if (registers.get(t)==null)
+			break;
+		}
+		if (t==5)
+		    return -1;
 
-	simRob.copyRob(robi);
-
-	Card[] simCards=new HumanCard[9];
-	// cards in simCards einlesen, gesperrte Karten werden nicht ber�cksichtigt
-	int j=0;
-	for (int i = 0; i < cards.size(); i++) {
-	    if((cards.get(i) != null)&&((HumanCard)cards.get(i)).getState() == HumanCard.FREE) {
-		simCards[j] = new HumanCard((HumanCard)cards.get(i));
-		j++;
-	    }
-	}
-	// gelegte Karten in das enstprechende gesperrte Register des Robis packen
-	for (int l = 0; l<registers.size();l++) {
-	    if ((registers.get(l) != null)&&(!((HumanCard)registers.get(l)).free())) {
-		simRob.lockRegister(l,  Deck.get(((HumanCard)registers.get(l)).getprio()));
-	    }
-	}
-	// gesperrte Register in simRob.zug schreiben
-	for (int i = 0; i < simRob.getLockedRegisters().length; i++){
-	    simRob.setMove(i, simRob.getLockedRegister(i));
-	}
-	Card[] vonPermut = wirbel.findBestMove(simCards, simRob);
-	for (int i=0;i<5;i++){
-	    predict[i]=vonPermut[i].getprio();
-	}
-	//Global.debug(this,"karten bekommen anz: "+vonPermut.length+" "+vonPermut);
-	//for (int i=0; i < vonPermut.length; i++) {
-	//Global.debug(this,"vonPermut["+i+"] ist "+vonPermut[i].getprio());
-	//}
-
-	// in vonPermut steht die vorgeschlagene Registerprogrammierung, so wie sie ggf. z.T.schon
-	// in den Registern steht
-	int nextprio =-1;
-	for (int su=0; su<5;su++){
-	    if ((registers.get(su) == null) || ((HumanCard)registers.get(su)).getprio() != (vonPermut[su].getprio())){
-                nextprio = vonPermut[su].getprio();
-		lastPredict=su;
+		simRob.copyRob(robi);
+	
+		Card[] simCards=new HumanCard[9];
+		// put all free cards at the begin of the simCard array 
+		int j=0;
+		for (int i = 0; i < cards.size(); i++) {
+		    if((cards.get(i) != null)&&((HumanCard)cards.get(i)).getState() == HumanCard.FREE) {
+				simCards[j] = new HumanCard((HumanCard)cards.get(i));
+				j++;
+		    }
+		}
+		// gelegte Karten in das enstprechende gesperrte Register des Robis packen
+		for (int l = 0; l<registers.size();l++) {
+		    if ((registers.get(l) != null)&&(!((HumanCard)registers.get(l)).free())) {
+		        simRob.lockRegister(l,  Deck.get(((HumanCard)registers.get(l)).getprio()));
+		    }
+		}
+		// gesperrte Register in simRob.zug schreiben
+		for (int i = 0; i < simRob.getLockedRegisters().length; i++){
+		    simRob.setMove(i, simRob.getLockedRegister(i));
+		}
+		Card[] vonPermut = wirbel.findBestMove(simCards, simRob);
+		for (int i=0;i<5;i++){
+		    predict[i]=vonPermut[i].getprio();
+		}
+		//Global.debug(this,"karten bekommen anz: "+vonPermut.length+" "+vonPermut);
+		//for (int i=0; i < vonPermut.length; i++) {
+		//Global.debug(this,"vonPermut["+i+"] ist "+vonPermut[i].getprio());
+		//}
+	
+		// in vonPermut steht die vorgeschlagene Registerprogrammierung, so wie sie ggf. z.T.schon
+		// in den Registern steht
+		int nextprio =-1; // will contain the card (identified by its unique priority) we recommend 
+		for (int registerNum=0; registerNum<5;registerNum++){
+		    // looking for the register we have to program: 
+		    HumanCard card = (HumanCard) registers.get(registerNum);
+		    if ( card == null || (card.getprio() != vonPermut[registerNum].getprio()) ){               
+		        // found an empty or suboptimal programmed register
+		        nextprio = vonPermut[registerNum].getprio(); // setting our recommendation 
+                lastPredict=registerNum; // updating the marker for the last predicted register  
                 break;
-            }
-	}
-	if (lastPredict==5){
-	    return -1;
-	}
-	return getIndex(nextprio,cards);
+	        }
+		}
+		if (lastPredict==5){
+		    return -1;
+		}
+		
+		return getIndex(nextprio,cards);
     }
 
+    /** 
+     * Will find the index of the card with priority <code>nextprio</code> 
+     * in the HumanCard list <code>robicards</code>.
+     * If the card is not found it will return 0 (==the first card; don't know
+     * whether that is such a good idea but, hey, I didn't write the code and
+     * it seems to work this way..).
+     * 
+     * @param nextprio The unique priority of the card to look for
+     * @param robiCards The possible cards (of <code>HumanCards</code>)
+     * @return the list position of the card we are looking for in the list
+     */
     private int getIndex(int nextprio,ArrayList robiCards){
         CAT.debug("Wisenheimer.getIndex() called");
-	int ind=0;
-	for (int i=0; i<robiCards.size();i++){
-	    if (robiCards.get(i) != null) {
-		if (((HumanCard)robiCards.get(i)).getprio() == nextprio) {
-		    ind=i;
-		    break;
+		int ind=0;
+		for (int i=0; i<robiCards.size();i++){
+		    if (robiCards.get(i) != null) {
+			if (((HumanCard)robiCards.get(i)).getprio() == nextprio) {
+			    ind=i;
+			    break;
+			}
 		}
-	    }
-	}
-	return ind;
+		}
+		return ind;
     }
 
     //gibt die n�chste karte von dem berechneten zug
     public int getNextPrediction(ArrayList registers,ArrayList robiCards){
         CAT.debug("Wisenheimer.getNextPrediction() called.");
-	//teste ob alle register belegt sind
-	int t=0;
-	for (t=0;t<5;t++){
-	    if (registers.get(t)==null)
-		break;
-	}
-	if (t==5)
-	    return -1;
-	while(lastPredict<5&&registers.get(lastPredict)!=null){
-	    lastPredict++;
-	}
-	if (lastPredict==5){
-	    return -1;
-	}
-	return getIndex(predict[lastPredict],robiCards);
+		//teste ob alle register belegt sind
+		int t=0;
+		for (t=0;t<5;t++){
+		    if (registers.get(t)==null)
+			break;
+		}
+		if (t==5)
+		    return -1;
+		while(lastPredict<5&&registers.get(lastPredict)!=null){
+		    lastPredict++;
+		}
+		if (lastPredict==5){
+		    return -1;
+		}
+		return getIndex(predict[lastPredict],robiCards);
     }
     
 }
