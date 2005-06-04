@@ -63,6 +63,7 @@ import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Category;
 
+import de.botsnscouts.gui.HumanPlayer;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.Global;
@@ -270,7 +271,8 @@ public class GameFieldPanel extends JPanel {
         
         
         timeoutInput = new TJNumberField(0, Integer.MAX_VALUE, 10);
-        timeoutInput.setValue(GameOptions.DTO);
+        int defaultTO = GameOptions.DTO;
+        timeoutInput.setValue(defaultTO);
 
         final JTextField metaServer = new TJTextField(announceGame.getServerString());
         metaServer.setEnabled(announceGame.willBeAnnounced());
@@ -382,12 +384,24 @@ public class GameFieldPanel extends JPanel {
         };
         chooser.setFileFilter(filter);
     }
+    
+    private int readTimeOut(){
+        int timeout = timeoutInput.getValue();
+        if (timeout < HumanPlayer.bufferSecondsBeforeTimeout) {
+            timeout = HumanPlayer.bufferSecondsBeforeTimeout+1;            
+            timeoutInput.setValue(timeout);
+            JOptionPane.showMessageDialog(this.parent, Message.say("StartSpieler","mIllegalTimeout", timeout));                            						
+        }
+        return timeout;
+        
+        
+    }
 
     private void okClicked() {
         gameOptions.setAllowWisenheimer(allowWisenheimer.isSelected());
         gameOptions.setAllowScout(allowScout.isSelected());
-        gameOptions.setInvitor(nam.getText());
-        gameOptions.setHandInTimeout(timeoutInput.getValue()*1000);
+        gameOptions.setInvitor(nam.getText());        
+        gameOptions.setHandInTimeout(readTimeOut()*1000);
         try {
             parent.facade.updateGameOptions();
             /* Handig over a postServerStartTask is still a bit weird, but
