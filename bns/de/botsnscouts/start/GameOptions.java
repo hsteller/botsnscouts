@@ -268,6 +268,7 @@ public class GameOptions {
         this.registrationPort = registrationPort;
     }
 
+    /** @param handInTimeout Timeout in ms for handing in cards.*/
     void setHandInTimeout(int handInTimeout) {
         this.handInTimeout = handInTimeout;
     }
