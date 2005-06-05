@@ -48,8 +48,10 @@ import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.swing.JComponent;
@@ -156,6 +158,11 @@ public class BoardView extends JComponent{
 
     /** maps Location(x,y) to the Image that should be painted as floor*/
    private HashMap floorElementHash = new HashMap();
+   
+   /** Main contain names(!) of robots that should not be painted by request of the user
+    *   (to support new "hide robot(s)" menu option) 
+    */
+   private HashSet theseBotsShouldNotBePainted = new HashSet();
 
     private int widthInPixel;
     private int heightInPixel;
@@ -198,6 +205,11 @@ public class BoardView extends JComponent{
     /** position to highlight*/
     Location highlightPos = new Location(0, 0);
 
+    /** This is where we keep our internal robots for animations */
+    private HashMap internalBotHash = new java.util.HashMap();
+    
+    private static final Location PIT = new Location(0, 0);
+    
     ClickListener myClickListener;
 
 
@@ -383,9 +395,37 @@ public class BoardView extends JComponent{
     }
 
 
-    private HashMap internalBotHash = new java.util.HashMap();
-    private static final Location pit = new Location(0, 0);
-
+/** Show/hide a robot.
+ * 
+ * @param bot the robot to be shown or hidden
+ * @param isVisible true: bot will be painted; false: bot will not be painted
+ */
+    protected  void setRobotVisbility(Bot bot, boolean isVisible) {
+        if (isVisible) {
+            theseBotsShouldNotBePainted.remove(bot.getName());
+        }
+        else {           
+            theseBotsShouldNotBePainted.add(bot.getName());
+        }
+        repaint();
+    }
+    
+    /** Call this to ensure that no robot is hidden. */
+    protected void setAllRobotsVisible() {
+        theseBotsShouldNotBePainted.clear();
+        repaint();
+    }
+    
+    /** Call this to ensure that all robots are hidden. */
+    protected void setAllRobotsInvisible(){
+        Enumeration botNames = nameToColorHash.keys();
+        while (botNames.hasMoreElements()){
+            theseBotsShouldNotBePainted.add(botNames.nextElement());    
+        }        
+        repaint();
+    }
+    
+    
 
     private void replaceInternalRobots( Bot[] robos_neu){
         int count = robos_neu!=null?robos_neu.length:0;
@@ -416,7 +456,7 @@ public class BoardView extends JComponent{
                     String botName = serverBot.getName();
                     Bot ourBot = (Bot) internalBotHash.get(botName);                    
                     Location ourPos = ourBot.getPos();
-                    if (!(serverBot.getPos().equals(pit) || serverBot.getDamage() >= 10 || ourPos.equals(pit))) {
+                    if (!(serverBot.getPos().equals(PIT) || serverBot.getDamage() >= 10 || ourPos.equals(PIT))) {
                         // ^^^^^^^^^^^^^
                         // otherwise we would not show
                         // the destroyed robot ever again
@@ -1011,7 +1051,7 @@ public class BoardView extends JComponent{
                      waitSomeTime(100, this);            // TODO make delay configurable       
                 }
                 backgroundImage.setData(blank);
-                internal.setPos(pit); 
+                internal.setPos(PIT); 
                 mainGraphics.setComposite(oldComposite);
         }
     }
@@ -2004,6 +2044,9 @@ public class BoardView extends JComponent{
     }
   
     private void paintRobot (Graphics2D g2d, Bot robot, int robocount, int xpos64, int ypos64) {
+        if ( theseBotsShouldNotBePainted.contains(robot.getName())){
+            return;
+        }
         int acht = (int)(dScale*8);
         
         int botVis = robot.getBotVis();
@@ -2041,14 +2084,11 @@ public class BoardView extends JComponent{
         // have the same position on the board  
         for (int roboCounter=0;it.hasNext();roboCounter++) {
             Bot robot = (Bot) it.next();
-            if (!robot.equals(dontPaintMe)) {                   
+            if (!robot.equals(dontPaintMe) && !theseBotsShouldNotBePainted.contains(robot.getName())) {                   
                 if ((robot.getDamage() < 10) && (robot.getLivesLeft() > 0)) {
                     paintRobot(g2d, robot, roboCounter);
                 }
-            }
-            else {
-                CAT.debug("skipping painting of 'dontPaintMeBot': "+dontPaintMe);                
-            }                                     
+            }                                  
         }            
     }
     
@@ -2242,6 +2282,9 @@ public class BoardView extends JComponent{
         return sac.getThumb(size);
     }
 
+    
+    
+    
     private void waitSomeTime(int ms, Object lock){                              	
             synchronized(lock) {
                 try {
@@ -2261,6 +2304,7 @@ public class BoardView extends JComponent{
         }
         */            
     }
+    
     
     
 }

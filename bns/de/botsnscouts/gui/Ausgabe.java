@@ -270,7 +270,7 @@ public class Ausgabe extends BNSThread {
                 // send OK to server
                 kommClient.spielstart();
 // set the viewport to the first flag
-                ausgabeView.showFlag(1);
+                ausgabeView.jumpToFlag(1);
 
             } catch (KommException kE) {
                 CAT.error("Ausgabe: Beim Versuch, die Bot zu holen, erhalte ich: " +

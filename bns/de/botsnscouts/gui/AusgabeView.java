@@ -44,6 +44,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -94,7 +95,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private JMenuBar menus = new JMenuBar();
 
     private JComponent northPanel = new PaintPanel( OptionPane.getBackgroundPaint(this) );
-    private ZoomMenu zoomMenu;
+    private ZoomMenu zoomMenu = new ZoomMenu();
+    private ShowOrHideRobMenu showHideMenu =  new ShowOrHideRobMenu();
 
     // settings for Zoom-Menu
     protected static final int MIN_ZOOM = 40;
@@ -168,7 +170,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 				public void flagClicked(RobotInfoEvent rie) {
 					RobotInfo ri = (RobotInfo) rie.getSource();
-					showFlag(ri.getRobot().getNextFlag());
+					jumpToFlag(ri.getRobot().getNextFlag());
 				}
 
 				public void diskClicked(RobotInfoEvent rie) {
@@ -337,7 +339,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     }
 */
     public void showPos(int robix, int robiy, boolean highlight, boolean scrollStepWise) {
-        showPos(robix, robiy, highlight, scrollStepWise, 200); 
+        showPos(robix, robiy, highlight, scrollStepWise, 250); 
     }
     
     public void showPos(int robix, int robiy, boolean highlight, boolean scrollStepWise, int tolerance) {
@@ -370,7 +372,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
             }
             else {
 	            int offset = 30;
-	            int delay = 5; // TODO 
+	            int delay = 5; // TODO find good value/make configurable
 	            if (newUpperLeft.x < currentUpperLeft.x) {
 	               currentUpperLeft =  scrollWest(currentUpperLeft, newUpperLeft, offset, delay);
 	            }
@@ -385,7 +387,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 	                currentUpperLeft = scrollSouth(currentUpperLeft, newUpperLeft, offset, delay);
 	            }
             }
-            waitSomeTime(300, this); // TODO 
+            waitSomeTime(300, this); // TODO find good value/make configurable 
         }
         
         if( highlight ) {
@@ -562,9 +564,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     private void initMenus() {
       JMenu locateMenu = new JMenu(Message.say("AusgabeView", "locateMenu"));
       if (gameBoardCanvas!=null) {
-        locateMenu.add(new ShowFlagMenu(gameBoardCanvas.getFlags()));
+        locateMenu.add(new JumpToFlagMenu(gameBoardCanvas.getFlags()));
       }
-      locateMenu.add(new ShowRobMenu());
+      locateMenu.add(new JumpToRobMenu());
     //  locateMenu.add(new TrackMenu());
       
       
@@ -584,8 +586,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
       menus.add(new FileMenu());
 
-      zoomMenu = new ZoomMenu();
-      menus.add(zoomMenu);
+      JMenu viewMenu = new ViewMenu();      
+      menus.add(viewMenu);
       menus.add(locateMenu);
       menus.add(new TrackMenu());
       menus.add(optionsMenu);
@@ -662,6 +664,137 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
        Conf.saveProperties();
        gameBoardCanvas.setAnimationSettings(conf);
     }
+
+    
+    private class ViewMenu extends JMenu  {
+        
+       
+        
+        public ViewMenu() {
+            super(Message.say("AusgabeView", "viewMenu"));
+            zoomMenu = new ZoomMenu();
+            showHideMenu = new ShowOrHideRobMenu();
+            add(zoomMenu);
+            add(showHideMenu);
+           
+        }
+        
+    }
+    
+    
+    private class ShowOrHideRobMenu extends JMenu{        
+       private JMenuItem showAll;  
+       private JMenuItem showNone; 
+      // private JMenuItem showMe;    
+       private BotCheckBoxMenuItem [] botBoxes;
+      
+       
+        public ShowOrHideRobMenu(){
+            super(Message.say("AusgabeView", "showRobMenu"));
+            showAll     = new JMenuItem(Message.say("AusgabeView", "showRobMenuAll"));
+            showAll.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent ae) {
+                    showAllRobots();
+                }
+            });
+            
+            showNone  =  new JMenuItem(Message.say("AusgabeView", "showRobMenuNone"));
+            showNone.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent ae) {
+                    hideAllRobots();
+                }
+            });
+         
+            /* not a good idea, this would break the separation of View and Player;
+             *  this View has no "Me"; also, with "hide all" one can easily simulate the function
+            showMe = new JMenuItem(Message.say("AusgabeView", "showRobMenuMe"));
+            showMe.addActionListener(new ActionListener(){
+                public void actionPerformed (ActionEvent e){
+                    
+                }
+            });
+           */
+            
+            add(showAll);
+            //add(showMe);
+            add(showNone);
+            addSeparator();
+            
+            botBoxes = new BotCheckBoxMenuItem[robotStatus.size()];
+            Enumeration e = robotStatus.elements();                        
+            int i=0;
+            while (e.hasMoreElements()){
+                RobotStatus rs = (RobotStatus) e.nextElement();
+                Bot robot = rs.getRobot();
+                BotCheckBoxMenuItem box =createCheckBoxItemForBot(robot); 
+                botBoxes[i++] = box;
+                add(box);
+            }
+        }
+                      
+
+        private void hideRobot(Bot bot){
+            gameBoardCanvas.setRobotVisbility(bot, false);
+        }
+        
+      
+        private void showRobot (Bot  bot){
+            gameBoardCanvas.setRobotVisbility(bot, true);
+        }
+        
+        public void hideAllRobots(){
+            int count = botBoxes.length;
+            for (int i=0;i<count;i++){
+                botBoxes[i].setSelected(false);
+            }            	
+            gameBoardCanvas.setAllRobotsInvisible();
+        }
+        
+        public void showAllRobots(){
+            int count = botBoxes.length;
+            for (int i=0;i<count;i++){
+                botBoxes[i].setSelected(true);
+            }
+            gameBoardCanvas.setAllRobotsVisible();
+        }
+            
+        
+        
+        private BotCheckBoxMenuItem createCheckBoxItemForBot(Bot bot){
+            final BotCheckBoxMenuItem box = new BotCheckBoxMenuItem(bot);
+            box.addActionListener(new ActionListener() {
+	    		public void actionPerformed(ActionEvent e){
+	    		    	if (box.isSelected()) {
+	    		    	    CAT.debug("IS SELECTED");
+	    		    	    showRobot( box.getBot());
+	    		    	}
+	    		    	else {
+	    		    	    CAT.debug("IS NOT SELECTED");
+	    		    	    hideRobot(box.getBot());
+	    		    	}
+	    		} 
+	    	 });
+            return box;
+        }
+        
+    }
+    
+    
+    private class BotCheckBoxMenuItem extends JCheckBoxMenuItem{
+        private Bot myBot;
+        public BotCheckBoxMenuItem(Bot bot){            
+            super(bot.getName(), true);
+            myBot = bot;
+            int myVis = myBot.getBotVis();
+            this.setIcon(new ImageIcon(BotVis.getRobotImages()[myVis]));            
+            this.setForeground(BotVis.getBotColorByBotVis(myVis));                   
+        }
+        public Bot getBot(){
+            return myBot;
+        }
+    
+    }
+    
 
     private class ZoomMenu extends JMenu implements ActionListener {
         private ButtonModel[] zoomItemModels = new ButtonModel[MAX_ZOOM_SCALE - MIN_ZOOM_SCALE + 1];
@@ -788,8 +921,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       //  String tmp = Conf.getProperty("sound.active");
       //  if (tmp!=null)
       //     soundOn = tmp.equals("true");
-	JCheckBoxMenuItem soundBox = new JCheckBoxMenuItem(Message.say("AusgabeView","mSoundOn"), soundOn);
-	soundBox.addActionListener(new ActionListener() {
+        JCheckBoxMenuItem soundBox = new JCheckBoxMenuItem(Message.say("AusgabeView","mSoundOn"), soundOn);
+        soundBox.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e){
 		    soundOn = !soundOn;
 		    SoundMan.setSoundActive(soundOn);
@@ -801,64 +934,66 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
                     showActionMessage(status);
                 }
 	    });
-	add(soundBox);
+        add(soundBox);
      }
+     
   }
 
+  
+  
+  
   private class SpeedMenu extends JMenu implements ActionListener {
       	JRadioButtonMenuItem lSpeed;
       	JRadioButtonMenuItem mSpeed;
     	JRadioButtonMenuItem hSpeed;
         JMenuItem customizeButton = new JMenuItem(Message.say("AusgabeFrame", "mCustomize"));
-      SpeedMenu () {
-        super(Message.say("AusgabeFrame","mSpeed"));
-        ButtonGroup speedGroup = new ButtonGroup();
-		lSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mSlow"),false);
-		mSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mMiddle"),true);
-	        hSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mFast"),false);
-        lSpeed.addActionListener(this);
-        mSpeed.addActionListener(this);
-        hSpeed.addActionListener(this);
-        speedGroup.add(lSpeed);
-        speedGroup.add(mSpeed);
-        speedGroup.add(hSpeed);
-        this.add(lSpeed);
-        this.add(mSpeed);
-        this.add(hSpeed);
-        
-        customizeButton.addActionListener(this);
-        this.add(customizeButton);
-      }
+        SpeedMenu () {
+	        super(Message.say("AusgabeFrame","mSpeed"));
+	        ButtonGroup speedGroup = new ButtonGroup();
+			lSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mSlow"),false);
+			mSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mMiddle"),true);
+		    hSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mFast"),false);
+	        lSpeed.addActionListener(this);
+	        mSpeed.addActionListener(this);
+	        hSpeed.addActionListener(this);
+	        speedGroup.add(lSpeed);
+	        speedGroup.add(mSpeed);
+	        speedGroup.add(hSpeed);
+	        this.add(lSpeed);
+	        this.add(mSpeed);
+	        this.add(hSpeed);	      
+	        customizeButton.addActionListener(this);
+	        this.add(customizeButton);
+        }
 
-      public void actionPerformed(ActionEvent e) {
-	    String message = null;
-      	
-	 
-      	if (e.getSource()==customizeButton){    
-      	  if (speedSettingEditor.getState() == JFrame.ICONIFIED) {
-              speedSettingEditor.setState(JFrame.NORMAL);
-          }
-      	    speedSettingEditor.setVisible(true);
-      	    speedSettingEditor.toFront();
-      	    
-      	}
-      	else {
-	      	if (e.getSource() == lSpeed) {
-				currentSpeedConfig = speedSettingSlow;
-				message = "gAufLang";	
-		    }
-	      	else if (e.getSource() == hSpeed){
-	      	  currentSpeedConfig = speedSettingFast;
-	    		message = "gAufUn";    	
-	    	}
-		    else  {
-		        currentSpeedConfig = speedSettingMedium;
-				message = "gAufMitt";              
-	        }
-	      	
-		    setAnimationSpeed(currentSpeedConfig);
-	      	showActionMessage(Message.say("AusgabeFrame",message));
-      	}
+        public void actionPerformed(ActionEvent e) {
+		    String message = null;	      
+		 
+	      	if (e.getSource()==customizeButton){    
+	      	  if (speedSettingEditor.getState() == JFrame.ICONIFIED) {
+	              speedSettingEditor.setState(JFrame.NORMAL);
+	          }
+	      	    speedSettingEditor.setVisible(true);
+	      	    speedSettingEditor.toFront();
+	      	    
+	      	}
+	      	else {
+		      	if (e.getSource() == lSpeed) {
+					currentSpeedConfig = speedSettingSlow;
+					message = "gAufLang";	
+			    }
+		      	else if (e.getSource() == hSpeed){
+		      	  currentSpeedConfig = speedSettingFast;
+		    		message = "gAufUn";    	
+		    	}
+			    else  {
+			        currentSpeedConfig = speedSettingMedium;
+					message = "gAufMitt";              
+		        }
+		      	
+			    setAnimationSpeed(currentSpeedConfig);
+		      	showActionMessage(Message.say("AusgabeFrame",message));
+	      	}
 	}
 
 
@@ -867,10 +1002,10 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
       HelpMenu () {
         super (Message.say("AusgabeFrame","mHelpMenuName"));
         JMenuItem about = new JMenuItem(Message.say("AusgabeFrame","mAbout"));
-	about.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    new AboutFenster();
-		}
+        about.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			    new AboutFenster();
+			}
 	    });
         add(about);
       }
@@ -880,8 +1015,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
 
 
-   private class ShowFlagMenu extends JMenu {
-      ShowFlagMenu(Location [] flagPos) {
+   private class JumpToFlagMenu extends JMenu {
+      JumpToFlagMenu(Location [] flagPos) {
         super(Message.say("AusgabeView", "flag"));
         init (flagPos);
       }
@@ -890,7 +1025,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         if (flags!=null){
           for (int i=0;i<flags.length;i++){
             JMenuItem flag = new JMenuItem(" #"+(i+1));
-            flag.addActionListener(new ShowFlagListener(flags[i].x, flags[i].y));
+            flag.addActionListener(new JumpToFlagListener(flags[i].x, flags[i].y));
             this.add(flag);
             if (CAT.isDebugEnabled()){
               CAT.debug("ScrollFlag - added flag: #"+(i+1)+" x:"+flags[i].x+" y:"+flags[i].y);
@@ -903,9 +1038,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
    }
 
-    private class ShowFlagListener implements ActionListener {
+    private class JumpToFlagListener implements ActionListener {
         int xpos, ypos;
-        public ShowFlagListener(int x, int y){
+        public JumpToFlagListener(int x, int y){
           this.xpos = x;
           this.ypos = y;
         }
@@ -917,8 +1052,8 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         }
     }
 
-   private class ShowRobMenu extends JMenu {
-      ShowRobMenu() {
+   private class JumpToRobMenu extends JMenu {
+      JumpToRobMenu() {
         super(Message.say("AusgabeView", "rob"));
         init ();
       }
@@ -933,7 +1068,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
             CAT.debug( "Bot is: " + robot );
             CAT.debug( "imgs is: " + BotVis.getRobotImages() );
             JMenuItem rob = new JMenuItem(robot.getName(),new ImageIcon(BotVis.getRobotImages()[robot.getBotVis()]));
-            rob.addActionListener(new ShowRobListener(rs));
+            rob.addActionListener(new JumpToRobListener(rs));
             this.add(rob);
           }
         }
@@ -943,9 +1078,9 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
    }
 
-    private class ShowRobListener implements ActionListener {
+    private class JumpToRobListener implements ActionListener {
         RobotStatus rob;
-        public ShowRobListener(RobotStatus r){
+        public JumpToRobListener(RobotStatus r){
           rob = r;
         }
 
@@ -1096,9 +1231,11 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
        }
     }
     /**
-    * Zentriert die angegebenen Flagge
+    * Centers the view on the given flag and highlight it.
+    * 
+    * @param the number of the flag to center on 
     */
-   public void showFlag(int nr) {
+   public void jumpToFlag(int nr) {
        if (nr > 0 && nr <= flags.length) {
            showPos(flags[(nr - 1)].getX(), flags[(nr - 1)].getY(), true, false);
        }
