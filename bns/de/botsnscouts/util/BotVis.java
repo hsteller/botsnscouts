@@ -74,6 +74,10 @@ public class BotVis {
     public static Color getBotColorByName(String name) {
         return BoardView.ROBOCOLOR[getBotVisByName(name)];
     }
+    
+    public static Color getBotColorByBotVis(int botsbotvis){
+        return BoardView.ROBOCOLOR[botsbotvis];
+    }
 
     public static Image getBotIconByName(String name) {
         return getRobotImages()[getBotVisByName(name)];
