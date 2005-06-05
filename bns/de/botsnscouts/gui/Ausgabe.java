@@ -668,6 +668,10 @@ public class Ausgabe extends BNSThread {
                 // its ok to do the reset on each phase change,
                 // will not do anything if all are reset
                 ausgabeView.resetProgrammingLEDs();
+                // force all robots to be visible at start of each evaluation phase,
+                // as the robots will be painted during the animations - independend from
+                // their visibility setting by the user
+                ausgabeView.showAllRobots();
                 view.showGameStatusMessage(Message.say("AusgabeFrame", "phase") + " " + stArray[0].aktPhase);
                 lastPhase = stArray[0].aktPhase;
             }
