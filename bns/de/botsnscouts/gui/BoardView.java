@@ -985,12 +985,12 @@ public class BoardView extends JComponent{
     }
     
     
-    protected void animateBotCrushed(Bot b){
+    protected void animateBotCrushed(Bot b){     
         SoundMan.playSound(SoundMan.CRUSHED);
         shrinkRobot(b);
     }
     
-    protected void animatePitFall(Bot b){
+    protected void animatePitFall(Bot b){       
         SoundMan.playSound(SoundMan.PIT);
         Location pos = b.getPos();
         if (pos.x<1 || pos.y<1||pos.x>sf.getSizeX()|| pos.y>sf.getSizeY()){

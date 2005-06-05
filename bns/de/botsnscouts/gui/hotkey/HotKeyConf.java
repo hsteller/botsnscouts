@@ -15,7 +15,18 @@ import de.botsnscouts.util.Message;
  *  and also for displaying them in the HotKeyEditorPanel.
  */
 public class HotKeyConf {
-
+// To add a hotkey:
+// (1)  add a constant with its name (see below: declaration of HOTKEY_something)
+// (2)  add that constant to one of the group arrays below (probably GROUP_NORMAL)
+// (3)  add a description for your hotkey to the HotKeyDescription section in the 
+//       MessagesBundle files in botsnscouts.conf, using the value of your constant in (1) as key
+// (4)  create a HotKey object, the HotKeyAction that should be executed by the HotKey and 
+//       add both to the HotKeyMan (example see: AusgabeView, initHotKeysAndAddToHotkeyman)
+// (5)  add a default value to bns.config; REMEMBER TO ADD THE PROPER SUFFIX!!
+//       For a simple key (not a chatmessage) the entry should look like: 
+//       "value of your key from (1)"+"value of CODE_SUFFIX"=keycode
+//                                               
+    
   static Category CAT = Category.getInstance(HotKeyConf.class);
 
 
@@ -39,6 +50,8 @@ public class HotKeyConf {
   public static final String CODE_SUFFIX = "Code";
   public static final String TEXT_SUFFIX = "Text";
 
+  // The following constants are used to get the key description from the resource bundle files
+  
   public static final String HOTKEY_MSG1 = "keyMsg1";
   public static final String HOTKEY_MSG2 = "keyMsg2";
   public static final String HOTKEY_MSG3 = "keyMsg3";
@@ -54,6 +67,8 @@ public class HotKeyConf {
   public static final String HOTKEY_SHOW_FLAG4 = "keyShowFlag4";
   public static final String HOTKEY_SHOW_FLAG5 = "keyShowFlag5";
   public static final String HOTKEY_SHOW_FLAG6 = "keyShowFlag6";
+
+  public static final String HOTKEY_TOGGLE_BOT_VISIBILITY = "keyToggleBotVisibility";
 
   // for easier access in loops:
   public static final String [] HOTKEY_SHOW_FLAG_X = new String [] {
@@ -74,7 +89,7 @@ public class HotKeyConf {
                                                              HOTKEY_SHOW_CHATLINE
                                                               };
   public static final String [] GROUP_NORMAL  = new String [] {
-      HOTKEY_ZOOM_IN, HOTKEY_ZOOM_OUT, HOTKEY_SHOW_FLAG1, HOTKEY_SHOW_FLAG2,
+      HOTKEY_ZOOM_IN, HOTKEY_ZOOM_OUT, HOTKEY_TOGGLE_BOT_VISIBILITY, HOTKEY_SHOW_FLAG1, HOTKEY_SHOW_FLAG2,
       HOTKEY_SHOW_FLAG3,HOTKEY_SHOW_FLAG4,HOTKEY_SHOW_FLAG5,HOTKEY_SHOW_FLAG6,
     };
 

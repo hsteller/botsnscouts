@@ -61,6 +61,8 @@ import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Category;
 
+import sun.nio.cs.ext.SJIS;
+
 import de.botsnscouts.gui.hotkey.HotKey;
 import de.botsnscouts.gui.hotkey.HotKeyAction;
 import de.botsnscouts.gui.hotkey.HotKeyConf;
@@ -96,7 +98,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
     private JComponent northPanel = new PaintPanel( OptionPane.getBackgroundPaint(this) );
     private ZoomMenu zoomMenu = new ZoomMenu();
-    private ShowOrHideRobMenu showHideMenu =  new ShowOrHideRobMenu();
+    private ShowOrHideRobMenu showHideMenu =  new ShowOrHideRobMenu(); // must not be null
 
     // settings for Zoom-Menu
     protected static final int MIN_ZOOM = 40;
@@ -121,7 +123,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     /**  If currentTrackMode is set to TRACKMODE_BOT, we will try to scroll to this bot's position 
      *  everytime something happens to him.*/
     private Bot botToTrack;
-    
+ 
     // sound-menu
     private boolean soundOn = false;
 
@@ -666,6 +668,12 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
     }
 
     
+    protected void showAllRobots() {
+        if (showHideMenu != null) {
+            showHideMenu.showAllRobots();
+        }
+    }
+    
     private class ViewMenu extends JMenu  {
         
        
@@ -687,7 +695,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
        private JMenuItem showNone; 
       // private JMenuItem showMe;    
        private BotCheckBoxMenuItem [] botBoxes;
-      
+       private boolean botsVisible = true;
        
         public ShowOrHideRobMenu(){
             super(Message.say("AusgabeView", "showRobMenu"));
@@ -747,6 +755,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
             for (int i=0;i<count;i++){
                 botBoxes[i].setSelected(false);
             }            	
+            botsVisible = false;
             gameBoardCanvas.setAllRobotsInvisible();
         }
         
@@ -755,6 +764,7 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
             for (int i=0;i<count;i++){
                 botBoxes[i].setSelected(true);
             }
+            botsVisible = true;
             gameBoardCanvas.setAllRobotsVisible();
         }
             
@@ -1110,6 +1120,21 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
 
    
     protected void initHotKeysAndAddToHotkeyman(HotKeyMan keyMan) {
+        
+        HotKeyAction toggleBotVisibility = new HotKeyAction() {           
+            public void actionPerformed(ActionEvent e) {                      
+                if (showHideMenu.botsVisible) {                                     
+                    showHideMenu.hideAllRobots();
+                }
+                else {
+                    showHideMenu.showAllRobots();
+                }
+               
+                    
+                }
+            };
+        keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_TOGGLE_BOT_VISIBILITY, 
+                        								toggleBotVisibility));
         
         HotKeyAction zoomIn = new HotKeyAction() {
             public void actionPerformed(ActionEvent ae) {
