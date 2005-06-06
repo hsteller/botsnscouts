@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 
@@ -335,4 +337,19 @@ public class H {
 	    return false;
     }
 
+    public static void main (String [] args){
+       File f = new File(".");
+       System.out.println(f.getAbsolutePath());
+       Properties  p = System.getProperties();
+       Enumeration e = p.keys();
+       while (e.hasMoreElements()){
+           Object o = e.nextElement();
+           String value = p.getProperty((String)o);
+           pln(o+" = "+value);
+       }
+       
+      
+        
+    }
+    
 }

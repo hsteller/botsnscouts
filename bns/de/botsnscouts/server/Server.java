@@ -37,6 +37,7 @@ import de.botsnscouts.comm.KommFutschException;
 import de.botsnscouts.comm.MessageID;
 import de.botsnscouts.comm.OtherConstants;
 import de.botsnscouts.start.GameOptions;
+import de.botsnscouts.start.RegistrationStartListener;
 import de.botsnscouts.start.ServerObserver;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Bot;
@@ -117,7 +118,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
             CAT.error("Fehler in den Flaggen.", e);
             System.exit(5);
         }
-
+        registrationManager = new RegistrationManager(this);
         CAT.debug("New server with these options: " + options);
     }
     
@@ -639,7 +640,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
     private synchronized boolean anmeldung() {
  //       CAT.debug("588 lock on Server");
         try {
-            registrationManager = new RegistrationManager(this);
+          // instantiation moved  to constructor: registrationManager = new RegistrationManager(this);
             registrationManager.beginRegistration();
             CAT.debug("registrationManager gestartet");
             if (isInterrupted()) {
@@ -1315,6 +1316,10 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
             
            	
         	this.interrupt();
+    }
+    
+    public void addRegistrationStartListener(RegistrationStartListener l){
+        registrationManager.addRegStartListener(l);
     }
     
     public void interrupt() {

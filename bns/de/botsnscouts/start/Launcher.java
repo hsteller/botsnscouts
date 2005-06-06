@@ -37,7 +37,7 @@ import de.botsnscouts.util.Registry;
 
 // launches human player, output ...
 
-public class Launcher {
+public class Launcher implements RegistrationStartListener{
 
     static final Category CAT = Category.getInstance(Launcher.class);
 
@@ -45,6 +45,13 @@ public class Launcher {
     
     private Server server;
 
+    /** Only created so this class and the static methods can implement and 
+     *  use the RegistrationListener interface.
+     *  ParticipateInAGame will use this method to synchronize on so that the  player
+     *  won't be launched until the server has signaled that the registration has started. 
+     */
+    private static Launcher meTheLauncher = new Launcher();
+    
     // launches output
     public static BNSThread watchAGame(String ip, int port, boolean noSplash) {
        
@@ -66,6 +73,7 @@ public class Launcher {
 
     // launches human player
     public static BNSThread participateInAGame(String ip, int port, String name, int farbe, boolean noSplash) {
+        meTheLauncher.ensureRegistrationHasStarted();
         HumanPlayer ret;
         try {
             if (CAT.isDebugEnabled()) CAT.debug("Trying to start human player...");
@@ -89,7 +97,7 @@ public class Launcher {
     }
 
     public static BNSThread startAutoBot(String ip, int port, int iq, boolean beltAware,
-                                      String botName) {
+                                      String botName) {      
         CAT.debug("creating AutoBot-BNSThread for "+botName);
         if (ip == null) { 
             ip=GameOptions.DHOST; 
@@ -104,6 +112,7 @@ public class Launcher {
 
     public Server startGame(GameOptions options, ServerObserver listener) throws OneFlagException, NonContiguousMapException {
        server = new Server(options, listener);
+       server.addRegistrationStartListener(meTheLauncher);
        server.start();
        String ip = options.getHost();
        if (ip == null){
@@ -126,6 +135,31 @@ public class Launcher {
         System.gc();
     }
     
+    private volatile boolean regHasStarted = false;
+   
+    public  void registrationStarted(){
+        synchronized (meTheLauncher) {
+            regHasStarted = true;
+            meTheLauncher.notifyAll();
+            
+        }
+    }
+    
+    private void ensureRegistrationHasStarted(){
+        synchronized (meTheLauncher) {
+	        while (!regHasStarted) {
+	            try {
+	                meTheLauncher.wait();
+	            }
+	            catch (InterruptedException ie){
+	                CAT.error(ie);
+	                meTheLauncher.notifyAll();
+	            }	            	            
+	        }
+	       meTheLauncher.notifyAll();
+        }
+        
+    }
     
 
     

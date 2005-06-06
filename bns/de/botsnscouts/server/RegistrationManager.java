@@ -32,8 +32,10 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.apache.log4j.Category;
@@ -42,6 +44,7 @@ import org.apache.regexp.RE;
 import de.botsnscouts.comm.KommException;
 import de.botsnscouts.comm.KommServerAusgabe;
 import de.botsnscouts.comm.KommServerRoboter;
+import de.botsnscouts.start.RegistrationStartListener;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Encoder;
@@ -92,6 +95,8 @@ class RegistrationManager implements Runnable, Shutdownable {
         workingThread.interrupt();            
     }
     
+    
+    
     public void shutdown(boolean notifyListeners) {
         endRegistration();
         if (seso != null){
@@ -123,6 +128,7 @@ class RegistrationManager implements Runnable, Shutdownable {
            CAT.debug("creating server socket");
             seso = new ServerSocket(server.getRegistrationPort());
             seso.setSoTimeout(0);
+            notifyStartListeners();
             
             while (!Thread.interrupted()) {
                 clientSocket = seso.accept();
@@ -327,6 +333,24 @@ class RegistrationManager implements Runnable, Shutdownable {
             throw re;
         }
     }
+    
+    
+    private Collection startListeners = new LinkedList(); 
+    public  void addRegStartListener(RegistrationStartListener l) {
+        synchronized (startListeners){
+            startListeners.add(l);
+        }
+    }
+    
+    private void notifyStartListeners(){
+        synchronized (startListeners){
+            Iterator it = startListeners.iterator();
+            while (it.hasNext()){
+                ((RegistrationStartListener) it.next()).registrationStarted();
+            }
+        }
+    }
+    
     
     static class RegistrationException extends Exception {
         Exception nested = null;
