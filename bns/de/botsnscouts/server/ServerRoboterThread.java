@@ -158,6 +158,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 abgemeldet = true;
                                 ende = true;
                                 robMaint.deleteRob(this, MessageID.SOMEONE_QUIT);
+                                notifyServer();
                                 break;
 
                             case ServerAntwort.AENDERUNGFERTIG:
