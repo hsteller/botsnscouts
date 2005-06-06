@@ -327,7 +327,7 @@ public class View extends JFrame {
 	         Dimension ssize = BotsNScouts.getScreenSize();
 	          int w = ssize.width-8;
 	          int h = ssize.height-8;
-	          int leftPanelWidth=Math.max(w-250, 400);
+	          int leftPanelWidth=Math.max(w-280, 400);
 	          int leftPanelHeight=Math.max(h-250, 350);
 	          if (CAT.isDebugEnabled()){
 	            CAT.debug("Setting minimum and preferred width of left Splitpane to: "+leftPanelWidth);
@@ -337,8 +337,8 @@ public class View extends JFrame {
 	          JPanel p = humanView.getWiseAndScoutPanel();
 	          av.addWiseAndScout(p);
 	          av.setPreferredSize(new Dimension(leftPanelWidth,leftPanelHeight));
-	          av.setMinimumSize(new Dimension(leftPanelWidth,leftPanelHeight));
-	          humanView.setPreferredSize(new Dimension(250, 400));
+	         // av.setMinimumSize(new Dimension(leftPanelWidth,leftPanelHeight));
+	          humanView.setPreferredSize(new Dimension(280, 400));
 	          sp.setLeftComponent(av);
 	         // sp.setDividerLocation(0.75);
         }
