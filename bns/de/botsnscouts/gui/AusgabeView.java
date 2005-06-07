@@ -74,6 +74,7 @@ import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Message;
+import de.botsnscouts.util.Registry;
 import de.botsnscouts.util.SoundMan;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.PaintPanel;
@@ -534,7 +535,17 @@ public class AusgabeView extends JPanel implements AusgabeViewInterface {
         CAT.debug("AusgabeView starts procedure to quit the client..");
 	JLabel[] msg = new JLabel[2];
 	msg[0] = new TJLabel(Message.say("AusgabeView", "reallyQuit1"));
-	msg[1] = new TJLabel(Message.say("AusgabeView","reallyQuit2"));
+	Registry globalReg = Registry.getSingletonInstance();
+	if (globalReg.isMyServerLocal(this.ausgabe) && // have we started the server or are we a remote view? 
+	    globalReg.getNumOfLocalViewsForMyGame(this.ausgabe)<2){
+	    // ..and are we the only local view left?
+	    // => add message that the server will go down if this view quits
+	    msg[1] = new TJLabel(Message.say("AusgabeView","reallyQuit2"));
+	}
+	else {
+	    msg[1]=new TJLabel("");
+	}
+	
 	if (JOptionPane.showConfirmDialog(this, msg,
 	                Message.say("AusgabeView","reallyQuitTitle"),
 		JOptionPane.OK_CANCEL_OPTION,

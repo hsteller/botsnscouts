@@ -114,6 +114,21 @@ public class Registry implements ShutdownListener, GameOverListener {
         }
         
         
+        public boolean isMyServerLocal(Shutdownable client){
+           Game game = findGame(client);
+           return game != null && game.getServer()!=null;              
+        }
+        
+        public int getNumOfLocalViewsForMyGame(Shutdownable client){
+            Game game = findGame(client);
+            if (game != null){
+                return game.getNumOfViews();
+            }
+            else {
+                return 0;
+            }
+        }
+        
         public  void addClient (HumanPlayer player, String serverIp, int port){
             addClient(serverIp, port, player, ClientInfo.CLIENT_TYPE_HUMANPLAYER);
         }
@@ -547,18 +562,19 @@ public class Registry implements ShutdownListener, GameOverListener {
         protected void setServerToNULL(){
             server = null;
         }
-        
+      
         public boolean hasClients(){
             return clients != null &&  !clients.isEmpty();//  (server == null || server.isShutDown());
         }
         
-        public boolean hasHumanView() {
-            boolean foundHuman = false;
+        public int getNumOfViews() {
+           
+            int foundCounter = 0;
             synchronized(clients){
                 if (clients != null) {
                     CAT.debug("hasHumanView: iterating clients");
                     Iterator it = clients.iterator();
-                    while (!foundHuman && it.hasNext()){
+                    while (it.hasNext()){
                         ClientInfo client = (ClientInfo) it.next();
                         CAT.debug("\tchecking client:"+client);
                         int type = client.getClientType();
@@ -567,12 +583,19 @@ public class Registry implements ShutdownListener, GameOverListener {
                           // a local human player without a local view doesn't make sense  
                            // as long as we don't  implement the option to start and register a telnet-client
                            // via the launcher app ;-)
-                            foundHuman = true;
+                            
+                            foundCounter++;
                         }
                     }
                 }
             }
-            return foundHuman;
+            return foundCounter;
+        }
+        
+      
+        
+        public boolean hasHumanView() {
+            return getNumOfViews()>0;
         }
         
         

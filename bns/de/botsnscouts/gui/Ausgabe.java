@@ -712,6 +712,7 @@ public class Ausgabe extends BNSThread {
         specialMessages.add(MessageID.BOT_REMOVED);
         specialMessages.add(MessageID.WISE_USED);
         specialMessages.add(MessageID.INITIAL_FACINGS);
+        specialMessages.add(MessageID.SOMEONE_QUIT);
         
         // some deprecated messages that should not be animated but also not
         // start with "mAusw" and not also be displayed..
@@ -1015,15 +1016,26 @@ public class Ausgabe extends BNSThread {
                     }
                 });
 
-        AbstractMessageAction tmp = new AbstractMessageAction() {
-            public void invoke(ClientAntwort msgData) {
-                comMsgHandleRobotRemoved(msgData);
-            }
-        };
+       
         //sequencer.addActionMapping(MessageID., tmp);
 
-        sequencer.addActionMapping(MessageID.BOT_REMOVED, tmp);
-
+        sequencer.addActionMapping(MessageID.BOT_REMOVED, 
+                        new AbstractMessageAction() {
+				            public void invoke(ClientAntwort msgData) {
+				                comMsgHandleRobotRemoved(msgData);
+				            }
+				        });
+        
+        sequencer.addActionMapping(MessageID.SOMEONE_QUIT,
+                        new AbstractMessageAction(){
+            				public void invoke(ClientAntwort msgData){
+            				    comMsgHandleRobotRemoved(msgData);
+            				    sequencer.invoke(DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY, msgData);
+            				    //showActionMessage(msgData.str);
+            				}
+        			});
+        
+        
         sequencer.addActionMapping(MessageID.CHAT,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {
