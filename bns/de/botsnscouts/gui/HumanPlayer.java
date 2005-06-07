@@ -258,7 +258,7 @@ public class HumanPlayer extends BNSThread {
                         try {
                             String[] gewinnerListe = comm.getSpielstand();
                             if (gewinnerListe != null) {
-                                showMessage(Message.say("SpielerMensch", "spielende"));
+                                //showMessage(Message.say("SpielerMensch", "spielende"));
                                 for (int i = 0; i < gewinnerListe.length; i++) {
                                     if (gewinnerListe[i].equals(name)) {
                                         dead = false;
@@ -286,17 +286,18 @@ public class HumanPlayer extends BNSThread {
 
         CAT.debug("Human Player reached end of run-method");
         //view.removeChatPane();
-/*
+
         try {
-            CAT.debug("Waiting 10 seconds for Ausgabe (join())..");
-            ausgabe.join(10000);
-            CAT.debug("Ausgabe is now ready (well, or hangs..)");
+            CAT.debug("Waitingfor Ausgabe (join())..");
+            ausgabe.join();
+           
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }*/
+        }
        
-       shutdown(true);
-   
+       // we don't want to kill our communication in every case;
+        // for example: we would lose shutdown(true);
+        shutdown(true);
         if (killJVMonceFinished){
             System.exit(0);
         }
