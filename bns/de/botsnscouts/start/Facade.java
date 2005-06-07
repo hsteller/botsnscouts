@@ -246,14 +246,15 @@ public class Facade {
         return Launcher.participateInAGame(ip, port, name, color, false);
     }
 
-    public static BNSThread participateInAGame(String ip, String name, int color) {
+   /* public static BNSThread participateInAGame(String ip, String name, int color) {
         return Launcher.participateInAGame(ip, GameOptions.DPORT, name, color, false);
     }
-
+*/
+    // called by Start.main(); should wait for local server+registration
     public static BNSThread participateInAGame(String name, int color) {
         return Launcher.participateInAGame(GameOptions.DHOST, GameOptions.DPORT, name, color, false);
     }
-
+   // noSplash = should wait for server
     public static BNSThread participateInAGameNoSplash(String name, int color) {
         return Launcher.participateInAGame(GameOptions.DHOST, GameOptions.DPORT, name, color, true);
     }
