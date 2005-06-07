@@ -54,7 +54,12 @@ public class Launcher implements RegistrationStartListener{
     
     // launches output
     public static BNSThread watchAGame(String ip, int port, boolean noSplash) {
-       
+        if (noSplash) { 
+            // this also means that we were started due to  the checked  
+              // "participate checkbox" on server startup - and not via "join game" in the main menu;
+            // in the first case there should be a local server, in the second case there shouldn't => no waiting
+            meTheLauncher.ensureRegistrationHasStarted();
+        }
         try {
             Ausgabe view = new Ausgabe(ip, port, noSplash){
                 public void doShutdown() {
@@ -73,7 +78,12 @@ public class Launcher implements RegistrationStartListener{
 
     // launches human player
     public static BNSThread participateInAGame(String ip, int port, String name, int farbe, boolean noSplash) {
-        meTheLauncher.ensureRegistrationHasStarted();
+        if (noSplash) { 
+            // this also means that we were started due to  the checked  
+              // "participate checkbox" on server startup - and not via "join game" in the main menu;
+            // in the first case there should be a local server, in the second case there shouldn't => no waiting
+            meTheLauncher.ensureRegistrationHasStarted();
+        }
         HumanPlayer ret;
         try {
             if (CAT.isDebugEnabled()) CAT.debug("Trying to start human player...");
@@ -112,6 +122,9 @@ public class Launcher implements RegistrationStartListener{
 
     public Server startGame(GameOptions options, ServerObserver listener) throws OneFlagException, NonContiguousMapException {
        server = new Server(options, listener);
+       synchronized (meTheLauncher) {
+           regHasStarted  = false;
+       }
        server.addRegistrationStartListener(meTheLauncher);
        server.start();
        String ip = options.getHost();
@@ -125,11 +138,16 @@ public class Launcher implements RegistrationStartListener{
 
     public void gameStarts(String ip, int port) {
         server.startGame();
+        synchronized (meTheLauncher) {
+            regHasStarted  = false;
+        }
     }
 
     public void stopServer() {
         // Not nice, but this is the way it was done before...
-      
+        synchronized (meTheLauncher) {
+            regHasStarted  = false;
+        }
         server.shutdown();              
         server = null;
         System.gc();
