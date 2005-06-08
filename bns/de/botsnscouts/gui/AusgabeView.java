@@ -80,7 +80,7 @@ import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.PaintPanel;
 import de.botsnscouts.widgets.TJLabel;
 
-public class AusgabeView extends JPanel implements AusgabeViewInterface {
+public class AusgabeView extends JPanel  {
     static Category CAT = Category.getInstance(AusgabeView.class);
 
     private final static long SHOW_MESSAGE_DELAY=300;
