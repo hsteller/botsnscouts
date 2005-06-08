@@ -1,22 +1,21 @@
 Things to do after fixing the more-or-less clean shutdown and
 restart issue
 
-[ **** seems DONE.. ******
-  - !!!!!!BUG: while playing in background:
+DONE  - !!!!!!BUG: while playing in background:
   there is something wrong with resetting the timer for emergency
   card submit if it gets to close (I sent the cards mysek just in time
   and the new cards in the next(!) round were immediately submitted by
   the emergency submit..)
-]
 
 DONE - pusher pushing robots not animated (anymore): missing message?
 DONE - show big "goal reached" message long enough to be seen 
 DONE - Wisenheimer submits emergency cards
 DONE - hide/show robot feature 
 
-- autosubmit of client answer for all questions, not only for register
-  programming: 
-  direction after destruction, stay power down, repair register
+DONE - autosubmit of client answer for all questions, not only for register
+       programming: 
+       direction after destruction, stay power down, repair register
+
 
 - nicer winner list, maybe robot images (different sizes?) and colored names 
 
@@ -27,23 +26,25 @@ DONE - hide/show robot feature
   preferred bot color, last used board layout (maybe autosave ".spf"
   on game startup as "lastUsed_autosavespf" and loading it as default?)
 
-- reduce initial height of card panel as it looks bad/is too big for
-  1024x768 with the kde panel stealing some of the 768 pixels at the bottom
+TEST - reduce initial height of card panel as it looks bad/is too big for
+       1024x768 with the kde panel stealing some of the 768 pixels at the bottom
+       **** should be fixed by increasing the width of the card panel
+            and the scrollbar for 800x600 support ****
 
 - include the manual in the "help" menu and maybe some tipps&tricks
-  and FAQs (right click the for scrolling);
-  explain strength of laser colors somewhere
+  and FAQs (right click for scrolling etc);
+  explain strength of laser <=> colors somewhere or display them better
   
 
-(- bigger(?): use UserInfo to display what happens; 
+- bigger(?): use UserInfo to display what happens; 
    display the current robot and the card that will be executed;
    maybe little robots with five registers that get uncovererd besides them
-   and highliting the card to be evaluated )
+   and highliting the card to be evaluated 
 
-- increase the initial heapsize in the scripts?
-  -> test memory usage with enabled animations, 3x3 boards and 8 players 
-     (AutoBots!)
+TEST (- increase the initial heapsize in the scripts?
+         -> test memory usage with enabled animations, 3x3 boards and 8 players 
+         (AutoBots!))
 
-[- (?? advanced option to switch animation methods ??)
-   NOPE **with fixed messaging CPU-heavy method is usable ** ]
+NOPE [- (?? advanced option to switch animation methods ??)
+       ****with fixed messaging CPU-heavy method is usable **** ]
   
