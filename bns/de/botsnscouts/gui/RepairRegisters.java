@@ -122,22 +122,27 @@ public class RepairRegisters extends TJPanel implements ActionListener{
 	this.registers=tmp;
     }
 
+    /** 
+     * 
+     * @return A list of Integers, containing the number(s) of the register(s) to repair;
+     *              the first register has number 1 ( not 0)
+     */
     public ArrayList getSelection() {
-	int cntr=0;
-	boolean[] torepair=new boolean[5];
-	for(int i=0;i<registers.size();i++){
-	    torepair[i]=locked[i]&&(!(((RegisterView)registers.get(i)).locked()));
-	    if(torepair[i]){
-		cntr++;
-	    }
-	}
-	ArrayList lst=new ArrayList(cntr);
-	for(int i=0;i<registers.size();i++){
-	    if(torepair[i]){
-		lst.add(new Integer(i+1));
-	    }
-	}
-	return lst;
+		int cntr=0;
+		boolean[] torepair=new boolean[5];
+		for(int i=0;i<registers.size();i++){
+		    torepair[i]=locked[i]&&(!(((RegisterView)registers.get(i)).locked()));
+		    if(torepair[i]){
+			cntr++;
+		    }
+		}
+		ArrayList lst=new ArrayList(cntr);
+		for(int i=0;i<registers.size();i++){
+		    if(torepair[i]){
+			lst.add(new Integer(i+1));
+		    }
+		}
+		return lst;
     }
 
       public void actionPerformed (ActionEvent e) {
