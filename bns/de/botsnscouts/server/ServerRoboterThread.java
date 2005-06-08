@@ -73,6 +73,36 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
         okListener.notifyDone(this);
     }
 
+    private boolean isMoveValid(int[] regs) {
+        if (regs == null) {
+            CAT.error("move for robot "+rob.getName()+" was null");
+            return false;
+        }       
+        else {
+            int size = regs.length;
+            boolean [] cardsReceivedSoFar = new boolean [Bot.NUM_CARDS];
+            for (int i=0;i<size;i++){
+                int cardNum = regs[i];
+                if(cardNum<1 || cardNum>rob.cardsToGive()){
+                    CAT.error(rob.getName()+" returned invalid card index:"+cardNum);
+                    CAT.error("\tshould have gotten  "+rob.cardsToGive()+" cards");
+                    return false;
+                }
+                else {
+                    // case above should have taken care of size>=cardsReceivedSoFar.length
+                    if (cardsReceivedSoFar[cardNum-1]) {
+                        CAT.error(rob.getName()+" used a card more than once");
+                        return false;
+                    }
+                    else {
+                        cardsReceivedSoFar[cardNum-1] = true;
+                    }
+                }               
+            }
+            return true;
+        }
+    }
+    
     public void run() {
         try {
             ende = false;
@@ -86,7 +116,15 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                         switch (ans.typ) {
                             case ServerAntwort.PROGRAMMIERUNG:
                                 if (m != Server.PROGRAMMIERUNG) {
-                                    d("RV: habe Programmierung im Modus " + m + " erhalten; und tschuess");
+                                    d("RULE VIOLATION by "+rob.getName());
+                                    d("\treceived programming in mode " + m + "; byebye!");
+                                    robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
+                                    ende = true;
+                                    return;
+                                }
+                                else if (!isMoveValid(ans.register)){
+                                    d("RULE VIOLATION by "+rob.getName());
+                                    d("\treceived an illegal programming; byebye!");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
                                     return;
@@ -94,9 +132,9 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
 
                                 rob.setNextTurnPoweredDown(ans.ok); // PowerDown?
 
-                                d("Setze Programmierung um.");
+                                d("Apply register programming...");
                                 rob.program(ans.register);
-                                d("Programmierung umgesetzt. Bot:");
+                                d("Programming applied; Bot values:");
                                 rob.debug();
 
                                 notifyServer();
@@ -106,7 +144,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                             case ServerAntwort.AUSRICHTUNG:
                                 if ((m != Server.INITAUSR) && (m != Server.ZERSTOERT_SYNC)
                                                 && (m != Server.ZERSTOERT_ASYNC)) {
-                                    d("RV: habe Ausrichtung im Modus" + m + "erhalten; und tschuess");
+                                    d("RV: received direction choice in mode " + m + "; byebye!");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
                                     break;
@@ -127,7 +165,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
 
                             case ServerAntwort.REAKTIVIERUNG:
                                 if (m != Server.POWERUP) {
-                                    d("RV: habe Reaktivierung im Modus " + m + " erhalten; und tschuess");
+                                    d("RV: received reactivation in mode " + m + "; byebye!");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
                                     break;
@@ -140,7 +178,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
 
                             case ServerAntwort.REPARATUR:
                                 if (m != Server.ENTSPERREN) {
-                                    d("RV: habe Reperatur im Modus " + m + " erhalten; und tschuess");
+                                    d("RV: received register repait in mode " + m + "; byebye!");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
                                     break;
@@ -154,7 +192,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 break;
 
                             case ServerAntwort.ABMELDUNG:
-                                d("Abmeldung. Modus: " + m);
+                                d("Got a deregistration. Mode: " + m);
                                 abgemeldet = true;
                                 ende = true;
                                 robMaint.deleteRob(this, MessageID.SOMEONE_QUIT);
@@ -163,7 +201,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
 
                             case ServerAntwort.AENDERUNGFERTIG:
                                 if ((m != Server.SPIELSTART) && (m != Server.SPIELENDE)) {
-                                    d("RV: habe OK im Modus " + m + " erhalten; und tschuess");
+                                    d("RV:received  OK in mode " + m + " ;byebye!");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
                                     return;
