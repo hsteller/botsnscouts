@@ -387,8 +387,8 @@ public class GameFieldPanel extends JPanel {
     
     private int readTimeOut(){
         int timeout = timeoutInput.getValue();
-        if (timeout < HumanPlayer.bufferSecondsBeforeTimeout) {
-            timeout = HumanPlayer.bufferSecondsBeforeTimeout+1;            
+        if (timeout < HumanPlayer.BUFFER_SECONDS_BEFORE_TIMEOUT) {
+            timeout = HumanPlayer.BUFFER_SECONDS_BEFORE_TIMEOUT+1;            
             timeoutInput.setValue(timeout);
             JOptionPane.showMessageDialog(this.parent, Message.say("StartSpieler","mIllegalTimeout", timeout));                            						
         }
