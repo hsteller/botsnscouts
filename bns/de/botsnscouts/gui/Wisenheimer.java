@@ -32,6 +32,7 @@ import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.server.Deck;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Card;
+import de.botsnscouts.util.Global;
 
 /** Wisenheimer's logic
  * 
@@ -61,37 +62,13 @@ public class Wisenheimer{
 
     protected int getPrediction(ArrayList registers, ArrayList cards, Bot robi){
         CAT.debug("Wisenheimer.getPrediction() called.");
-		//teste ob alle register belegt sind
-		int t=0;
-		for (t=0;t<5;t++){
-		    if (registers.get(t)==null)
-			break;
-		}
-		if (t==5)
+		
+		Card[] vonPermut = getPredictionCards(registers, cards, robi);
+		if (vonPermut.length == 0){
 		    return -1;
-
-		simRob.copyRob(robi);
-	
-		Card[] simCards=new HumanCard[9];
-		// put all free cards at the begin of the simCard array 
-		int j=0;
-		for (int i = 0; i < cards.size(); i++) {
-		    if((cards.get(i) != null)&&((HumanCard)cards.get(i)).getState() == HumanCard.FREE) {
-				simCards[j] = new HumanCard((HumanCard)cards.get(i));
-				j++;
-		    }
 		}
-		// gelegte Karten in das enstprechende gesperrte Register des Robis packen
-		for (int l = 0; l<registers.size();l++) {
-		    if ((registers.get(l) != null)&&(!((HumanCard)registers.get(l)).free())) {
-		        simRob.lockRegister(l,  Deck.get(((HumanCard)registers.get(l)).getprio()));
-		    }
-		}
-		// gesperrte Register in simRob.zug schreiben
-		for (int i = 0; i < simRob.getLockedRegisters().length; i++){
-		    simRob.setMove(i, simRob.getLockedRegister(i));
-		}
-		Card[] vonPermut = wirbel.findBestMove(simCards, simRob);
+		CAT.debug("getPrediction returned:\n"+Global.arrayToString(vonPermut));
+		CAT.debug("SIMROB3\n"+simRob);
 		for (int i=0;i<5;i++){
 		    predict[i]=vonPermut[i].getprio();
 		}
@@ -120,6 +97,54 @@ public class Wisenheimer{
 		return getIndex(nextprio,cards);
     }
 
+    
+    protected Card [] getPredictionCards(ArrayList registers, ArrayList cards, Bot robi){
+        	//      teste ob alle register belegt sind
+		int t=0;
+		for (t=0;t<5;t++){
+		    if (registers.get(t)==null)
+			break;
+		}
+		if (t==5)
+		    return new Card[0];
+
+		simRob.copyRob(robi);
+	
+		Card[] simCards=new HumanCard[9];
+		// put all free cards at the begin of the simCard array 
+		int j=0;
+		for (int i = 0; i < cards.size(); i++) {
+		    if((cards.get(i) != null)&&((HumanCard)cards.get(i)).getState() == HumanCard.FREE) {
+				simCards[j] = new HumanCard((HumanCard)cards.get(i));
+				j++;
+		    }
+		}
+		CAT.debug("simCards:\n"+Global.arrayToString(simCards));
+		// gelegte Karten in das enstprechende gesperrte Register des Robis packen
+		for (int l = 0; l<registers.size();l++) {
+		    if ((registers.get(l) != null)&&(!((HumanCard)registers.get(l)).free())) {
+		        simRob.lockRegister(l,  Deck.get(((HumanCard)registers.get(l)).getprio()));
+		    }
+		}
+		CAT.debug("SIMROB1:\n "+simRob);
+		// gesperrte Register in simRob.zug schreiben
+		for (int i = 0; i < simRob.getLockedRegisters().length; i++){
+		    Card locked = simRob.getLockedRegister(i);
+		    
+		    if (locked == null){
+		        simRob.setMove(i,null);
+		    }
+		    else {
+		        HumanCard hc = new HumanCard(locked);
+		        hc.setState(HumanCard.LOCKED);
+		        simRob.setMove(i, hc);
+		    }
+		}
+		CAT.debug("SIMROB2:\n "+simRob);
+		return wirbel.findBestMove(simCards, simRob);
+    }
+    
+
     /** 
      * Will find the index of the card with priority <code>nextprio</code> 
      * in the HumanCard list <code>robicards</code>.
@@ -131,7 +156,7 @@ public class Wisenheimer{
      * @param robiCards The possible cards (of <code>HumanCards</code>)
      * @return the list position of the card we are looking for in the list
      */
-    private int getIndex(int nextprio,ArrayList robiCards){
+    public static int getIndex(int nextprio,ArrayList robiCards){
         CAT.debug("Wisenheimer.getIndex() called");
 		int ind=0;
 		for (int i=0; i<robiCards.size();i++){
