@@ -95,7 +95,15 @@ public class ClientAntwort implements Comparable {
         return messageSequenceNumber-num;
     }
 
+    
+    public final static int REMOVAL_REASON_TIMEOUT = 1;
+    public final static int REMOVAL_REASON_RULEVIOLATION = 2;
+    public final static int REMOVAL_REASON_GAMEOVER = 3;
+    public final static int REMOVAL_REASON_LOSTLIVES = 4;
+    public final static int REMOVAL_REASON_TOOLATE = 5;
+    public final static int REMOVAL_REASON_OTHER = 6;
 
+    
     public final static int SPIELFELDDIM = 1;
     public final static int FAHNENPOS = 2;
     public final static int SPIELERNAMEN = 3;

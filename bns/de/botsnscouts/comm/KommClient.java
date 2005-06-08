@@ -675,18 +675,30 @@ public class KommClient implements Shutdownable{
 			    String work = com.substring(klauf+1,klazu);
 		
 			    if (work.length()<=2) {
-			        if (work.equals("LL")) // lost all lives
+			        if (work.equals("LL"))  {// lost all lives
 			            back.str=Message.say("comm", "removalReasonLL");
-			        else if (work.equals("TO"))
+			            back.zahl = ClientAntwort.REMOVAL_REASON_LOSTLIVES;
+			        }
+			        else if (work.equals("TO")) {
 			            back.str=Message.say("comm", "removalReasonTO"); // timeout
-			        else if (work.equals("GO"))
+			            back.zahl = ClientAntwort.REMOVAL_REASON_TIMEOUT;
+			        }
+			        else if (work.equals("GO")) {
 			            back.str=Message.say("comm", "removalReasonGO"); // game is over
-			        else if (work.equals("RV"))
+			            back.zahl = ClientAntwort.REMOVAL_REASON_GAMEOVER;
+			        }
+			        else if (work.equals("RV")) {
 			            back.str=Message.say("comm", "removalReasonRV"); // rule violation
-			        else if (work.equals("ZS"))
+			            back.zahl = ClientAntwort.REMOVAL_REASON_RULEVIOLATION;
+			        }
+			        else if (work.equals("ZS")) {
 			            back.str=Message.say("comm", "removalReasonZS"); // to late registered
-			        else
+			            back.zahl = ClientAntwort.REMOVAL_REASON_TOOLATE;
+			        }
+			        else {
 			            back.str=Message.say("comm", "removalReasonOther", work); // unknown reason
+			            back.zahl = ClientAntwort.REMOVAL_REASON_OTHER;
+			        }
 			    }
 			    else {
 			        //klauf = work.indexOf ('(');
