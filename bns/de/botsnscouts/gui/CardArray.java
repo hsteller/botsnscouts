@@ -39,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
+import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.GreenTheme;
 import de.botsnscouts.widgets.OptionPane;
@@ -50,60 +51,44 @@ import de.botsnscouts.widgets.TJPanel;
  */
 public class CardArray extends TJPanel {
 
-    private JButton sendButton = OptionPane.getTransparentButton(Message.say("SpielerMensch","senden"), 14);
-    private ArrayList cardsView = new ArrayList(9);
+    private JButton sendButton = OptionPane.getTransparentButton(Message.say("SpielerMensch","senden"), 14);   
+    private ArrayList cardsView = new ArrayList(Bot.NUM_CARDS);
+    
     private JCheckBox powerDownBox = new TJCheckBox(Message.say("SpielerMensch","powerdown"),false);
     
     private Dimension myPrefSize = new Dimension (150,550);
-    
-    public CardArray() {
-	this(new ActionListener(){
-		public void actionPerformed(ActionEvent ae) {
-		    System.err.println("Card klicked.");
-		}
-	    }
-	     ,new ActionListener(){
-		public void actionPerformed(ActionEvent ae) {
-		    System.err.println("Send.");
-		}
-	    });
-
-    }
+        
 
     public CardArray(ActionListener cards, ActionListener send) {
-	JPanel chooser = new TJPanel( new GridLayout(2,1, 3, 3) );
-
-
-	setLayout(new GridLayout(5,2));
-
-	sendButton.setEnabled(false);
-	powerDownBox.setEnabled(true);
-        powerDownBox.setOpaque(false);
-	sendButton.addActionListener(send);
-	powerDownBox.setVerticalTextPosition(AbstractButton.BOTTOM);
-	powerDownBox.setHorizontalTextPosition(AbstractButton.CENTER);
-	powerDownBox.setFont(new Font("Dialog",Font.BOLD,8));
-	for (int i=0; i<9; i++) {
-	    CardView c = new CardView(cards);
-	    cardsView.add((i),c);
-	    add(c);
-	}
-
-	//chooser.setBorder(new EmptyBorder(25,0,0,0));
-	chooser.add(sendButton);
-	chooser.add(powerDownBox);
-	
-	add(chooser);
-
+		JPanel chooser = new TJPanel( new GridLayout(2,1, 3, 3) );
+		setLayout(new GridLayout(5,2));
+		sendButton.setEnabled(false);
+		powerDownBox.setEnabled(true);
+	    powerDownBox.setOpaque(false);
+		sendButton.addActionListener(send);
+		powerDownBox.setVerticalTextPosition(AbstractButton.BOTTOM);
+		powerDownBox.setHorizontalTextPosition(AbstractButton.CENTER);
+		powerDownBox.setFont(new Font("Dialog",Font.BOLD,8));
+		for (int i=0; i<Bot.NUM_CARDS; i++) {
+		    CardView c = new CardView(cards);
+		    cardsView.add((i),c);
+		    add(c);
+		}	
+		//chooser.setBorder(new EmptyBorder(25,0,0,0));
+		chooser.add(sendButton);
+		chooser.add(powerDownBox);		
+		add(chooser);
     }
 
     protected void resetAll() {
-	powerDownBox.setSelected(false);
-	sendButton.setEnabled(false);
-	for (int i=0; i < cardsView.size(); i++) {
-	    ((CardView) cardsView.get(i)).reset();
-            ((CardView) cardsView.get(i)).setEnabled( false ); // XXX
-	}
+		powerDownBox.setSelected(false);
+		sendButton.setEnabled(false);
+		int size = cardsView.size();
+		for (int i=0; i < size; i++) {
+		    CardView cv = (CardView )cardsView.get(i);
+		    cv.reset();
+	        cv.setEnabled( false ); // XXX
+		}
     }
 
     protected boolean wishesPowerDown() {
@@ -111,69 +96,88 @@ public class CardArray extends TJPanel {
     }
 
     public void addCard(HumanCard hc) {
-	for (int i=0; i < cardsView.size(); i++) {
-	    if (((CardView) cardsView.get(i)).getCard() == null) {
-		((CardView) cardsView.get(i)).setCard(hc);
-		break;
-	    }
-	}
+        int size = cardsView.size();
+		for (int i=0; i < size; i++) {
+		    CardView cv = (CardView )cardsView.get(i);
+		    if (cv.getCard() == null) {
+		        cv.setCard(hc);
+		       return;
+		    }
+		}
     }
 
     protected ArrayList getCards() {
-	ArrayList regs = new ArrayList(9);
-	for (int i=0; i < cardsView.size(); i++) {
-	    regs.add(((CardView) cardsView.get(i)).getCard());
-	}
-	return regs;
+		ArrayList regs = new ArrayList(Bot.NUM_CARDS);
+		int size = cardsView.size();
+		for (int i=0; i < size; i++) {
+		    regs.add(((CardView) cardsView.get(i)).getCard());
+		}
+		return regs;
     }
 
 
     public void setCards(ArrayList cards) {
-	resetAll();
-	for (int i=0; i < cards.size(); i++) {
-	    ((CardView) cardsView.get(i)).setCard((HumanCard)cards.get(i));
-	    ((CardView) cardsView.get(i)).setEnabled( true );
-	}
+        resetAll();
+        int size = cards!=null?cards.size():0;
+        for (int i=0; i < size; i++) {
+            CardView cv = (CardView) cardsView.get(i);
+            cv.setCard((HumanCard)cards.get(i));
+            cv.setEnabled( true );
+        }
     }
 
     protected void activateButton() {
-	sendButton.setEnabled(true);
+        sendButton.setEnabled(true);
     }
 
     protected void deActivateButton() {
-	sendButton.setEnabled(false);
+        sendButton.setEnabled(false);
     }
 
     protected void setWisenheimer(int predCard) {
-	for (int i=0;i<9;i++){
-	    ((CardView)cardsView.get(i)).delWisenheimer();
-	}
-	if (predCard!=-1){
-	    ((CardView)cardsView.get(predCard)).setWisenheimer();
-	}
+        removeWisenheimer();
+        if (predCard>=0 && predCard<cardsView.size()){
+            ((CardView)cardsView.get(predCard)).setWisenheimer();
+        }
     }
 
+    protected void removeWisenheimer(){
+        for (int i=0;i<Bot.NUM_CARDS;i++){
+    	    ((CardView)cardsView.get(i)).delWisenheimer();
+    	}
+    }
+    
     public Dimension getMinimumSize() {
-	return myPrefSize;
+        return myPrefSize;
     }
 
     public Dimension getPreferredSize() {
-	return myPrefSize;
+        return myPrefSize;
     }
 
    
 
     public static void main (String args[]) {
-	Message.setLanguage("deutsch");
+		Message.setLanguage("deutsch");
         JWindow f = new JWindow();
-	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
+        MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
 
-        CardArray re = new CardArray();
+        CardArray re = new CardArray(
+                        new ActionListener(){
+							public void actionPerformed(ActionEvent ae) {
+							    System.err.println("Card klicked.");
+								}
+                        },
+						new ActionListener(){
+							public void actionPerformed(ActionEvent ae) {
+							    System.err.println("Send.");
+							}
+   					  	});
 
-	f.getContentPane().add(re);
-	f.pack();
-	f.setLocation(100,100);
-	f.setVisible(true);
+		f.getContentPane().add(re);
+		f.pack();
+		f.setLocation(100,100);
+		f.setVisible(true);
     }
 
 
