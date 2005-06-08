@@ -214,16 +214,16 @@ public class Ausgabe extends BNSThread {
     }
 
 
-    protected void initialize() {
+    protected boolean initialize() {
         registerAtServer();
         try {
             kommAntwort = kommClient.warte();
         } catch (KommFutschException kE) {
             CAT.error("KE: " + kE.getMessage());
-            return;
+            return false;
         } catch (KommException ke) {
             CAT.error("ke: " + ke.getMessage());
-            return;
+            return false;
         }
 
         if (kommAntwort.typ == ClientAntwort.SPIELSTART) {
@@ -275,25 +275,27 @@ public class Ausgabe extends BNSThread {
             } catch (KommException kE) {
                 CAT.error("Ausgabe: Beim Versuch, die Bot zu holen, erhalte ich: " +
                         kE.getMessage());
-                return;
+                return false;
             } catch (FormatException e) {
-                System.err.println(e.getMessage());
+                CAT.error(e.getMessage(),e);
             } catch (FlagException e) {
-                System.err.println(e.getMessage());
+                CAT.error(e.getMessage(), e);
             }
         } 
         else if (kommAntwort.typ == ClientAntwort.ENTFERNUNG){
             CAT.info("server removed me before the game started; reason="+kommAntwort.str);
             CAT.info("I'm going to kill myself..");
             shutdown();
+            return false;
         }        
         else {
             // Problem: the server sends garbage
-            CAT.debug("server does not send a game start at game start... pfui!");
+            CAT.error("server does not send a game start at game start... pfui!");
         }
 
         registered = true;
-
+        return true;
+        
     }
 
     private Color[] initRobotColors(Hashtable playerColorHash, String[] playerColors) throws KommException {
