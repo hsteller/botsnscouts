@@ -41,6 +41,8 @@ import de.botsnscouts.comm.KommClientSpieler;
 import de.botsnscouts.comm.KommException;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Card;
+import de.botsnscouts.util.Directions;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.KrimsKrams;
 import de.botsnscouts.util.Location;
@@ -56,7 +58,7 @@ import de.botsnscouts.widgets.GreenTheme;
 public class HumanPlayer extends BNSThread {
     static Category CAT = Category.getInstance(HumanPlayer.class);
 
-
+    
     protected final static int MODE_PROGRAM = 0;
     protected final static int MODE_OTHER = 1;
 
@@ -72,21 +74,39 @@ public class HumanPlayer extends BNSThread {
     private String host, name;
     private int port, myColor, globalTimeout;
     private boolean gameOver = false, nosplash = false;
+    /** The Wisenheimer the user can use */
     private Wisenheimer wisenheimer;
-
+    /** The Wisenheimer the EmergencyCardSubmitter uses */
+    private Wisenheimer emergencyWisenheimer; 
+    
+    
     private boolean isScoutAllowed = true;
     private boolean isWisenheimerAllowed = true;
     
     private Timer timeoutWatcher;
     private EmergencyCardSubmitter emergencyCardSubmitter;
+    private EmergencyDirectionSubmitter emergencyDirectionSubmitter;
+    private EmergencyStayPowerDownSubmitter emergencyPowerDownSubmitter;
+    private EmergencyRegRepairSubmitter emergencyRegRepairSubmitter;
+    private Bot emergencyBotCopy = Bot.getNewInstance("EmergencySubmitterCopy");
+    private volatile boolean cardsSent;    
+    private volatile boolean newDirectionSent = false;
+    private volatile boolean stayPowerDownAnswered = false;
+    private volatile boolean repairRegistersAnswered = false;
     
-    private volatile boolean cardsSent;
+    /** We start our emergency submit for cards/direction/power down state/register numbers
+     *   that many seconds before the global timeout expires. 
+     *   This should compensate for network lag, Timer-management overhead,
+     *    Wisenheimer-prediction for a good answer etc. 
+     */
+    private static final int COVER_MY_ASS_BUFFER = 5;
+    
     /** Starting the EmergencyCardSubmitter that many seconds before the global timeout expires*/
-    public static final int bufferSecondsBeforeTimeout = 25;
+    public static final int BUFFER_SECONDS_BEFORE_TIMEOUT = 25;
     /** This is the number of seconds we show to the user; after this many seconds the
      *   EmergencyCardSubmitter will kick into action, blocking the user and getting the
      *   Wisenheimer's prediction to send*/
-    public static final int bufferSecondsBeforeSendingCards = bufferSecondsBeforeTimeout-5;
+    public static final int BUFFER_SECONDS_BEFORE_SENDING_CARDS = BUFFER_SECONDS_BEFORE_TIMEOUT-COVER_MY_ASS_BUFFER;
     /** If set to true, we will do a System.exit(0) on the end of the run() method*/
     private boolean killJVMonceFinished = false;
        
@@ -117,6 +137,8 @@ public class HumanPlayer extends BNSThread {
     	    return name;
     	}
     
+    	
+    	
     /**
      * Start des Menschlichen Spielers
      */
@@ -146,45 +168,67 @@ public class HumanPlayer extends BNSThread {
             switch (commAnswer.typ) {
                 case (ClientAntwort.MACHEZUG):
                     {
-                    	synchronized(comm) {
-                    	    cardsSent = false;
-	                    	mode = MODE_PROGRAM;
-	                    	Global.debug(this, "I am requested to send cards");
-	                    	if (timeoutWatcher != null){
-	                    	    try {
-	                    	        timeoutWatcher.cancel();
-	                    	    }
-	                    	    catch (Exception e){
-	                    	        CAT.error("exception canceling the old timeout watcher", e);
-	                    	    }
-	                    	}                    	   
-	                    	timeoutWatcher = new Timer();    
-	                    	emergencyCardSubmitter = new EmergencyCardSubmitter();
-                    	    timeoutWatcher.schedule(emergencyCardSubmitter, (globalTimeout-bufferSecondsBeforeTimeout)*1000);                    	    
-                    	}                    	
-                        // card
-                        showMessage(Message.say("SpielerMensch", "mwartereg"));
-
-                        try {
-                            Bot meAtStartOfRound = comm.getRobStatus(name);                                                       
-                            if (CAT.isDebugEnabled()) {
-                                CAT.debug("rob has the following locked registers: ");
-                                for (int i = 0; i < meAtStartOfRound.getLockedRegisters().length; i++) { 
-	                                CAT.debug("index: " + i + " ist " + meAtStartOfRound.getLockedRegister(i));
+                    	//                  ----- insert cards  -----
+	                    cards.clear();
+	                    for (int i = 0; i < commAnswer.karten.length; i++) {
+	                        cards.add(i, new HumanCard(commAnswer.karten[i]));
+	                    }
+	                    humanView.showCards(cards);
+	                    try {
+	                        // the following makes-not-so-much-sense copying&stuff is done so
+	                        // that the EmergencySubmitters Wisenheimer prediction will work in
+	                        // some not-so-obvious cases (locked registers with register-repair by the
+	                        // repair emergency submitter); it turned out that even if the bot's locked registers 
+	                        // are ok here, they might be "magically" missing at the time of prediction, leading
+	                        // to errors
+	                        // => EmergencySubmitter gets copy of robot that noone else will mess up
+	                        Bot meAtStartOfRound = comm.getRobStatus(name);   
+	                       /* Bot meCopy*/	                       
+	                        emergencyBotCopy.copyRob(meAtStartOfRound);
+	                      /*  Card [] cards = meAtStartOfRound.getCards();	                        
+	                        int size=cards!=null?cards.length:0;
+	                        HumanCard [] cardCopys = new HumanCard[size];
+	                        for (int i = 0;i<size;i++){
+	                            
+	                        }
+	                                        
+	                        meCopy.setCards();
+	                        */
+	                        /*	int size = meAtStartOfRound.getLockedRegisters().length;
+	                            ArrayList lockedCards = new ArrayList(size);
+	                        	for (int i = 0; i <size ; i++) { 
+	                        	    Card c = meAtStartOfRound.getLockedRegister(i);
+	                                CAT.debug("index: " + i + " ist " + c);
+	                                HumanCard hc = new HumanCard(c);
+	                                lockedCards.add(hc);	                                
 	                            }
-                            }
-                            humanView.updateRegisters(meAtStartOfRound.getLockedRegisters());
-                        } 
-                        catch (KommException kE) {
-                            CAT.error("SpielerMenschERROR: " + kE.getMessage());
-                        }
-
-                        // ----- Karten einsortieren  -----
-                        cards.clear();
-                        for (int i = 0; i < commAnswer.karten.length; i++) {
-                            cards.add(i, new HumanCard(commAnswer.karten[i]));
-                        }
-                        humanView.showCards(cards);
+	                       */
+	                        synchronized(comm) {
+	                    	    cardsSent = false;
+		                    	mode = MODE_PROGRAM;
+		                    	Global.debug(this, "I am requested to send cards");
+		                    	if (timeoutWatcher != null){
+		                    	    try {
+		                    	        timeoutWatcher.cancel();
+		                    	    }
+		                    	    catch (Exception e){
+		                    	        CAT.error("exception canceling the old timeout watcher", e);
+		                    	    }
+		                    	}                    	   
+		                    
+		                    	timeoutWatcher = new Timer();    
+		                    	emergencyCardSubmitter = new EmergencyCardSubmitter(/*meCopy*/);
+	                    	    timeoutWatcher.schedule(emergencyCardSubmitter, (globalTimeout-BUFFER_SECONDS_BEFORE_TIMEOUT)*1000);                    	    
+	                    	}  
+	                        humanView.updateRegisters(meAtStartOfRound.getLockedRegisters());
+	                    } 
+	                    catch (KommException kE) {
+	                        CAT.error(kE.getMessage(), kE);
+	                    }
+	                    
+                        showMessage(Message.say("SpielerMensch", "mwartereg"));
+                        
+                       
                         
                         break;
                     }
@@ -200,8 +244,23 @@ public class HumanPlayer extends BNSThread {
                     // robot destroyed or initally set on the board
                 case (ClientAntwort.ZERSTOERUNG):
                     {
+	                    if (globalTimeout == 0) {
+	                        try {
+	                            globalTimeout = comm.getTimeOut();
+	                        } catch (KommException kE) {
+	                            CAT.error("during request for global timeout value", kE);	                            
+	                        }
+	                    }
+	                    synchronized (comm) {
+	                        killEmergencySubmitters();
+	                        newDirectionSent = false;
+	                        timeoutWatcher = new Timer();    
+	                        emergencyDirectionSubmitter = new EmergencyDirectionSubmitter();
+	                        timeoutWatcher.schedule(emergencyDirectionSubmitter, 
+	                                        (globalTimeout-COVER_MY_ASS_BUFFER)*1000);
+	                    }
                         humanView.showGetDirection();
-                        Global.debug(this, "Habe eine Zerstoerung bekommen.");
+                        CAT.debug("received desctruction");
                         showMessage(Message.say("SpielerMensch", "roboauffeld"));
 // ---get board for wisenheimer
                         if (intelliBoard == null) {
@@ -211,18 +270,19 @@ public class HumanPlayer extends BNSThread {
                         }
 
                         // ----- ask for timeout -------
-                        if (globalTimeout == 0) {
-                            try {
-                                globalTimeout = comm.getTimeOut();
-                            } catch (KommException kE) {
-                                System.err.println("SpielerMenschKommunkationsERROR: wollte Timeout erfragen: " + kE.getMessage());
-                            }
-                        }
+                       
                         break;
                     }
                     // robot reaktivated
                 case (ClientAntwort.REAKTIVIERUNG):
                     {
+	                    synchronized (comm) {
+	                        stayPowerDownAnswered = false;
+	                        timeoutWatcher = new Timer();    
+	                        emergencyPowerDownSubmitter = new EmergencyStayPowerDownSubmitter();
+	                        timeoutWatcher.schedule(emergencyPowerDownSubmitter, 
+	                                        (globalTimeout-COVER_MY_ASS_BUFFER)*1000);
+	                    }
                         showMessage(Message.say("SpielerMensch", "roboreaktiviert"));
                         // ask for powerDownagain
                         humanView.showRePowerDown();
@@ -234,13 +294,21 @@ public class HumanPlayer extends BNSThread {
                     // repair your registers
                 case (ClientAntwort.REPARATUR):
                     {
-                        Global.debug(this, "Reparatur erhalten");
+                        CAT.debug("may repair some register(s)");
 
-                        try {
-                            Global.debug(this, "Reparatur erhalten; ersuche, Status von " + name + "  zu erfragen...");
+                        try {                            
                             Bot tempRob = comm.getRobStatus(name);
+                            emergencyBotCopy.copyRob(tempRob);                            
                             int repPoints = commAnswer.zahl;
-                            humanView.showRegisterRepair(tempRob.getLockedRegisters(), repPoints);
+                            synchronized (comm) {
+                                repairRegistersAnswered = false;
+    	                        timeoutWatcher = new Timer();    
+    	                        emergencyRegRepairSubmitter = new EmergencyRegRepairSubmitter(/*me,*/repPoints);
+    	                        timeoutWatcher.schedule(emergencyRegRepairSubmitter, 
+    	                                        (globalTimeout-COVER_MY_ASS_BUFFER)*1000);
+    	                    }
+                            
+                            humanView.showRegisterRepair(tempRob.getLockedRegisters(), repPoints);             
                         } catch (KommException kE) {
                             CAT.error(kE);
                         }
@@ -253,24 +321,26 @@ public class HumanPlayer extends BNSThread {
                     {
                         // ------- Habe ich gewonnen / bin ich gestorben ----------
                         boolean dead = true;
-                        
                         int rating = 0;
-                        try {
-                            String[] gewinnerListe = comm.getSpielstand();
-                            if (gewinnerListe != null) {
-                                //showMessage(Message.say("SpielerMensch", "spielende"));
-                                for (int i = 0; i < gewinnerListe.length; i++) {
-                                    if (gewinnerListe[i].equals(name)) {
-                                        dead = false;
-                                        rating = (i + 1);
-                                    }
-                                }
-                            } else {
-                                Global.debug(this, "Bin gestorben...");
-                                dead = true;
-                            }
-                        } catch (KommException e) {
-                            Global.debug(this, e.getMessage());
+                        if (commAnswer.zahl == ClientAntwort.REMOVAL_REASON_GAMEOVER ||
+                                        commAnswer.zahl == ClientAntwort.REMOVAL_REASON_LOSTLIVES) {	                        
+	                        try {
+	                            String[] gewinnerListe = comm.getSpielstand();
+	                            if (gewinnerListe != null) {
+	                                //showMessage(Message.say("SpielerMensch", "spielende"));
+	                                for (int i = 0; i < gewinnerListe.length; i++) {
+	                                    if (gewinnerListe[i].equals(name)) {
+	                                        dead = false;
+	                                        rating = (i + 1);
+	                                    }
+	                                }
+	                            } else {
+	                                Global.debug(this, "Bin gestorben...");
+	                                dead = true;
+	                            }
+	                        } catch (KommException e) {
+	                            Global.debug(this, e.getMessage());
+	                        }
                         }
                         String removalReason = commAnswer.str;
                         gameOver = true;
@@ -292,7 +362,7 @@ public class HumanPlayer extends BNSThread {
             ausgabe.join();
            
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            CAT.error(e);
         }
        
        // we don't want to kill our communication in every case;
@@ -400,8 +470,14 @@ public class HumanPlayer extends BNSThread {
 	        }
 	        synchronized (comm){	            
 	            if (!cardsSent) {
-	                timeoutWatcher.cancel();
-	           
+	                emergencyCardSubmitter.cancel();
+	                	    
+	                try {
+	                    timeoutWatcher.cancel();
+	                }
+	                catch (Exception e){
+	                    CAT.warn("while doing an additional, prob. unnecessary cancel:"+e.getMessage(),e);
+	                }
 	                comm.registerProg(name, sendProg, nextTurnPowerDown);
 	                cardsSent = true;
 	            }
@@ -450,24 +526,9 @@ public class HumanPlayer extends BNSThread {
         }
         CAT.debug("setting condition for leaving the run()-method");
         gameOver = true;               
-        CAT.debug("killing/interrupting potential EmergenyCardSubmitter:");
-        if (timeoutWatcher != null){
-            try {
-                timeoutWatcher.cancel();
-            }
-            catch (Exception e){
-                CAT.warn("in shutdown (timeoutWatcher)", e);
-            }              
-        }
-        if (emergencyCardSubmitter != null){
-            try {
-                emergencyCardSubmitter.cancel();
-            }
-            catch (Exception e){
-                CAT.warn("in shutdown (emergencyCardSubmitter)", e);
-            }              
-        }
-
+        
+        killEmergencySubmitters();
+        
         if (view != null){
             // in view.showGameOver() a timer Thread gets started that will call view.wait() for atm 8 seconds 
             synchronized (view){
@@ -478,6 +539,56 @@ public class HumanPlayer extends BNSThread {
         
     }
 
+    private void killEmergencySubmitters(){
+        CAT.debug("killing/interrupting potential EmergenySubmitter:");
+        if (timeoutWatcher != null){
+            try {
+                timeoutWatcher.cancel();
+                timeoutWatcher = null;
+            }
+            catch (Exception e){
+                CAT.warn("in shutdown (timeoutWatcher)", e);
+            }              
+        }
+        if (emergencyCardSubmitter != null){
+            try {
+                emergencyCardSubmitter.cancel();
+                emergencyCardSubmitter = null;
+            }
+            catch (Exception e){
+                CAT.warn("in shutdown (emergencyCardSubmitter)", e);
+            }              
+        }
+        if (emergencyDirectionSubmitter != null) {
+            try {
+                emergencyDirectionSubmitter.cancel();
+                emergencyDirectionSubmitter = null;
+            }
+            catch (Exception e){
+                CAT.warn("in shutdown (emergencyDirectionSubmitter)", e);
+            }         
+        }
+        if (emergencyPowerDownSubmitter != null) {
+            try {
+                emergencyPowerDownSubmitter.cancel();
+                emergencyPowerDownSubmitter = null;
+            }
+            catch (Exception e){
+                CAT.warn("in shutdown (emergencyPowerDownSubmitter)", e);
+            }         
+        }
+        if (emergencyRegRepairSubmitter != null) {
+            try {
+                emergencyRegRepairSubmitter.cancel();
+                emergencyRegRepairSubmitter = null;
+            }
+            catch (Exception e){
+                CAT.warn("in shutdown (emergencyRegRepairSubmitter)", e);
+            }         
+        }
+        
+    }
+    
 
     protected void passUpdatedScout(int chosen, Bot[] robs) {
         ausgabe.showScout(chosen, robs);
@@ -485,13 +596,25 @@ public class HumanPlayer extends BNSThread {
 
 
     protected void sendRepair(ArrayList respReparatur) {
-        d("sende meinen Reparaturwunsch: " + respReparatur);
-        int[] repa = new int[respReparatur.size()];
-        for (int i = 0; i < respReparatur.size(); i++) {
-            repa[i] = ((Integer) respReparatur.get(i)).intValue();
+        synchronized (comm) {
+	        if (!repairRegistersAnswered) {
+	            d("sende meinen Reparaturwunsch: " + respReparatur);
+		        int[] repa = new int[respReparatur.size()];
+		        for (int i = 0; i < respReparatur.size(); i++) {
+		            repa[i] = ((Integer) respReparatur.get(i)).intValue();
+		        }
+		        comm.respReparatur(name, repa);
+		        showMessage(Message.say("SpielerMensch", "sendregrep"));		       
+		        emergencyRegRepairSubmitter.cancel();
+		        repairRegistersAnswered = true;
+	        }
+	        else {
+	            CAT.debug("ignored request to send register repair ("
+	                            +Global.collectionToString(respReparatur)+
+	            ") because it looks like a direction got already sent..");
+	        }
+	        
         }
-        comm.respReparatur(name, repa);
-        showMessage(Message.say("SpielerMensch", "sendregrep"));
     }
 
     /** Sends a ChatMessage to the server */
@@ -518,15 +641,36 @@ public class HumanPlayer extends BNSThread {
 
     }
 
-
+   
     protected void sendDirection(int r) {
-        comm.respZerstoert(name, r);
+        synchronized (comm) {
+            if (!newDirectionSent) {
+                CAT.debug("sending direction"+r);
+                comm.respZerstoert(name, r);             
+                emergencyDirectionSubmitter.cancel();
+                newDirectionSent = true;
+           }
+            else {
+                CAT.debug("ignored request to send direction "+r+
+                				" because it looks like a direction was already sent..");
+            }
         // show wait message
+        }
     }
 
 
     protected void sendAgainPowerDown(boolean down) {
-        comm.respReaktivierung(name, down);
+        synchronized (comm){
+            if (!stayPowerDownAnswered) {                
+                comm.respReaktivierung(name, down);               
+                emergencyPowerDownSubmitter.cancel();     
+                stayPowerDownAnswered = true;
+            }
+            else {
+                CAT.debug("ignored request to send stay powerdown answer ("+down+
+				") because it looks like an answer was already sent..");
+            }
+        }
     }
 
     protected int getNextPrediction(ArrayList registerList, ArrayList cardList) {
@@ -541,30 +685,100 @@ public class HumanPlayer extends BNSThread {
         }
     }
     
-    protected int [] getCompleteWisenheimerMove(){
+    /** 
+     * NOTE: THIS METHOD USES NOT(!) THE USER'S WISENHEIMER!
+     * 
+     * @param registersWithLockedHumanCards  A Bot.NUM_REG-long list containing locked HumanCards or null as values
+     * @return An array with  the indices of the cards the Wisenheimer has recommended
+     *               (array values are of [1,2,..,9]  ) 
+     */
+    private int [] getCompleteWisenheimerMove(Bot somebot){
         // RegisterArray.resetAll(); // resetting move so far
         // RegisterArray.getWisenheimerCards(); // getting possible locked registers
         	//wisenheimer.getPrediction(cardList, ausgabe.getBot(name));
-        Bot me = ausgabe.getBot(name);       
-        ArrayList myRegs = new ArrayList(Bot.NUM_REG);
+       
+        ArrayList myRegs = new ArrayList(Bot.NUM_REG);        
         int numOfCardsNeeded = Bot.NUM_REG;       
-        for (int i=0;i<Bot.NUM_REG;i++){
-            Object card = me.getLockedRegister(i);            
-            myRegs.add(card);
-            if (card != null) { // register was locked, one turn less to predict
-                numOfCardsNeeded--;
+        for (int i=0;i<Bot.NUM_REG;i++){   
+            Card c = somebot.getLockedRegister(i);
+            //HumanCard card = (HumanCard) registersWithLockedHumanCards.get(i);
+            // somebot.getLockedRegister(i);      
+            if (c == null) {
+                myRegs.add((HumanCard)null);
             }
+            else {
+                HumanCard hc = new HumanCard(c);
+                hc.setState(HumanCard.LOCKED);
+                myRegs.add(hc);
+                // register was locked, one phase less to predict
+                numOfCardsNeeded--;
+            }                     
+        }            
+            
+        if (CAT.isDebugEnabled()) {
+            CAT.debug("numOfCardsNeeded="+numOfCardsNeeded);
+            CAT.debug("****** myRegs:\n"+Global.collectionToString(myRegs));      
+            CAT.debug("****** cards:\n"+Global.collectionToString(cards));
+              
         }
-      
         int [] predictions = new int[numOfCardsNeeded];
         if (numOfCardsNeeded > 0 ) {
             synchronized (wisenheimer) {
-	            // getting initial prediction/resetting prediction, probably doing the same work
-	            // twice if the wisenheimer was already called in this round 
-	            predictions [0] = wisenheimer.getPrediction(myRegs, cards, me);	         
+	            // since the wisenheimer is not stateless and shared with the user,
+                // we will deactivate its button so that the user can't interfere with our predicting
+                CAT.debug("disabling wisenheimer");
+                humanView.wisenheimerView.setSelected(false);
+                humanView.wisenheimerView.setEnabled(false);
+                humanView.removeWisenheimer();
+                // reason for the following loop:
+                // if the user has already selected some cards, our wisenheimer won't use them
+                // and might have not enough cards to create a as many predictions as we want
+                // to have from him; this might lead to a suboptimal move or even to a NullPointerException
+                // in wisenheimer.getPrediction()
+
+                try {
+	                int cardCount = cards.size();
+	                for (int i=0;i<cardCount;i++){
+	                    HumanCard card = (HumanCard) cards.get(i);
+	                    if (card.getState() != HumanCard.LOCKED) {
+	                        card.setState(HumanCard.FREE); 
+	                    }
+	                }        
+	               
+	                // getting initial prediction/resetting prediction, probably doing the same work
+		            // twice if the wisenheimer was already called in this round 
+	                Card [] move = emergencyWisenheimer.getPredictionCards(myRegs, cards, somebot);
+	                CAT.debug("wise returned: ");
+	                CAT.debug(Global.arrayToString(move,'\n'));
+	                int numOfCards = move!=null?move.length:0;
+               
+                    int predCounter = 0;
+	                for (int i=0;i<numOfCards;i++){
+	                    HumanCard hc = (HumanCard) move[i];
+	                    if (!hc.locked()) {
+	                        int prio = hc.getprio();
+	                        predictions[predCounter++] = Wisenheimer.getIndex(prio, cards)+1;
+	                    }
+	                }
+                }
+                catch (Exception e){
+                    CAT.error(e.getMessage(), e);     
+                    for (int i=0;i<numOfCardsNeeded;i++){
+                        predictions[i] = i+1;
+                    }
+                }             /*
+               predictions [0] = emergencyWisenheimer.getPrediction(myRegs, cards, emergencyBotCopy);
+               Object card = cards.get(predictions[0])
+               myRegs.set(0, card);
 	            for (int i=1;i<numOfCardsNeeded;i++) {
-	                predictions[i] = wisenheimer.getNextPrediction(myRegs, cards);	                
-	            }
+	                predictions[i] = emergencyWisenheimer.getNextPrediction(myRegs, cards);	  
+	                card = cards.get(predictions[i]);
+	                myRegs.set(i, card);
+	            }	
+	            */           
+	            CAT.debug("card indices I will submit: "+Global.arrayToString(predictions));
+	            CAT.debug("reenabling winsenheimer");
+                humanView.wisenheimerView.setEnabled(true);
             }
         }
         return predictions;
@@ -608,11 +822,14 @@ public class HumanPlayer extends BNSThread {
             String spielfeldstring = comm.getSpielfeld();
             try {
                 intelliBoard = SimBoard.getInstance(dimx, dimy, spielfeldstring, fahnen);
+                SimBoard tmp = SimBoard.getInstance(dimx, dimy, spielfeldstring, fahnen); // to be on the safe side,
+                                                                                   // don't know if wisenhheimers may share a board
+                emergencyWisenheimer = new Wisenheimer(tmp);                																                     
             } catch (Exception e) {
-                System.err.println("HumanPlayer has a problem: No Board" + e);
+                CAT.error("HumanPlayer has a problem: No Board" + e.getMessage(),e);
             }
         } catch (Exception e) {
-            System.err.println("HumanPlayer has a problem: No Board!" + e);
+            CAT.error("HumanPlayer has a problem: No Board!" + e.getMessage(),e);
         }
     }
 
@@ -621,9 +838,13 @@ public class HumanPlayer extends BNSThread {
         humanView = new HumanView(this);
         view = new View(humanView);          // adds the humanView to the JFrame
         ausgabe = new Ausgabe(host, port, nosplash, view);   //adds the AusgabeView to the JFrame
-        ausgabe.initialize();
-        Registry.getSingletonInstance().addClient(ausgabe, host, port);
-        ausgabe.start();
+        if (ausgabe.initialize()) {
+            Registry.getSingletonInstance().addClient(ausgabe, host, port);
+            ausgabe.start();
+        }
+        else {
+            CAT.warn("view.initialize returned false");
+        }
 //	ChatPane chatpane=new ChatPane(this);
 //	view.addChatPane(chatpane);
     }
@@ -678,25 +899,120 @@ public class HumanPlayer extends BNSThread {
         comm.abmelden(name);
     }
 
+    class EmergencyDirectionSubmitter extends TimerTask{
+        public void run(){
+            showMessage(Message.say("HumanPlayer","legalDirection"));
+            if (humanView != null) {
+                // calling the send method of HumanView (that will call the
+                // corresponding send method in this class) so that we don't have to take 
+                // care about removing the dialog window and telling the HumanView what
+                // should be shown instead.
+                humanView.setDialogInSidebarActive(false);
+                humanView.sendDirection(Directions.NORTH);
+            }
+        }
+    }
+
+    class EmergencyStayPowerDownSubmitter extends TimerTask{
+        public void run(){
+            showMessage(Message.say("HumanPlayer","legalPowerDownResponse"));
+            if (humanView != null) {
+                // calling the send method of HumanView (that will call the
+                // corresponding send method in this class) so that we don't have to take 
+                // care about removing the dialog window and telling the HumanView what
+                // should be shown instead.
+                boolean again = getRob().getDamage() > 3;
+                humanView.setDialogInSidebarActive(false);
+                humanView.sendAgainPowerDown(again);
+                
+            }
+        }
+    }
+    //
+    class EmergencyRegRepairSubmitter extends TimerTask{
+        
+      //  Bot me;
+        int repairPoints;
+        public EmergencyRegRepairSubmitter (/*Bot me,*/ int repairPoints){
+            //this.me = me;
+            this.repairPoints = repairPoints;
+        }
+        
+        public void run(){
+            showMessage(Message.say("HumanPlayer","legalRegisterRepair"));
+            if (humanView != null) {
+                // calling the send method of HumanView (that will call the
+                // corresponding send method in this class) so that we don't have to take 
+                // care about removing the dialog window and telling the HumanView what
+                // should be shown instead.
+                ArrayList registerIndices = new ArrayList(repairPoints);
+                for (int i=0;i<Bot.NUM_REG && repairPoints>0;i++){                    
+                    if (emergencyBotCopy.getLockedRegister(i) != null ) {                       
+                        // send repair method starts counting register at 1 (not 0)
+                        registerIndices.add(new Integer(i+1));
+                        repairPoints--;
+                    }
+                }
+                humanView.setDialogInSidebarActive(false);
+                humanView.sendRepairRegisters(registerIndices);      
+                
+            }
+        }
+    }
+    
+   
+    private volatile static int idCounter=0;
     class EmergencyCardSubmitter extends TimerTask {
        
-        public EmergencyCardSubmitter( ){
+        //private Bot me;
+        private int id; 
+        private boolean gotCancel = false;
+        public EmergencyCardSubmitter(/* Bot bot*/){
+            //me = bot;
+            id = idCounter++;
         }
 
         public void run() {
-            showMessage(Message.say("HumanPlayer", "closeToTimeout", bufferSecondsBeforeSendingCards));
+           // showMessage(Message.say("HumanPlayer", "closeToTimeout", BUFFER_SECONDS_BEFORE_SENDING_CARDS));
+           int secondsLeft = BUFFER_SECONDS_BEFORE_SENDING_CARDS;
             synchronized (this){
                 try {
-                    wait (bufferSecondsBeforeSendingCards*1000);
+                    CAT.debug(id+": waiting..");
+                    while (secondsLeft>5){
+                        if (gotCancel || cardsSent || gameOver) {
+                            CAT.debug(id+": return as requested");
+                            return;
+                            
+                        }
+                        showMessage(Message.say("HumanPlayer", "closeToTimeout", secondsLeft));
+                        secondsLeft-=5;
+                        
+                        wait(5000);                        
+                    }
+                    while (secondsLeft>0){
+                        if (gotCancel || cardsSent || gameOver) {
+                            CAT.debug(id+": return as requested");
+                            return;
+                        }
+                        showMessage(Message.say("HumanPlayer", "closeToTimeout", secondsLeft));
+                        secondsLeft--;                                                                         
+                        wait(1000);
+                    }
+                   // wait (BUFFER_SECONDS_BEFORE_SENDING_CARDS*1000);
                 }
                 catch (InterruptedException ie){
-                    CAT.error("interrupted while giving user a last chance for sending cards himself", ie);
+                    CAT.warn(id+":interrupted while giving user a last chance for sending cards himself", ie);
+                    if (gotCancel || cardsSent || gameOver) {
+                        CAT.debug(id+": return as requested");
+                        return;
+                    }
                 }
             }
             synchronized (comm) {
-                if (!gameOver && !cardsSent) {
+                CAT.debug(id+": in sync comm block");
+                if (!gameOver && !cardsSent && !gotCancel) {
                     mode = MODE_OTHER;
-                    showMessage(Message.say("SpielerMensch","legalZug"));
+                    CAT.debug(id+":going to send..");
                    
                     /*
                     Bot rob = getRob();                
@@ -706,20 +1022,34 @@ public class HumanPlayer extends BNSThread {
                         prog[i] = (i+1);
                     }
                     */
-                    int [] prog = getCompleteWisenheimerMove();
-                    comm.registerProg(name,prog,false);
-                    cardsSent = true;
-                   
                     humanView.setDialogInSidebarActive(false); // hide cardpanel
+                    int [] prog = getCompleteWisenheimerMove(emergencyBotCopy);                  
+                    comm.registerProg(name,prog,false);                    
+                    cardsSent = true;
+                    showMessage(Message.say("SpielerMensch","legalZug"));
+                   
                     }                
             }
-            
+            CAT.debug(id+": bye");
+        }
+        public boolean cancel(){
+            gotCancel = true;
+            CAT.debug(id+": CANCEL");
+            boolean back = super.cancel();
+            CAT.debug(id+": super.cancel call returned: "+back);
+            synchronized (this) {
+                CAT.debug(id+": notifyAll.");                
+                this.notifyAll();                                
+            }
+            CAT.debug(id+": cancel end");
+            return back;
+           
         }
         
     }
 
     private void d(String s) {
-        Global.debug(this, s);
+        CAT.debug(s);
     }
 
 }
