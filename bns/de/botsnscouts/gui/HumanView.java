@@ -52,7 +52,7 @@ import de.botsnscouts.widgets.TJPanel;
  * @author Lukasz Pekacki
  */
 
-public class HumanView extends JPanel implements HumanViewInterface {
+public class HumanView extends JPanel  {
 
     static Category CAT = Category.getInstance(HumanView.class);
 
@@ -325,16 +325,12 @@ public class HumanView extends JPanel implements HumanViewInterface {
         cards.setWisenheimer(predCard);
     }
 
-    /**
-     * activate the knowitall
-     */
-    public void activateKlugScheisser() {
-    }
 
     /**
-     * remove the knowitall
+     * Remove the Wisenheimer from the cards he might be sitting on
      */
-    public void removeKlugScheisser() {
+    public void removeWisenheimer(){
+        cards.removeWisenheimer();
     }
 
     /**
@@ -374,12 +370,12 @@ public class HumanView extends JPanel implements HumanViewInterface {
         registers.resetAll();
     }
 
-    private void sendDirection(int d) {
+    protected void sendDirection(int d) {
         human.sendDirection(d);
         showMessageToPlayer(Message.say("SpielerMensch", "mkartenMisch"));
     }
 
-    private void sendAgainPowerDown(boolean again) {
+    protected void sendAgainPowerDown(boolean again) {
         if (!again) {
             showMessageToPlayer(Message.say("SpielerMensch", "mkartenMisch"));
         }
@@ -389,10 +385,18 @@ public class HumanView extends JPanel implements HumanViewInterface {
         human.sendAgainPowerDown(again);
     }
 
-    private void sendRepairRegisters() {
+    private void sendRepairRegisters(){
+        sendRepairRegisters(repairRegisters.getSelection());
+    }
+    
+    /**
+     * 
+     * @param regsRep A list of Integers, containing the number(s) of the register(s)
+     *              to repair; register numbers start with 1 (not 0)
+     */
+    protected void sendRepairRegisters(ArrayList regsRep) {
         CAT.debug("sendRepairRegisters");
         showMessageToPlayer(Message.say("SpielerMensch", "mkartenMisch"));
-        ArrayList regsRep = repairRegisters.getSelection();
         unlockRegisters(regsRep);
         human.sendRepair(regsRep);
     }
@@ -400,8 +404,9 @@ public class HumanView extends JPanel implements HumanViewInterface {
     private void unlockRegisters(ArrayList repairRegs) {
         CAT.debug("Die Register vor dem unlock: " + registers.toString());
         for (int i = 0; i < repairRegs.size(); i++) {
-            CAT.debug("Entsperre Register: " + ((Integer) repairRegs.get(i)).intValue());
-            registers.unlockRegister(((Integer) repairRegs.get(i)).intValue() - 1);
+            int regNum = ((Integer) repairRegs.get(i)).intValue();
+            CAT.debug("Entsperre Register: " +regNum );
+            registers.unlockRegister(regNum - 1);
         }
 
         CAT.debug("Die Register nach dem unlock: " + registers.toString());
