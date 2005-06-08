@@ -539,7 +539,7 @@ public class Bot {
     /** Programm the register.
      *  This means: set "zug" according to the cards I have in "Karten"
      * and the locked registers.
-     * @param Array which tells how to programm: Includes the index in "karten"
+     * @param Array which tells how to program: Includes the index in "karten"
      * of the card to be put in the register. The array is one shorter for
      * each lockes register.
      * Pre: register includes only values from 1 to deales cards+1.
@@ -549,7 +549,7 @@ public class Bot {
 	int j=0;
 	for (int i=0; i < NUM_REG; i++){
 	    if (!lockedRegisters[i]){
-		move[i] = cards[register[j++]-1];
+	        move[i] = cards[register[j++]-1];
 	    }
 	}
 
