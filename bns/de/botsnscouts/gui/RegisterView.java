@@ -104,10 +104,12 @@ public class RegisterView extends JButton {
     }
 
     public void setLocked(boolean b){
-	if(b) h.setState(HumanCard.LOCKED);
-	else  {
-	    if (h!=null) {
-		h.setState(HumanCard.FREE);
+        if(b) {
+            h.setState(HumanCard.LOCKED);
+        }
+        else  {
+            if (h!=null) {
+                h.setState(HumanCard.FREE);
 	    }
 	}
 	//	repaint();
