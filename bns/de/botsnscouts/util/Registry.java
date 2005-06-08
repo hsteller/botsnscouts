@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import org.apache.log4j.Category;
 
 import de.botsnscouts.autobot.AutoBot;
@@ -71,9 +74,9 @@ public class Registry implements ShutdownListener, GameOverListener {
             this.isEnabled = enabled;
         }
         
-        public void addGame(Server server, String serverIp, int serverPort){
+        public Game addGame(Server server, String serverIp, int serverPort){
             if (!isEnabled) {
-                return;
+                return null;
             }
             CAT.debug("xXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx");
             CAT.debug(dump());
@@ -84,6 +87,7 @@ public class Registry implements ShutdownListener, GameOverListener {
             synchronized (games) {
                 games.add(game);
             }
+            return game;
             
         }
         
@@ -151,7 +155,7 @@ public class Registry implements ShutdownListener, GameOverListener {
             if (game == null) {
                 CAT.info("Registry: Tried to add a client to a non-existing game on "
                                 +serverIp+":"+port+"; this is ok if you participate in a non-local game");             
-                addGame(null, serverIp, port);  
+                game = addGame(null, serverIp, port);  
             }            
             ClientInfo info = new ClientInfo( client, clientInfoClientType);
             game.addClient(info);
@@ -273,9 +277,9 @@ public class Registry implements ShutdownListener, GameOverListener {
                 	serv.shutdown(false);	    
             }
             try {
-                int seconds = 7;
+                int seconds = 5;
                 CAT.info("Registry waits at max. "+seconds+" seconds for the server to sort things out..");
-                serv.join(seconds*1000);
+                 serv.join(seconds*1000);           
             }
             catch (Exception e){
                 	CAT.warn(e);
@@ -350,6 +354,7 @@ public class Registry implements ShutdownListener, GameOverListener {
                  
                  shutdownServer(serv, someThreadsGame, false);
                  registryRemoveAndKillAutobots(someThreadsGame);
+                 
                                  
             }
             else {
@@ -388,15 +393,24 @@ public class Registry implements ShutdownListener, GameOverListener {
 	                    Thread temp = new Thread(farkingDeadLocks);
 	                    temp.start();
 	                    try {
-	                        temp.join(5000);
+	                        temp.join(5500);
 	                    }
 	                    catch (InterruptedException ie){
 	                        CAT.warn(ie);
 	                    }
 	                    if (pseudoBoolean[0] == null){ // Thread "temp" seems not to have finished
 	                                                               // we are only here because of the join-timeout
-	                        CAT.info("Sorry I'm not sure that everything (the server)  shut down nicely,\n"
-	                                        +" so I end the program as starting a new server probably won't work..");
+	                        String message1 = Message.say("Registry", "serverHangs1");
+	                        String message2 = Message.say("Registry", "serverHangs2");
+	                        String message3 = Message.say("Registry", "serverHangs3");
+	                        String title         = Message.say("Registry","serverHangsTitle");
+	                        JLabel[] msg = new JLabel[3];
+	                        msg[0] = new JLabel(message1);
+	                        msg[1] = new JLabel(message2);
+	                        msg[2] = new JLabel(message3);
+	                        JOptionPane.showMessageDialog(Start.getLauncherAppSingleton(),msg, title,
+	                                        JOptionPane.ERROR_MESSAGE);
+	                        CAT.warn("server hangs in shutdown");
 	                        bruteRestart();
 	                    }
 	                    redisplayMenu();
