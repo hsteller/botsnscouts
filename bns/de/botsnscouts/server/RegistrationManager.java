@@ -128,7 +128,31 @@ class RegistrationManager implements Runnable, Shutdownable {
            CAT.debug("creating server socket");
             seso = new ServerSocket(server.getRegistrationPort());
             seso.setSoTimeout(0);
-            notifyStartListeners();
+            
+            // we need to wait a little, so that "seso.accept()" below
+            // is up and working; otherwise a quick (local) client still tries
+            // to connect too early (yes, that does happen)
+            // => notifying from this "dummy" Thread that will wait a few ms
+            //      before notifying the listeners
+           
+            Runnable notifier = new Runnable(){
+                Object foo = new Object();
+                public void run() {
+                    try {
+                        synchronized (foo) {
+                            foo.wait(200);
+                        }
+                    }
+                    catch (InterruptedException ie){
+                        CAT.warn(ie);
+                    }
+                    notifyStartListeners();
+                }
+            };
+            Thread dummyNotify = new Thread(notifier);
+            dummyNotify.start();
+           
+            
             
             while (!Thread.interrupted()) {
                 clientSocket = seso.accept();

@@ -50,7 +50,7 @@ public class Launcher implements RegistrationStartListener{
      *  ParticipateInAGame will use this method to synchronize on so that the  player
      *  won't be launched until the server has signaled that the registration has started. 
      */
-    private static Launcher meTheLauncher = new Launcher();
+    private static  Launcher meTheLauncher = new Launcher();
     
     // launches output
     public static BNSThread watchAGame(String ip, int port, boolean noSplash) {
@@ -67,7 +67,7 @@ public class Launcher implements RegistrationStartListener{
                 }     
             };
             gameRegistry.addClient(view, ip, port);
-            view .start();
+            view.start();
             return view;
            
         } catch (Exception exp) {
@@ -78,6 +78,7 @@ public class Launcher implements RegistrationStartListener{
 
     // launches human player
     public static BNSThread participateInAGame(String ip, int port, String name, int farbe, boolean noSplash) {
+        CAT.debug("participate: has registration started? -> "+meTheLauncher.regHasStarted);
         if (noSplash) { 
             // this also means that we were started due to  the checked  
               // "participate checkbox" on server startup - and not via "join game" in the main menu;
@@ -87,9 +88,9 @@ public class Launcher implements RegistrationStartListener{
         HumanPlayer ret;
         try {
             if (CAT.isDebugEnabled()) CAT.debug("Trying to start human player...");
-            ret = new HumanPlayer(ip, port, name, farbe, noSplash);
-            ret.start();
+            ret = new HumanPlayer(ip, port, name, farbe, noSplash);            
             gameRegistry.addClient(ret, ip, port);
+            ret.start();
         } catch (Exception u) {
             CAT.error("Error while starting the game for player " + name + ": " + u.getMessage());
             return null;
@@ -121,17 +122,19 @@ public class Launcher implements RegistrationStartListener{
     }
 
     public Server startGame(GameOptions options, ServerObserver listener) throws OneFlagException, NonContiguousMapException {
-       server = new Server(options, listener);
+       
        synchronized (meTheLauncher) {
-           regHasStarted  = false;
+           meTheLauncher.regHasStarted  = false;
        }
+       server = new Server(options, listener);
        server.addRegistrationStartListener(meTheLauncher);
-       server.start();
+       
        String ip = options.getHost();
        if (ip == null){
            ip = GameOptions.DHOST;
        }
        gameRegistry.addGame(server, ip, options.getRegistrationPort());
+       server.start();
        return server;
    }
 
@@ -139,43 +142,48 @@ public class Launcher implements RegistrationStartListener{
     public void gameStarts(String ip, int port) {
         server.startGame();
         synchronized (meTheLauncher) {
-            regHasStarted  = false;
+            meTheLauncher.regHasStarted  = false;
         }
     }
 
     public void stopServer() {
+        
         // Not nice, but this is the way it was done before...
         synchronized (meTheLauncher) {
-            regHasStarted  = false;
+            CAT.debug("stopServer1: "+meTheLauncher.regHasStarted);
+            meTheLauncher.regHasStarted  = false;
         }
         server.shutdown();              
         server = null;
         System.gc();
+        CAT.debug("stopServer2: "+meTheLauncher.regHasStarted);
     }
     
     private volatile boolean regHasStarted = false;
    
     public  void registrationStarted(){
-        synchronized (meTheLauncher) {
-            regHasStarted = true;
-            meTheLauncher.notifyAll();
-            
+
+        synchronized (meTheLauncher) {    
+            CAT.debug("got notified of registration start: "+meTheLauncher.regHasStarted);
+            meTheLauncher.regHasStarted = true;
+            meTheLauncher.notifyAll();            
         }
     }
     
     private void ensureRegistrationHasStarted(){
         synchronized (meTheLauncher) {
-	        while (!regHasStarted) {
+            CAT.debug("entering ensure; state = "+meTheLauncher.regHasStarted  );
+	        while (!meTheLauncher.regHasStarted) {
 	            try {
 	                meTheLauncher.wait();
 	            }
 	            catch (InterruptedException ie){
-	                CAT.error(ie);
-	                meTheLauncher.notifyAll();
+	                CAT.error(ie);	                
 	            }	            	            
 	        }
 	       meTheLauncher.notifyAll();
         }
+        CAT.debug("leaving ensure; state = "+meTheLauncher.regHasStarted  );
         
     }
     
