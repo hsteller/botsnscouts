@@ -928,19 +928,20 @@ public class KommClient implements Shutdownable{
 	    int zaehler=0;
 	    int start=0;
 	    while (pos!=-1) {
-		pos = rein.indexOf(',',start);
-		if (pos!=-1)
-		    zaehler++;
-		start=pos+1;
+			pos = rein.indexOf(',',start);
+			if (pos!=-1)
+			    zaehler++;
+			start=pos+1;
 	    }// now : zaehler==number of names == number of ','
 
 
 	    raus = new String [zaehler];
 	    rein = rein.substring (1); // remove '('
 	    for (int i=0;i<zaehler;i++) {
-		int kommapos = rein.indexOf(',');
-		raus [i] = Encoder.commDecode(rein.substring(0,kommapos));
-		rein = rein.substring(kommapos+1); // remove read names and ','
+			int kommapos = rein.indexOf(',');
+			String myString = rein.substring(0,kommapos).trim();
+			raus [i] = Encoder.commDecode(myString);
+			rein = rein.substring(kommapos+1); // remove read names and ','
 	    }
 
 

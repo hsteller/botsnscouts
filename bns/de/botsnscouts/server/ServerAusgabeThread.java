@@ -139,9 +139,9 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 
 			case ServerAntwort.GIBSPIELSTAND:
 			    if(info.gameRunning()){
-				komm.spielstand(new Boolean(true), info.getStanding());
+				komm.spielstand(true, info.getStanding());
 			    }else{
-				komm.spielstand(new Boolean(false), info.getStanding());
+				komm.spielstand(false, info.getStanding());
 				notifyServer();
 			    }
 			    break;

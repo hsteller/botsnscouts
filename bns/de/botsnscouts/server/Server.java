@@ -350,7 +350,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
     }
 
     public String[] getStanding() {
-        String[] s = new String[8];
+        String[] s = new String[wonThreads.size()];
         int i = 0;
         for (Iterator e = wonThreads.iterator(); e.hasNext();) {
             s[i++] = ((ServerRoboterThread) e.next()).rob.getName();

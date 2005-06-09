@@ -1024,8 +1024,7 @@ public class KommServer {
     /**
      * Zur Antwort auf Info-Request 'gibSpielstand'. Boolean 'laeuft' gibt an,
      * ob das Spiel noch l�uft oder schon beendet ist (true = Spiel l�uft,
-     * false=Spiel beendet). ANMERKUNG: Das 'laeuft' ein Boolean-Objekt und kein
-     * boolean ist, war nur ein Tippfehler; ist jetzt aber nicht mehr zu �ndern.
+     * false=Spiel beendet). 
      * Falls das Spiel beendet ist, enth�lt das Array die Namen der Spieler,
      * wobei der des Gewinners an erster Stelle steht Falls nicht, wird 'null'
      * anstelle des Arrays �bergeben.
@@ -1035,11 +1034,11 @@ public class KommServer {
      *                           IOException) auftrat
      */
 
-    public void spielstand(Boolean laeuft, String[] endplazierung) throws KommException {
+    public void spielstand(boolean laeuft, String[] endplazierung) throws KommException {
         // 2.7.99
         try {
             String raus = "";
-            if (laeuft.booleanValue())
+            if (laeuft)
                 raus = "SS(LAU,";
             else {
                 raus = "SS(END,";
