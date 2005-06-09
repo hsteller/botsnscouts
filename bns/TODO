@@ -1,5 +1,3 @@
-Things to do after fixing the more-or-less clean shutdown and
-restart issue
 
 DONE  - !!!!!!BUG: while playing in background:
   there is something wrong with resetting the timer for emergency
@@ -17,14 +15,15 @@ DONE - autosubmit of client answer for all questions, not only for register
        direction after destruction, stay power down, repair register
 
 
-- nicer winner list, maybe robot images (different sizes?) and colored names 
+DONE -  nicer winner list, maybe robot images (different sizes?) and colored names 
 
 - reimplement access to some more info about the other players
-  (locked registers(!) and maybe cards played but see below)
+  (locked registers in Tooltip of damage bar)
 
 - keep last choices of player as default for different things:
-  preferred bot color, last used board layout (maybe autosave ".spf"
-  on game startup as "lastUsed_autosavespf" and loading it as default?)
+  last used board layout (maybe auto-save the last ".spf"
+   on game startup as "lastUsed_autosavespf" and loading it as default;
+   or is that what default.spf is for?->rename to autosave or something)
 
 TEST - reduce initial height of card panel as it looks bad/is too big for
        1024x768 with the kde panel stealing some of the 768 pixels at the bottom
@@ -40,6 +39,9 @@ TEST - reduce initial height of card panel as it looks bad/is too big for
    display the current robot and the card that will be executed;
    maybe little robots with five registers that get uncovererd besides them
    and highliting the card to be evaluated 
+
+[- hard game restart: try to restart the program in a new JVM if the server
+   hangs (or maybe everytime, to free memory?)]
 
 TEST (- increase the initial heapsize in the scripts?
          -> test memory usage with enabled animations, 3x3 boards and 8 players 
