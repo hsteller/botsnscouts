@@ -28,6 +28,7 @@ package de.botsnscouts.start;
 import org.apache.log4j.Category;
 
 import de.botsnscouts.autobot.AutoBot;
+import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.gui.Ausgabe;
 import de.botsnscouts.gui.HumanPlayer;
 import de.botsnscouts.server.Server;
@@ -134,6 +135,7 @@ public class Launcher implements RegistrationStartListener{
            ip = GameOptions.DHOST;
        }
        gameRegistry.addGame(server, ip, options.getRegistrationPort());
+       SimBoard.clearBoardCache();
        server.start();
        return server;
    }

@@ -668,8 +668,10 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
         if (board == null) {
             CAT.error("feld ist null");
         }
-        CAT.debug("setze x und archivX in robots auf " + board.getFlags()[0].getX());
-        CAT.debug("setze y und archivY in robots auf " + board.getFlags()[0].getY());
+        if (CAT.isDebugEnabled()) {
+            CAT.debug("setze x und archivX in robots auf " + board.getFlags()[0].getX());
+            CAT.debug("setze y und archivY in robots auf " + board.getFlags()[0].getY());
+        }
         for (int i = 0; i < curBotsThreads.size(); i++) {
             ((ServerRoboterThread) (curBotsThreads.elementAt(i))).rob.setPos(board.getFlags()[0]);
             ((ServerRoboterThread) (curBotsThreads.elementAt(i))).rob.touchArchive();
@@ -1267,6 +1269,11 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
     
    
     public void doShutdown() {
+        CAT.debug("doShutdown..");
+        if (board != null) {
+            board.setServer(null);
+        }
+        
         if (messageThread != null){
     	    CAT.debug("messageThread");
     	    messageThread.shutdown();      
@@ -1277,8 +1284,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
     	        CAT.warn(e);
     	    }
     	}
-        
-        CAT.debug("doShutdown..");
+                        
         	int count = shutdownableCollections.length;
         	CAT.debug("count="+count);
         	for (int i=0;i<count;i++){

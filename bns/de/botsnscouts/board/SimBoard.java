@@ -38,6 +38,7 @@ import de.botsnscouts.server.Server;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Directions;
 import de.botsnscouts.util.FormatException;
+import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Stats;
 import de.botsnscouts.util.StatsList;
@@ -200,10 +201,11 @@ public class SimBoard extends Board implements Directions {
 
     /**
      * Initializes including notification support
-     *
+     * 
      * @param map   The game map in the network-specified string
      * @param flags The flags
      */
+    // used by the Server
     public SimBoard(int sx, int sy, String map, Location[] flags, Server s) throws FormatException, FlagException {
         super(sx, sy, map, flags);
         server = s;
@@ -281,6 +283,7 @@ public class SimBoard extends Board implements Directions {
     /**
      * Initialize without notification support
      */
+    // used by getInstance() and everybody else.. 
     public SimBoard(int x, int y, String map, Location[] flags) throws FormatException, FlagException {
         this(x, y, map, flags, null);
     }
@@ -289,7 +292,8 @@ public class SimBoard extends Board implements Directions {
      * Board without notification support and without inital flags.
      *
      * @throws FlagException will not be thrown here.
-     */
+     */    
+    // used by BoardView for board thumbnails&stuff
     public SimBoard(int x, int y, String map) throws FormatException, FlagException {
         this(x, y, map, new Location[0]);
     }
@@ -1116,10 +1120,29 @@ public class SimBoard extends Board implements Directions {
     private static Map instances = new HashMap();
 
     public static SimBoard getInstance(int x, int y, String field, Location[] flags) throws FormatException, FlagException {
-        if (instances.get(field) == null) {
-            instances.put(field, new SimBoard(x, y, field, flags));
+        String hashString = field+"XXX("+x+","+y+")XXX"+Global.arrayToString(flags,';');
+        synchronized (instances) {
+	        SimBoard old = (SimBoard)instances.get(hashString);
+	        if (old == null) {
+	            old = new SimBoard(x, y, field, flags);
+	            instances.put(hashString,old );
+	        }
+	        return old;
         }
-        return (SimBoard) instances.get(field);
+        
+	   
+	        
     }
-
+    
+    public static void clearBoardCache(){
+        synchronized (instances){
+            instances.clear();
+        }
+    }
+    
+    public void setServer(Server serv){
+        	this.server = null;
+    }
+    
+    
 } // spielfeldsim ende
