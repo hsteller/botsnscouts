@@ -883,19 +883,6 @@ public class HumanPlayer extends BNSThread {
     }
 
     private void abmelden() {
-        /*  while (mode!=MODE_PROGRAM) {
-            CAT.debug("waiting for next turn to quit..");
-            try {
-              synchronized(this){
-                wait();
-              }
-            }
-            catch (InterruptedException ie){
-              CAT.error(ie.getMessage(), ie);
-            }
-
-          }
-          */
         comm.abmelden(name);
     }
 

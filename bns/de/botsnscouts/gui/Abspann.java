@@ -36,6 +36,7 @@ import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Message;
 /**
  * Diese Klasse spielt bei Spielende den Abspann ab
+ * @deprecated use de.botsnscouts.gui.WinnerListPanel
  **/
 public class Abspann extends JPanel {
     // Konstanten

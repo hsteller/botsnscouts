@@ -42,7 +42,17 @@ import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJPanel;
 
-
+/**
+ * 
+ * Gets shown in the right half of the GUI (instead of the cards, registers etc) if
+ * the game is over.
+ * Contains a big vertical message, every letter in a TJLabel; also, another TJLabel
+ * for additional inforamtion (example: big message="robot destroyed", small="reason:rule violation").
+ * But mostly intended to show something like "Goal reached" if the bot has reached the
+ * final flag
+ * 
+ * @version $Id$
+ */
 public class ZielfahneErreicht extends TJPanel{
 
     private static final Color backColor = new Color(4,64,4);

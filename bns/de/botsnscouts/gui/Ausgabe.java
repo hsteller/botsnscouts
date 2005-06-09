@@ -185,7 +185,7 @@ public class Ausgabe extends BNSThread {
                         if (!isShutDown()){
                             shutdown(true);
                         }
-                        return;
+                        
                     }
                     break;
                 }
@@ -198,19 +198,21 @@ public class Ausgabe extends BNSThread {
                         comHandleWeWereRemoved(kommAntwort);
                     }
                     catch (Exception e){
-                        CAT.error(e);
-                        if (!isShutDown()){
-                            shutdown(true);
-                        }
+                        CAT.error(e.getMessage(), e);
+                        //if (!isShutDown()){
+                         //   shutdown(true);
+                       // }
                     }
                 }
             }
 
         }
         CAT.debug("Ausgabe reached end of its run method");
-        //showActionMessage(Message.say("AusgabeFrame","spielende"));
-        // TODO shutdown of Views only via menu or closing of a window?  shutdown();
-        return;
+        CAT.debug("now waiting for signal that I may leave the method");
+        waitBlockingUntilShutdownCalled();
+        CAT.debug("Ausgabe leaves run");
+        
+        
     }
 
 
@@ -503,6 +505,10 @@ public class Ausgabe extends BNSThread {
     
     private void quit (boolean keepWatching, boolean quitHumanPlayer, boolean calledByShutdown){        
        
+        if (!keepWatching) {
+            allowRunToFinish();
+        }
+        
         if (!keepWatching && kommClient!=null){
 	        abmelden();      
 	        try {
@@ -533,12 +539,13 @@ public class Ausgabe extends BNSThread {
         
     }
     
+ 
+    
     public void doShutdown() {
         CAT.debug("starting shutdown..");
-       
-        
         sequencer.clear();               
         quit(false, true, true);
+        allowRunToFinish();
         CAT.debug("reached end of shutdown");
     }
 
@@ -582,10 +589,12 @@ public class Ausgabe extends BNSThread {
         try {
             String[] spielErgebnis = kommClient.getSpielstand();
             if (spielErgebnis != null) { // were we removed because the game is over?
-                CAT.debug("We have " + spielErgebnis.length + " winners");
+                CAT.debug("We have " + spielErgebnis.length + " winners");             
                 ausgabeView.showWinnerlist(spielErgebnis);
-            } else
+               
+            } else {
                 CAT.debug("No winner exists");
+            }
         } catch (KommException e) {
             CAT.error(e.getMessage(), e);
             return;
@@ -735,6 +744,28 @@ public class Ausgabe extends BNSThread {
 
     }
 
+    private volatile boolean mayFinishRun = false;
+  //  private Object shutdownLock = new Object();
+    private void waitBlockingUntilShutdownCalled(){
+        synchronized (this) {
+            while (!mayFinishRun) {
+                try {
+                    this.wait();
+                }
+                catch (InterruptedException ie) {
+                    CAT.warn(ie.getMessage(), ie);
+                }
+            }            
+        }
+    }
+    
+    private void allowRunToFinish(){
+        synchronized (this) {
+            mayFinishRun = true;
+            this.notifyAll();
+        }
+    }
+    
     //</SEQUENCER-FIx>
 
     private void comHandleMessages(ClientAntwort kommAntwort) {

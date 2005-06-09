@@ -28,6 +28,7 @@ package de.botsnscouts.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -516,9 +517,20 @@ public class AusgabeView extends JPanel  {
      *  shows the winner list at game over
      */
     public void showWinnerlist (String[] winners) {
-	gameBoardCanvas.setVisible(false);
-	add(new Abspann(winners),BorderLayout.CENTER);
-	validate();
+		gameBoardScrollPane.setVisible(false);				
+		this.remove(gameBoardScrollPane);
+		View view = ausgabe.getView();
+		if (view != null){
+		    view.logFloatPane.setVisible(false);
+		}
+        WinnerListPanel wp = new WinnerListPanel(winners);        
+        //JPanel bla = new JPanel(); // stupid, but the only (simple) working way I found to 
+        // show the WinnerListPanel including its borders
+        ///bla.setLayout(new BorderLayout());
+       // bla.add(wp, BorderLayout.CENTER);
+       // add(bla,BorderLayout.CENTER);
+        add(wp, BorderLayout.CENTER);
+		validate();
     }
 
     protected void showScout(int chosen, Bot[] robs) {
