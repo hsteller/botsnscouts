@@ -29,6 +29,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -132,15 +133,18 @@ public class RegisterView extends JButton {
 
     }
 
+   
+    
     public HumanCard getCard() {
 	return h;
     }
 
     static final Image lockedImage = ImageMan.getImage(ImageMan.PNG_REGLOCK);
-    static Color back = new Color(65,65,65,192);
+    public static final Color BG_COLOR = new Color(65,65,65,192);
     public void paintComponent(Graphics g){
-        g.setColor( back );
+        g.setColor( BG_COLOR );
         g.fillRect(0,0,getWidth(),getHeight());
+     
 	super.paintComponent(g);
 	if(myX==0||myY==0){
 	    Dimension d=getSize();
@@ -170,7 +174,7 @@ public class RegisterView extends JButton {
         r.setLocked( true );
 
 	f.getContentPane().add(r);
-	f.pack();
+f.pack();
 	f.setLocation(100,100);
 	f.setVisible(true);
     }
