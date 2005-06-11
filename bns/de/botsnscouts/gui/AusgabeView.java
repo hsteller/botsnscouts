@@ -164,7 +164,7 @@ public class AusgabeView extends JPanel  {
 		// create status panel
 		for (int i = 0; i < robots.length; i++) {
 			final String robotName = robots[i].getName();
-			RobotInfo r = new RobotInfo(robots[i], flagCount);
+			RobotInfo r = new RobotInfo(robots[i], flagCount, ausgabe.getInfoRegistersForBot(robotName));
 			r.addRobotInfoListener(new RobotInfoListener() {
 				public void robotClicked(RobotInfoEvent rie) {
 				    Bot robot = ((RobotInfo) rie.getSource()).getRobot();
