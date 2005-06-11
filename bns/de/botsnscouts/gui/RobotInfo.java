@@ -6,8 +6,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -21,19 +23,22 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToolTip;
 
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.CropperField2;
 import de.botsnscouts.util.CursorMan;
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.TJLabel;
 
 public class RobotInfo extends JComponent  implements RobotStatus, ActionListener {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( RobotInfo.class );
     static final Image[] roboImages = ImageMan.getImages( ImageMan.ROBOS );
     static final Image[] cursors = CursorMan.getImages( CursorMan.STATUSROBOTS );
-    static Image[] stuff = null;
+    private static Image[] stuff = null;
 
     static final Color COLOR_LED_OFF = new Color(0,0,50);
     static final Color COLOR_LED_ON  = Color.green;
@@ -42,15 +47,15 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
    
 
     static final int MINI_IMAGE_COUNT = 4;
-    DamageBar damageBar1 = new DamageBar();
-    FlagBar flagBar2 = new FlagBar();
-    StatusRobot statusRobot1; // must not be initialized here because it needs the bot images that might not be loaded yet
-    JButton diskButton1 = new JButton();
-    int viz;
-    int ranking = 0;
-    Bot robot;
+    private DamageBar damageBar1;
+    private FlagBar flagBar2 = new FlagBar();
+    private StatusRobot statusRobot1; // must not be initialized here because it needs the bot images that might not be loaded yet
+    private JButton diskButton1 = new JButton();
+    private int viz;
+    private int ranking = 0;
+    private Bot robot;
 
-    Color ledColor = COLOR_LED_OFF;
+    private Color ledColor = COLOR_LED_OFF;
 
     public Color getLedColor() {
         return ledColor;
@@ -80,11 +85,11 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     static Image getDisk() { return getImage(2); }
     static Image getOffSwitch() { return getImage(3); }
 
-    RobotInfo(Bot r, int flagCount ) {
-        this( r, flagCount, r.getBotVis() );
+    RobotInfo(Bot r, int flagCount, ScalableRegisterRow regsOfR_forStatusTooltip ) {
+        this( r, flagCount, r.getBotVis(), regsOfR_forStatusTooltip );
     }
 
-    RobotInfo(Bot r, int flagCount, int viz) {
+    RobotInfo(Bot r, int flagCount, int viz,ScalableRegisterRow regsOfR_forStatusTooltip) {
         this.robot = r;
         this.viz = viz;
         Icon big = new ImageIcon(roboImages[viz*4+robot.getFacing()]);
@@ -92,6 +97,9 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         damageBar1 = new DamageBar();
         flagBar2 = new FlagBar(flagCount);
         statusRobot1 = new StatusRobot(big, small, r);
+        if (regsOfR_forStatusTooltip != null) {
+            statusRobot1.setToolTip(new RegisterToolTip(regsOfR_forStatusTooltip), true);
+        }
         diskButton1 = new JButton();
         diskButton1.setIcon( new ImageIcon(getDisk()) );
         flagBar2.addActionListener(this);
@@ -115,8 +123,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         }
     }
 
-   private void initLayout() throws Exception {
- 
+   private void initLayout() throws Exception {       
         this.setBackground( Color.black );
         this.setSize( getPreferredSize() );
         this.setLayout(null);
@@ -139,7 +146,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         flagBar2.setToolTipText(Message.say("RobotInfo", "nextFlag", robot.getName()));
         statusRobot1.setToolTipText(Message.say("RobotInfo", "botPos", robot.getName()));
         damageBar1.setToolTipText(Message.say("RobotInfo", "damage", robot.getName(),""+robot.getDamage()));
-    
+   
         // flagBar2, statusRobot1,damageBar1 should not be focusable either;
         // the constructors of the above classes should take care of that and set the focusable
         // property to false
@@ -247,8 +254,14 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         }
     }
 
+  
+   
+    
+    
+    
+    
     public void updateRobot(Bot r) {
-        
+   
         robot = r;
         damageBar1.setDamageValue(r.getDamage());
         damageBar1.setToolTipText(Message.say("RobotInfo", "damage",r.getName(), r.getDamage()+""));
@@ -273,7 +286,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         for(int i=0; i<6; i++) {
             Bot robot = Bot.getNewInstance("TestRob " + i);
             robot.setActivated( i % 2 == 0 );
-            final RobotInfo db = new RobotInfo( robot, 7, i);
+            final RobotInfo db = new RobotInfo( robot, 7, i, null);
             db.setWinnerNumber(i);
             db.setBorder( BorderFactory.createLineBorder(Color.black) );
             db.setSize( db.getPreferredSize() );
