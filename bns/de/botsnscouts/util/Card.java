@@ -31,9 +31,26 @@ package de.botsnscouts.util;
  * server.
 */
 
+import java.awt.Image;
 import java.util.Comparator;
+import java.util.HashMap;
+
+import javax.swing.ImageIcon;
 
 public abstract class Card  {
+    
+
+    public static final String ACTION_MOVE1      = "M1";
+    public static final String ACTION_MOVE2      = "M2";
+    public static final String ACTION_MOVE3      = "M3";
+    public static final String ACTION_BACK        = "BU";
+    public static final String ACTION_ROTATE_R = "RR";
+    public static final String ACTION_ROTATE_L = "RL";
+    public static final String ACTION_UTURN      = "UT";
+    
+    private static HashMap actionToImageMapping;
+    private ImageIcon myImage;
+    
     protected int prio;
     protected String action;
 
@@ -90,6 +107,34 @@ public abstract class Card  {
     public String toString(){
 	return "("+this.prio+","+this.action+")";
     }
-
-
+    
+    public static ImageIcon getImageIconByAction (String cardActionId){        
+        if (actionToImageMapping == null) {
+            initActionToImageMapping();
+        }
+        return (ImageIcon) actionToImageMapping.get(cardActionId);       
+    }
+    
+    public ImageIcon getImageIcon() {
+        if (myImage == null) {
+            myImage = getImageIconByAction(action);
+        }
+        return myImage;
+    }
+    
+    
+  
+    private static void initActionToImageMapping(){
+        ImageMan.finishLoading();
+        actionToImageMapping = new HashMap();
+        actionToImageMapping.put(ACTION_MOVE1, ImageMan.CardM1);
+        actionToImageMapping.put(ACTION_MOVE2, ImageMan.CardM2);
+        actionToImageMapping.put(ACTION_MOVE3, ImageMan.CardM3);
+        actionToImageMapping.put(ACTION_BACK, ImageMan.CardBU);
+        actionToImageMapping.put(ACTION_ROTATE_L, ImageMan.CardRL);
+        actionToImageMapping.put(ACTION_ROTATE_R, ImageMan.CardRR);
+        actionToImageMapping.put(ACTION_UTURN, ImageMan.CardUT);
+    }
+    
+    
 }
