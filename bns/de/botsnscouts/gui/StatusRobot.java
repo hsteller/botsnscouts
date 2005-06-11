@@ -18,6 +18,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JToolTip;
+import javax.swing.ToolTipManager;
 
 import de.botsnscouts.util.Bot;
 
@@ -124,9 +126,70 @@ public class StatusRobot extends JButton {
     
     protected void updateRobot (Bot newValues/*, ImageIcon bigIcon*/){
         robot = newValues;
+        
+    
         if (turnPicAccordingToFacing)
             bigBot= new ImageIcon(RobotInfo.roboImages[robot.getBotVis()*4+robot.getFacing()]);
         repaint();
     }
+    
+  
+    
+	public void setToolTipText(String text) {
+	    if(registerToolTip!=null) {
+	        //registerToolTip.setTipText(text);
+	        registerToolTip.setTheText(text);
+	       
+	    }
+	    
+	  super.setToolTipText(""); // DON'T ASK!!
+	  // 1. without calling this method (or passing null) there is no Tooltip, due to 
+	  //     Java's internal working (ToolTipManager registration
+	  // 2. WITH CALLING: 
+	  //     the text will be shown..but only if the JLabel registerToolTip.text
+	  //     is set, resulting in the text being shown TWIC
+	 // 
+	  // I mean, WHAT THE F____ ?!?!??!?
+	  //
+	  // don't get me started on the influence an uncommented getToolTipText() might have..
+	   
+	        
+	} 
+	
+/*
+	public String getToolTipText() {
+	 
+	   if(registerToolTip!=null) {
+	        return registerToolTip.getTipText();
+	    }
+	    else  {
+	        return super.getToolTipText();
+	    }
+	}
+*/
+
+    
+    private RegisterToolTip registerToolTip = null;
+    public void setToolTip(RegisterToolTip regTip, boolean useOldText){
+   /*  if (useOldText && regTip != null) {
+             String oldTip = getToolTipText();
+             regTip.setTipText(oldTip);
+             
+     }*/
+         registerToolTip = regTip;
+         //super.setToolTipText(regTip.getTipText());
+    }
+   
+    public JToolTip createToolTip(){       
+        //return new RegisterToolTip(new ScalableRegisterRow(0.3));
+      if (registerToolTip == null) {
+            return null;//super.createToolTip();
+            
+        }
+        else {
+            return registerToolTip;
+        }
+   }
+    
 
 }
