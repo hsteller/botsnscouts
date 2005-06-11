@@ -31,6 +31,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -49,6 +52,7 @@ import de.botsnscouts.comm.MessageID;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.BotVis;
+import de.botsnscouts.util.Card;
 import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.KrimsKrams;
@@ -163,7 +167,7 @@ public class Ausgabe extends BNSThread {
                 kommAntwort = kommClient.warte();
        
             } catch (Exception ke) { // something went wrong parsing the server's message
-                CAT.error(ke);
+                CAT.error(ke.getMessage(),ke);
                 if (!isShutDown()){
                     shutdown(true);
                 }
@@ -181,7 +185,7 @@ public class Ausgabe extends BNSThread {
                     try {
                         comHandleNotifyChange(kommAntwort);
                     } catch (Exception ke) {
-                        CAT.error(ke);
+                        CAT.error(ke.getMessage(),ke);
                         if (!isShutDown()){
                             shutdown(true);
                         }
@@ -221,10 +225,10 @@ public class Ausgabe extends BNSThread {
         try {
             kommAntwort = kommClient.warte();
         } catch (KommFutschException kE) {
-            CAT.error("KE: " + kE.getMessage());
+            CAT.error("KE: " + kE.getMessage(), kE);
             return false;
         } catch (KommException ke) {
-            CAT.error("ke: " + ke.getMessage());
+            CAT.error("ke: " + ke.getMessage(),ke);
             return false;
         }
 
@@ -252,7 +256,7 @@ public class Ausgabe extends BNSThread {
                     tempRob.setBotVis(h_int.intValue());
                     robots.put(playerNames[i], tempRob);
                 }
-
+                initRegisterRowHash(playerNames);
 
                 initBoard(robotsNewColor, flags);
 
@@ -276,12 +280,12 @@ public class Ausgabe extends BNSThread {
 
             } catch (KommException kE) {
                 CAT.error("Ausgabe: Beim Versuch, die Bot zu holen, erhalte ich: " +
-                        kE.getMessage());
+                        kE.getMessage(), kE);
                 return false;
             } catch (FormatException e) {
                 CAT.error(e.getMessage(),e);
-            } catch (FlagException e) {
-                CAT.error(e.getMessage(), e);
+            } catch (FlagException fe) {
+                CAT.error(fe.getMessage(), fe);
             }
         } 
         else if (kommAntwort.typ == ClientAntwort.ENTFERNUNG){
@@ -422,7 +426,7 @@ public class Ausgabe extends BNSThread {
                 try {
                     Thread.sleep(3000);
                 } catch (Exception e) {
-                    CAT.error(e.getMessage());
+                    CAT.error(e.getMessage(),e );
                 }
             }
         }
@@ -436,7 +440,7 @@ public class Ausgabe extends BNSThread {
             try {
                 Thread.sleep(2000);
             } catch (Exception e) {
-                CAT.error(e.getMessage());
+                CAT.error(e.getMessage(), e);
             }
             removeSplash();
         }
@@ -516,7 +520,7 @@ public class Ausgabe extends BNSThread {
 	            kommClient.shutdown(true);
 	        }
 	        catch (Exception ioe ){
-	            CAT.warn("during communication shutdown", ioe);
+	            CAT.error("during communication shutdown", ioe);
 	         }
         }
         if (quitHumanPlayer && view != null) {
@@ -643,6 +647,8 @@ public class Ausgabe extends BNSThread {
         	    updatedBots[i] = getBotDataFromServer(botNames[counter]);
         	return updatedBots;
     }
+    
+    
 
 
     private void comMsgHandleInitialFacings(ClientAntwort kommAntwort)  {
@@ -659,7 +665,7 @@ public class Ausgabe extends BNSThread {
 
 
     private void comHandleNotifyChange(ClientAntwort kommAntwort) throws KommException {
-
+        CAT.debug("NTC handler calling");
         // updating the data for the bots that have changed 
         Bot[] tmp = getBotsDataFromServer(kommAntwort.namen);
 
@@ -675,7 +681,84 @@ public class Ausgabe extends BNSThread {
         // --------- get other information from the server
         Status[] stArray = kommClient.getSpielstatus();
         if (stArray != null) {
+            CAT.debug("NTC handler working through status array");
+            int size = stArray.length;
+            for (int i=0;i<size;i++){ // TODO move this block inside "if(aktpahse!=lastPhase)" block below?
+                                                // would be more efficient but I think this way we might get informed of register locks..
+                Status data = stArray[i];
+                // TODO free locked registers/adjust in case of powerdown for 
+                if (data !=  null) {
+                    		CAT.debug("processing status for bot "+data.robName);
+		                    Bot bot=null;
+		                    for (int j=0;j<tmp.length;j++){
+		                        if (data.robName.equals(tmp[j].getName())){
+		                            bot = tmp[j];
+		                            break;
+		                        }
+		                    }
+		                    if (bot == null){
+		                        CAT.debug("skipping bot: "+data.robName);		                        		                      
+		                        continue;
+		                    }
+		                    CAT.debug("setting/locking cards for bot:\n"+bot);
+		                    Card [] cards = data.register;
+		                    int cc = cards!=null?cards.length:0;
+		                    HumanCard [] hcs = new HumanCard[Bot.NUM_REG];
+		                    for (int j=0;j<cc;j++){
+			                    Card c = cards[j];
+			                    if (c != null) {                                      
+			                        HumanCard hc = new HumanCard(c);
+			                        // the following is now done below:
+			                        //if (bot.getLockedRegister(j)!=null){
+			                        //    hc.setState(HumanCard.LOCKED);
+			                       // }
+			                        
+			                        hcs[j]=hc;
+			                    }
+			                    else {
+			                        hcs[j]=null;
+			                    }
+		                    }
+		                    
+		                    // this method receives only the cards from phase 1 to phase data.aktphase,
+		                    // but the original point of the whole excercise was to show the locked registers
+		                    // => so I need to add them if I know about any of them..
+		                    Card [] locked = bot.getLockedRegisters();
+		                    int cll = locked==null?0:locked.length;
+		                    for (int j=0;j<cll;j++){
+		                        Card c = locked[j];
+		                        if (c!=null){ // this card should be locked
+		                            if (hcs[j] == null) { // we didn't get this card above, probably not yet evaluated
+		                                hcs[j] = new HumanCard(c);
+		                            }
+		                            hcs[j].setState(HumanCard.LOCKED);		                            
+		                        }
+		                    }
+		                    
+		                    boolean hideRegs = lastPhase==4 && stArray[0].aktPhase != lastPhase;
+		                    Collection list = getRegisterRowsForBot(data.robName);
+		                    Iterator it = list.iterator();
+			                while (it.hasNext()){
+			                    ScalableRegisterRow row = (ScalableRegisterRow)it.next();
+			                    row.setCards(hcs);    
+			                    if (hideRegs){
+			                        row.hideAll(); // hide, not empty, to show locked registers
+			                        
+			                    }
+			                    row.setCardVisibilityUntilPhase(data.aktPhase,true);
+			                }
+                } // data !=null
+            }
+
+                                        	   
+            CAT.debug("aktPhase="+stArray[0].aktPhase+",lastPhase="+lastPhase);
             if (stArray[0].aktPhase != lastPhase) {
+                
+                
+                
+                if (stArray[0].aktPhase==0){
+                    CAT.debug("***********NEW PHASE*************");
+                }
                 // its ok to do the reset on each phase change,
                 // will not do anything if all are reset
                 ausgabeView.resetProgrammingLEDs();
@@ -686,6 +769,9 @@ public class Ausgabe extends BNSThread {
                 view.showGameStatusMessage(Message.say("AusgabeFrame", "phase") + " " + stArray[0].aktPhase);
                 lastPhase = stArray[0].aktPhase;
             }
+        }
+        else {
+            CAT.warn("status array was null");
         }
         // --------- has somebody already reached the final flag?
         String[] winnerStateList = kommClient.getSpielstand();
@@ -793,7 +879,7 @@ public class Ausgabe extends BNSThread {
 	        acknowledgeMessage();
         }
         catch (Exception e){
-            CAT.error(e);
+            CAT.error(e.getMessage(), e);
         }
     }
 
@@ -982,6 +1068,7 @@ public class Ausgabe extends BNSThread {
             int directionInt = Integer.parseInt(direction);
             ausgabeView.animateRobMove(r, directionInt);
         } catch (NumberFormatException nfe) {
+            CAT.error(nfe);
             CAT.error("Failed to convert direction for robot \""
                     + robname + "\"from String to int!");
             CAT.error("String was: \"" + direction + "\"");
@@ -1001,6 +1088,7 @@ public class Ausgabe extends BNSThread {
             int directionInt = Integer.parseInt(direction);
             ausgabeView.animateRobTurn(r, directionInt);
         } catch (NumberFormatException nfe) {
+            CAT.error(nfe.getMessage(), nfe);
             CAT.error("Failed to convert direction for robot \""
                     + robname + "\"from String to int!");
             CAT.error("String was: \"" + direction + "\"");
@@ -1188,14 +1276,61 @@ public class Ausgabe extends BNSThread {
                         Bot[] updatedBots = msgData.updatedBotsForNTC;
                         int l = updatedBots.length;
                         for (int i = 0; i < l; i++) {
-                            Bot $_ = updatedBots[i];  // it seems someone read to much Perl books.. ;-)
+                            Bot $_ = updatedBots[i];  // it seems someone read too many Perl books.. ;-)
                             robots.put($_.getName(), $_);
                         }
                         updateBoardView();
                     }
                 });
     }
+    
+    
+    private HashMap robNameToRegisterRowCollection = new HashMap();
+    private ArrayList getRegisterRowsForBot(String name){
+        return (ArrayList) robNameToRegisterRowCollection.get(name);
+    }
 
+    private static final int TOOLTIP_REGISTER_INDEX=0;
+    private static final int INFO_REGISTER_INDEX=1;
+ 
+    private void initRegisterRowHash(String [] names) {
+        int c = names!=null?names.length:0;
+        CAT.debug("register init for: "+Global.arrayToString(names));
+        
+        for (int i=0;i<c;i++){
+            ArrayList list = new ArrayList(2);
+            if (names [i] !=null) {
+                // tooltip:
+                ScalableRegisterRow row1 = new ScalableRegisterRow(0.3);
+                row1.useCardBacksideForEmptyRegisters();
+                list.add(TOOLTIP_REGISTER_INDEX,row1); 
+                // info panel:
+                ScalableRegisterRow row2 = new ScalableRegisterRow(0.5);
+                row2.useCardBacksideForEmptyRegisters();
+                list.add(INFO_REGISTER_INDEX,row2);
+                
+                robNameToRegisterRowCollection.put(names[i],list);
+            }
+        }
+    }         
+        
+    private ScalableRegisterRow getRegistersForBot(String name, int regIndex){
+        ArrayList list = getRegisterRowsForBot(name);
+        ScalableRegisterRow back=null;
+        if (list != null){
+            back = (ScalableRegisterRow) list.get(regIndex);
+        }
+       CAT.debug("getRegistersForBot_back="+back);
+        return back;
+      
+    
+    }
+    protected ScalableRegisterRow getToottipRegistersForBot(String name){
+        return getRegistersForBot(name, TOOLTIP_REGISTER_INDEX);
+    }
+    protected ScalableRegisterRow getInfoRegistersForBot(String name){
+        return getRegistersForBot(name, INFO_REGISTER_INDEX);
+    }
 }
 
 
