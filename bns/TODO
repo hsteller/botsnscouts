@@ -1,4 +1,6 @@
 
+- BUGBUGBUG: if all registers are locked, the sent button is disabled
+
 DONE  - !!!!!!BUG: while playing in background:
   there is something wrong with resetting the timer for emergency
   card submit if it gets to close (I sent the cards mysek just in time
@@ -17,7 +19,7 @@ DONE - autosubmit of client answer for all questions, not only for register
 
 DONE -  nicer winner list, maybe robot images (different sizes?) and colored names 
 
-- reimplement access to some more info about the other players
+DONE - reimplement access to some more info about the other players
   (locked registers in Tooltip of damage bar)
 
 - keep last choices of player as default for different things:
