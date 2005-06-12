@@ -142,4 +142,13 @@ public class Global {
 	    
 	}
 	
+	 public static void beeep() {
+	        try {
+	            java.awt.Toolkit t = java.awt.Toolkit.getDefaultToolkit();
+	            t.beep();
+	        } catch (Throwable err) {
+
+	        }
+	    }
+	
 } // ende Klasse

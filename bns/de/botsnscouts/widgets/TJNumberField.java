@@ -12,6 +12,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
+import de.botsnscouts.util.Global;
 import de.botsnscouts.util.RangeFilter;
 
 /**
@@ -110,6 +111,7 @@ public class TJNumberField extends JTextField implements DocumentListener {
         getDocument().addDocumentListener(this);
     }
 
+    
 
     // Ueberschreiben wohl nicht mehr noetig, dank eigenem Dokument
     public void setText(String str) {
@@ -117,7 +119,7 @@ public class TJNumberField extends JTextField implements DocumentListener {
 			try {
 				Integer.parseInt(str);
 			} catch (NumberFormatException nfe) {
-				beeep();
+			    Global.beeep();
 				return;
 			}
 		}
@@ -162,14 +164,7 @@ public class TJNumberField extends JTextField implements DocumentListener {
         return (s == null || s.trim().equals(""));
     }
 
-    public static void beeep() {
-        try {
-            java.awt.Toolkit t = java.awt.Toolkit.getDefaultToolkit();
-            t.beep();
-        } catch (Throwable err) {
-
-        }
-    }
+   
    
 }
 
@@ -206,7 +201,7 @@ public class TJNumberField extends JTextField implements DocumentListener {
             if (filter == null || filter.isTypInfinite()) {
                 for (int i = 0; i < upper.length; i++) {
                     if (!Character.isDigit(upper[i])) {
-                        TJNumberField.beeep();
+                        Global.beeep();
                         return; 
                     }
                 }
@@ -228,7 +223,7 @@ public class TJNumberField extends JTextField implements DocumentListener {
                 }
                 catch (NumberFormatException ne){
                     // in this case: there was a non digit in "str"
-                    TJNumberField.beeep();
+                    Global.beeep();
                     return;
                 }
                 boolean getsBigEnough = maxValue >= filter.getMinimum();
@@ -238,7 +233,7 @@ public class TJNumberField extends JTextField implements DocumentListener {
                     int ende = tmp1.length();                    
                     if (!Character.isDigit(upper[i])) { // TODO obsolete with the maxValue-block above?
                         // not a number -> stop inserting
-                        TJNumberField.beeep();
+                        Global.beeep();
                         return;
                     } 
                     else {
@@ -260,7 +255,7 @@ public class TJNumberField extends JTextField implements DocumentListener {
                              
                             }                            
                             else if (!filter.isInRange(foo)) {
-                                TJNumberField.beeep();
+                                Global.beeep();
                                 return;
                             }
 
