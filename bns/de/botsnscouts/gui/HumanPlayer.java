@@ -173,7 +173,8 @@ public class HumanPlayer extends BNSThread {
 	                    for (int i = 0; i < commAnswer.karten.length; i++) {
 	                        cards.add(i, new HumanCard(commAnswer.karten[i]));
 	                    }
-	                    humanView.showCards(cards);
+	                  
+	                    
 	                    try {
 	                        // the following makes-not-so-much-sense copying&stuff is done so
 	                        // that the EmergencySubmitters Wisenheimer prediction will work in
@@ -183,9 +184,12 @@ public class HumanPlayer extends BNSThread {
 	                        // to errors
 	                        // => EmergencySubmitter gets copy of robot that noone else will mess up
 	                        Bot meAtStartOfRound = comm.getRobStatus(name);   
-	                       /* Bot meCopy*/	                       
+	                    
+	                        /* Bot meCopy*/	                       
 	                        emergencyBotCopy.copyRob(meAtStartOfRound);
-	                      /*  Card [] cards = meAtStartOfRound.getCards();	                        
+	                        humanView.updateRegisters(meAtStartOfRound.getLockedRegisters());
+	                        humanView.showCards(cards);
+	                        /*  Card [] cards = meAtStartOfRound.getCards();	                        
 	                        int size=cards!=null?cards.length:0;
 	                        HumanCard [] cardCopys = new HumanCard[size];
 	                        for (int i = 0;i<size;i++){
@@ -220,8 +224,8 @@ public class HumanPlayer extends BNSThread {
 		                    	emergencyCardSubmitter = new EmergencyCardSubmitter(/*meCopy*/);
 	                    	    timeoutWatcher.schedule(emergencyCardSubmitter, (globalTimeout-BUFFER_SECONDS_BEFORE_TIMEOUT)*1000);                    	    
 	                    	}  
-	                        humanView.updateRegisters(meAtStartOfRound.getLockedRegisters());
-	                    } 
+	                    
+	                    }  
 	                    catch (KommException kE) {
 	                        CAT.error(kE.getMessage(), kE);
 	                    }
