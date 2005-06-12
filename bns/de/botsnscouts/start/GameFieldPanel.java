@@ -54,6 +54,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -90,8 +91,9 @@ public class GameFieldPanel extends JPanel {
 
     private FieldGrid boardGrid;
     JPanel pnl;
-    private JScrollPane scrl;
-
+    
+   
+   
     private JComponent okPanel;
     private JButton okBut;
     private JButton backBut;
@@ -131,20 +133,28 @@ public class GameFieldPanel extends JPanel {
         setLayout(lay);
         requestFocus();
 
-        scrl = new JScrollPane();
+        JScrollPane leftPane = new JScrollPane();
 
         pnl = new TJPanel();
         pnl.setLayout(new FlowLayout());
         pnl.setBorder(new EmptyBorder(50, 50, 50, 50));
         pnl.add(boardGrid);
 
-        scrl.setOpaque(false);
-        scrl.getViewport().setOpaque(false);
-        scrl.getViewport().setView(pnl);
+        leftPane.setOpaque(false);
+        leftPane.getViewport().setOpaque(false);
+        leftPane.getViewport().setView(pnl);
+        leftPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         add(BorderLayout.SOUTH, okPanel);
-        add(BorderLayout.CENTER, scrl);
-        add(BorderLayout.EAST, editPanel);
+        add(BorderLayout.CENTER, leftPane);
+        JScrollPane rightPane= new JScrollPane();
+        rightPane.getViewport().setView(editPanel);
+        rightPane.setOpaque(false);
+       
+        rightPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        rightPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+       
+        add(BorderLayout.EAST, rightPane/*editPanel*/);
         boardGrid.rasterChanged();
 
         gameOptions = parent.facade.getGameOptions();
@@ -292,7 +302,7 @@ public class GameFieldPanel extends JPanel {
                             announceGame.parse(metaServer.getText());
                         } catch (InvalidInputException ex) {
                             CAT.info(ex.getMessage());
-                            //TODO: beep
+                            Global.beeep();
                             metaServer.setText(announceGame.getServerString());
                         }
                     }
@@ -361,7 +371,8 @@ public class GameFieldPanel extends JPanel {
                 boardGrid.rasterChanged();
             }
         });
-
+        
+       
         return panel;
     }
 

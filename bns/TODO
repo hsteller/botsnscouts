@@ -42,7 +42,7 @@ DONE - reduce initial height of card panel as it looks bad/is too big for
    maybe little robots with five registers that get uncovererd besides them
    and highliting the card to be evaluated 
 
-- if not needed, remove unnecessary scrollbar(s) from game(field?) panel 
+DONE - if not needed, remove unnecessary scrollbar(s) from game(field?) panel 
 
 - hard game restart: try to restart the program in a new JVM if the server
    hangs (or maybe everytime, to free memory?)
