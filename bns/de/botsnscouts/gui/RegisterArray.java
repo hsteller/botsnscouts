@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import javax.swing.JWindow;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
+import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Message;
@@ -46,7 +47,7 @@ import de.botsnscouts.widgets.TJPanel;
  */
 public class RegisterArray extends TJPanel {
 
-    private ArrayList registerView = new ArrayList(5);
+    private ArrayList registerView = new ArrayList(Bot.NUM_REG);
     private int xsize = 70, ysize = 550;
 
     public RegisterArray() {
@@ -59,9 +60,9 @@ public class RegisterArray extends TJPanel {
     }
 
     public RegisterArray(ActionListener register) {
-        setLayout(new GridLayout(5, 1));
-
-        for (int i = 0; i < 5; i++) {
+        setLayout(new GridLayout(Bot.NUM_REG, 1));
+        int size=Bot.NUM_REG;
+        for (int i = 0; i < size; i++) {
             RegisterView r = new RegisterView(register);
             registerView.add((i), r);
             add(r);
@@ -81,9 +82,11 @@ public class RegisterArray extends TJPanel {
      */
     protected ArrayList getCards() {
         ArrayList regs = new ArrayList(programmed());
-        for (int i = 0; i < registerView.size(); i++) {
-            if (!((RegisterView) registerView.get(i)).locked()) {
-                regs.add(((RegisterView) registerView.get(i)).getCard());
+        int size = registerView.size();
+        for (int i = 0; i < size; i++) {
+            RegisterView view = (RegisterView) registerView.get(i); 
+            if (!view.locked()) {
+                regs.add(view.getCard());
             }
         }
         return regs;
@@ -95,7 +98,8 @@ public class RegisterArray extends TJPanel {
      */
     protected ArrayList getWisenheimerCards() {
         ArrayList regs = new ArrayList(programmed());
-        for (int i = 0; i < registerView.size(); i++) {
+        int size = registerView.size();
+        for (int i = 0; i < size; i++) {
             regs.add(((RegisterView) registerView.get(i)).getCard());
         }
         return regs;
@@ -113,9 +117,11 @@ public class RegisterArray extends TJPanel {
     }
 
     void addCard(HumanCard hc) {
-        for (int i = 0; i < registerView.size(); i++) {
-            if (((RegisterView) registerView.get(i)).getCard() == null) {
-                ((RegisterView) registerView.get(i)).setCard(hc);
+        int size = registerView.size();
+        for (int i = 0; i < size; i++) {
+            RegisterView view = (RegisterView) registerView.get(i); 
+            if (view.getCard() == null) {
+                view.setCard(hc);
                 break;
             }
         }
@@ -123,7 +129,8 @@ public class RegisterArray extends TJPanel {
 
 
     boolean allOcupied() {
-        for (int i = 0; i < registerView.size(); i++) {
+        int size = registerView.size();
+        for (int i = 0; i < size; i++) {
             if (((RegisterView) registerView.get(i)).getCard() == null) {
                 return false;
             }
@@ -156,7 +163,8 @@ public class RegisterArray extends TJPanel {
     }
 
     protected void updateRegisters(Card[] roboCards) {
-        for (int i = 0; i < 5; i++) {
+        int size = Bot.NUM_REG;
+        for (int i = 0; i < size; i++) {
             if (roboCards[i] != null) {
                 ((RegisterView) registerView.get(i)).setLocked(true);
             } else {
@@ -175,12 +183,10 @@ public class RegisterArray extends TJPanel {
     }
 
     protected boolean allLocked() {
-        for (int i = 0; i < registerView.size(); i++) {
-            if ((RegisterView) registerView.get(i) != null) {
-                if (!((RegisterView) registerView.get(i)).locked()) {
-                    return false;
-                }
-            } else {
+        int size = registerView.size();
+        for (int i = 0; i < size;  i++) {
+            RegisterView view =  (RegisterView) registerView.get(i);
+            if ( view == null || !view.locked() ) {                
                 return false;
             }
         }
@@ -198,7 +204,7 @@ public class RegisterArray extends TJPanel {
                 oc++;
             }
         }
-        return (5 - oc);
+        return (Bot.NUM_REG - oc);
     }
 
     private int alreadyProgrammed() {
