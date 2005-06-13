@@ -5,17 +5,21 @@
  */
 package de.botsnscouts.util;
 
+import java.awt.Dimension;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Properties;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import org.apache.log4j.Category;
 
+import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.autobot.AutoBot;
 import de.botsnscouts.gui.Ausgabe;
 import de.botsnscouts.gui.HumanPlayer;
@@ -430,8 +434,53 @@ public class Registry implements ShutdownListener, GameOverListener {
             
         }
         
+        private static void hardRestart ()throws Exception{
+            
+               
+
+            }
+        
        private void bruteRestart(){
-           System.exit(0);
+           try {
+	           File f = new File(".");
+	           
+	           Properties  p = System.getProperties();
+	           /*Enumeration e = p.keys();
+	           while (e.hasMoreElements()){
+	               Object o = e.nextElement();
+	               String value = p.getProperty((String)o);
+	               pln(o+" = "+value);
+	           }
+	           */
+	           String jhome = p.getProperty("java.home", null);
+	           String separator = File.separator;
+	           String binString = "java ";
+	           if (jhome != null) {
+	              binString = jhome+separator+"bin"+separator+"java ";
+	           }
+	     //      String classpath = p.getProperty("java.class.path");
+	      //     String cp = "-classpath "+classpath;
+	           
+	           Runtime run = Runtime.getRuntime();
+	        //   String bla="";
+	         //  for (int i=0;i<args.length;i++) {
+	         //      bla+=args[i].toString()+" ";
+	         //  }
+	           String s1 = " -Dbns.home="+f.getCanonicalPath();
+	           String s2 = " -jar botsnscouts.jar";
+	           Dimension size = BotsNScouts.getScreenSize();
+	           String s3 = " -Dgeometry="+size.width+"x"+size.height;
+	           String cmd = binString+s3+s1+s2;
+	           CAT.info("EXEC: "+cmd);
+	           
+	           Process proc = run.exec(cmd);
+           }
+           catch (Exception e){
+               CAT.error(e.getMessage(),e);
+           }
+           finally {
+               System.exit(0);
+           }
        }
         
        private void registryRemoveAndKillAutobots (Game game) {
