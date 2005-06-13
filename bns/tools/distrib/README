@@ -17,8 +17,7 @@ We like both - you should find out yourself: The board game was originally
 published in the U.S. from Wizards of The Coast (TM). In Germany it's
 distributed by Amigo-Spiele.
 
-There's lots of other websites to find out more about Roborally. The best place
-to start is the one from Eric Floderus <A HREF="http://members.xoom.com/eflod">.
+There's lots of other websites to find out more about Roborally. 
 
 The the file INSTALL which came with your distribution explains how to install
 and start the game.
@@ -28,7 +27,7 @@ If you like to send us any comments or if you found any bugs, please e-mail us
 at botsnscouts-devel@lists.sf.net .
 
 
-Configuration of Language, Sounds...
+CONFIGURATION of Language, Sounds...
 
 In the top-level Bots 'n' Scouts directory, a file called bns.config will
 be created on the first run of the game. In it, you can customize various
@@ -44,3 +43,17 @@ sound.active		(true for on, false for off. Can be accessed through
 server.IP		(IP-Nr or name of default gameserver)
 timeout			(Seconds that players have to return their programming)
 robot.name		(Default Name of the player)
+
+
+Someone wanted to have a different window size (instead of "as-big-as-possible")
+on startup; if you want the same, you can use the parameter 
+                   -Dgeometry=<width>x<height>
+in your start.bat/start.sh files.
+Example "start.sh" for 1024x768 window size:
+instead of 
+"java -Dbns.home=$PWD/`dirname $0` -jar botsnscouts.jar" 
+use:
+"java -Dgeometry=1024x768 -Dbns.home=$PWD/`dirname $0` -jar botsnscouts.jar"
+
+
+
