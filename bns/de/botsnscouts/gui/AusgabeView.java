@@ -101,7 +101,8 @@ public class AusgabeView extends JPanel  {
     private JComponent northPanel = new PaintPanel( OptionPane.getBackgroundPaint(this) );
     private ZoomMenu zoomMenu = new ZoomMenu();
     private ShowOrHideRobMenu showHideMenu =  new ShowOrHideRobMenu(); // must not be null
-
+    private SpeedMenu speedMenu = new SpeedMenu();
+    
     // settings for Zoom-Menu
     protected static final int MIN_ZOOM = 40;
     protected static final int DEFAULT_ZOOM = 100; // selects the RadioButton to
@@ -230,7 +231,7 @@ public class AusgabeView extends JPanel  {
         speedSettingSlow = new AnimationConfig(AnimationConfig.ANIMATION_SLOW, true);
         speedSettingMedium = new AnimationConfig(AnimationConfig.ANIMATION_MEDIUM, true);
         speedSettingFast = new AnimationConfig(AnimationConfig.ANIMATION_FAST, true);
-       AnimationConfig defaultSpeed = speedSettingMedium;
+        AnimationConfig defaultSpeed = speedSettingMedium;
         String lastSetting = Conf.getProperty(PROPERTY_DEFAULT_SPEED);
         if (lastSetting != null){
             if (lastSetting.equals(speedSettingSlow.getConfigName())) {
@@ -241,7 +242,7 @@ public class AusgabeView extends JPanel  {
             }
            // else: we keep medium as the defaultspeed
         }
-        setAnimationSpeed(defaultSpeed);
+        speedMenu.setAnimationSpeed(defaultSpeed);
         
         speedSettingEditor = new AnimationsSettingEditor(speedSettingSlow, speedSettingMedium,
                                                                                                    speedSettingFast);
@@ -603,7 +604,7 @@ public class AusgabeView extends JPanel  {
       });
 
       JMenu optionsMenu = new JMenu (Message.say("AusgabeFrame","mOptions"));
-      optionsMenu.add(new SpeedMenu());
+      optionsMenu.add(speedMenu);
       optionsMenu.add(new SoundMenu());
       optionsMenu.add(hotkeyMenu);
 
@@ -683,12 +684,6 @@ public class AusgabeView extends JPanel  {
         zoom (actualScale-ZOOM_STEP);
     }
 
-    private void setAnimationSpeed(AnimationConfig conf){
-        currentSpeedConfig = conf;
-       Conf.setProperty(PROPERTY_DEFAULT_SPEED, conf.getConfigName());
-       Conf.saveProperties();
-       gameBoardCanvas.setAnimationSettings(conf);
-    }
 
     
     protected void showAllRobots() {
@@ -979,10 +974,11 @@ public class AusgabeView extends JPanel  {
       	JRadioButtonMenuItem lSpeed;
       	JRadioButtonMenuItem mSpeed;
     	JRadioButtonMenuItem hSpeed;
-        JMenuItem customizeButton = new JMenuItem(Message.say("AusgabeFrame", "mCustomize"));
+    	ButtonGroup speedGroup;
+    	JMenuItem customizeButton = new JMenuItem(Message.say("AusgabeFrame", "mCustomize"));
         SpeedMenu () {
 	        super(Message.say("AusgabeFrame","mSpeed"));
-	        ButtonGroup speedGroup = new ButtonGroup();
+	        speedGroup = new ButtonGroup();
 			lSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mSlow"),false);
 			mSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mMiddle"),true);
 		    hSpeed = new JRadioButtonMenuItem(Message.say("AusgabeFrame","mFast"),false);
@@ -1028,6 +1024,22 @@ public class AusgabeView extends JPanel  {
 		      	showActionMessage(Message.say("AusgabeFrame",message));
 	      	}
 	}
+        private void setAnimationSpeed(AnimationConfig conf){
+           currentSpeedConfig = conf;
+           if (currentSpeedConfig.equals(speedSettingSlow)){
+               speedGroup.setSelected(lSpeed.getModel(),true);
+           }
+           else if (currentSpeedConfig.equals(speedSettingFast)){
+               speedGroup.setSelected(hSpeed.getModel(),true);
+           }
+           else {
+               speedGroup.setSelected(mSpeed.getModel(),true);
+           }
+           Conf.setProperty(PROPERTY_DEFAULT_SPEED, conf.getConfigName());
+           Conf.saveProperties();
+           gameBoardCanvas.setAnimationSettings(conf);
+        }
+
 
 
    }
