@@ -51,12 +51,10 @@ public class GameOptions {
             stmp = "127.0.0.1";
         }
         DHOST = stmp;
-        tmp = Conf.getIntProperty("server.port");
-        DPORT = (tmp == -1 ? 8077 : tmp);
-        tmp = Conf.getIntProperty("players");
-        DPLAYERS = (tmp == -1 ? 8 : tmp);
-        tmp = Conf.getIntProperty("timeout");
-        DTO = (tmp == -1 ? 200 : tmp);
+        DPORT = Conf.getIntProperty("server.port",8077);        
+        DPLAYERS= Conf.getIntProperty("players",8);        
+        DTO = Conf.getIntProperty("timeout", 200);
+        
     }
 
     /** Max number of players for this game */

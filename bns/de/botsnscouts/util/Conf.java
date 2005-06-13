@@ -145,9 +145,9 @@ public class Conf {
     }
 
 
-    public static int getIntProperty(String key) {
+    public static int getIntProperty(String key, int defaultValue) {
         String data = getProperty(key);
-        int ret = -1;
+        int ret = defaultValue;
         try {
             ret = Integer.parseInt(data);
         } catch (Exception e) {
