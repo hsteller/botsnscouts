@@ -816,9 +816,16 @@ public class SimBoard extends Board implements Directions {
             }
         }
     }
-
-    private void doLasers(BoardBot[] robbis) {
-        // Board lasers
+    /**
+     * Does the evaluation of the board lasers.
+     * 
+     * @param robbis all our robots
+     * @return boolean array of the same length as "robbis"; if it contains true at index i, 
+     *               "robbis[i]" received so much damage that it has to be destroyed 
+     */
+    private boolean[] doBoardLasers(BoardBot [] robbis) {
+        int robCount = robbis!=null?robbis.length:0;
+        boolean[] haveToDestoryBotLater = new boolean [robCount];
         for (Enumeration e = lasers.elements(); e.hasMoreElements();) {
             LaserDef l = (LaserDef) e.nextElement();
             int x = l.x;
@@ -826,7 +833,7 @@ public class SimBoard extends Board implements Directions {
             boolean hit = false;
 
             aussen: for (int i = l.length; i > 0; i--) {
-                for (int j = 0; j < robbis.length; j++) {
+                for (int j = 0; j < robCount; j++) {
                     if ((robbis[j].getX() == x) && (robbis[j].getY() == y)) { // Hit
                         if (server != null) {
                             String[] tmp = new String[5];
@@ -846,13 +853,21 @@ public class SimBoard extends Board implements Directions {
                             for (int s = l.strength; s > 0; s--) {
                                 robbis[j].incDamage();
                                 lockRegisters(robbis[j]);
+                                if (robbis[j].getDamage()>=10) {
+                                    haveToDestoryBotLater[j]=true;
+                                }
                             }
                             moved[j] = true;
-                        } else if (!hit) {
+                        }
+                        else if (!hit) {
                             for (int s = l.strength; s > 0; s--) {
                                 robbis[j].incDamage();
                                 lockRegisters(robbis[j]);
                             }
+                            if (robbis[j].getDamage()>=10) {
+                                haveToDestoryBotLater[j]=true;
+                            }
+
                             moved[j] = true;
                             hit = true;
                         }
@@ -880,8 +895,21 @@ public class SimBoard extends Board implements Directions {
             } // for length
         } //for Enumeration
 
-        // Bot-Laser
-        aussen2: for (int rob = 0; rob < robbis.length; rob++) {
+        return haveToDestoryBotLater;
+    }
+    
+    /**
+     * Does the evaluation of the robot lasers.
+     * 
+     * @param robbis all our robots
+     * @return boolean array of the same length as "robbis"; if it contains true at index i, 
+     *               "robbis[i]" received so much damage that it has to be destroyed 
+     */
+    private boolean[] doRobLasers(BoardBot[] robbis){
+        int robCount = robbis!=null?robbis.length:0;
+        boolean[] haveToDestoryBotLater = new boolean [robCount];
+//      Bot-Laser
+        aussen2: for (int rob = 0; rob < robCount; rob++) {
             if ((robbis[rob].isVirtual()) || (!robbis[rob].isActivated())) {
                 continue aussen2;
             }
@@ -892,24 +920,13 @@ public class SimBoard extends Board implements Directions {
                     if (ew(x, y).isExisting()) {
                         continue aussen2;
                     }
-                    x++;  // Start auf Folgefeld
+                    x++;  // Start on next field
                     while ((x <= sizeX) && (!ww(x, y).isExisting())) {
-                        for (int j = 0; j < robbis.length; j++) {
-                            if ((robbis[j].getX() == x) && (robbis[j].getY() == y) && (!robbis[j].isVirtual())) { // Treffer
-                                robbis[j].incDamage();
-                                lockRegisters(robbis[j]);
-                                moved[j] = true; // �nderung erfolgt
-
-                                ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER, robbis[rob].getName(), robbis[j].getName());
-                                curStats = stats.getStats(robbis[rob].getName());
-                                curStats.incHits();
-                                if (robbis[j].getDamage() >= 10) {
-                                    curStats.incKills();
-                                }
-                                curStats = stats.getStats(robbis[j].getName());
-                                curStats.incDamageByRobots();
-
-
+                        for (int j = 0; j < robCount; j++) {
+                            BoardBot target = robbis[j];
+                            if ((target.getX() == x) && (target.getY() == y) && (!target.isVirtual())) { // Hit
+                                haveToDestoryBotLater[j]=doSingleRobLaserShot(robbis[rob], target);                                
+                                moved[j] = true;                                     
                                 continue aussen2;
                             }
                         }
@@ -922,14 +939,11 @@ public class SimBoard extends Board implements Directions {
                     }
                     x--;
                     while ((x > 0) && (!ew(x, y).isExisting())) {
-                        for (int j = 0; j < robbis.length; j++) {
-                            if ((robbis[j].getX() == x) && (robbis[j].getY() == y) && (!robbis[j].isVirtual())) { //Treffer
-                                robbis[j].incDamage();
-                                lockRegisters(robbis[j]);
-                                moved[j] = true;
-
-                                ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER, robbis[rob].getName(), robbis[j].getName());
-
+                        for (int j = 0; j < robCount; j++) {
+                            BoardBot target = robbis[j];
+                            if ((target.getX() == x) && (target.getY() == y) && (!target.isVirtual())) { //Hit
+                                haveToDestoryBotLater[j]=doSingleRobLaserShot(robbis[rob], target);                                
+                                moved[j] = true;      
                                 continue aussen2;
                             }
                         }
@@ -942,14 +956,11 @@ public class SimBoard extends Board implements Directions {
                     }
                     y++;
                     while ((y <= sizeY) && (!sw(x, y).isExisting())) {
-                        for (int j = 0; j < robbis.length; j++) {
-                            if ((robbis[j].getX() == x) && (robbis[j].getY() == y) && (!robbis[j].isVirtual())) { //Treffer
-                                robbis[j].incDamage();
-                                lockRegisters(robbis[j]);
-                                moved[j] = true;
-
-                                ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER, robbis[rob].getName(), robbis[j].getName());
-
+                        for (int j = 0; j < robCount; j++) {
+                            BoardBot target = robbis[j];
+                            if ((target.getX() == x) && (target.getY() == y) && (!target.isVirtual())) { //Hit
+                                haveToDestoryBotLater[j]=doSingleRobLaserShot(robbis[rob], target);                                
+                                moved[j] = true;      
                                 continue aussen2;
                             }
                         }
@@ -962,14 +973,11 @@ public class SimBoard extends Board implements Directions {
                     }
                     y--;
                     while ((y > 0) && (!nw(x, y).isExisting())) {
-                        for (int j = 0; j < robbis.length; j++) {
-                            if ((robbis[j].getX() == x) && (robbis[j].getY() == y) && (!robbis[j].isVirtual())) { //Treffer
-                                robbis[j].incDamage();
-                                lockRegisters(robbis[j]);
-                                moved[j] = true;
-
-                                ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER, robbis[rob].getName(), robbis[j].getName());
-
+                        for (int j = 0; j < robCount; j++) {
+                            BoardBot target = robbis[j];
+                            if ((target.getX() == x) && (target.getY() == y) && (!target.isVirtual())) { // Hit                             
+                                haveToDestoryBotLater[j]=doSingleRobLaserShot(robbis[rob], target);                                
+                                moved[j] = true;                          
                                 continue aussen2;
                             }
                         }
@@ -978,7 +986,51 @@ public class SimBoard extends Board implements Directions {
                     break;
             } //switch
         } //for rob
+        return haveToDestoryBotLater;
+        
+    }
+/**
+ * 
+ * @param robbis out robbots
+ * @param hasToBeDestroyed if "hasToBeDestroyed[i]" is true, "robbis[i]" will be destroyed
+ */
+    private void doDestroyIfNecessary(BoardBot[] robbis, boolean [] hasToBeDestroyed){
+        int robCount = robbis!=null?robbis.length:0;
+        for (int rob=0;rob<robCount;rob++){
+            if (hasToBeDestroyed[rob]){
+                destroyBot(robbis[rob]);                
+            }
+        }
+    }
+    
+    private void doLasers(BoardBot[] robbis) {        
+        boolean[] haveToDestoryBotLater = doBoardLasers(robbis); 
+        doDestroyIfNecessary(robbis, haveToDestoryBotLater);
+        haveToDestoryBotLater = doRobLasers(robbis);
+        doDestroyIfNecessary(robbis, haveToDestoryBotLater);        
     } // doLasers
+    
+    /**
+     *  @return if the target robot was killed/is dead
+     */
+    private boolean doSingleRobLaserShot (BoardBot source, BoardBot target){
+        boolean wasKilled = false;
+        target.incDamage();
+        lockRegisters(target);
+        if (target.getDamage()>=10) {
+            wasKilled=true;
+        }      
+
+        ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER, source.getName(),target.getName());
+        curStats = stats.getStats(source.getName());
+        curStats.incHits();
+        if (wasKilled) {
+            curStats.incKills();
+        }
+        curStats = stats.getStats(target.getName());
+        curStats.incDamageByRobots();
+        return wasKilled;
+    }
 
     private void doArchiveUpdate(BoardBot[] robbis) {
         //d("doArchivUpdate called.");
@@ -1101,7 +1153,9 @@ public class SimBoard extends Board implements Directions {
         //d("registerSperren called mit "+robbi.getName());
 
         if (robbi.getDamage() >= 10) {
-            destroyBot(robbi);
+            // HS: don't do that here; it messes up laser evaluation if this bot is destroyed before he had a chance
+            //       to fire
+            //  destroyBot(robbi);
             return;
         }
         if (robbi.getDamage() >= 5) {
