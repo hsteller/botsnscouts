@@ -10,13 +10,8 @@ KNOWN BUGS:
       minor problems.
     * Adjust the size of the board and the number of auto-bots to the power of
       your computer.
-    * The game will likely crash if a player quits in the middle of a game.
-    * Confirming "game over" at the end of the game _IMMEDIATELY_ stops
-      everything, including the server. Don't confirm if the other players want
-      to continue.
     * You may set only up to six flags and no more than eight players. The
       names mustn't contain anything but letters from 'A' to 'z', sorry.
-    * Chat messages may not contain kommas, sorry.
     * Linux: "fullscreen.sh" is experimental. Read README.fullscreen which
       comes with your distribution.
 
