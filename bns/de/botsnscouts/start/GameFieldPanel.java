@@ -92,7 +92,7 @@ public class GameFieldPanel extends JPanel {
     private FieldGrid boardGrid;
     JPanel pnl;
     
-   
+    
    
     private JComponent okPanel;
     private JButton okBut;
@@ -112,6 +112,10 @@ public class GameFieldPanel extends JPanel {
     private TJNumberField timeoutInput;
 
     private GameOptions gameOptions;
+    
+   public static final String PROPNAME_LAST_SPF = "nameOfLastUsedBoardSPF";
+   public static final String PROPNAME_LAST_COLOR_INDEX = "indexOfLastRobColor";
+  
 
     /**
      * Announce the game at a meta server?
@@ -218,11 +222,19 @@ public class GameFieldPanel extends JPanel {
         JLabel spielfeld = new TJLabel(Message.say("Start", "mSpielfeld"));
         String[] spielfeldAr = loader.getSpielfelder();
         String defSpf = null;
-        for (int i = 0; i < spielfeldAr.length; i++) {
-            if (spielfeldAr[i].equals("default")) {
-                defSpf = spielfeldAr[i];
+        String lastSpfName = Conf.getProperty(PROPNAME_LAST_SPF);
+        if (lastSpfName !=  null) {   
+            if (lastSpfName.toLowerCase().endsWith(".spf")){
+                lastSpfName = lastSpfName.substring(lastSpfName.length()-4);
+            }
+            for (int i = 0; i < spielfeldAr.length; i++) {
+                if (spielfeldAr[i].equals(lastSpfName)) {
+                    defSpf = spielfeldAr[i];
+                    break;
+                }
             }
         }
+       
         spielfelder = new JComboBox(spielfeldAr);
         spielfeld.setVisible(false);
         spielfelder.setVisible(true);
@@ -243,7 +255,7 @@ public class GameFieldPanel extends JPanel {
                     if (file.getName().equals("")) {
                         return;
                     }
-                    if (!filename.endsWith(".spf")) {
+                    if (!filename.toLowerCase().endsWith(".spf")) {
                         file = new File(file.getParent(), filename + ".spf");
                     }
                     //falls datei existiert
@@ -274,6 +286,8 @@ public class GameFieldPanel extends JPanel {
 
         nam = new TJTextField(Conf.getDefaultRobName());
         colors = new RoboBox(true);
+        int lastIndex = Conf.getIntProperty(PROPNAME_LAST_COLOR_INDEX,0);
+        colors.setSelectedIndex(lastIndex);
         participate = new TJCheckBox(Message.say("Start", "mTeilnehmenBox"), true);
 
         allowScout = new TJCheckBox(Message.say("Start", "mAllowScout"), true);
@@ -409,6 +423,13 @@ public class GameFieldPanel extends JPanel {
     }
 
     private void okClicked() {
+        String spfName = (String) spielfelder.getSelectedItem();
+        if (CAT.isDebugEnabled()) {
+            CAT.debug("SPF selected: "+spfName);
+        }
+        Conf.setProperty(PROPNAME_LAST_SPF, spfName);
+        Conf.setProperty(PROPNAME_LAST_COLOR_INDEX, colors.getSelectedIndex()+"");
+        Conf.saveProperties();
         gameOptions.setAllowWisenheimer(allowWisenheimer.isSelected());
         gameOptions.setAllowScout(allowScout.isSelected());
         gameOptions.setInvitor(nam.getText());        
@@ -431,9 +452,9 @@ public class GameFieldPanel extends JPanel {
                     try {
                         announceGame.announceGame(gameOptions);
                     } catch (UnableToAnnounceGameException e) {
-                        e.printStackTrace(); //TODO: give info
+                       CAT.error(e.getMessage(), e); //TODO: give info
                     } catch (YouAreNotReachable youAreNotReachable) {
-                        youAreNotReachable.printStackTrace(); //TODO: give info
+                        CAT.error(youAreNotReachable.getMessage(), youAreNotReachable); //TODO: give info
                     }
                 }
             });

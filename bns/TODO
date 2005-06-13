@@ -22,11 +22,11 @@ DONE -  nicer winner list, maybe robot images (different sizes?) and colored nam
 DONE - reimplement access to some more info about the other players
   (locked registers in Tooltip of damage bar)
 
-- keep last choices of player as default for different things:
+DONE - keep last choices of player as default for different things:
   last used board layout (maybe auto-save the last ".spf"
    on game startup as "lastUsed_autosavespf" and loading it as default;
    or is that what default.spf is for?->rename to autosave or something)
-
+   [solution: no autosave, simply remember the last chosen spf and rob color]
 DONE - reduce initial height of card panel as it looks bad/is too big for
        1024x768 with the kde panel stealing some of the 768 pixels at the bottom
        **** should be fixed by increasing the width of the card panel
