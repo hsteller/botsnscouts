@@ -1106,7 +1106,8 @@ public class Ausgabe extends BNSThread {
                     }
                 }
                 while (it.hasNext()){
-	                ScalableRegisterRow row = (ScalableRegisterRow) it.next();
+	                ScalableRegisterRow row = (ScalableRegisterRow) it.next();	                
+	                row.alwayshowCardBackInsteadOfEmpty(bot.isActivated() && !bot.isInPit());	               
 	                row.setCards(hcs);	               
 	                row.setCardVisibility(phase+1, true);               
 	            }
@@ -1114,6 +1115,7 @@ public class Ausgabe extends BNSThread {
             else {  // any other phase, we only need to set a single card           
 	            while (it.hasNext()){
 	                ScalableRegisterRow row = (ScalableRegisterRow) it.next();
+	                row.alwayshowCardBackInsteadOfEmpty(bot.isActivated() && !bot.isInPit());	       
 	                row.setCard(phase+1,hc );
 	                row.setCardVisibility(phase+1, true);               
 	            }
@@ -1150,31 +1152,34 @@ public class Ausgabe extends BNSThread {
     }
     private void comMsgHandleRegisterLock(ClientAntwort ca, boolean unlock){
         String botname = ca.namen[1];
-        String registerIndex = ca.namen[2];
-        String cardPrio = ca.namen[3];
-        String cardAction = ca.namen[4];
-        try {
+        String registerIndex = ca.namen[2];      
+       
+        try {          
+            HumanCard hc = null;       
             int index = Integer.parseInt(registerIndex); // value 0-4
             index++; // value 1-5
-            int prio = 0;
-            try {
-                prio = Integer.parseInt(cardPrio);
-            }
-            catch (NumberFormatException ne2){
-                CAT.error("Failed to parse card priority:"+cardPrio);
-                CAT.error(ne2.getMessage(), ne2);
-            }
-            HumanCard hc = new HumanCard(prio, cardAction);
             if (!unlock) {
-                hc.setState(HumanCard.LOCKED);
-            }          
-            
+	            String cardPrio = ca.namen[3];
+                String cardAction = ca.namen[4];
+	            int prio = 0;
+	            try {
+	                prio = Integer.parseInt(cardPrio);
+	            }
+	            catch (NumberFormatException ne2){
+	                CAT.error("Failed to parse card priority:"+cardPrio);
+	                CAT.error(ne2.getMessage(), ne2);
+	            }
+	        
+	            hc = new HumanCard(prio, cardAction);	          
+	            hc.setState(HumanCard.LOCKED);
+            }
             ArrayList rows = getRegisterRowsForBot(botname);
             Iterator it = rows.iterator();
             while (it.hasNext()){
                 ScalableRegisterRow row = (ScalableRegisterRow) it.next();
                 row.setCard(index, hc);
             }
+            
             
         }
         catch (NumberFormatException ne){
