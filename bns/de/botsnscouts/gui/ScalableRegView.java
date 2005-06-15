@@ -7,15 +7,15 @@ package de.botsnscouts.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Rectangle;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -35,6 +35,8 @@ public class ScalableRegView extends JComponent {
     Category CAT = Category.getInstance(ScalableRegView.class);
     
     private static final Color EMPTY_BG_COLOR = RegisterView.BG_COLOR;
+    private static final Color PRIORITY_FONT_COLOR = RegisterView.prioColor;
+    private static final Font  PRIORITY_FONT = RegisterView.prioFont;
     
     private HumanCard myCard;
     private boolean isCardHidden = true;
@@ -61,7 +63,7 @@ public class ScalableRegView extends JComponent {
             lockImg = ImageMan.getImage(ImageMan.PNG_REGLOCK);
         }
         isCardHidden = true;
-        
+     
     }
 
     public int getImageWidth(){
@@ -81,10 +83,14 @@ public class ScalableRegView extends JComponent {
         return new Dimension(w,h);
     }
     
-    public Dimension getMinimumSize(){
-        return getPreferredSize();
-    }
+//   public Dimension getMinimumSize(){
+ //       return getPreferredSize();
+ //   }
+   
     
+   public boolean isCardBackInsteadOfEmptyShown(){
+       return showBackSideInsteadOfEmpty;
+   }
     
     public void alwayshowCardBackInsteadOfEmpty(boolean showBackside){
         showBackSideInsteadOfEmpty = showBackside;
@@ -105,8 +111,7 @@ public class ScalableRegView extends JComponent {
     
     public void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D)g;               
-        g2.scale(scale,scale);                       
-        // TODO paint card's priority        
+        g2.scale(scale,scale);                                      
         if (myCard == null  ){
             g.setColor( EMPTY_BG_COLOR );
             g.fillRect(0,0,bgWidth,bgHeight);            
@@ -120,7 +125,16 @@ public class ScalableRegView extends JComponent {
         }
 
         if (/*isCardHidden ||*/ !isCardHidden || myCard.locked()) {
-            g2.drawImage(myCard.getImageIcon().getImage(),0,0,bgWidth,bgHeight,this);
+           
+            Image img = myCard.getImage();//ImageMan.getCardImage(myCard.getAction());//
+            g2.drawImage(img,0,0,bgWidth,bgHeight,this);
+            g.setFont(PRIORITY_FONT);
+        	g.setColor(PRIORITY_FONT_COLOR);
+        
+        	int prio = myCard.getprio();
+        	if (prio>0) { 
+        	    g.drawString(""+10*prio,26,17);
+        	}
             if (myCard.locked()){
                 g2.drawImage( lockImg, 4,3,this);
             }
@@ -130,11 +144,15 @@ public class ScalableRegView extends JComponent {
         }                                                 
         
     }
-    
-   
     public void setHidden(boolean showCardsBackside) {
+        setHidden(showCardsBackside, true);
+    }
+   
+    public void setHidden(boolean showCardsBackside, boolean callRepaint) {
         isCardHidden = showCardsBackside;
-        repaint();
+        if (callRepaint) {
+            repaint();
+        }
     }
     
     public void setEmpty(){
@@ -167,7 +185,7 @@ public class ScalableRegView extends JComponent {
         foo.setLayout(new BorderLayout());
         foo.add(rv, BorderLayout.CENTER);
         JButton hide = new JButton("hide");
-        rv.setScale(0.5);
+        rv.setScale(1.0);
         hide.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 rv.setHidden(true);
