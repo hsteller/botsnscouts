@@ -248,15 +248,20 @@ public class Ausgabe extends BNSThread {
                 Location [] flags = kommClient.getFahnenPos();
                 
                 // Initializing the robots an applying the colors to their visualization
-                for (int i = 0; i < playerNames.length; i++) {
+                int botCount = playerNames.length;
+                Bot [] tempBots = new Bot[botCount];
+                for (int i = 0; i < botCount; i++) {
+                    
                     d("Hole Roboterstatus von: " + playerNames[i]);
                     Bot tempRob = kommClient.getRobStatus(playerNames[i]);
+                    tempBots[i]=tempRob;
                     String h_name = tempRob.getName();
                     Integer h_int = (Integer) playerColorHash.get(h_name);
                     tempRob.setBotVis(h_int.intValue());
                     robots.put(playerNames[i], tempRob);
                 }
-                initRegisterRowHash(playerNames);
+                initRegisterRowHash(tempBots);
+                
 
                 initBoard(robotsNewColor, flags);
 
@@ -700,7 +705,7 @@ public class Ausgabe extends BNSThread {
                 // as the robots will be painted during the animations - independend from
                 // their visibility setting by the user
                 ausgabeView.showAllRobots();
-                view.showGameStatusMessage(Message.say("AusgabeFrame", "phase") + " " + stArray[0].aktPhase);
+               // view.showGameStatusMessage(Message.say("AusgabeFrame", "phase") + " " + stArray[0].aktPhase);
                 lastPhase = stArray[0].aktPhase;
             }
         }
@@ -801,8 +806,8 @@ public class Ausgabe extends BNSThread {
 	        // don't show if message is a "mAusw*"-message or it
 	        // is a SIGNAL_ACTION_[START|STOP]-message
 	        if (isActionToBeDisplayedInInfopanelOnly(msgId)) {
-	            // this is a little dirty; we will override the message id so that will
-	            // be mapped to an action that does nothing else than displaying this
+	            // this is a little dirty; we will override the message id so that it gets
+	            // mapped to an action that does nothing else than displaying this
 	            // (status) message in the transparent chatpane on the bottom of the
 	            // display
 	            sequencer.invoke(DUMMY_MESSAGE_ID_DISPLAY_STRING_ONLY, kommAntwort);
@@ -1227,25 +1232,29 @@ public class Ausgabe extends BNSThread {
     private static final int TOOLTIP_REGISTER_INDEX=0;
     private static final int INFO_REGISTER_INDEX=1;
  
-    private void initRegisterRowHash(String [] names) {
-        int c = names!=null?names.length:0;
-        CAT.debug("register init for: "+Global.arrayToString(names));
+    private void  initRegisterRowHash(Bot [] bots) {
+        int c = bots!=null?bots.length:0;     
+        if (CAT.isDebugEnabled()){
+            CAT.debug("register init for: "+Global.arrayToString(bots));
+        }
         
         for (int i=0;i<c;i++){
             ArrayList list = new ArrayList(2);
-            if (names [i] !=null) {
+            if (bots [i] !=null) {
                 // tooltip:
                 ScalableRegisterRow row1 = new ScalableRegisterRow(0.3);
-                row1.useCardBacksideForEmptyRegisters();
+               // row1.useCardBacksideForEmptyRegisters();
                 list.add(TOOLTIP_REGISTER_INDEX,row1); 
                 // info panel:
-                ScalableRegisterRow row2 = new ScalableRegisterRow(0.5);
-                row2.useCardBacksideForEmptyRegisters();
-                list.add(INFO_REGISTER_INDEX,row2);
-                
-                robNameToRegisterRowCollection.put(names[i],list);
+                ScalableRegisterRow row2 = new ScalableRegisterRow(0.5, false, 5);
+                row2.setOpaque(false);
+               // row2.useCardBacksideForEmptyRegisters();
+                list.add(INFO_REGISTER_INDEX,row2);               
+                robNameToRegisterRowCollection.put(bots[i].getName(),list);
+        
             }
         }
+        
     }         
         
     private ScalableRegisterRow getRegistersForBot(String name, int regIndex){
@@ -1259,7 +1268,7 @@ public class Ausgabe extends BNSThread {
       
     
     }
-    protected ScalableRegisterRow getToottipRegistersForBot(String name){
+    protected ScalableRegisterRow getTooltipRegistersForBot(String name){
         return getRegistersForBot(name, TOOLTIP_REGISTER_INDEX);
     }
     protected ScalableRegisterRow getInfoRegistersForBot(String name){
@@ -1268,8 +1277,7 @@ public class Ausgabe extends BNSThread {
     
     private void updateRegisterViews(Bot [] updatedBots, Status[] updatedStati){
         int size = updatedStati.length;
-        for (int i=0;i<size;i++){ // TODO move this block inside "if(aktpahse!=lastPhase)" block below?
-                                            // would be more efficient but I think this way we might get informed of register locks..
+        for (int i=0;i<size;i++){
             Status data = updatedStati[i];
             // TODO free locked registers/adjust in case of powerdown for 
             if (data !=  null) {
@@ -1286,6 +1294,17 @@ public class Ausgabe extends BNSThread {
 	                        CAT.debug("skipping bot: "+data.robName);		                        		                      
 	                        continue;
 	                    }
+	                    if (!bot.isActivated()) {
+	                        Collection list = getRegisterRowsForBot(data.robName);		                    
+		                    Iterator it = list.iterator();
+		                    while (it.hasNext()){
+		                        ScalableRegisterRow row = (ScalableRegisterRow)it.next();      
+		                        row.alwayshowCardBackInsteadOfEmpty(false);
+		                        row.emptyAll();
+		                    } 
+		                    continue;
+	                    }
+	                    
 	                    // we found the Bot "bot" for the current Status 
 	                    
 	                    CAT.debug("setting/locking cards for bot:\n"+bot);
@@ -1294,15 +1313,17 @@ public class Ausgabe extends BNSThread {
 	                    int cc = cards!=null?cards.length:0;
 	                    // "hcs" will contain the HumanCards (or null values) we will use to update the register views 
 	                    HumanCard [] hcs = new HumanCard[Bot.NUM_REG];
+	                   
 	                    // creating a "HumanCard" for every "Card" found in cards, putting it into "hcs"
 	                    for (int j=0;j<cc;j++){
 		                    Card c = cards[j];
 		                    if (c != null) {                                      
-		                        HumanCard hc = new HumanCard(c);		                        
-		                        hcs[j]=hc;
+		                        HumanCard hc = new HumanCard(c);
+		                    //    HumanCard hc2 = new HumanCard(c);
+		                        hcs[j]=hc;		                      
 		                    }
 		                    else {
-		                        hcs[j]=null;
+		                        hcs[j]=null;		                     
 		                    }
 	                    }
 	                    
@@ -1318,9 +1339,9 @@ public class Ausgabe extends BNSThread {
 	                        Card c = locked[j];
 	                        if (c!=null){ // this card should be locked
 	                            if (hcs[j] == null) { // we didn't get this card above, probably not yet evaluated
-	                                hcs[j] = new HumanCard(c);
+	                                hcs[j] = new HumanCard(c);	                             
 	                            }
-	                            hcs[j].setState(HumanCard.LOCKED);		                            
+	                            hcs[j].setState(HumanCard.LOCKED);	                            
 	                        }
 	                    }
 	                    // now we have all of the bot's cards we know about with the right locked/unlocked state in hcs 
@@ -1333,16 +1354,19 @@ public class Ausgabe extends BNSThread {
 	                    // finally, we go through all RegisterRows for the current bot and set the updated cards for
 	                    // the current phase
 	                    Collection list = getRegisterRowsForBot(data.robName);
+	                    
 	                    Iterator it = list.iterator();
-		                while (it.hasNext()){
-		                    ScalableRegisterRow row = (ScalableRegisterRow)it.next();
-		                    row.setCards(hcs);    
+	                    while (it.hasNext()){
+	                        ScalableRegisterRow row = (ScalableRegisterRow)it.next();                    
+	                        row.setCards(hcs);	 
+	                        
+	                        row.alwayshowCardBackInsteadOfEmpty(!bot.isInPit());
+	                        
 		                    if (hideRegs){
-		                        row.hideAll(); // hide, not empty, to show locked registers
-		                        
+		                        row.hideAll(); // hide, not empty, to show locked registers		                       
 		                    }
 		                    row.setCardVisibilityUntilPhase(data.aktPhase,true);
-		                }
+	                    } 
             } // data !=null
         }
     }
