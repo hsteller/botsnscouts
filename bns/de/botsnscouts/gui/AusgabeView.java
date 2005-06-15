@@ -165,7 +165,7 @@ public class AusgabeView extends JPanel  {
 		// create status panel
 		for (int i = 0; i < robots.length; i++) {
 			final String robotName = robots[i].getName();
-			RobotInfo r = new RobotInfo(robots[i], flagCount, ausgabe.getInfoRegistersForBot(robotName));
+			RobotInfo r = new RobotInfo(robots[i], flagCount, ausgabe.getTooltipRegistersForBot(robotName));
 			r.addRobotInfoListener(new RobotInfoListener() {
 				public void robotClicked(RobotInfoEvent rie) {
 				    Bot robot = ((RobotInfo) rie.getSource()).getRobot();
@@ -517,7 +517,7 @@ public class AusgabeView extends JPanel  {
     /**
      *  shows the winner list at game over
      */
-    public void showWinnerlist (String[] winners) {
+    public void showWinnerlist (String[] winners) {       
 		gameBoardScrollPane.setVisible(false);				
 		this.remove(gameBoardScrollPane);
 		View view = ausgabe.getView();
