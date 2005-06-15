@@ -26,6 +26,7 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import de.botsnscouts.util.BotVis;
+import de.botsnscouts.util.Directions;
 import de.botsnscouts.util.KrimsKrams;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.util.Stats;
@@ -126,10 +127,15 @@ public class WinnerListPanel extends JPanel {
       desc[row][0].setFont(f);
       desc[row][0].setForeground(FORE_COLOR);
       desc[row][0].setText(row+1+".");
-      Color c = BotVis.getBotColorByName(name);
+      int vis = BotVis.getBotVisByName(name);
+      Color c = BotVis.getBotColorByBotVis(vis);
       
-      desc [row][IMAGE_COL].setIcon(new ImageIcon(BotVis.getBotIconByName(name)));
-
+      if (row==0) {
+          desc [row][IMAGE_COL].setIcon(new ImageIcon(BotVis.getBotImageByBotVis(vis, Directions.NORTH)));
+      }
+      else {
+          desc [row][IMAGE_COL].setIcon(new ImageIcon(BotVis.getBotIconByBotVis(vis)));
+      }
       desc[row][NAME_COL].setFont(f);
       desc [row] [NAME_COL].setForeground(c);
       desc [row] [NAME_COL].setText(name);
