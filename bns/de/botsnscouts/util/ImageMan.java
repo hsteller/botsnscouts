@@ -283,7 +283,7 @@ public class ImageMan {
     }
     
     
-    // FIXME return a new image, don't cache (ImageIcon.getImage() is not enough)
+   
     public static Image getCardImage(String action){
         if (actionToImageMapping == null){
             initActionToImageMapping();
