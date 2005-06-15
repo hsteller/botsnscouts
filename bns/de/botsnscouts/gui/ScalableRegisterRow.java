@@ -40,23 +40,29 @@ public class ScalableRegisterRow extends JPanel {
     private ScalableRegView [] phases = new ScalableRegView[Bot.NUM_REG];
     
     public ScalableRegisterRow(){
-        this(1,false);
+        this(1,false, 0);
     }
     
     public ScalableRegisterRow(double scale){
-        this (scale, false);
+        this (scale, false, 0);
     }
     
-    public ScalableRegisterRow(double scale, boolean isVertical){
+    public ScalableRegisterRow(double scale, boolean isVertical, int gap){
         super();
         this.isVertical = isVertical;
         this.scale = scale;
         int phaseCount = phases.length;
-        if (this.isVertical) {
-            this.setLayout(new GridLayout(phaseCount,1));
+        this.setOpaque(true);
+       
+        if (this.isVertical){
+            GridLayout lay = new  GridLayout(phaseCount,1);
+            lay.setHgap(gap);
+            this.setLayout(lay);           
         }
         else {
-            this.setLayout(new GridLayout(1,phaseCount));
+            GridLayout lay = new  GridLayout(1,phaseCount);
+            lay.setHgap(gap);
+            this.setLayout(lay);            
         }
         for (int i=0;i<phaseCount;i++){
             ScalableRegView rv = new ScalableRegView(scale); 
@@ -64,7 +70,8 @@ public class ScalableRegisterRow extends JPanel {
             rv.setScale(scale);
             rv.setVisible(true);           
             add(rv,i);
-        }                
+        }           
+       
     }
     
     public boolean isVertical(){
@@ -96,6 +103,14 @@ public class ScalableRegisterRow extends JPanel {
             
         }
         setCards(all);
+    }
+    
+    
+    
+    public void alwayshowCardBackInsteadOfEmpty(boolean showBackside){
+        for (int i=0;i<phases.length;i++){
+            phases[i].alwayshowCardBackInsteadOfEmpty(showBackside);
+        }
     }
     
     /**
@@ -202,11 +217,7 @@ public Dimension getPreferredSize() {
    }
 
    
-   public void useCardBacksideForEmptyRegisters(){
-       for (int i=0;i<phases.length;i++){
-           phases[i].alwayshowCardBackInsteadOfEmpty(true);
-       }
-   }
+  
     
     public static void main(String[] args) {
 	        JFrame fr = new JFrame("RegRowTest");
@@ -230,18 +241,32 @@ public Dimension getPreferredSize() {
         	                new HumanCard(5,Card.ACTION_ROTATE_L)
         	};
         	row.setCards(cards);
-        	foo.add(row, BorderLayout.CENTER);
+        	final ScalableRegisterRow row2 = new ScalableRegisterRow(0.8);
+        	row2.setCards(cards);
+        	JPanel bar = new JPanel();
+        	bar.setLayout(new GridLayout(2,1));
+        	bar.add(row, 0);
+        	bar.add(row2,1);
         	
+        	foo.add(bar, BorderLayout.CENTER);
         	JButton inc = new JButton("+");
         	inc.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    row.setScale(row.getScale()+0.1);
+                    double s = row.getScale()+0.1;
+                    System.out.print("setting scale to "+s);
+                    row.setScale(s);
+                    row2.setScale(s);
+                    System.out.println(": prefSize="+row.getPreferredSize());
                 }
             });
         	JButton dec = new JButton("-");
         	dec.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    row.setScale(row.getScale()-0.1);
+                    double s = row.getScale()-0.1;
+                    System.out.print("setting scale to "+s);
+                    row.setScale(s);
+                    row2.setScale(s);
+                    System.out.println(": prefSize="+row.getPreferredSize());
                 }
             });
         	final JButton show = new JButton("show next (1)");
@@ -249,6 +274,7 @@ public Dimension getPreferredSize() {
                 int phase = 0;
         	    public void actionPerformed(ActionEvent e) {                    
                     row.setCardVisibility(phase+1,true);
+                    row2.setCardVisibility(phase+1, true);
                     phase=(phase+1)%5;
                     show.setText("show next("+(phase+1)+")");
                 }
@@ -258,6 +284,7 @@ public Dimension getPreferredSize() {
         	hide.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     row.hideAll();
+                    row2.hideAll();
                 }
             });
         	
