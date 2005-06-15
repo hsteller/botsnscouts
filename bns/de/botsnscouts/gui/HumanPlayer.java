@@ -326,11 +326,13 @@ public class HumanPlayer extends BNSThread {
                         // ------- Habe ich gewonnen / bin ich gestorben ----------
                         boolean dead = true;
                         int rating = 0;
+                        boolean gameIsFinished = false;
                         if (commAnswer.zahl == ClientAntwort.REMOVAL_REASON_GAMEOVER ||
                                         commAnswer.zahl == ClientAntwort.REMOVAL_REASON_LOSTLIVES) {	                        
 	                        try {
 	                            String[] gewinnerListe = comm.getSpielstand();
-	                            if (gewinnerListe != null) {
+	                            gameIsFinished = gewinnerListe != null;
+	                            if (gameIsFinished) {
 	                                //showMessage(Message.say("SpielerMensch", "spielende"));
 	                                for (int i = 0; i < gewinnerListe.length; i++) {
 	                                    if (gewinnerListe[i].equals(name)) {
@@ -348,7 +350,8 @@ public class HumanPlayer extends BNSThread {
                         }
                         String removalReason = commAnswer.str;
                         gameOver = true;
-                        humanView.showGameOver(dead, rating, removalReason);
+                        
+                        humanView.showGameOver(dead, rating, removalReason, gameIsFinished);
                         break;
                     }
                 default :
@@ -482,8 +485,9 @@ public class HumanPlayer extends BNSThread {
 	                catch (Exception e){
 	                    CAT.warn("while doing an additional, prob. unnecessary cancel:"+e.getMessage(),e);
 	                }
-	                comm.registerProg(name, sendProg, nextTurnPowerDown);
+	                comm.registerProg(name, sendProg, nextTurnPowerDown);	                
 	                cardsSent = true;
+	                humanView.hidePhaseInfoCards();
 	            }
 	        }
     }
@@ -849,8 +853,22 @@ public class HumanPlayer extends BNSThread {
         else {
             CAT.warn("view.initialize returned false");
         }
-//	ChatPane chatpane=new ChatPane(this);
-//	view.addChatPane(chatpane);
+        try {
+            String [] names = comm.getNamen();
+            int nameCount = names!=null?names.length:0;
+            Bot [] bots = new Bot[nameCount];
+            ScalableRegisterRow [] rows = new ScalableRegisterRow[nameCount];
+            for (int i=0;i<nameCount;i++){
+                String name = names[i];
+                bots[i] = ausgabe.getBot(name);
+                rows[i] = ausgabe.getInfoRegistersForBot(name);
+            }
+            humanView.fillPhaseInfoPanel(bots, rows);
+        }
+        catch (KommException ke){
+            CAT.error(ke.getMessage(), ke);
+        }
+        
     }
 
     /** Returns the size of the main JFrame or null if the JFrame
