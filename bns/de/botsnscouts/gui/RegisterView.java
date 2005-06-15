@@ -36,6 +36,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JWindow;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
@@ -52,8 +53,8 @@ public class RegisterView extends JButton {
     ImageIcon cardImage;
     HumanCard h;
     int myX=0,myY=0;
-    private Font prioFont=new Font("SansSerif",Font.PLAIN,8);
-    private Color prioColor=Color.darkGray;
+    public static final Font prioFont=new Font("SansSerif",Font.PLAIN,8);
+    public static final Color prioColor=Color.darkGray;
 
     public RegisterView() {
 	this(new ActionListener() {
@@ -159,7 +160,9 @@ public class RegisterView extends JButton {
 	g.setFont(prioFont);
 	g.setColor(prioColor);
 	//Miriam: priority is multiplies by ten because the cards look better then.
-	if (h!=null && (h.getprio()>0)) g.drawString(""+10*h.getprio(),26,22);
+	if (h!=null && (h.getprio()>0)) { 
+	    g.drawString(""+10*h.getprio(),26,22);
+	}
     }
 
     public static void main (String args[]) {
