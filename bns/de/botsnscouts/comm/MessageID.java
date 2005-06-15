@@ -24,7 +24,11 @@ public interface MessageID {
 
     public static final String SIGNAL_ACTION_START = "mSignalStart";
     public static final String SIGNAL_ACTION_STOP = "mSignalStop";
-
+    public static final String PHASE_STARTED = AUSWERTUNG+"phaseStart";
+    public static final String PHASE_ENDED = AUSWERTUNG+"phaseStop";
+    public static final String PLAYING_CARD = AUSWERTUNG+"playingCard";
+    public static final String REGISTER_LOCKED = AUSWERTUNG+"registerLocked";
+    public static final String REGISTER_UNLOCKED = AUSWERTUNG+"registerUNLocked";
     public static final String NTC = "NOTIFY_CHANGE";
 
     
