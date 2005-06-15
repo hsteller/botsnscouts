@@ -26,6 +26,7 @@
 package de.botsnscouts.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
@@ -50,7 +51,7 @@ import de.botsnscouts.widgets.TJPanel;
  * @author Lukasz Pekacki
  */
 public class GetDirection extends TJPanel {
-
+    private static Color arrowColor = GreenTheme.getTextColor();// new Color(64,191,64); 
     public GetDirection() {
 	this(new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
@@ -112,7 +113,9 @@ public class GetDirection extends TJPanel {
 	    return new Dimension(60,60);
 	}
 
+	
 	public void paintComponent(Graphics g){
+	    g.setColor(arrowColor);
 	    if (richt == Directions.NORTH){
 		int[] x = {5,55,30};
 		int[] y = {55,55,5};
