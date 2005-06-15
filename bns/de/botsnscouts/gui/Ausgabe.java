@@ -687,17 +687,11 @@ public class Ausgabe extends BNSThread {
         Status[] stArray = kommClient.getSpielstatus();
         if (stArray != null) {
             CAT.debug("NTC handler working through status array");
-           updateRegisterViews(tmp, stArray);
+           // updateRegisterViews(tmp, stArray);
 
                                         	   
             CAT.debug("aktPhase="+stArray[0].aktPhase+",lastPhase="+lastPhase);
-            if (stArray[0].aktPhase != lastPhase) {
-                
-                
-                
-                if (stArray[0].aktPhase==0){
-                    CAT.debug("***********NEW PHASE*************");
-                }
+            if (stArray[0].aktPhase != lastPhase) {                                                               
                 // its ok to do the reset on each phase change,
                 // will not do anything if all are reset
                 ausgabeView.resetProgrammingLEDs();
@@ -1056,7 +1050,171 @@ public class Ausgabe extends BNSThread {
         return tmpstr;
     }
 
+    private void comMsgHandleEvalPhaseStart(ClientAntwort cw) {
+        // cw.namen looks like:
+        // cw.namen[0] = messageId
+        // cw.namen[1] = for "phase number"
+        // followed by: 
+        // cw.namen[i] = robname #i 
+        // cw.namen[i+1] = robname #i's card priority
+//      	cw.namen[i+2] = robname #i's card action
+        // ..for every robot 
+        String phaseNumber = cw.namen[1];
+        int phase = 0;
+        try {
+             phase = Integer.parseInt(phaseNumber);
+        }
+        catch (NumberFormatException ne){
+            CAT.error("failed to parse phase number: "+phaseNumber);
+            CAT.error(ne.getMessage(), ne);
+        }
+        int length = cw.namen.length;
+        for (int i=2;i<length;i+=3){            
+            String botname = cw.namen[i];
+            Bot bot = getBot(botname);
+            String prioS = cw.namen[i+1];
+            String action = cw.namen[i+2];
+            int prio = -1;
+            try {
+                prio = Integer.parseInt(prioS);
+            }
+            catch (NumberFormatException ne){
+                CAT.error("failed to parse card priority: "+prioS);
+                CAT.error(ne.getMessage(), ne);
+            }
+            HumanCard hc = new HumanCard(prio, action);
+            if (bot.getLockedRegister(phase)!= null) {
+                hc.setState(HumanCard.LOCKED);
+            }
+            ArrayList rows = getRegisterRowsForBot(botname);
+            Iterator it = rows.iterator();            
+            if (phase == 0) {
+                // lock locked registers if in first phase..
+                Card [] lockedCards = bot.getLockedRegisters();
+                HumanCard [] hcs = new HumanCard[Bot.NUM_REG];
+                for (int j=0;j<Bot.NUM_REG;j++){
+                    if (j == phase){ // this card is hc, already with the correct state
+                        hcs[j] = hc;
+                    }
+                    else {
+	                    Card c  = lockedCards[j];
+	                    if (c != null){
+	                        HumanCard hci = new HumanCard(c);
+	                        hci.setState(HumanCard.LOCKED);
+	                        hcs[j] = hci;
+	                    }
+                    }
+                }
+                while (it.hasNext()){
+	                ScalableRegisterRow row = (ScalableRegisterRow) it.next();
+	                row.setCards(hcs);	               
+	                row.setCardVisibility(phase+1, true);               
+	            }
+            } 
+            else {  // any other phase, we only need to set a single card           
+	            while (it.hasNext()){
+	                ScalableRegisterRow row = (ScalableRegisterRow) it.next();
+	                row.setCard(phase+1,hc );
+	                row.setCardVisibility(phase+1, true);               
+	            }
+            }
+        }    
+        
+        SoundMan.playSound(SoundMan.REVEAL_CARDS);
+    }
+    private void comMsgHandleEvalPhaseEnd(ClientAntwort cw) {
+       /*String phaseNumber = cw.namen[1];
+           try {
+               int phase = Integer.parseInt(phaseNumber);
+               if (phase == 4) { // last phase over
+                   // TODO hide cards?, show messages?
+               }
+           }
+           catch (NumberFormatException ne){
+               CAT.error("failed to parse phase number: "+phaseNumber);
+               CAT.error(ne.getMessage(), ne);
+           }
+      */
+       
+    }
+    
+    
+    private void comMsgHandleEvalOfCard(ClientAntwort cw) {
+        // TODO highlight card
+    }
+    private void comMsgHandleRegisterLock(ClientAntwort ca){
+        comMsgHandleRegisterLock(ca, false);
+    }
+    private void comMsgHandleRegisterUnLock(ClientAntwort ca){
+        comMsgHandleRegisterLock(ca, true);
+    }
+    private void comMsgHandleRegisterLock(ClientAntwort ca, boolean unlock){
+        String botname = ca.namen[1];
+        String registerIndex = ca.namen[2];
+        String cardPrio = ca.namen[3];
+        String cardAction = ca.namen[4];
+        try {
+            int index = Integer.parseInt(registerIndex); // value 0-4
+            index++; // value 1-5
+            int prio = 0;
+            try {
+                prio = Integer.parseInt(cardPrio);
+            }
+            catch (NumberFormatException ne2){
+                CAT.error("Failed to parse card priority:"+cardPrio);
+                CAT.error(ne2.getMessage(), ne2);
+            }
+            HumanCard hc = new HumanCard(prio, cardAction);
+            if (!unlock) {
+                hc.setState(HumanCard.LOCKED);
+            }          
+            
+            ArrayList rows = getRegisterRowsForBot(botname);
+            Iterator it = rows.iterator();
+            while (it.hasNext()){
+                ScalableRegisterRow row = (ScalableRegisterRow) it.next();
+                row.setCard(index, hc);
+            }
+            
+        }
+        catch (NumberFormatException ne){
+            CAT.error("failed to parse register number: "+ca.namen[2]);
+            CAT.error(ne.getMessage(), ne);
+        }
+    }
+    
     private void initMessageToActionMapping() {
+        sequencer.addActionMapping(MessageID.REGISTER_LOCKED,
+                        new AbstractMessageAction() {
+                            public void invoke(ClientAntwort msgData) {
+                                comMsgHandleRegisterLock(msgData);
+                            }
+                        });
+        sequencer.addActionMapping(MessageID.REGISTER_UNLOCKED,
+                        new AbstractMessageAction() {
+                            public void invoke(ClientAntwort msgData) {
+                                comMsgHandleRegisterUnLock(msgData);
+                            }
+                        });
+        sequencer.addActionMapping(MessageID.PHASE_STARTED,
+                        new AbstractMessageAction() {
+                            public void invoke(ClientAntwort msgData) {
+                                comMsgHandleEvalPhaseStart(msgData);
+                            }
+                        });
+        sequencer.addActionMapping(MessageID.PHASE_ENDED,
+                        new AbstractMessageAction() {
+                            public void invoke(ClientAntwort msgData) {
+                                comMsgHandleEvalPhaseEnd(msgData);
+                            }
+                        });
+        
+        sequencer.addActionMapping(MessageID.PLAYING_CARD,
+                        new AbstractMessageAction() {
+                            public void invoke(ClientAntwort msgData) {
+                                comMsgHandleEvalOfCard(msgData);
+                            }
+                        });
         sequencer.addActionMapping(MessageID.SIGNAL_ACTION_START,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {
@@ -1274,7 +1432,7 @@ public class Ausgabe extends BNSThread {
     protected ScalableRegisterRow getInfoRegistersForBot(String name){
         return getRegistersForBot(name, INFO_REGISTER_INDEX);
     }
-    
+    /*
     private void updateRegisterViews(Bot [] updatedBots, Status[] updatedStati){
         int size = updatedStati.length;
         for (int i=0;i<size;i++){
@@ -1369,7 +1527,7 @@ public class Ausgabe extends BNSThread {
 	                    } 
             } // data !=null
         }
-    }
+    }*/
 }
 
 
