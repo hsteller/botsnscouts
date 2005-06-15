@@ -136,7 +136,7 @@ public class CursorMan {
 	return imgSets[id];
     }
 
-    static void finishLoading() {
+    public static void finishLoading() {
 	if(! imagesLoading )
 	    loadImages();
 
