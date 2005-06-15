@@ -184,9 +184,12 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                     break;
                                 }
 
-                                for (int i = 0; i < ans.register.length; i++)
-                                    rob.unlockRegister(ans.register[i] - 1);
-
+                                for (int i = 0; i < ans.register.length; i++) {
+                                    int regIndex = ans.register[i] - 1;
+                                    rob.unlockRegister(regIndex);
+                                    robMaint.sendMsg(MessageID.REGISTER_UNLOCKED, new String[]
+                                                                                             {rob.getName(),""+regIndex});
+                                }
                                 notifyServer();
 
                                 break;
