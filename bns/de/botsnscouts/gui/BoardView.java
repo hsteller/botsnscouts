@@ -537,10 +537,11 @@ public class BoardView extends JComponent{
                    if (bot.isVirtual())
                        g2d.setComposite(AC_SRC_OVER_05);
                    else
-                       g2d.setComposite(AC_SRC_OVER);               
-                   g2d.setColor(ROBOCOLOR[bot.getBotVis()]);
+                       g2d.setComposite(AC_SRC_OVER);
+                   int botVis = bot.getBotVis();
+                   g2d.setColor(ROBOCOLOR[botVis]);
                    g2d.drawString(bot.getName(),xoffset,yoffset + acht + roboCounter * acht);
-                   g2d.drawImage(getRobImage(bot, bot.getFacing()), xoffset, yoffset,scaledFeldSize, scaledFeldSize,this );                
+                   g2d.drawImage(BotVis.getBotImageByBotVis(botVis, bot.getFacing()), xoffset, yoffset,scaledFeldSize, scaledFeldSize,this );                
                    
                }
                roboCounter++;
@@ -2092,11 +2093,7 @@ public class BoardView extends JComponent{
         }            
     }
     
-    protected Image getRobImage(Bot robot, int facing) {
-        int botVis = robot.getBotVis();
-        return robosCrop[facing + botVis * 4];
-    }
-
+    
 
     private final static Stroke[] hi = new Stroke[]{
         new BasicStroke(6), new BasicStroke(4), new BasicStroke(2), new BasicStroke(1)
