@@ -36,6 +36,7 @@ import de.botsnscouts.comm.MessageID;
 import de.botsnscouts.comm.OtherConstants;
 import de.botsnscouts.server.Server;
 import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Directions;
 import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.Global;
@@ -334,13 +335,24 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void doPhaseReal(int phase, BoardBot[] bots) {
+        String [] botsNCards = new String [bots.length*3+1];
+        botsNCards[0] = (phase-1)+"";
         for (int i = 0; i < bots.length; i++) {  // potential direction to -1
             bots[i].setTempFacing(DUMMY_DIRECTION,DUMMY_DIRECTION) ;
+            if (server != null) {
+	            int x = 3*i+1;
+	            botsNCards[x]=bots[i].getName();
+	            Card c = bots[i].getMove(phase-1);
+	            botsNCards[x+1] = ""+c.getprio();
+	            botsNCards[x+2]=c.getAction();
+            }
         } 
 
         moved = new boolean[bots.length];
         moved2false();
 
+        ausgabenMsg(MessageID.PHASE_STARTED,botsNCards);
+        
         ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswRobBew");
         doRobMoveCards(phase, bots);
@@ -385,6 +397,7 @@ public class SimBoard extends Board implements Directions {
             devirtualize(bots);
             fireBotsChanged(bots);
         }
+        ausgabenMsg(MessageID.PHASE_ENDED,new String[]{""+phase});
     }
 
     private void doRobMoveCards(int phase, BoardBot[] robbis) {
@@ -418,21 +431,13 @@ public class SimBoard extends Board implements Directions {
         BoardBot bot = robbis[rob];
         int facing = bot.getFacing();
         String name = bot.getName();
-        if (aktion.equals("M1")) {
+        ausgabenMsgString2(MessageID.PLAYING_CARD, name, aktion);
+        if (aktion.equals(Card.ACTION_MOVE1)) {
             if (moveRobOne(robbis, rob, facing, true)){
                 ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
             }
             checkForPitVictims(robbis, false);
-        } else if (aktion.equals("M2")) {
-            if (moveRobOne(robbis, rob, facing, true)){
-                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
-            }
-            checkForPitVictims(robbis, false);
-            if (moveRobOne(robbis, rob, facing, true)){
-                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
-            }
-            checkForPitVictims(robbis, false);
-        } else if (aktion.equals("M3")) {
+        } else if (aktion.equals(Card.ACTION_MOVE2)) {
             if (moveRobOne(robbis, rob, facing, true)){
                 ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
             }
@@ -441,23 +446,32 @@ public class SimBoard extends Board implements Directions {
                 ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
             }
             checkForPitVictims(robbis, false);
+        } else if (aktion.equals(Card.ACTION_MOVE3)) {
             if (moveRobOne(robbis, rob, facing, true)){
                 ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
             }
             checkForPitVictims(robbis, false);
-        } else if (aktion.equals("BU")) {  // Back Up
+            if (moveRobOne(robbis, rob, facing, true)){
+                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
+            }
+            checkForPitVictims(robbis, false);
+            if (moveRobOne(robbis, rob, facing, true)){
+                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
+            }
+            checkForPitVictims(robbis, false);
+        } else if (aktion.equals(Card.ACTION_BACK)) {  // Back Up
             int trueDirection = (facing+ 2) % 4;
             if (moveRobOne(robbis, rob, trueDirection, true)){           
                     ausgabenMsgString2(MessageID.BOT_MOVE, name,   trueDirection + "");           
             }
             checkForPitVictims(robbis, false);
-        } else if (aktion.equals("RL")) {  // Rotate Left
+        } else if (aktion.equals(Card.ACTION_ROTATE_L)) {  // Rotate Left
             turnBot(robbis[rob], GEAR_COUNTERCLOCKWISE);
             moved[rob] = true;
-        } else if (aktion.equals("RR")) {  // Rotate Right
+        } else if (aktion.equals(Card.ACTION_ROTATE_R)) {  // Rotate Right
             turnBot(robbis[rob], GEAR_CLOCKWISE);
             moved[rob] = true;
-        } else if (aktion.equals("UT")) {  // U-Turn
+        } else if (aktion.equals(Card.ACTION_UTURN)) {  // U-Turn
             robbis[rob].setFacing((robbis[rob].getFacing() + 2) % 4);
             ausgabenMsgString(MessageID.BOT_UTURN, robbis[rob].getName());
             moved[rob] = true;
@@ -1161,8 +1175,14 @@ public class SimBoard extends Board implements Directions {
         if (robbi.getDamage() >= 5) {
             for (int i = 4; i >= 0; i--) {
                 if (robbi.getLockedRegisters()[i] == null) {
-                    if (robbi.getMove()[i] != null) {
+                    Card c = robbi.getMove()[i]; 
+                    if (c != null) {
                         robbi.lockRegister(i);
+                        String [] msg = new String [] {
+                                        robbi.getName(),""+i,
+                                        c.getprio()+"", c.getAction()                                        
+                        };
+                        ausgabenMsg(MessageID.REGISTER_LOCKED,msg);
                         //d("Sperre Register "+i);
                     }
                     return;
