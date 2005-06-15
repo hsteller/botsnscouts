@@ -31,6 +31,7 @@ import java.awt.MediaTracker;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 
@@ -57,7 +58,8 @@ public class ImageMan {
     PNG_REGLOCK =12,
     PNG_BOTDAMAGE =13,
     STATUS_STUFF = 14,
-    STATUS_FRAME = 15;
+    STATUS_FRAME = 15,
+    MEDIUM_ROBOS = 16;
     
     // PNG-IDs
     //    public final static int
@@ -67,16 +69,26 @@ public class ImageMan {
     
     
     static Class c = de.botsnscouts.BotsNScouts.class;
+    private static HashMap actionToImageMapping;
+    public static final String IMG_NAME_BACKSIDE  = "images/karterueck.gif";
+    public static final String IMG_NAME_EMPTY       = "images/register-leer.gif";
+    public static final String IMG_NAME_MOVE1      = "images/m1.gif";
+    public static final String IMG_NAME_MOVE2      = "images/m2.gif";
+    public static final String IMG_NAME_MOVE3      = "images/m3.gif";
+    public static final String IMG_NAME_BACKUP        = "images/bu.gif";
+    public static final String IMG_NAME_ROTATE_R = "images/rr.gif";
+    public static final String IMG_NAME_ROTATE_L = "images/rl.gif";
+    public static final String IMG_NAME_UTURN      = "images/ut.gif";
     
-    public final static  ImageIcon CardRUECK = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/karterueck.gif")));
-    public final static  ImageIcon CardM1 = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/m1.gif")));
-    public final static  ImageIcon CardM2 = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/m2.gif")));
-    public final static  ImageIcon CardM3 = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/m3.gif")));
-    public final static  ImageIcon CardBU = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/bu.gif")));
-    public final static  ImageIcon CardRL = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/rl.gif")));
-    public final static  ImageIcon CardRR = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/rr.gif")));
-    public final static  ImageIcon CardUT = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/ut.gif")));
-    public final static  ImageIcon CardRLEER = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource("images/register-leer.gif")));
+    public final static  ImageIcon CardRUECK = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource(IMG_NAME_BACKSIDE)));
+    public final static  ImageIcon CardM1 = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource(IMG_NAME_MOVE1)));
+    public final static  ImageIcon CardM2 = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource(IMG_NAME_MOVE2)));
+    public final static  ImageIcon CardM3 = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource(IMG_NAME_MOVE3)));
+    public final static  ImageIcon CardBU = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource(IMG_NAME_BACKUP)));
+    public final static  ImageIcon CardRL = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource(IMG_NAME_ROTATE_L)));
+    public final static  ImageIcon CardRR = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource(IMG_NAME_ROTATE_R)));
+    public final static  ImageIcon CardUT = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource(IMG_NAME_UTURN)));
+    public final static  ImageIcon CardRLEER = new ImageIcon(Toolkit.getDefaultToolkit().getImage(c.getResource(IMG_NAME_EMPTY)));
     
     final static ImageSet[] imgSetDescr = {
                     ImageSet.getInstance("images/cbelts.gif",   24, 5 ),
@@ -95,12 +107,19 @@ public class ImageMan {
                     ImageSet.getInstance("images/boom.png", 1, 1),
                     ImageSet.getInstance("images/ministuff.png", 1, 1),
                     ImageSet.getInstance("images/statusframe.png", 1, 1),
+                    
+    };
+    
+    final static ImageSet [] imgSetDescrMedium = {
+                    ImageSet.getInstance("images/robos48x48.gif",32,4)
     };
     
     final static int IMGSETCOUNT = imgSetDescr.length;
+    final static int IMGSETCOUNT_MEDIUM = imgSetDescrMedium.length;
+    final static int IMGSETCOUNT_ALL = IMGSETCOUNT+IMGSETCOUNT_MEDIUM;
     
     
-    static Image[][] imgSets = new Image[IMGSETCOUNT][];
+    static Image[][] imgSets = new Image[IMGSETCOUNT_ALL][];
     
     static boolean imagesLoading = false;
     static boolean loadingFinished = false;
@@ -116,23 +135,49 @@ public class ImageMan {
         tracker = new MediaTracker(new Button());
         Toolkit tk = Toolkit.getDefaultToolkit();
         CropperField gridCropper = new CropperField(8, 8, 64, tk);
+        CropperField mediumCropper = new CropperField(4,8,48,tk);
         
-        for(int i=0; i<IMGSETCOUNT; i++) {
+        for( int i=0; i<IMGSETCOUNT; i++) {
             ImageSet descr = imgSetDescr[i];
             try {
                 Image img = descr.getImage();
                 imgSets[i] = new Image[ descr.size ];
                 
                 tracker.addImage( img, i );
-                if( descr.size == 1 )
+                if( descr.size == 1 ) {
                     imgSets[i][0] = img;
-                else
-                    gridCropper.multiCrop( img, descr.rowlength, descr.size, imgSets[i], tracker, i);
+                }
+                else {                 
+                        gridCropper.multiCrop( img, descr.rowlength, descr.size, imgSets[i], tracker, i);                                        
+                }
             } catch(IOException ioe) {
                 CAT.error("Couldn't load: " + descr.name, ioe);
                 imgSets[i] = new Image[0];
             }
         }
+        for( int i=0, globalI=IMGSETCOUNT; i<IMGSETCOUNT_MEDIUM; i++, globalI++) {
+            ImageSet descr = imgSetDescrMedium[i];
+            try {
+                Image img = descr.getImage();               
+                imgSets[globalI] = new Image[ descr.size ];
+                
+                tracker.addImage( img, globalI );
+                if( descr.size == 1 ) {
+                    imgSets[globalI][0] = img;
+                }
+                else {                 
+                        mediumCropper.multiCrop( img, descr.rowlength, descr.size, imgSets[globalI], tracker,globalI);                                        
+                }
+            } catch(IOException ioe) {
+                CAT.error("Couldn't load: " + descr.name, ioe);
+                imgSets[globalI] = new Image[0];
+            }
+        }
+        	
+        
+       
+            
+        
         
         
         // start loading in a different thread
@@ -235,5 +280,54 @@ public class ImageMan {
     public static ImageIcon getIcon(String s) {
         URL url = BotsNScouts.class.getResource( "images/" + s );
         return new ImageIcon( url );
+    }
+    
+    
+    // FIXME return a new image, don't cache (ImageIcon.getImage() is not enough)
+    public static Image getCardImage(String action){
+        if (actionToImageMapping == null){
+            initActionToImageMapping();
+        }
+        
+        ImageIcon icon = (ImageIcon) actionToImageMapping.get(action);
+        if (icon != null){
+            return icon.getImage();
+        }
+        else {
+            return null;
+        }
+        /*
+        
+        String resourceString = (String) actionToImageMapping.get(action);
+        if (resourceString!=null){
+            	return Toolkit.getDefaultToolkit().getImage(c.getResource(resourceString));
+        }
+        else {
+            return null;
+        }
+        */
+    }
+    
+   
+    private static void initActionToImageMapping(){
+        ImageMan.finishLoading();
+        actionToImageMapping = new HashMap();
+        
+        actionToImageMapping.put(Card.ACTION_MOVE1, CardM1);
+        actionToImageMapping.put(Card.ACTION_MOVE2,  CardM2 );
+        actionToImageMapping.put(Card.ACTION_MOVE3, CardM3);
+        actionToImageMapping.put(Card.ACTION_BACK,CardBU);
+        actionToImageMapping.put(Card.ACTION_ROTATE_L, CardRL);
+        actionToImageMapping.put(Card.ACTION_ROTATE_R, CardRR);
+        actionToImageMapping.put(Card.ACTION_UTURN, CardUT);
+        
+        /*actionToImageMapping.put(Card.ACTION_MOVE1, IMG_NAME_MOVE1);
+        actionToImageMapping.put(Card.ACTION_MOVE2,  IMG_NAME_MOVE2 );
+        actionToImageMapping.put(Card.ACTION_MOVE3,  IMG_NAME_MOVE3);
+        actionToImageMapping.put(Card.ACTION_BACK,IMG_NAME_BACKUP);
+        actionToImageMapping.put(Card.ACTION_ROTATE_L, IMG_NAME_ROTATE_L);
+        actionToImageMapping.put(Card.ACTION_ROTATE_R, IMG_NAME_ROTATE_R);
+        actionToImageMapping.put(Card.ACTION_UTURN, IMG_NAME_UTURN);
+        */
     }
 }
