@@ -75,6 +75,8 @@ public class SoundMan {
     public static final int MESSAGE = 14;
 
     public static final int PROGRAMMING_DONE = 15;
+    
+    public static final int REVEAL_CARDS = PROGRAMMING_DONE;
 
     /**
      * How to locate the sounds relative to de.botsnscouts.BotsNScouts Mind the
