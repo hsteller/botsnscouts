@@ -80,8 +80,20 @@ public class BotVis {
     }
 
     public static Image getBotIconByName(String name) {
-        return getRobotImages()[getBotVisByName(name)];
+        return robotImages[getBotVisByName(name)];
     }
+    
+    public static Image getBotIconByBotVis(int vis){
+        return robotImages[vis];
+    }
+    
+    public static Image getBotImageByBotVis(int vis,  int facing){
+        return ImageMan.getImage(ImageMan.ROBOS, facing+vis*4);
+    }
+    public static Image get48x48BotImageByBotVis(int vis,  int facing){
+        return ImageMan.getImage(ImageMan.MEDIUM_ROBOS, facing+vis*4);
+    }
+    
 
     public static int getBotLaserSoundByName(String name) {
         return roboLaserSound[getBotVisByName(name)];
