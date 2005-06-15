@@ -62,8 +62,10 @@ public class HumanView extends JPanel  {
 
     private RepairRegisters repairRegisters;
 
-    private UserInfo userInfo;
+   private UserInfo userInfo;
 
+    private PhaseEvaluationPanel phaseInfo; 
+    
     private CardArray cards;
 
     private RegisterArray registers;
@@ -162,6 +164,7 @@ public class HumanView extends JPanel  {
         }
 
         );
+        /*
         JButton emergencyButton = new JButton(Message.say("SpielerMensch","forceCardDisplayButton"));
 		emergencyButton.addActionListener(new ActionListener(){
 		    public void actionPerformed(ActionEvent e){
@@ -176,15 +179,18 @@ public class HumanView extends JPanel  {
 		        
 		        showCards(oldCards);
 		    }
-		});
-        userInfo = new UserInfo(emergencyButton);
+		});*/
+        userInfo = new UserInfo(/*emergencyButton*/);
 
-        wiseAndScout.add(wisenheimerView);
+        phaseInfo = new PhaseEvaluationPanel();
+		wiseAndScout.add(wisenheimerView);
         wiseAndScout.add(scoutView);
 
         regsAndCards.add(registers);
         regsAndCards.add(cards);
         switcherPanel.add(userInfo, "userInfo");
+        switcherPanel.add(phaseInfo, "phaseInfo");
+        
         switcherPanel.add(getDir, "getDirection");
         switcherPanel.add(againPowerDown, "againPowerDown");
         switcherPanel.add(repairRegisters, "repairRegisters");
@@ -211,10 +217,23 @@ public class HumanView extends JPanel  {
             return;
         }
         userInfo.setInfo(s);
-        panelSwitcher.show(switcherPanel, "userInfo");
+        panelSwitcher.show(switcherPanel,nonDialogPanel);
         this.requestFocus();
     }
 
+    protected void fillPhaseInfoPanel(Bot [] robs, ScalableRegisterRow[]registerRows){
+        phaseInfo.setContents(robs, registerRows);
+        
+    }
+    
+    /** Tell PhaseInfoPanel to cover all cards (show their backsides)     
+     */
+    protected void hidePhaseInfoCards() {
+        phaseInfo.hideAll(true);
+        
+    }
+    
+    
     /**
      * display the card
      */
@@ -335,9 +354,11 @@ public class HumanView extends JPanel  {
 
     /**
      * show game over two types: a) winner + winner no. b) dead
-     *
+     * @param lockPanel force the switcherPanel to not leave the dialog mode 
+     *               (==showing the winnerpanel until the player quits, as he was removed and
+     *                 won't get another dialog) 
      */
-    public synchronized void showGameOver(boolean dead, int winnerNumber, String removalReason) {        
+    public synchronized void showGameOver(boolean dead, int winnerNumber, String removalReason, boolean lockPanel) {        
         String bigVerticalMessage=dead?Message.say("SpielerMensch", "mkilled"):Message.say("SpielerMensch", "mflagreached");       
         gameOverPanel.setMessage(bigVerticalMessage,dead,removalReason);
         panelSwitcher.show(switcherPanel, "reachedEnd");      
@@ -345,21 +366,23 @@ public class HumanView extends JPanel  {
         // we are not a dialog but pretend to be one, so nobody immediately replaces the reachedEnd-Panel        
         //  The Runnable/Thread only ensures that we are show at least 8 seconds 
         setDialogInSidebarActive(true);
-         Runnable foo = new Runnable(){
-             public void run(){                 
-                 synchronized (this){
-                     try {
-                         wait (8000);
-                     }
-                     catch (InterruptedException ie){
-                         CAT.error("interrupted while giving user a last chance for sending cards himself", ie);
-                     }
-                     setDialogInSidebarActive(false);
-                 }
-             }
-         };
-         Thread t = new Thread(foo);
-         t.start();
+        if (!lockPanel) { 
+	         Runnable foo = new Runnable(){
+	             public void run(){                 
+	                 synchronized (this){
+	                     try {
+	                         wait (8000);
+	                     }
+	                     catch (InterruptedException ie){
+	                         CAT.error(ie.getMessage(), ie);
+	                     }
+	                     setDialogInSidebarActive(false);
+	                 }
+	             }
+	         };
+	         Thread t = new Thread(foo);
+	         t.start();
+        }
         //}
     }
 
@@ -436,6 +459,7 @@ public class HumanView extends JPanel  {
             if (cards.wishesPowerDown()) {
                 showPowerDown();
             }
+            setNonDialogToPhaseInfo();
             cards.resetAll();
         }
         wisenheimerView.setSelected(false);
@@ -500,19 +524,30 @@ public class HumanView extends JPanel  {
     private synchronized boolean isDialogInSidebarActive() {
         return dialogInSidebarActive;
     }
+    
+    private String nonDialogPanel="userInfo";
+    
+    protected void setNonDialogToUserInfo(){
+        nonDialogPanel = "userInfo";
+    }
+    
+    protected void setNonDialogToPhaseInfo(){
+        nonDialogPanel ="phaseInfo";
+    }
 
     protected synchronized void setDialogInSidebarActive(boolean dialogInSidebarActive) {
         this.dialogInSidebarActive = dialogInSidebarActive;
         if (!dialogInSidebarActive) {
             userInfo.setInfo(Message.say("SpielerMensch", "mrelax"));
-            panelSwitcher.show(switcherPanel, "userInfo");
+            panelSwitcher.show(switcherPanel, nonDialogPanel);
         }
     }
-    public Dimension getPreferredSize () {
+   public Dimension getPreferredSize () {
         return new Dimension(150,550);
-    } public Dimension getMinimumSize () {
-        return new Dimension(150,550);
-    }
-    
+    }/*
+   public Dimension getMinimumSize () {
+       return new Dimension(150,550);
+   }
+   */
 }
 
