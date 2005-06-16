@@ -150,7 +150,7 @@ public class HumanView extends JPanel  {
         return  new AgainPowerDown(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {                
                 sendAgainPowerDown(ae.getActionCommand().equals("powerdownagain"));
-                setDialogInSidebarActive(false);
+               //done in sendAgainPowerDown now:  setDialogInSidebarActive(false);
             }
         });
     }
@@ -160,7 +160,7 @@ public class HumanView extends JPanel  {
             public void actionPerformed(ActionEvent ae) {
                 int direct = Integer.parseInt(ae.getActionCommand());               
                 sendDirection(direct);
-                setDialogInSidebarActive(false);
+               // done in sendDirection now setDialogInSidebarActive(false);
             }
         });
     }
@@ -169,7 +169,7 @@ public class HumanView extends JPanel  {
        return  new RepairRegisters(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 sendRepairRegisters();
-                setDialogInSidebarActive(false);
+      // done in sendRepairRegsiters:          setDialogInSidebarActive(false);
             }
         });
     }
@@ -404,10 +404,12 @@ public class HumanView extends JPanel  {
 
     protected void sendDirection(int d) {
         human.sendDirection(d);
+        setDialogInSidebarActive(false);
         showMessageToPlayer(Message.say("SpielerMensch", "mkartenMisch"));
     }
 
     protected void sendAgainPowerDown(boolean again) {
+        setDialogInSidebarActive(false);
         if (!again) {
             showMessageToPlayer(Message.say("SpielerMensch", "mkartenMisch"));
         }
@@ -426,6 +428,7 @@ public class HumanView extends JPanel  {
      */
     protected void sendRepairRegisters(ArrayList regsRep) {
         CAT.debug("sendRepairRegisters");
+        setDialogInSidebarActive(false);
         showMessageToPlayer(Message.say("SpielerMensch", "mkartenMisch"));
         unlockRegisters(regsRep);
         human.sendRepair(regsRep);
