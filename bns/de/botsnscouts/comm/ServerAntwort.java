@@ -71,6 +71,7 @@ public class ServerAntwort {
     public static final int MSG_ACK=20;
     public static final int IS_SCOUT_ALLOWED=21;
     public static final int IS_WISENHEIMER_ALLOWED=22;
+    public static final int CAN_PUSHERS_PUSH_MORE_THAN_ONE_BOT=23;
     
     /** zu Debug-/Informationszwecken:
 	Die Methode liefert den Namen der ServerAntwort-Konstanten (mit Wert t) als String zur�ck.*/
@@ -98,6 +99,7 @@ public class ServerAntwort {
 	case MSG_ACK: return "MSG_ACK (MOK)";
 	case IS_SCOUT_ALLOWED : return "IS SCOUT ALLOWED (ISS)";
 	case IS_WISENHEIMER_ALLOWED: return "IS WISENHEIMER ALLOWED (ISW)";
+	case CAN_PUSHERS_PUSH_MORE_THAN_ONE_BOT: return "CAN_PUSHERS_PUSH_MORE_THAN_ONE_BOT (ISPPMB)";
 	default: return "ERROR - UNKNOWN KIND OF COMMUNICATION";
 	          
 	}

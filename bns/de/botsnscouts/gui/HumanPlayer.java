@@ -809,9 +809,12 @@ public class HumanPlayer extends BNSThread {
             Location[] fahnen = comm.getFahnenPos();
             String spielfeldstring = comm.getSpielfeld();
             try {
+                boolean canPushersPushMultipleBots = comm.getCanPushersPushMultipleBots();
                 intelliBoard = SimBoard.getInstance(dimx, dimy, spielfeldstring, fahnen);
+                intelliBoard.setPusherCanPushMoreThanOneBot(canPushersPushMultipleBots);
                 SimBoard tmp = SimBoard.getInstance(dimx, dimy, spielfeldstring, fahnen); // to be on the safe side,
                                                                                    // don't know if wisenhheimers may share a board
+                tmp.setPusherCanPushMoreThanOneBot(canPushersPushMultipleBots);
                 emergencyWisenheimer = new Wisenheimer(tmp);                																                     
             } catch (Exception e) {
                 CAT.error("HumanPlayer has a problem: No Board" + e.getMessage(),e);

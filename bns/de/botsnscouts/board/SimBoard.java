@@ -54,6 +54,8 @@ public class SimBoard extends Board implements Directions {
 
     private Priority origLevel = null;
 
+    private boolean pushersCanPushMoreThanOneBot = false;
+    
     public void setDebug(boolean b) {
         if (origLevel == null) {
             origLevel = CAT.getPriority();
@@ -101,8 +103,8 @@ public class SimBoard extends Board implements Directions {
         for (int i = 0; i < moved.length; i++) {
             moved[i] = false;
         }
-    }
-
+    } 
+    
     private void fireBotsChanged(BoardBot[] robbis) {
         if (server == null) {
             return;
@@ -728,16 +730,16 @@ public class SimBoard extends Board implements Directions {
             int x = r.getX();
             int y = r.getY();
             if (nw(x, y).isSouthPusherActive(phase)) {
-                moveRobOne(robbis, i, SOUTH, false);
+                moveRobOne(robbis, i, SOUTH, pushersCanPushMoreThanOneBot);
             }
             if (sw(x, y).isNorthPusherActive(phase)) {
-                moveRobOne(robbis, i, NORTH, false);
+                moveRobOne(robbis, i, NORTH, pushersCanPushMoreThanOneBot);
             }
             if (ew(x, y).isWestPusherActive(phase)) {
-                moveRobOne(robbis, i, WEST, false);
+                moveRobOne(robbis, i, WEST, pushersCanPushMoreThanOneBot);
             }
             if (ww(x, y).isEastPusherActive(phase)) {
-                moveRobOne(robbis, i, EAST, false);
+                moveRobOne(robbis, i, EAST, pushersCanPushMoreThanOneBot);
             }
         } //for
         
@@ -1216,6 +1218,14 @@ public class SimBoard extends Board implements Directions {
     
     public void setServer(Server serv){
         	this.server = null;
+    }
+    
+    public void setPusherCanPushMoreThanOneBot(boolean wellCanThey){
+        pushersCanPushMoreThanOneBot = wellCanThey;
+    }
+    
+    public boolean arePushersPushingMoreThanOneBot(){
+        return pushersCanPushMoreThanOneBot;
     }
     
     

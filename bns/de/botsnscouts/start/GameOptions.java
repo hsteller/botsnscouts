@@ -37,6 +37,7 @@ public class GameOptions {
     static final int DPORT;//=8077;
     static final int DPLAYERS;//=8;
     static final int DTO;//=200;
+    static final boolean PUSHERS_PUSH_MULTIPLE_BOTS;
 
     private final static Category CAT = Category.getInstance(GameOptions.class);
 
@@ -54,6 +55,7 @@ public class GameOptions {
         DPORT = Conf.getIntProperty("server.port",8077);        
         DPLAYERS= Conf.getIntProperty("players",8);        
         DTO = Conf.getIntProperty("timeout", 200);
+        PUSHERS_PUSH_MULTIPLE_BOTS = Conf.getBooleanProperty("canPushersPushMutltipleBots", false);
         
     }
 
@@ -395,6 +397,10 @@ public class GameOptions {
 
     public String getInvitor() {
         return invitor;
+    }
+    
+    public boolean arePushersAbleToPushMultipleBots(){
+        return PUSHERS_PUSH_MULTIPLE_BOTS;
     }
 
 }

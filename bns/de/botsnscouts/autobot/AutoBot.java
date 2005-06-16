@@ -267,11 +267,12 @@ public class AutoBot extends BNSThread  {
     }
 
     /**
-     * erzeugt mit der Spielfelddimension, den Fahnenpositionen und dem
-     * Spielfeldstring das Board des kuenstlichen Spielers, ruft
-     * ausserdem die Entfernungsberechnung in DistanceCalculator auf
+     * Creates the gameboardlayout used by this Autobot,
+     * Uses the gameboard dimension, flag locations and the gameboard String
+     * for creation.
+     * 
      */
-    public void initField() {
+    private void initField() {
         CAT.debug("initializing field...");
         int dimx, dimy;
         Location dimension;
@@ -286,8 +287,10 @@ public class AutoBot extends BNSThread  {
             fieldAsString = myComm.getSpielfeld();
             //d(spielfeldstring);
 
+            boolean canPushersPushMultipleBots = myComm.getCanPushersPushMultipleBots();
             try {
                 myMap = SimBoard.getInstance(dimx, dimy, fieldAsString, flags);
+                myMap.setPusherCanPushMoreThanOneBot(canPushersPushMultipleBots);
             } catch (FlagException fe) {
                 CAT.warn("Flag on pit", fe);
             } catch (FormatException e) {

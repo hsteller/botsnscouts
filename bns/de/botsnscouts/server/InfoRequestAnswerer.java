@@ -42,5 +42,6 @@ interface InfoRequestAnswerer{
     
     boolean isScoutAllowed();
     boolean isWisenheimerAllowed();
+    boolean  arePushersPushingMultipleBots();
     
 }

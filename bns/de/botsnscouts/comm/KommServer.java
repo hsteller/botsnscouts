@@ -28,6 +28,8 @@ import java.io.PrintWriter;
 
 import org.apache.log4j.Category;
 
+import com.sun.rsasign.i;
+
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Encoder;
 import de.botsnscouts.util.Location;
@@ -680,6 +682,9 @@ public class KommServer {
                             back.typ = ServerAntwort.IS_SCOUT_ALLOWED;
                         else if (rd == 'W')
                             back.typ = ServerAntwort.IS_WISENHEIMER_ALLOWED;                        
+                        else if (input.equals(OtherConstants.REQUEST_PUSHERS_PUSH_MULTIPLE)){
+                            back.typ = ServerAntwort.CAN_PUSHERS_PUSH_MORE_THAN_ONE_BOT;
+                        }
                         else {
                             error = true;
                             errormsg = "received IS but no S or W as third character";

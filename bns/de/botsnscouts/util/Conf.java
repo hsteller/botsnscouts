@@ -145,6 +145,23 @@ public class Conf {
     }
 
 
+    public static boolean getBooleanProperty(String key, boolean defaultValue) {
+        String data = getProperty(key);
+        boolean ret = defaultValue;
+       
+        if (data !=null) {
+            String d = data.trim();
+            if (d.equalsIgnoreCase("true")) {
+                ret = true;
+            }
+        else if (d.equalsIgnoreCase("false")) {
+                ret = true;
+            }
+        }                
+           
+        return ret;
+    }
+    
     public static int getIntProperty(String key, int defaultValue) {
         String data = getProperty(key);
         int ret = defaultValue;

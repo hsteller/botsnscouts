@@ -77,7 +77,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
 
     private ServerObserver serverObserver;
 
-    protected SimBoard board;
+    private SimBoard board;
 
     protected String[] players = new String[8];
     private boolean gameover = false;
@@ -111,6 +111,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
         this.options = options;
         try {
             board = new SimBoard(options.getX(), options.getY(), options.getBoard(), options.getFlags(), this);
+            board.setPusherCanPushMoreThanOneBot(options.arePushersAbleToPushMultipleBots());
         } catch (FormatException e) {
             CAT.error("Fehler im Spielfeldstring.", e);
             System.exit(5);
@@ -267,6 +268,10 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
 
     public boolean isWisenheimerAllowed() {
         return options.isAllowWisenheimer();
+    }
+    
+    public boolean arePushersPushingMultipleBots(){
+        return options.arePushersAbleToPushMultipleBots();
     }
 
     int getRegistrationPort() {

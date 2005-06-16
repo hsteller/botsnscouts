@@ -310,6 +310,10 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 komm.sendBoolean(info.isWisenheimerAllowed());
                                 break;
                             }
+                            case ServerAntwort.CAN_PUSHERS_PUSH_MORE_THAN_ONE_BOT: {
+                                komm.sendBoolean(info.arePushersPushingMultipleBots());
+                                break;
+                            }
                             case ServerAntwort.MESSAGE:
                                 String[] tmp = new String[ans.msg.length - 1];
                                 for (int k = 1; k < ans.msg.length; k++)

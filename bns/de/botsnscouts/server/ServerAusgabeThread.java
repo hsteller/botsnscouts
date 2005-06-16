@@ -160,6 +160,18 @@ class ServerAusgabeThread extends BNSThread implements Waitable
 			case ServerAntwort.STATS:
 			    komm.sendStats(info.getStats());
 			    break;
+			 case ServerAntwort.CAN_PUSHERS_PUSH_MORE_THAN_ONE_BOT:{
+			     komm.sendBoolean(info.arePushersPushingMultipleBots());
+			     break;			     
+			 }
+			   case ServerAntwort.IS_SCOUT_ALLOWED: {
+                   komm.sendBoolean(info.isScoutAllowed());
+                   break;
+               }
+               case ServerAntwort.IS_WISENHEIMER_ALLOWED: {
+                   komm.sendBoolean(info.isWisenheimerAllowed());
+                   break;
+               }
 
 			case ServerAntwort.ABMELDUNG:
                 CAT.debug("received abmeldung!");

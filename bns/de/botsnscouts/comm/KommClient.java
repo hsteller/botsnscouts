@@ -1166,27 +1166,37 @@ public class KommClient implements Shutdownable{
         
     }
     
-    public boolean getIsScoutAllowed() throws KommException{
-        this.senden("ISS");
+    public boolean getCanPushersPushMultipleBots() throws KommException{
+       return performBooleanRequest(OtherConstants.REQUEST_PUSHERS_PUSH_MULTIPLE);
+        
+    }
+    
+    private boolean parseBooleanAnswer(String bAnswer) throws KommException{
+        if (bAnswer.equals("true")){
+            return true;
+        }
+        else if (bAnswer.equals("false")){
+            return false;
+        }
+        else {        
+            throw new  KommException("not a valid lowercase boolean: "+bAnswer);
+        }
+    }
+    
+    private boolean performBooleanRequest(String command)throws KommException{
+        this.senden(command);
         String value = this.einlesen();
         if (value != null){
-            if (value.equals("true"))
-                return true;
-            else if (value.equals("false"))
-                return false;     
-        }
-        throw new KommException("Question isScoutAllowed got unknown answer: "+value);
+            return parseBooleanAnswer(value);
+         }
+         throw new KommException("request \""+command+"\" got an unknown answer: "+value);
+    }
+    
+    public boolean getIsScoutAllowed() throws KommException{
+        return performBooleanRequest("ISS");       
     }
     public boolean getIsWisenheimerAllowed() throws KommException{
-        this.senden("ISW");
-        String value = this.einlesen();
-        if (value != null){
-            if (value.equals("true"))
-                return true;
-            else if (value.equals("false"))
-                return false;     
-        }
-        throw new KommException("Question isWisenheimerAllowed got unknown answer: "+value);
+        return performBooleanRequest("ISW"); 
     }
     
     /** Request zur Abfrage des Timeouts. Rueckgabewert: Timeout in Sekunden

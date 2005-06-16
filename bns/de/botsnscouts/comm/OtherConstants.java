@@ -9,6 +9,8 @@ public interface OtherConstants {
     public static final String REASON_TIMEOUT        = "TO";
     public static final String REASON_RULE_VIOLATION = "RV";
     public static final String REASON_SERVER_SHUTDOWN = "server shutdown";
+    
+    public static final String REQUEST_PUSHERS_PUSH_MULTIPLE = "ISPPMB";
 
   // for sending a sequence number in a message use MESSAGE_NUMBER=1234;
   // should be put into the last field if the message's String array
