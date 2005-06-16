@@ -693,19 +693,28 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
     }
 
     /**
-     * Repariere Schaden, falls auf Reparaturfeld oder Flagge
-     * Liefert true, falls erst erfragt werden muss, welche  Register entsperren.werden sollen.
+     * Repair damage.
+     * Returns true, if we have to ask the player which registers should be repaired
+     * (if more than one register is locked)
      */
     private boolean repariereGgf(ServerRoboterThread t) {
-        if (t.rob.countLockedRegisters() == 0) {
+        int lockedCount = t.rob.countLockedRegisters(); 
+        int damage = t.rob.getDamage();
+        if ( lockedCount == 0) {
+            // no registers locked, nothing to unlock
             return false;
         }
-        if ((t.rob.countLockedRegisters() > 0) && (t.rob.getDamage() < 5)) {
-            t.rob.unlockAllRegisters();
+        else if ((lockedCount > 0) && damage< 5) {
+            // only one register to unlock, no need to ask the player
+            String [] msg = t.rob.unlockAllRegistersAndGetMessage();
+            if (msg != null){
+                sendMsg(MessageID.REGISTER_UNLOCKED, msg);
+            }
             return false;
         }
-
-        return (t.rob.getDamage() - 4 < t.rob.countLockedRegisters());
+        else {
+            return (damage - 4 < lockedCount);
+        }
     }
 
     /**
@@ -1054,11 +1063,14 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                                 e.remove();  //aus aktRoboter
                                 tmp.rob.decrLife();
 
-                                // Voellig tot?
+                                // really dead, no lives left?
                                 if (tmp.rob.getLivesLeft() > 0) {
                                     tmp.rob.setDamage(2);
-                                    //Register entsperren
-                                    tmp.rob.unlockAllRegisters();
+                                    // unlock registers
+                                    String [] msg = tmp.rob.unlockAllRegistersAndGetMessage();
+                                    // TODO notifying the views of unlock? 
+                                    // Probably not necessary because of destruction messages
+                                  
                                     tmp.rob.setNextTurnPoweredDown(false);
 
                                     destroyedBotsThreads.addElement(tmp);
@@ -1068,7 +1080,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                                     } catch (KommFutschException ex) {
                                         new Fehlermeldung(Message.say("Server", "eKommFutschR", tmp.rob.getName()));
                                     } catch (KommException ex) {
-                                        System.err.println("Mit Spieler " + tmp.rob.getName() + "ist ein Kommunikationsfehler aufgetreten.");
+                                        CAT.error("Communication error with player "+ tmp.rob.getName());
                                     }
                                 } else {
                                     graveyardThreads.addElement(tmp);
@@ -1076,7 +1088,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                                     try {
                                         tmp.deleteMe("LL");
                                     } catch (KommException ex) {
-                                        CAT.debug("Kommunikationsfehler beim Entfernen eines Roboters");
+                                        CAT.debug("Communication error deleting a robot");
                                     }
                                     gameover = istSpielende();
                                 }
@@ -1099,21 +1111,23 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                 for (Iterator e = curBotsThreads.iterator(); e.hasNext();) {
                     ServerRoboterThread tmp = (ServerRoboterThread) e.next();
                     if (repariereGgf(tmp)) {
-                        CAT.debug("Addiere einen zu repairing hinzu.");
+                        CAT.debug("Adding one to 'repairing' list");
                         repairing.addElement(tmp);
                     }
                 }
                 if (repairing.size() > 0) {
-                    CAT.debug("Reparaturanfrage stellen an " + repairing.size());
+                    if (CAT.isDebugEnabled()) {
+                        CAT.debug("Asking " + repairing.size()+ " players for register repair choice");
+                    }
                     mode = ENTSPERREN;
                     wechselModus(repairing.iterator(), ENTSPERREN);
                     waitablesImWaitingFor = new WaitingForSet(repairing);
                     broadcastUndWarteAufRoboter();
-                    CAT.debug("Reparaturanfragen sind beantwortet.");
+                    CAT.debug("repair questions answered");
                 }
 
-                // gesperrte Register einsammeln
-                CAT.debug("Gesperrte Register einsammeln.");
+                
+                CAT.debug("Collecting locked registers");
                 gesperrteKarten.removeAllElements();
  //               CAT.debug("1050 wait rThreads");
                 synchronized (botThreads) {
@@ -1128,8 +1142,9 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                     }
                 }
       //          CAT.debug("1050 release rThreads");
-                CAT.debug("Habe " + gesperrteKarten.size() + " gesperrte Karten gefunden und gespeichert.");
-
+                if (CAT.isDebugEnabled()) {
+                    CAT.debug("Did find and save " + gesperrteKarten.size() + " locked cards");
+                }
                 /* End-of-turn-evaluation:
                                    2.) Set bots to deactivated if they chose power down
                                  */
@@ -1160,7 +1175,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
 
             } // Rundenschleife ende
 
-            CAT.debug("Das Spiel ist jetzt zu Ende. (Rundenschleife verlassen.)");
+            CAT.debug("The game is now over (leaving round evaluation loop)");
 
             /* Falls wir jemals ein anderes Ende haben wollen, mu� man sich hier nochmal Gedanken
                        machen (eines, bei dem nicht alle Bot auf der letzten Flagge angekommen sind.
@@ -1179,7 +1194,9 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                        deleteRoby(tmp, "GO");
                        }*/
 
-            CAT.debug("Es sind noch " + ausgabeThreads.size() + " Ausgaben da.");
+            if (CAT.isDebugEnabled()) {
+                CAT.debug("There are " + ausgabeThreads.size() + " views left.");
+            }
             if (ausgabeThreads.size() > 0) {
              //   CAT.debug("1114 wait aThreads");
                 synchronized (ausgabeThreads) {
@@ -1190,10 +1207,11 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                         try {
                             tmp.deleteMe("GO");
                         } catch (KommException ex) {
-                            CAT.debug("ausgabenBenachrichtigen: Es ist eine KommException aufgetreten.");
+                            CAT.error("notifiying Views: KommException");
+                            CAT.error(ex.getMessage(), ex);
                         }
                     } //for
-                    CAT.debug("Alle AusgabeThreads vom Spielende benachrichtigt und in den richtigen Modus versetzt.");
+                    CAT.debug("Notified all AusgabeThreads (Views) about the end of the game;set them into the right mode.");
 
                     waitablesImWaitingFor = new WaitingForSet(ausgabeThreads);
                     waitablesImWaitingFor.waitFor(notifyTO);
@@ -1203,7 +1221,8 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
                         try {
                             tmp.endGame();
                         } catch (java.io.IOException ex) {
-                            CAT.debug("IOException aufgetreten.");
+                            CAT.error("IOException at view.endGame().");
+                            CAT.error(ex.getMessage(), ex);
                         }
                     }
                 } // synchronized aThreads
@@ -1214,7 +1233,8 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
             try {
                 registrationManager.seso.close();
             } catch (java.io.IOException ex) {
-                CAT.debug("IOException beim AnmeldeThreadKillen.");
+                CAT.error("IOException while killing registration Thread.");
+                CAT.error(ex.getMessage(), ex);
             }
 
             // MessageThread killen
@@ -1225,7 +1245,7 @@ public class Server extends BNSThread implements ModusConstants,  ServerOutputTh
             }
             
         } catch (Throwable t) {
-            CAT.fatal("Exception:", t);
+            CAT.fatal("Exception:"+t.getMessage(), t);
         }
         finally {            
             CAT.info("SERVER REACHED END OF RUN METHOD");
