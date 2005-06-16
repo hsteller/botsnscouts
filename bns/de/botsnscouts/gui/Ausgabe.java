@@ -1107,7 +1107,10 @@ public class Ausgabe extends BNSThread {
                 }
                 while (it.hasNext()){
 	                ScalableRegisterRow row = (ScalableRegisterRow) it.next();	                
-	                row.alwayshowCardBackInsteadOfEmpty(bot.isActivated() && !bot.isInPit());	               
+	                row.alwayshowCardBackInsteadOfEmpty(bot.isActivated() && !bot.isInPit());	   
+	                if (!bot.isActivated()|| bot.isInPit()) {	                   
+	                    hcs = new HumanCard[Bot.NUM_REG];
+	                }
 	                row.setCards(hcs);	               
 	                row.setCardVisibility(phase+1, true);               
 	            }
@@ -1116,6 +1119,9 @@ public class Ausgabe extends BNSThread {
 	            while (it.hasNext()){
 	                ScalableRegisterRow row = (ScalableRegisterRow) it.next();
 	                row.alwayshowCardBackInsteadOfEmpty(bot.isActivated() && !bot.isInPit());	       
+	                if (!bot.isActivated()|| bot.isInPit()) {	                   
+	                    hc = null;
+	                }
 	                row.setCard(phase+1,hc );
 	                row.setCardVisibility(phase+1, true);               
 	            }
@@ -1125,11 +1131,20 @@ public class Ausgabe extends BNSThread {
         SoundMan.playSound(SoundMan.REVEAL_CARDS);
     }
     private void comMsgHandleEvalPhaseEnd(ClientAntwort cw) {
-       /*String phaseNumber = cw.namen[1];
+      /* String phaseNumber = cw.namen[1];
            try {
                int phase = Integer.parseInt(phaseNumber);
                if (phase == 4) { // last phase over
-                   // TODO hide cards?, show messages?
+                   Iterator allRobsRowLists = robNameToRegisterRowCollection.values().iterator();
+                   while (allRobsRowLists.hasNext()){
+                       Iterator rows = ((Collection) allRobsRowLists.next()).iterator();
+                       while (rows.hasNext()){
+                           ScalableRegisterRow row = (ScalableRegisterRow)rows.next();
+                           row.hideAll();
+                       }
+                     
+                   }
+                   
                }
            }
            catch (NumberFormatException ne){
@@ -1153,7 +1168,7 @@ public class Ausgabe extends BNSThread {
     private void comMsgHandleRegisterLock(ClientAntwort ca, boolean unlock){
         String botname = ca.namen[1];
         String registerIndex = ca.namen[2];      
-       
+      
         try {          
             HumanCard hc = null;       
             int index = Integer.parseInt(registerIndex); // value 0-4
@@ -1173,12 +1188,29 @@ public class Ausgabe extends BNSThread {
 	            hc = new HumanCard(prio, cardAction);	          
 	            hc.setState(HumanCard.LOCKED);
             }
+            else { // if unlock
+                Bot bot = getBot(botname);
+                Card oldLocked = bot.getLockedRegister(index -1);
+                if (oldLocked!=null){
+                    // this way, the locked card gets shown unlocked;
+                    // otherwise (hc==null), a card's backside would be shown
+                    // (and that looks stupid since all the other cards will be kept&shown
+                    //  until phase one of the next round has started)
+                    hc = new HumanCard(oldLocked);                  
+                }
+                // otherwise the locked-image is shown until the new card gets set
+                // in the next phase (until then the register would be displayed as locked altough
+                // it isn't)
+                bot.unlockRegister(index-1);       
+                
+            }
             ArrayList rows = getRegisterRowsForBot(botname);
             Iterator it = rows.iterator();
             while (it.hasNext()){
                 ScalableRegisterRow row = (ScalableRegisterRow) it.next();
                 row.setCard(index, hc);
             }
+           
             
             
         }
