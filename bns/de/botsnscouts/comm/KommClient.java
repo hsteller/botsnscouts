@@ -1255,15 +1255,18 @@ public class KommClient implements Shutdownable{
             back.y = Integer.parseInt(rein.substring(1+komma, klammerzu));
         }
         catch (StringIndexOutOfBoundsException sioob){
+            CAT.error(sioob.getMessage(), sioob);
             throw new KommException (method+" warf StringIndexOutOfBoundsException(Inhalt:"+sioob.getMessage()+"); Ursache: vermutlich falsch aufgebaute Antwort vom Server");
         }
         catch (NumberFormatException nfe) {
+            CAT.error(nfe.getMessage(), nfe);
             throw new KommException(method+": NumberFormatException: Parsen der koordinaten-substrings schlug fehl");
         }
         //catch (IOException ioe) {
         //      throw new KommException (method+" warf eine IOException; Message: "+ioe.getMessage());
         //      }
         catch (Exception sonstige) {
+            CAT.error(sonstige.getMessage(), sonstige);
             throw new KommException (method+" warf eine Exception; Message: "+sonstige.getMessage());
         }
         return back;
