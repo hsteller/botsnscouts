@@ -25,6 +25,8 @@
 
 package de.botsnscouts.util;
 
+import java.util.LinkedList;
+
 
 /**
  * Represents one robot.
@@ -353,10 +355,31 @@ public class Bot {
 	return c;
     }
 
+    
+    
     /** entsperrt alle Register */
-    public void unlockAllRegisters() {
-	for (int i=0; i<NUM_REG; i++)
-	    lockedRegisters[i] = false;
+    public String [] unlockAllRegistersAndGetMessage() {
+        int [] regNums = new int [NUM_REG];
+        int lockCounter=0;
+        for (int i=0; i<NUM_REG; i++) {
+            if (lockedRegisters[i]) {
+                lockedRegisters[i] = false;
+                regNums[lockCounter++]=i;               
+            }
+            
+		}
+        if (lockCounter>0) {
+	        String [] msg = new String[lockCounter+1];
+	        msg[0]=getName();
+	        for (int i=0;i<lockCounter;i++){             
+	            msg[i+1]=""+regNums[i];
+	        }
+	        return msg;
+        }
+        else {
+            return null;
+        }
+        
     }
 
     /** Remember the curent poition as archive position */
