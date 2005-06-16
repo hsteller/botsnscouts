@@ -188,25 +188,7 @@ public class HumanPlayer extends BNSThread {
 	                        /* Bot meCopy*/	                       
 	                        emergencyBotCopy.copyRob(meAtStartOfRound);
 	                        humanView.updateRegisters(meAtStartOfRound.getLockedRegisters());
-	                        humanView.showCards(cards);
-	                        /*  Card [] cards = meAtStartOfRound.getCards();	                        
-	                        int size=cards!=null?cards.length:0;
-	                        HumanCard [] cardCopys = new HumanCard[size];
-	                        for (int i = 0;i<size;i++){
-	                            
-	                        }
-	                                        
-	                        meCopy.setCards();
-	                        */
-	                        /*	int size = meAtStartOfRound.getLockedRegisters().length;
-	                            ArrayList lockedCards = new ArrayList(size);
-	                        	for (int i = 0; i <size ; i++) { 
-	                        	    Card c = meAtStartOfRound.getLockedRegister(i);
-	                                CAT.debug("index: " + i + " ist " + c);
-	                                HumanCard hc = new HumanCard(c);
-	                                lockedCards.add(hc);	                                
-	                            }
-	                       */
+	                        humanView.showCards(cards);	                      
 	                        synchronized(comm) {
 	                    	    cardsSent = false;
 		                    	mode = MODE_PROGRAM;
@@ -221,7 +203,7 @@ public class HumanPlayer extends BNSThread {
 		                    	}                    	   
 		                    
 		                    	timeoutWatcher = new Timer();    
-		                    	emergencyCardSubmitter = new EmergencyCardSubmitter(/*meCopy*/);
+		                    	emergencyCardSubmitter = new EmergencyCardSubmitter();
 	                    	    timeoutWatcher.schedule(emergencyCardSubmitter, (globalTimeout-BUFFER_SECONDS_BEFORE_TIMEOUT)*1000);                    	    
 	                    	}  
 	                    
@@ -455,9 +437,7 @@ public class HumanPlayer extends BNSThread {
     }
 
     protected void sendCards(ArrayList registerCards, boolean nextTurnPowerDown) {
-        
-      
-	        mode = MODE_OTHER;
+            mode = MODE_OTHER;
 	        int sendProg[] = new int[registerCards.size()];
 	        int index = 0;
 	
@@ -1031,9 +1011,12 @@ public class HumanPlayer extends BNSThread {
                         prog[i] = (i+1);
                     }
                     */
+                    humanView.setPanelToShow(HumanView.PANEL_USERINFO);
                     humanView.setDialogInSidebarActive(false); // hide cardpanel
+                    
                     int [] prog = getCompleteWisenheimerMove(emergencyBotCopy);                  
                     comm.registerProg(name,prog,false);                    
+                    humanView.hidePhaseInfoCards();
                     cardsSent = true;
                     showMessage(Message.say("SpielerMensch","legalZug"));
                    
