@@ -30,10 +30,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.TimerTask;
 
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Category;
@@ -56,96 +54,127 @@ public class HumanView extends JPanel  {
 
     static Category CAT = Category.getInstance(HumanView.class);
 
+    private static final String PANEL_REPAIR         = "repairRegs";
+    private static final String PANEL_REGISTERS    = "regs";
+    private static final String PANEL_PHASE_EVAL  = "evalPhases";
+    private static final String PANEL_DIRECTION    = "direction";
+    private static final String PANEL_POWERDOWN = "powerdown";
+    public  static final String PANEL_USERINFO      = "info";
+    private static final String PANEL_GAMEOVER     = "gameover";
+    
     private HumanPlayer human;
 
-    private CardLayout panelSwitcher = new CardLayout();
-
-    private RepairRegisters repairRegisters;
-
-   private UserInfo userInfo;
-
-    private PhaseEvaluationPanel phaseInfo; 
+   
+    private UserInfo userInfo = new UserInfo();
+    private PhaseEvaluationPanel phaseInfo=new PhaseEvaluationPanel(); 
+    private ZielfahneErreicht gameOverPanel = new ZielfahneErreicht();
+    private RepairRegisters regRepairPanel;
     
     private CardArray cards;
-
     private RegisterArray registers;
 
-    ScoutVertiefung scoutView;
+    private JPanel wiseAndScout = new TJPanel(); 
+    protected ScoutVertiefung scoutView;
+    protected KlugscheisserLatte wisenheimerView;
 
-    KlugscheisserLatte wisenheimerView;
-
-    private JPanel switcherPanel;
-
-    private JPanel wiseAndScout;
-
-    private ZielfahneErreicht gameOverPanel = null;
+    private JPanel panelSwitcher;
+    private CardLayout panelSwitcherLayout = new CardLayout();
+    private String panelToShow;
     
+    private boolean dialogInSidebarActive = false;
+
     public HumanView(HumanPlayer hp) {
         human = hp;
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        switcherPanel = new PaintPanel(OptionPane.getBackgroundPaint(this), true); 
-        JPanel regsAndCards = new TJPanel();
-        wiseAndScout = new TJPanel();
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));                         
+        wisenheimerView = createWisenheimerHome();
+        regRepairPanel = createRegisterRepairPanel();
+        scoutView = createScoutHome();
+        wiseAndScout.add(wisenheimerView);
+        wiseAndScout.add(scoutView);
+        initSwitchPanel();
+        add(panelSwitcher);
+    
+    }
+    
+    
+    private void initSwitchPanel(){
+        panelSwitcher = new PaintPanel(OptionPane.getBackgroundPaint(this), true); 
+        panelSwitcher.setLayout(panelSwitcherLayout);
+                
+        panelSwitcher.add(createDirectionPanel(), PANEL_DIRECTION);               
+        panelSwitcher.add(createPowerDownPanel(), PANEL_POWERDOWN);
+        panelSwitcher.add(createCardAndRegisterPanel(), PANEL_REGISTERS);
+        panelSwitcher.add(regRepairPanel, PANEL_REPAIR);
+        panelSwitcher.add(phaseInfo, PANEL_PHASE_EVAL);
+        panelSwitcher.add(gameOverPanel, PANEL_GAMEOVER);
+        panelSwitcher.add(userInfo, PANEL_USERINFO);
+        
+    }
 
-        switcherPanel.setLayout(panelSwitcher);
-
-        GetDirection getDir = new GetDirection(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                int direct = Integer.parseInt(ae.getActionCommand());
-                Global.debug(this, "I have choosen direction: " + direct);
-                sendDirection(direct);
-                setDialogInSidebarActive(false);
-            }
-        });
-        AgainPowerDown againPowerDown = new AgainPowerDown(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                CAT.debug("The user clicked: " + ae.getActionCommand());
-                sendAgainPowerDown(ae.getActionCommand().equals("powerdownagain"));
-                setDialogInSidebarActive(false);
-            }
-        });
-        gameOverPanel = new ZielfahneErreicht();
-        //ZielfahneErreicht reachedEndDead = new ZielfahneErreicht(Message.say("SpielerMensch", "mkilled"), true);
-        //ZielfahneErreicht reachedEndWinner = new ZielfahneErreicht(Message.say("SpielerMensch", "mflagreached"), false);
-
-        wisenheimerView = new KlugscheisserLatte(new ActionListener() {
+    private ScoutVertiefung createScoutHome(){
+        return new ScoutVertiefung(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (((KlugscheisserLatte) e.getSource()).selected()) {
-                    //			d(this,"wisenheimer, wake up!");
-                    if (human.mode == HumanPlayer.MODE_PROGRAM) {
-                        klugscheisserClicked(true);
-                        human.sendWisenheimerMsg();
-                    }
-                    else
-                        CAT.debug("asked wisenheimer but it did not make sense at this moment");
-                }
-                else {
-                    //			d(this,"wisenheimer, go home!");
-                    klugscheisserClicked(false);
-                }
-            }
-        });
-
-        scoutView = new ScoutVertiefung(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (((ScoutVertiefung) e.getSource()).isSelected()) {
-                    // d("Scout, wake up!");
+                if (((ScoutVertiefung) e.getSource()).isSelected()) {                 
                     scoutClicked(true);
                 }
-                else {
-                    // d("Scout, go home!");
+                else {                  
                     scoutClicked(false);
                 }
             }
         });
+    }
+    
+    private KlugscheisserLatte createWisenheimerHome() {
+        return new KlugscheisserLatte(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (((KlugscheisserLatte) e.getSource()).selected()) {                 
+                    if (human.mode == HumanPlayer.MODE_PROGRAM) {
+                        klugscheisserClicked(true);
+                        human.sendWisenheimerMsg();
+                    }
+                    else {
+                        CAT.debug("asked wisenheimer but it did not make sense at this moment");
+                    }
+                }
+                else {              
+                    klugscheisserClicked(false);
+                }
+            }
+        });
+    }
+    
 
-        repairRegisters = new RepairRegisters(new ActionListener() {
+    
+    private AgainPowerDown createPowerDownPanel(){
+        return  new AgainPowerDown(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {                
+                sendAgainPowerDown(ae.getActionCommand().equals("powerdownagain"));
+                setDialogInSidebarActive(false);
+            }
+        });
+    }
+    
+    private GetDirection createDirectionPanel(){
+        return new GetDirection(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                int direct = Integer.parseInt(ae.getActionCommand());               
+                sendDirection(direct);
+                setDialogInSidebarActive(false);
+            }
+        });
+    }
+    
+    private RepairRegisters createRegisterRepairPanel(){
+       return  new RepairRegisters(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 sendRepairRegisters();
                 setDialogInSidebarActive(false);
             }
         });
-
+    }
+    
+    private JPanel createCardAndRegisterPanel(){
+        JPanel regsAndCards = new TJPanel();
         cards = new CardArray(new ActionListener() {
             public void actionPerformed(ActionEvent cardKlick) {
                 treatCardKlick((CardView) cardKlick.getSource());
@@ -164,46 +193,11 @@ public class HumanView extends JPanel  {
         }
 
         );
-        /*
-        JButton emergencyButton = new JButton(Message.say("SpielerMensch","forceCardDisplayButton"));
-		emergencyButton.addActionListener(new ActionListener(){
-		    public void actionPerformed(ActionEvent e){
-		        ArrayList oldCards = cards.getCards();
-		        
-	            int cartCount = oldCards==null?0:oldCards.size();
-	            for (int i=0;i<cartCount;i++){
-	                if (oldCards.get(i)==null) { // got no cards
-	                    return; // otherwise NullPointerException in "showCards"
-	                }
-	            }
-		        
-		        showCards(oldCards);
-		    }
-		});*/
-        userInfo = new UserInfo(/*emergencyButton*/);
-
-        phaseInfo = new PhaseEvaluationPanel();
-		wiseAndScout.add(wisenheimerView);
-        wiseAndScout.add(scoutView);
-
         regsAndCards.add(registers);
         regsAndCards.add(cards);
-        switcherPanel.add(userInfo, "userInfo");
-        switcherPanel.add(phaseInfo, "phaseInfo");
-        
-        switcherPanel.add(getDir, "getDirection");
-        switcherPanel.add(againPowerDown, "againPowerDown");
-        switcherPanel.add(repairRegisters, "repairRegisters");
-        switcherPanel.add(regsAndCards, "regsAndCards");
-        //switcherPanel.add(reachedEndDead, "reachedEndDead");
-       // switcherPanel.add(reachedEndWinner, "reachedEndWinner");
-        switcherPanel.add(gameOverPanel, "reachedEnd");
-        //add(wiseAndScout);
-        add(switcherPanel);
-        
-       
+        return regsAndCards;
     }
-
+    
     protected JPanel getWiseAndScoutPanel() {
         return wiseAndScout;
 
@@ -213,13 +207,19 @@ public class HumanView extends JPanel  {
      * display a message that is shown only to this player
      */
     public synchronized void showMessageToPlayer(String s) {
+        
         if (isDialogInSidebarActive()) { /* don't switch :-) */
             return;
         }
         userInfo.setInfo(s);
-        panelSwitcher.show(switcherPanel,nonDialogPanel);
+        showPanel(panelToShow);     
         this.requestFocus();
     }
+    
+    protected  void setPanelToShow (String panelName) {
+        panelToShow = panelName;
+    }
+    
 
     protected void fillPhaseInfoPanel(Bot [] robs, ScalableRegisterRow[]registerRows){
         phaseInfo.setContents(robs, registerRows);
@@ -231,39 +231,41 @@ public class HumanView extends JPanel  {
     protected void hidePhaseInfoCards() {
         phaseInfo.hideAll(true);
         
+    }  
+  
+    /**
+     * display info that the robot is power down int this turn
+     */
+    public synchronized void showPowerDown() {
+         panelToShow = PANEL_PHASE_EVAL;
+         showMessageToPlayer(Message.say("SpielerMensch", "istPowerDown"));
+         this.requestFocus();
     }
-    
-    
+
     /**
      * display the card
      */
     public synchronized void showCards(ArrayList humanCards) {
-        CAT.debug("Show cards");
+        panelToShow = PANEL_REGISTERS;        
         cards.setCards(humanCards);
-        panelSwitcher.show(switcherPanel, "regsAndCards");
-        if (registers.allLocked()) {
-            CAT.debug("All Registes locked!");
+        showPanel(PANEL_REGISTERS);
+        if (registers.allLocked()) {            
             cards.activateButton();
         }
-       this.requestFocus();
+        this.requestFocus();
         setDialogInSidebarActive(true);
     }
 
-    /**
-     * display info that the robot is power down int this turn
-     */
-    public void showPowerDown() {
-        showMessageToPlayer(Message.say("SpielerMensch", "istPowerDown"));
-         this.requestFocus();
+    
+    private synchronized void showPanel (String panelName) {
+        panelSwitcherLayout.show(panelSwitcher, panelName);
     }
-
-    private boolean dialogInSidebarActive = false;
 
     /**
      * display the get direction request
      */
     public synchronized void showGetDirection() {
-        panelSwitcher.show(switcherPanel, "getDirection");
+        showPanel(PANEL_DIRECTION);
         this.requestFocus();
         setDialogInSidebarActive(true);
     }
@@ -273,7 +275,7 @@ public class HumanView extends JPanel  {
      */
 
     public synchronized void showRePowerDown() {
-        panelSwitcher.show(switcherPanel, "againPowerDown");
+        showPanel(PANEL_POWERDOWN);
         this.requestFocus();
         setDialogInSidebarActive(true);
     }
@@ -284,10 +286,56 @@ public class HumanView extends JPanel  {
     public synchronized void showRegisterRepair(Card[] robRegs, int repairNumber) {
         CAT.debug("Show Register Repair");
         registers.updateRegisters(robRegs);
-        repairRegisters.setChoises(registers.getRegisterViewArray(), repairNumber);
-        panelSwitcher.show(switcherPanel, "repairRegisters");
+        regRepairPanel.setChoices(registers.getRegisterViewArray(), repairNumber);
+        showPanel(PANEL_REPAIR);
         this.requestFocus();
         setDialogInSidebarActive(true);
+    }
+    
+
+    /**
+     * show game over two types: a) winner + winner no. b) dead
+     * @param lockPanel force the switcherPanel to not leave the dialog mode 
+     *               (==showing the winnerpanel until the player quits, as he was removed and
+     *                 won't get another dialog) 
+     */
+    public synchronized void showGameOver(boolean dead, int winnerNumber, String removalReason, boolean lockPanel) {        
+        String bigVerticalMessage=dead?Message.say("SpielerMensch", "mkilled"):Message.say("SpielerMensch", "mflagreached");       
+        gameOverPanel.setMessage(bigVerticalMessage,dead,removalReason);
+        showPanel(PANEL_GAMEOVER);      
+        // little not-so-nice hack:
+        // we are not a dialog but pretend to be one, so nobody immediately replaces the reachedEnd-Panel        
+        //  The Runnable/Thread only ensures that we are show at least 8 seconds 
+        setDialogInSidebarActive(true);
+        if (!lockPanel) { 
+            panelToShow = PANEL_GAMEOVER;
+	         Runnable foo = new Runnable(){
+	             public void run(){                 
+	                 synchronized (this){
+	                     try {
+	                         wait (8000);
+	                     }
+	                     catch (InterruptedException ie){
+	                         CAT.error(ie.getMessage(), ie);
+	                     }
+	                     setDialogInSidebarActive(false);
+	                 }
+	             }
+	         };
+	         Thread t = new Thread(foo);
+	         t.start();
+        }
+        //}
+    }
+    private void sendRepairRegisters(){
+        sendRepairRegisters(regRepairPanel.getSelection());
+    }
+    protected synchronized void setDialogInSidebarActive(boolean dialogInSidebarActive) {
+        this.dialogInSidebarActive = dialogInSidebarActive;
+        if (!dialogInSidebarActive) {
+            userInfo.setInfo(Message.say("SpielerMensch", "mrelax"));
+            showPanel(panelToShow);
+        }
     }
 
     /**
@@ -306,12 +354,6 @@ public class HumanView extends JPanel  {
             doPhaseRob[0].debug();
             human.passUpdatedScout(alreadyChosen.size(), doPhaseRob);
         }
-    }
-
-    /**
-     * activate the scout
-     */
-    public void activateScout() {
     }
 
     /**
@@ -352,40 +394,6 @@ public class HumanView extends JPanel  {
         cards.removeWisenheimer();
     }
 
-    /**
-     * show game over two types: a) winner + winner no. b) dead
-     * @param lockPanel force the switcherPanel to not leave the dialog mode 
-     *               (==showing the winnerpanel until the player quits, as he was removed and
-     *                 won't get another dialog) 
-     */
-    public synchronized void showGameOver(boolean dead, int winnerNumber, String removalReason, boolean lockPanel) {        
-        String bigVerticalMessage=dead?Message.say("SpielerMensch", "mkilled"):Message.say("SpielerMensch", "mflagreached");       
-        gameOverPanel.setMessage(bigVerticalMessage,dead,removalReason);
-        panelSwitcher.show(switcherPanel, "reachedEnd");      
-        // little not-so-nice hack:
-        // we are not a dialog but pretend to be one, so nobody immediately replaces the reachedEnd-Panel        
-        //  The Runnable/Thread only ensures that we are show at least 8 seconds 
-        setDialogInSidebarActive(true);
-        if (!lockPanel) { 
-	         Runnable foo = new Runnable(){
-	             public void run(){                 
-	                 synchronized (this){
-	                     try {
-	                         wait (8000);
-	                     }
-	                     catch (InterruptedException ie){
-	                         CAT.error(ie.getMessage(), ie);
-	                     }
-	                     setDialogInSidebarActive(false);
-	                 }
-	             }
-	         };
-	         Thread t = new Thread(foo);
-	         t.start();
-        }
-        //}
-    }
-
     
     protected void updateRegisters(Card[] robRegs) {
         registers.updateRegisters(robRegs);
@@ -408,10 +416,8 @@ public class HumanView extends JPanel  {
         human.sendAgainPowerDown(again);
     }
 
-    private void sendRepairRegisters(){
-        sendRepairRegisters(repairRegisters.getSelection());
-    }
-    
+ 
+
     /**
      * 
      * @param regsRep A list of Integers, containing the number(s) of the register(s)
@@ -425,14 +431,17 @@ public class HumanView extends JPanel  {
     }
 
     private void unlockRegisters(ArrayList repairRegs) {
-        CAT.debug("Die Register vor dem unlock: " + registers.toString());
+        if (CAT.isDebugEnabled()) {
+            CAT.debug("registers before unlocking: " + registers.toString());
+        }
         for (int i = 0; i < repairRegs.size(); i++) {
             int regNum = ((Integer) repairRegs.get(i)).intValue();
-            CAT.debug("Entsperre Register: " +regNum );
+            CAT.debug("unlock register: " +regNum );
             registers.unlockRegister(regNum - 1);
         }
-
-        CAT.debug("Die Register nach dem unlock: " + registers.toString());
+        if (CAT.isDebugEnabled()) {
+        CAT.debug("register after unlocking: " + registers.toString());
+        }
         registers.resetAll();
 
     }
@@ -454,16 +463,21 @@ public class HumanView extends JPanel  {
     private void treatSendCards() {
         if (registers.allOcupied()) {
             showMessageToPlayer(Message.say("SpielerMensch", "mkartenMisch"));
-            d("send to Server: " + registers.getCards() + " powerDown: " + cards.wishesPowerDown());
+            if (CAT.isDebugEnabled()) {
+                CAT.debug("send to Server: " + registers.getCards()
+                               + " powerDown: " + cards.wishesPowerDown());
+            }
+            panelToShow = PANEL_PHASE_EVAL;
+            showPanel(PANEL_PHASE_EVAL);
             human.sendCards(registers.getCards(), cards.wishesPowerDown());
             if (cards.wishesPowerDown()) {
                 showPowerDown();
-            }
-            setNonDialogToPhaseInfo();
+            }   
             cards.resetAll();
         }
         wisenheimerView.setSelected(false);
     }
+    
 
     private void treatRegisterKlick(RegisterView rv) {
         if ((rv.getCard() != null) && (!rv.locked())) {
@@ -525,23 +539,8 @@ public class HumanView extends JPanel  {
         return dialogInSidebarActive;
     }
     
-    private String nonDialogPanel="userInfo";
-    
-    protected void setNonDialogToUserInfo(){
-        nonDialogPanel = "userInfo";
-    }
-    
-    protected void setNonDialogToPhaseInfo(){
-        nonDialogPanel ="phaseInfo";
-    }
 
-    protected synchronized void setDialogInSidebarActive(boolean dialogInSidebarActive) {
-        this.dialogInSidebarActive = dialogInSidebarActive;
-        if (!dialogInSidebarActive) {
-            userInfo.setInfo(Message.say("SpielerMensch", "mrelax"));
-            panelSwitcher.show(switcherPanel, nonDialogPanel);
-        }
-    }
+  
    public Dimension getPreferredSize () {
         return new Dimension(150,550);
     }/*
