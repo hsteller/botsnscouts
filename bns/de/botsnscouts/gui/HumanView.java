@@ -108,6 +108,7 @@ public class HumanView extends JPanel  {
         panelSwitcher.add(phaseInfo, PANEL_PHASE_EVAL);
         panelSwitcher.add(gameOverPanel, PANEL_GAMEOVER);
         panelSwitcher.add(userInfo, PANEL_USERINFO);
+        showPanel(PANEL_USERINFO);
         
     }
 
