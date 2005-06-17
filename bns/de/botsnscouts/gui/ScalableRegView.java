@@ -152,8 +152,18 @@ public class ScalableRegView extends JComponent {
             if (isHighlited){
                 g2.setColor(HIGHLIGHT_COLOR);
                 
-                g2.setComposite(AC_SRC_OVER_05);
-                g2.fillRect(0,0,62,102);
+             
+                
+                int thickness = 8;
+                g2.fillRect(0,0,thickness,bgHeight+1); // left side
+                 g2.fillRect(bgWidth+1-thickness,0,thickness,bgHeight+1); // right side
+                int horiWidth  =bgWidth-2*thickness;
+                g2.fillRect(0,0,bgWidth,thickness); // top
+                g2.fillRect(0,bgHeight+1-thickness,bgWidth,thickness);//bottom
+               
+                //g2.setComposite(AC_SRC_OVER_05);
+               // g2.fillRect(thickness,thickness,horiWidth,bgHeight-2*thickness);
+                
             }
             
         }
