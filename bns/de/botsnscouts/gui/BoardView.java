@@ -2282,7 +2282,16 @@ public class BoardView extends JComponent{
     
     
     
-    private void waitSomeTime(int ms, Object lock){                              	
+    private void waitSomeTime(int ms, Object lock){   
+        	if (ms == 0){
+        	    CAT.warn("waitSomeTime was asked to wait "+ms
+        	                    +"ms; ignoring this request as it means to wait infinite time..");
+        	    return;
+        	}
+        	else if (ms <0){
+        	    CAT.error("was asked to wait a negative number of milliseconds: "+ms);
+        	    return;
+        	}
             synchronized(lock) {
                 try {
                     lock.wait(ms);
