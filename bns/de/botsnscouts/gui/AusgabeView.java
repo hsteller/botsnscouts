@@ -1153,6 +1153,7 @@ public class AusgabeView extends JPanel  {
     }
 
 
+    
    
     protected void initHotKeysAndAddToHotkeyman(HotKeyMan keyMan) {
         
@@ -1243,6 +1244,9 @@ public class AusgabeView extends JPanel  {
     }
 
    
+    protected AnimationConfig getCurrentSpeedSettings() {
+        return currentSpeedConfig;
+    }
     
     
     private void checkAndDoTracking(){

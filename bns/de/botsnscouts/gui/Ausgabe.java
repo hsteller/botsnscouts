@@ -55,6 +55,7 @@ import de.botsnscouts.util.BotVis;
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.Global;
+import de.botsnscouts.util.H;
 import de.botsnscouts.util.KrimsKrams;
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Message;
@@ -1049,7 +1050,8 @@ public class Ausgabe extends BNSThread {
     }
 
     private void comMsgHandleEvalPhaseStart(ClientAntwort cw) {
-    
+      
+        
         
         // the following code was directly lifted from the notifyChange-handler,
         // because we now have this easy way here to figure out if there was a phase change
@@ -1142,6 +1144,10 @@ public class Ausgabe extends BNSThread {
         }    
         
         SoundMan.playSound(SoundMan.REVEAL_CARDS);
+        int delay = ausgabeView.getCurrentSpeedSettings().getDelayAfterRevealingCardsForPhase();
+       // TODO  
+        waitSomeTime(delay);
+        
     }
     private void comMsgHandleEvalPhaseEnd(ClientAntwort cw) {
         if (rowOfBotWhoseCardWasLastEvaluated != null) {
@@ -1183,6 +1189,9 @@ public class Ausgabe extends BNSThread {
         }
         row.setRegisterHighLighted(currentPhase, true);
         rowOfBotWhoseCardWasLastEvaluated = row;
+        int delay = ausgabeView.getCurrentSpeedSettings().getDelayAfterHighlightingCurrentCard();
+    //TODO     
+        waitSomeTime(delay);
     }
     private void comMsgHandleRegisterLock(ClientAntwort ca){
         comMsgHandleRegisterLock(ca, false);
@@ -1482,8 +1491,7 @@ public class Ausgabe extends BNSThread {
         ScalableRegisterRow back=null;
         if (list != null){
             back = (ScalableRegisterRow) list.get(regIndex);
-        }
-       CAT.debug("getRegistersForBot_back="+back);
+        }   
         return back;
       
     
@@ -1494,102 +1502,24 @@ public class Ausgabe extends BNSThread {
     protected ScalableRegisterRow getInfoRegistersForBot(String name){
         return getRegistersForBot(name, INFO_REGISTER_INDEX);
     }
-    /*
-    private void updateRegisterViews(Bot [] updatedBots, Status[] updatedStati){
-        int size = updatedStati.length;
-        for (int i=0;i<size;i++){
-            Status data = updatedStati[i];
-            // TODO free locked registers/adjust in case of powerdown for 
-            if (data !=  null) {
-                		CAT.debug("processing status for bot "+data.robName);
-                		// finding the Bot for the Status that we process in this loop iteration:
-	                    Bot bot=null;
-	                    for (int j=0;j<updatedBots.length;j++){
-	                        if (data.robName.equals(updatedBots[j].getName())){
-	                            bot = updatedBots[j];
-	                            break;
-	                        }
-	                    }
-	                    if (bot == null){
-	                        CAT.debug("skipping bot: "+data.robName);		                        		                      
-	                        continue;
-	                    }
-	                    if (!bot.isActivated()) {
-	                        Collection list = getRegisterRowsForBot(data.robName);		                    
-		                    Iterator it = list.iterator();
-		                    while (it.hasNext()){
-		                        ScalableRegisterRow row = (ScalableRegisterRow)it.next();      
-		                        row.alwayshowCardBackInsteadOfEmpty(false);
-		                        row.emptyAll();
-		                    } 
-		                    continue;
-	                    }
-	                    
-	                    // we found the Bot "bot" for the current Status 
-	                    
-	                    CAT.debug("setting/locking cards for bot:\n"+bot);
-	                    // getting the cards of bot that have been revealed so far in this round; putting them into "cards":
-	                    Card [] cards = data.register;
-	                    int cc = cards!=null?cards.length:0;
-	                    // "hcs" will contain the HumanCards (or null values) we will use to update the register views 
-	                    HumanCard [] hcs = new HumanCard[Bot.NUM_REG];
-	                   
-	                    // creating a "HumanCard" for every "Card" found in cards, putting it into "hcs"
-	                    for (int j=0;j<cc;j++){
-		                    Card c = cards[j];
-		                    if (c != null) {                                      
-		                        HumanCard hc = new HumanCard(c);
-		                    //    HumanCard hc2 = new HumanCard(c);
-		                        hcs[j]=hc;		                      
-		                    }
-		                    else {
-		                        hcs[j]=null;		                     
-		                    }
-	                    }
-	                    
-	                    // this method receives only the cards from phase 1 to phase data.aktphase,
-	                    // but the original point of the whole excercise was to show the locked registers
-	                    // => so I need to add them if I know about any of them..
-	                    Card [] locked = bot.getLockedRegisters();
-	                    int cll = locked==null?0:locked.length;
-	                    // if a register is locked, the following loop will either 
-	                    //  - set the card state to "locked"  if a card was added to the register (corresponding position in "hcs") above
-	                    // - or, if the register is empty and locked: get the locked card from the Status array and put it into "hcs"
-	                    for (int j=0;j<cll;j++){
-	                        Card c = locked[j];
-	                        if (c!=null){ // this card should be locked
-	                            if (hcs[j] == null) { // we didn't get this card above, probably not yet evaluated
-	                                hcs[j] = new HumanCard(c);	                             
-	                            }
-	                            hcs[j].setState(HumanCard.LOCKED);	                            
-	                        }
-	                    }
-	                    // now we have all of the bot's cards we know about with the right locked/unlocked state in hcs 
-	                    
-	                    
-	                    // checking whether a new round has started; in that case, we want to hide the cards before updating
-	                    // so that the old move isn't shown 
-	                    boolean hideRegs = lastPhase==4 && updatedStati[0].aktPhase != lastPhase;	                    
-	                   
-	                    // finally, we go through all RegisterRows for the current bot and set the updated cards for
-	                    // the current phase
-	                    Collection list = getRegisterRowsForBot(data.robName);
-	                    
-	                    Iterator it = list.iterator();
-	                    while (it.hasNext()){
-	                        ScalableRegisterRow row = (ScalableRegisterRow)it.next();                    
-	                        row.setCards(hcs);	 
-	                        
-	                        row.alwayshowCardBackInsteadOfEmpty(!bot.isInPit());
-	                        
-		                    if (hideRegs){
-		                        row.hideAll(); // hide, not empty, to show locked registers		                       
-		                    }
-		                    row.setCardVisibilityUntilPhase(data.aktPhase,true);
-	                    } 
-            } // data !=null
+  
+    private Object waitLock = new Object();
+    private void waitSomeTime(int ms){
+        if (ms<= 0){
+            return;
         }
-    }*/
+        synchronized (waitLock){
+            try {
+                CAT.debug("waiting "+ms+"ms");
+                waitLock.wait(ms);
+                CAT.debug("done waiting "+ms+"ms");
+            }
+            catch (InterruptedException ie){
+                CAT.error(ie.getMessage(), ie);
+            }
+        }
+    }
+    
 }
 
 

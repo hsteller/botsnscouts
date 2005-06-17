@@ -51,6 +51,8 @@ public class AnimationsSettingEditor extends JFrame {
     private static JLabel labelLaserDelayPerStep= new TJLabel(Message.say(msgSec,"laserDelay"));
     private static JLabel labelLaserDelayAfterAnimation= new TJLabel(Message.say(msgSec,"laserPause"));
     private static JLabel labelDelayBetweenActions = new TJLabel(Message.say(msgSec,"actionDelay"));
+    private static JLabel labelDelayRevealingCards = new TJLabel(Message.say(msgSec,"cardRevealDelay"));
+    private static JLabel labelDelayCardHighlight = new TJLabel(Message.say(msgSec,"cardHighlightDelay"));
     
     private JLabel labelHeading  = new JLabel(Message.say(msgSec, "heading"), JLabel.CENTER);
     private JButton applyButton   = new TJButton(Message.say(msgSec,"apply"), 16);
@@ -70,7 +72,7 @@ public class AnimationsSettingEditor extends JFrame {
     private static final JLabel [] SETTING_NAMES = new JLabel[]{
                     labelMoveOffset, labelMoveDelay, labelTurnSteps, labelTurnDelayPerStep,
                     labelLaserSoundBeforeAnimations, labelLaserDelayPerStep, labelLaserDelayAfterAnimation,
-                    labelDelayBetweenActions
+                    labelDelayBetweenActions, labelDelayRevealingCards, labelDelayCardHighlight
                     };
     private static final int NUM_OF_SETTINGS = SETTING_NAMES.length;
     private EditorPanel [] editors = new EditorPanel[CONFIG_COUNT];
@@ -232,6 +234,8 @@ public class AnimationsSettingEditor extends JFrame {
         private JTextField laserDelayPerAnimationStep;
         private JTextField  laserDelayAfterEndOfAnimation; 
         private JTextField delayBetweenActions;
+        private JTextField delayAfterRevealingCardsForPhase;
+        private JTextField delayAfterCardHighlight;
         
         private JLabel configName = new JLabel("unknown");
 
@@ -261,13 +265,15 @@ public class AnimationsSettingEditor extends JFrame {
             laserDelayPerAnimationStep = new JTextField(""+conf.getLaserDelayPerAnimationStep(), 6);
             laserDelayAfterEndOfAnimation= new JTextField(""+conf.getLaserDelayAfterEndOfAnimation(), 6);
             delayBetweenActions = new JTextField(""+conf.getDelayBetweenActions(), 6);
+            delayAfterRevealingCardsForPhase = new JTextField(""+conf.getDelayAfterRevealingCardsForPhase(),6);
+            delayAfterCardHighlight = new JTextField(""+conf.getDelayAfterHighlightingCurrentCard());
             // If you change this array you also have to change #AnimationSettingsEditor.SETTING_NAMES because
             // this JTextField-Array has to match the JLabel-Array SETTING_NAMES.         
             
             textFields =  new JTextField[] {
                             animationOffsetMoveRob, animationDelayMoveRob, animationStepsTurnRob, animationDelayTurnRob,
                             laserDelayBetweenStartOfSoundAndAnimation, laserDelayPerAnimationStep, laserDelayAfterEndOfAnimation,
-                            delayBetweenActions
+                            delayBetweenActions, delayAfterRevealingCardsForPhase, delayAfterCardHighlight
             };
         }
     
@@ -330,7 +336,7 @@ public class AnimationsSettingEditor extends JFrame {
                             				config.getDelayBetweenActions());
             config.setDelayBetweenActions(actionDelay);
             
-            AnimationConfig.setMovementAnimationsEnabled(toggleMovementAnimation.isSelected());
+            config.setMovementAnimationsEnabled(toggleMovementAnimation.isSelected());
             
         }
         

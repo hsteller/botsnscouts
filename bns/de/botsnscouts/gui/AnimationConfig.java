@@ -21,7 +21,7 @@ public class AnimationConfig {
     public static final String ANIMATION_MEDIUM="animationsSettingsMedium";
     public static final String ANIMATION_FAST="animationSettingsFast";
     
-    private static boolean areMovementAnimationsEnabled=true;
+    private static  boolean areMovementAnimationsEnabled=true;
     private static final String PROP_NAME_ANIMATIONSENABLED = "areMovementAnimationsEnabled";
     private String configName;
     
@@ -63,6 +63,14 @@ public class AnimationConfig {
     
     /** Will be used everytime something has happend in BoardView*/
     private int delayBetweenActions = 1000;
+    
+    /** How long to wait at the start of a new evaluation phase */
+    private int delayAfterRevealingCards = 2500;
+    
+    /** We will wait this long before starting the animation after a new card is evaluated*/ 
+    private int delayAfterCardHighlight = 1000;
+    
+    
     
     public void setAnimationOffsetMoveRob(int animationOffsetMoveRob) {
         this.animationOffsetMoveRob = animationOffsetMoveRob;
@@ -120,6 +128,21 @@ public class AnimationConfig {
         return laserDelayAfterEndOfAnimation;
     }
     
+    public int getDelayAfterRevealingCardsForPhase(){
+        return delayAfterRevealingCards;
+    }
+    
+    public int getDelayAfterHighlightingCurrentCard(){
+        return delayAfterCardHighlight;
+    }
+    
+    public void setDelayAfterRevealingCardsForPhase(int delay){
+        delayAfterRevealingCards = delay;
+    }
+    
+    public void setDelayAfterHighlightingCurrentCard(int delay){
+        delayAfterCardHighlight = delay;
+    }
     
     public String getConfigName(){
         return configName;
@@ -134,7 +157,9 @@ public class AnimationConfig {
         saveString.append(laserDelayBetweenStartOfSoundAndAnimation).append('+');
         saveString.append(laserDelayAfterEndOfAnimation).append('+');
         saveString.append(laserDelayPerAnimationStep).append('+');
-        saveString.append(delayBetweenActions);
+        saveString.append(delayBetweenActions).append('+');
+        saveString.append(delayAfterRevealingCards).append('+');
+        saveString.append(delayAfterCardHighlight);
         String s = saveString.toString();
         CAT.debug("saving for "+configName+":  "+s);
         Conf.setProperty(configName, s);
@@ -150,7 +175,7 @@ public class AnimationConfig {
         String saveString = Conf.getProperty(configName);
         CAT.debug("loading for "+configName+":  "+saveString);
         if (saveString != null && saveString.length()>0){
-            	int [] values = new int [8]; 
+            	int [] values = new int [10]; 
             	try {
 	                StringTokenizer st = new StringTokenizer(saveString,"+");               
 	                values[0] = Integer.parseInt(st.nextToken());
@@ -161,6 +186,8 @@ public class AnimationConfig {
 	                values[5] = Integer.parseInt(st.nextToken());
 	                values[6] = Integer.parseInt(st.nextToken());
 	                values[7] = Integer.parseInt(st.nextToken());
+	                values[8] =  Integer.parseInt(st.nextToken());
+	                values[9] =  Integer.parseInt(st.nextToken());
             	}
             	catch (Exception e){
             	    CAT.error("Exception loading the animation settings for: "+configName);
@@ -176,6 +203,8 @@ public class AnimationConfig {
                 laserDelayAfterEndOfAnimation=values[5];
                 laserDelayPerAnimationStep=values[6];          
                 delayBetweenActions = values[7];
+                delayAfterRevealingCards = values[8];
+                delayAfterCardHighlight = values[9];
         }
         
     }
@@ -193,8 +222,9 @@ public class AnimationConfig {
     public int getDelayBetweenActions() {
         return delayBetweenActions;
     }
-    
-    public static void setMovementAnimationsEnabled(boolean isEnabled){
+    // TODO shouldn't be static..maybe create a meta-object that contains the config settings
+    // for the three different speed levels and this one boolean
+    public  static void setMovementAnimationsEnabled(boolean isEnabled){
         areMovementAnimationsEnabled = isEnabled;
     }
     
