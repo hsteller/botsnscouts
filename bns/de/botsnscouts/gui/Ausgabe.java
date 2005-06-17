@@ -93,11 +93,7 @@ public class Ausgabe extends BNSThread {
     private boolean nosplash = false;
     private boolean registered = false;
 
-    /**
-     * the last phase of the current turn
-     */
-    private int lastPhase = 1;
-
+    private int currentPhase = -1;
 
     // this flag tells us to ignore a "removed from game" message if we
     // requested the removal; in this case we don't want to get any status
@@ -684,6 +680,7 @@ public class Ausgabe extends BNSThread {
         sequencer.invoke(MessageID.NTC, kommAntwort);
 
         // --------- get other information from the server
+        /*
         Status[] stArray = kommClient.getSpielstatus();
         if (stArray != null) {
             CAT.debug("NTC handler working through status array");
@@ -706,6 +703,7 @@ public class Ausgabe extends BNSThread {
         else {
             CAT.warn("status array was null");
         }
+        */
         // --------- has somebody already reached the final flag?
         String[] winnerStateList = kommClient.getSpielstand();
         ausgabeView.showWinnerState(winnerStateList);
@@ -1051,6 +1049,20 @@ public class Ausgabe extends BNSThread {
     }
 
     private void comMsgHandleEvalPhaseStart(ClientAntwort cw) {
+    
+        
+        // the following code was directly lifted from the notifyChange-handler,
+        // because we now have this easy way here to figure out if there was a phase change
+        //
+        // its ok to do the reset on each phase change,
+        // will not do anything if all are reset
+        ausgabeView.resetProgrammingLEDs();
+        // force all robots to be visible at start of each evaluation phase,
+        // as the robots will be painted during the animations - independend from
+        // their visibility setting by the user
+        ausgabeView.showAllRobots();
+        
+        
         // cw.namen looks like:
         // cw.namen[0] = messageId
         // cw.namen[1] = for "phase number"
@@ -1068,6 +1080,7 @@ public class Ausgabe extends BNSThread {
             CAT.error("failed to parse phase number: "+phaseNumber);
             CAT.error(ne.getMessage(), ne);
         }
+        currentPhase=phase;
         int length = cw.namen.length;
         for (int i=2;i<length;i+=3){            
             String botname = cw.namen[i];
@@ -1131,6 +1144,10 @@ public class Ausgabe extends BNSThread {
         SoundMan.playSound(SoundMan.REVEAL_CARDS);
     }
     private void comMsgHandleEvalPhaseEnd(ClientAntwort cw) {
+        if (rowOfBotWhoseCardWasLastEvaluated != null) {
+            rowOfBotWhoseCardWasLastEvaluated.setRegisterHighLighted(currentPhase, false);
+            rowOfBotWhoseCardWasLastEvaluated = null;
+        }
       /* String phaseNumber = cw.namen[1];
            try {
                int phase = Integer.parseInt(phaseNumber);
@@ -1155,9 +1172,17 @@ public class Ausgabe extends BNSThread {
        
     }
     
+    private ScalableRegisterRow rowOfBotWhoseCardWasLastEvaluated = null;
+    
     
     private void comMsgHandleEvalOfCard(ClientAntwort cw) {
-        // TODO highlight card
+        String robName = cw.namen[1];
+        ScalableRegisterRow row = getInfoRegistersForBot(robName);
+        if (rowOfBotWhoseCardWasLastEvaluated != null) {
+            rowOfBotWhoseCardWasLastEvaluated.setRegisterHighLighted(currentPhase, false);
+        }
+        row.setRegisterHighLighted(currentPhase, true);
+        rowOfBotWhoseCardWasLastEvaluated = row;
     }
     private void comMsgHandleRegisterLock(ClientAntwort ca){
         comMsgHandleRegisterLock(ca, false);

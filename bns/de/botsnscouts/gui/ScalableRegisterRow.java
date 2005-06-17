@@ -200,6 +200,21 @@ public Dimension getPreferredSize() {
       repaint();
    }
    
+   public void setRegisterHighLighted (int phase, boolean highLight){
+       ScalableRegView rv = phases[phase];
+       rv.setHighLighted(highLight);
+     /*  double prevScale = rv.getScale();
+       if (highLight){
+         rv.setScale(scale+0.2);
+         
+       }
+       else {
+           rv.setScale(scale);
+       }
+       revalidate();
+       */
+   }
+   
    public double getScale(){
        return scale;
    }
@@ -241,6 +256,7 @@ public Dimension getPreferredSize() {
         	                new HumanCard(5,Card.ACTION_ROTATE_L)
         	};
         	row.setCards(cards);
+        	row.setRegisterHighLighted(2, true);
         	final ScalableRegisterRow row2 = new ScalableRegisterRow(0.8);
         	row2.setCards(cards);
         	JPanel bar = new JPanel();

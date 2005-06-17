@@ -4,6 +4,7 @@
  */
 package de.botsnscouts.gui;
 
+import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -37,11 +38,14 @@ public class ScalableRegView extends JComponent {
     private static final Color EMPTY_BG_COLOR = RegisterView.BG_COLOR;
     private static final Color PRIORITY_FONT_COLOR = RegisterView.prioColor;
     private static final Font  PRIORITY_FONT = RegisterView.prioFont;
+    private static final Color HIGHLIGHT_COLOR = Color.RED.brighter();
     
     private HumanCard myCard;
     private boolean isCardHidden = true;
     private double scale = 1;
     private int bgWidth, bgHeight;
+    private boolean isHighlited = false;
+    
     
     private Image emptyBgImg;
     private Image cardBackSideImg;
@@ -103,12 +107,19 @@ public class ScalableRegView extends JComponent {
     }
     
     public void setScale(double scale){
+        if (this.scale == scale){
+            return;
+        }
         this.scale = scale;
         super.setPreferredSize(getPreferredSize());
         super.setMinimumSize(getPreferredSize());
         repaint();
     }
+    public double getScale(){
+        return scale;
+    }
     
+    private static final AlphaComposite AC_SRC_OVER_05 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f);
     public void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D)g;               
         g2.scale(scale,scale);                                      
@@ -138,6 +149,13 @@ public class ScalableRegView extends JComponent {
             if (myCard.locked()){
                 g2.drawImage( lockImg, 4,3,this);
             }
+            if (isHighlited){
+                g2.setColor(HIGHLIGHT_COLOR);
+                
+                g2.setComposite(AC_SRC_OVER_05);
+                g2.fillRect(0,0,62,102);
+            }
+            
         }
         else {
             g2.drawImage( cardBackSideImg,0,0,bgWidth,bgHeight,this);          
@@ -166,6 +184,15 @@ public class ScalableRegView extends JComponent {
         sb.append("card: ").append(myCard).append(";hidden=").append(isCardHidden)
         	.append(";scaleFactor="+scale);
         return sb.toString();
+    }
+    
+    public boolean isHighLighted(){
+        return isHighlited;
+    }
+    
+    public void setHighLighted(boolean isHighLighted ){
+        this.isHighlited = isHighLighted;
+        repaint();
     }
     
     public static void main(String[] args) {
