@@ -2236,11 +2236,11 @@ public class BoardView extends JComponent{
         Rectangle rect = this.getVisibleRect();
         int x1 = (int)rect.getCenterX();
         int y1 = (int)rect.getCenterY();
-        int stringX = x1 - 210;	
+        int stringX = x1 - 240;	
         int stringY= y1;
-        int rectTopLeftX = x1-235;
+        int rectTopLeftX = stringX-25;
         int rectTopLeftY = y1 - 90;
-        int rectWidth = 440;
+        int rectWidth = 490;
         int rectHeight = 110;
         
         dbg.setComposite(AC_SRC_OVER_07);
@@ -2252,7 +2252,7 @@ public class BoardView extends JComponent{
         dbg.drawRect(rectTopLeftX, rectTopLeftY, rectWidth, rectHeight); 
         dbg.setColor(COLOR_PHASE_FG);
         dbg.setFont(FONT_PHASE);
-        dbg.drawString("PHASE "+phase,stringX,stringY);
+        dbg.drawString("PHASE #"+phase,stringX,stringY);
     }
     
     private boolean isPhaseNumberToBePainted=false; 
