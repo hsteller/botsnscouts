@@ -40,6 +40,8 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -546,33 +548,37 @@ public class AusgabeView extends JPanel  {
     
      protected void quit(boolean keepWatching) {
         CAT.debug("AusgabeView starts procedure to quit the client..");
-	JLabel[] msg = new JLabel[2];
-	msg[0] = new TJLabel(Message.say("AusgabeView", "reallyQuit1"));
-	Registry globalReg = Registry.getSingletonInstance();
-	if (globalReg.isMyServerLocal(this.ausgabe) && // have we started the server or are we a remote view? 
-	    globalReg.getNumOfLocalViewsForMyGame(this.ausgabe)<2){
-	    // ..and are we the only local view left?
-	    // => add message that the server will go down if this view quits
-	    msg[1] = new TJLabel(Message.say("AusgabeView","reallyQuit2"));
-	}
-	else {
-	    msg[1]=new TJLabel("");
-	}
-	
-	if (JOptionPane.showConfirmDialog(this, msg,
-	                Message.say("AusgabeView","reallyQuitTitle"),
-		JOptionPane.OK_CANCEL_OPTION,
-		JOptionPane.QUESTION_MESSAGE)
-	                        == JOptionPane.OK_OPTION){
-	 // null means CANCEL
-	    boolean shutdownPossibleHumanPlayer = true;
-        ausgabe.quit(keepWatching, shutdownPossibleHumanPlayer);
-     
-	// Since this does not work properly by now, we do:
-	//System.exit(0);
-     }
-	else {  // dont quit
-	}
+		JLabel[] msg = new JLabel[2];
+		msg[0] = new TJLabel(Message.say("AusgabeView", "reallyQuit1"));
+		Registry globalReg = Registry.getSingletonInstance();
+		if (globalReg.isMyServerLocal(this.ausgabe) && // have we started the server or are we a remote view? 
+		    globalReg.getNumOfLocalViewsForMyGame(this.ausgabe)<2){
+		    // ..and are we the only local view left?
+		    // => add message that the server will go down if this view quits
+		    msg[1] = new TJLabel(Message.say("AusgabeView","reallyQuit2"));
+		}
+		else {
+		    msg[1]=new TJLabel("");
+		}
+		
+		int feedback = JOptionPane.showConfirmDialog(this, msg,
+		                	Message.say("AusgabeView","reallyQuitTitle"),
+		                	JOptionPane.OK_CANCEL_OPTION,
+		                	JOptionPane.QUESTION_MESSAGE);
+		if (feedback == JOptionPane.OK_OPTION){		
+		    if (phaseTimer != null) {
+		        try {
+		            phaseTimer.cancel();		           
+		        }
+		        catch (Exception e){
+		            CAT.warn(e.getMessage(), e);
+		        }
+		    }
+		    boolean shutdownPossibleHumanPlayer = true;
+	        ausgabe.quit(keepWatching, shutdownPossibleHumanPlayer);
+	     }
+		else {  // dont quit
+		}
 	
     }
 
@@ -1153,6 +1159,30 @@ public class AusgabeView extends JPanel  {
     }
 
 
+    
+    private Timer phaseTimer;
+    protected void displayPhaseNumber(int phase, long showThatManyMS ){
+      
+        if (showThatManyMS<=0){
+            return;
+        }
+        TimerTask displayStopper = new TimerTask(){
+            public void run(){
+                if (gameBoardCanvas != null) {
+                    gameBoardCanvas.setIsPhaseNumToBePainted(false);
+                    gameBoardCanvas.repaint();
+                }
+                
+            }
+        };
+        
+        phaseTimer = new Timer();
+        phaseTimer.schedule(displayStopper,showThatManyMS);        
+        gameBoardCanvas.setPhaseNumber(phase);
+        gameBoardCanvas.setIsPhaseNumToBePainted(true);
+        gameBoardCanvas.repaint();
+            
+    }
     
    
     protected void initHotKeysAndAddToHotkeyman(HotKeyMan keyMan) {

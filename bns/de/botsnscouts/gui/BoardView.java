@@ -30,6 +30,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -53,6 +54,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.TimerTask;
 
 import javax.swing.JComponent;
 import javax.swing.JViewport;
@@ -437,6 +439,7 @@ public class BoardView extends JComponent{
     }
     
     protected void ersetzeRobos(Bot[] robos_neu) {
+        waitForPhaseDisplay();
   
         if (!gotColors) { // this is the first time I get the robots
             setRobColors(robos_neu);
@@ -862,6 +865,7 @@ public class BoardView extends JComponent{
     
     
     protected /*synchronized*/ void animateRobUTurn(Bot rob) {
+        waitForPhaseDisplay();
         if (!AnimationConfig.areMovementAnimationsEnabled()){
             return;
         }
@@ -876,6 +880,7 @@ public class BoardView extends JComponent{
     
     /** @param direction either BOT_TURN_CLOCKWISE or BOT_TURN_COUNTER_CLOCKWISE in MessageID*/
     protected /* synchronized*/ void animateRobTurn(Bot rob, int direction) {
+        waitForPhaseDisplay();
         if (!AnimationConfig.areMovementAnimationsEnabled()){            
             return;
         }
@@ -1063,6 +1068,8 @@ public class BoardView extends JComponent{
     
     
     protected /*synchronized*/ void animateRobMove(Bot rob, int direction) {
+        waitForPhaseDisplay();
+        
         // important: according to the code in SpielfeldSim we do not get
         //            the updated robot position;
         //            the updated position will be the endposition of the total move,
@@ -2178,8 +2185,8 @@ public class BoardView extends JComponent{
 
     public void paintComponent(Graphics g) {
         Rectangle oldClip = g.getClipBounds();
-        //Rectangle rect = this.getVisibleRect();
-        //System.out.println("OLD="+oldClip+"\tNEW="+rect);
+        
+     //   System.out.println("OLD="+oldClip+"\tNEW="+rect);
         //g.setClip(rect);
         if (useStaticBg) { // 100% doublebuffered
             Graphics2D offG = (Graphics2D) offScreenImage.getGraphics();
@@ -2211,9 +2218,58 @@ public class BoardView extends JComponent{
             paintRobos(dbg);
             dbg.setComposite(AC_SRC);
         }
+        
+        if (isPhaseNumberToBePainted){
+            paintPhaseNumber(g, phaseNumber);
+        }
+        
         //g.setClip(oldClip);
     }
 
+    
+    private static final Color COLOR_PHASE_BG =  new Color(64,181,64);
+    private static final Color COLOR_PHASE_FG =  Color.RED;
+    private static final Font  FONT_PHASE = new Font("times", Font.BOLD, 90);
+ 
+    private void paintPhaseNumber(Graphics g, int phase){
+        Graphics2D dbg = (Graphics2D) g;
+        Rectangle rect = this.getVisibleRect();
+        int x1 = (int)rect.getCenterX();
+        int y1 = (int)rect.getCenterY();
+        int stringX = x1 - 210;	
+        int stringY= y1;
+        int rectTopLeftX = x1-235;
+        int rectTopLeftY = y1 - 90;
+        int rectWidth = 440;
+        int rectHeight = 110;
+        
+        dbg.setComposite(AC_SRC_OVER_07);
+        dbg.setColor(COLOR_PHASE_BG);
+        dbg.fillRect(rectTopLeftX, rectTopLeftY, rectWidth, rectHeight); 
+       
+        dbg.setComposite(AC_SRC);
+        dbg.setColor(Color.black);
+        dbg.drawRect(rectTopLeftX, rectTopLeftY, rectWidth, rectHeight); 
+        dbg.setColor(COLOR_PHASE_FG);
+        dbg.setFont(FONT_PHASE);
+        dbg.drawString("PHASE "+phase,stringX,stringY);
+    }
+    
+    private boolean isPhaseNumberToBePainted=false; 
+    private int phaseNumber = 1;
+    protected void setIsPhaseNumToBePainted (boolean paintIt){
+      //  synchronized (phaseDisplayLock){
+            isPhaseNumberToBePainted = paintIt;
+       //     phaseDisplayLock.notifyAll();
+       // }
+    }
+    
+    protected void setPhaseNumber(int phase){
+        phaseNumber = phase;
+    }
+    
+    
+    
     protected void paintUnbuffered(Graphics dbg) {
         paintSpielfeldBoden(dbg);
         paintLaserStrahlen(dbg);
@@ -2281,6 +2337,23 @@ public class BoardView extends JComponent{
 
     
     
+    
+    //private Object phaseDisplayLock = new Object();
+    private void waitForPhaseDisplay(){
+     /*
+        synchronized (phaseDisplayLock){
+            while (isPhaseNumberToBePainted){
+                try {
+                    phaseDisplayLock.wait();
+                }
+                catch (InterruptedException ie){
+                    CAT.warn(ie.getMessage(), ie);
+                }
+                phaseDisplayLock.notifyAll();
+            }
+            
+        }*/
+    }
     
     private void waitSomeTime(int ms, Object lock){   
         	if (ms == 0){

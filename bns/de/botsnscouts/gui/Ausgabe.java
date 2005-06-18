@@ -786,6 +786,7 @@ public class Ausgabe extends BNSThread {
     
     //</SEQUENCER-FIx>
 
+ 
     private void comHandleMessages(ClientAntwort kommAntwort) {
         try {
             String msgId = kommAntwort.namen[0];
@@ -808,6 +809,7 @@ public class Ausgabe extends BNSThread {
 	            sequencer.invoke(kommAntwort);
 	        }
 		
+	        
 	        acknowledgeMessage();
         }
         catch (Exception e){
@@ -1065,6 +1067,8 @@ public class Ausgabe extends BNSThread {
         ausgabeView.showAllRobots();
         
         
+        
+        
         // cw.namen looks like:
         // cw.namen[0] = messageId
         // cw.namen[1] = for "phase number"
@@ -1083,6 +1087,9 @@ public class Ausgabe extends BNSThread {
             CAT.error(ne.getMessage(), ne);
         }
         currentPhase=phase;
+        int delay = ausgabeView.getCurrentSpeedSettings().getDelayAfterRevealingCardsForPhase();
+        int delay2 = Math.max(1, delay-200);
+        ausgabeView.displayPhaseNumber(currentPhase+1, delay2);
         int length = cw.namen.length;
         for (int i=2;i<length;i+=3){            
             String botname = cw.namen[i];
@@ -1144,8 +1151,8 @@ public class Ausgabe extends BNSThread {
         }    
         
         SoundMan.playSound(SoundMan.REVEAL_CARDS);
-        int delay = ausgabeView.getCurrentSpeedSettings().getDelayAfterRevealingCardsForPhase();
-       // TODO  
+        
+       
         waitSomeTime(delay);
         
     }
@@ -1259,24 +1266,28 @@ public class Ausgabe extends BNSThread {
                         new AbstractMessageAction() {
                             public void invoke(ClientAntwort msgData) {
                                 comMsgHandleRegisterLock(msgData);
+                                
                             }
                         });
         sequencer.addActionMapping(MessageID.REGISTER_UNLOCKED,
                         new AbstractMessageAction() {
                             public void invoke(ClientAntwort msgData) {
                                 comMsgHandleRegisterUnLock(msgData);
+                             
                             }
                         });
         sequencer.addActionMapping(MessageID.PHASE_STARTED,
                         new AbstractMessageAction() {
                             public void invoke(ClientAntwort msgData) {
                                 comMsgHandleEvalPhaseStart(msgData);
+                             
                             }
                         });
         sequencer.addActionMapping(MessageID.PHASE_ENDED,
                         new AbstractMessageAction() {
                             public void invoke(ClientAntwort msgData) {
                                 comMsgHandleEvalPhaseEnd(msgData);
+                              
                             }
                         });
         
@@ -1284,24 +1295,28 @@ public class Ausgabe extends BNSThread {
                         new AbstractMessageAction() {
                             public void invoke(ClientAntwort msgData) {
                                 comMsgHandleEvalOfCard(msgData);
+                               
                             }
                         });
         sequencer.addActionMapping(MessageID.SIGNAL_ACTION_START,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {
                         comMsgHandleActionStart(msgData);
+                      
                     }
                 });
         sequencer.addActionMapping(MessageID.SIGNAL_ACTION_STOP,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {
                         comMsgHandleActionStop(msgData);
+                 
                     }
                 });
         sequencer.addActionMapping(MessageID.PROG_DONE,
                 new AbstractMessageAction() {
                     public void invoke(ClientAntwort msgData) {
                         comMsgHandleProgrammingDone(msgData);
+                
                     }
                 });
 
