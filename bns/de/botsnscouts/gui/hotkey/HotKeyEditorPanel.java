@@ -91,7 +91,8 @@ public class HotKeyEditorPanel extends JPanel {
     for (int i=0;i<size;i++) {
       HotKey k = keyman.getHotKeyByName(keys[i]);
       if (k == null) {
-        CAT.warn("no hotkey found for "+keys[i]);
+          // this happens if there are less than six flags=>debug instead of warn like before
+        CAT.debug("no hotkey found for "+keys[i]);
         continue;
       }
       JLabel desc = new JLabel(k.getAction().getDescription());

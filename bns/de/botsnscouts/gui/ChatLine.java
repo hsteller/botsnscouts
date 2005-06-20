@@ -97,10 +97,14 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
         text.setText("");
         KeyboardFocusManager kman = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         Object o = kman.getFocusOwner();
-        System.out.println("OWNER: "+o);
+        if (CAT.isDebugEnabled()) {
+            CAT.debug("focus owner: "+o);
+        }
         view.requestFocus();
          o = kman.getFocusOwner();
-        System.out.println("OWNER: "+o);
+         if (CAT.isDebugEnabled()) {
+             CAT.debug("focus owner: "+o);
+         }
         timer.stop();
         
     }
