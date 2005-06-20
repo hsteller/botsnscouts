@@ -43,6 +43,12 @@ sound.active		(true for on, false for off. Can be accessed through
 server.IP		(IP-Nr or name of default gameserver)
 timeout			(Seconds that players have to return their programming)
 robot.name		(Default Name of the player)
+canPushersPushMutltipleBots (set to true if you want pushers that are strong
+                             enough to push a robot R1 on a field that already
+                             is occupied by another robot R2, pushing R1 and
+                             R2; default is false => no pushing of R1
+                             if the "push's target field" is already occupied  by
+                             R2) 
 
 
 Someone wanted to have a different window size (instead of "as-big-as-possible")

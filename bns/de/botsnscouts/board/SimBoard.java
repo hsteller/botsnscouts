@@ -355,39 +355,39 @@ public class SimBoard extends Board implements Directions {
 
         ausgabenMsg(MessageID.PHASE_STARTED,botsNCards);
         
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+   //    ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswRobBew");
         doRobMoveCards(phase, bots);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+     //   ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+    //    ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswExprFl");
         doExpressBelts(bots);
         fireBotsChanged(bots);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+//       ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+ //       ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswFl");
         doBelts(bots);  // also 2nd move of express belts
         fireBotsChanged(bots);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+  //      ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+  //      ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswPusher");
         doPushers(phase, bots);
         fireBotsChanged(bots);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+     //   ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+     //   ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswRot", null);
         doRotatingGears(bots);
         fireBotsChanged(bots);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+   //     ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+    //    ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswCrushers");
         doCrushers(phase, bots);
         fireBotsChanged(bots);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+    //    ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+     //   ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         doLasers(bots);        // Board and bot lasers
         fireBotsChanged(bots);
-        ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+   //     ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
 
         doArchiveUpdate(bots);
         fireBotsChanged(bots);
@@ -489,7 +489,7 @@ public class SimBoard extends Board implements Directions {
     
     private boolean moveRobOne(BoardBot[] robbis, int rob, int direction, boolean pushOthers, boolean hack_isCollisionMove) {
         BoardBot currentBot = robbis[rob];
-        
+        CAT.debug(currentBot);
         if (currentBot.getDamage() >= 10) {
             return false;
         }
@@ -546,15 +546,20 @@ public class SimBoard extends Board implements Directions {
                 }
             }
           
-            //fourth, commit the change if we reach this point
+            //fourth, commit the change if we reach this point            
             currentBot.setPos(xx, yy);
+            // the setting of currentBot.xx and currentBot.yy is necessary here if pushersCanPushMultiple is 
+            // true and this method here was called by doPushers(): without updating currentBot.xx and 
+            // currentBot.yy the following "doIntended()" call in doPushers() would move the robot back to 
+            // (xx,yy), sending a movement message with the wrong direction to the clients
+            currentBot.xx = xx;
+            currentBot.yy = yy;
             //in that case, the robot has actually moved a square
             moved[rob] = true;
-            if (hack_isCollisionMove) {                
+            if (hack_isCollisionMove ) {                
                 ausgabenMsgString2(MessageID.BOT_MOVE, "" + currentBot.getName(), direction + "");
             }
-            
-            
+         
         } //if pushOthers
         else {
             switch (direction) {
@@ -730,16 +735,16 @@ public class SimBoard extends Board implements Directions {
             int x = r.getX();
             int y = r.getY();
             if (nw(x, y).isSouthPusherActive(phase)) {
-                moveRobOne(robbis, i, SOUTH, pushersCanPushMoreThanOneBot);
+                moveRobOne(robbis, i, SOUTH, pushersCanPushMoreThanOneBot, pushersCanPushMoreThanOneBot);
             }
             if (sw(x, y).isNorthPusherActive(phase)) {
-                moveRobOne(robbis, i, NORTH, pushersCanPushMoreThanOneBot);
+                moveRobOne(robbis, i, NORTH, pushersCanPushMoreThanOneBot, pushersCanPushMoreThanOneBot);
             }
             if (ew(x, y).isWestPusherActive(phase)) {
-                moveRobOne(robbis, i, WEST, pushersCanPushMoreThanOneBot);
+                moveRobOne(robbis, i, WEST, pushersCanPushMoreThanOneBot, pushersCanPushMoreThanOneBot);
             }
             if (ww(x, y).isEastPusherActive(phase)) {
-                moveRobOne(robbis, i, EAST, pushersCanPushMoreThanOneBot);
+                moveRobOne(robbis, i, EAST, pushersCanPushMoreThanOneBot, pushersCanPushMoreThanOneBot);
             }
         } //for
         
