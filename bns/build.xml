@@ -90,19 +90,20 @@
 
   <target name="run" depends="compile">
      <java classname="de.botsnscouts.BotsNScouts" fork="true">
+     	<jvmarg value="-Xss640k"/>
         <classpath>
-	   <fileset dir="${jars}" includes="*.jar" />
-	   <pathelement path="${build}" />
-	</classpath>
+	   		<fileset dir="${jars}" includes="*.jar" />
+	  		 <pathelement path="${build}" />
+		</classpath>
      </java>
   </target>
 
   <target name="metaserver" depends="compile">
-       <java classname="de.botsnscouts.meta.Server" fork="true">
+       <java classname="de.botsnscouts.meta.Sever" fork="true">       	
           <classpath>
-         <fileset dir="${jars}" includes="*.jar" />
-         <pathelement path="${build}" />
-      </classpath>
+	         <fileset dir="${jars}" includes="*.jar" />
+	         <pathelement path="${build}" />
+      		</classpath>
        </java>
   </target>
 
