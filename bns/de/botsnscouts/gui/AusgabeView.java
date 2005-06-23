@@ -28,7 +28,6 @@ package de.botsnscouts.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -47,7 +46,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -63,8 +61,6 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Category;
-
-import sun.nio.cs.ext.SJIS;
 
 import de.botsnscouts.gui.hotkey.HotKey;
 import de.botsnscouts.gui.hotkey.HotKeyAction;
@@ -546,7 +542,11 @@ public class AusgabeView extends JPanel  {
     }
 
     
-     protected void quit(boolean keepWatching) {
+    protected void quit(boolean keepWatching){
+        quit (keepWatching, false);
+    }
+    
+     protected void quit(boolean keepWatching, boolean killJVM) {
         CAT.debug("AusgabeView starts procedure to quit the client..");
 		JLabel[] msg = new JLabel[2];
 		msg[0] = new TJLabel(Message.say("AusgabeView", "reallyQuit1"));
@@ -576,6 +576,19 @@ public class AusgabeView extends JPanel  {
 		    }
 		    boolean shutdownPossibleHumanPlayer = true;
 	        ausgabe.quit(keepWatching, shutdownPossibleHumanPlayer);
+	        if (killJVM) {
+		        try {
+		            synchronized(this){
+		                this.wait(3000);
+		            }
+		        }
+		        catch (Exception e){
+		            CAT.warn(e.getMessage(), e);
+		        }
+		        finally {
+		            System.exit(0);
+		        }
+	        }
 	     }
 		else {  // dont quit
 		}
@@ -634,8 +647,14 @@ public class AusgabeView extends JPanel  {
           super(Message.say("AusgabeView", "mFile"));
           JMenuItem mQuit = new JMenuItem((Message.say("AusgabeView","mFinish")));
           mQuit.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e){
-                  quit(false);
+		public void actionPerformed(ActionEvent e){		    	
+                  quit(false, true);
+                }
+	    });
+          JMenuItem mRestart = new JMenuItem((Message.say("AusgabeView","mRestart")));
+          mRestart.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e){		    	
+                  quit(false, false);
                 }
 	    });
           JMenuItem stats = new JMenuItem(Message.say("AusgabeView", "stats"));
@@ -656,6 +675,7 @@ public class AusgabeView extends JPanel  {
           */
           this.add(stats);
           this.addSeparator();
+          this.add(mRestart);
           this.add(mQuit);
       }
     }
