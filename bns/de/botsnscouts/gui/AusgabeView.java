@@ -1052,6 +1052,14 @@ public class AusgabeView extends JPanel  {
    private class HelpMenu extends JMenu {
       HelpMenu () {
         super (Message.say("AusgabeFrame","mHelpMenuName"));
+       // TODO include Jude's manual, add title of MenuItem to message bundles
+        /*JMenuItem manual = new JMenuItem(Message.say("AusgabeFrame", "manual"));
+        manual.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                
+            }
+        });
+        */
         JMenuItem about = new JMenuItem(Message.say("AusgabeFrame","mAbout"));
         about.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1059,6 +1067,7 @@ public class AusgabeView extends JPanel  {
 			}
 	    });
         add(about);
+        
       }
 
     }
@@ -1075,8 +1084,16 @@ public class AusgabeView extends JPanel  {
       void init(Location [] flags) {
         if (flags!=null){
           for (int i=0;i<flags.length;i++){
-            JMenuItem flag = new JMenuItem(" #"+(i+1));
-            flag.addActionListener(new JumpToFlagListener(flags[i].x, flags[i].y));
+            final int flagNr = i+1;
+            JMenuItem flag = new JMenuItem(" #"+flagNr);
+            flag.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (CAT.isDebugEnabled()) {
+                        CAT.debug("Showing Flag:"+flagNr);
+                      }                     
+                     jumpToFlag(flagNr);
+                }
+            });           
             this.add(flag);
             if (CAT.isDebugEnabled()){
               CAT.debug("ScrollFlag - added flag: #"+(i+1)+" x:"+flags[i].x+" y:"+flags[i].y);
@@ -1089,44 +1106,32 @@ public class AusgabeView extends JPanel  {
 
    }
 
-    private class JumpToFlagListener implements ActionListener {
-        int xpos, ypos;
-        public JumpToFlagListener(int x, int y){
-          this.xpos = x;
-          this.ypos = y;
-        }
 
-        public void actionPerformed(ActionEvent e){
-          if (CAT.isDebugEnabled())
-            CAT.debug("Showing Pos at x:"+xpos+" y:"+ypos);
-          showPos(xpos, ypos, true, false);
-        }
-    }
 
    private class JumpToRobMenu extends JMenu {
-      JumpToRobMenu() {
-        super(Message.say("AusgabeView", "rob"));
-        init ();
-      }
-
-      void init() {
-        if (robotStatus!=null){
-          int l = robotStatus.size();
-         Enumeration e = robotStatus.elements();
-         while (e.hasMoreElements()){
-            RobotStatus rs = (RobotStatus) e.nextElement();
-            Bot robot = rs.getRobot();
-            CAT.debug( "Bot is: " + robot );
-            CAT.debug( "imgs is: " + BotVis.getRobotImages() );
-            JMenuItem rob = new JMenuItem(robot.getName(),new ImageIcon(BotVis.getRobotImages()[robot.getBotVis()]));
-            rob.addActionListener(new JumpToRobListener(rs));
-            this.add(rob);
-          }
-        }
-        else
-          CAT.debug("robotstatus was null! Failed to create ShowRobMenu items");
-      }
-
+       JumpToRobMenu() {
+           super(Message.say("AusgabeView", "rob"));
+           init ();
+       }
+       
+       void init() {
+           if (robotStatus!=null){
+               int l = robotStatus.size();
+               Enumeration e = robotStatus.elements();
+               while (e.hasMoreElements()){
+                   RobotStatus rs = (RobotStatus) e.nextElement();
+                   Bot robot = rs.getRobot();
+                   CAT.debug( "Bot is: " + robot );
+                   CAT.debug( "imgs is: " + BotVis.getRobotImages() );
+                   JMenuItem rob = new JMenuItem(robot.getName(),new ImageIcon(BotVis.getRobotImages()[robot.getBotVis()]));
+                   rob.addActionListener(new JumpToRobListener(rs));
+                   this.add(rob);
+               }
+           }
+           else
+               CAT.debug("robotstatus was null! Failed to create ShowRobMenu items");
+       }
+       
    }
 
     private class JumpToRobListener implements ActionListener {
@@ -1315,6 +1320,9 @@ public class AusgabeView extends JPanel  {
     }
     
     private void waitSomeTime(int ms, Object lock){
+        if (ms<1){
+            return;
+        }
        synchronized(lock) {
            try {
                lock.wait(ms);
@@ -1327,11 +1335,14 @@ public class AusgabeView extends JPanel  {
     /**
     * Centers the view on the given flag and highlight it.
     * 
-    * @param the number of the flag to center on 
+    * @param the number of the flag to center on (possible values: [1-6])
     */
    public void jumpToFlag(int nr) {
        if (nr > 0 && nr <= flags.length) {
            showPos(flags[(nr - 1)].getX(), flags[(nr - 1)].getY(), true, false);
+           if (BoardView.DEBUG_DISTANCE_CALC) {
+               gameBoardCanvas.setDebugBotNextFlag(nr);
+           }
        }
    }
 }

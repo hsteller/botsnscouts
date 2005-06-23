@@ -61,8 +61,12 @@ import javax.swing.JViewport;
 
 import org.apache.log4j.Category;
 
+import sun.awt.font.AdvanceCache;
+
 import com.keypoint.PngEncoder;
 
+import de.botsnscouts.autobot.AdvDistanceCalculator3;
+import de.botsnscouts.autobot.DistanceCalculator;
 import de.botsnscouts.board.Board;
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.board.Floor;
@@ -225,6 +229,13 @@ public class BoardView extends JComponent{
     private static final AlphaComposite AC_SRC_OVER_05 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
     private static final AlphaComposite AC_SRC_OVER_07 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
 
+    // This stuff can be used to display the distance calculation on the board: 
+    public static final boolean DEBUG_DISTANCE_CALC = false;
+    Font myDebugFont=new Font("SansSerif", Font.PLAIN, 10);
+    Bot debugbot;
+    DistanceCalculator calc;
+    
+    
     public BoardView(SimBoard sf_neu) {
         init(sf_neu, ROBOCOLOR);
         
@@ -1652,6 +1663,9 @@ public class BoardView extends JComponent{
         Location l = new Location(xpos, ypos);
         Image img = (Image) floorElementHash.get(l);
         g.drawImage(img, actx, acty, width, height, this);
+        if (DEBUG_DISTANCE_CALC) {
+            paintFeldBodenAutoBotDebug(g,xpos, ypos,actx, acty);
+        }
     }
 
     // for painting crushers
@@ -1673,6 +1687,62 @@ public class BoardView extends JComponent{
         } //for
     }
 
+    
+    
+    
+   
+    /** 
+     * To support debugging of the autobot distance calculation:
+     * toggle the flag for which the distances should be shown 
+     */
+    protected void setDebugBotNextFlag(int flag){
+        if (!DEBUG_DISTANCE_CALC){
+            return;
+        }
+        if (debugbot == null) {
+            debugbot = Bot.getNewInstance("debugDummy");
+        }
+        debugbot.setNextFlag(flag);
+        offScreenImage = createBoardImage();
+        repaint();
+    }
+
+    /** Will paint the floor and add the values of the autobot distance calculation on it for debugging purposes
+     * */
+    private void paintFeldBodenAutoBotDebug(Graphics g, int xpos, int ypos, int pixelx, int pixely) {       
+        if (calc == null && sf != null && sf.getFlags()!=null){
+            
+                calc = AdvDistanceCalculator3.getInstance(sf);
+                if (debugbot == null) {
+                    debugbot = Bot.getNewInstance("debugDummy");
+                }
+                debugbot.setNextFlag(1);
+        }
+        if (calc != null){
+            int x = pixelx+FELDSIZE/2;
+            int y = pixely+FELDSIZE/2;
+            g.setFont(myDebugFont);
+            g.setColor(Color.red);
+            debugbot.moveTo(xpos, ypos);
+            debugbot.setDamage(0);
+            debugbot.setFacing(Directions.NORTH);
+            g.drawString(""+calc.getDistance(debugbot), x, y-20);
+            debugbot.setFacing(Directions.SOUTH);
+            g.drawString(""+calc.getDistance(debugbot), x, y+20);
+            debugbot.setFacing(Directions.EAST);
+            g.drawString(""+calc.getDistance(debugbot), x+5, y);
+            debugbot.setFacing(Directions.WEST);
+            g.drawString(""+calc.getDistance(debugbot), x-30, y);
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
     /** paints the (back-)ground of the board*/
     private void paintSpielfeldBoden(Graphics g2) {
 
@@ -1991,6 +2061,8 @@ public class BoardView extends JComponent{
             t.restart();
 
         repaintOrt(x, y);
+        
+        
     }
 
 
