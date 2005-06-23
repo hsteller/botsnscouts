@@ -26,12 +26,28 @@ public class AdvDistanceCalculator extends DistanceCalculator {
      */
     int[][][][] distances;
 
+    boolean [] flagsCalculated = new boolean [6];
+    
+    
     private AdvDistanceCalculator(Board board) {
-        super(board);
+        super(board, false);
+        if (distances == null){
+            distances = new int[board.getFlags().length][board.getSizeX()+2]
+                               [board.getSizeY()+2][4];
+            CAT.debug("new distances Array: "+distances.length+"x"+
+                    distances[0].length+"x"+distances[0][0].length+"x"+
+                    distances[0][0][0].length);
+        }
     }
 
     protected int getDistance(int x, int y, int flag, int facing) {
+        if (!flagsCalculated[flag-1]) {
+            preCalculate(flag-1);
+        }
         return distances[flag-1][x][y][facing];
+        
+            
+        
     }
 
     // if subclasses have larger "distances"
@@ -57,10 +73,14 @@ public class AdvDistanceCalculator extends DistanceCalculator {
         CAT.debug("preC(int) called with "+flag);
         Location location = board.getFlags()[flag];
         initialize(distances[flag]);
+        //distances[flag][location.getX()][location.getY()][facing]=0;
+        //preCalculate(distances[flag], location.getX(), location.getY(), facing);
         for (int facing=0;facing<4;facing++){
             distances[flag][location.getX()][location.getY()][facing]=0;
             preCalculate(distances[flag], location.getX(), location.getY(), facing);
+            flagsCalculated[flag]=true;
         }
+        
     }
 
     private void initialize(int[][][] dist) {
