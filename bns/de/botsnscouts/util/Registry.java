@@ -33,7 +33,7 @@ import de.botsnscouts.start.Start;
  * 
  * 
  * More or less a hack.
- * Is intended to keep track of the sevrver and clients/BNSThreads that were launched on  localhost;
+ * Is intended to keep track of the server and clients/BNSThreads that were launched on  localhost;
  * to make sure that the clients get killed if the server isn't running anymore.
  * General purpose for that: being able to do a "clean" quit of local HumanPlayers/games 
  *  (==redisplay the main launcher app to maybe start a new game instead of the former "System.exit(0)"
@@ -44,6 +44,9 @@ public class Registry implements ShutdownListener, GameOverListener {
     
     	private static Category CAT = Category.getInstance(Registry.class);
    
+    	private static final boolean TRY_RESTART_WITHOUT_KILLING_JVM = false;
+    	private static final int MS_TO_WAIT_FOR_SERVER_SHUTDOWN = TRY_RESTART_WITHOUT_KILLING_JVM?5500:750;
+    	
     	private static Registry globalGameRegistry = new Registry();
     	
         private Collection games;
@@ -220,21 +223,28 @@ public class Registry implements ShutdownListener, GameOverListener {
         */
         
         private void redisplayMenu(){
-        
-        	CAT.debug("redisplayMenu, dumping registry:");
-        	CAT.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        	CAT.debug(dump());
-        	CAT.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        	Start mainMenu = Start.getLauncherAppSingleton();
-        	if (mainMenu != null ){
-        		//mainMenu.setVisible(true);
-        		//mainMenu.resetWaiter();        		
-        		mainMenu.show();
-        		mainMenu.showMainMenu();
-        	}
-        	else {
-        		CAT.error("the main menu/launcher application was null");
-        	}
+            if (CAT.isDebugEnabled()) {
+	        	CAT.debug("redisplayMenu, dumping registry:");
+	        	CAT.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+	        	CAT.debug(dump());
+	        	CAT.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            }
+            if (TRY_RESTART_WITHOUT_KILLING_JVM) {
+                Start mainMenu = Start.getLauncherAppSingleton();
+            	if (mainMenu != null ){
+            		//mainMenu.setVisible(true);
+            		//mainMenu.resetWaiter();        		
+            		mainMenu.show();
+            		mainMenu.showMainMenu();
+            	}
+            	else {
+            		CAT.error("the main menu/launcher application was null");
+            	}
+            }
+            else {
+                bruteRestart();
+            }
+        	
         	
         }
         
@@ -281,9 +291,10 @@ public class Registry implements ShutdownListener, GameOverListener {
                 	serv.shutdown(false);	    
             }
             try {
-                int seconds = 5;
-                CAT.info("Registry waits at max. "+seconds+" seconds for the server to sort things out..");
-                 serv.join(seconds*1000);           
+                
+                CAT.info("Registry waits at max. "+MS_TO_WAIT_FOR_SERVER_SHUTDOWN
+                                +" milliseconds for the server to sort things out..");
+                 serv.join(MS_TO_WAIT_FOR_SERVER_SHUTDOWN);           
             }
             catch (Exception e){
                 	CAT.warn(e);
@@ -387,7 +398,7 @@ public class Registry implements ShutdownListener, GameOverListener {
 			                       CAT.debug("no local server found for this game");
 			                    }
 			                    else {
-			                       //CAT.debug("XXX shutting down the server: "+localServer);	  	                      
+			                       //CAT.debug("shutting down the server: "+localServer);	  	                      
 			                     shutdownServer(localServer,stg, true);
 			                    }
 			                    registryRemoveAndKillAutobots(stg);
@@ -397,12 +408,12 @@ public class Registry implements ShutdownListener, GameOverListener {
 	                    Thread temp = new Thread(farkingDeadLocks);
 	                    temp.start();
 	                    try {
-	                        temp.join(5500);
+	                        temp.join(MS_TO_WAIT_FOR_SERVER_SHUTDOWN+500);
 	                    }
 	                    catch (InterruptedException ie){
 	                        CAT.warn(ie);
 	                    }
-	                    if (pseudoBoolean[0] == null){ // Thread "temp" seems not to have finished
+	                    if (TRY_RESTART_WITHOUT_KILLING_JVM && pseudoBoolean[0] == null){ // Thread "temp" does not  have finished,
 	                                                               // we are only here because of the join-timeout
 	                        String message1 = Message.say("Registry", "serverHangs1");
 	                        String message2 = Message.say("Registry", "serverHangs2");
@@ -434,11 +445,7 @@ public class Registry implements ShutdownListener, GameOverListener {
             
         }
         
-        private static void hardRestart ()throws Exception{
-            
-               
-
-            }
+        
         
        private void bruteRestart(){
            try {
@@ -469,7 +476,7 @@ public class Registry implements ShutdownListener, GameOverListener {
 	           String s1 = " -Dbns.home="+f.getCanonicalPath();
 	           String s2 = " -jar botsnscouts.jar";
 	           Dimension size = BotsNScouts.getScreenSize();
-	           String s3 = " -Dgeometry="+size.width+"x"+size.height;
+	           String s3 = " -Xss640k -Dgeometry="+size.width+"x"+size.height;
 	           String cmd = binString+s3+s1+s2;
 	           CAT.info("EXEC: "+cmd);
 	           
