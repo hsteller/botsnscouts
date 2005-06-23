@@ -14,11 +14,17 @@ public abstract class DistanceCalculator {
 
     Board board;
 
-    public DistanceCalculator(Board board) {
+    public DistanceCalculator(Board board, boolean callPreCalculate) {
         this.board = board;
-        preCalculate();
+        if (callPreCalculate) {
+            preCalculate();
+        }
     }
 
+    public DistanceCalculator(Board board){
+        this(board, true);
+    }
+    
     /*
      * Takes into account actual distance, flag, damage, repair possibility
      * and play strength. The lower the return value is, the better.
@@ -97,14 +103,17 @@ public abstract class DistanceCalculator {
     }
 
     /* final so it may be inlined */
-    final int rotateright(int facing) {
+    final int rotateright(int facing) {    
         return (facing+1)%4;
     }
     final int rotateleft(int facing) {
-        facing --;
-        if (facing<0)
-            facing=3;
-        return facing;
+        if (facing==0) {
+            return 3;
+        }    
+        else {
+            return --facing;
+        }
+        
     }
 
 }
