@@ -57,7 +57,7 @@ class EditorBoardView extends BoardView{
         paintUnbuffered( g );
     }
 
-    Font myFont=new Font("SansSerif", Font.PLAIN, 16);
+    Font myFont=new Font("SansSerif", Font.PLAIN, 12);
     Bot bot;
     protected void paintFeldBoden(Graphics g, int xpos, int ypos, int pixelx, int pixely) {
         super.paintFeldBoden(g, xpos, ypos, pixelx, pixely);

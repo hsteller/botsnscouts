@@ -32,7 +32,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -55,14 +54,12 @@ import de.botsnscouts.util.BotVis;
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.Global;
-import de.botsnscouts.util.H;
 import de.botsnscouts.util.KrimsKrams;
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.util.SoundMan;
 import de.botsnscouts.util.Stats;
 import de.botsnscouts.util.StatsList;
-import de.botsnscouts.util.Status;
 
 
 public class Ausgabe extends BNSThread {

@@ -49,19 +49,15 @@ import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.TimerTask;
 
 import javax.swing.JComponent;
 import javax.swing.JViewport;
 
 import org.apache.log4j.Category;
-
-import sun.awt.font.AdvanceCache;
 
 import com.keypoint.PngEncoder;
 

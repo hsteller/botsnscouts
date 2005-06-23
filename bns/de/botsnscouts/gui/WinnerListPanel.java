@@ -7,11 +7,9 @@ package de.botsnscouts.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Hashtable;
@@ -28,11 +26,7 @@ import javax.swing.border.TitledBorder;
 import de.botsnscouts.util.BotVis;
 import de.botsnscouts.util.Directions;
 import de.botsnscouts.util.KrimsKrams;
-import de.botsnscouts.util.Message;
-import de.botsnscouts.util.Stats;
-import de.botsnscouts.util.StatsList;
 import de.botsnscouts.widgets.TJLabel;
-import de.botsnscouts.widgets.TJPanel;
 
 /**
  * @author Hendrik Steller

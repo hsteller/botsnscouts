@@ -40,7 +40,6 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Category;
 
-import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.GreenTheme;
 import de.botsnscouts.widgets.OptionPane;

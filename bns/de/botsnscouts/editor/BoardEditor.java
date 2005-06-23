@@ -51,7 +51,7 @@ import org.apache.log4j.Category;
 import org.apache.log4j.PropertyConfigurator;
 
 import de.botsnscouts.BotsNScouts;
-import de.botsnscouts.autobot.AdvDistanceCalculator;
+import de.botsnscouts.autobot.AdvDistanceCalculator3;
 import de.botsnscouts.autobot.DistanceCalculator;
 import de.botsnscouts.board.Board;
 import de.botsnscouts.board.FlagException;
@@ -202,7 +202,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
         if (dp.advancedFeaturesEnabled()) {
             CAT.debug("setting flag to " + x + ", " + y);
             board.setFlags(new Location[]{new Location(x, y)});
-            DistanceCalculator calc = AdvDistanceCalculator.getInstance(board);
+            DistanceCalculator calc = AdvDistanceCalculator3.getInstance(board);
             calc.preCalculate();
             boardView.setCalc(calc);
             repaint();

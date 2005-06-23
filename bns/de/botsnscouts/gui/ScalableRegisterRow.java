@@ -6,7 +6,6 @@ package de.botsnscouts.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,8 +17,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Category;
-
-
 
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Card;

@@ -19,7 +19,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
-import javax.swing.ToolTipManager;
 
 import de.botsnscouts.util.Bot;
 

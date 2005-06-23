@@ -5,18 +5,14 @@
 package de.botsnscouts.gui;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -25,7 +21,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
 
 import org.apache.log4j.Category;
 
@@ -35,7 +30,6 @@ import de.botsnscouts.util.CursorMan;
 import de.botsnscouts.util.Directions;
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.KrimsKrams;
-import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJPanel;
 
 /**

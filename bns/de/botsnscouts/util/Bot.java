@@ -25,7 +25,6 @@
 
 package de.botsnscouts.util;
 
-import java.util.LinkedList;
 
 
 /**

@@ -6,10 +6,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -23,16 +21,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToolTip;
 
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.CropperField2;
 import de.botsnscouts.util.CursorMan;
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.Message;
-import de.botsnscouts.widgets.TJLabel;
 
 public class RobotInfo extends JComponent  implements RobotStatus, ActionListener {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( RobotInfo.class );

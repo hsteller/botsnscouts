@@ -33,11 +33,6 @@ package de.botsnscouts.util;
 
 import java.awt.Image;
 import java.util.Comparator;
-import java.util.HashMap;
-
-import javax.swing.ImageIcon;
-
-import de.botsnscouts.start.MyCellRenderer;
 
 public abstract class Card  {
     

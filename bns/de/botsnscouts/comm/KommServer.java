@@ -28,8 +28,6 @@ import java.io.PrintWriter;
 
 import org.apache.log4j.Category;
 
-import com.sun.rsasign.i;
-
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Encoder;
 import de.botsnscouts.util.Location;
