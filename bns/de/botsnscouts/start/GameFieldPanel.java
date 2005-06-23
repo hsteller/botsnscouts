@@ -140,7 +140,7 @@ public class GameFieldPanel extends JPanel {
 
         pnl = new TJPanel();
         pnl.setLayout(new FlowLayout());
-        pnl.setBorder(new EmptyBorder(50, 50, 50, 50));
+        pnl.setBorder(new EmptyBorder(30, 30, 30, 30));
         pnl.add(boardGrid);
 
         leftPane.setOpaque(false);
@@ -206,11 +206,14 @@ public class GameFieldPanel extends JPanel {
         JComponent inner = new JPanel();
         GridBagLayout lay = new GridBagLayout();
         GridBagConstraints gc = new GridBagConstraints();
+        //gc.fill = GridBagConstraints.NONE;
         gc.fill = GridBagConstraints.HORIZONTAL;
-        gc.insets = new Insets(0, 0, 20, 0);
+        gc.insets = new Insets(0, 0, 12, 0);
         gc.gridx = 0;
         gc.gridy = GridBagConstraints.RELATIVE;
-        panel.setBorder(new EmptyBorder(20, 10, 10, 10));
+        
+        gc.anchor = GridBagConstraints.CENTER;
+        panel.setBorder(new EmptyBorder(12, 7, 7, 7));
         panel.setOpaque(false);
 
         inner.setLayout(lay);
@@ -361,9 +364,14 @@ public class GameFieldPanel extends JPanel {
         inner.add(announce, gc);   
         inner.add(metaServer, gc);
 
-        gc.fill = GridBagConstraints.HORIZONTAL;
+       
 
         panel.add(inner);
+        
+        Dimension d = panel.getPreferredSize();
+        Dimension d2 = new Dimension(330, d.height);
+        //panel.setPreferredSize(d2);
+        CAT.error("panel="+d+",inner="+inner.getPreferredSize());
         //Add new game options below this one.
 
         //Always load th efirst board
