@@ -61,7 +61,7 @@ import org.apache.log4j.Category;
 
 import com.keypoint.PngEncoder;
 
-import de.botsnscouts.autobot.AdvDistanceCalculator3;
+import de.botsnscouts.autobot.AdvDistanceCalculator;
 import de.botsnscouts.autobot.DistanceCalculator;
 import de.botsnscouts.board.Board;
 import de.botsnscouts.board.FlagException;
@@ -1708,7 +1708,7 @@ public class BoardView extends JComponent{
     private void paintFeldBodenAutoBotDebug(Graphics g, int xpos, int ypos, int pixelx, int pixely) {       
         if (calc == null && sf != null && sf.getFlags()!=null){
             
-                calc = AdvDistanceCalculator3.getInstance(sf);
+                calc = AdvDistanceCalculator.getInstance(sf);
                 if (debugbot == null) {
                     debugbot = Bot.getNewInstance("debugDummy");
                 }
