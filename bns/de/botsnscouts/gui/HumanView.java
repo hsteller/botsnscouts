@@ -56,7 +56,7 @@ public class HumanView extends JPanel  {
 
     private static final String PANEL_REPAIR         = "repairRegs";
     private static final String PANEL_REGISTERS    = "regs";
-    private static final String PANEL_PHASE_EVAL  = "evalPhases";
+    public  static final String PANEL_PHASE_EVAL  = "evalPhases";
     private static final String PANEL_DIRECTION    = "direction";
     private static final String PANEL_POWERDOWN = "powerdown";
     public  static final String PANEL_USERINFO      = "info";
@@ -258,7 +258,7 @@ public class HumanView extends JPanel  {
     }
 
     
-    private synchronized void showPanel (String panelName) {
+    protected synchronized void showPanel (String panelName) {
         panelSwitcherLayout.show(panelSwitcher, panelName);
     }
 
@@ -280,6 +280,8 @@ public class HumanView extends JPanel  {
         this.requestFocus();
         setDialogInSidebarActive(true);
     }
+    
+    
 
     /**
      * display the register repair request

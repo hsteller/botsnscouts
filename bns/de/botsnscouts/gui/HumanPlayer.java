@@ -1014,12 +1014,14 @@ public class HumanPlayer extends BNSThread {
                         prog[i] = (i+1);
                     }
                     */
-                    humanView.setPanelToShow(HumanView.PANEL_USERINFO);
+                   
                     humanView.setDialogInSidebarActive(false); // hide cardpanel
-                    
+                    humanView.hidePhaseInfoCards();
                     int [] prog = getCompleteWisenheimerMove(emergencyBotCopy);                  
                     comm.registerProg(name,prog,false);                    
-                    humanView.hidePhaseInfoCards();
+                   
+                    humanView.setPanelToShow(HumanView.PANEL_PHASE_EVAL);
+                    humanView.showPanel(HumanView.PANEL_PHASE_EVAL);
                     cardsSent = true;
                     showMessage(Message.say("SpielerMensch","legalZug"));
                    
