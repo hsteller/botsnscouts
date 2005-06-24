@@ -46,6 +46,11 @@ public class Conf {
     private static Properties properties;
     private static final char MULTIPLE_PROP_SEPARATOR = ',';
 
+//    private static final String PROPNAME_METASERVER_ENABLED = "enableMetaserver";
+    public static final boolean IS_METASERVER_ENABLED = false;//Conf.getBooleanProperty(
+    										//Conf.PROPNAME_METASERVER_ENABLED, false);
+    
+    
     static {
         // Set bnsHome: if it's explicitly set, we take that
         String s = System.getProperty("bns.home");

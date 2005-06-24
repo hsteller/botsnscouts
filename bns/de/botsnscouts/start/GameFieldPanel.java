@@ -300,17 +300,9 @@ public class GameFieldPanel extends JPanel {
         int defaultTO = GameOptions.DTO;
         timeoutInput.setValue(defaultTO);
 
+      
         final JTextField metaServer = new TJTextField(announceGame.getServerString());
         metaServer.setEnabled(announceGame.willBeAnnounced());
-        final JCheckBox announce = new TJCheckBox(Message.say("Start", "mAnnounceMetaServer"),
-                announceGame.willBeAnnounced());
-        announce.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                metaServer.setEnabled(announce.isSelected());
-                metaServer.setEditable(announce.isSelected());
-                announceGame.setAnnounce(announce.isSelected());
-            }
-        });
         metaServer.addFocusListener(
                 new FocusAdapter() {
                     public void focusLost(FocusEvent event) {
@@ -324,7 +316,21 @@ public class GameFieldPanel extends JPanel {
                     }
                 }
         );
-
+        final JCheckBox announce = new TJCheckBox(
+        		Message.say("Start", "mAnnounceMetaServer"),
+                announceGame.willBeAnnounced());
+        announce.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                metaServer.setEnabled(announce.isSelected());
+                metaServer.setEditable(announce.isSelected());
+                announceGame.setAnnounce(announce.isSelected());
+            }
+        });
+        
+       if (!Conf.IS_METASERVER_ENABLED){
+       		announce.setEnabled(false);
+       		metaServer.setEnabled(false);
+       }
 
         spielfelder.setFont(font);
         save.setFont(font);
@@ -360,6 +366,7 @@ public class GameFieldPanel extends JPanel {
         inner.add(allowWisenheimer, gc);
         inner.add(allowScout, gc);
         inner.add(new TJLabel(Message.say("Start", "mHandInTimeOut")), gc);
+       
         inner.add(timeoutInput, gc);
         inner.add(announce, gc);   
         inner.add(metaServer, gc);
@@ -367,11 +374,7 @@ public class GameFieldPanel extends JPanel {
        
 
         panel.add(inner);
-        
-        Dimension d = panel.getPreferredSize();
-        Dimension d2 = new Dimension(330, d.height);
-        //panel.setPreferredSize(d2);
-        CAT.error("panel="+d+",inner="+inner.getPreferredSize());
+             
         //Add new game options below this one.
 
         //Always load th efirst board

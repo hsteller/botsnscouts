@@ -35,6 +35,7 @@ import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJButton;
 import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJPanel;
 import de.botsnscouts.widgets.TJTextField;
 
 /*
@@ -62,6 +63,7 @@ import de.botsnscouts.widgets.TJTextField;
  * @author Miriam
  */
 public class JoinGamePanel extends ColoredComponent {
+
 
     private JTextField hostName = new TJTextField(Message.say("Start", "mServerInh"),
                                         JTextField.CENTER, true);
@@ -126,16 +128,19 @@ public class JoinGamePanel extends ColoredComponent {
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-        JComponent left = createFindServersView();
+        
+     
         JComponent right = Box.createVerticalBox();
 
-;
+
 
         right.add(new TJLabel(Message.say("Start", "mServer")+" ", Color.lightGray, true));
         right.add(hostName);
         right.add(gamePreview);
-
-        panel.add(left);
+        if (Conf.IS_METASERVER_ENABLED){
+        	JComponent left = createFindServersView();
+        	panel.add(left);
+        }	
         panel.add(right);
 
         return panel;
@@ -196,7 +201,8 @@ public class JoinGamePanel extends ColoredComponent {
         robName = new TJTextField(Conf.getDefaultRobName(), JTextField.CENTER, true);
         colors = new RoboBox(true);
         //colors.setOpaque(false);
-        colors.setFont(new Font("Sans", Font.BOLD, 24));
+        Font bigFont = new Font("Sans", Font.BOLD, 20);
+        colors.setFont(bigFont);
 
         JComponent panel = new ColoredComponent();
         panel.setBorder(new EmptyBorder(50, 50, 50, 50));
@@ -208,18 +214,18 @@ public class JoinGamePanel extends ColoredComponent {
         panel.add( new TJLabel(Message.say("Start", "mParticipateAs"), Color.lightGray, true));
         panel.add( Box.createGlue() );
 
-        JComponent panelLeft = new JPanel();
+        JComponent panelLeft = new TJPanel();
         panelLeft.setLayout(new BoxLayout(panelLeft, BoxLayout.X_AXIS));
 
-        panelLeft.add(new TJLabel(Message.say("Start", "mName")+" ", Color.lightGray, true));
+        panelLeft.add(new TJLabel(Message.say("Start", "mName")+" ", Color.lightGray, bigFont));
         panelLeft.add(robName);
 
         panel.add( panelLeft );
 
-        JComponent panelRight = new JPanel();
+        JComponent panelRight = new TJPanel();
         panelRight.setLayout(new BoxLayout(panelRight, BoxLayout.X_AXIS));
 
-        panelRight.add(new TJLabel(Message.say("Start", "mFarbe")+" ", Color.lightGray, true));
+        panelRight.add(new TJLabel(Message.say("Start", "mFarbe")+" ", Color.lightGray, bigFont));
         panelRight.add(colors);
 
         panel.add(panelRight);

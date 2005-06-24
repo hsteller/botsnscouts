@@ -67,7 +67,7 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
     private Paint paint;
 
     public ParticipatePanel(Start par) {
-
+    	
         TJButton go;
         TJButton back;
 
@@ -93,7 +93,8 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
         robName = new TJTextField(Conf.getDefaultRobName(), JTextField.CENTER, true);
         colors = new RoboBox(true);
         colors.setOpaque(false);
-        colors.setFont(new Font("Sans", Font.BOLD, 24));
+        Font bigFont = new Font("Sans", Font.BOLD, 20);
+        colors.setFont(bigFont);
         go = new TJButton(Message.say("Start", "mGoButton"));
         back = new TJButton(Message.say("Start", "mZurueckButton"));
 
@@ -103,15 +104,16 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
         go.setActionCommand("go");
         back.setActionCommand("back");
 
-        add(new TJLabel(Message.say("Start", "mServer"), Color.lightGray, true));
+        add(new TJLabel(Message.say("Start", "mServer"), Color.lightGray, bigFont));
         add(hostName);
-        add(new TJLabel(Message.say("Start", "mName"), Color.lightGray, true ));
+        add(new TJLabel(Message.say("Start", "mName"), Color.lightGray, bigFont ));
         add(robName);
 
-        add(new TJLabel(Message.say("Start", "mFarbe"), Color.lightGray, true ));
+        add(new TJLabel(Message.say("Start", "mFarbe"), Color.lightGray, bigFont ));
         add(colors);
         add(back);
         add(go);
+        
     }
 
     public void actionPerformed(ActionEvent e) {
