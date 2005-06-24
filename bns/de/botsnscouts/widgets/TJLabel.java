@@ -68,6 +68,7 @@ public class TJLabel extends JLabel {
     
     public TJLabel(String text, int align, Color color) {
         this(text,align);
+        init();
         setForeground(color);
     }
 
@@ -80,6 +81,13 @@ public class TJLabel extends JLabel {
         } else {
             setFont(fontSmall);
         }
+    }
+    public TJLabel(String text, Color color, Font font) {
+        super(text);
+        init();
+        setForeground(color);
+        setFont(font);
+        
     }
 
     public TJLabel(Icon icon) {
