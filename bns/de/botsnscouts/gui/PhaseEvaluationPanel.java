@@ -121,7 +121,7 @@ public class PhaseEvaluationPanel extends TJPanel {
             gc.anchor=GridBagConstraints.EAST;
             gc.fill = GridBagConstraints.BOTH;
             
-            Border border = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, botColor.brighter(),botColor.darker());            
+         //   Border border = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, botColor.brighter(),botColor.darker());            
          //   TitledBorder titleBorder =  BorderFactory.createTitledBorder(border,currentBot.getName(),
          //                   					TitledBorder.LEFT, TitledBorder.TOP,nameFont, botColor);
             
