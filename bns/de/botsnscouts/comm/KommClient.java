@@ -1152,7 +1152,7 @@ public class KommClient implements Shutdownable{
          throw new KommException ("IOException bei getSpielstatus; Message: "+ioe.getMessage());
          }*/
         if (xyz.typ==ClientAntwort.SPIELSTATUS){
-            if (xyz.ok=false)
+            if (xyz.ok==false) 
                 return null;
             else
                 return xyz.stati;
