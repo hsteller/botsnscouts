@@ -67,7 +67,7 @@ public class Ausgabe extends BNSThread {
 
     // for communication with server
     private KommClientAusgabe kommClient;
-    private ClientAntwort kommAntwort = new ClientAntwort();
+ 
 
     // for displaying the stuff
     private AusgabeView ausgabeView;
@@ -156,9 +156,10 @@ public class Ausgabe extends BNSThread {
 
         // ---- entering game  ---------
         while (!spielEnde && !isShutDown()) {
+            ClientAntwort  kommAntwort=null;
             try {
                 // waiting for server messages
-                kommAntwort = kommClient.warte();
+              kommAntwort = kommClient.warte();
        
             } catch (Exception ke) { // something went wrong parsing the server's message
                 CAT.error(ke.getMessage(),ke);
@@ -216,6 +217,7 @@ public class Ausgabe extends BNSThread {
 
     protected boolean initialize() {
         registerAtServer();
+        ClientAntwort kommAntwort=null;
         try {
             kommAntwort = kommClient.warte();
         } catch (KommFutschException kE) {
