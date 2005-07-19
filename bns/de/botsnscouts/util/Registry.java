@@ -85,11 +85,12 @@ public class Registry implements ShutdownListener, GameOverListener {
             if (!isEnabled) {
                 return null;
             }
-            CAT.debug("xXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx");
-            CAT.debug(dump());
-            CAT.debug("xXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx");
-            
-            CAT.debug("addGame:server="+server+"; ip="+serverIp+"; port="+serverPort);
+            if (CAT.isDebugEnabled()) {
+	            CAT.debug("xXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx");
+	            CAT.debug(dump());
+	            CAT.debug("xXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx");	           
+	            CAT.debug("addGame:server="+server+"; ip="+serverIp+"; port="+serverPort);
+            }
             Game game = new Game(server, serverIp, serverPort);          
             synchronized (games) {
                 games.add(game);
