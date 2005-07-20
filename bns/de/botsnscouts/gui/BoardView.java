@@ -262,7 +262,7 @@ public class BoardView extends JComponent{
         //dScale = scale;
       //  Bot preCopy = previewRob;
       //  previewRob = null;
-        synchronized (rescaleLock) {
+        synchronized (rescaleLock) {           
 	        deleteScout();
 	        scaledFeldSize = (int) (scale * FELDSIZE);
 	        dScale = scaledFeldSize/((double)FELDSIZE);
@@ -2006,7 +2006,7 @@ public class BoardView extends JComponent{
     }
 
 
-    Rectangle rc = new Rectangle();
+    private Rectangle rcForOrt2Rect = new Rectangle();
     // for internal use. see repaintOrt()
 
     /** Triggert ein Neuzeichnen des Feldes mit den \uFFFDbergebenen
@@ -2014,13 +2014,13 @@ public class BoardView extends JComponent{
      */
 
     void repaintOrt(Location ort) {
-        ort2Rect(ort, rc);        
-        repaint(1, rc.x, rc.y, rc.width, rc.height);
+        ort2Rect(ort, rcForOrt2Rect);        
+        repaint(1, rcForOrt2Rect.x, rcForOrt2Rect.y, rcForOrt2Rect.width, rcForOrt2Rect.height);
     }
 
     void repaintOrt(int x, int y) {
-        ort2Rect(x, y, rc);
-        repaint(1, rc.x, rc.y, rc.width, rc.height);
+        ort2Rect(x, y, rcForOrt2Rect);
+        repaint(1, rcForOrt2Rect.x, rcForOrt2Rect.y, rcForOrt2Rect.width, rcForOrt2Rect.height);
     }
 
     void unhighlight() {
@@ -2180,19 +2180,19 @@ public class BoardView extends JComponent{
     public final Color highCol2 = new Color(255, 255, 0, 128);
 
     private void paintHighlight(Graphics2D g) {
-        Rectangle rc = new Rectangle();
-        ort2Rect(highlightPos, rc);
-        rc.grow(-3, -3);
+        Rectangle rect = new Rectangle();
+        ort2Rect(highlightPos, rect);
+        rect.grow(-3, -3);
         for (int i = 0; i < hi.length; i++) {
             g.setColor(hiColOut[i]);
             g.setStroke(hi[i]);
-            g.drawOval(rc.x, rc.y, rc.width, rc.height);
+            g.drawOval(rect.x, rect.y, rect.width, rect.height);
         }
 
-        Paint p = new GradientPaint(rc.x, rc.y, highCol1, rc.x + rc.width, rc.y + rc.height, highCol2);
+        Paint p = new GradientPaint(rect.x, rect.y, highCol1, rect.x + rect.width, rect.y + rect.height, highCol2);
         g.setPaint(p);
-        rc.grow(-1, -1);
-        g.fillOval(rc.x, rc.y, rc.width, rc.height);
+        rect.grow(-1, -1);
+        g.fillOval(rect.x, rect.y, rect.width, rect.height);
     }
 
 //     private void createOffscreenImage() {

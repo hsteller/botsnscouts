@@ -323,10 +323,10 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
         return strpos + wallString.length();
     }
 
-    private int parseAndCreateFloor(int strpos, String kacheln, Floor[][] floor, int a, int b)
+    private int parseAndCreateFloor(int strpos, String kacheln, Floor[][] somefloor, int a, int b)
             throws FormatException {
         String floorString = Floor.extractFloorDef(strpos, kacheln);
-        floor[a][b] = Floor.getFloor(floorString);
+        somefloor[a][b] = Floor.getFloor(floorString);
         return strpos + floorString.length();
     }
 

@@ -842,9 +842,9 @@ public class HumanPlayer extends BNSThread {
             Bot [] bots = new Bot[nameCount];
             ScalableRegisterRow [] rows = new ScalableRegisterRow[nameCount];
             for (int i=0;i<nameCount;i++){
-                String name = names[i];
-                bots[i] = ausgabe.getBot(name);
-                rows[i] = ausgabe.getInfoRegistersForBot(name);
+                String botname = names[i];
+                bots[i] = ausgabe.getBot(botname);
+                rows[i] = ausgabe.getInfoRegistersForBot(botname);
             }
             humanView.fillPhaseInfoPanel(bots, rows);
         }

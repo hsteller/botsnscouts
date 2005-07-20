@@ -367,8 +367,8 @@ public class Ausgabe extends BNSThread {
         }
     }
 
-    protected Bot getBot(String name) {
-        return (Bot) robots.get(name);
+    protected Bot getBot(String botname) {
+        return (Bot) robots.get(botname);
     }
 
 
@@ -1468,8 +1468,8 @@ public class Ausgabe extends BNSThread {
     
     
     private HashMap robNameToRegisterRowCollection = new HashMap();
-    private ArrayList getRegisterRowsForBot(String name){
-        return (ArrayList) robNameToRegisterRowCollection.get(name);
+    private ArrayList getRegisterRowsForBot(String botname){
+        return (ArrayList) robNameToRegisterRowCollection.get(botname);
     }
 
     private static final int TOOLTIP_REGISTER_INDEX=0;
@@ -1500,8 +1500,8 @@ public class Ausgabe extends BNSThread {
         
     }         
         
-    private ScalableRegisterRow getRegistersForBot(String name, int regIndex){
-        ArrayList list = getRegisterRowsForBot(name);
+    private ScalableRegisterRow getRegistersForBot(String botname, int regIndex){
+        ArrayList list = getRegisterRowsForBot(botname);
         ScalableRegisterRow back=null;
         if (list != null){
             back = (ScalableRegisterRow) list.get(regIndex);
@@ -1510,11 +1510,11 @@ public class Ausgabe extends BNSThread {
       
     
     }
-    protected ScalableRegisterRow getTooltipRegistersForBot(String name){
-        return getRegistersForBot(name, TOOLTIP_REGISTER_INDEX);
+    protected ScalableRegisterRow getTooltipRegistersForBot(String botname){
+        return getRegistersForBot(botname, TOOLTIP_REGISTER_INDEX);
     }
-    protected ScalableRegisterRow getInfoRegistersForBot(String name){
-        return getRegistersForBot(name, INFO_REGISTER_INDEX);
+    protected ScalableRegisterRow getInfoRegistersForBot(String botname){
+        return getRegistersForBot(botname, INFO_REGISTER_INDEX);
     }
   
     private Object waitLock = new Object();

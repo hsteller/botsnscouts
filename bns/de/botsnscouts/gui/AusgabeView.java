@@ -936,7 +936,7 @@ public class AusgabeView extends JPanel  {
         private void createAndAddBotRadioButtons() {
             if (robotStatus!=null){              
                       Enumeration e = robotStatus.elements();
-                       int i=0;
+                      // int i=0;
                       while (e.hasMoreElements()){
                         RobotStatus rs = (RobotStatus) e.nextElement();
                         Bot robot = rs.getRobot();        
@@ -1101,9 +1101,9 @@ public class AusgabeView extends JPanel  {
         init (flagPos);
       }
 
-      void init(Location [] flags) {
-        if (flags!=null){
-          for (int i=0;i<flags.length;i++){
+      void init(Location [] newflags) {
+        if (newflags!=null){
+          for (int i=0;i<newflags.length;i++){
             final int flagNr = i+1;
             JMenuItem flag = new JMenuItem(" #"+flagNr);
             flag.addActionListener(new ActionListener() {
@@ -1116,7 +1116,7 @@ public class AusgabeView extends JPanel  {
             });           
             this.add(flag);
             if (CAT.isDebugEnabled()){
-              CAT.debug("ScrollFlag - added flag: #"+(i+1)+" x:"+flags[i].x+" y:"+flags[i].y);
+              CAT.debug("ScrollFlag - added flag: #"+(i+1)+" x:"+newflags[i].x+" y:"+newflags[i].y);
             }
           }
         }
@@ -1241,11 +1241,11 @@ public class AusgabeView extends JPanel  {
         };
         keyMan.addHotKey(new HotKey(HotKeyConf.HOTKEY_ZOOM_OUT, zoomOut));
 
-        final Location[] flags = gameBoardCanvas.getFlags();
-        int num = flags.length;
+        Location[] finalFlags = gameBoardCanvas.getFlags();
+        int num = finalFlags.length;
 
         for (int i = 0; i < num; i++) {           
-            final Location pos = flags[i];
+            final Location pos = finalFlags[i];
             HotKeyAction showFlagAction = new HotKeyAction() {              
                 public void actionPerformed(ActionEvent ae) {                 
                     showPos(pos.getX(), pos.getY(), true, false);
