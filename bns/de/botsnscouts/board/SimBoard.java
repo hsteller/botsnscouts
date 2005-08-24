@@ -27,9 +27,11 @@ package de.botsnscouts.board;
 
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.log4j.Category;
 import org.apache.log4j.Priority;
 
 import de.botsnscouts.comm.MessageID;
@@ -47,11 +49,18 @@ import de.botsnscouts.util.StatsList;
 /**
  * This board is also able to do phases.
  *
+
+ *     
+ *     
+ * 
+ *
  * @author Dirk Materlik
  *         Id: $Id$
  */
 public class SimBoard extends Board implements Directions {
 
+    private static final Category CAT = Category.getInstance(SimBoard.class);
+    
     private Priority origLevel = null;
 
     private boolean pushersCanPushMoreThanOneBot = false;
@@ -73,7 +82,7 @@ public class SimBoard extends Board implements Directions {
     /**
      * TODO: the server to be notified of every change... This design sucks royally
      */
-    protected Server server;
+    private Server server;
 
     /* The bots that moved so far. Used to notify server */
     protected boolean[] moved;
@@ -186,9 +195,18 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void sendCollectedMsgs() {
-        if (server != null) {
-            while (msgIdsQ.size() > 0) {
-                server.sendMsg((String) msgIdsQ.remove(0), (String[]) msgArgsQ.remove(0));
+        if (server != null) {  
+            try {
+	            while (msgIdsQ.size() > 0) {
+	                server.sendMsg((String) msgIdsQ.remove(0), (String[]) msgArgsQ.remove(0));
+	            }
+            }
+            catch (NullPointerException ne){
+                // now that is ugly, but safer than "while (server !=null && msgIdsQ..)"
+                // (if someone shuts down the server, our server will become null while
+                //   we are in the loop.. and I don't want to do synchronization here/because of that) 
+                CAT.warn("NullPointerException while sending messages;"+
+                                " I guess someone shut down the server..", ne);                                  
             }
         }
     }
@@ -489,7 +507,6 @@ public class SimBoard extends Board implements Directions {
     
     private boolean moveRobOne(BoardBot[] robbis, int rob, int direction, boolean pushOthers, boolean hack_isCollisionMove) {
         BoardBot currentBot = robbis[rob];
-        CAT.debug(currentBot);
         if (currentBot.getDamage() >= 10) {
             return false;
         }
@@ -549,9 +566,9 @@ public class SimBoard extends Board implements Directions {
             //fourth, commit the change if we reach this point            
             currentBot.setPos(xx, yy);
             // the setting of currentBot.xx and currentBot.yy is necessary here if pushersCanPushMultiple is 
-            // true and this method here was called by doPushers(): without updating currentBot.xx and 
-            // currentBot.yy the following "doIntended()" call in doPushers() would move the robot back to 
-            // (xx,yy), sending a movement message with the wrong direction to the clients
+            // true and this method here was called by doPushers(): 
+            // without updating currentBot.xx and currentBot.yy a subsequent "doIntended()" call in doPushers() 
+            // will move the robot back to  (xx,yy), sending a movement message with the wrong direction to the clients
             currentBot.xx = xx;
             currentBot.yy = yy;
             //in that case, the robot has actually moved a square
@@ -651,12 +668,21 @@ public class SimBoard extends Board implements Directions {
             }
         }
       //  checkForPitVictims(bots, true);
+        if (CAT.isDebugEnabled()) {
+            CAT.debug("ROBOTS BEFORE:");
+            CAT.debug(Global.arrayToString(bots));
+        }
+        doBeltsCollisionCheck(bots);       
+        if (CAT.isDebugEnabled()) {
+            CAT.debug("++++++++++++++++++++++++++++++++");
+            CAT.debug(Global.arrayToString(bots));
+        }
         doIntended(bots);
         checkForPitVictims(bots, false);
     }
 
     private void doBelts(BoardBot[] bots) {
-        initIntendedValues(bots); // saving current location and facing to BoarBot.xx, BoardBot.yy, BoardBot.aa
+        initIntendedValues(bots); // saving current location and facing to BoardBot.xx, BoardBot.yy, BoardBot.aa
         for (int i = 0; i < bots.length; i++) {
             Floor floor = floor(bots[i].getX(), bots[i].getY());
             if (floor.isBelt()) {
@@ -664,6 +690,7 @@ public class SimBoard extends Board implements Directions {
             }
         }
         //checkForPitVictims(bots, true);
+        doBeltsCollisionCheck(bots);
         doIntended(bots);
         checkForPitVictims(bots, false);
     }
@@ -714,6 +741,88 @@ public class SimBoard extends Board implements Directions {
             }
         }
     }
+    
+    /**
+     * PROBLEM: "doBelts" and "doIntended" can create illegal moves because there is no check for pushing 
+     *  in "doBelts"; "doBelts" only checks for walls and the collision checks in "doIntended" fail in certain 
+     *  "belt-related" circumstances:
+     *   Suppose we have an east movind belt that ends at a wall:      ->>>>>>| 
+     *  Let there be three bots (A,B,N) on the belt                              ->>>ABN|
+     *   What will happen:
+     *   1. in doBelts() there won't be an "intended move" of bot N as the wall blocks it -> ok
+     *   2. in "doIntended()" the bot B won't move because its neighbour N 
+     *       has no intended move (==is blocked) and so the target field of B's move is blocked
+     *       -> ok
+     *   3.  BUT:  "doIntended" will move A onto the same field as B, not recognizing that B's 
+     *                 intended move got blocked
+     *        -> A and B and up on the same position -> NOT OK
+     *    
+     * SOLUTION: I don't want to add a check for this to "doIntended()" as it might be wrong
+     *                  if there are not belts involved and/or it might create the wrong results if we
+     *                  iterate in different orders through the robots; I'm too lazy to think about/check
+     *                  all possible problems, so the simplest solution will be to call this method before
+     *                  "doIntended" in the do[Express]Belts methods.
+     *                   
+     *   It is supposed fix the above problem by resetting B's intended move..               
+     * 
+     * @param robbis
+     */
+    private void doBeltsCollisionCheck(BoardBot [] robbis) {
+        int roboCount = robbis.length;
+        int [] intendedMoveDirections = new int [roboCount];
+        boolean [] botMoved = new boolean [roboCount];
+        HashSet blockedPositions = new HashSet();
+        boolean moveBlocked = false;
+        for (int i=0;i<roboCount;i++){
+            intendedMoveDirections[i] = robbis[i].getIntendedMoveDirection();    
+            botMoved[i] = intendedMoveDirections[i]!=DUMMY_DIRECTION;
+            if (!botMoved[i]){
+                // robot will keep its old position
+                blockedPositions.add(robbis[i].getPos());
+                moveBlocked = true;
+            }
+        }
+        if (CAT.isDebugEnabled()) {
+            CAT.debug("intendedDirs: "+Global.arrayToString(intendedMoveDirections));
+       
+            CAT.debug("botMoved: "+Global.arrayToString(botMoved));       
+            CAT.debug("blockedPositions:"+Global.collectionToString(blockedPositions));
+        }
+
+        while (moveBlocked) {
+            boolean foundAnotherBlockedPosition = false;
+	        for (int i = 0; i < roboCount; i++){
+	            if (botMoved[i]) { // no need to check the non-moving bots
+		            BoardBot bot = robbis[i];
+		            Location intendedNewPos = new Location (bot.xx, bot.yy);
+		            if (blockedPositions.contains(intendedNewPos)){
+		                // the target of the current bot's move is blocked
+		                // => reset the intended move
+		                bot.xx = bot.getX();
+		                bot.yy = bot.getY();
+		                // if the belt has a curve it would have turned the bot in it's intended move
+		                // => also reset a possible change of the bot's facing:
+		                if (bot.getTempFacing()!= DUMMY_DIRECTION) {
+		                    bot.setTempFacing(DUMMY_DIRECTION, DUMMY_DIRECTION);
+		                }	                		                
+		                botMoved[i]=false; // don't check this bot again, it's intended move is gone
+		                // adding the bot's position to the list of blocked Positions:		                
+		                blockedPositions.add(bot.getPos());
+		                // we found another blocked position so we have to check the other intended moves 
+		                // for a possible problem with this new blocked position as it didn't yet exist in the
+		                // previous loop iterations
+		                foundAnotherBlockedPosition = true;
+		                // as we have to do the for-loop again with the updated block list, we might as well 
+		                // jump out of the loop now to avoid a few unnecessary loop iterations
+		                break; 
+		            }
+	            }
+	        }
+	        // re-check the intended moves if we found a blocked position that didn't exist before 
+	        moveBlocked = foundAnotherBlockedPosition;
+
+        }  
+    }
 
     private void initIntendedValues(BoardBot[] robbis) {
         int rsize = robbis.length;
@@ -724,7 +833,18 @@ public class SimBoard extends Board implements Directions {
             bot.setTempFacing( bot.getFacing(), DUMMY_DIRECTION);
         }
     }
-
+    /*TODO there are some open questions regarding rules, I think:
+        * 1. multiple pushers (active in the same phase) on one field;
+        *     for example: one at the north wall, one at the east wall
+        *     => will a robot be pushed to the south or to the west?
+        * 2. pushers (active in the same phase) with the same "push-to field":
+        *     example: one pusher pushes to the south, another to the west;
+        *                   both will push a robot onto the same field.
+        *                   Now, if bot pushers have to push a bot: what to do?
+        *                   - Select one pusher that pushes first?
+        *                   - No pushing at all?
+        *                   ..our code _might_ merge them on the same field.. 
+        */     
     private void doPushers(int phase, BoardBot[] robbis) {
         initIntendedValues(robbis);
         for (int i = 0; i < robbis.length; i++) {
@@ -751,7 +871,6 @@ public class SimBoard extends Board implements Directions {
         doIntended(robbis);
         checkForPitVictims(robbis, false);
     }
-
     private void doIntended(BoardBot[] robbis) {
         int roboCount = robbis.length;
         boolean[] robmove = new boolean[roboCount];
@@ -783,19 +902,7 @@ public class SimBoard extends Board implements Directions {
                 // if there are no objections we can execute the intended move 
                 BoardBot currentBot = robbis[i];
     
-                int direction = DUMMY_DIRECTION;
-                if (currentBot.yy> currentBot.getY()){
-                    direction = NORTH;
-                }                
-                else if (currentBot.yy < currentBot.getY()) {
-                    direction = SOUTH;
-                }
-                else if (currentBot.xx<currentBot.getX()){
-                    direction = WEST;
-                }
-                else if (currentBot.xx>currentBot.getX()){
-                    direction = EAST;
-                }
+                int direction = currentBot.getIntendedMoveDirection();
                 currentBot.setPos(currentBot.xx, currentBot.yy);
                 if (direction != DUMMY_DIRECTION) {
                     ausgabenMsgString2(MessageID.BOT_MOVE, "" + currentBot.getName(), direction + "");
@@ -814,7 +921,68 @@ public class SimBoard extends Board implements Directions {
             }
         }
     }
-
+    
+  /*  private void doIntended(BoardBot[] robbis) {
+        int roboCount = robbis.length;
+        boolean[] robmove = new boolean[roboCount];
+        
+        for (int i = 0; i < roboCount; i++) {
+            robmove[i] = true;
+           
+        }
+        
+        for (int rob1 = 0; rob1 < roboCount; rob1++) {
+            for (int rob2 = rob1 + 1; rob2 < roboCount; rob2++) {
+                if ((!robbis[rob1].isVirtual()) && (!robbis[rob2].isVirtual())) { 
+                    // both are non-virtual
+                    if ((robbis[rob1].xx == robbis[rob2].xx) && (robbis[rob1].yy == robbis[rob2].yy)) {
+                        // both non-virtuals would have the same position after intended move->not good
+                        robmove[rob1] = false;
+                        robmove[rob2] = false;
+                    }
+                    if ((robbis[rob1].getX() == robbis[rob2].xx) && (robbis[rob1].getY() == robbis[rob2].yy)
+                                    // above: rob1 occupies the position that rob2 wants to move to
+                                    // below: rob2 occupies the position that rob1 wants to move to
+                           && (robbis[rob2].getX() == robbis[rob1].xx) && (robbis[rob2].getY() == robbis[rob1].yy)) {
+                        // um, not sure what happens here...
+                        // looks like a check to avoid robots switching their positions 
+                        // (I guess to avoid a non-virtual bot moving through another non-virtual?!?) 
+                        robmove[rob1] = false;
+                        robmove[rob2] = false;
+                    }
+                }
+            }
+        }
+       
+        
+        for (int i = 0; i < roboCount; i++) {
+            if (robmove[i]) {  // if there are no objections we can execute the intended move
+                BoardBot currentBot = robbis[i];
+                currentBot.setPos(currentBot.xx, currentBot.yy);
+                int direction = currentBot.getIntendedMoveDirection(); 
+                if ( direction != DUMMY_DIRECTION) {
+                        // bot has moved->notify clients
+                        ausgabenMsgString2(MessageID.BOT_MOVE, "" + currentBot.getName(),
+                                        				direction + "");
+                }
+                
+              
+                if (currentBot.getTempFacing() != DUMMY_DIRECTION) {
+                    // bot has turned
+                    currentBot.setFacing(currentBot.getTempFacing());
+                    int turnDirection = currentBot.getLastTempRotateDirection();       
+                    if (turnDirection != DUMMY_DIRECTION) {
+                        ausgabenMsgString2(MessageID.BOT_TURN,currentBot.getName(), ""+turnDirection);
+                    }
+                    currentBot.setTempFacing(DUMMY_DIRECTION, DUMMY_DIRECTION);
+                }
+                moved[i] = true;
+            }
+        }
+    }
+*/
+   
+    
     private void doRotatingGears(BoardBot[] robbis) {
         for (int i = 0; i < robbis.length; i++) {
             Floor floor = floor(robbis[i].getX(), robbis[i].getY());
@@ -1222,7 +1390,7 @@ public class SimBoard extends Board implements Directions {
     }
     
     public void setServer(Server serv){
-        	this.server = null;
+        	this.server = serv;
     }
     
     public void setPusherCanPushMoreThanOneBot(boolean wellCanThey){
