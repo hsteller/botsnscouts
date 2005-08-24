@@ -26,6 +26,7 @@
 package de.botsnscouts.board;
 
 import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Directions;
 
 public class BoardBot extends Bot {
 
@@ -59,10 +60,14 @@ public class BoardBot extends Bot {
     }
 
     /**
-     *  Temporary, "intended" positions for the bot. Only used internally by
+     *  X-coordinate of temporary, "intended" position for the bot. Only used internally by
      *  SimBoard.
      */
     protected int xx;
+    /**
+     *  Y-coordinate of temporary, "intended" position for the bot. Only used internally by
+     *  SimBoard.
+     */
     protected int yy;
     /** Temporary facing */
     private  int aa;
@@ -93,6 +98,30 @@ public class BoardBot extends Bot {
         return lastRotateDirection;
     }
     
+    /**
+     * Uses the current position of the bot and its intended position (this.xx, this.yy)
+     * to determinen in which direction the robot will move.
+     * If there is no movement (if xx=getX() && yy ==getY()) 
+     * de.botsncouts.util.Directions.DUMMY_DIRECTION will be returned
+     * @return one of the direction constants from de.botsncouts.util.Directions; 
+     * might be Directions.DUMMY_DIRECTION
+     */
+    protected int getIntendedMoveDirection() {
+        int direction = Directions.DUMMY_DIRECTION;
+        if (this.yy> this.getY()){
+            direction = Directions.NORTH;
+        }                
+        else if (this.yy < this.getY()) {
+            direction = Directions.SOUTH;
+        }
+        else if (this.xx<this.getX()){
+            direction = Directions.WEST;
+        }
+        else if (this.xx>this.getX()){
+            direction = Directions.EAST;
+        }
+        return direction;
+    }
     
 
     public void dumpZug() {
