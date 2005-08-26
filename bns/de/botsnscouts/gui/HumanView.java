@@ -108,6 +108,7 @@ public class HumanView extends JPanel  {
         panelSwitcher.add(phaseInfo, PANEL_PHASE_EVAL);
         panelSwitcher.add(gameOverPanel, PANEL_GAMEOVER);
         panelSwitcher.add(userInfo, PANEL_USERINFO);
+        panelToShow = PANEL_USERINFO;
         showPanel(PANEL_USERINFO);
         
     }
@@ -160,7 +161,7 @@ public class HumanView extends JPanel  {
             public void actionPerformed(ActionEvent ae) {
                 int direct = Integer.parseInt(ae.getActionCommand());               
                 sendDirection(direct);
-               // done in sendDirection now setDialogInSidebarActive(false);
+               // done in sendDirection now: setDialogInSidebarActive(false);
             }
         });
     }
@@ -407,7 +408,7 @@ public class HumanView extends JPanel  {
     protected void sendDirection(int d) {
         human.sendDirection(d);
         setDialogInSidebarActive(false);
-        showMessageToPlayer(Message.say("SpielerMensch", "mkartenMisch"));
+        showMessageToPlayer(Message.say("SpielerMensch", "mrelax"));
     }
 
     protected void sendAgainPowerDown(boolean again) {
