@@ -624,11 +624,7 @@ public class SimBoard extends Board implements Directions {
      * Destroy a bot (invalidate position, set damage to 10)
      */
     private void destroyBot(BoardBot thorsten) {
-        thorsten.setDamage(10);
-        thorsten.setVirtual();
-        thorsten.setInvalidPos();
-        thorsten.xx = 0;
-        thorsten.yy = 0;
+        thorsten.destroyBot();
     }
 
     private void turnBot(BoardBot robbi, int rotationDirection) {
@@ -1287,11 +1283,7 @@ public class SimBoard extends Board implements Directions {
                         ausgabenMsgString("mRepFlag", robbis[i].getName());
                     }
                 }
-            }
-
-            if (robbis[i].getDamage() < 0) {
-                robbis[i].setDamage(0);
-            }
+            }   
         }
     } // doRepairs
 
@@ -1339,6 +1331,8 @@ public class SimBoard extends Board implements Directions {
      * Lock registers if damage sufficiently high
      */
     private void lockRegisters(BoardBot robbi) {
+        // TODO could be done in BoardBot.incDamage()
+        
         //d("registerSperren called mit "+robbi.getName());
 
         if (robbi.getDamage() >= 10) {
