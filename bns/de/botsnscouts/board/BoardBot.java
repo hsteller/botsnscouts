@@ -123,6 +123,36 @@ public class BoardBot extends Bot {
         return direction;
     }
     
+    
+    /** Increment damage by one 
+     * WARNING: won't lock any registers
+     * */  
+    public void incDamage() {        
+        this.damage++;
+    }
+    
+    /** Reduces the damage (==repairs the bot).
+     *   WARNING: won't unlock any registers
+     *   NOTE: the damage will not become less than zero
+     *      * @param i the amount of damage points to decrease by
+     */
+    public void decrDamage(int i) {
+        damage -= i;
+        if (damage < 0){
+            damage = 0;
+        }
+    }
+    
+    /** Sets damage to 10,  the position to somewhere outside of the board
+     *  and the bot to virtual.    
+     */
+    public void destroyBot(){      
+	    this.damage = 10;
+	    this.setVirtual();
+	    this.setInvalidPos();       
+        this.xx = 0;
+        this.yy = 0;
+    }
 
     public void dumpZug() {
         for (int i = 0; i < move.length; i++) {
