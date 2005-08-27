@@ -1,3 +1,12 @@
+
+
+- beautify of register tooltips
+
+- bug: do something against the server deadlock if a player(or only the view?) quits
+       during phase evaluation; maybe the server waits for some ACK?
+
+- explicit notifying of views if someone has lost all lives
+
 DONE - BUG: to quote myself:
   "Btw. there is another bug that isn't mentioned anywhere:
    try to not damage a powered-down human player that he
@@ -8,7 +17,7 @@ DONE - BUG: If there are more than two bots on a belt (and there is a wall on th
   end of the belt) the belt can "merge" non-virtual bots so that there
   are two non-virtuals on the same position
 
-- BUG: something is wrong with the advanced tooltips that are used to show
+DONE - BUG: something is wrong with the advanced tooltips that are used to show
   the last programming (so one can see the content of locked registers):
   * always: the very first try to see the tooltips fails, the tooltip
     is only a few pixels high (probably empty) 
