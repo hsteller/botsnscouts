@@ -1505,7 +1505,7 @@ public class Ausgabe extends BNSThread {
             ArrayList list = new ArrayList(2);
             if (bots [i] !=null) {
                 // tooltip:
-                ScalableRegisterRow row1 = new ScalableRegisterRow(0.3);
+                ScalableRegisterRow row1 = new ScalableRegisterRow(0.3,false, 10);
                // row1.useCardBacksideForEmptyRegisters();
                 list.add(TOOLTIP_REGISTER_INDEX,row1); 
                 // info panel:

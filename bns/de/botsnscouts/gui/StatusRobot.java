@@ -9,6 +9,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -29,9 +30,12 @@ import javax.swing.JWindow;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.ToolTipManager;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
 
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.ColoredPanel;
 import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJPanel;
 
@@ -47,6 +51,7 @@ public class StatusRobot extends JButton {
     // it should not only show a text ("click robot to..") but also show the robots registers
     // (including the current cards)     
     private TJPanel registerPanel= new TJPanel();    
+    //private ColoredPanel registerPanel= new ColoredPanel();
     private ScalableRegisterRow registers;
     private MouseListener customTooltipTrigger;
     
@@ -167,12 +172,24 @@ public class StatusRobot extends JButton {
             this.registers = null;
         }
         else if (this.registers == null) {       
-            this.registers = robsRegisters;          
+            this.registers = robsRegisters;        
+             
             this.registers.setOpaque(false);           
             registerPanel.setLayout(new BorderLayout());
-            
-            TJLabel pseudoTooltipText = new TJLabel(Message.say("RobotInfo", "botPos", robot.getName()));
-            registerPanel.add(pseudoTooltipText, BorderLayout.NORTH);                       
+            Border inner = BorderFactory.createEmptyBorder(5,5,5,5);
+            Border outer = BorderFactory.createEtchedBorder(EtchedBorder.RAISED, Color.GRAY, Color.GRAY);
+            Border both = BorderFactory.createCompoundBorder(outer,inner);            
+            registerPanel.setBorder(both);
+          // Border inner2 =  BorderFactory.createEmptyBorder(10,0,0,0);
+             Border outer2 = BorderFactory.createMatteBorder(2,0,0,0,Color.GRAY);
+         //   registers.setBorder(BorderFactory.createCompoundBorder(outer2,inner2));  
+             registers.setBorder(outer2);
+             registers.setInsets(new Insets(10,5,5,5));
+             TJLabel pseudoTooltipText = new TJLabel(
+                            Message.say("RobotInfo", "botPos", robot.getName())
+                            );
+           
+            registerPanel.add(pseudoTooltipText, BorderLayout.NORTH);                                   
             registerPanel.add(registers, BorderLayout.CENTER);
             customTooltipTrigger = new ToolTipAdapter(/*this,*/ registerPanel,0,20);
        
