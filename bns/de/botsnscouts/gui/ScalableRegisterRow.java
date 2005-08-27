@@ -7,11 +7,13 @@ package de.botsnscouts.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -22,6 +24,7 @@ import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.ImageMan;
+import de.botsnscouts.widgets.TJLabel;
 
 /**
  * @author Hendrik Steller
@@ -33,6 +36,7 @@ public class ScalableRegisterRow extends JPanel {
     
     private double scale = 1;
     private boolean isVertical = false;
+    private Insets insets = new Insets(5,5,5,5);
     
     private ScalableRegView [] phases = new ScalableRegView[Bot.NUM_REG];
     
@@ -59,15 +63,17 @@ public class ScalableRegisterRow extends JPanel {
         else {
             GridLayout lay = new  GridLayout(1,phaseCount);
             lay.setHgap(gap);
-            this.setLayout(lay);            
+            this.setLayout(lay);              
         }
+        
         for (int i=0;i<phaseCount;i++){
             ScalableRegView rv = new ScalableRegView(scale); 
             phases[i]  = rv;
             rv.setScale(scale);
             rv.setVisible(true);           
             add(rv,i);
-        }           
+        }      
+      //  this.setBorder(BorderFactory.createLineBorder(Color.RED));
        
     }
     
@@ -229,7 +235,14 @@ public Dimension getPreferredSize() {
    }
 
    
-  
+  public Insets getInsets(){
+     return insets;
+  }
+  public void setInsets(Insets in){
+      insets = in;
+      revalidate();
+  }
+   
     
     public static void main(String[] args) {
 	        JFrame fr = new JFrame("RegRowTest");

@@ -117,7 +117,7 @@ public class ScalableRegView extends JComponent {
         return scale;
     }
     
-    private static final AlphaComposite AC_SRC_OVER_05 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f);
+//    private static final AlphaComposite AC_SRC_OVER_05 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f);
     public void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D)g;               
         g2.scale(scale,scale);                                      
@@ -155,7 +155,7 @@ public class ScalableRegView extends JComponent {
                 int thickness = 8;
                 g2.fillRect(0,0,thickness,bgHeight+1); // left side
                  g2.fillRect(bgWidth+1-thickness,0,thickness,bgHeight+1); // right side
-                int horiWidth  =bgWidth-2*thickness;
+              //  int horiWidth  =bgWidth-2*thickness;
                 g2.fillRect(0,0,bgWidth,thickness); // top
                 g2.fillRect(0,bgHeight+1-thickness,bgWidth,thickness);//bottom
                
