@@ -836,7 +836,10 @@ public class HumanPlayer extends BNSThread {
         else {
             CAT.warn("view.initialize returned false");
         }
-        try {
+        
+        humanView.addPhaseInfoPanel(ausgabe.getAusgabeView().getPhaseEvalPanel());
+       
+        /*try {
             String [] names = comm.getNamen();
             int nameCount = names!=null?names.length:0;
             Bot [] bots = new Bot[nameCount];
@@ -850,7 +853,7 @@ public class HumanPlayer extends BNSThread {
         }
         catch (KommException ke){
             CAT.error(ke.getMessage(), ke);
-        }
+        }*/
         
     }
 

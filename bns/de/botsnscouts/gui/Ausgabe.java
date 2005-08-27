@@ -41,6 +41,7 @@ import javax.swing.JFrame;
 
 import org.apache.log4j.Category;
 
+
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.comm.ClientAntwort;
@@ -843,10 +844,29 @@ public class Ausgabe extends BNSThread {
 
     private void comMsgHandleRobotRemoved(ClientAntwort kommAntwort) {
         try {
-            Bot actual = kommClient.getRobStatus(kommAntwort.namen[1]);
+            String botname = kommAntwort.namen[1];
+            Bot actual = kommClient.getRobStatus(botname);
             robots.put(kommAntwort.namen[1], actual);
-            ausgabeView.showUpdatedRobots(getRoboterArray());
-
+            Bot [] bots = getRoboterArray();
+            ausgabeView.showUpdatedRobots(bots);
+            
+            // stuff for updating the PhaseEvalPanel
+            int size = bots.length;
+            int sizeNew = Math.max(0,size-1);
+            Bot [] botsWithoutRemoved = new Bot[sizeNew];
+            ScalableRegisterRow [] rowsWR = new ScalableRegisterRow[sizeNew];
+            int counter =0;
+            for (int i=0;i<size;i++){
+                Bot cur = bots[i];
+                if (cur!=actual){
+                    botsWithoutRemoved[counter] = cur;
+                    rowsWR [counter]=getInfoRegistersForBot(cur.getName()); 
+                    ++counter;
+                }
+            }
+            ausgabeView.getPhaseEvalPanel().setContents(botsWithoutRemoved, rowsWR);
+            
+            
         } catch (KommFutschException ke) {
             CAT.error(ke.getMessage(), ke);
         } catch (KommException kE) {
@@ -1499,6 +1519,9 @@ public class Ausgabe extends BNSThread {
         }
         
     }         
+    
+    
+    
         
     private ScalableRegisterRow getRegistersForBot(String botname, int regIndex){
         ArrayList list = getRegisterRowsForBot(botname);

@@ -85,6 +85,7 @@ public class AusgabeView extends JPanel  {
     private final static long SHOW_MESSAGE_DELAY=300;
 
     // --- objects
+    private PhaseEvaluationPanel phaseInfo=new PhaseEvaluationPanel(); 
     private JScrollPane gameBoardScrollPane;
     private JViewport gameBoardView;
     private BoardView  gameBoardCanvas;
@@ -161,8 +162,11 @@ public class AusgabeView extends JPanel  {
 		setLayout(new BorderLayout());
 
 		// create status panel
-		for (int i = 0; i < robots.length; i++) {
-			final String robotName = robots[i].getName();
+		ScalableRegisterRow [] phaseEvalRows = new ScalableRegisterRow[robots.length];
+		for (int i = 0; i < robots.length; i++) {		
+		    final String robotName = robots[i].getName();
+		    // not for the status panel, but while I am already looping over the bots..
+		    phaseEvalRows[i] = ausgabe.getInfoRegistersForBot(robotName);		    
 			RobotInfo r = new RobotInfo(robots[i], flagCount, ausgabe.getTooltipRegistersForBot(robotName));
 			r.addRobotInfoListener(new RobotInfoListener() {
 				public void robotClicked(RobotInfoEvent rie) {
@@ -197,6 +201,8 @@ public class AusgabeView extends JPanel  {
 			robotCardStatus.put(robots[i].getName(), rc);
 		}
 
+		phaseInfo.setContents(robots, phaseEvalRows);
+		
 		this.northPanel.setLayout(new BorderLayout());
 		northPanel.setOpaque(false);
 		northPanel.add(robotsStatusContainer, BorderLayout.WEST);
@@ -537,6 +543,12 @@ public class AusgabeView extends JPanel  {
     }
 
 
+    
+    
+    public PhaseEvaluationPanel getPhaseEvalPanel(){
+        return phaseInfo;
+    }
+    
     public BoardView getBoardView() {
       return gameBoardCanvas;
     }

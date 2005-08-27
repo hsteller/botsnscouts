@@ -66,7 +66,7 @@ public class HumanView extends JPanel  {
 
    
     private UserInfo userInfo = new UserInfo();
-    private PhaseEvaluationPanel phaseInfo=new PhaseEvaluationPanel(); 
+    private PhaseEvaluationPanel phaseInfo;//=new PhaseEvaluationPanel(); 
     private ZielfahneErreicht gameOverPanel = new ZielfahneErreicht();
     private RepairRegisters regRepairPanel;
     
@@ -85,6 +85,7 @@ public class HumanView extends JPanel  {
 
     public HumanView(HumanPlayer hp) {
         human = hp;
+       
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));                         
         wisenheimerView = createWisenheimerHome();
         regRepairPanel = createRegisterRepairPanel();
@@ -105,7 +106,7 @@ public class HumanView extends JPanel  {
         panelSwitcher.add(createPowerDownPanel(), PANEL_POWERDOWN);
         panelSwitcher.add(createCardAndRegisterPanel(), PANEL_REGISTERS);
         panelSwitcher.add(regRepairPanel, PANEL_REPAIR);
-        panelSwitcher.add(phaseInfo, PANEL_PHASE_EVAL);
+        //panelSwitcher.add(phaseInfo, PANEL_PHASE_EVAL);
         panelSwitcher.add(gameOverPanel, PANEL_GAMEOVER);
         panelSwitcher.add(userInfo, PANEL_USERINFO);
         panelToShow = PANEL_USERINFO;
@@ -223,15 +224,23 @@ public class HumanView extends JPanel  {
     }
     
 
-    protected void fillPhaseInfoPanel(Bot [] robs, ScalableRegisterRow[]registerRows){
+    protected void addPhaseInfoPanel(PhaseEvaluationPanel pI){
+        this.phaseInfo = pI;
+        panelSwitcher.add(this.phaseInfo, PANEL_PHASE_EVAL);                
+    }
+    
+   /* protected void fillPhaseInfoPanel(Bot [] robs, ScalableRegisterRow[]registerRows){
+        
         phaseInfo.setContents(robs, registerRows);
         
-    }
+    }*/
     
     /** Tell PhaseInfoPanel to cover all cards (show their backsides)     
      */
     protected void hidePhaseInfoCards() {
-        phaseInfo.hideAll(true);
+        if (phaseInfo != null) {            
+            phaseInfo.hideAll(true);
+        }
         
     }  
   
