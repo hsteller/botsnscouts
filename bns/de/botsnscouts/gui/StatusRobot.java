@@ -3,12 +3,16 @@ package de.botsnscouts.gui;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Composite;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -16,11 +20,20 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
+import javax.swing.JWindow;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
+import javax.swing.ToolTipManager;
 
 import de.botsnscouts.util.Bot;
+import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJPanel;
 
 
 public class StatusRobot extends JButton {
@@ -29,6 +42,13 @@ public class StatusRobot extends JButton {
     Bot robot;
 
     boolean turnPicAccordingToFacing = true;
+    
+    // The following three objects are needed for the "advanced tooltip" this class has:
+    // it should not only show a text ("click robot to..") but also show the robots registers
+    // (including the current cards)     
+    private TJPanel registerPanel= new TJPanel();    
+    private ScalableRegisterRow registers;
+    private MouseListener customTooltipTrigger;
     
     public StatusRobot( Icon bigBot, Icon smallBot ) {
         this( bigBot, smallBot, null );
@@ -47,6 +67,8 @@ public class StatusRobot extends JButton {
         setOpaque( false );
         setRolloverEnabled( false );
         setFocusable(false);
+      
+        
     }
 
     public StatusRobot() {
@@ -133,62 +155,78 @@ public class StatusRobot extends JButton {
     }
     
   
-    
-	public void setToolTipText(String text) {
-	    if(registerToolTip!=null) {
-	        //registerToolTip.setTipText(text);
-	        registerToolTip.setTheText(text);
-	       
-	    }
-	    
-	  super.setToolTipText(""); // DON'T ASK!!
-	  // 1. without calling this method (or passing null) there is no Tooltip, due to 
-	  //     Java's internal working (ToolTipManager registration
-	  // 2. WITH CALLING: 
-	  //     the text will be shown..but only if the JLabel registerToolTip.text
-	  //     is set, resulting in the text being shown TWIC
-	 // 
-	  // I mean, WHAT THE F____ ?!?!??!?
-	  //
-	  // don't get me started on the influence an uncommented getToolTipText() might have..
-	   
-	        
-	} 
+    protected void notifyOfRobRemoval(){
+        
+        removeCustomToolTipMouseAdapter();
+        setRoboRegisters(null);
+    }
 	
-/*
-	public String getToolTipText() {
-	 
-	   if(registerToolTip!=null) {
-	        return registerToolTip.getTipText();
-	    }
-	    else  {
-	        return super.getToolTipText();
-	    }
-	}
-*/
 
+    public void setRoboRegisters(ScalableRegisterRow robsRegisters){
+        if (robsRegisters == null) {
+            this.registers = null;
+        }
+        else if (this.registers == null) {       
+            this.registers = robsRegisters;          
+            this.registers.setOpaque(false);           
+            registerPanel.setLayout(new BorderLayout());
+            
+            TJLabel pseudoTooltipText = new TJLabel(Message.say("RobotInfo", "botPos", robot.getName()));
+            registerPanel.add(pseudoTooltipText, BorderLayout.NORTH);                       
+            registerPanel.add(registers, BorderLayout.CENTER);
+            customTooltipTrigger = new ToolTipAdapter(/*this,*/ registerPanel,0,20);
+       
+            this.addMouseListener(customTooltipTrigger);
+        }
+        
+    }
     
-    private RegisterToolTip registerToolTip = null;
-    public void setToolTip(RegisterToolTip regTip, boolean useOldText){
-   /*  if (useOldText && regTip != null) {
-             String oldTip = getToolTipText();
-             regTip.setTipText(oldTip);
-             
-     }*/
-         registerToolTip = regTip;
-         //super.setToolTipText(regTip.getTipText());
+    private void removeCustomToolTipMouseAdapter(){
+        this.removeMouseListener(customTooltipTrigger);
     }
    
-    public JToolTip createToolTip(){       
-        //return new RegisterToolTip(new ScalableRegisterRow(0.3));
-      if (registerToolTip == null) {
-            return null;//super.createToolTip();
+    class ToolTipAdapter extends MouseAdapter {  
+        
+        private Popup registerPopup;
+      //  private JComponent popupOwner;
+        private JComponent compToShow;
+        private int xoff;
+        private int yoff;
+        private PopupFactory popFactory = PopupFactory.getSharedInstance();
+        
+        public ToolTipAdapter(/*JComponent owner, */JComponent toShow, int yoff, int xoff){
+        //    popupOwner = owner;
+            compToShow = toShow;
+            this.xoff = xoff;
+            this.yoff = yoff;
+        }
+        
+        public void 	mouseEntered(MouseEvent e){
+            int x = xoff;
+            int y  = yoff;            
+            Point relativePoint = e.getPoint();
+            x+=relativePoint.x;
+            y+=relativePoint.y;
             
+            Component source = e.getComponent();
+            if (source != null) {
+                Point p = source.getLocationOnScreen();
+                x+=p.x;
+                y+=p.y;
+            }
+            registerPopup = popFactory.getPopup(source, compToShow,x,y);
+            
+            registerPopup.show();
+         }
+        
+        public void 	mouseExited(MouseEvent e) {
+                registerPopup.hide();
+        
         }
-        else {
-            return registerToolTip;
-        }
-   }
-    
+        
+        
+        
+        
+    }
 
 }

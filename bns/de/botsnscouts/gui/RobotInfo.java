@@ -93,7 +93,8 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         flagBar2 = new FlagBar(flagCount);
         statusRobot1 = new StatusRobot(big, small, r);
         if (regsOfR_forStatusTooltip != null) {
-            statusRobot1.setToolTip(new RegisterToolTip(regsOfR_forStatusTooltip), true);
+           // statusRobot1.setToolTip(new RegisterToolTip(regsOfR_forStatusTooltip), true);
+            statusRobot1.setRoboRegisters(regsOfR_forStatusTooltip);
         }
         diskButton1 = new JButton();
         diskButton1.setIcon( new ImageIcon(getDisk()) );
@@ -139,7 +140,8 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
 
         diskButton1.setToolTipText(Message.say("RobotInfo", "archive",robot.getName()));
         flagBar2.setToolTipText(Message.say("RobotInfo", "nextFlag", robot.getName()));
-        statusRobot1.setToolTipText(Message.say("RobotInfo", "botPos", robot.getName()));
+       // statusRobot got an advanced "tooltip" => no "normal" tooltip anymore
+        // statusRobot1.setToolTipText(Message.say("RobotInfo", "botPos", robot.getName()));
         damageBar1.setToolTipText(Message.say("RobotInfo", "damage", robot.getName(),""+robot.getDamage()));
    
         // flagBar2, statusRobot1,damageBar1 should not be focusable either;
@@ -363,6 +365,12 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     }
     public void setDead(boolean newDead) {
         dead = newDead;
+        if (dead) {
+            CAT.debug("NOTIFY OF DEATH: "+robot.getName());
+            statusRobot1.notifyOfRobRemoval();
+            
+        }
+        
     }
     public boolean isDead() {
         return dead;
