@@ -57,12 +57,13 @@ public class PhaseEvaluationPanel extends TJPanel {
     public void setContents(Bot [] robots, ScalableRegisterRow [] viewRows ){
         this.bots = robots;
         this.registerRows = viewRows;
-        initLayout();
+        reinitLayout();
     }
     
    
     
-    private void initLayout()  {
+    protected void reinitLayout()  {
+        this.removeAll(); 
         GridBagLayout gr = new GridBagLayout();
         GridBagConstraints outer = new GridBagConstraints();
         outer.insets.bottom=5;
@@ -76,9 +77,11 @@ public class PhaseEvaluationPanel extends TJPanel {
        Font font = new Font("Sans", Font.BOLD, 10);
         
         int count = bots!=null?bots.length:0;
-        for (int row=0;row<count;row++){
+        for (int row=0;row<count;row++){                       
             TJPanel rowPanel = new TJPanel();                        
             Bot currentBot = bots[row];
+            
+          
             int visID = currentBot.getBotVis();
             Color botColor = BotVis.getBotColorByBotVis(visID);
             
