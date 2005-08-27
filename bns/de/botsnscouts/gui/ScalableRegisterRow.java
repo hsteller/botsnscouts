@@ -6,6 +6,8 @@ package de.botsnscouts.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -51,10 +53,12 @@ public class ScalableRegisterRow extends JPanel {
     public ScalableRegisterRow(double scale, boolean isVertical, int gap){
         super();
         this.isVertical = isVertical;
-        this.scale = scale;
-        int phaseCount = phases.length;
+        this.scale = scale;       
         this.setOpaque(true);
-       
+        initLayout(gap);
+        
+        
+        /*
         if (this.isVertical){
             GridLayout lay = new  GridLayout(phaseCount,1);
             lay.setHgap(gap);
@@ -72,9 +76,53 @@ public class ScalableRegisterRow extends JPanel {
             rv.setScale(scale);
             rv.setVisible(true);           
             add(rv,i);
-        }      
+        }  
+        */    
       //  this.setBorder(BorderFactory.createLineBorder(Color.RED));
        
+    }
+    
+    private void initLayout(int gap){
+        
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+       
+        if (this.isVertical) {            
+            gbc.insets = new Insets(0,0,gap,0);
+            int phaseCount = phases.length;
+            for (int i=0;i<phaseCount-1;i++){            
+                ScalableRegView rv = new ScalableRegView(scale); 
+                phases[i]  = rv;
+                rv.setScale(scale);
+                rv.setVisible(true);              
+                gbc.gridy++;                            
+                this.add(rv, gbc);
+            }
+            gbc.gridy++;        
+            gbc.insets.bottom = 0;
+            ScalableRegView rv = new ScalableRegView(scale); 
+            phases[gbc.gridy]  = rv;
+            this.add(rv, gbc);            
+        }
+        else {                       
+                gbc.insets = new Insets(0,0,0,gap);
+                int phaseCount = phases.length;
+                for (int i=0;i<phaseCount-1;i++){            
+                    ScalableRegView rv = new ScalableRegView(scale); 
+                    phases[i]  = rv;
+                    rv.setScale(scale);
+                    rv.setVisible(true);              
+                    gbc.gridx++;                            
+                    this.add(rv, gbc);
+                }
+                gbc.gridx++;        
+                gbc.insets.right = 0;
+                ScalableRegView rv = new ScalableRegView(scale); 
+                phases[gbc.gridx]  = rv;
+                this.add(rv, gbc);                        
+        }
+        
+        
     }
     
     public boolean isVertical(){
@@ -238,12 +286,12 @@ public Dimension getPreferredSize() {
   public Insets getInsets(){
      return insets;
   }
+  
   public void setInsets(Insets in){
       insets = in;
       revalidate();
   }
    
-    
     public static void main(String[] args) {
 	        JFrame fr = new JFrame("RegRowTest");
 	        fr.addWindowListener(new WindowAdapter(){
