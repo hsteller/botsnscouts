@@ -1,11 +1,22 @@
 
+- JDK1.5: Combobox, Dialogs, some borders of Components,..  
+          still don't work with custom color theme 
 
-- beautify of register tooltips
+- BUG: Cancel Button in the panel where one can start autobots and local players
+       does kill the JVM (-> special case in Registry needed for that) 
+
+- include the manual in the "help" menu and maybe some tipps&tricks
+  and FAQs (right click for scrolling etc);
+  explain strength of laser <=> colors somewhere or display them better
 
 - bug: do something against the server deadlock if a player(or only the view?) quits
        during phase evaluation; maybe the server waits for some ACK?
 
-- explicit notifying of views if someone has lost all lives
+- explicit notifying of views if someone has lost all lives so we can remove
+  his register view from the PhaseEval panel (atm only done if the server 
+  really removes the player)
+
+DONE - beautify of register tooltips
 
 DONE - BUG: to quote myself:
   "Btw. there is another bug that isn't mentioned anywhere:
