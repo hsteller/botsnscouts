@@ -33,9 +33,15 @@ import javax.swing.ToolTipManager;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
+import sun.security.krb5.internal.bg;
+
+
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.ColoredPanel;
+import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.PaintPanel;
 import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJPanel;
 
@@ -50,8 +56,8 @@ public class StatusRobot extends JButton {
     // The following three objects are needed for the "advanced tooltip" this class has:
     // it should not only show a text ("click robot to..") but also show the robots registers
     // (including the current cards)     
-    private TJPanel registerPanel= new TJPanel();    
-    //private ColoredPanel registerPanel= new ColoredPanel();
+    private PaintPanel registerPanel= new PaintPanel(OptionPane.getBackgroundPaint(this));    
+    //private ColoredPanel registerPanel= new ColoredPanel(GreenTheme.getBnsBackgroundColor());
     private ScalableRegisterRow registers;
     private MouseListener customTooltipTrigger;
     
@@ -172,9 +178,10 @@ public class StatusRobot extends JButton {
             this.registers = null;
         }
         else if (this.registers == null) {       
-            this.registers = robsRegisters;        
-             
-            this.registers.setOpaque(false);           
+            this.registers = robsRegisters;                
+          //  ColoredPanel registerPanel = new ColoredPanel();
+          //  registerPanel.setOpaque(false);        
+          //  registerPanelBg.add(registerPanel); // hack to get a darker background
             registerPanel.setLayout(new BorderLayout());
             Border inner = BorderFactory.createEmptyBorder(5,5,5,5);
             Border outer = BorderFactory.createEtchedBorder(EtchedBorder.RAISED, Color.GRAY, Color.GRAY);
@@ -231,8 +238,7 @@ public class StatusRobot extends JButton {
                 x+=p.x;
                 y+=p.y;
             }
-            registerPopup = popFactory.getPopup(source, compToShow,x,y);
-            
+            registerPopup = popFactory.getPopup(source, compToShow,x,y);            
             registerPopup.show();
          }
         
