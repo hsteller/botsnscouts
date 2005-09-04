@@ -56,7 +56,7 @@ public class StatusRobot extends JButton {
     // The following three objects are needed for the "advanced tooltip" this class has:
     // it should not only show a text ("click robot to..") but also show the robots registers
     // (including the current cards)     
-    private PaintPanel registerPanel= new PaintPanel(OptionPane.getBackgroundPaint(this));    
+    private PaintPanel registerPanel= new PaintPanel(OptionPane.getBackgroundPaint(this), true);    
     //private ColoredPanel registerPanel= new ColoredPanel(GreenTheme.getBnsBackgroundColor());
     private ScalableRegisterRow registers;
     private MouseListener customTooltipTrigger;

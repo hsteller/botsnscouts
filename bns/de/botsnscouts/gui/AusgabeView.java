@@ -1281,7 +1281,7 @@ public class AusgabeView extends PaintPanel  {
     private void createHotkeyEditFrame(HotKeyMan keyMan){
         hotKeyFrame = new JFrame(Message.say("AusgabeView", "hotkeyMenu"));
    
-        hotKeyFrame.setContentPane(new PaintPanel(OptionPane.getBackgroundPaint(hotKeyFrame)));
+        hotKeyFrame.setContentPane(new PaintPanel(OptionPane.getBackgroundPaint(hotKeyFrame), true));
         hotKeyFrame.getContentPane().add(new HotKeyEditorPanel(keyMan));
         final HotKeyMan finalkeyMan = keyMan;
         hotKeyFrame.addWindowListener(new WindowAdapter() {  	   

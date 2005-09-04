@@ -86,7 +86,7 @@ public class AnimationsSettingEditor extends JFrame {
 
     public AnimationsSettingEditor(AnimationConfig slow, AnimationConfig medium, AnimationConfig fast){
         super(Message.say(msgSec, "heading"));
-        this.setContentPane(new PaintPanel(OptionPane.getBackgroundPaint(this)));
+        this.setContentPane(new PaintPanel(OptionPane.getBackgroundPaint(this),true));
         //this.setBackground(GreenTheme.getBnsBackgroundColor());
        
      //   this.setContentPane(new ColoredPanel(GreenTheme.getBnsBackgroundColor()));
