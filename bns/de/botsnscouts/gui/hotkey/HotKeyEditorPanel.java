@@ -14,9 +14,11 @@ import javax.swing.JTextField;
 import org.apache.log4j.Category;
 
 import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJPanel;
 
 
-public class HotKeyEditorPanel extends JPanel {
+public class HotKeyEditorPanel extends TJPanel {
   static Category CAT = Category.getInstance(HotKeyEditorPanel.class);
 
   // Hendrik is lazy right now..:
@@ -25,13 +27,13 @@ public class HotKeyEditorPanel extends JPanel {
   private HotKeyMan keyman;
 
   // <descriptions:>
-  public final JLabel colKeyLblHeader1  = new JLabel(Message.say(SEC, "colKeys"));
-  public final JLabel colFuncLblHeader1 = new JLabel(Message.say(SEC, "colDesc"));
-  public final JLabel colKeyLblHeader2  = new JLabel(Message.say(SEC, "colKeys"));
+  public final JLabel colKeyLblHeader1  = new TJLabel(Message.say(SEC, "colKeys"));
+  public final JLabel colFuncLblHeader1 = new TJLabel(Message.say(SEC, "colDesc"));
+  public final JLabel colKeyLblHeader2  = new TJLabel(Message.say(SEC, "colKeys"));
   public final JLabel colFuncLblHeader2 = new JLabel(Message.say(SEC, "colDesc"));
 
-  public final JLabel colChatMesgLbl   = new JLabel(Message.say(SEC,"editMessageLabel"));
-  public final JLabel colChatCommitLbl = new JLabel(Message.say(SEC, "autoCommitBoxLabel"));
+  public final JLabel colChatMesgLbl   = new TJLabel(Message.say(SEC,"editMessageLabel"));
+  public final JLabel colChatCommitLbl = new TJLabel(Message.say(SEC, "autoCommitBoxLabel"));
 
   private final static int KEY_FIELD_SIZE = 10;
   private final static Font headlineFont = new Font(null, Font.BOLD, 14);
@@ -95,8 +97,8 @@ public class HotKeyEditorPanel extends JPanel {
         CAT.debug("no hotkey found for "+keys[i]);
         continue;
       }
-      JLabel desc = new JLabel(k.getAction().getDescription());
-      JTextField edit = createHotKeyEditField(k);
+      JLabel desc = new TJLabel(k.getAction().getDescription());
+      JTextField edit = createHotKeyEditField(k);      
       edit.setText(k.getKeyText());
       JComponent additionals[] = k.getAction().getOptionalComponents();
       JComponent additional1 = null;
@@ -164,7 +166,7 @@ public class HotKeyEditorPanel extends JPanel {
         startColumn++;
      else
       this.add(x2, new GridBagConstraints(startColumn++, startRow,1,1,0.0,0.0,
-                                               GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                               GridBagConstraints.WEST, GridBagConstraints.NONE,
                                                new Insets(0,10,bottomInset,10),0,0));
      if (x3 == null)
         startColumn++;

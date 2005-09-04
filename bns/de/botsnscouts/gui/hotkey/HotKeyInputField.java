@@ -12,10 +12,12 @@ import javax.swing.KeyStroke;
 
 import org.apache.log4j.Category;
 
+import de.botsnscouts.widgets.TJTextField;
+
 /**
  * @author hendrik
  */
-public class HotKeyInputField extends JTextField {
+public class HotKeyInputField extends TJTextField {
     Category CAT = Category.getInstance(HotKeyInputField.class);
    
     private String keyname;
