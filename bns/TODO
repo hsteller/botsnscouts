@@ -2,14 +2,16 @@
 - JDK1.5: Combobox, Dialogs, some borders of Components,..  
           still don't work with custom color theme 
 
-- BUG: Cancel Button in the panel where one can start autobots and local players
+DONE - BUG Cancel Button in the panel where one can start autobots and local players
        does kill the JVM (-> special case in Registry needed for that) 
+       (NOT A BUG, WORKED AS DESIGNED; did a JVM restart instad of going back to ensure 
+        that all resources (memory) were freed before starting a new game)  
 
 - include the manual in the "help" menu and maybe some tipps&tricks
   and FAQs (right click for scrolling etc);
   explain strength of laser <=> colors somewhere or display them better
 
-- bug: do something against the server deadlock if a player(or only the view?) quits
+- bug: sometimes the server deadlock if a player(or only the view?) quits
        during phase evaluation; maybe the server waits for some ACK?
 
 - explicit notifying of views if someone has lost all lives so we can remove
@@ -69,11 +71,6 @@ DONE - reduce initial height of card panel as it looks bad/is too big for
        1024x768 with the kde panel stealing some of the 768 pixels at the bottom
        **** should be fixed by increasing the width of the card panel
             and the scrollbar for 800x600 support ****
-
-- include the manual in the "help" menu and maybe some tipps&tricks
-  and FAQs (right click for scrolling etc);
-  explain strength of laser <=> colors somewhere or display them better
-  
 
 DONE - bigger(?): use UserInfo to display what happens; 
    display the current robot and the card that will be executed;
