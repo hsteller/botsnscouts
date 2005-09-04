@@ -37,6 +37,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
@@ -67,14 +68,13 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
     private Paint paint;
 
     public ParticipatePanel(Start par) {
-    	
+        
         TJButton go;
-        TJButton back;
-
+        TJButton back;       
         parent = par;
         parent.setTitle(Message.say("Start", "mTeilnehmen"));
-        paint = parent.paint;
-
+        paint = parent.paint;        
+       
         GridLayout lay;
         lay = new GridLayout(4, 2);
         lay.setHgap(170);
@@ -92,7 +92,7 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
                                JTextField.CENTER, true);
         robName = new TJTextField(Conf.getDefaultRobName(), JTextField.CENTER, true);
         colors = new RoboBox(true);
-        colors.setOpaque(false);
+        //colors.setOpaque(false);
         Font bigFont = new Font("Sans", Font.BOLD, 20);
         colors.setFont(bigFont);
         go = new TJButton(Message.say("Start", "mGoButton"));

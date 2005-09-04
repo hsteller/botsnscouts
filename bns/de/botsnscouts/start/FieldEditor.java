@@ -57,10 +57,11 @@ import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.ColoredPanel;
 import de.botsnscouts.widgets.TJButton;
+import de.botsnscouts.widgets.TJPanel;
 
 /**
  */
-public class FieldEditor extends JPanel implements ActionListener, TileClickListener, ListSelectionListener {
+public class FieldEditor extends TJPanel implements ActionListener, TileClickListener, ListSelectionListener {
 
     public static final int MODE_FLAGGE_SETZEN = 0;
     public static final int MODE_FLAGGE_ENTFERNEN = 1;
@@ -192,6 +193,7 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
         tileListe.setOpaque(false);
         fuerTileListe = new JScrollPane();
         fuerTileListe.getViewport().setView(tileListe);
+        fuerTileListe.setOpaque(false);
         fuerTileListe.getViewport().setOpaque(false);
 
         add(BorderLayout.EAST, fuerTileListe);
@@ -211,12 +213,12 @@ public class FieldEditor extends JPanel implements ActionListener, TileClickList
         okZur.add(ok);
         add(BorderLayout.SOUTH, okZur);
 
-        fuerSpf = new JPanel();
-        fuerSpf.setOpaque(false);
+        fuerSpf = new TJPanel();
         fuerSpf.add(spf);
 
         fuerfuerSpf = new JScrollPane();
         fuerfuerSpf.setOpaque(false);
+        fuerfuerSpf.getViewport().setOpaque(false);
         fuerfuerSpf.getViewport().setView(fuerSpf);
         fuerfuerSpf.getViewport().scrollRectToVisible(new Rectangle(0, 540, 10, 530));
         add(BorderLayout.CENTER, fuerfuerSpf);

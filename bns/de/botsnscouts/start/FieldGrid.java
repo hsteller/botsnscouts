@@ -30,8 +30,9 @@ import java.awt.GridLayout;
 import javax.swing.JPanel;
 
 import de.botsnscouts.util.Location;
+import de.botsnscouts.widgets.TJPanel;
 
-class FieldGrid extends JPanel {
+class FieldGrid extends TJPanel {
     private Start parent;
     private TileComponent[][] tileP;
 

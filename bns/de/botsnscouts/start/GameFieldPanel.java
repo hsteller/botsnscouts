@@ -26,6 +26,7 @@
 package de.botsnscouts.start;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -74,6 +75,7 @@ import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.widgets.ColoredPanel;
 import de.botsnscouts.widgets.TJButton;
 import de.botsnscouts.widgets.TJCheckBox;
+import de.botsnscouts.widgets.TJComboBox;
 import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJNumberField;
 import de.botsnscouts.widgets.TJPanel;
@@ -85,6 +87,8 @@ import de.botsnscouts.widgets.TJTextField;
  * and then start the server and others can register.
  */
 public class GameFieldPanel extends JPanel {
+    private static final boolean USE_DEBUG_COLORS = false;
+    
     private Paint paint;
     private Start parent;
 
@@ -152,7 +156,8 @@ public class GameFieldPanel extends JPanel {
         add(BorderLayout.CENTER, leftPane);
         JScrollPane rightPane= new JScrollPane();
         rightPane.getViewport().setView(editPanel);
-        rightPane.setOpaque(false);
+        rightPane.setOpaque(false);         
+        rightPane.getViewport().setOpaque(false);
        
         rightPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         rightPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -201,12 +206,18 @@ public class GameFieldPanel extends JPanel {
     }
 
     private JComponent getEditPanel() {
-        JComponent panel = new ColoredPanel();
+        
+        JComponent panel;
+        if (USE_DEBUG_COLORS) {
+            panel = new ColoredPanel(Color.RED);
+        }
+        else {
+            panel = new ColoredPanel();
+        }
 
-        JComponent inner = new JPanel();
+        JComponent inner = new TJPanel();
         GridBagLayout lay = new GridBagLayout();
-        GridBagConstraints gc = new GridBagConstraints();
-        //gc.fill = GridBagConstraints.NONE;
+        GridBagConstraints gc = new GridBagConstraints();        
         gc.fill = GridBagConstraints.HORIZONTAL;
         gc.insets = new Insets(0, 0, 12, 0);
         gc.gridx = 0;
@@ -218,7 +229,11 @@ public class GameFieldPanel extends JPanel {
 
         inner.setLayout(lay);
         inner.setOpaque(false);
-
+        if (USE_DEBUG_COLORS) {
+            inner.setBackground(Color.BLUE);
+            inner.setOpaque(true);
+        }
+       
         Font font = new Font("Sans", Font.BOLD, 12);
 
         JLabel spielfeld = new TJLabel(Message.say("Start", "mSpielfeld"));
@@ -237,10 +252,9 @@ public class GameFieldPanel extends JPanel {
             }
         }
        
-        spielfelder = new JComboBox(spielfeldAr);
+        spielfelder = new TJComboBox(spielfeldAr);
         spielfeld.setVisible(false);
-        spielfelder.setVisible(true);
-        spielfelder.setOpaque(false);
+        spielfelder.setVisible(true);     
 
         save = new TJButton(Message.say("Start", "bSave"));
         save.setVisible(true);

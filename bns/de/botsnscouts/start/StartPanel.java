@@ -26,6 +26,7 @@
 package de.botsnscouts.start;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -93,7 +94,7 @@ public class StartPanel extends JPanel {
         setLayout(lay);
         setBorder(new EmptyBorder(50, 50, 50, 50));
         setOpaque(false);
-
+        
         angem = new TJLabel();
         playersComponent = new PlayersPanel(parent);
      //   recreateServerObeserver();

@@ -16,7 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
+
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -34,6 +34,7 @@ import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJButton;
+import de.botsnscouts.widgets.TJComboBox;
 import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJPanel;
 import de.botsnscouts.widgets.TJTextField;
@@ -68,7 +69,7 @@ public class JoinGamePanel extends ColoredComponent {
     private JTextField hostName = new TJTextField(Message.say("Start", "mServerInh"),
                                         JTextField.CENTER, true);
     private JTextField robName;
-    private JComboBox colors;
+    private TJComboBox colors;
     private int port = GameOptions.DPORT;
 
     private JList favServerList;

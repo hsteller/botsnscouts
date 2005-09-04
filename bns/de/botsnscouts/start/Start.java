@@ -320,6 +320,7 @@ public class Start extends JFrame implements WindowListener {
 
     }
 
+    
 
     protected static void initBasics() {
         MetalLookAndFeel.setCurrentTheme(new GreenTheme());

@@ -26,18 +26,24 @@
 package de.botsnscouts.start;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
+
+import org.apache.log4j.Category;
+
 
 import de.botsnscouts.util.Message;
+import de.botsnscouts.widgets.TJComboBox;
 
-class RoboBox extends JComboBox {
+class RoboBox extends TJComboBox {
+    
+
+    
     private boolean withEgal;
 
     public RoboBox(boolean egal) {
         String[] farben;
 
         withEgal = egal;
-        setOpaque(false);
+       // setOpaque(true);
 
         if (withEgal) {
             farben = new String[]{Message.say("Start", "mFarbeEgal"), Message.say("Start", "mFarbeGruen"), Message.say("Start", "mFarbeGelb"), Message.say("Start", "mFarbeRot"), Message.say("Start", "mFarbeBlau"), Message.say("Start", "mFarbeMagenta"), Message.say("Start", "mFarbeOrange"), Message.say("Start", "mFarbeGrau"), Message.say("Start", "mFarbeDunkelMagenta")};
@@ -45,8 +51,7 @@ class RoboBox extends JComboBox {
             farben = new String[]{Message.say("Start", "mFarbeGruen"), Message.say("Start", "mFarbeGelb"), Message.say("Start", "mFarbeRot"), Message.say("Start", "mFarbeBlau"), Message.say("Start", "mFarbeMagenta"), Message.say("Start", "mFarbeOrange"), Message.say("Start", "mFarbeGrau"), Message.say("Start", "mFarbeDunkelMagenta")};
         }
 
-        setModel(new DefaultComboBoxModel(farben));
-
+        setModel(new DefaultComboBoxModel(farben));       
         setRenderer(new RoboCellRenderer(true));
         setLightWeightPopupEnabled(false);
         setSelectedIndex(0);

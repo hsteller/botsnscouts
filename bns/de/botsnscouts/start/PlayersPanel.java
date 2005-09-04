@@ -56,8 +56,7 @@ class PlayersPanel extends ColoredPanel {
         parent = par;
         roblist = new JList();
         roblist.setOpaque(false);
-        roblist.setFixedCellWidth(250);
-        roblist.setOpaque(false);
+        roblist.setFixedCellWidth(250);      
         roblist.setFont(new Font("Sans", Font.BOLD, 20));
         roblist.setCellRenderer(new CellRenderer());
         roblist.setFixedCellHeight(64);
@@ -81,7 +80,7 @@ class PlayersPanel extends ColoredPanel {
         Global.debug(this, name+" added to name list");
         roblist.setListData(names);
         Global.debug(this, "name list replaced");
-        parent.show();
+        parent.setVisible(true);
     }
 
     public void gameStarted() {
@@ -91,7 +90,7 @@ class PlayersPanel extends ColoredPanel {
         names.clear();
         roblist.removeAll();
         
-        parent.hide();
+        parent.setVisible(false);
     }
 
     
