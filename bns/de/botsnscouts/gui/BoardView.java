@@ -2151,8 +2151,7 @@ public class BoardView extends JComponent{
         paintRobos(g, null);
     }
 
-    private void paintRobos(Graphics g, Bot dontPaintMe) {
-        CAT.debug("...painting Robots..");
+    private void paintRobos(Graphics g, Bot dontPaintMe) {   
         Graphics2D g2d = (Graphics2D) g;          
         Iterator it = internalBotHash.values().iterator();
         // roboCounter will be used in paintRobot() as an offset for writing the robot's name on the
