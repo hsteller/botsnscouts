@@ -149,7 +149,7 @@ public class OptionPane extends JPanel {
         g.setColor( green );
     }
     protected void processMouseEvent(MouseEvent e) {
-        /**odo: Override this java.awt.Component method*/
+        /**todo: Override this java.awt.Component method*/
 //        super.processMouseEvent( e);
     }
     protected void processMouseMotionEvent(MouseEvent e) {

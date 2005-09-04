@@ -27,9 +27,19 @@ package de.botsnscouts.widgets;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.DefaultMetalTheme;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import sun.security.action.GetLongAction;
 
 /**
  * Our default theme. (Not really "greenTheme" anymore...)
@@ -61,7 +71,7 @@ public class GreenTheme extends DefaultMetalTheme {
         return bigFont;
     }
 
-    protected ColorUIResource getPrimary1() {
+    protected ColorUIResource getPrimary1() {    
         return prim1;
     }
 
@@ -91,9 +101,55 @@ public class GreenTheme extends DefaultMetalTheme {
 
     protected ColorUIResource getWhite() {
         return white;
+        
     }
-
+    
+    public static Color getBnsCaretColor(){      
+        return prim1;
+    }
+    
+    public static Color getBnsBackgroundColor(){
+        return sec2;
+    }
+    public static Color getBnsForegroundColor(){
+        return prim2;
+    }
+    
+    public static Color getBnsDisabledTextColor(){
+        return white;
+    }
+    
     public static Color getTextColor() {
         return black;
+    }
+    
+    public static void main (String [] args){
+        JFrame frame = new JFrame("color test");
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing (WindowEvent e){
+                System.exit(0);
+            }
+        });
+        
+        TJPanel content = new TJPanel();
+        GridLayout lay = new GridLayout(2,3);
+        lay.setHgap(10);
+        lay.setVgap(10);
+        content.setLayout(lay);
+        Color [] colors = new Color[] {
+                        prim1, prim2, prim3, sec1, sec2, sec3
+        };
+              
+        for (int i=0;i<colors.length;i++){
+            TJLabel l = new TJLabel();
+            l.setBackground(colors[i]);
+            l.setOpaque(true);
+            l.setText(colors[i].toString());
+            content.add(l); 
+        }
+        frame.getContentPane().add(content);
+        frame.pack();
+        frame.setVisible(true);
+        
     }
 }
