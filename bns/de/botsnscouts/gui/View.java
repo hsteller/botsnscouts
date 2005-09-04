@@ -109,7 +109,7 @@ public class View extends JFrame {
         sp.setRightComponent(right);
        
         sp.setOneTouchExpandable(true);
-        sp.setOpaque(true);
+        sp.setOpaque(false);
         contentpane.add ( sp);
       
         // not AusgabeView yet :(
@@ -340,6 +340,7 @@ public class View extends JFrame {
 	         // av.setMinimumSize(new Dimension(leftPanelWidth,leftPanelHeight));
 	          humanView.setPreferredSize(new Dimension(280, 400));
 	          sp.setLeftComponent(av);
+	         
 	         // sp.setDividerLocation(0.75);
         }
         else{

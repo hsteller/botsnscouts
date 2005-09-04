@@ -61,6 +61,9 @@ import de.botsnscouts.util.Message;
 import de.botsnscouts.util.SoundMan;
 import de.botsnscouts.util.Stats;
 import de.botsnscouts.util.StatsList;
+import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.PaintPanel;
 
 
 public class Ausgabe extends BNSThread {
@@ -562,8 +565,9 @@ public class Ausgabe extends BNSThread {
 
 
     protected void showStats() {
-        if (statsWindow == null) {
-            statsWindow = new JFrame(Message.say("AusgabeView", "stats"));
+        if (statsWindow == null) {            
+            statsWindow = new JFrame(Message.say("AusgabeView", "stats"));   
+            statsWindow.setContentPane(new PaintPanel(OptionPane.getBackgroundPaint(statsWindow)));
             statsWindow.getContentPane().add(new StatisticPanel(stats));
             statsWindow.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {

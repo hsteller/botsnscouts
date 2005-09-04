@@ -37,20 +37,26 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import de.botsnscouts.util.BotVis;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.util.Stats;
 import de.botsnscouts.util.StatsList;
+import de.botsnscouts.widgets.ColoredPanel;
+import de.botsnscouts.widgets.GreenTheme;
+import de.botsnscouts.widgets.OptionPane;
+import de.botsnscouts.widgets.PaintPanel;
 import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJPanel;
 
 
 
-public class StatisticPanel extends JPanel implements ActionListener {
+public class StatisticPanel extends ColoredPanel implements ActionListener {
 
     private StatsList list;
     private JLabel [] [] desc;
-    private static JLabel [] headings;
+    //private static JLabel [] headings;
 
     private static final int COL_COUNT=8;
     private static final String MESSAGE_SECTION="StatisticPanel";
@@ -66,22 +72,20 @@ public class StatisticPanel extends JPanel implements ActionListener {
 
     };
 
-    public StatisticPanel (StatsList stats){
-      super();
-      setOpaque(false);
-      list = stats;
-      init();
-      list.addActionListener(this);
+    public StatisticPanel (StatsList stats){      
+        super();
+        setOpaque(false);          
+	    list = stats;
+	    init();
+	    list.addActionListener(this);
     }
 
     public void actionPerformed(ActionEvent e) {
       setAll();
-      update();
+      super.repaint();
     }
 
-    public void update(){
-      repaint();
-    }
+    
 
    private void init() {
       int l = list.size();

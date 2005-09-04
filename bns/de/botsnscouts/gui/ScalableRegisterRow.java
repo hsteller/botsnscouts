@@ -27,12 +27,13 @@ import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJPanel;
 
 /**
  * @author Hendrik Steller
  * @version $Id$
  */
-public class ScalableRegisterRow extends JPanel {
+public class ScalableRegisterRow extends TJPanel {
 
     Category CAT = Category.getInstance(ScalableRegisterRow.class);
     
@@ -54,7 +55,7 @@ public class ScalableRegisterRow extends JPanel {
         super();
         this.isVertical = isVertical;
         this.scale = scale;       
-        this.setOpaque(true);
+        this.setOpaque(false);
         initLayout(gap);
         
         

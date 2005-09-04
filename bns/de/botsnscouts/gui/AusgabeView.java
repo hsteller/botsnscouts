@@ -78,8 +78,9 @@ import de.botsnscouts.util.SoundMan;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.PaintPanel;
 import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJPanel;
 
-public class AusgabeView extends JPanel  {
+public class AusgabeView extends PaintPanel  {
     static Category CAT = Category.getInstance(AusgabeView.class);
 
     private final static long SHOW_MESSAGE_DELAY=300;
@@ -142,11 +143,12 @@ public class AusgabeView extends JPanel  {
     private Location [] flags;
     
     public AusgabeView(BoardView sa, Bot[] robots, Ausgabe aus) {
+        super(OptionPane.getBackgroundPaint(null));
 		ausgabe = aus;
 		gameBoardCanvas = sa;
 		//        statusLog = new StatusLog(aus.getView());
 
-		JPanel robotsStatusContainer = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel robotsStatusContainer = new TJPanel(new FlowLayout(FlowLayout.LEFT));
 		robotsStatusContainer.setOpaque(false);
 		//        Box robotsStatusContainer = new Box(BoxLayout.X_AXIS) {
 		//            public void paint(Graphics g) {
@@ -155,7 +157,7 @@ public class AusgabeView extends JPanel  {
 		//                super.paint(g);
 		//            }
 		//        };
-		JPanel robotsCardContainer = new JPanel(new GridLayout(8, 1));
+		JPanel robotsCardContainer = new TJPanel(new GridLayout(8, 1));
 		flags = sa.sf.getFlags();
 		int flagCount = flags.length;
 
@@ -214,13 +216,15 @@ public class AusgabeView extends JPanel  {
 		//	add(statusLog,BorderLayout.SOUTH);
 
 		// create scroll panel
+		
 		gameBoardScrollPane = new JScrollPane();
 		gameBoardScrollPane.getHorizontalScrollBar().setUnitIncrement(64);
 		gameBoardScrollPane.getVerticalScrollBar().setUnitIncrement(64);
 		gameBoardScrollPane.setViewportView(gameBoardCanvas);
-        gameBoardScrollPane.getViewport().setOpaque(false);
-		gameBoardScrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		add(gameBoardScrollPane, BorderLayout.CENTER);
+		gameBoardScrollPane.setOpaque(false);
+		gameBoardScrollPane.getViewport().setOpaque(false);
+		gameBoardScrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));		
+		this.add(gameBoardScrollPane, BorderLayout.CENTER);
 		gameBoardView = gameBoardScrollPane.getViewport();
 		this.initSpeedSettings();
 		this.initMenus();
@@ -1276,6 +1280,8 @@ public class AusgabeView extends JPanel  {
      *  (The EditFrame won't show fields for the keys that are added to the Keyman after this method was called)*/
     private void createHotkeyEditFrame(HotKeyMan keyMan){
         hotKeyFrame = new JFrame(Message.say("AusgabeView", "hotkeyMenu"));
+   
+        hotKeyFrame.setContentPane(new PaintPanel(OptionPane.getBackgroundPaint(hotKeyFrame)));
         hotKeyFrame.getContentPane().add(new HotKeyEditorPanel(keyMan));
         final HotKeyMan finalkeyMan = keyMan;
         hotKeyFrame.addWindowListener(new WindowAdapter() {  	   
@@ -1303,10 +1309,8 @@ public class AusgabeView extends JPanel  {
         hotKeyFrame.setState(JFrame.NORMAL);
 
       hotKeyFrame.toFront();
-      hotKeyFrame.setVisible(true);
-      hotKeyFrame.show();
+      hotKeyFrame.setVisible(true);      
   
-
 
     }
 
