@@ -453,7 +453,7 @@ public class KommClient implements Shutdownable{
                                     try {
                                         Card [] karten1 = new Card [9]; // max. number of cards
                                         int klammerauf=com.indexOf('(');
-                                        int klammerletzt=com.lastIndexOf(')');
+                                    //   int klammerletzt=com.lastIndexOf(')');
                                         com=com.substring (klammerauf+1);
                                         int count=0;
                                         
@@ -462,7 +462,7 @@ public class KommClient implements Shutdownable{
                                             int klzu=com.indexOf(')');
                                             String work= com.substring(klauf+1,klzu); // first card, without parens, i.e. "M1,123"
                                             int komma=work.indexOf(',');
-                                            String art=work.substring(0,komma);
+                                        //    String art=work.substring(0,komma);
                                             String pri=work.substring(komma+1);
                                             try {
                                                 int prio=Integer.parseInt(pri);
@@ -1243,7 +1243,7 @@ public class KommClient implements Shutdownable{
      * @param name WILL BE IGNORED */
     private  Location fetchOrt (String name, boolean RobPos) throws KommException{
         Location back= new Location (-1,-1); // Initialisierung
-        String method="noch fetchOrt";;
+        String method="noch fetchOrt";
         try {
             if (RobPos) { // getRobPos ?!
                 method="getRobPos";
@@ -1312,7 +1312,7 @@ public class KommClient implements Shutdownable{
                 int klauf = in.indexOf('(');
                 int klazu = in.indexOf(')');
                 if ((komma!=-1)&&(klauf!=-1)&&(klazu!=-1)) {
-                    String akt = in.substring(klauf+1,komma);
+                   // String akt = in.substring(klauf+1,komma);
                     String prio = in.substring(komma+1,klazu);
                     int p=0;
                     try {
@@ -1362,7 +1362,7 @@ public class KommClient implements Shutdownable{
                 int klzu=active.indexOf(')');
                 int komma=active.indexOf(',');
                 
-                String kartenaktion=active.substring(klauf+1,komma);
+              //  String kartenaktion=active.substring(klauf+1,komma);
                 
                 int prioritaet=0;
                 try {
@@ -1455,7 +1455,7 @@ public class KommClient implements Shutdownable{
     }
     
     public boolean isShutDown() {
-        return isShutDown();
+        return isShutDown;
     }
     
     /** Finalizer closes the streams.
