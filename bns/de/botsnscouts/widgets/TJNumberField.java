@@ -23,7 +23,7 @@ import de.botsnscouts.util.RangeFilter;
 *  The accepted integer input can be restricted to an integer interval.  
 * 
 */
-public class TJNumberField extends JTextField implements DocumentListener {
+public class TJNumberField extends TJTextField implements DocumentListener {
        
     private int dflt = 0;
     private NumberFieldDocument doku = null;
@@ -60,39 +60,21 @@ public class TJNumberField extends JTextField implements DocumentListener {
         
     }
     
-    private TJNumberField() {
-        super();
-        init();
-    }
+    
 
 
     private TJNumberField(NumberFieldDocument doc, int cols) {
         super(doc, null, cols);
         doku = doc;
-        init();
-    }
-
-    private  TJNumberField(NumberFieldDocument doc) {
-        this(doc, 0);
-        init();
-    }
-
-    
-    private void init() {
-        tjIfy(false);
         translateUpdateEvents();
     }
+
+  
+    
+ 
     
     
-    private void tjIfy(boolean useBigFont) {
-        setOpaque(false);
-        setForeground(GreenTheme.getTextColor());
-        if (useBigFont) {
-            setFont(GreenTheme.getBigFont());
-        } else {
-            setFont(GreenTheme.getFont());
-        }
-    }
+   
     
     public void changedUpdate(DocumentEvent e) {
         fireActionPerformed();
