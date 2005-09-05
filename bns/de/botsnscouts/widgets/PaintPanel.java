@@ -55,11 +55,10 @@ public class PaintPanel extends JPanel {
     }
 
     public void paintComponent(Graphics g) {
-	Graphics2D g2d = (Graphics2D) g;
-	Dimension d = getSize();
-	//g2d.setPaint( OptionPane.getBackgroundPaint(this) );
-	g2d.setPaint(paint);
-	g2d.fillRect(0,0, d.width, d.height);
+		Graphics2D g2d = (Graphics2D) g;
+		Dimension d = getSize();	
+		g2d.setPaint(paint);
+		g2d.fillRect(0,0, d.width, d.height);
         if( shade ) {
             g2d.setPaint( color );
             g2d.fillRect(0,0, d.width, d.height);
