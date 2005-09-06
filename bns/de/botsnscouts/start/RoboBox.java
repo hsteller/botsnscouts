@@ -53,7 +53,7 @@ class RoboBox extends TJComboBox {
 
         setModel(new DefaultComboBoxModel(farben));       
         setRenderer(new RoboCellRenderer(true));
-        setLightWeightPopupEnabled(false);
+        //setLightWeightPopupEnabled(false);
         setSelectedIndex(0);
     }
 }
