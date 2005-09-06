@@ -25,7 +25,6 @@
 
 package de.botsnscouts.start;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -35,15 +34,12 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import org.apache.log4j.Category;
-
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.Message;
-import de.botsnscouts.widgets.GreenTheme;
-import de.botsnscouts.widgets.TJLabel;
+
 
 public class RoboCellRenderer extends JLabel implements ListCellRenderer {
-    private static Category CAT = Category.getInstance(RoboBox.class);
+   
     
     public static ImageIcon[] robIcons = new ImageIcon[8];
 
@@ -66,7 +62,7 @@ public class RoboCellRenderer extends JLabel implements ListCellRenderer {
         
         withEgal = wEgal;
         size = new Dimension(96, 48);
-        setOpaque(false);
+        setOpaque(true);
     }
 
     /**
@@ -98,20 +94,14 @@ public class RoboCellRenderer extends JLabel implements ListCellRenderer {
             setIcon(robIcons[index]);
         }
 
-       if (isSelected) {
-            
-            //setBackground(Color.YELLOW);
-            //setForeground(Color.CYAN);
+       if (isSelected) {       
             setBackground(list.getSelectionBackground());
             setForeground(list.getSelectionForeground());
         } else {
-            
-           // setBackground(Color.RED);
-           // setForeground(Color.BLUE);
            setBackground(list.getBackground());
            setForeground(list.getForeground());
         }
-        
+   
         setEnabled(list.isEnabled());
         setFont(list.getFont());
         return this;
