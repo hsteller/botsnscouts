@@ -30,10 +30,7 @@ public class TJComboBox extends JComboBox {
     
     
     private void initTheme() {
-        setOpaque(false);
-        
-        setBackground(GreenTheme.getBnsBackgroundColor());   
-        
+        setOpaque(false);                        
         setForeground(GreenTheme.getTextColor());
 	    setFont(GreenTheme.getFont());
     }
