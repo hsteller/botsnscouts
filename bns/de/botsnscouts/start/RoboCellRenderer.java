@@ -37,7 +37,10 @@ import javax.swing.ListCellRenderer;
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.Message;
 
-
+/** 
+ * 
+ * @version $Id$
+ */
 public class RoboCellRenderer extends JLabel implements ListCellRenderer {
    
     
@@ -58,11 +61,10 @@ public class RoboCellRenderer extends JLabel implements ListCellRenderer {
         this(true);
     }
 
-    RoboCellRenderer(boolean wEgal) {
-        
+    RoboCellRenderer(boolean wEgal) {       
         withEgal = wEgal;
         size = new Dimension(96, 48);
-        setOpaque(true);
+        setOpaque(false);
     }
 
     /**
