@@ -28,17 +28,21 @@ package de.botsnscouts;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
 import org.apache.log4j.Category;
 import org.apache.log4j.PropertyConfigurator;
 
 import de.botsnscouts.gui.Splash;
 import de.botsnscouts.start.Start;
+import de.botsnscouts.widgets.GreenTheme;
 
 public class BotsNScouts {
     private static Category CAT = Category.getInstance(BotsNScouts.class);
 
     public static void main(String[] args) throws Throwable {
         try {
+            MetalLookAndFeel.setCurrentTheme(new GreenTheme());
             Splash splash = new Splash();
             splash.showSplash();
 

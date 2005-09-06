@@ -322,9 +322,7 @@ public class Start extends JFrame implements WindowListener {
 
     
 
-    protected static void initBasics() {
-        MetalLookAndFeel.setCurrentTheme(new GreenTheme());
-
+    protected static void initBasics() { 
         // enabling registry
         Registry.getSingletonInstance().setEnabled(true);
         
