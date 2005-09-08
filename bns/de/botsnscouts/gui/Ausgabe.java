@@ -1180,6 +1180,13 @@ public class Ausgabe extends BNSThread {
         
     }
     private void comMsgHandleEvalPhaseEnd(ClientAntwort cw) {
+        if (currentPhase < 0) {          
+            // special case:
+            // if we are a view that joins a game in mid-game it is likely that 
+            // we get a "reveal card" message before the currentphase (set at begin of a phase)
+            // was set
+            return;
+        }
         if (rowOfBotWhoseCardWasLastEvaluated != null) {
             rowOfBotWhoseCardWasLastEvaluated.setRegisterHighLighted(currentPhase, false);
             rowOfBotWhoseCardWasLastEvaluated = null;
@@ -1212,6 +1219,13 @@ public class Ausgabe extends BNSThread {
     
     
     private void comMsgHandleEvalOfCard(ClientAntwort cw) {
+        if (currentPhase < 0) {          
+            // special case:
+            // if we are a view that joins a game in mid-game it is likely that 
+            // we get a "eval card" message before the currentphase (set at begin of a phase)
+            // was set => do nothing until the phase is initialized 
+            return;
+        }
         String robName = cw.namen[1];
         ScalableRegisterRow row = getInfoRegistersForBot(robName);
         if (rowOfBotWhoseCardWasLastEvaluated != null) {
@@ -1553,6 +1567,7 @@ public class Ausgabe extends BNSThread {
             try {
                 CAT.debug("waiting "+ms+"ms");
                 waitLock.wait(ms);
+                
                 CAT.debug("done waiting "+ms+"ms");
             }
             catch (InterruptedException ie){
