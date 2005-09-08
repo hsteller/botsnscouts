@@ -1,1 +1,1 @@
-java -jar -Xss640k botsnscouts.jar
+java -jar -Xss768k botsnscouts.jar

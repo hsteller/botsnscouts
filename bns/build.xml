@@ -8,7 +8,7 @@
   <property name="dist" value="dist"/>
   <property name="doc" value="docs" />
   <property name="jars" value="lib"/>
-  <property name="bns.ver" value="0.9beta" />     
+  <property name="bns.ver" value="0.9pre" />     
 
   <target name="init">
      <!-- Create the time stamp -->
@@ -90,7 +90,7 @@
 
   <target name="run" depends="compile">
      <java classname="de.botsnscouts.BotsNScouts" fork="true">
-     	<jvmarg value="-Xss640k"/>
+     	<jvmarg value="-Xss768k"/>
         <classpath>
 	   		<fileset dir="${jars}" includes="*.jar" />
 	  		 <pathelement path="${build}" />

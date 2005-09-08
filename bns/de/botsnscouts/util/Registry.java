@@ -462,7 +462,7 @@ public class Registry implements ShutdownListener, GameOverListener {
 	           */
 	           String jhome = p.getProperty("java.home", null);
 	           String separator = File.separator;
-	           String binString = "java ";
+	           String binString = "java";
 	           if (jhome != null) {
 	              binString = jhome+separator+"bin"+separator+"java ";
 	           }
@@ -474,13 +474,15 @@ public class Registry implements ShutdownListener, GameOverListener {
 	         //  for (int i=0;i<args.length;i++) {
 	         //      bla+=args[i].toString()+" ";
 	         //  }
-	           String s1 = " -Dbns.home="+f.getCanonicalPath();
-	           String s2 = " -jar botsnscouts.jar";
+	           String s1 = "-Dbns.home="+f.getCanonicalPath();
+	           String s2 = "-jar botsnscouts.jar";
 	           Dimension size = BotsNScouts.getScreenSize();
-	           String s3 = " -Xss640k -Dgeometry="+size.width+"x"+size.height;
-	           String cmd = binString+s3+s1+s2;
-	           CAT.info("EXEC: "+cmd);
-	           
+	           String s3 = "-Xss768k"; // TODO move to bns.config file?
+	           String s4 = "-Dgeometry="+size.width+"x"+size.height;
+	           String cmd = binString+" "+s3+" "+s4+" "+s1+" "+s2;
+	          // CAT.info("EXEC: "+cmd);
+	         // String [] cmd = new String []{binString,s3,s4,s1,s2};
+	          
 	           Process proc = run.exec(cmd);
            }
            catch (Exception e){
