@@ -388,78 +388,28 @@ public class AusgabeView extends PaintPanel  {
             }
             else {
 	            int offset = 30;
-	            int delay = 5; // TODO find good value/make configurable
-	            if (newUpperLeft.x < currentUpperLeft.x) {
-	               currentUpperLeft =  scrollWest(currentUpperLeft, newUpperLeft, offset, delay);
+	            int delay = 5; // TODO find good value/make configurable	          
+	            Point [] scrollPoints = ScrollHelper.calculateDiagonalScrollSteps(currentUpperLeft, 
+	                            newUpperLeft, offset);
+	           // Point [] scrollPoints = ScrollHelper.scrollRightAngled(newUpperLeft, currentUpperLeft,
+	          //                 offset, true);
+	            int pcount = scrollPoints.length;
+	            for (int i=0;i<pcount;i++){
+	                gameBoardView.setViewPosition(scrollPoints[i]);
+	                waitSomeTime(delay, this);
 	            }
-	            else if (newUpperLeft.x > currentUpperLeft.x) {
-	                currentUpperLeft = scrollEast(currentUpperLeft, newUpperLeft, offset, delay);
-	            }
-	            
-	            if (newUpperLeft.y < currentUpperLeft.y) {
-	                currentUpperLeft = scrollNorth(currentUpperLeft, newUpperLeft, offset, delay);
-	            }
-	            else if (newUpperLeft.y > currentUpperLeft.y) {
-	                currentUpperLeft = scrollSouth(currentUpperLeft, newUpperLeft, offset, delay);
-	            }
+	           
+	            waitSomeTime(300, this); // TODO find good value/make configurable
             }
-            waitSomeTime(300, this); // TODO find good value/make configurable 
         }
         
         if( highlight ) {
             this.gameBoardCanvas.highlight(robix, robiy);
         }
     }
-    
-    private Point scrollWest (Point cur, Point pref, int diff, int delay){
-        int stop = pref.x+diff;
-        while (stop< cur.x) {
-            cur.x-=diff;
-            gameBoardView.setViewPosition(cur);
-            waitSomeTime(delay, this);
-        }
-        cur.x = pref.x;
-        gameBoardView.setViewPosition(cur);
-        waitSomeTime(delay, this);
-        return cur;
-    }
-    
-    private Point scrollEast (Point cur, Point pref, int diff, int delay){
-        int stop = pref.x-diff;
-        while (stop>cur.x) {
-            cur.x+=diff;
-            gameBoardView.setViewPosition(cur);            
-            waitSomeTime(delay, this);
-        }
-        cur.x = pref.x;
-        gameBoardView.setViewPosition(cur);
-        waitSomeTime(delay, this);
-        return cur;
-    }
-    private Point scrollSouth (Point cur, Point pref, int diff, int delay){
-        int stop = pref.y-diff;
-        while (stop>cur.y) {
-            cur.y+=diff;
-            gameBoardView.setViewPosition(cur);
-            waitSomeTime(delay, this);
-        }
-        cur.y = pref.y;
-        gameBoardView.setViewPosition(cur);
-        waitSomeTime(delay, this);
-        return cur;
-    }
-    private  Point scrollNorth (Point cur, Point pref, int diff,int delay){
-        int stop = pref.y+diff;
-        while (stop< cur.y) {
-            cur.y-=diff;
-            gameBoardView.setViewPosition(cur);
-            waitSomeTime(delay, this);
-        }
-        cur.y = pref.y;
-        gameBoardView.setViewPosition(cur);
-        waitSomeTime(delay, this);
-        return cur;
-    }
+        
+
+
    
     /**
      * board view is to paint robolaser activity
