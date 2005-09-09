@@ -6,7 +6,9 @@
 package de.botsnscouts.util;
 
 import java.awt.Dimension;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,6 +27,7 @@ import de.botsnscouts.gui.Ausgabe;
 import de.botsnscouts.gui.HumanPlayer;
 import de.botsnscouts.server.Server;
 import de.botsnscouts.start.Start;
+import de.botsnscouts.widgets.TJLabel;
 
 
 /**
@@ -421,9 +424,9 @@ public class Registry implements ShutdownListener, GameOverListener {
 	                        String message3 = Message.say("Registry", "serverHangs3");
 	                        String title         = Message.say("Registry","serverHangsTitle");
 	                        JLabel[] msg = new JLabel[3];
-	                        msg[0] = new JLabel(message1);
-	                        msg[1] = new JLabel(message2);
-	                        msg[2] = new JLabel(message3);
+	                        msg[0] = new TJLabel(message1);
+	                        msg[1] = new TJLabel(message2);
+	                        msg[2] = new TJLabel(message3);
 	                        JOptionPane.showMessageDialog(Start.getLauncherAppSingleton(),msg, title,
 	                                        JOptionPane.ERROR_MESSAGE);
 	                        CAT.warn("server hangs in shutdown");
@@ -447,6 +450,27 @@ public class Registry implements ShutdownListener, GameOverListener {
         }
         
         
+        private static String maskWhiteSpace(String s){
+        	if (s == null){
+        		return null;
+        	}
+        	int length = s.length();
+        	StringBuffer sb = new StringBuffer(length+10);
+        	char space = ' ';
+        	for (int i=0;i<length;i++){
+        		char c = s.charAt(i);
+        		if (c == ' '){
+        			sb.append('\\');
+        		}
+        		sb.append(c);
+        	}
+        	if (length!=sb.length()){
+        		return sb.toString();
+        	}
+        	else {
+        		return s;
+        	}
+        }
         
        private void bruteRestart(){
            try {
@@ -463,27 +487,24 @@ public class Registry implements ShutdownListener, GameOverListener {
 	           String jhome = p.getProperty("java.home", null);
 	           String separator = File.separator;
 	           String binString = "java";
-	           if (jhome != null) {
-	              binString = jhome+separator+"bin"+separator+"java ";
+	           if (jhome != null) {	           	 
+	           		binString = jhome+separator+"bin"+separator+"java";
 	           }
-	     //      String classpath = p.getProperty("java.class.path");
-	      //     String cp = "-classpath "+classpath;
-	           
 	           Runtime run = Runtime.getRuntime();
-	        //   String bla="";
-	         //  for (int i=0;i<args.length;i++) {
-	         //      bla+=args[i].toString()+" ";
-	         //  }
-	           String s1 = "-Dbns.home="+f.getCanonicalPath();
-	           String s2 = "-jar botsnscouts.jar";
+	           String bnshome = "\""+f.getCanonicalPath()+"\"";	           
+	           //String tmp = maskWhiteSpace(f.getCanonicalPath());
+	           String s1 = "-Dbns.home="+bnshome;
+	           String s2 = "-jar "+/*"\""+f.getCanonicalPath()+separator+*/"botsnscouts.jar\"";
 	           Dimension size = BotsNScouts.getScreenSize();
 	           String s3 = "-Xss768k"; // TODO move to bns.config file?
 	           String s4 = "-Dgeometry="+size.width+"x"+size.height;
-	           String cmd = binString+" "+s3+" "+s4+" "+s1+" "+s2;
-	          // CAT.info("EXEC: "+cmd);
+	           String cmd = "\""+binString+"\" "+s3+" "+s4+" "+s1+" "+s2;
+	            CAT.info("EXEC: "+cmd);
 	         // String [] cmd = new String []{binString,s3,s4,s1,s2};
 	          
 	           Process proc = run.exec(cmd);
+	           
+	          
            }
            catch (Exception e){
                CAT.error(e.getMessage(),e);
