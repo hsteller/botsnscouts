@@ -25,6 +25,7 @@
 
 package de.botsnscouts.comm;
 
+import de.botsnscouts.server.RegistrationException;
 import de.botsnscouts.util.Encoder;
 
 /** Klasse fuer die Dinge, die nicht in 'KommClient' vorkommen und die die Ausgabe nix angehen
@@ -42,13 +43,13 @@ Trat ein nicht-technischer Fehler auf (d.h. beim Parsen), so wird eine Exception
 NEW: Encodes the client name
 @exception KommException Tritt beim Parsen ein Fehler auf (z.B. wegen falsch aufgebauten Strings), wird eine KommException geworfen.
 */
-    public boolean anmelden (String ipnr, int portnr, String name) throws KommException{
+    public boolean anmelden (String ipnr, int portnr, String name) throws KommException, RegistrationException{
 	return super.anmelden (ipnr, portnr, Encoder.commEncode(name), "RGS");
     }
     /** Anmeldung; eine Farbe zwischen 1 und 8 waehlen
      *  NEW: Encodes the client name
      *  */
-    public boolean anmelden2 (String ipnr, int portnr, String name, int farbe) throws KommException{
+    public boolean anmelden2 (String ipnr, int portnr, String name, int farbe) throws KommException, RegistrationException{
 	if ((farbe>0)&&(farbe<9)){
             return super.anmelden (ipnr, portnr, (Encoder.commEncode(name)+","+farbe), "RS2");
 	}

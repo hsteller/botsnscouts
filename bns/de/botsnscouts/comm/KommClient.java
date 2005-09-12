@@ -39,6 +39,7 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Category;
 
 import de.botsnscouts.server.Deck;
+import de.botsnscouts.server.RegistrationException;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Directions;
@@ -763,7 +764,7 @@ public class KommClient implements Shutdownable{
      @param kuerzel Indicates, whether the client is a robot or an output channel
      @exception  KommException Thrown, if parsing failed
      */
-    protected boolean anmelden (String ipnr, int portnr,String clientName, String kuerzel)throws KommException{
+    protected boolean anmelden (String ipnr, int portnr,String clientName, String kuerzel)throws KommException, RegistrationException{
         
         StringTokenizer st = new StringTokenizer(clientName, ",");
         
@@ -782,8 +783,7 @@ public class KommClient implements Shutdownable{
             // out.println(raus);
             this.senden(raus);
         }
-        catch(UnknownHostException e){
-            
+        catch(UnknownHostException e){            
             throw new KommException(Message.say("KommClient", "nohost"));
         }
         catch (java.io.IOException fehler) {
@@ -792,12 +792,19 @@ public class KommClient implements Shutdownable{
         // einlesen der Antwort beginnen
         try {
             String antwort=in.readLine();
-            if (antwort==null)
-                System.err.println ("KommClient: answer is null");
-            if (antwort.equals("ok") || (antwort.equals("OK")))
+            String answerLC = null;
+            if (antwort==null) {
+              CAT.error("Answer is null");
+            }
+            else {
+                answerLC = antwort.toLowerCase();
+            }
+            if (answerLC.equals("ok")){
                 return true;
-            else if (antwort.equals("error") || (antwort.equals("ERROR")))
-                return false;
+            }
+            else if (antwort.toLowerCase().startsWith("error")){
+                throw new RegistrationException(antwort);
+            }
             else
                 throw new KommException("Wrong return value for server registration request: "+antwort);
         }
