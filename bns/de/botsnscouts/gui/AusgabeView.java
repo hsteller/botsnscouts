@@ -143,23 +143,16 @@ public class AusgabeView extends PaintPanel  {
     /** Editor for SpeedMenu actions*/
     private AnimationsSettingEditor speedSettingEditor;
     
+    
     private Location [] flags;
     
     public AusgabeView(BoardView sa, Bot[] robots, Ausgabe aus) {
         super(OptionPane.getBackgroundPaint(null));
 		ausgabe = aus;
 		gameBoardCanvas = sa;
-		//        statusLog = new StatusLog(aus.getView());
-
+		
 		JPanel robotsStatusContainer = new TJPanel(new FlowLayout(FlowLayout.LEFT));
 		robotsStatusContainer.setOpaque(false);
-		//        Box robotsStatusContainer = new Box(BoxLayout.X_AXIS) {
-		//            public void paint(Graphics g) {
-		//                g.setColor(Color.black);
-		//                g.fillRect(0,0,getWidth(), getHeight());
-		//                super.paint(g);
-		//            }
-		//        };
 		JPanel robotsCardContainer = new TJPanel(new GridLayout(8, 1));
 		flags = sa.sf.getFlags();
 		int flagCount = flags.length;
@@ -192,14 +185,7 @@ public class AusgabeView extends PaintPanel  {
 				}
 			});
 			robotsStatusContainer.add(r);
-			robotStatus.put(robots[i].getName(), r);
-
-			// add entry to track menu
-			//  JMenuItem trackItem = new JMenuItem( r.getName() );
-			// trackItem.addActionListener( new
-			// HumanPlayer.RoboTrackListener(robots[i]) );
-			// optTrack.add(trackItem);
-
+			robotStatus.put(robots[i].getName(), r);			
 			RobotCard rc = new RobotCard(robots[i]);
 			robotsCardContainer.add(rc);
 			robotsCardContainer.setOpaque(false);
@@ -210,16 +196,7 @@ public class AusgabeView extends PaintPanel  {
 		
 		this.northPanel.setLayout(new BorderLayout());
 		northPanel.setOpaque(false);
-		northPanel.add(robotsStatusContainer, BorderLayout.WEST);
-		//this.add(northPanel, BorderLayout.NORTH);
-		// before splitpane: add(robotsStatusContainer,BorderLayout.NORTH);
-		//	add(robotsCardContainer,BorderLayout.EAST);
-
-		// create status log
-		//	add(statusLog,BorderLayout.SOUTH);
-
-		// create scroll panel
-		
+		northPanel.add(robotsStatusContainer, BorderLayout.WEST);		
 		gameBoardScrollPane = new JScrollPane();
 		gameBoardScrollPane.getHorizontalScrollBar().setUnitIncrement(64);
 		gameBoardScrollPane.getVerticalScrollBar().setUnitIncrement(64);
@@ -234,6 +211,8 @@ public class AusgabeView extends PaintPanel  {
 		
 
 	}
+    
+    
     
     public static final String PROPERTY_DEFAULT_SPEED="defaultAnimationSetting";
     
