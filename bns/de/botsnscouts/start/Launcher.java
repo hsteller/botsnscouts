@@ -97,7 +97,8 @@ public class Launcher implements RegistrationStartListener{
         }
         catch (Exception exp) {
             CAT.error("Error while starting the game for player " + name + ": " + exp.getMessage());
-            ret.shutdown();      // TODO necessary? shutting down of a possible Ausageb needed?      
+            ret.shutdown();      // I think this is unnecessary for a HumanPlayer, but shouldn't hurt    
+            ret = null;
             if (exp instanceof JoiningGameFailedException) {
                 throw (JoiningGameFailedException)exp;
             }

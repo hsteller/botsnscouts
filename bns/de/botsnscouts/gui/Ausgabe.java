@@ -520,7 +520,9 @@ public class Ausgabe extends BNSClientThread {
     
     public void doShutdown() {
         CAT.debug("starting shutdown..");
-        sequencer.clear();               
+        if (sequencer != null) {
+            sequencer.clear();
+        }
         quit(false, true, true);
         allowRunToFinish();
         CAT.debug("reached end of shutdown");

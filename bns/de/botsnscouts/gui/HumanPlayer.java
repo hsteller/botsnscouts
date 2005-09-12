@@ -430,17 +430,19 @@ public class HumanPlayer extends BNSClientThread {
             CAT.debug(name + "was called to quit");
             CAT.debug("sending quit to server..");
         }
-        try {
-            comm.abmelden(name); // notify server
-        }
-        catch (Exception e){
-            CAT.warn("in shutdown (deregistering)", e);
-        }
-        try {
-            comm.shutdown(true); // close socket and streams
-        }
-        catch (Exception e){
-            CAT.warn("in shutdown (killing communication)", e);
+        if ( comm != null ) {
+	        try {          
+	                comm.abmelden(name); // notify server            
+	        }
+	        catch (Exception e){
+	            CAT.warn("in shutdown (deregistering)", e);
+	        }
+	        try {           
+	                comm.shutdown(true); // close socket and streams            
+	        }
+	        catch (Exception e){
+	            CAT.warn("in shutdown (killing communication)", e);
+	        }
         }
         CAT.debug("setting condition for leaving the run()-method");
         gameOver = true;               
