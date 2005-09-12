@@ -225,7 +225,7 @@ public class Start extends JFrame implements WindowListener {
                 wth.start();
             }
         } catch (IllegalThreadStateException e) {
-            System.err.println(Message.say("Start", "eSpielEnde"));
+            CAT.error(Message.say("Start", "eSpielEnde"));
         }
         CAT.debug("disposing start frame");
         dispose();

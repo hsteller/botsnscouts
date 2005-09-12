@@ -143,9 +143,7 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
 	        }   
             Global.debug(this, "SpielerMensch gestartet");
             parent.addKS(smth);
-            parent.hide();
-           // XXX HS 28.05.2005 parent.dispose();
-           // XXX HS 28.05.2005 parent.beenden();
+            parent.hide();         
         } else if (e.getActionCommand().equals("back")) {
             parent.showMainMenu();
         }
