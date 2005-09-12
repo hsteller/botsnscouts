@@ -35,7 +35,6 @@ import java.util.Properties;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.apache.log4j.Category;
 
@@ -49,9 +48,12 @@ import de.botsnscouts.util.Message;
 import de.botsnscouts.util.Registry;
 import de.botsnscouts.util.SoundMan;
 import de.botsnscouts.util.Task;
-import de.botsnscouts.widgets.GreenTheme;
 import de.botsnscouts.widgets.OptionPane;
-
+/**
+ * 
+ * 
+ * @version $Id$
+ */
 public class Start extends JFrame implements WindowListener {
 
     private static final Category CAT = Category.getInstance(Start.class);
@@ -157,6 +159,7 @@ public class Start extends JFrame implements WindowListener {
         switchCard(MAIN_MENU);
         mainMenu.unrollOverButs();
         setTitle(Message.say("Start", "mStartTitel"));
+        //setVisible(true);
     }
 
     public void windowDeactivated(WindowEvent e) {
