@@ -30,6 +30,7 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Category;
 
 import de.botsnscouts.gui.OkComponent;
+import de.botsnscouts.gui.Splash;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.Global;
@@ -107,29 +108,49 @@ public class JoinGamePanel extends ColoredComponent {
 
         confirmPanel.addOkListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                BNSThread smth;
-                try {
-                    smth = Facade.participateInAGame(hostName.getText(), port, robName.getText(),
-                        colors.getSelectedIndex());
-                }
-                catch (JoiningGameFailedException je){
-                    Exception cause = je.getPossibleReason();                      
-                    String msg1 = Message.say("Start","registerAtServerError");
-                    String msg2 = msg1;
-                    CAT.error(je.getMessage(),je);
-                    if (cause!=null){                         
-                        msg2 = cause.getMessage();                         
-                        CAT.error(msg2, cause);
-                    }                      
-          		 
-                    JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);                                                                                        
-                    return;
-                }                
-                Global.debug(this, "SpielerMensch gestartet");
-                parent.addKS(smth);
-                parent.hide();
-//              XXX HS 28.05.2005  parent.dispose();
-//              XXX HS 28.05.2005 parent.beenden();
+                Thread dontBlockAWT = new Thread(new Runnable(){                
+                    public void run() {
+	                    parent.setVisible(false);
+	                    Splash connectSplash = new Splash();
+	                    connectSplash.setText(Message.say("Start", "connectServer1"));
+	                    connectSplash.showSplash(true);
+	                    BNSThread smth=null;
+		                try {		                  
+		                    smth = Facade.participateInAGame(hostName.getText(), port, robName.getText(),
+		                                    									colors.getSelectedIndex());
+		                    connectSplash.setText(Message.say("Start", "connectServer2"));
+		                    synchronized(this) {
+		                        try {
+		                            wait(500);
+		                        }
+		                        catch (InterruptedException ie){		                           
+		                        }
+		                    }
+		                    connectSplash.showSplash(false);
+		                }
+		                catch (JoiningGameFailedException je){
+		                    Exception cause = je.getPossibleReason();                      
+		                    String msg1 = Message.say("Start","registerAtServerError");
+		                    String msg2 = msg1;
+		                    CAT.error(je.getMessage(),je);
+		                    if (cause!=null){                         
+		                        msg2 = cause.getMessage();                         
+		                        CAT.error(msg2, cause);
+		                    }            
+		                    connectSplash.showSplash(false);
+		                    JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);                                                                                        
+		                    parent.setVisible(true);
+		                    return;
+		                }
+		                finally {
+		                    connectSplash = null;
+		                }
+		                
+		                parent.addKS(smth);
+                    }
+                });
+                dontBlockAWT.start();
+                
             }
         });
         confirmPanel.addBackListener(new ActionListener() {
