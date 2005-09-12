@@ -37,9 +37,12 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+
+import org.apache.log4j.Category;
 
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Conf;
@@ -58,6 +61,8 @@ import de.botsnscouts.widgets.TJTextField;
  */
 public class ParticipatePanel extends ColoredComponent implements ActionListener {
 
+    private static Category CAT = Category.getInstance(ParticipatePanel.class);
+    
     private JTextField hostName;
     private JTextField robName;
     private JComboBox colors;
@@ -118,8 +123,24 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
 
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("go")) {
-            BNSThread smth = Facade.participateInAGame(hostName.getText(), port, robName.getText(),
+            BNSThread smth;
+            try {
+                smth = Facade.participateInAGame(hostName.getText(), port, robName.getText(),         
                     colors.getSelectedIndex());
+            }        
+            catch (JoiningGameFailedException je){
+	            Exception cause = je.getPossibleReason();                      
+	            String msg1 = Message.say("Start","registerAtServerError");
+	            String msg2 = msg1;
+	            CAT.error(je.getMessage(),je);
+	            if (cause!=null){                         
+	                msg2 = cause.getMessage();                         
+	                CAT.error(msg2, cause);
+	            }                      	  		 
+	            JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);                                                                                        
+	            parent.showMainMenu();
+	            return;
+	        }   
             Global.debug(this, "SpielerMensch gestartet");
             parent.addKS(smth);
             parent.hide();
