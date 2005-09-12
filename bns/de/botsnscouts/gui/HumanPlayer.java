@@ -39,6 +39,7 @@ import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.comm.ClientAntwort;
 import de.botsnscouts.comm.KommClientSpieler;
 import de.botsnscouts.comm.KommException;
+import de.botsnscouts.server.RegistrationException;
 import de.botsnscouts.start.JoiningGameFailedException;
 import de.botsnscouts.util.BNSClientThread;
 import de.botsnscouts.util.Bot;
@@ -419,7 +420,8 @@ public class HumanPlayer extends BNSClientThread {
 	        }
     }
 
-    public boolean sendRegistrationRequestOnce (String host, int port) throws KommException{
+    public boolean sendRegistrationRequestOnce (String host, int port) throws KommException,
+    																									RegistrationException{
         return comm.anmelden2(host, port, name, myColor);
     }
 

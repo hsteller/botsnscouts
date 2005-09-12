@@ -50,6 +50,7 @@ import de.botsnscouts.comm.KommClientAusgabe;
 import de.botsnscouts.comm.KommException;
 import de.botsnscouts.comm.KommFutschException;
 import de.botsnscouts.comm.MessageID;
+import de.botsnscouts.server.RegistrationException;
 import de.botsnscouts.start.JoiningGameFailedException;
 import de.botsnscouts.util.BNSClientThread;
 import de.botsnscouts.util.Bot;
@@ -241,7 +242,7 @@ public class Ausgabe extends BNSClientThread {
     }
 
 
-    public boolean sendRegistrationRequestOnce(String host, int port) throws KommException{
+    public boolean sendRegistrationRequestOnce(String host, int port) throws KommException, RegistrationException{
        return kommClient.anmelden2(host, port, getName());
     }
            

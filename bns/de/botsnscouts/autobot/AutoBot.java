@@ -32,6 +32,7 @@ import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.comm.ClientAntwort;
 import de.botsnscouts.comm.KommClientSpieler;
 import de.botsnscouts.comm.KommException;
+import de.botsnscouts.server.RegistrationException;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Card;
@@ -102,7 +103,12 @@ public class AutoBot extends BNSThread  {
                 shutdown();
                 return;
             }
-        } catch (KommException e) {
+        }
+        catch (RegistrationException re){
+            CAT.error("The server denied the registration: "+re.getMessage() );
+            return;
+        }
+        catch (KommException e) {
             CAT.error("Could not connect", e);
             return;
         }

@@ -6,6 +6,7 @@ package de.botsnscouts.util;
 
 
 import de.botsnscouts.comm.KommException;
+import de.botsnscouts.server.RegistrationException;
 import de.botsnscouts.start.JoiningGameFailedException;
 
 /**
@@ -75,7 +76,7 @@ public abstract  class BNSClientThread extends BNSThread {
     
     
     public abstract boolean sendRegistrationRequestOnce( String hostname, int portNr) 
-    throws KommException;
+    throws KommException, RegistrationException;
         
    
     
@@ -107,13 +108,19 @@ public abstract  class BNSClientThread extends BNSThread {
                try {
                    registrationSuccess = sendRegistrationRequestOnce(host, port);                                  
                }
+               catch (RegistrationException re){
+                  // no retries in that case, we have encountered some "logical error":
+                  // the name is already in use, the game has already started or the 
+                   // maximum number of players is already registered
+                   return new JoiningGameFailedException(re);                   
+               }
                catch (Exception kE) {
                    lastEx = kE;
-                   CAT.debug(kE.getMessage());              
-                   retries++;                   
+                   CAT.debug(kE.getMessage());                                                   
                }            
                if (!registrationSuccess) {
                    waitToRetry();
+                   retries++;
                }
            }
      
