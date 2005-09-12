@@ -25,6 +25,10 @@
  
 package de.botsnscouts.util;
 
+/**
+ * 
+ * @version $Id$
+ */
 public abstract class BNSThread extends Thread implements Shutdownable {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( BNSThread.class );
 
@@ -69,19 +73,13 @@ public abstract class BNSThread extends Thread implements Shutdownable {
         String s = super.toString();     
         return s;
     }
+
+    
     
     private ShutdownableSupport shutdownSupport = new ShutdownableSupport(this);
     
     /** Override this method instead of "shutdown()" */
     public abstract void doShutdown();
-    
-   /* public void doShutdown(boolean notifyListeners){
-        if (notifyListeners){ //
-            doShutdown();
-        }       
-    }
-      */  
-   
  
     public final void shutdown(){
         shutdown(true);
