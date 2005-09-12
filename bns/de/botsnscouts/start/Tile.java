@@ -32,6 +32,8 @@ import de.botsnscouts.util.Location;
 
 /** Saves image and name of tiles and
  *  gives rotated image.
+ * 
+ * @version $Id$
  */
 public class Tile extends SimBoard {
 
@@ -72,7 +74,9 @@ public class Tile extends SimBoard {
         return rotat;
     }
 
-    //gibt um 90° gedrehtes Clone
+    /*
+     * Creates a version of this tile rotated by 90 degrees
+     */
     public Tile getRotated() {
         String gedrTile = getTurnedLeft90Degrees();
         Tile drTile = null;
