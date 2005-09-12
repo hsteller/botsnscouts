@@ -231,7 +231,7 @@ public class View extends JFrame {
 	this.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e){
 		      if (ausgabeView!=null){
-                          ausgabeView.quit(false); // will tell all the others to quit, using
+                          ausgabeView.quit(false, false); // will tell all the others to quit, using
                                                    // the same functions like the Quit-game-button;
                                                    // quitHumanPlayer() will be called, too
                       }

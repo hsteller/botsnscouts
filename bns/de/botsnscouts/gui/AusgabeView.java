@@ -489,11 +489,7 @@ public class AusgabeView extends PaintPanel  {
       return gameBoardCanvas;
     }
 
-    
-    protected void quit(boolean keepWatching){
-        quit (keepWatching, false);
-    }
-    
+      
      protected void quit(boolean keepWatching, boolean killJVM) {
         CAT.debug("AusgabeView starts procedure to quit the client..");
 		JLabel[] msg = new JLabel[2];
