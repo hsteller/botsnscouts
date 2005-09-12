@@ -25,10 +25,13 @@
  
 package de.botsnscouts.comm;
 
-/** KommExceptions werden von den Komm-Klassen geworfen, falls diese einen String nicht parsen können oder eine Exception beim Parsen auftritt.
-  @author Hendrik
- */ 
-  
+  /**
+   * KommExceptions will be thrown by communication classes in case they are not able
+   * to parse a received String. 
+   * 
+   * @author Hendrik Steller
+   * @version $Id$
+   */
 public class KommException extends Exception {
   
 	public KommException () {
@@ -36,9 +39,7 @@ public class KommException extends Exception {
   	}
 
 
-  /** Der String s wird als Message der Exception ausgegeben.
-   */
-	public KommException (String s) {
+  public KommException (String s) {
     		super (s);
   	}
   

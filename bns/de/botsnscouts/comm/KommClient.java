@@ -775,9 +775,9 @@ public class KommClient implements Shutdownable{
             in = new BufferedReader(new InputStreamReader(socAnmeldung.getInputStream()));
             out= new PrintWriter(new OutputStreamWriter(socAnmeldung.getOutputStream()),true);
             if (in==null)
-                System.err.println("KommClient: in ist null (anmelden)");
+                CAT.error("in is null (anmelden)");
             if (out==null)
-                System.err.println("KommClient: out ist null (anmelden)");
+                CAT.error("out is null (anmelden)");
             String raus = kuerzel+"("+clientName+")";
             // out.println(raus);
             this.senden(raus);
@@ -793,16 +793,17 @@ public class KommClient implements Shutdownable{
         try {
             String antwort=in.readLine();
             if (antwort==null)
-                System.err.println ("KommClient: antwort ist null");
+                System.err.println ("KommClient: answer is null");
             if (antwort.equals("ok") || (antwort.equals("OK")))
                 return true;
             else if (antwort.equals("error") || (antwort.equals("ERROR")))
                 return false;
             else
-                throw new KommException("Falsche Rueckgabe (nicht ok/error)bei \"anmeldung\"");
+                throw new KommException("Wrong return value for server registration request: "+antwort);
         }
-        catch (IOException fehler_beim_Lesen_vom_BufferedReader) {
-            throw new KommException ("Fehler bei der Anmeldung: IOexception beim Lesen");
+        catch (IOException ie) {
+            throw new KommException ("Error registering at the server: IOException during read: "
+                            +ie.getMessage());
         }
         
         
