@@ -36,7 +36,9 @@ import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.KrimsKrams;
 import de.botsnscouts.util.Registry;
 
-// launches human player, output ...
+/**  launches human player, output ...
+ * @version $Id$	
+ * */
 
 public class Launcher implements RegistrationStartListener{
 
@@ -54,31 +56,34 @@ public class Launcher implements RegistrationStartListener{
     private static  Launcher meTheLauncher = new Launcher();
     
     // launches output
-    public static BNSThread watchAGame(String ip, int port, boolean noSplash) {
+    public static BNSThread watchAGame(String ip, int port, boolean noSplash) throws JoiningGameFailedException{
         if (noSplash) { 
             // this also means that we were started due to  the checked  
               // "participate checkbox" on server startup - and not via "join game" in the main menu;
             // in the first case there should be a local server, in the second case there shouldn't => no waiting
             meTheLauncher.ensureRegistrationHasStarted();
         }
-        try {
-            Ausgabe view = new Ausgabe(ip, port, noSplash){
-                public void doShutdown() {
-                    // TODO maybe kill the Ausgabe?
-                }     
-            };
-            gameRegistry.addClient(view, ip, port);
-            view.start();
-            return view;
-           
-        } catch (Exception exp) {
-            return null;
+        Ausgabe view = new Ausgabe(ip, port, noSplash);
+        try {                   
+            view.bnsStart();
+            return view;           
+        } 
+        catch (Exception exp) {
+            view.shutdown();
+            view = null;
+            if (exp instanceof JoiningGameFailedException) {
+                throw (JoiningGameFailedException)exp;
+            }
+            else {
+                CAT.warn(exp.getMessage(), exp);
+                throw new JoiningGameFailedException(exp);
+            }
         }
         
     }
 
     // launches human player
-    public static BNSThread participateInAGame(String ip, int port, String name, int farbe, boolean noSplash) {
+    public static BNSThread participateInAGame(String ip, int port, String name, int farbe, boolean noSplash)throws JoiningGameFailedException {
         CAT.debug("participate: has registration started? -> "+meTheLauncher.regHasStarted);
         if (noSplash) { 
             // this also means that we were started due to  the checked  
@@ -86,16 +91,21 @@ public class Launcher implements RegistrationStartListener{
             // in the first case there should be a local server, in the second case there shouldn't => no waiting
             meTheLauncher.ensureRegistrationHasStarted();
         }
-        HumanPlayer ret;
-        try {
-            if (CAT.isDebugEnabled()) CAT.debug("Trying to start human player...");
-            ret = new HumanPlayer(ip, port, name, farbe, noSplash);            
-            gameRegistry.addClient(ret, ip, port);
-            ret.start();
-        } catch (Exception u) {
-            CAT.error("Error while starting the game for player " + name + ": " + u.getMessage());
-            return null;
+        HumanPlayer ret = new HumanPlayer(ip, port, name, farbe, noSplash);
+        try {                                   
+            ret.bnsStart();
         }
+        catch (Exception exp) {
+            CAT.error("Error while starting the game for player " + name + ": " + exp.getMessage());
+            ret.shutdown();      // TODO necessary? shutting down of a possible Ausageb needed?      
+            if (exp instanceof JoiningGameFailedException) {
+                throw (JoiningGameFailedException)exp;
+            }
+            else {
+                CAT.warn(exp.getMessage(), exp);
+                throw new JoiningGameFailedException(exp);
+            }
+        } 
         return ret;
     }
 
