@@ -36,6 +36,7 @@ import org.apache.log4j.PropertyConfigurator;
 import de.botsnscouts.gui.Splash;
 import de.botsnscouts.start.Start;
 import de.botsnscouts.widgets.GreenTheme;
+
 /**
  * 
  * @version $Id$

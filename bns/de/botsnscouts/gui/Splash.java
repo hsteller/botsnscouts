@@ -41,10 +41,9 @@ import javax.swing.JLabel;
 import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.widgets.TJLabel;
 
-/** $id:$
- * @author Daniel Holtz, modified by Dirk, modified by Hendrik, modified by ??? ;-)
+/**
+ * @version $Id$
  */
-
 public class Splash{
     public static final int WIDTH = 468;
     public static final int HEIGHT = 115;
