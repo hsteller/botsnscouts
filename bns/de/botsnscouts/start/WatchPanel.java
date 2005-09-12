@@ -38,9 +38,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+
+import org.apache.log4j.Category;
 
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Message;
@@ -51,9 +54,12 @@ import de.botsnscouts.widgets.TJTextField;
 /**
  * You see this panel when you want to register for watching a game without
  * participating.
+ * @version $Id$
  */
 public class WatchPanel extends JPanel implements ActionListener, MouseListener {
-
+    
+    private static Category CAT = Category.getInstance(WatchPanel.class);
+    
     JLabel server;
     //JLabel port;
 
@@ -114,20 +120,37 @@ public class WatchPanel extends JPanel implements ActionListener, MouseListener 
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("go")) {
-//	    System.out.println(farb.getSelectedIndex());
-            int portnr = 8077;
-            /*try{
-            portnr=Integer.parseInt(prt.getText());
-            }catch (Exception x){
-            System.err.println("Must be a number!");
-            return;
-            }*/
-            BNSThread ausgabe = Facade.watchAGame(serv.getText(), portnr);
-            parent.addKS(ausgabe);
-            parent.hide();
-//          XXX HS 28.05.2005 parent.dispose();
-//          XXX HS 28.05.2005 parent.beenden();
+        if (e.getActionCommand().equals("go")) {           
+            Thread foo = new Thread(new Runnable() {
+                public void run() {
+                    BNSThread ausgabe;  
+                    int portnr = 8077;
+		            try {
+		                parent.setVisible(false);
+		                // shows a splash:
+		                ausgabe = Facade.watchAGame(serv.getText(), portnr);
+		            }
+		            catch (JoiningGameFailedException je){
+		                Exception cause = je.getPossibleReason();                      
+		                String msg1 = Message.say("Start","registerAtServerError");
+		                String msg2 = msg1;
+		                CAT.error(je.getMessage(),je);
+		                if (cause!=null){                         
+		                    msg2 = cause.getMessage();                         
+		                    CAT.error(msg2, cause);
+		                }                      
+		      		 
+		                JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);                                                                                        
+		                parent.setVisible(true);
+		                //parent.showMainMenu();
+		                return;
+		            }   
+		            parent.addKS(ausgabe);
+		            
+                }
+            });
+            foo.start();
+            
         } else if (e.getActionCommand().equals("back")) {
             parent.showMainMenu();
         }
