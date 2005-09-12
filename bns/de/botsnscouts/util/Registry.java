@@ -50,6 +50,11 @@ public class Registry implements ShutdownListener, GameOverListener {
     	private static final boolean TRY_RESTART_WITHOUT_KILLING_JVM = false;
     	private static final int MS_TO_WAIT_FOR_SERVER_SHUTDOWN = TRY_RESTART_WITHOUT_KILLING_JVM?5500:750;
     	
+	    public static final int CLIENT_TYPE_UNKNOWN      = -1;
+	    public static final int CLIENT_TYPE_HUMANPLAYER = 1;
+	    public static final int CLIENT_TYPE_VIEW              = 2;
+	    public static final int CLIENT_TYPE_AUTOBOT        = 3;
+    	
     	private static Registry globalGameRegistry = new Registry();
     	
         private Collection games;
@@ -145,18 +150,18 @@ public class Registry implements ShutdownListener, GameOverListener {
         }
         
         public  void addClient (HumanPlayer player, String serverIp, int port){
-            addClient(serverIp, port, player, ClientInfo.CLIENT_TYPE_HUMANPLAYER);
+            addClient(serverIp, port, player, CLIENT_TYPE_HUMANPLAYER);
         }
         
         public void addClient (AutoBot player, String serverIp, int port){
-            addClient(serverIp, port, player, ClientInfo.CLIENT_TYPE_AUTOBOT);
+            addClient(serverIp, port, player, CLIENT_TYPE_AUTOBOT);
         }
         
         public  void addClient (Ausgabe view, String serverIp, int port){
-            addClient(serverIp, port, view, ClientInfo.CLIENT_TYPE_VIEW);
+            addClient(serverIp, port, view, CLIENT_TYPE_VIEW);
         }
         
-        private  void addClient(String serverIp, int port, Shutdownable client, int clientInfoClientType){
+        protected  void addClient(String serverIp, int port, Shutdownable client, int clientInfoClientType){
             if (!isEnabled) {
                 return;
             }
@@ -251,6 +256,8 @@ public class Registry implements ShutdownListener, GameOverListener {
         	
         	
         }
+        
+        
         
        
         
@@ -384,7 +391,7 @@ public class Registry implements ShutdownListener, GameOverListener {
                 if (removeSuccessful) {                   
 	                if (!someThreadsGame.hasHumanView()){
 	                    CAT.debug("removed "+someThread+"; no local view connected anymore");	                    
-	                     boolean probablyFinisheDshutdownNicely;
+	                     //boolean probablyFinisheDshutdownNicely;
 	                   
 	                    final Game stg = someThreadsGame;
 	                    final Object [] pseudoBoolean = new Object[1]; 
@@ -806,15 +813,9 @@ public class Registry implements ShutdownListener, GameOverListener {
  * */
 class ClientInfo {
    
-	Category CAT = Category.getInstance(ClientInfo.class);
-	
-    public static final int CLIENT_TYPE_UNKNOWN      = -1;
-    public static final int CLIENT_TYPE_HUMANPLAYER = 1;
-    public static final int CLIENT_TYPE_VIEW              = 2;
-    public static final int CLIENT_TYPE_AUTOBOT        = 3;
+	Category CAT = Category.getInstance(ClientInfo.class);	   
     
-    
-    private int clientType = CLIENT_TYPE_UNKNOWN;
+    private int clientType = Registry.CLIENT_TYPE_UNKNOWN;
     private Shutdownable client = null;
     
     /**
