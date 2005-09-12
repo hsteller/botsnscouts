@@ -43,6 +43,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
@@ -194,7 +195,22 @@ public class StartPanel extends JPanel {
                 new Thread() {
                     public void run() {
                         CAT.debug("Button pressed. Going to register " + name.getText());
-                        BNSThread player = Facade.participateInAGameNoSplash(name.getText(), color.getSelectedIndex());
+                        BNSThread player;
+                        try {
+                            player = Facade.participateInAGameNoSplash(name.getText(), color.getSelectedIndex());
+                        }
+                        catch (JoiningGameFailedException je){
+                            Exception cause = je.getPossibleReason();                      
+                            String msg1 = Message.say("Start","registerAtServerError");
+                            String msg2 = msg1;
+                            CAT.error(je.getMessage(),je);
+                            if (cause!=null){                         
+                                msg2 = cause.getMessage();                         
+                                CAT.error(msg2, cause);
+                            }                                        		 
+                            JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);                                                                                        
+                            return;
+                        }   
                         parent.addKS(player);
                         //Generate a new name for the (potential) next local player
                         name.setText(KrimsKrams.randomName());
