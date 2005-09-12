@@ -48,6 +48,7 @@ import de.botsnscouts.start.RegistrationStartListener;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Encoder;
+import de.botsnscouts.util.Message;
 import de.botsnscouts.util.ShutdownListener;
 import de.botsnscouts.util.Shutdownable;
 import de.botsnscouts.util.ShutdownableSupport;
@@ -66,7 +67,7 @@ class RegistrationManager implements Runnable, Shutdownable {
     
     ServerSocket seso; 
     
-    Set names = new HashSet();
+    private Set names = new HashSet();
     
     int anzSpieler = 0;
     
@@ -184,20 +185,24 @@ class RegistrationManager implements Runnable, Shutdownable {
     
     /** Registriert Namen als benutzt - soll mit isLegalName() benutzt werden */
     private void addName(String s) throws RegistrationException {
-        if (CAT.isDebugEnabled()) {
-            CAT.debug("want to add " + s + ", right now we have:");
-            Iterator i = names.iterator();
-            while (i.hasNext())
-                CAT.debug(i.next());
+        synchronized (names) {
+	        if (CAT.isDebugEnabled()) {
+	            CAT.debug("want to add " + s + ", right now we have:");
+	            Iterator i = names.iterator();
+	            while (i.hasNext())
+	                CAT.debug(i.next());
+	        }
+	        if (names.contains(s))
+	            throw new RegistrationException("Name already registered");
+	        else
+	            names.add(s);
         }
-        if (names.contains(s))
-            throw new RegistrationException("Name already registered");
-        else
-            names.add(s);
     }
     
     boolean isNameAvailable(String name) {
-        return !names.contains(name);
+        synchronized (names) {
+            return !names.contains(name);
+        }
     }
     
     /**
@@ -271,31 +276,40 @@ class RegistrationManager implements Runnable, Shutdownable {
     private void registerPlayer(String clientName, int farbe, BufferedReader in, PrintWriter out, float version)
     throws RegistrationException {
         // darf ein Spieler sich anmelden?
-        CAT.debug("Ein Spieler versucht sich an der Anmeldung.");
+        CAT.debug("A player tries to connect");
         // einfacher?: if(server.gameRunning())
         if (server.isGameStarted()) {
-            CAT.debug("Keine Roboteranmeldungen jetzt. Kille Verbindung");
-            out.println("REN(SO(SpielLaeuftSchon))");
+            CAT.debug("No more bot registrations at this point . Killing connection");
+            String msg = Message.say("Server", "registrationFailureGameRunning");
+            out.println("Error: "+msg);            
+            //            out.println("error ");
+           // out.println("REN(SO(SpielLaeuftSchon))");
             throw new RegistrationException("No robot registrations allowed now.");
         }
-        CAT.debug("Er darf jedenfalls, vom Server aus.");
+        CAT.debug("He may - as far as the server is concerned..");
         
         if (!isNameAvailable(clientName)) {
-            out.println("REN(SO(SchonVergebenerName))");
+            String msg = Message.say("Server", "registrationFailureName");
+            out.println("Error: "+msg);                                   
+            //out.println("error");
+         //   out.println("REN(SO(nameAlreadyInUse)");
             throw new RegistrationException("Name already registered: " + clientName);
         }
-        CAT.debug("Der Name ist jedenfalls noch nicht vergeben.");
+        CAT.debug("The name isn't in use.");
         addName(clientName);
         
         if (anzSpieler == server.getMaxPlayers()) {
-            CAT.debug("Zuviele Spieler. Kille Verbindung");
-            out.println("REN(ZS)");
+            CAT.debug("Too many players. Killing connection");
+            String msg = Message.say("Server", "registrationFailureGameFull");
+            out.println("Error: "+msg);
+            //out.println("error");
+            //out.println("REN(ZS)");
             throw new RegistrationException("Game is full!");
         } // Zuviele Spieler
-        CAT.debug("Noch nicht zuviele Spieler.");
+        CAT.debug("Not yet too many players..");
         
         farbe = server.allocateColor(farbe, clientName);
-        CAT.debug("Farbe Nr. " + farbe + " zugeteilt.");
+        CAT.debug("Assigned color: " + farbe);
         
         Bot h = Bot.getNewInstance(clientName);
         h.setBotVis(farbe);
@@ -372,34 +386,6 @@ class RegistrationManager implements Runnable, Shutdownable {
             while (it.hasNext()){
                 ((RegistrationStartListener) it.next()).registrationStarted();
             }
-        }
-    }
-    
-    
-    static class RegistrationException extends Exception {
-        Exception nested = null;
-        
-        RegistrationException() {
-        };
-        
-        RegistrationException(String s) {
-            super(s);
-        }
-        
-        RegistrationException(String s, Exception nested) {
-            super(s);
-            this.nested = nested;
-        }
-        
-        RegistrationException(Exception nested) {
-            this.nested = nested;
-        }
-        
-        public String getMessage() {
-            if (nested != null)
-                return super.getMessage() + "[" + nested.getMessage() + "]";
-            else
-                return super.getMessage();
         }
     }
 }
