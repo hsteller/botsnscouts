@@ -366,6 +366,7 @@ public class Ausgabe extends BNSClientThread {
         BoardView board = new BoardView(sim, robotsNewColor);
         board.setAutoscrolls(true);
         ausgabeView = new AusgabeView(board, getRoboterArray(), this);
+        fireAusgabeViewInit();
         board.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent me) {
                 if ((me.getModifiers() & MouseEvent.BUTTON3_MASK) > 0) {
@@ -430,8 +431,31 @@ public class Ausgabe extends BNSClientThread {
         return robs;
     }
 
-
+    private synchronized  void waitForAusgabeViewInit(){
+        while (ausgabeView==null) {            
+                try {
+                    this.wait();
+                }
+                catch (InterruptedException ie){
+                    CAT.warn(ie.getMessage(), ie);
+                }                       
+        }        
+        this.notifyAll();       
+    }
+    
+    private synchronized void fireAusgabeViewInit(){
+        this.notifyAll();
+    }
+    
+/**
+ * CAUTION: will block until the AusgabeView is not null 
+ * (the AusgabeView will be created when the server sends the "game start" message). 
+ * @return the AusagbeView that does all the displaying for this Ausgabe
+ */
     public AusgabeView getAusgabeView() {
+        if (ausgabeView == null){
+            waitForAusgabeViewInit();
+        }
         return ausgabeView;
     }
 

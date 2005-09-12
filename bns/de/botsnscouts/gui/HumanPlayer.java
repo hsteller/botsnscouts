@@ -237,7 +237,7 @@ public class HumanPlayer extends BNSClientThread {
                     // start of the game
                 case (ClientAntwort.SPIELSTART):
                     {
-                        showMessage(Message.say("SpielerMensch", "spielgehtlos"));
+                        showMessage(Message.say("SpielerMensch", "spielgehtlos"));                       
                         comm.spielstart();
                         break;
                     }
@@ -764,12 +764,11 @@ public class HumanPlayer extends BNSClientThread {
     private void initView() throws JoiningGameFailedException{
         humanView = new HumanView(this);
         view = new View(humanView); // adds the humanView to the JFrame ("view")
-        // the following construtor will add the AusgabeView to the JFrame:
-        ausgabe = new Ausgabe(super.getServer(), super.getPortOnServer(), nosplash, view);   
-        ausgabe.bnsStart();
-            
-        humanView.addPhaseInfoPanel(ausgabe.getAusgabeView().getPhaseEvalPanel());
-     
+        ausgabe = new Ausgabe(super.getServer(), super.getPortOnServer(), nosplash, view);           
+        ausgabe.bnsStart();     
+        // ausgabe.getAusgabeView() will block until the game has started;
+        // the AusgabeView won't be available until then        
+        humanView.addPhaseInfoPanel(ausgabe.getAusgabeView().getPhaseEvalPanel());    
     }
 
 
