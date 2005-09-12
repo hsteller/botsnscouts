@@ -527,6 +527,16 @@ public class AusgabeView extends PaintPanel  {
 		            CAT.warn(e.getMessage(), e);
 		        }
 		    }
+		    if (killJVM) {
+		        // the disabling of the registry is needed here, because the shutdown
+		        // of every client will result in the registry trying to "redisplay" the
+		        // main menu - and "redisplaying the main menu" means at the moment that a new
+		        // JVM is launched => the application could only be closed in the main menu,
+		        // but not by closing the window or selecting the "quit game" menu item.
+		        // In fact, without disabling the registry, both "restart game" and "quit game"
+		        // would have the same effect at the moment
+		        Registry.getSingletonInstance().setEnabled(false);
+		    }
 		    boolean shutdownPossibleHumanPlayer = true;
 	        ausgabe.quit(keepWatching, shutdownPossibleHumanPlayer);
 	        if (killJVM) {
