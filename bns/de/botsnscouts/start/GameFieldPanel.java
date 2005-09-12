@@ -465,6 +465,7 @@ public class GameFieldPanel extends JPanel {
              */
             parent.showNewStartPanel(new Task() {
                 public void doIt() {
+                  try {
                     if (participate.getSelectedObjects() != null) {                       
                         BNSThread smth = Facade.participateInAGameNoSplash(nam.getText(), colors.getSelectedIndex());
                         parent.addKS(smth);
@@ -472,6 +473,19 @@ public class GameFieldPanel extends JPanel {
                     } else {//starte einen AusgabeFrame
                         parent.addKS(Facade.watchAGameNoSplash());
                     }
+                  }
+                  catch (JoiningGameFailedException je){
+                      Exception cause = je.getPossibleReason();                      
+                      String msg1 = Message.say("Start","registerAtServerError");
+                      String msg2 = msg1;
+            		 CAT.error(je.getMessage(),je);
+                      if (cause!=null){                         
+                          msg2 = cause.getMessage();                         
+                          CAT.error(msg2, cause);
+                      }                      
+            		 
+                      JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);                                                                                        
+                  }
                     // Announce game, if we shall do this.
                     try {
                         announceGame.announceGame(gameOptions);

@@ -19,12 +19,15 @@ import javax.swing.JButton;
 
 import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import org.apache.log4j.Category;
 
 import de.botsnscouts.gui.OkComponent;
 import de.botsnscouts.util.BNSThread;
@@ -64,7 +67,8 @@ import de.botsnscouts.widgets.TJTextField;
  * @author Miriam
  */
 public class JoinGamePanel extends ColoredComponent {
-
+    
+    private static Category CAT = Category.getInstance(JoinGamePanel.class);
 
     private JTextField hostName = new TJTextField(Message.say("Start", "mServerInh"),
                                         JTextField.CENTER, true);
@@ -103,8 +107,24 @@ public class JoinGamePanel extends ColoredComponent {
 
         confirmPanel.addOkListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                BNSThread smth = Facade.participateInAGame(hostName.getText(), port, robName.getText(),
+                BNSThread smth;
+                try {
+                    smth = Facade.participateInAGame(hostName.getText(), port, robName.getText(),
                         colors.getSelectedIndex());
+                }
+                catch (JoiningGameFailedException je){
+                    Exception cause = je.getPossibleReason();                      
+                    String msg1 = Message.say("Start","registerAtServerError");
+                    String msg2 = msg1;
+                    CAT.error(je.getMessage(),je);
+                    if (cause!=null){                         
+                        msg2 = cause.getMessage();                         
+                        CAT.error(msg2, cause);
+                    }                      
+          		 
+                    JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);                                                                                        
+                    return;
+                }                
                 Global.debug(this, "SpielerMensch gestartet");
                 parent.addKS(smth);
                 parent.hide();
