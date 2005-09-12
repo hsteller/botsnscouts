@@ -37,7 +37,9 @@ import de.botsnscouts.util.Location;
 
 // Diese Klasse dient der Entkopplung der GUI-Schicht (StartSpieler)
 // von der Fachkonzeptschicht(...) und der Datenhaltungsschicht (...)
-
+/**
+ * @version $Id$
+ */
 public class Facade {
 
     private static Category CAT = Category.getInstance(Facade.class);
@@ -227,22 +229,22 @@ public class Facade {
     /**
      * Start a stand-alone Ausgabe.
      */
-    public static BNSThread watchAGame(String ip, int port) {
+    public static BNSThread watchAGame(String ip, int port) throws JoiningGameFailedException{
         return Launcher.watchAGame(ip, port, false);
     }
 
-    public static BNSThread watchAGame() {
+    public static BNSThread watchAGame()throws JoiningGameFailedException {
         return Launcher.watchAGame(GameOptions.DHOST, GameOptions.DPORT, false);
     }
 
-    public static BNSThread watchAGameNoSplash() {
+    public static BNSThread watchAGameNoSplash() throws JoiningGameFailedException{
         return Launcher.watchAGame(GameOptions.DHOST, GameOptions.DPORT, true);
     }
 
     /**
      * Start a human player
      */
-    public static BNSThread participateInAGame(String ip, int port, String name, int color) {
+    public static BNSThread participateInAGame(String ip, int port, String name, int color) throws JoiningGameFailedException{
         return Launcher.participateInAGame(ip, port, name, color, false);
     }
 
@@ -251,11 +253,11 @@ public class Facade {
     }
 */
     // called by Start.main(); should wait for local server+registration
-    public static BNSThread participateInAGame(String name, int color) {
+    public static BNSThread participateInAGame(String name, int color) throws JoiningGameFailedException{
         return Launcher.participateInAGame(GameOptions.DHOST, GameOptions.DPORT, name, color, false);
     }
    // noSplash = should wait for server
-    public static BNSThread participateInAGameNoSplash(String name, int color) {
+    public static BNSThread participateInAGameNoSplash(String name, int color) throws JoiningGameFailedException{
         return Launcher.participateInAGame(GameOptions.DHOST, GameOptions.DPORT, name, color, true);
     }
 
