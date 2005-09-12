@@ -39,7 +39,8 @@ import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.comm.ClientAntwort;
 import de.botsnscouts.comm.KommClientSpieler;
 import de.botsnscouts.comm.KommException;
-import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.start.JoiningGameFailedException;
+import de.botsnscouts.util.BNSClientThread;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Directions;
@@ -51,11 +52,21 @@ import de.botsnscouts.util.Registry;
 import de.botsnscouts.widgets.GreenTheme;
 
 /**
- * logic for the human player
- * @author Lukasz Pekacki
+ *  This class is the main client class for a human player; it works on the
+ *  same level as the AI robots regarding the kinds of messages it
+ *  exchanges with the server.
+ *  But of course, most of these message require a decision of the human.
+ *  To interact with the human player this class uses a <code>HumanView</code> to display
+ *  the necessary dialogs. The <code>HumanView</code>in turn uses the <code>HumanPlayer</code>
+ *  to send the user's choices back to the server.
+ * 
+ *  To display the board and all the other status info and stuff (that an AI robot wouldn't care
+ *  about) this class uses an instance of an <code>Ausgabe</code> that registers separately
+ *  with the server.   
+ * 
  *  @version $Id$
  */
-public class HumanPlayer extends BNSThread {
+public class HumanPlayer extends BNSClientThread {
     static Category CAT = Category.getInstance(HumanPlayer.class);
 
     
@@ -71,9 +82,10 @@ public class HumanPlayer extends BNSThread {
     private SimBoard intelliBoard;
 
     private ArrayList cards = new ArrayList(9);
-    private String host, name;
-    private int port, myColor, globalTimeout;
-    private boolean gameOver = false, nosplash = false;
+    private String name;
+    private int myColor, globalTimeout;
+    private boolean gameOver = false;
+    private boolean  nosplash = false;
     /** The Wisenheimer the user can use */
     private Wisenheimer wisenheimer;
     /** The Wisenheimer the EmergencyCardSubmitter uses */
@@ -114,46 +126,55 @@ public class HumanPlayer extends BNSThread {
         this(host, port, name, -1);
     }
 
-    public HumanPlayer() {
+    private HumanPlayer() {
         this("localhost", 8077, KrimsKrams.randomName());
     }
 
-    public HumanPlayer(String host, int port, String name, int color) {
+    private  HumanPlayer(String host, int port, String name, int color) {
         this(host, port, name, color, false);
     }
 
+    /** 
+     * Useed by start.Launcher to start a new human player
+     * 
+     * @param host IP-address or hostname of the server
+     * @param port the port on the server to register for the game 
+     * @param name the name of the human player
+     * @param color you can ask the server to get this color/picture for the bot 
+     *              (if someone else already got that color you will get a random color)
+     * @param nosplash set to true if this player's view shouldn't display a splashscreen until the game starts 
+     */
+    
     public HumanPlayer(String host, int port, String name, int color, boolean nosplash) {
-        super("HP:" + name);
-        this.host = host;
-        this.port = port;
-        this.name = name;
+        super(name,Registry.CLIENT_TYPE_HUMANPLAYER, host, port);     
+        this.name = name; // keeping a copy instead of calling super.getName() for every request we send
         this.nosplash = nosplash;
         myColor = color;
         comm = new KommClientSpieler();
     }
 
 
-    	public String getPlayerName(){
-    	    return name;
-    	}
+	public String getPlayerName(){
+	    return super.getName();
+	}
     
-    	
-    	
+   	
     /**
-     * Start des Menschlichen Spielers
-     */
+     *  Start of a human player.
+     *  Don't call directly (it assumes the player is already registered at the server),
+     *  but if you thought about calling it (or "start()"):
+     *  --waves hand -- "These aren't the methods you are looking for."
+     *   But you might want to call/look at @see BnsClientThread.bnsStart()
+     */ 
     public void run() {
-
-        // --- registering for game ---
-        if (registerAtServer()) {
-            Global.debug(this, "registered for game as new humanplayer with name: " + name);
-        } else {
-            ErrorView.show(Message.say("HumanPlayer", "eNoServerRunning", host, port));
-            CAT.fatal("No server running on host " + host + " at port " + port);
-            return;
-        }
-
+      try {
         initView();
+      }
+      catch (JoiningGameFailedException fex){
+          CAT.fatal(fex.getMessage(), fex);
+        // TODO find a way to handle such errors..
+          throw new RuntimeException("Server registration of the human player's view (Ausgabe) failed!");
+      }            
 
         // ------- begin to play
         while (!gameOver) {
@@ -173,19 +194,16 @@ public class HumanPlayer extends BNSThread {
 	                    for (int i = 0; i < commAnswer.karten.length; i++) {
 	                        cards.add(i, new HumanCard(commAnswer.karten[i]));
 	                    }
-	                  
-	                    
-	                    try {
-	                        // the following makes-not-so-much-sense copying&stuff is done so
-	                        // that the EmergencySubmitters Wisenheimer prediction will work in
+                    try {
+	                        // the following makes-not-so-much-sense-copying&stuff is done so
+	                        // that the EmergencySubmitter's Wisenheimer prediction will work in
 	                        // some not-so-obvious cases (locked registers with register-repair by the
 	                        // repair emergency submitter); it turned out that even if the bot's locked registers 
 	                        // are ok here, they might be "magically" missing at the time of prediction, leading
 	                        // to errors
 	                        // => EmergencySubmitter gets copy of robot that noone else will mess up
 	                        Bot meAtStartOfRound = comm.getRobStatus(name);   
-	                    
-	                        /* Bot meCopy*/	                       
+                     
 	                        emergencyBotCopy.copyRob(meAtStartOfRound);
 	                        humanView.updateRegisters(meAtStartOfRound.getLockedRegisters());
 	                        humanView.showCards(cards);	                      
@@ -212,10 +230,7 @@ public class HumanPlayer extends BNSThread {
 	                        CAT.error(kE.getMessage(), kE);
 	                    }
 	                    
-                        showMessage(Message.say("SpielerMensch", "mwartereg"));
-                        
-                       
-                        
+                        showMessage(Message.say("SpielerMensch", "mwartereg"));               
                         break;
                     }
 
@@ -365,85 +380,17 @@ public class HumanPlayer extends BNSThread {
 
     }
 
-    /**
-     * Main-Methode, die den menschlichen Spieler von der Shell aus als Thread startet
-     */
-    public static void main(String[] args) {
-        //1. name
-        //2. host 
-        //3. port
-        //4. farbe 
-        // 5. killJVM 
-        String name  = KrimsKrams.randomName();
-        String host = "127.0.0.1";
-        int port = 8077, farbe = 0; 
-        boolean killJVM = true;       
-        int tmpInt;
-        switch (args.length) {
-            case 5: { // JVM
-                killJVM = new Boolean(args[4]).booleanValue();
-            }
-            case 4: { // color
-                try {
-                    farbe = Integer.parseInt(args[3]);
-                }
-                catch (NumberFormatException nfe){
-                    System.err.println("illegal color value:\"" +args[3]+"\"; using '0' instead");
-                    farbe = 0;
-                }
-            }
-            case 3: { // serverPort 
-                try {
-                    tmpInt = Integer.parseInt(args[2]);
-                    if (tmpInt < 9) {
-                        farbe = tmpInt;
-                        port = 8077;
-                    } else {
-                        port = tmpInt;
-                        farbe = 0;
-                    }
-                } catch (NumberFormatException e) {
-                    System.err.println("number parse error on \""+args[2]+"\"");
-                }
-            }
-            case 2: {// serverIp 
-                try {
-                    tmpInt = Integer.parseInt(args[1]);
-                    if (tmpInt < 9) {
-                        farbe = tmpInt;
-                        port = 8077;
-                    } else {
-                        port = tmpInt;
-                        farbe = 0;
-                    }
-                    host = "127.0.0.1";
-                } catch (NumberFormatException e) {
-                    host = args[1];
-                    port = 8077;
-                    farbe = 0;
-                }
-            }
-           case 1: { // name     
-               if (args[0] != null){                  
-                   name = args[0];
-               }
-           }
-        }
-                                
-        MetalLookAndFeel.setCurrentTheme(new GreenTheme());
-        HumanPlayer hp = new HumanPlayer(host, port, name, farbe);
-        hp.killJVMonceFinished = killJVM;
-        hp.start();
-    }
+    
 
     protected void sendCards(ArrayList registerCards, boolean nextTurnPowerDown) {
             mode = MODE_OTHER;
 	        int sendProg[] = new int[registerCards.size()];
 	        int index = 0;
 	
-	        d("meine Registerkarten: " + registerCards);
-	        d("die Karten, die der Server ausgeteilt hat:" + cards);
-	
+	        if (CAT.isDebugEnabled()) {
+	            CAT.debug("my register cards: " + registerCards);
+	            CAT.debug("the cards that were dealt by the server:" + cards);
+	        }
 	        
 	
 	        for (int i = 0; i < registerCards.size(); i++) {
@@ -472,25 +419,8 @@ public class HumanPlayer extends BNSThread {
 	        }
     }
 
-    private boolean registerAtServer() {
-        boolean anmeldungErfolg = false;
-        int versuche = 0;
-
-        while ((!anmeldungErfolg) && (versuche < 3)) {
-            try {
-                anmeldungErfolg = comm.anmelden2(host, port, name, myColor);
-            } catch (KommException kE) {
-                CAT.warn(kE.getMessage());
-                versuche++;
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                    CAT.debug(e.getMessage());
-                }
-            }
-        }
-        return anmeldungErfolg;
-
+    public boolean sendRegistrationRequestOnce (String host, int port) throws KommException{
+        return comm.anmelden2(host, port, name, myColor);
     }
 
     /** meldet den Spieler beim Server ab und beendet diesen Thread.
@@ -586,7 +516,10 @@ public class HumanPlayer extends BNSThread {
     protected void sendRepair(ArrayList respReparatur) {
         synchronized (comm) {
 	        if (!repairRegistersAnswered) {
-	            d("sende meinen Reparaturwunsch: " + respReparatur);
+	            if (CAT.isDebugEnabled()) {
+	                CAT.debug("sending my reparation whishlist as response: "
+	                                + Global.collectionToString(respReparatur));
+	            }
 		        int[] repa = new int[respReparatur.size()];
 		        for (int i = 0; i < respReparatur.size(); i++) {
 		            repa[i] = ((Integer) respReparatur.get(i)).intValue();
@@ -597,11 +530,12 @@ public class HumanPlayer extends BNSThread {
 		        repairRegistersAnswered = true;
 	        }
 	        else {
-	            CAT.debug("ignored request to send register repair ("
+	            if (CAT.isDebugEnabled()){
+	                CAT.debug("ignored request to send register repair ("
 	                            +Global.collectionToString(respReparatur)+
-	            ") because it looks like a direction got already sent..");
+	                ") because it looks like a direction got already sent..");
+	            }	           
 	        }
-	        
         }
     }
 
@@ -825,48 +759,18 @@ public class HumanPlayer extends BNSThread {
     }
 
 
-    private void initView() {
+    private void initView() throws JoiningGameFailedException{
         humanView = new HumanView(this);
-        view = new View(humanView);          // adds the humanView to the JFrame
-        ausgabe = new Ausgabe(host, port, nosplash, view);   //adds the AusgabeView to the JFrame
-        if (ausgabe.initialize()) {
-            Registry.getSingletonInstance().addClient(ausgabe, host, port);
-            ausgabe.start();
-        }
-        else {
-            CAT.warn("view.initialize returned false");
-        }
-        
+        view = new View(humanView); // adds the humanView to the JFrame ("view")
+        // the following construtor will add the AusgabeView to the JFrame:
+        ausgabe = new Ausgabe(super.getServer(), super.getPortOnServer(), nosplash, view);   
+        ausgabe.bnsStart();
+            
         humanView.addPhaseInfoPanel(ausgabe.getAusgabeView().getPhaseEvalPanel());
-       
-        /*try {
-            String [] names = comm.getNamen();
-            int nameCount = names!=null?names.length:0;
-            Bot [] bots = new Bot[nameCount];
-            ScalableRegisterRow [] rows = new ScalableRegisterRow[nameCount];
-            for (int i=0;i<nameCount;i++){
-                String botname = names[i];
-                bots[i] = ausgabe.getBot(botname);
-                rows[i] = ausgabe.getInfoRegistersForBot(botname);
-            }
-            humanView.fillPhaseInfoPanel(bots, rows);
-        }
-        catch (KommException ke){
-            CAT.error(ke.getMessage(), ke);
-        }*/
-        
+     
     }
 
-    /** Returns the size of the main JFrame or null if the JFrame
-     *  is null for any reason.
-     *  #*/
-//    protected Dimension getViewSize() {
-//      if (view!=null)
-//        return view.getSize();
-//
-//      else
-//        return null;
-//    }
+
 
 
 
@@ -890,9 +794,6 @@ public class HumanPlayer extends BNSThread {
         }
     }
 
-    private void abmelden() {
-        comm.abmelden(name);
-    }
 
     class EmergencyDirectionSubmitter extends TimerTask{
         public void run(){
@@ -1047,9 +948,77 @@ public class HumanPlayer extends BNSThread {
         }
         
     }
-
-    private void d(String s) {
-        CAT.debug(s);
+ 
+    
+    /**
+     * Main-Methode, die den menschlichen Spieler von der Shell aus als Thread startet
+     */
+    public static void main(String[] args) throws JoiningGameFailedException{
+        //1. name
+        //2. host 
+        //3. port
+        //4. farbe 
+        // 5. killJVM 
+        String name  = KrimsKrams.randomName();
+        String host = "127.0.0.1";
+        int port = 8077, farbe = 0; 
+        boolean killJVM = true;       
+        int tmpInt;
+        switch (args.length) {
+            case 5: { // JVM
+                killJVM = new Boolean(args[4]).booleanValue();
+            }
+            case 4: { // color
+                try {
+                    farbe = Integer.parseInt(args[3]);
+                }
+                catch (NumberFormatException nfe){
+                    System.err.println("illegal color value:\"" +args[3]+"\"; using '0' instead");
+                    farbe = 0;
+                }
+            }
+            case 3: { // serverPort 
+                try {
+                    tmpInt = Integer.parseInt(args[2]);
+                    if (tmpInt < 9) {
+                        farbe = tmpInt;
+                        port = 8077;
+                    } else {
+                        port = tmpInt;
+                        farbe = 0;
+                    }
+                } catch (NumberFormatException e) {
+                    System.err.println("number parse error on \""+args[2]+"\"");
+                }
+            }
+            case 2: {// serverIp 
+                try {
+                    tmpInt = Integer.parseInt(args[1]);
+                    if (tmpInt < 9) {
+                        farbe = tmpInt;
+                        port = 8077;
+                    } else {
+                        port = tmpInt;
+                        farbe = 0;
+                    }
+                    host = "127.0.0.1";
+                } catch (NumberFormatException e) {
+                    host = args[1];
+                    port = 8077;
+                    farbe = 0;
+                }
+            }
+           case 1: { // name     
+               if (args[0] != null){                  
+                   name = args[0];
+               }
+           }
+        }                                
+        MetalLookAndFeel.setCurrentTheme(new GreenTheme());
+        HumanPlayer hp = new HumanPlayer(host, port, name, farbe);
+        hp.killJVMonceFinished = killJVM;        
+        hp.bnsStart();
     }
+    
 
 }

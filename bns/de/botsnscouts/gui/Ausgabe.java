@@ -42,6 +42,7 @@ import javax.swing.JFrame;
 import org.apache.log4j.Category;
 
 
+import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.comm.ClientAntwort;
@@ -49,7 +50,8 @@ import de.botsnscouts.comm.KommClientAusgabe;
 import de.botsnscouts.comm.KommException;
 import de.botsnscouts.comm.KommFutschException;
 import de.botsnscouts.comm.MessageID;
-import de.botsnscouts.util.BNSThread;
+import de.botsnscouts.start.JoiningGameFailedException;
+import de.botsnscouts.util.BNSClientThread;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.BotVis;
 import de.botsnscouts.util.Card;
@@ -58,15 +60,38 @@ import de.botsnscouts.util.Global;
 import de.botsnscouts.util.KrimsKrams;
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Message;
+import de.botsnscouts.util.Registry;
 import de.botsnscouts.util.SoundMan;
 import de.botsnscouts.util.Stats;
 import de.botsnscouts.util.StatsList;
-import de.botsnscouts.widgets.GreenTheme;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.PaintPanel;
 
-
-public class Ausgabe extends BNSThread {
+/**
+ * Ausgabe("view")
+ * 
+ * Responsible for the view logic - the communication with the server about 
+ * stuff to display; every human player needs one, as the class "HumanPlayer" per se
+ * works on the same level as the AI bots and the AIs don't care about stuff that
+ * happens during phase evaluation.
+ * Think of an "Ausgabe" as a spectator (in fact, it can connect to a server and 
+ * let you watch the game without participating); communication that requires 
+ * the interaction of a participating player will be handled by a <code>HumanPlayer</code> 
+ *  and its <code>HumanView</code> - though they are at the moment still more connected
+ *  as one might like.
+ * The communication of an Ausgabe(view) is (more or less) "one-way":
+ * The server tells an "Ausgabe" about things that happen in the game and
+ * the Ausgabe reacts to the server's messages by calling a big bunch of handler 
+ * methods for displaying stuff. Since the server sometimes sends a simple "notify change"(NTC) 
+ *  without actually telling what has happend (only which bot(s) were affected) ,
+ *  the Ausgabe often sends requests to get the current state of robots. 
+ * 
+ * The actual displaying is done in its AusgabeView and AusgabeView's BoardView.
+ * 
+ * 
+ * @version $Id$
+ */
+public class Ausgabe extends BNSClientThread {
     static Category CAT = Category.getInstance(Ausgabe.class);
 
     // for communication with server
@@ -87,13 +112,8 @@ public class Ausgabe extends BNSThread {
 
     // game constants
     private Dimension boardDimension;
-  //  private Location[] flags;
 
-    private String host, name;
-    private int port;
     private boolean spielEnde = false;
-    private boolean nosplash = false;
-    private boolean registered = false;
 
     private int currentPhase = -1;
 
@@ -119,45 +139,47 @@ public class Ausgabe extends BNSThread {
     private MessageSequencer sequencer;
     
     
-
-  
     /**
      * Start a new Ausgabe with a View. It will start displaying Message 1.
-     */
-    public Ausgabe(String host, int port, boolean nosplash, View v) {
+     * Used by the HumanPlayer. 
+    */
+    protected Ausgabe(String host, int port, boolean nosplash, View v) {
         this(host, port, nosplash, false);
         this.view = v;
     }
 
+  
+
     /**
      * Start a new stand-alone Ausgabe. It will start displaying Messages immediately, discarding
      * earlier ones that arrive out-of-sequence.
+     *
+     * Used by start.Launcher to start a view.
      */
     public Ausgabe(String host, int port, boolean nosplash) {
         this(host, port, nosplash, true);
     }
 
     private Ausgabe(String host, int port, boolean nosplash, boolean lateInit) {
-        super("someAusgabe");
-        sequencer = new MessageSequencer(lateInit);
-        this.nosplash = nosplash;
-        this.host = host;
-        this.port = port;
-        name = KrimsKrams.randomName();
-       
-        super.setName("Ausgabe[" + name + "]");
-        showSplash(Message.say("AusgabeFrame", "msplashWarte"));
+        super("View["+KrimsKrams.randomName()+"]", Registry.CLIENT_TYPE_VIEW, host, port);       
+       // this.nosplash = nosplash;
+        if (!nosplash) {
+            showSplash(Message.say("AusgabeFrame", "msplashWarte"));
+        }
+        sequencer = new MessageSequencer(lateInit);                            
         kommClient = new KommClientAusgabe();
         initSpecialMessagesSet();
         initMessageToActionMapping();
     }
-
-    public void run() {
-
-        if (!registered) {
-            initialize();
-        }
-
+    
+    /***  Don't call directly (it assumes the view is already registered at the server),
+    *  but if you thought about calling it (or "start()"):
+    *  --waves hand -- "These aren't the methods you are looking for."
+    *   But you might want to call/look at @see BnsClientThread.bnsStart()
+    */
+    public void run() {      
+        
+        waitForGameStartAndInitGameData();
         // ---- entering game  ---------
         while (!spielEnde && !isShutDown()) {
             ClientAntwort  kommAntwort=null;
@@ -219,19 +241,20 @@ public class Ausgabe extends BNSThread {
     }
 
 
-    protected boolean initialize() {
-        registerAtServer();
+    public boolean sendRegistrationRequestOnce(String host, int port) throws KommException{
+       return kommClient.anmelden2(host, port, getName());
+    }
+           
+    private boolean waitForGameStartAndInitGameData(){
         ClientAntwort kommAntwort=null;
         try {
             kommAntwort = kommClient.warte();
-        } catch (KommFutschException kE) {
-            CAT.error("KE: " + kE.getMessage(), kE);
-            return false;
-        } catch (KommException ke) {
-            CAT.error("ke: " + ke.getMessage(),ke);
-            return false;
         }
-
+        catch (KommException ke)
+        {
+            CAT.error(ke.getMessage(), ke);
+        }
+        
         if (kommAntwort.typ == ClientAntwort.SPIELSTART) {
             CAT.debug("Server send me: game start.");
 
@@ -240,18 +263,12 @@ public class Ausgabe extends BNSThread {
                 String[] playerNames = kommClient.getNamen();
                 String[] playerColors = kommClient.getFarben();
                 Hashtable playerColorHash = new Hashtable(playerColors.length);
-
                 // some magic for setting the robot colors
-                Color[] robotsNewColor = initRobotColors(playerColorHash, playerColors);
-                
-                // getting the flags
-                Location [] flags = kommClient.getFahnenPos();
-                
+                Color[] robotsNewColor = initRobotColors(playerColorHash, playerColors);                               
                 // Initializing the robots an applying the colors to their visualization
                 int botCount = playerNames.length;
                 Bot [] tempBots = new Bot[botCount];
-                for (int i = 0; i < botCount; i++) {
-                    
+                for (int i = 0; i < botCount; i++) {                    
                     d("Hole Roboterstatus von: " + playerNames[i]);
                     Bot tempRob = kommClient.getRobStatus(playerNames[i]);
                     tempBots[i]=tempRob;
@@ -260,37 +277,40 @@ public class Ausgabe extends BNSThread {
                     tempRob.setBotVis(h_int.intValue());
                     robots.put(playerNames[i], tempRob);
                 }
-                initRegisterRowHash(tempBots);
+                initRegisterRowHash(tempBots);      
+                // getting the flags
+                Location [] flags = kommClient.getFahnenPos();
+                 initBoard(robotsNewColor, flags);                
+                //  fetching initial stats
+                initStats();
                 
-
-                initBoard(robotsNewColor, flags);
-
-
+                // creating the GUI
                 if (view == null) {
                     view = new View(ausgabeView);
-                } else {
+                } 
+                else {
                     view.addAusgabeView(ausgabeView);
                     view.makeVisible();
                 }
-
-// fetching initial stats
-                initStats();
-// we are done, removing splashscreen
+                // set the viewport to the first flag
+                ausgabeView.jumpToFlag(1);                
+                // 	we are done, removing splashscreen
                 removeSplash();
-
-                // send OK to server
+                // we are done, send OK to server
                 kommClient.spielstart();
-// set the viewport to the first flag
-                ausgabeView.jumpToFlag(1);
-
-            } catch (KommException kE) {
-                CAT.error("Ausgabe: Beim Versuch, die Bot zu holen, erhalte ich: " +
+            } 
+            catch (KommException kE) {
+                CAT.error("While trying to load the game data I got : " +
                         kE.getMessage(), kE);
                 return false;
-            } catch (FormatException e) {
+            }
+            catch (FormatException e) {
                 CAT.error(e.getMessage(),e);
-            } catch (FlagException fe) {
+                return false;
+            } 
+            catch (FlagException fe) {
                 CAT.error(fe.getMessage(), fe);
+                return false;               
             }
         } 
         else if (kommAntwort.typ == ClientAntwort.ENTFERNUNG){
@@ -302,9 +322,8 @@ public class Ausgabe extends BNSThread {
         else {
             // Problem: the server sends garbage
             CAT.error("server does not send a game start at game start... pfui!");
+            return false;
         }
-
-        registered = true;
         return true;
         
     }
@@ -382,25 +401,22 @@ public class Ausgabe extends BNSThread {
 
 
     /**
-     * Zeigt einen Text im Splashscreen an
-     * (erzeugt den Splashscreen, falls noetig)
+     * Shows a text in a splashscreen;
+     * creates the splashscreen if necessary
      */
-    void showSplash(String s) {
-        CAT.debug("showSplash: " + s + "(" + nosplash + ")");
-        if (!nosplash) {
+    private void showSplash(String s) { 
             if (splashScreen == null) {
                 splashScreen = new Splash();
             }
-            splashScreen.showSplash();
-        }
-
+            splashScreen.setText(s);
+            splashScreen.showSplash(true);
     }
 
-    private void removeSplash() {
-        if (!nosplash) {
+    public void removeSplash() {
+        if (splashScreen!=null) {
             splashScreen.noSplash();
-        }
-
+            splashScreen = null;
+        }       
     }
 
     private Bot[] getRoboterArray() {
@@ -414,53 +430,6 @@ public class Ausgabe extends BNSThread {
         return robs;
     }
 
-
-    private void registerAtServer() {
-        boolean anmeldungErfolg = false;
-        int versuche = 0;
-
-
-        showActionMessage(Message.say("AusgabeFrame", "Anmeldung"));
-        while ((!anmeldungErfolg) && (versuche < 3)) {
-            try {
-                anmeldungErfolg = kommClient.anmelden2(host, port, name);
-            } catch (KommException kE) {
-                CAT.error(kE.getMessage());
-                showSplash(Message.say("AusgabeFrame", "msplashFehlerAnmeldung"));
-                versuche++;
-                try {
-                    Thread.sleep(3000);
-                } catch (Exception e) {
-                    CAT.error(e.getMessage(),e );
-                }
-            }
-        }
-
-
-        if (anmeldungErfolg) {
-            CAT.debug("registered for game as new view with name: " + name);
-        } else {
-            CAT.debug("could not register at the server: " + host);
-            showSplash(Message.say("AusgabeFrame", "msplashEnde"));
-            try {
-                Thread.sleep(2000);
-            } catch (Exception e) {
-                CAT.error(e.getMessage(), e);
-            }
-            removeSplash();
-        }
-
-    }
-
-
-
-    
-
-    
-
-    private void showPos(int x, int y, boolean highlight, boolean scrollStepWise) {
-        ausgabeView.showPos(x, y, highlight, scrollStepWise);
-    }
 
     public AusgabeView getAusgabeView() {
         return ausgabeView;
@@ -505,7 +474,7 @@ public class Ausgabe extends BNSThread {
         quitByMyself = true;
         spielEnde = true;
         CAT.debug("Ausgabe deregisters from server");
-        kommClient.abmelden(name);
+        kommClient.abmelden(getName());
     }
 
     protected void quit(boolean keepWatching, boolean quitHumanPlayer) {
@@ -513,7 +482,7 @@ public class Ausgabe extends BNSThread {
      }
     
     private void quit (boolean keepWatching, boolean quitHumanPlayer, boolean calledByShutdown){        
-       
+        removeSplash(); // needed cleanup in case we show a splash and fail to connect to the server..
         if (!keepWatching) {
             allowRunToFinish();
         }
@@ -541,9 +510,8 @@ public class Ausgabe extends BNSThread {
             view = null;
         }
         if (!calledByShutdown){
-            shutdown();
-            
-        }
+            shutdown();           
+        }       
         
         
     }
