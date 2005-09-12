@@ -109,7 +109,7 @@ public abstract  class BNSClientThread extends BNSThread {
                }
                catch (Exception kE) {
                    lastEx = kE;
-                   CAT.error(kE.getMessage());              
+                   CAT.debug(kE.getMessage());              
                    retries++;                   
                }            
                if (!registrationSuccess) {
