@@ -25,7 +25,10 @@
 
 package de.botsnscouts.server;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Vector;
 
 import org.apache.log4j.Category;
@@ -155,7 +158,7 @@ ThreadMaintainer, Shutdownable {
             CAT.debug("Bot " + t.rob.getName() + " konnte nicht mehr von seiner Entfernung wg. " + reason + " benachrichtigt werden: " + ex);
         }
         
-        t.interrupt();     // Beende den Thread bei n�chster Gelegenheit
+        t.interrupt();     //  use the next opportunity to end the thread
         
         botThreads.remove(t);
         curBotsThreads.remove(t);
@@ -1261,6 +1264,7 @@ ThreadMaintainer, Shutdownable {
         }
         finally {            
             CAT.info("SERVER REACHED END OF RUN METHOD");
+            fireGameStateChange(false);
             shutdown();
         }
     }// run() ende
@@ -1279,25 +1283,48 @@ ThreadMaintainer, Shutdownable {
         }
     }
     
-    synchronized boolean isGameStarted() {
-        try {
-            //     CAT.debug("1183 wait for server");
-            return gameStarted;
-            
-        } finally {
-            //     CAT.debug("1183 release server");
-        }
+    public synchronized boolean isGameStarted() {       
+            return gameStarted;          
     }
     
-    synchronized public void startGame() {
+     public synchronized void startGame() {
         try {
-            //      CAT.debug("1193 wait for server");
             gameStarted = true;
             notify();
         } catch (Exception e) {
-            //     CAT.debug("1197 release server");
+            CAT.error(e.getMessage(), e);
         }
+        fireGameStateChange(true);
     }
+     
+     
+     private Collection gameStateObservers = new ArrayList(2);
+     public void addGameStateListener(GameStateListener l){
+         synchronized (gameStateObservers){
+             gameStateObservers.add(l);
+         }
+     }
+     
+     public boolean removeGameStateListener(GameStateListener l){
+         synchronized(gameStateObservers){
+             return gameStateObservers.remove(l);
+         }     
+     }
+     private void fireGameStateChange(boolean started){
+         synchronized(gameStateObservers){
+             Iterator it = gameStateObservers.iterator();
+             while (it.hasNext()){                 
+                 GameStateListener l = (GameStateListener) it.next();
+                 if (started){
+                     l.gameStarted(this);
+                 }
+                 else {
+                     l.gameFinished(this);
+                 }                                
+             }
+         }
+     }
+     
     
     
     public void doShutdown() {

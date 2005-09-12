@@ -25,6 +25,7 @@ import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.autobot.AutoBot;
 import de.botsnscouts.gui.Ausgabe;
 import de.botsnscouts.gui.HumanPlayer;
+import de.botsnscouts.server.GameStateListener;
 import de.botsnscouts.server.Server;
 import de.botsnscouts.start.Start;
 import de.botsnscouts.widgets.TJLabel;
@@ -43,12 +44,24 @@ import de.botsnscouts.widgets.TJLabel;
  *  or the current "just hang up")
  * 
  */
-public class Registry implements ShutdownListener, GameOverListener {
+public class Registry implements ShutdownListener, GameOverListener, GameStateListener {
     
     	private static Category CAT = Category.getInstance(Registry.class);
    
-    	private static final boolean TRY_RESTART_WITHOUT_KILLING_JVM = false;
-    	private static final int MS_TO_WAIT_FOR_SERVER_SHUTDOWN = TRY_RESTART_WITHOUT_KILLING_JVM?5500:750;
+    	
+    	
+    	
+    /** If set to "true", we will attempt to redisplay the main menu (leaks lotsa memory);
+     *   => if set to false, we will almost always kill the JVM and try to restart the game in a new one,
+     *   EXCEPT: if "aGameHasStarted" is still false, we will try a redisplay without killing the JVM, 
+     *   as I think the memory trouble might not be so severe if the game has not started yet
+     *   (=> the clients didn't do much, only registered at  the server and the views didn't load the
+     *          graphics for the gamebaord yet..)
+     *  
+     */
+    	private static final boolean RESTARTS_BY_KILLING_JVM = true;
+    	private static final int MS_TO_WAIT_FOR_SERVER_SHUTDOWN = RESTARTS_BY_KILLING_JVM?750:5500;
+    	private static boolean aGameHasStarted = false;
     	
 	    public static final int CLIENT_TYPE_UNKNOWN      = -1;
 	    public static final int CLIENT_TYPE_HUMANPLAYER = 1;
@@ -89,6 +102,14 @@ public class Registry implements ShutdownListener, GameOverListener {
             this.isEnabled = enabled;
         }
         
+        public void gameStarted(Server theServer) {
+            aGameHasStarted = true;            
+        }
+        
+        public void gameFinished(Server theServer){
+            // I don't care (yet?) as a server will also call its shutdown method in that case..
+        }
+        
         public Game addGame(Server server, String serverIp, int serverPort){
             if (!isEnabled) {
                 return null;
@@ -99,7 +120,10 @@ public class Registry implements ShutdownListener, GameOverListener {
 	            CAT.debug("xXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx");	           
 	            CAT.debug("addGame:server="+server+"; ip="+serverIp+"; port="+serverPort);
             }
-            Game game = new Game(server, serverIp, serverPort);          
+            Game game = new Game(server, serverIp, serverPort);         
+            if (server!=null){
+                server.addGameStateListener(this);
+            }
             synchronized (games) {
                 games.add(game);
             }
@@ -238,22 +262,25 @@ public class Registry implements ShutdownListener, GameOverListener {
 	        	CAT.debug(dump());
 	        	CAT.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             }
-            if (TRY_RESTART_WITHOUT_KILLING_JVM) {
+            
+            if (aGameHasStarted && RESTARTS_BY_KILLING_JVM) {
+                bruteRestart();
+            }
+            else {                           
                 Start mainMenu = Start.getLauncherAppSingleton();
             	if (mainMenu != null ){
             		//mainMenu.setVisible(true);
             		//mainMenu.resetWaiter();        		
-            		mainMenu.show();
-            		mainMenu.showMainMenu();
+            		if (!mainMenu.isVisible()) {
+            		    mainMenu.showMainMenu();
+            		    mainMenu.setVisible(true);
+            		}
+            		
             	}
             	else {
             		CAT.error("the main menu/launcher application was null");
             	}
-            }
-            else {
-                bruteRestart();
-            }
-        	
+            }        	
         	
         }
         
@@ -376,12 +403,9 @@ public class Registry implements ShutdownListener, GameOverListener {
             
             if (someThread instanceof Server) {
                  CAT.debug("There is a server going down: "+someThread);               
-                 Server serv = (Server) someThread;            
-                 
+                 Server serv = (Server) someThread;                             
                  shutdownServer(serv, someThreadsGame, false);
-                 registryRemoveAndKillAutobots(someThreadsGame);
-                 
-                                 
+                 registryRemoveAndKillAutobots(someThreadsGame);                                                  
             }
             else {
                 // some client         
@@ -390,8 +414,7 @@ public class Registry implements ShutdownListener, GameOverListener {
                 		+"successful");
                 if (removeSuccessful) {                   
 	                if (!someThreadsGame.hasHumanView()){
-	                    CAT.debug("removed "+someThread+"; no local view connected anymore");	                    
-	                     //boolean probablyFinisheDshutdownNicely;
+	                    CAT.debug("removed "+someThread+"; no local view connected anymore");	                    	                    
 	                   
 	                    final Game stg = someThreadsGame;
 	                    final Object [] pseudoBoolean = new Object[1]; 
@@ -424,7 +447,7 @@ public class Registry implements ShutdownListener, GameOverListener {
 	                    catch (InterruptedException ie){
 	                        CAT.warn(ie);
 	                    }
-	                    if (TRY_RESTART_WITHOUT_KILLING_JVM && pseudoBoolean[0] == null){ // Thread "temp" does not  have finished,
+	                    if (!RESTARTS_BY_KILLING_JVM && pseudoBoolean[0] == null){ // Thread "temp" does not  have finished,
 	                                                               // we are only here because of the join-timeout
 	                        String message1 = Message.say("Registry", "serverHangs1");
 	                        String message2 = Message.say("Registry", "serverHangs2");
@@ -481,37 +504,34 @@ public class Registry implements ShutdownListener, GameOverListener {
         
        private void bruteRestart(){
            try {
-	           File f = new File(".");
-	           
-	           Properties  p = System.getProperties();
-	           /*Enumeration e = p.keys();
-	           while (e.hasMoreElements()){
-	               Object o = e.nextElement();
-	               String value = p.getProperty((String)o);
-	               pln(o+" = "+value);
+	           File f = new File(".");	           
+	           Properties  p = System.getProperties();	     
+	           Runtime run = Runtime.getRuntime();
+	           String restart = p.getProperty("restartcommand",null);
+	           if (restart != null) {
+	               run.exec("ant run");
 	           }
-	           */
-	           String jhome = p.getProperty("java.home", null);
+	           
+	           //String jhome = p.getProperty("java.home", null);
 	           String separator = File.separator;
 	           String binString = "java";
-	           if (jhome != null) {	           	 
-	           		binString = jhome+separator+"bin"+separator+"java";
-	           }
-	           Runtime run = Runtime.getRuntime();
+	           //if (jhome != null) {	           	 
+	          // 		binString = jhome+separator+"bin"+separator+"java";
+	          // }
+	           
 	           String bnshome = "\""+f.getCanonicalPath()+"\"";	           
 	           //String tmp = maskWhiteSpace(f.getCanonicalPath());
-	           String s1 = "-Dbns.home="+bnshome;
-	           String s2 = "-jar "+/*"\""+f.getCanonicalPath()+separator+*/"botsnscouts.jar\"";
+	           String s1 = " -Dbns.home="+bnshome;	           
+	           String s2 = " -jar botsnscouts.jar";	           
 	           Dimension size = BotsNScouts.getScreenSize();
-	           String s3 = "-Xss768k"; // TODO move to bns.config file?
-	           String s4 = "-Dgeometry="+size.width+"x"+size.height;
-	           String cmd = "\""+binString+"\" "+s3+" "+s4+" "+s1+" "+s2;
-	            CAT.info("EXEC: "+cmd);
-	         // String [] cmd = new String []{binString,s3,s4,s1,s2};
-	          
-	           Process proc = run.exec(cmd);
+	           String s3 = " -Xss768k"; // TODO move to bns.config file?
+	           String s4 = " -Dgeometry="+size.width+"x"+size.height;
 	           
-	          
+	           String cmd = binString+s3+" "+s4+" "+s1+" "+s2;
+	           CAT.debug("dir="+f.getCanonicalPath());
+	           CAT.info("EXEC: "+cmd);	       	
+	           
+	           Process proc = run.exec(cmd);	           	          
            }
            catch (Exception e){
                CAT.error(e.getMessage(),e);
