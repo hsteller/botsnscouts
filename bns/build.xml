@@ -79,18 +79,20 @@
 
   <target name="compile" depends="init">
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" includes="${maindir}/**/*.java" 
-     destdir="${build}" deprecation="on" 
+    <javac  srcdir="${src}" includes="${maindir}/**/*.java" 
+     destdir="${build}" deprecation="on"
     	debug="true">
       <classpath>
          <fileset dir="${jars}" includes="*.jar" />
       </classpath>	      
+    <!--- for jdk1.5:	<compilerarg value="-Xlint"/> -->
     </javac>
   </target>
 
   <target name="run" depends="compile">
      <java classname="de.botsnscouts.BotsNScouts" fork="true">
      	<jvmarg value="-Xss768k"/>
+     	<jvmarg value="-Drestartcommand='ant run'" />
         <classpath>
 	   		<fileset dir="${jars}" includes="*.jar" />
 	  		 <pathelement path="${build}" />
