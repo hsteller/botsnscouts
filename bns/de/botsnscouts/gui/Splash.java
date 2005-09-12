@@ -36,59 +36,65 @@ import java.awt.Label;
 import java.awt.Toolkit;
 import java.awt.Window;
 
-import de.botsnscouts.BotsNScouts;
+import javax.swing.JLabel;
 
-/** $id$
- * @author Daniel Holtz, modified by Dirk
+import de.botsnscouts.BotsNScouts;
+import de.botsnscouts.widgets.TJLabel;
+
+/** $id:$
+ * @author Daniel Holtz, modified by Dirk, modified by Hendrik, modified by ??? ;-)
  */
 
 public class Splash{
-    Window splash;
-    Frame dummy;
-    Label textLabel;
-
-    public void setText(String s){
-	textLabel.setText(s);
-	splash.add(textLabel,BorderLayout.SOUTH);
-	splash.repaint();
-    }
-
-//    public static final int WIDTH = 744;
-//    public static final int HEIGHT = 184;
     public static final int WIDTH = 468;
     public static final int HEIGHT = 115;
+    private Window splash;
+    private Frame dummy;
+    private JLabel textLabel;
 
-    public void showSplash(){
-	dummy=new Frame();
-	splash = new Window(dummy);
+    public Splash (){
+        dummy = new Frame();
+        splash = new Window(dummy);    	
+        textLabel=new JLabel(); 
+		Dimension screen = BotsNScouts.getScreenSize();
+		int x = (screen.width-WIDTH)/2;
+		int y = (screen.height-HEIGHT)/3;
+		splash.setBounds(x,y,WIDTH,HEIGHT);
+	
+		ImageCanvas ic=new ImageCanvas(Toolkit.getDefaultToolkit().getImage(de.botsnscouts.BotsNScouts.class.getResource("images/logosmall.jpg")));
+		splash.add(ic,BorderLayout.CENTER);
+		splash.add(textLabel,BorderLayout.SOUTH);
+	    splash.pack();
+    }
+    
+    public void setText(String s){        
+		textLabel.setText(s);		
+		splash.repaint();
+    }
+  
 
-	Dimension screen = BotsNScouts.getScreenSize();
-	int x = (screen.width-WIDTH)/2;
-	int y = (screen.height-HEIGHT)/3;
-	splash.setBounds(x,y,WIDTH,HEIGHT);
-
-	ImageCanvas ic=new ImageCanvas(Toolkit.getDefaultToolkit().getImage(de.botsnscouts.BotsNScouts.class.getResource("images/logosmall.jpg")));
-	splash.add(ic,BorderLayout.CENTER);
-
-	textLabel=new Label();
-	textLabel.setFont(new Font("Sans-Serif", Font.BOLD, 12));
-
-	splash.pack();
-	splash.setVisible(true);
+    public void showSplash(boolean visible){				
+        if (splash != null) {
+            splash.setVisible(visible);
+        }
     }
 
     public void noSplash(){
-	splash.setVisible(false);
-	splash=null;
+       showSplash(false);       
     }
 
     private class ImageCanvas extends Canvas{
-	private Image im;
-	public ImageCanvas(Image im){ this.im=im; }
-	public void paint(Graphics g){
-	    g.drawImage(im,0,0,im.getWidth(this),im.getHeight(this),this);
-	}
-	private Dimension d=new Dimension(Splash.WIDTH,Splash.HEIGHT);
-	public Dimension getPreferredSize(){ return d; }
+		private Image im;
+		private Dimension d=new Dimension(Splash.WIDTH,Splash.HEIGHT);
+		public ImageCanvas(Image im){ 
+		    this.im=im; 
+		}
+		public void paint(Graphics g){
+		    g.drawImage(im,0,0,im.getWidth(this),im.getHeight(this),this);
+		}
+		
+		public Dimension getPreferredSize(){
+		    return d;
+		}
     }
 }

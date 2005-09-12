@@ -36,7 +36,10 @@ import org.apache.log4j.PropertyConfigurator;
 import de.botsnscouts.gui.Splash;
 import de.botsnscouts.start.Start;
 import de.botsnscouts.widgets.GreenTheme;
-
+/**
+ * 
+ * @version $Id$
+ */
 public class BotsNScouts {
     private static Category CAT = Category.getInstance(BotsNScouts.class);
 
@@ -44,7 +47,7 @@ public class BotsNScouts {
         try {
             MetalLookAndFeel.setCurrentTheme(new GreenTheme());
             Splash splash = new Splash();
-            splash.showSplash();
+            splash.showSplash(true);
 
             PropertyConfigurator.configure(BotsNScouts.class.getResource("conf/log4j.conf"));
             CAT.debug("Starting app");
