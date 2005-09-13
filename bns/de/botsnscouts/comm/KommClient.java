@@ -791,22 +791,23 @@ public class KommClient implements Shutdownable{
         }
         // einlesen der Antwort beginnen
         try {
-            String antwort=in.readLine();
-            String answerLC = null;
+            String antwort=in.readLine();           
             if (antwort==null) {
               CAT.error("Answer is null");
+              return false;
             }
             else {
-                answerLC = antwort.toLowerCase();
+                String answerLC = antwort.toLowerCase();
+                if (answerLC.equals("ok")){
+                    return true;
+                }                      
+                else if (antwort.toLowerCase().startsWith("error")){
+                	throw new RegistrationException(antwort);
+                }	
+                else {
+                	throw new KommException("Wrong return value for server registration request: "+antwort);
+                }
             }
-            if (answerLC.equals("ok")){
-                return true;
-            }
-            else if (antwort.toLowerCase().startsWith("error")){
-                throw new RegistrationException(antwort);
-            }
-            else
-                throw new KommException("Wrong return value for server registration request: "+antwort);
         }
         catch (IOException ie) {
             throw new KommException ("Error registering at the server: IOException during read: "
