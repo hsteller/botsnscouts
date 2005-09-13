@@ -45,7 +45,7 @@ public abstract  class BNSClientThread extends BNSThread {
     // SUN's JDKs 1.4 and 1.5 on windows; on SuSE it didn't even need
     // volatile; anyway, letting the Threads sync on this dummy object
     // should work everywhere
-    private Object myWindowsSucksVolatileHack = new Object();
+    //private Object myWindowsSucksVolatileHack = new Object();
     
     public void bnsStart() throws JoiningGameFailedException{
        
@@ -54,7 +54,7 @@ public abstract  class BNSClientThread extends BNSThread {
         t.start();
         try {
             t.join(MAX_RETRIES*REGISTRATION_RETRY_INTERVAL+500);
-            synchronized(myWindowsSucksVolatileHack){
+            //synchronized(myWindowsSucksVolatileHack){
             	// an interesting effect with different JDKs on Windows:
             	// isNullInCaseOfSuccess will be set waaaaay after this point
             	// (allthough the join() waits long enough and there is no 
@@ -62,11 +62,11 @@ public abstract  class BNSClientThread extends BNSThread {
             	// => isNullInCaseOfSuccess is _always_ null in the if-statement
             	// below;
             	// marking isNullInCaseOfSuccess "volatile" didn't help either..
-            	myWindowsSucksVolatileHack.wait();
+            //	myWindowsSucksVolatileHack.wait();
             	// also, we MUST USE WAIT AND JOIN
             	// removing the join() and using wait(MAX_RETRIES*..) also had
             	// the above effect
-            }
+           // }
         }
         catch (InterruptedException ie){
             CAT.warn(ie.getMessage(), ie);
@@ -121,9 +121,9 @@ public abstract  class BNSClientThread extends BNSThread {
 	           	}
 	       	}
 	       	finally {
-	       		synchronized(myWindowsSucksVolatileHack){
-	       			myWindowsSucksVolatileHack.notify();
-	       		}
+	      // 		synchronized(myWindowsSucksVolatileHack){
+	      // 			myWindowsSucksVolatileHack.notify();
+	      // 		}
 	       	}
         }
        	
