@@ -254,6 +254,7 @@ public class Ausgabe extends BNSClientThread {
         catch (KommException ke)
         {
             CAT.error(ke.getMessage(), ke);
+            return false;
         }
         
         if (kommAntwort.typ == ClientAntwort.SPIELSTART) {
