@@ -183,180 +183,181 @@ public class HumanPlayer extends BNSClientThread {
             try {
                 commAnswer = comm.warte();
                 Global.debug(this, "Server sends : " + commAnswer.getTyp());
-            } catch (KommException kE) {
-                Global.debug(this, kE.getMessage());
+            } catch (Exception kE) {
+                CAT.error( kE.getMessage(), kE);                
             }
-
-            switch (commAnswer.typ) {
-                case (ClientAntwort.MACHEZUG):
-                    {
-                    	//                  ----- insert cards  -----
-	                    cards.clear();
-	                    for (int i = 0; i < commAnswer.karten.length; i++) {
-	                        cards.add(i, new HumanCard(commAnswer.karten[i]));
-	                    }
-                    try {
-	                        // the following makes-not-so-much-sense-copying&stuff is done so
-	                        // that the EmergencySubmitter's Wisenheimer prediction will work in
-	                        // some not-so-obvious cases (locked registers with register-repair by the
-	                        // repair emergency submitter); it turned out that even if the bot's locked registers 
-	                        // are ok here, they might be "magically" missing at the time of prediction, leading
-	                        // to errors
-	                        // => EmergencySubmitter gets copy of robot that noone else will mess up
-	                        Bot meAtStartOfRound = comm.getRobStatus(name);   
-                     
-	                        emergencyBotCopy.copyRob(meAtStartOfRound);
-	                        humanView.updateRegisters(meAtStartOfRound.getLockedRegisters());
-	                        humanView.showCards(cards);	                      
-	                        synchronized(comm) {
-	                    	    cardsSent = false;
-		                    	mode = MODE_PROGRAM;
-		                    	Global.debug(this, "I am requested to send cards");
-		                    	if (timeoutWatcher != null){
-		                    	    try {
-		                    	        timeoutWatcher.cancel();
-		                    	    }
-		                    	    catch (Exception e){
-		                    	        CAT.error("exception canceling the old timeout watcher", e);
-		                    	    }
-		                    	}                    	   
+            if (commAnswer != null) {
+	            switch (commAnswer.typ) {
+	                case (ClientAntwort.MACHEZUG):
+	                    {
+	                    	//                  ----- insert cards  -----
+		                    cards.clear();
+		                    for (int i = 0; i < commAnswer.karten.length; i++) {
+		                        cards.add(i, new HumanCard(commAnswer.karten[i]));
+		                    }
+	                    try {
+		                        // the following makes-not-so-much-sense-copying&stuff is done so
+		                        // that the EmergencySubmitter's Wisenheimer prediction will work in
+		                        // some not-so-obvious cases (locked registers with register-repair by the
+		                        // repair emergency submitter); it turned out that even if the bot's locked registers 
+		                        // are ok here, they might be "magically" missing at the time of prediction, leading
+		                        // to errors
+		                        // => EmergencySubmitter gets copy of robot that noone else will mess up
+		                        Bot meAtStartOfRound = comm.getRobStatus(name);   
+	                     
+		                        emergencyBotCopy.copyRob(meAtStartOfRound);
+		                        humanView.updateRegisters(meAtStartOfRound.getLockedRegisters());
+		                        humanView.showCards(cards);	                      
+		                        synchronized(comm) {
+		                    	    cardsSent = false;
+			                    	mode = MODE_PROGRAM;
+			                    	Global.debug(this, "I am requested to send cards");
+			                    	if (timeoutWatcher != null){
+			                    	    try {
+			                    	        timeoutWatcher.cancel();
+			                    	    }
+			                    	    catch (Exception e){
+			                    	        CAT.error("exception canceling the old timeout watcher", e);
+			                    	    }
+			                    	}                    	   
+			                    
+			                    	timeoutWatcher = new Timer();    
+			                    	emergencyCardSubmitter = new EmergencyCardSubmitter();
+		                    	    timeoutWatcher.schedule(emergencyCardSubmitter, (globalTimeout-BUFFER_SECONDS_BEFORE_TIMEOUT)*1000);                    	    
+		                    	}  
 		                    
-		                    	timeoutWatcher = new Timer();    
-		                    	emergencyCardSubmitter = new EmergencyCardSubmitter();
-	                    	    timeoutWatcher.schedule(emergencyCardSubmitter, (globalTimeout-BUFFER_SECONDS_BEFORE_TIMEOUT)*1000);                    	    
-	                    	}  
-	                    
-	                    }  
-	                    catch (KommException kE) {
-	                        CAT.error(kE.getMessage(), kE);
+		                    }  
+		                    catch (KommException kE) {
+		                        CAT.error(kE.getMessage(), kE);
+		                    }
+		                    
+	                        showMessage(Message.say("SpielerMensch", "mwartereg"));               
+	                        break;
 	                    }
-	                    
-                        showMessage(Message.say("SpielerMensch", "mwartereg"));               
-                        break;
-                    }
-
-                    // start of the game
-                case (ClientAntwort.SPIELSTART):
-                    {
-                        showMessage(Message.say("SpielerMensch", "spielgehtlos"));                       
-                        comm.spielstart();
-                        break;
-                    }
-
-                    // robot destroyed or initally set on the board
-                case (ClientAntwort.ZERSTOERUNG):
-                    {
-	                    if (globalTimeout == 0) {
-	                        try {
-	                            globalTimeout = comm.getTimeOut();
+	
+	                    // start of the game
+	                case (ClientAntwort.SPIELSTART):
+	                    {
+	                        showMessage(Message.say("SpielerMensch", "spielgehtlos"));                       
+	                        comm.spielstart();
+	                        break;
+	                    }
+	
+	                    // robot destroyed or initally set on the board
+	                case (ClientAntwort.ZERSTOERUNG):
+	                    {
+		                    if (globalTimeout == 0) {
+		                        try {
+		                            globalTimeout = comm.getTimeOut();
+		                        } catch (KommException kE) {
+		                            CAT.error("during request for global timeout value", kE);	                            
+		                        }
+		                    }
+		                    synchronized (comm) {
+		                        killEmergencySubmitters();
+		                        newDirectionSent = false;
+		                        timeoutWatcher = new Timer();    
+		                        emergencyDirectionSubmitter = new EmergencyDirectionSubmitter();
+		                        timeoutWatcher.schedule(emergencyDirectionSubmitter, 
+		                                        (globalTimeout-COVER_MY_ASS_BUFFER)*1000);
+		                    }
+	                        humanView.showGetDirection();
+	                        CAT.debug("received desctruction");
+	                        showMessage(Message.say("SpielerMensch", "roboauffeld"));
+	// ---get board for wisenheimer
+	                        if (intelliBoard == null) {
+	                            initIntelligentBoard();
+	                            wisenheimer = new Wisenheimer(intelliBoard);
+	                            initScoutAndWisenheimerPermissions();
+	                        }
+	
+	                        // ----- ask for timeout -------
+	                       
+	                        break;
+	                    }
+	                    // robot reaktivated
+	                case (ClientAntwort.REAKTIVIERUNG):
+	                    {
+		                    synchronized (comm) {
+		                        stayPowerDownAnswered = false;
+		                        timeoutWatcher = new Timer();    
+		                        emergencyPowerDownSubmitter = new EmergencyStayPowerDownSubmitter();
+		                        timeoutWatcher.schedule(emergencyPowerDownSubmitter, 
+		                                        (globalTimeout-COVER_MY_ASS_BUFFER)*1000);
+		                    }
+	                        showMessage(Message.say("SpielerMensch", "roboreaktiviert"));
+	                        // ask for powerDownagain
+	                        humanView.showRePowerDown();
+	
+	
+	                        break;
+	                    }
+	
+	                    // repair your registers
+	                case (ClientAntwort.REPARATUR):
+	                    {
+	                        CAT.debug("may repair some register(s)");
+	
+	                        try {                            
+	                            Bot tempRob = comm.getRobStatus(name);
+	                            emergencyBotCopy.copyRob(tempRob);                            
+	                            int repPoints = commAnswer.zahl;
+	                            synchronized (comm) {
+	                                repairRegistersAnswered = false;
+	    	                        timeoutWatcher = new Timer();    
+	    	                        emergencyRegRepairSubmitter = new EmergencyRegRepairSubmitter(/*me,*/repPoints);
+	    	                        timeoutWatcher.schedule(emergencyRegRepairSubmitter, 
+	    	                                        (globalTimeout-COVER_MY_ASS_BUFFER)*1000);
+	    	                    }
+	                            
+	                            humanView.showRegisterRepair(tempRob.getLockedRegisters(), repPoints);             
 	                        } catch (KommException kE) {
-	                            CAT.error("during request for global timeout value", kE);	                            
+	                            CAT.error(kE);
 	                        }
+	
+	                        break;
 	                    }
-	                    synchronized (comm) {
-	                        killEmergencySubmitters();
-	                        newDirectionSent = false;
-	                        timeoutWatcher = new Timer();    
-	                        emergencyDirectionSubmitter = new EmergencyDirectionSubmitter();
-	                        timeoutWatcher.schedule(emergencyDirectionSubmitter, 
-	                                        (globalTimeout-COVER_MY_ASS_BUFFER)*1000);
-	                    }
-                        humanView.showGetDirection();
-                        CAT.debug("received desctruction");
-                        showMessage(Message.say("SpielerMensch", "roboauffeld"));
-// ---get board for wisenheimer
-                        if (intelliBoard == null) {
-                            initIntelligentBoard();
-                            wisenheimer = new Wisenheimer(intelliBoard);
-                            initScoutAndWisenheimerPermissions();
-                        }
-
-                        // ----- ask for timeout -------
-                       
-                        break;
-                    }
-                    // robot reaktivated
-                case (ClientAntwort.REAKTIVIERUNG):
-                    {
-	                    synchronized (comm) {
-	                        stayPowerDownAnswered = false;
-	                        timeoutWatcher = new Timer();    
-	                        emergencyPowerDownSubmitter = new EmergencyStayPowerDownSubmitter();
-	                        timeoutWatcher.schedule(emergencyPowerDownSubmitter, 
-	                                        (globalTimeout-COVER_MY_ASS_BUFFER)*1000);
-	                    }
-                        showMessage(Message.say("SpielerMensch", "roboreaktiviert"));
-                        // ask for powerDownagain
-                        humanView.showRePowerDown();
-
-
-                        break;
-                    }
-
-                    // repair your registers
-                case (ClientAntwort.REPARATUR):
-                    {
-                        CAT.debug("may repair some register(s)");
-
-                        try {                            
-                            Bot tempRob = comm.getRobStatus(name);
-                            emergencyBotCopy.copyRob(tempRob);                            
-                            int repPoints = commAnswer.zahl;
-                            synchronized (comm) {
-                                repairRegistersAnswered = false;
-    	                        timeoutWatcher = new Timer();    
-    	                        emergencyRegRepairSubmitter = new EmergencyRegRepairSubmitter(/*me,*/repPoints);
-    	                        timeoutWatcher.schedule(emergencyRegRepairSubmitter, 
-    	                                        (globalTimeout-COVER_MY_ASS_BUFFER)*1000);
-    	                    }
-                            
-                            humanView.showRegisterRepair(tempRob.getLockedRegisters(), repPoints);             
-                        } catch (KommException kE) {
-                            CAT.error(kE);
-                        }
-
-                        break;
-                    }
-
-                    // removed from game
-                case (ClientAntwort.ENTFERNUNG):
-                    {
-                        // ------- Habe ich gewonnen / bin ich gestorben ----------
-                        boolean dead = true;
-                        int rating = 0;
-                        boolean gameIsFinished = false;
-                        if (commAnswer.zahl == ClientAntwort.REMOVAL_REASON_GAMEOVER ||
-                                        commAnswer.zahl == ClientAntwort.REMOVAL_REASON_LOSTLIVES) {	                        
-	                        try {
-	                            String[] gewinnerListe = comm.getSpielstand();
-	                            gameIsFinished = gewinnerListe != null;
-	                            if (gameIsFinished) {
-	                                //showMessage(Message.say("SpielerMensch", "spielende"));
-	                                for (int i = 0; i < gewinnerListe.length; i++) {
-	                                    if (gewinnerListe[i].equals(name)) {
-	                                        dead = false;
-	                                        rating = (i + 1);
-	                                    }
-	                                }
-	                            } else {
-	                                Global.debug(this, "Bin gestorben...");
-	                                dead = true;
-	                            }
-	                        } catch (KommException e) {
-	                            Global.debug(this, e.getMessage());
+	
+	                    // removed from game
+	                case (ClientAntwort.ENTFERNUNG):
+	                    {
+	                        // ------- Habe ich gewonnen / bin ich gestorben ----------
+	                        boolean dead = true;
+	                        int rating = 0;
+	                        boolean gameIsFinished = false;
+	                        if (commAnswer.zahl == ClientAntwort.REMOVAL_REASON_GAMEOVER ||
+	                                        commAnswer.zahl == ClientAntwort.REMOVAL_REASON_LOSTLIVES) {	                        
+		                        try {
+		                            String[] gewinnerListe = comm.getSpielstand();
+		                            gameIsFinished = gewinnerListe != null;
+		                            if (gameIsFinished) {
+		                                //showMessage(Message.say("SpielerMensch", "spielende"));
+		                                for (int i = 0; i < gewinnerListe.length; i++) {
+		                                    if (gewinnerListe[i].equals(name)) {
+		                                        dead = false;
+		                                        rating = (i + 1);
+		                                    }
+		                                }
+		                            } else {
+		                                Global.debug(this, "Bin gestorben...");
+		                                dead = true;
+		                            }
+		                        } catch (KommException e) {
+		                            Global.debug(this, e.getMessage());
+		                        }
 	                        }
-                        }
-                        String removalReason = commAnswer.str;
-                        gameOver = true;
-                        
-                        humanView.showGameOver(dead, rating, removalReason, gameIsFinished);
-                        break;
-                    }
-                default :
-                    {
-                        Global.debug(this, "Unkonown message form server.");
-                    }
-            }
+	                        String removalReason = commAnswer.str;
+	                        gameOver = true;
+	                        
+	                        humanView.showGameOver(dead, rating, removalReason, gameIsFinished);
+	                        break;
+	                    }
+	                default :
+	                    {
+	                        Global.debug(this, "Unkonown message form server.");
+	                    }
+	            }
+           }	
         }
 
         CAT.debug("Human Player reached end of run-method");

@@ -180,7 +180,10 @@ public class Ausgabe extends BNSClientThread {
     */
     public void run() {      
         
-        waitForGameStartAndInitGameData();
+        boolean ok = waitForGameStartAndInitGameData();
+        if (!ok){
+            return;
+        }
         // ---- entering game  ---------
         while (!spielEnde && !isShutDown()) {
             ClientAntwort  kommAntwort=null;
@@ -195,6 +198,7 @@ public class Ausgabe extends BNSClientThread {
                 }
             }
             // what did the server send?
+            
             switch (kommAntwort.typ) {
                 case (ClientAntwort.MESSAGE):
                 { // (user information) messages about stuff that happend;
