@@ -41,6 +41,12 @@ public abstract  class BNSClientThread extends BNSThread {
        throw new RuntimeException ("You are supposed to call bnsStart() instead of start()!");
     }
     
+    // interestingly enough, "volatile" doesn't seem to work on my versions of
+    // SUN's JDKs 1.4 and 1.5 on windows; on SuSE it didn't even need
+    // volatile; anyway, letting the Threads sync on this dummy object
+    // should work everywhere
+    private Object myWindowsSucksVolatileHack = new Object();
+    
     public void bnsStart() throws JoiningGameFailedException{
        
         RegistrationRunner  dontWantToLockAWT = new RegistrationRunner();        
@@ -48,6 +54,19 @@ public abstract  class BNSClientThread extends BNSThread {
         t.start();
         try {
             t.join(MAX_RETRIES*REGISTRATION_RETRY_INTERVAL+500);
+            synchronized(myWindowsSucksVolatileHack){
+            	// an interesting effect with different JDKs on Windows:
+            	// isNullInCaseOfSuccess will be set waaaaay after this point
+            	// (allthough the join() waits long enough and there is no 
+            	//  InterruptedException)
+            	// => isNullInCaseOfSuccess is _always_ null in the if-statement
+            	// below;
+            	// marking isNullInCaseOfSuccess "volatile" didn't help either..
+            	myWindowsSucksVolatileHack.wait();
+            	// also, we MUST USE WAIT AND JOIN
+            	// removing the join() and using wait(MAX_RETRIES*..) also had
+            	// the above effect
+            }
         }
         catch (InterruptedException ie){
             CAT.warn(ie.getMessage(), ie);
@@ -84,22 +103,30 @@ public abstract  class BNSClientThread extends BNSThread {
     class RegistrationRunner implements Runnable{
        JoiningGameFailedException isNullInCaseOfSuccess = null;
        public void run(){
-           Exception tmp;
-           	try {
-           	    tmp = registerAtServer();
-           	}
-           	catch (Exception e){
-           	    tmp = e;
-           	}
-           	if (tmp != null) {
-	           	if (tmp instanceof JoiningGameFailedException){
-	           	    isNullInCaseOfSuccess = (JoiningGameFailedException) tmp;
+	       	try {
+	           Exception tmp;
+	           	try {
+	           	    tmp = registerAtServer();
 	           	}
-	           	else {
-	           	    isNullInCaseOfSuccess = new JoiningGameFailedException(tmp);
+	           	catch (Exception e){
+	           	    tmp = e;
 	           	}
-           	}
+	           	if (tmp != null) {
+		           	if (tmp instanceof JoiningGameFailedException){
+		           	    isNullInCaseOfSuccess = (JoiningGameFailedException) tmp;
+		           	}
+		           	else {
+		           	    isNullInCaseOfSuccess = new JoiningGameFailedException(tmp);
+		           	}
+	           	}
+	       	}
+	       	finally {
+	       		synchronized(myWindowsSucksVolatileHack){
+	       			myWindowsSucksVolatileHack.notify();
+	       		}
+	       	}
         }
+       	
        private Exception registerAtServer() {
            boolean registrationSuccess = false;
            int retries = 0;
