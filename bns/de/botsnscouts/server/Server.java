@@ -136,6 +136,7 @@ ThreadMaintainer, Shutdownable {
     public void notifyDone(Waitable me) {
         CAT.debug("Server: notify done");
         waitablesImWaitingFor.removeAndNotify(me);
+        CAT.debug("leaving notify done");
     }
     
     // Methods needed for ServerRobotThreadMaintainer
@@ -208,18 +209,23 @@ ThreadMaintainer, Shutdownable {
     // Methods mandated by interface ServerOutputThreadMaintainer
     
     public void deleteOutput(ServerAusgabeThread t, String reason) {
+        CAT.debug("deleteOutput: LOCK  on ausagbeThreads");
         synchronized (ausgabeThreads) {
             CAT.debug("deleteOutput called. Reason:" + reason);
             try {
                 waitablesImWaitingFor.removeAndNotify(t);
+                CAT.debug("calling deleteMe");
                 t.deleteMe(reason);
             } catch (KommException ex) {
                 CAT.debug("Could not notify Ausgabe",ex);
             }
-            
+            CAT.debug("interrupting AusgabeThread");
             t.interrupt();
+            CAT.debug("removing Thread from ausgabeThreads");
             ausgabeThreads.remove(t);
+            CAT.debug("after remove from ausgabeThreads");
         }
+        CAT.debug("deleteOutPut: RELEASE LOCK on  ausgabeThread ");
     }
     
     public int getOutputTimeout() {
@@ -227,7 +233,24 @@ ThreadMaintainer, Shutdownable {
     }
     
     // Methods mandated by interface ThreadMaintainer
+    
+    /** NOTE: the never synchronize on the returned Vector unless you know what you are doing.
+     * Yes, MessageThread, I mean you too. Had to change ServerAusgabeThread to avoid deadlocks
+     * in case an output deregisters and the ServerAusgabeThread wants to call deleteOutput()
+     *  which needs the lock on "ausgabeThreads" while (during phase eval) it is owned by
+     * MessageThread most of the time; and MessageThread uses a synchronized method of 
+     *  ServerAusgabeThread and WHOOOOPS there is a cyclic dependency and the deadlock.
+     */
     public Vector getActiveOutputs() {
+    /*    Vector v = null;
+        CAT.debug("returning ausgabeThreads");
+        CAT.debug("getActiveOutputs(): before LOCK on ausgabeThreads ");
+        synchronized (ausgabeThreads) {
+            CAT.debug("getActiveOutputs(): LOCK on ausgabeThreads ");
+            v = new Vector(ausgabeThreads);            
+        }
+        CAT.debug("getActiveOutputs(): RELEASE LOCK on ausgabeThreads ");
+        return v;*/
         return ausgabeThreads;
     }
     
@@ -407,7 +430,7 @@ ThreadMaintainer, Shutdownable {
         
         // PRE: currentThread is the ServerThread
         // but let's make sure.
-        
+        CAT.debug("in notifyViews");
         if (Thread.currentThread() != this) {
             CAT.debug("This method must be called by the ServerThread, not" + Thread.currentThread());
             throw new RuntimeException();
@@ -417,28 +440,33 @@ ThreadMaintainer, Shutdownable {
             CAT.debug("0-size array");
             return;
         }
-        
-        CAT.debug("Size of enterList:" + ausgabenEnterRequestedThreads.size() + "; aThreads: " + ausgabeThreads.size());
+       CAT.debug("going to call setzeAusgaben()");
         setzeAusgaben();
-        CAT.debug("Size of enterList:" + ausgabenEnterRequestedThreads.size() + "; aThreads: " + ausgabeThreads.size());
+        CAT.debug("called setzeAusgaben()"); 
         
-        //  CAT.debug("372 wait For athreads");
+         CAT.debug("notifyViews before LOCK ausgabeThreads");
         synchronized (ausgabeThreads) {
-            //     CAT.debug("374 lock aThreads");
+            CAT.debug("notifyViews LOCK on ausgabeThreads");            
             waitablesImWaitingFor = new WaitingForSet(ausgabeThreads);
-            
+            CAT.debug("iterating..");
             for (Iterator it = ausgabeThreads.iterator(); it.hasNext();) {
                 ServerAusgabeThread tmp = (ServerAusgabeThread) it.next();
+                CAT.debug("testing: "+tmp);
                 if (!tmp.isAlive()) {
+                    CAT.debug(tmp+ " IS NOT ALIVE");
                     it.remove();
+                    CAT.debug("removed Thread from Iterator..is that safe?");
                     waitablesImWaitingFor.remove(tmp);
+                    CAT.debug("removed from waitingForSet");
                     continue;
                 }
-                
+                CAT.debug("setting mode: QUESTIONS_ALLOWED");
                 tmp.setMode(FRAGENERLAUBT);
                 
                 try {
+                    CAT.debug("calling ausgabeThread.notfiyChange()");
                     tmp.notifyChange(msgNum, robotNames);
+                    CAT.debug("notified");
                 } catch (KommFutschException ex) {
                     new Fehlermeldung(Message.say("Server", "eKommFutschA"));
                 } catch (KommException ex) {
@@ -448,6 +476,8 @@ ThreadMaintainer, Shutdownable {
             CAT.debug("updated all ausgabeThreads");
             
             if (ausgabeThreads.size() == 0) {
+                CAT.debug("ausgabeThreads.size()==0");
+                CAT.debug("return->RELEASE LOCK on ausgabeThread");
                 return;
             }
             
@@ -456,16 +486,24 @@ ThreadMaintainer, Shutdownable {
             // FIXME TODO XXX 
             // there can be ConcurrentModificationExceptions (deleting something from a Vector
             // that we are iterating)
+            CAT.debug("getting unsafe iterator..; starting waitFor");
+            long a = System.currentTimeMillis();
             Iterator it = waitablesImWaitingFor.waitFor(notifyTO);
+            long b = System.currentTimeMillis();
+            CAT.debug("waited for: "+(b-a));
             while (it.hasNext()) {
-                deleteOutput((ServerAusgabeThread) it.next(), "TO");
+                CAT.debug("iterating: calling deleteOutput with Timeout as reason");                
+                deleteOutput((ServerAusgabeThread) it.next(), "TO");                
+                CAT.debug("output deleted");
             }
         }
-        //  CAT.debug("374 release aThread");
+         CAT.debug("noitfyViews: RELEASE LOCK on ausgabeThread");
         // allow possibly generated messages to be sent
-        // synchronizes laser-fire-animations.
+        // synchronizes laser-fire-animations.         
         messageThread.blockUntilQEmpty();
+        CAT.debug("Thread.yield()");
         Thread.yield();
+        CAT.debug("notifyViews: leaving");
     }
     
     // Private methods needed by run()
@@ -598,50 +636,65 @@ ThreadMaintainer, Shutdownable {
     private void setzeAusgaben() {
         CAT.debug("setzeAusgaben");
         //  CAT.debug("539 wait for aThreads");
+        CAT.debug("setzeAusgaben: before LOCK  ausgabeThreads in setzeAusgaben");
         synchronized (ausgabeThreads) {
-            //       CAT.debug("541 lock on aThreads\nwait for ausgabenEL");
+            	CAT.debug("setzeAusgaben: LOCK ausgabeThreads in setzeAusgaben");
+                CAT.debug("setzeAusgaben: before locking on ausgabenEnterRequestedThreads");
             synchronized (ausgabenEnterRequestedThreads) {
-                //         CAT.debug("543 lock on ausgabenEintrittsListe");
+                CAT.debug("setzeAusgaben: LOCK on ausgabenEnterRequestedThreads");                
                 if (ausgabenEnterRequestedThreads.size() == 0) {
+                    CAT.debug("RETURNING->RELEASE LOCK: ausgabeThreads,ausgabenEnterRequestedThreads");
                     return;
                 } else {
                     CAT.debug("There are new views. Welcoming them");
                 }
-                
+                CAT.debug("creating new waitForSet");
                 waitablesImWaitingFor = new WaitingForSet(ausgabenEnterRequestedThreads);
-                
+                CAT.debug("created");
                 for (Iterator e = ausgabenEnterRequestedThreads.iterator(); e.hasNext();) {
                     ServerAusgabeThread tmp = (ServerAusgabeThread) e.next();
+                    CAT.debug("setMode(questionsAllowed on "+tmp);
                     tmp.setMode(FRAGENERLAUBT);
-                    try {
+                    CAT.debug("mode set");
+                    try {                       
                         tmp.startGame();
+                        CAT.debug("called startGame()");
                     } catch (KommFutschException ex) {
                         new Fehlermeldung(Message.say("Server", "eKummFutschA"));
                     } catch (KommException ex) {
                         CAT.debug("setzeAusgaben: Es ist eine KommException aufgetreten.");
                     }
+                    CAT.debug("starting ausgabeThread");
                     tmp.start();
+                   
                 } //for
-                CAT.debug("Alle ael-s benachrichtigt und in den richtigen Modus versetzt.");
-                
+                CAT.debug("notified alle ael-s and set them into the right mode.");
+                CAT.debug("setzeAusgaben: waiting for NOTIFYTO");
+                long a = System.currentTimeMillis();
                 Iterator it = waitablesImWaitingFor.waitFor(notifyTO);
-                
+                long b = System.currentTimeMillis();
+                CAT.debug("setzeAusgaben: waited for "+ (b-a));
                 while (it.hasNext()) {
+                    CAT.debug("going to remove Ausgabe from enterRequest list");
                     ausgabenEnterRequestedThreads.remove(it.next());
+                    CAT.debug("removed");
                 }
                 
-                CAT.debug("Kopiere ael: " + ausgabenEnterRequestedThreads.size());
+                CAT.debug("copying ael: " + ausgabenEnterRequestedThreads.size());
                 for (Iterator iter = ausgabenEnterRequestedThreads.iterator(); iter.hasNext();) {
                     ServerAusgabeThread tmp = (ServerAusgabeThread) iter.next();
+                    CAT.debug("setting mode: NO_QUESTIONS");
                     tmp.setMode(KEINEFRAGEN);
+                    CAT.debug("removing from ael-iterator. Is that safe?");
                     iter.remove();     // aus ael
-                    CAT.debug("Addiere einen zu aThreads hinzu");
+                    CAT.debug("adding von thread to ausgabeThreads");
                     ausgabeThreads.addElement(tmp);
+                    CAT.debug("added: "+tmp);
                 }
             } // synchronized ausgabenEL
-            //   CAT.debug("543 release ausgabenEl");
+             CAT.debug("setzeAusgaben:  RELEASE LOCK on  ausgabenEl");
         } // sync aThreads
-        //     CAT.debug("541 release aThreads");
+        CAT.debug("setzeAusgaben: RELEASE LOCK on ausgabenThreads");
     }
     
     // returns false if interrupted, true if all is ok
@@ -1209,18 +1262,21 @@ ThreadMaintainer, Shutdownable {
              deleteRoby(tmp, "GO");
              }*/
             
-            if (CAT.isDebugEnabled()) {
-                CAT.debug("There are " + ausgabeThreads.size() + " views left.");
-            }
-            if (ausgabeThreads.size() > 0) {
-                //   CAT.debug("1114 wait aThreads");
-                synchronized (ausgabeThreads) {
-                    //       CAT.debug("1114 have raThreads");
+            CAT.debug("run: before LOCK on ausgabeThreads");
+            synchronized (ausgabeThreads) {  
+            	if (ausgabeThreads.size() > 0) {                                        
+                    if (CAT.isDebugEnabled()) {
+                        CAT.debug("run: LOCK on ausgabeThreads");
+                        CAT.debug("There are " + ausgabeThreads.size() + " views left.");
+                    }
                     for (Iterator e = ausgabeThreads.iterator(); e.hasNext();) {
                         ServerAusgabeThread tmp = (ServerAusgabeThread) e.next();
+                        CAT.debug("setting mode: QUESTIONS_ALLOWED");
                         tmp.setMode(FRAGENERLAUBT);
                         try {
+                            CAT.debug("going to delete Ausgabe (game over, GO):"+tmp);
                             tmp.deleteMe("GO");
+                            CAT.debug("deleted(GO)");
                         } catch (KommException ex) {
                             CAT.error("notifiying Views: KommException");
                             CAT.error(ex.getMessage(), ex);
@@ -1229,33 +1285,40 @@ ThreadMaintainer, Shutdownable {
                     CAT.debug("Notified all AusgabeThreads (Views) about the end of the game;set them into the right mode.");
                     
                     waitablesImWaitingFor = new WaitingForSet(ausgabeThreads);
+                    CAT.debug("run(): waitFor with notifyTO");
+                    long a = System.currentTimeMillis();
                     waitablesImWaitingFor.waitFor(notifyTO);
-                    
+                    long b = System.currentTimeMillis();
+                    CAT.debug("run() waited for: "+(b-a));
                     for (Iterator e = ausgabeThreads.iterator(); e.hasNext();) {
                         ServerAusgabeThread tmp = (ServerAusgabeThread) e.next();
                         try {
+                            CAT.debug("calling endGame on: "+tmp);
                             tmp.endGame();
+                            CAT.debug("endGame called");
                         } catch (java.io.IOException ex) {
                             CAT.error("IOException at view.endGame().");
                             CAT.error(ex.getMessage(), ex);
                         }
                     }
-                } // synchronized aThreads
-                //     CAT.debug("1114 release raThreads");
-            } // if aThreads > 0
-            
+                }  // if aThreads > 0            
+                   
+            } // synchronized aThreads   
+            CAT.debug("run(): RELEASE LOCK ausgabeThreads");
             // AnmeldeThread killen
             try {
+                CAT.debug("killing regManager");
                 registrationManager.seso.close();
             } catch (java.io.IOException ex) {
                 CAT.error("IOException while killing registration Thread.");
                 CAT.error(ex.getMessage(), ex);
             }
-            
+            CAT.debug("interrupting messageThread");
             // MessageThread killen
             messageThread.interrupt();
-            
+            CAT.debug("--interrupted");
             if (serverObserver != null) {
+                CAT.debug("fireGameFinished");
                 serverObserver.fireGameFinished();
             }
             
@@ -1265,8 +1328,11 @@ ThreadMaintainer, Shutdownable {
         finally {            
             CAT.info("SERVER REACHED END OF RUN METHOD");
             fireGameStateChange(false);
+            CAT.debug("calling shutdown");
             shutdown();
+            CAT.debug("shutdown called");
         }
+        
     }// run() ende
     
     private RobProgListener robProgListener = new RobProgListener();

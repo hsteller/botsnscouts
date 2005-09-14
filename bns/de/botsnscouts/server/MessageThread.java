@@ -78,31 +78,35 @@ class MessageThread extends de.botsnscouts.util.BNSThread
 
 
     private void sendMsg(Msg msg){
-	Vector v=server.getActiveOutputs();
-	// Synchronization between MessageThread and ServerThread: whenever one of
-	// them wishes to communicate with the Outputs, it synchronizes on the
-	// Vector that contains them all.
-	CAT.debug("Sending msg: "+msg.id);
-	synchronized(v){
-	  //  CAT.debug("85 Got lock ausgabeThreads");
-	    wait = new WaitingForSet(v);
-	    for (Iterator it=v.iterator();it.hasNext();){
-	        ServerAusgabeThread tmp=(ServerAusgabeThread)it.next();
-	        currentAusgabe = tmp;
-			if (!tmp.isAlive())
-			    it.remove();
-			else
-			    tmp.sendMsg(msg.id,msg.args);
-	    }
-	   // CAT.debug("94 now starting wait");
-	    Iterator it= wait.waitFor(timeout);
-	  // CAT.debug("94 end of wait");
-	    while(it.hasNext()) {
-	        server.deleteOutput((ServerAusgabeThread)it.next(),"TO");
-	    }
-	    currentAusgabe = null;
-	}
-	//CAT.debug("85 released lock");
+		Vector v=server.getActiveOutputs();
+		// Synchronization between MessageThread and ServerThread: whenever one of
+		// them wishes to communicate with the Outputs, it synchronizes on the
+		// Vector that contains them all.
+		CAT.debug("Sending msg: "+msg.id);
+		CAT.debug("before LOCK on ausgabeThreads");
+		synchronized(v){
+		    CAT.debug("LOCK on ausgabeThreads");
+		    wait = new WaitingForSet(v);
+		    for (Iterator it=v.iterator();it.hasNext();){
+		        ServerAusgabeThread tmp=(ServerAusgabeThread)it.next();
+		        currentAusgabe = tmp;
+				if (!tmp.isAlive())
+				    it.remove();
+				else
+				    tmp.sendMsg(msg.id,msg.args);
+		    }
+		    
+		    long a = System.currentTimeMillis();
+		   CAT.debug("94 now starting wait: ");
+		    Iterator it= wait.waitFor(timeout);
+		   long b = System.currentTimeMillis();
+		   CAT.debug("94 end of wait after "+(b-a));
+		    while(it.hasNext()) {
+		        server.deleteOutput((ServerAusgabeThread)it.next(),"TO");
+		    }
+		    currentAusgabe = null;
+		}
+		CAT.debug("RELEASE LOCK ausgabeThreads");
     }
 
     public void run(){

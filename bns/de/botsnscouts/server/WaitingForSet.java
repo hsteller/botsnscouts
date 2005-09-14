@@ -66,16 +66,17 @@ import org.apache.log4j.Category;
       * @throws RuntimeException if we didn't wait for that element.
       */
      synchronized void removeAndNotify(Waitable w){
-      CAT.debug("remove and notify!");
-	 if (waitingFor.remove(w)) {
-	     CAT.debug("fire removal event");
-             fireRemovalEvent(w);
-
-         }
-	 if (waitingFor.isEmpty()){
-            CAT.debug("witingFor is empty/notify");
-	     notify();
-	 }
+        CAT.debug("remove and notify!");
+		 if (waitingFor.remove(w)) {
+		     CAT.debug("fire removal event");
+	         fireRemovalEvent(w);	
+	     }
+		 CAT.debug("before empty check");
+		 if (waitingFor.isEmpty()){
+	            CAT.debug("waitingFor is empty/notify");
+		     notify();
+		 }
+		 CAT.debug("leaving remove and notify");
      }
 
      boolean isEmpty(){ return waitingFor.isEmpty(); }
