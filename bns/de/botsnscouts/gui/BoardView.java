@@ -915,86 +915,90 @@ public class BoardView extends JComponent{
     }
     
     
-    private void turnRobot(Bot internal, int angle, int animationSteps, boolean clockWise) {       
-        AlphaComposite ac = AC_SRC_OVER;         
-        if (internal.isVirtual())
-            ac = AC_SRC_OVER_05;
-        Image cropRobImage = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
-        double rotateTheta;
-        if (clockWise)
-            rotateTheta= Math.toRadians(angle/animationSteps);
-        else 
-            rotateTheta = Math.toRadians(360-angle/animationSteps);  
-        //CAT.debug("turning bot; theta="+rotateTheta);
-        synchronized (rescaleLock) {       
-            Graphics2D mainGraphics = (Graphics2D)getGraphics();  
-            Composite oldComposite = mainGraphics.getComposite();
-            int feldSize = scaledFeldSize;           
-            int xposScaled=  (internal.getX()-1) *feldSize;
-            int yposScaled = (sf.getSizeY() - internal.getY())*feldSize;                         
-            int clipLength = feldSize;    
-            int halfSize = feldSize/2;
-           // TODO rasterFormatException 
-            BufferedImage offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
-            Graphics2D offScreenClip = (Graphics2D) offScreenClipImage.getGraphics();     
-            offScreenClip.setComposite(ac);       
-            mainGraphics.setComposite(ac);
-            BufferedImage blankImage;
-            
-            Raster blank;
-            if (useStaticBg){
-                blank = staticBackground.getData(new Rectangle(xposScaled,yposScaled,feldSize,clipLength));
-                blankImage = staticBackground.getSubimage(xposScaled,yposScaled,feldSize,clipLength);
-                //offScreenClipImage.setData(blank);
-                offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);
-                mainGraphics.drawImage(blankImage, xposScaled, yposScaled, feldSize, clipLength,this);
-            }
-            else {
-                // there shouldn't be any active content on the offScreen image if useStaticBg==false
-               // blank = offScreenClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
-                blankImage = new BufferedImage(feldSize, clipLength, BufferedImage.TYPE_INT_ARGB);
-                blankImage.getGraphics().drawImage(offScreenClipImage,0,0,feldSize,clipLength,this);
-               
-            }    
-                
-                                                  
-           // paintBotsOnPositionButNotMe(internal.getPos(), internal,offScreenClip,0,0);
-           Raster blankWithBots = offScreenClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
-            //offScreenClipImage.setData(blank);
-            
-            // painting the animated bot           
-            //offScreenClip.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
-            
-            int animationStepsTurnRob =animationSteps;//currentAnimationConfig.getAnimationStepsTurnRob();
-            int animationDelayTurnRob = currentAnimationConfig.getAnimationDelayTurnRob();
-             for (int step = 0; step<animationStepsTurnRob;step++) {
-                 	 
-               
-               //  offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);	 
-               //  paintBotsOnPositionButNotMe(internal.getPos(), internal,offScreenClip,0,0);
-                 	offScreenClipImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
-                     offScreenClip.rotate(rotateTheta,halfSize, halfSize); // rotating the robot pic further   
-                     offScreenClip.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);                  
-                     // paint the offscreen image on the screen:
-                     mainGraphics.drawImage(offScreenClipImage, xposScaled, yposScaled, feldSize, clipLength,this);                
-                     waitSomeTime(animationDelayTurnRob, this);                   
-             }
-             	if (useStaticBg) {
-             	   //offScreenClipImage.setData(blank);
-             	   offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);
-             	}
-             	else {
-             	    // doesn't work: offScreenClipImage.setData(blank);
-             	    // also doesn't work: offScreenClip.XYZ() 
-             	   Graphics2D tmpg = (Graphics2D)offScreenImage.getGraphics();             	   
-              	   Composite tmpComp = tmpg.getComposite();             	   
-              	   tmpg.setComposite(AC_SRC_OVER);
-              	   tmpg.drawImage(blankImage,xposScaled,yposScaled,feldSize,clipLength,this);
-              	   tmpg.setComposite(tmpComp); 
-                   mainGraphics.setComposite(oldComposite);   
-             	}
-             	
-        }
+    private void turnRobot(Bot internal, int angle, int animationSteps, boolean clockWise) {   
+        try {
+	        AlphaComposite ac = AC_SRC_OVER;         
+	        if (internal.isVirtual())
+	            ac = AC_SRC_OVER_05;
+	        Image cropRobImage = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
+	        double rotateTheta;
+	        if (clockWise)
+	            rotateTheta= Math.toRadians(angle/animationSteps);
+	        else 
+	            rotateTheta = Math.toRadians(360-angle/animationSteps);  
+	        //CAT.debug("turning bot; theta="+rotateTheta);
+	        synchronized (rescaleLock) {       
+	            Graphics2D mainGraphics = (Graphics2D)getGraphics();  
+	            Composite oldComposite = mainGraphics.getComposite();
+	            int feldSize = scaledFeldSize;           
+	            int xposScaled=  (internal.getX()-1) *feldSize;
+	            int yposScaled = (sf.getSizeY() - internal.getY())*feldSize;                         
+	            int clipLength = feldSize;    
+	            int halfSize = feldSize/2;
+	           // TODO rasterFormatException 
+	            BufferedImage offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
+	            Graphics2D offScreenClip = (Graphics2D) offScreenClipImage.getGraphics();     
+	            offScreenClip.setComposite(ac);       
+	            mainGraphics.setComposite(ac);
+	            BufferedImage blankImage;
+	            
+	            Raster blank;
+	            if (useStaticBg){
+	                blank = staticBackground.getData(new Rectangle(xposScaled,yposScaled,feldSize,clipLength));
+	                blankImage = staticBackground.getSubimage(xposScaled,yposScaled,feldSize,clipLength);
+	                //offScreenClipImage.setData(blank);
+	                offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);
+	                mainGraphics.drawImage(blankImage, xposScaled, yposScaled, feldSize, clipLength,this);
+	            }
+	            else {
+	                // there shouldn't be any active content on the offScreen image if useStaticBg==false
+	               // blank = offScreenClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
+	                blankImage = new BufferedImage(feldSize, clipLength, BufferedImage.TYPE_INT_ARGB);
+	                blankImage.getGraphics().drawImage(offScreenClipImage,0,0,feldSize,clipLength,this);
+	               
+	            }    
+	                
+	                                                  
+	           // paintBotsOnPositionButNotMe(internal.getPos(), internal,offScreenClip,0,0);
+	           Raster blankWithBots = offScreenClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
+	            //offScreenClipImage.setData(blank);
+	            
+	            // painting the animated bot           
+	            //offScreenClip.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
+	            
+	            int animationStepsTurnRob =animationSteps;//currentAnimationConfig.getAnimationStepsTurnRob();
+	            int animationDelayTurnRob = currentAnimationConfig.getAnimationDelayTurnRob();
+	             for (int step = 0; step<animationStepsTurnRob;step++) {
+	                 	 
+	               
+	               //  offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);	 
+	               //  paintBotsOnPositionButNotMe(internal.getPos(), internal,offScreenClip,0,0);
+	                 	offScreenClipImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
+	                     offScreenClip.rotate(rotateTheta,halfSize, halfSize); // rotating the robot pic further   
+	                     offScreenClip.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);                  
+	                     // paint the offscreen image on the screen:
+	                     mainGraphics.drawImage(offScreenClipImage, xposScaled, yposScaled, feldSize, clipLength,this);                
+	                     waitSomeTime(animationDelayTurnRob, this);                   
+	             }
+	             	if (useStaticBg) {
+	             	   //offScreenClipImage.setData(blank);
+	             	   offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);
+	             	}
+	             	else {
+	             	    // doesn't work: offScreenClipImage.setData(blank);
+	             	    // also doesn't work: offScreenClip.XYZ() 
+	             	   Graphics2D tmpg = (Graphics2D)offScreenImage.getGraphics();             	   
+	              	   Composite tmpComp = tmpg.getComposite();             	   
+	              	   tmpg.setComposite(AC_SRC_OVER);
+	              	   tmpg.drawImage(blankImage,xposScaled,yposScaled,feldSize,clipLength,this);
+	              	   tmpg.setComposite(tmpComp); 
+	                   mainGraphics.setComposite(oldComposite);   
+	             	}
+	        	}  	
+	        }
+	        catch (RasterFormatException e) {
+	            CAT.error(e.getMessage(), e);
+	        }
     }
     
     
