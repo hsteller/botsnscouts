@@ -109,6 +109,30 @@ public class KommClient implements Shutdownable{
     /** To implement the Shutdownable interface; will be set to true on the end of the shutdown() method */
     private boolean isShutDown = false; 
     
+    private int debugNTCCounter = 0;
+    private int debugMSGCounter = 0;
+    
+    protected synchronized void incNTCCounter(){
+        debugNTCCounter++;
+    }
+    protected synchronized void incMSGCounter(){
+        debugMSGCounter++;
+    }
+    protected synchronized void decNTCCounter(){
+        debugNTCCounter--;
+    }
+    protected synchronized void decMSGCounter(){
+        debugMSGCounter--;
+    }
+    
+    protected synchronized int getMSGCounter(){
+        return debugMSGCounter;
+    }
+    protected synchronized int getNTCCounter(){
+        return debugNTCCounter;
+    }
+    
+    
     public KommClient (){
         gotNTC=false;
         strNTC="";
@@ -320,22 +344,22 @@ public class KommClient implements Shutdownable{
             try {
                 rein = in.readLine();
                 if ((debug!=null)&&(log)) {
-                    debug.println("warte erhielt: "+rein);
+                    debug.println("warte() received: "+rein);
                     debug.close();
                 }
             }
             catch (IOException ioe) {
-                throw new KommException ("IOException bei KommClient.warte");
+                throw new KommException ("IOException in KommClient.warte():"+ioe.getMessage());
             }
             if (rein==null)
-                throw new KommFutschException("warte erhielt null");
+                throw new KommFutschException("warte() received null");
             return wait2(rein);
         }
         else {// we have an old NTC waiting for being processed
             
             gotNTC=false;
             if ((debug!=null)&&(log)) {
-                debug.println("baearbeite altes NTC: "+strNTC);
+                debug.println("processing an old NTC: "+strNTC);
                 debug.close();
             }
             return wait2(strNTC);
@@ -345,7 +369,9 @@ public class KommClient implements Shutdownable{
     /** This method does all the String parsing.
      */
     ClientAntwort wait2 (String com) throws KommException {
-        Global.debug(this,"CLIENT: warte erhielt: "+com);
+        if (CAT.isDebugEnabled()) {
+            CAT.debug("CLIENT: wait2 received: \""+com+"\"");
+        }
         ClientAntwort back=new ClientAntwort();
         boolean error=false;
         String errormesg="";
@@ -354,7 +380,7 @@ public class KommClient implements Shutdownable{
         TmpParsedSeqNumMessage foo = splitPossibleSeqNumAndMessage(com);
         com = foo.originalMessage;
         back.messageSequenceNumber = foo.messageNum; // will be set to -1 if there
-        // was no sequence number
+                                                                                // was no sequence number
         
         
         // </hack for synchronizing display stuff>
@@ -366,14 +392,11 @@ public class KommClient implements Shutdownable{
         else if ((com.equals("error")) || (com.equals("ERROR"))){
             back.typ=ClientAntwort.ANGEMELDET;
             back.ok=false;
-        }
-        //if (true){} // dummy
+        }       
         else {
             if (com.length()>=3) {
                 char st = com.charAt(0);
-                char nd = com.charAt(1);
-                
-                
+                char nd = com.charAt(1);                                
                 char rd = com.charAt(2);
                 switch (st){
                     case 'T': {
@@ -383,7 +406,7 @@ public class KommClient implements Shutdownable{
                                 int klammerzu= com.indexOf (')');
                                 if ((klammerzu==-1)||(klammerauf==-1)){
                                     error=true;
-                                    errormesg="TO -> dann folgte nicht (  )";
+                                    errormesg="TO not followed by (  )";
                                 }
                                 try {
                                     back.typ=ClientAntwort.TIMEOUT;
@@ -391,27 +414,26 @@ public class KommClient implements Shutdownable{
                                 }
                                 catch (NumberFormatException n) {
                                     error=true;
-                                    errormesg="TO-> NumberFormatException beim Parsen des TimeOuts";
+                                    errormesg="TO-> NumberFormatException parsing the TimeOut";
                                 }
-                                break;
-                                
-                                
+                                break;                                                                
                             }
                             catch (Exception e) {
                                 error= true;
-                                errormesg="Exception bei KC.wait2.TO; Message:"+e.getMessage();
+                                errormesg="Exception at KC.wait2.TO; Message:"+e.getMessage();
                                 break;
                             }
                             
                         }
                         else  {
                             error =true;
-                            errormesg="Vermutlich falscher String ";
+                            errormesg="probably a wrong String ";
                             break;
                         }
                     }
                     case 'M': {
-                        if ((nd=='S')&&(rd=='G')) { // some generic info message
+                        if ((nd=='S')&&(rd=='G')) { // some generic info message                            
+                            incMSGCounter();                            
                             back.typ=ClientAntwort.MESSAGE;
                             int k1 = com.indexOf('(');
                             com = com.substring (k1+1,com.length()-1);
@@ -563,6 +585,7 @@ public class KommClient implements Shutdownable{
                                 
                             }
                             else if (rd=='C'){ // something has changed for one or more robots
+                                incNTCCounter();
                                 try {
                                     back.typ=ClientAntwort.AENDERUNG;
                                     int klauf=com.indexOf('(');
@@ -571,19 +594,19 @@ public class KommClient implements Shutdownable{
                                 }
                                 catch (Exception e) {
                                     error= true;
-                                    errormesg="Exception bei KC.wait2.NTC; Message:"+e.getMessage();
+                                    errormesg="Exception at KC.wait2.NTC; Message:"+e.getMessage();
                                     break;
                                 }
                             }
                             else{
                                 error=true;
-                                errormesg="KC.wait2:NT -> dann kein S oder C danach";
+                                errormesg="KC.wait2 got NT -> wasn't followed by S or C";
                             }
                             
                         }
                         else {
                             error=true;
-                            errormesg="KC.wait2:N -> dann kein T danach";
+                            errormesg="KC.wait2:N wasn't followed by T";
                         }
                         break;
                     }
@@ -745,12 +768,21 @@ public class KommClient implements Shutdownable{
      @param name The name of the client UPDATE: WILL BE IGNORED
      
      */
-    public void abmelden (String name) {
+    public void abmelden (String name) {        
         
-        String back="RLE("+encodedName+")";
         
-        if(out!=null) out.println (back);
+        String back="RLE("+encodedName+")";        
+        if (out!=null)  {
+            try {
+                senden(back);
+            }
+            catch (KommFutschException e){
+                CAT.warn(e.getMessage(), e);
+            }
+        }
+        
     }
+    
     
     
     
@@ -1430,16 +1462,10 @@ public class KommClient implements Shutdownable{
         }
         return back;
     }
+        
     
     public void shutdown(boolean notifyListeners) {
-        if (socket != null) {
-            try {
-                socket.close();
-            }
-            catch (Exception ioe){
-                CAT.debug(ioe);
-            }
-        }
+        CAT.debug("SHUTDOWN called for "+encodedName);
         if (in != null) {
             try {
                 in.close();
@@ -1449,8 +1475,16 @@ public class KommClient implements Shutdownable{
             }
         }
         if (out != null) {
-            try {
+            try {                
                 out.close();
+            }
+            catch (Exception ioe){
+                CAT.debug(ioe);
+            }
+        }
+        if (socket != null) {
+            try {
+                socket.close();
             }
             catch (Exception ioe){
                 CAT.debug(ioe);
