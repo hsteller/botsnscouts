@@ -137,6 +137,7 @@ public class PhaseEvaluationPanel extends TJPanel {
         }
       //  this.setPreferredSize(new Dimension(260,550));
         this.revalidate();
+        this.repaint();        
     }
     
     public void hideAll(boolean showCardBacksideInsteadOfEmpty){
