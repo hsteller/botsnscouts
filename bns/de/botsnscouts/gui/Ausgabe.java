@@ -489,17 +489,6 @@ public class Ausgabe extends BNSClientThread {
 
     private void abmelden() {
         CAT.debug("deregistering from server..");
-        /* while (mayNotLeave) {
-           synchronized (this) {
-             try {
-               wait();
-             }
-             catch(InterruptedException ie) {
-               CAT.error("interrupted");
-               CAT.error(ie.getMessage(), ie);
-             }
-           }
-         }*/
         CAT.debug("Ausgabe sets condition(s) for leaving its run() method");
         quitByMyself = true;
         spielEnde = true;
@@ -517,6 +506,8 @@ public class Ausgabe extends BNSClientThread {
             allowRunToFinish();
         }
         
+      
+     
         if (!keepWatching && kommClient!=null){
 	        abmelden();      
 	        try {
@@ -532,7 +523,6 @@ public class Ausgabe extends BNSClientThread {
             view.quitHumanPlayer(true); // Tell the view to tell the HumanPlayer to quit, if there is any
             
         }
-        
         if (!keepWatching && view != null){
             CAT.debug("removing View");
             view.setVisible(false);
