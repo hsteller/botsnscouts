@@ -1,3 +1,7 @@
+- using a view to watch a game without participating doesn't work if
+  the server runs on windows; for some unknown reason the newly started 
+  ServerAusgabeThread will receive a MOK (message-ack) while being in 
+  "No questions allowed" mode
 
 DONE - JDK1.5: Combobox, Dialogs, some borders of Components,..  
           still don't work with custom color theme 
@@ -11,7 +15,7 @@ DONE - BUG Cancel Button in the panel where one can start autobots and local pla
   and FAQs (right click for scrolling etc);
   explain strength of laser <=> colors somewhere or display them better
 
-- bug: sometimes the server deadlock if a player(or only the view?) quits
+DONE- bug: sometimes the server deadlocks if a player(or only the view?) quits
        during phase evaluation; maybe the server waits for some ACK?
 
 - explicit notifying of views if someone has lost all lives so we can remove
