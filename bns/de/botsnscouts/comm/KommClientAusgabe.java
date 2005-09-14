@@ -26,6 +26,7 @@
 package de.botsnscouts.comm;
 
 
+import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -76,17 +77,20 @@ public class  KommClientAusgabe extends KommClient {
  */
  public void aenderungFertig() {
       try {
-	  this.senden("ok");
+          decNTCCounter();
+		  this.senden("ok");
+		  
       }
       catch (KommFutschException k) {
-	  System.err.println ("Exception bei KCA.aenderungfertig(von"+cn+"\nMessage: "+k.getMessage());
-	  k.printStackTrace();
+		  System.err.println ("Exception bei KCA.aenderungfertig(von"+cn+"\nMessage: "+k.getMessage());
+		  k.printStackTrace();
       }
   }
 
     /** Acknowledges a Message has been received */
-    public void acknowledgeMsg() throws KommException{
-	this.senden("MOK");
+    public void acknowledgeMsg() throws KommFutschException{
+        decMSGCounter();
+        this.senden("MOK");
     }
 
     /** This methods asks for the actual game stats (laserhits).
@@ -123,8 +127,36 @@ public class  KommClientAusgabe extends KommClient {
 	else
 	    throw new KommException ("getStats: Wrong answer: "+rein);
     }
-
-
+    public synchronized void abmelden (String name) {        
+            while (getNTCCounter()>0){
+                aenderungFertig();           
+            }
+            while (getMSGCounter()>0){
+                try {
+                    acknowledgeMsg();
+                }
+                catch (KommException willOnlyBeThrownAfterDecreasingTheCounter){
+                    CAT.warn(willOnlyBeThrownAfterDecreasingTheCounter.getMessage(),
+                                    willOnlyBeThrownAfterDecreasingTheCounter);
+                }
+            }        
+        
+	        String back="RLE("+encodedName+")";        
+	        if (out!=null && !deregistered)  {      
+	            try {
+	                senden(back);
+	                CAT.debug("waiting, so the server can receive the message before someone closes the socket");
+	                this.wait(300); // wait for the server to receive the message 
+	                CAT.debug("done waiting");
+	            }
+	            catch (Exception ke){
+	                CAT.warn(ke.getMessage(), ke);
+	            }
+	        }
+        
+    }
+    private boolean deregistered = false;
+ 
 }
 
 
