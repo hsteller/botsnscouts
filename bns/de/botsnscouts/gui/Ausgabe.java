@@ -229,9 +229,9 @@ public class Ausgabe extends BNSClientThread {
                     }
                     catch (Exception e){
                         CAT.error(e.getMessage(), e);
-                        //if (!isShutDown()){
-                         //   shutdown(true);
-                       // }
+                        if (!isShutDown()){
+                           shutdown(true);
+                        }
                     }
                 }
             }
@@ -576,7 +576,7 @@ public class Ausgabe extends BNSClientThread {
         statsWindow.show();
     }
 
-    private void comHandleWeWereRemoved(ClientAntwort kommAntwort) {
+    private void comHandleWeWereRemoved(ClientAntwort kommAntwort) throws KommException  {
         // we asked the server to be removed..
         if (quitByMyself) { // hendrik was here..
             CAT.debug("server seems to confirm our request for quitting the game");
@@ -586,7 +586,7 @@ public class Ausgabe extends BNSClientThread {
 
         spielEnde = true; // for leaving the main loop of the run()-method
 
-        try {
+       // try {
             String[] spielErgebnis = kommClient.getSpielstand();
             if (spielErgebnis != null) { // were we removed because the game is over?
                 CAT.debug("We have " + spielErgebnis.length + " winners");             
@@ -595,10 +595,10 @@ public class Ausgabe extends BNSClientThread {
             } else {
                 CAT.debug("No winner exists");
             }
-        } catch (KommException e) {
-            CAT.error(e.getMessage(), e);
-            return;
-        }
+     //   } catch (KommException e) {
+     //       CAT.error(e.getMessage(), e);
+       //     return;
+     //   }
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
