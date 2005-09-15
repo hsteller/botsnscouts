@@ -22,6 +22,7 @@ import org.apache.log4j.Category;
 import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJLabel;
+import de.botsnscouts.widgets.TJTextField;
 
 public class ChatLine extends ColoredComponent implements ActionListener, ComponentListener, KeyListener  {
     static final Category CAT = Category.getInstance(ChatLine.class);
@@ -37,7 +38,7 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
         this.humanPlayer = humanPlayer;
         setLayout( new BorderLayout() );
         add( new TJLabel("Chat: "), BorderLayout.WEST );
-        text = new JTextField(45) {
+        text = new TJTextField(45) {
           boolean firstCall = true;
           public void paint (Graphics g) {
             if (firstCall) {
@@ -50,8 +51,7 @@ public class ChatLine extends ColoredComponent implements ActionListener, Compon
           }
         };
         text.setBorder( BorderFactory.createEmptyBorder(0, 10, 0, 10) );
-        text.setOpaque( false );
-
+        text.setOpaque( false );      
         add( text, BorderLayout.CENTER );
         text.addActionListener( this );
         text.addKeyListener( this );
