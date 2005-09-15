@@ -116,7 +116,7 @@ public class Ausgabe extends BNSClientThread {
 
     private boolean spielEnde = false;
 
-    private int currentPhase = -1;
+    private int currentPhase = -1;  
 
     // this flag tells us to ignore a "removed from game" message if we
     // requested the removal; in this case we don't want to get any status
@@ -826,9 +826,7 @@ public class Ausgabe extends BNSClientThread {
             //  }
         } catch (KommFutschException ke) {
             CAT.error("ke2: " + ke.getMessage(), ke);
-        } catch (KommException kE) {
-            CAT.error(kE.getMessage(), kE);
-        }
+        } 
     }
 
     private void comMsgHandleProgrammingDone(ClientAntwort kommAntwort) {
@@ -1064,6 +1062,8 @@ public class Ausgabe extends BNSClientThread {
         return tmpstr;
     }
 
+    
+    
     private void comMsgHandleEvalPhaseStart(ClientAntwort cw) {
       
         
@@ -1161,16 +1161,14 @@ public class Ausgabe extends BNSClientThread {
 	                row.setCardVisibility(phase+1, true);               
 	            }
             }
-        }    
-        
-        SoundMan.playSound(SoundMan.REVEAL_CARDS);
-        
-       
+        }                 
+        SoundMan.playSound(SoundMan.REVEAL_CARDS);               
         waitSomeTime(delay);
         
     }
     private void comMsgHandleEvalPhaseEnd(ClientAntwort cw) {
-        if (currentPhase < 0) {          
+        if (currentPhase < 0) {
+            CAT.warn("********EVAL PHASE END: currentPhase="+currentPhase);
             // special case:
             // if we are a view that joins a game in mid-game it is likely that 
             // we get a "reveal card" message before the currentphase (set at begin of a phase)
@@ -1210,6 +1208,7 @@ public class Ausgabe extends BNSClientThread {
     
     private void comMsgHandleEvalOfCard(ClientAntwort cw) {
         if (currentPhase < 0) {          
+            CAT.warn("********EVAL OF CARD: currentPhase="+currentPhase);
             // special case:
             // if we are a view that joins a game in mid-game it is likely that 
             // we get a "eval card" message before the currentphase (set at begin of a phase)
