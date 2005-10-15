@@ -1,7 +1,16 @@
+- include the manual in the "help" menu and maybe some tipps&tricks
+  and FAQs (right click for scrolling etc);
+  explain strength of laser <=> colors somewhere or display them better
+
 - using a view to watch a game without participating doesn't work if
   the server runs on windows; for some unknown reason the newly started 
   ServerAusgabeThread will receive a MOK (message-ack) while being in 
   "No questions allowed" mode
+
+- explicit notifying of views if someone has lost all lives so we can remove
+  his register view from the PhaseEval panel (atm only done if the server
+  really removes the player)
+
 
 DONE - JDK1.5: Combobox, Dialogs, some borders of Components,..  
           still don't work with custom color theme 
@@ -11,16 +20,8 @@ DONE - BUG Cancel Button in the panel where one can start autobots and local pla
        (NOT A BUG, WORKED AS DESIGNED; did a JVM restart instad of going back to ensure 
         that all resources (memory) were freed before starting a new game)  
 
-- include the manual in the "help" menu and maybe some tipps&tricks
-  and FAQs (right click for scrolling etc);
-  explain strength of laser <=> colors somewhere or display them better
-
 DONE- bug: sometimes the server deadlocks if a player(or only the view?) quits
        during phase evaluation; maybe the server waits for some ACK?
-
-- explicit notifying of views if someone has lost all lives so we can remove
-  his register view from the PhaseEval panel (atm only done if the server 
-  really removes the player)
 
 DONE - beautify of register tooltips
 
