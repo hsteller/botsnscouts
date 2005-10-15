@@ -38,51 +38,84 @@ import de.botsnscouts.start.Start;
 import de.botsnscouts.widgets.GreenTheme;
 
 /**
- * 
+ * The starting Ramp for BotsNScouts
  * @version $Id$
  */
 public class BotsNScouts {
-    private static Category CAT = Category.getInstance(BotsNScouts.class);
+	
+	/**
+	 * This class has been deprecated and replaced by the Logger subclass. It
+	 * will be kept around to preserve backward compatibility until mid 2003.
+	 * Logger is a subclass of Category, i.e. it extends Category. In other
+	 * words, a logger is a category. Thus, all operations that can be performed
+	 * on a category can be performed on a logger. Internally, whenever log4j is
+	 * asked to produce a Category object, it will instead produce a Logger
+	 * object. Log4j 1.2 will never produce Category objects but only Logger
+	 * instances. In order to preserve backward compatibility, methods that
+	 * previously accepted category objects still continue to accept category
+	 * objects.
+	 * (http://logging.apache.org/log4j/docs/api/org/apache/log4j/Category.html)
+	 */
+	private static Category CAT = Category.getInstance(BotsNScouts.class);
 
-    public static void main(String[] args) throws Throwable {
-        try {
-            MetalLookAndFeel.setCurrentTheme(new GreenTheme());
-            Splash splash = new Splash();
-            splash.showSplash(true);
+	public static void main(String[] args) throws Throwable {
+		try {
+			/*
+			 * Initializes the LookAndFeel, this has to be done
+			 * before ANY UI element are created 
+			 */
+			MetalLookAndFeel.setCurrentTheme(new GreenTheme());
+			
+			/*
+			 * Splash Screen cration and displaying 
+			 */
+			Splash splash = new Splash();
+			splash.showSplash(true);
+			
+			/*
+			 * Allows the configuration of log4j from an external file
+			 */
+			PropertyConfigurator.configure(BotsNScouts.class
+					.getResource("conf/log4j.conf"));
+			//some loggings
+			CAT.debug("Starting app");
+			CAT.info("User.dir: " + System.getProperty("user.dir"));
+			CAT.info("Java version: " + System.getProperty("java.vendor") + " "
+					+ System.getProperty("java.version"));
+			/*
+			 * Shows the ingame window and hides the splash
+			 */
+			Start.main(args, splash);
+		} catch (Throwable t) {
+			CAT.fatal("Exception:", t);
+			throw t;
+		}
+	}
+	/**
+	 * should be used instead of Toolkit.getDefaultToolkit().getScreenSize();
+	 * @return the size of the screen 
+	 */
+	public static Dimension getScreenSize() {
+		String s = System.getProperty("geometry");
+		if (s != null) {
+			try {
+				s = s.toLowerCase();
+				int x = s.indexOf('x');
+				int x2 = x + 1;
+				if (x > 0 && x2 < s.length()) {
+					String widthS = s.substring(0, x).trim();
+					String heightS = s.substring(x2).trim();
+					int width = Integer.parseInt(widthS);
+					int height = Integer.parseInt(heightS);
+					return new Dimension(width, height);
+				}
+			} catch (Exception e) {
+				CAT.error("in getScreenSize()", e);
+			}
+		}
 
-            PropertyConfigurator.configure(BotsNScouts.class.getResource("conf/log4j.conf"));
-            CAT.debug("Starting app");
-            CAT.info("User.dir: " + System.getProperty("user.dir"));
-            CAT.info("Java version: " + System.getProperty("java.vendor") + " " +
-                    System.getProperty("java.version"));
-            Start.main(args, splash);
-        } catch (Throwable t) {
-            CAT.fatal("Exception:", t);
-            throw t;
-        }
-    }
-
-    public static Dimension getScreenSize() {
-        String s = System.getProperty("geometry");
-        if (s != null) {
-            try {
-                s = s.toLowerCase();
-                int x = s.indexOf('x');
-                int x2 = x + 1;
-                if (x > 0 && x2 < s.length()) {
-                    String widthS = s.substring(0, x).trim();
-                    String heightS = s.substring(x2).trim();
-                    int width = Integer.parseInt(widthS);
-                    int height = Integer.parseInt(heightS);
-                    return new Dimension(width, height);
-                }
-            } catch (Exception e) {
-                CAT.error("in getScreenSize()", e);
-            }
-        }
-
-        Toolkit tk = Toolkit.getDefaultToolkit();
-        return tk.getScreenSize();
-    }
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		return tk.getScreenSize();
+	}
 
 }

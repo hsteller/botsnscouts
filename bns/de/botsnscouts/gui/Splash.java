@@ -28,20 +28,21 @@ package de.botsnscouts.gui;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Label;
 import java.awt.Toolkit;
 import java.awt.Window;
 
 import javax.swing.JLabel;
 
 import de.botsnscouts.BotsNScouts;
-import de.botsnscouts.widgets.TJLabel;
 
 /**
+ * This class is used to produce the Splash Screen,
+ * The displayed image can be found at: images/logosmall.jpg
+ * Like the image location the dimension of this window is
+ * hard coded and can be found here
  * @version $Id$
  */
 public class Splash{
@@ -50,7 +51,11 @@ public class Splash{
     private Window splash;
     private Frame dummy;
     private JLabel textLabel;
-
+    
+    /**
+     * Creates a splash screen. The imaged used is images/logosmall.jpg
+     * To display the splash please use showsplash(true)
+     */
     public Splash (){
         dummy = new Frame();
         splash = new Window(dummy);    	
@@ -65,23 +70,36 @@ public class Splash{
 		splash.add(textLabel,BorderLayout.SOUTH);
 	    splash.pack();
     }
-    
+  
+    /**
+     * Is only used in Ausgabe.java
+     * This might be a point for refactoring
+     * @param s
+     */
     public void setText(String s){        
 		textLabel.setText(s);		
 		splash.repaint();
     }
   
-
+    /**
+     * Shows/Hides the Splash Screen
+     * @param visible whether the splash should be visible or not
+     */
     public void showSplash(boolean visible){				
         if (splash != null) {
             splash.setVisible(visible);
         }
     }
-
+    /**
+     * Is identical to showSplash(false);
+     * and should be removed
+     */
     public void noSplash(){
        showSplash(false);       
     }
-
+    /**
+     * Paints the Splash
+     */
     private class ImageCanvas extends Canvas{
 		private Image im;
 		private Dimension d=new Dimension(Splash.WIDTH,Splash.HEIGHT);
