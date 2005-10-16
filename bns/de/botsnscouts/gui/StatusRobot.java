@@ -33,9 +33,6 @@ import javax.swing.ToolTipManager;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
-import sun.security.krb5.internal.bg;
-
-
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.ColoredPanel;
