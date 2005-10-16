@@ -59,8 +59,18 @@ public class BotsNScouts {
 	private static Category CAT = Category.getInstance(BotsNScouts.class);
 
 	/**
+	 * The method to start BotsnScouts (using the main menu/start application).
+	 * Advanced use: for an immediate gamestart without configuring a game you have
+	 * to use the following three args:
+	 * args[0]: name of an .spf game description file (with or without ".spf" ending) 
+	 * args[1]: [yes|no] ("yes" will start a human player, "no" will start a View)
+	 * args[2]: the number of A.I. players to start
 	 * 
-	 * @param args What the hack are the acceptable values for args ?
+	 * Example: args = {"big_test.spf",  "yes", "3"} will start a game with the
+	 * preconfigured board "big_test", a human player and three additional A.I. robots.
+	 * 
+	 * 
+	 * @param args usually none;   
 	 * @throws Throwable
 	 */
 	public static void main(String[] args) throws Throwable {
