@@ -6,9 +6,7 @@
 package de.botsnscouts.util;
 
 import java.awt.Dimension;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,7 +35,7 @@ import de.botsnscouts.widgets.TJLabel;
  * 
  * 
  * More or less a hack.
- * Is intended to keep track of the server and clients/BNSThreads that were launched on  localhost;
+ * Is intended to keep track of the server and clients/BNSThreads that were launched on localhost;
  * to make sure that the clients get killed if the server isn't running anymore.
  * General purpose for that: being able to do a "clean" quit of local HumanPlayers/games 
  *  (==redisplay the main launcher app to maybe start a new game instead of the former "System.exit(0)"
@@ -45,7 +43,9 @@ import de.botsnscouts.widgets.TJLabel;
  * 
  */
 public class Registry implements ShutdownListener, GameOverListener, GameStateListener {
-    
+    	/**
+    	 * The logger
+    	 */
     	private static Category CAT = Category.getInstance(Registry.class);
    
     	
@@ -55,12 +55,12 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
      *   => if set to false, we will almost always kill the JVM and try to restart the game in a new one,
      *   EXCEPT: if "aGameHasStarted" is still false, we will try a redisplay without killing the JVM, 
      *   as I think the memory trouble might not be so severe if the game has not started yet
-     *   (=> the clients didn't do much, only registered at  the server and the views didn't load the
+     *   (=> the clients didn't do much, only registered at the server and the views didn't load the
      *          graphics for the gamebaord yet..)
      *  
      */
     	private static final boolean RESTARTS_BY_KILLING_JVM = true;
-    	private static final int MS_TO_WAIT_FOR_SERVER_SHUTDOWN = RESTARTS_BY_KILLING_JVM?750:5500;
+    	private static final int MS_TO_WAIT_FOR_SERVER_SHUTDOWN = RESTARTS_BY_KILLING_JVM?750:5500; //this needs refactoring
     	private static boolean aGameHasStarted = false;
     	
 	    public static final int CLIENT_TYPE_UNKNOWN      = -1;
@@ -83,7 +83,9 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
         }
         
         public static Registry getSingletonInstance(){
-            return globalGameRegistry;
+            /**todo: if (globalGameRegistry==null) globalGameRegistry=new Registry();*/
+        	return globalGameRegistry;
+        	
         }
         
         // this is supposed to catch the case where someone (probably developer..)  starts a client via CLI
@@ -102,16 +104,31 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
             this.isEnabled = enabled;
         }
         
+        /**
+         * Implementation of the GameStateListener Interface
+         */
         public void gameStarted(Server theServer) {
-            aGameHasStarted = true;            
+          /**TODO: remove or use this Parameter*/
+        	aGameHasStarted = true;            
         }
-        
+        /**
+         * Implementation of the GameStateListener Interface
+         */        
         public void gameFinished(Server theServer){
             // I don't care (yet?) as a server will also call its shutdown method in that case..
+        	/**TODO: delete or implement*/
         }
-        
+        /**
+         * Add a game to the registry
+         * @param server de.botsnscouts.server.Server
+         * @param serverIp Ip Adress of the Server
+         * @param serverPort the Server port
+         * @return The Game currently added
+         */
         public Game addGame(Server server, String serverIp, int serverPort){
             if (!isEnabled) {
+            	//maybe it will be better to throw an exception
+            	//or can this ever happen?
                 return null;
             }
             if (CAT.isDebugEnabled()) {
@@ -120,17 +137,26 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
 	            CAT.debug("xXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx");	           
 	            CAT.debug("addGame:server="+server+"; ip="+serverIp+"; port="+serverPort);
             }
+            /** Setting up a game */
             Game game = new Game(server, serverIp, serverPort);         
             if (server!=null){
                 server.addGameStateListener(this);
             }
+            /** IMHO it is possible to use a Synchronized Collection, instead of "handsyncing" */
             synchronized (games) {
                 games.add(game);
             }
             return game;
             
         }
-        
+        /**
+         * Tries to find a game with the given parameters
+         * The serverIp and the correspondending port are
+         * combined, can identify a game on a server
+         * @param serverIp the IP
+         * @param port the game port
+         * @return the Game with this parameters or null if no game found
+         */
         private Game findGame(String serverIp, int port){           
             dummyCompareGame.setServerIp(serverIp);
             dummyCompareGame.setServerPort(port);
@@ -148,9 +174,12 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
             CAT.debug("\treturning NULL");
             return null;
         }
-        
+        /**
+         * 
+         * @param clientOrServer
+         * @return
+         */
         private Game findGame(Shutdownable clientOrServer) {
-        	
         	Game g = (Game) shutdownablesToGames.get(clientOrServer);
         	CAT.debug("findGame for: "+clientOrServer);
         	CAT.debug("returning game: "+g);
@@ -479,13 +508,18 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
             
         }
         
-        
+        /**
+         * This method is never used
+         * @param s
+         * @return
+         */
         private static String maskWhiteSpace(String s){
         	if (s == null){
         		return null;
         	}
         	int length = s.length();
         	StringBuffer sb = new StringBuffer(length+10);
+        	// this variable is never used
         	char space = ' ';
         	for (int i=0;i<length;i++){
         		char c = s.charAt(i);
@@ -501,7 +535,11 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
         		return s;
         	}
         }
-        
+       /**
+        * This one is a heavy hack
+        * Kills the VM an starts a new one
+        *
+        */
        private void bruteRestart(){
            try {
 	           File f = new File(".");	           
@@ -540,7 +578,7 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
                System.exit(0);
            }
        }
-        
+
        private void registryRemoveAndKillAutobots (Game game) {
            Collection bots = game.removeAndKillAllAutoBots();
            if (bots != null ){
@@ -919,8 +957,12 @@ class ClientInfo {
             
 }
 
+/**
+ * Whats the difference to the GameStateListener?
+ * void gameIsOver(Game game);
+ */
+
 interface GameOverListener{
 
      void gameIsOver(Game game);
-    
-}
+ }

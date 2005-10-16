@@ -21,8 +21,4 @@ public interface Shutdownable {
    
    public boolean removeShutdownListener(ShutdownListener listener);
    
-   
-   
-   
-   
 }
