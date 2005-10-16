@@ -58,6 +58,11 @@ public class BotsNScouts {
 	 */
 	private static Category CAT = Category.getInstance(BotsNScouts.class);
 
+	/**
+	 * 
+	 * @param args What the hack are the acceptable values for args ?
+	 * @throws Throwable
+	 */
 	public static void main(String[] args) throws Throwable {
 		try {
 			/*
