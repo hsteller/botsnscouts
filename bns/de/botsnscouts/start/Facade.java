@@ -275,11 +275,12 @@ public class Facade {
         return Launcher.startAutoBot(GameOptions.DHOST, GameOptions.DPORT, iq, beltAware, botName);
     }
 
-    public Server startGame() throws OneFlagException, NonContiguousMapException {
+    public Server startGame() throws OneFlagException, NonContiguousMapException {        
        return  startGame(null);
     }
 
     public Server startGame(ServerObserver listener) throws OneFlagException, NonContiguousMapException {
+        updateGameOptions();
         return launcher.startGame(gameOptions, listener );
     }
 
@@ -310,6 +311,7 @@ public class Facade {
      * i.e. set field and flags.
      */
     public void updateGameOptions() throws OneFlagException, NonContiguousMapException  {
+        getGameOptions(); // create them if they didn't exist 
         Location dim = tileRaster.getSpielfeldSize();
         gameOptions.setX(dim.x);
         gameOptions.setY(dim.y);

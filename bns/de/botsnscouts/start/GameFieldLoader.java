@@ -102,14 +102,16 @@ class GameFieldLoader{
 	if (distSpf.contains(name)){
 	    istream=BotsNScouts.class.getResourceAsStream("tiles/"+name+".spf");
 	    if (istream==null){
-		CAT.warn("Error loading spf "+name+" from distribution.");
+		CAT.error("Error loading spf "+name+" from distribution.");
 		return null;
 	    }
 	}else{
 	    try{
 		istream=new FileInputStream("tiles"+System.getProperty("file.separator")+name+".spf");
 	    }catch(IOException e){
-		CAT.warn("Error loading spf "+name+" from user-def");
+	        
+		CAT.error("Error loading spf "+name+" from user-def");
+		CAT.error(e.getMessage(), e);
 		return null;
 	    }
 	}
@@ -118,7 +120,8 @@ class GameFieldLoader{
 	try{
 	    spfProp.load(istream);
 	}catch(IOException e){
-	    CAT.warn("Error loading spf "+name);
+	    CAT.error("Error loading spf "+name);
+	    CAT.error(e.getMessage(), e);
 	    return null;
 	}
 	return spfProp;
@@ -129,7 +132,8 @@ class GameFieldLoader{
 	 OutputStream ostream=new FileOutputStream(file);
 	 spfProp.store(ostream,null);
 	}catch(IOException e){
-	    System.err.println(e);
+	    CAT.error(e.getMessage(), e);
+	    
 	}
 
     }

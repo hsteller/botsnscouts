@@ -390,9 +390,12 @@ public class Start extends JFrame implements WindowListener {
     public static void main(String[] argv, Splash splash) {
         initBasics();
 
-        if (argv.length >= 4) {
+        if (argv.length != 3) { // "normal" case 
+            globalStart = new Start(splash);
+        }
+        else { // developer quickstart
             try {
-                String spielfeld = argv[1];
+                String spielfeld = argv[0];
                 if (spielfeld.toLowerCase().endsWith(".spf")) {
                     spielfeld = spielfeld.substring(0, spielfeld.length() - 4);
                 }
@@ -405,7 +408,7 @@ public class Start extends JFrame implements WindowListener {
                 CAT.debug("Spielfed loaded");
                 fassade.startGame();
                 CAT.debug("Server gestartet");
-                if (argv[2].equals("yes")) {
+                if (argv[1].equals("yes")) {
                     Facade.participateInAGame(KrimsKrams.randomName(), 0);
                     CAT.debug("Human player started");
                 } else {
@@ -414,7 +417,7 @@ public class Start extends JFrame implements WindowListener {
                 }
                 int anzKS = 0;
                 try {
-                    anzKS = Integer.parseInt(argv[3]);
+                    anzKS = Integer.parseInt(argv[2]);
                     for (int i = 0; i < anzKS; i++) {
                         Facade.startAutoBot(40, true);
                         CAT.debug("A.I. Bot started");
@@ -424,17 +427,18 @@ public class Start extends JFrame implements WindowListener {
                 try {
                     Thread.sleep((anzKS + 1) * 3000);
                 } catch (InterruptedException e) {
-                    System.err.println(e);
+                    CAT.warn(e.getMessage());
                 }
                 fassade.gameStarts();
                 CAT.debug("Spiel geht los");
                 return;
             } catch (Exception e) {
-                System.err.println(e);
+                CAT.error(e.getMessage(), e);
+                System.exit(1);
             }
-        } else {
-            globalStart = new Start(splash);
-        }
+        } 
+           
+        
     }
 
     public void dispose(){

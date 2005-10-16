@@ -134,7 +134,7 @@ public class Launcher implements RegistrationStartListener{
     }
 
     public Server startGame(GameOptions options, ServerObserver listener) throws OneFlagException, NonContiguousMapException {
-       
+   
        synchronized (meTheLauncher) {
            meTheLauncher.regHasStarted  = false;
        }
