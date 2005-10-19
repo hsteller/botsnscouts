@@ -78,6 +78,9 @@ public class Start extends JFrame implements WindowListener {
     private CardLayout layout = new CardLayout();
 
     private WaiterThread wth;
+    
+    private String lastShown = MAIN_MENU;
+    private String currentyShowing = MAIN_MENU;
 
     private Splash splash;
 
@@ -113,10 +116,7 @@ public class Start extends JFrame implements WindowListener {
     }
 
     
-    private String lastShown = MAIN_MENU;
-    private String currentyShowing = MAIN_MENU;
-    private void switchCard(String to) {
-       
+     private void switchCard(String to) {
         layout.show(getContentPane(), to);
         lastShown = currentyShowing;
         currentyShowing = to;
@@ -388,7 +388,10 @@ public class Start extends JFrame implements WindowListener {
     }
     
     public static void main(String[] argv, Splash splash) {
-        initBasics();
+        /**
+         * Initializing the Gameregistry, the Sounds and Language
+         */
+       initBasics();
 
         if (argv.length != 3) { // "normal" case 
             globalStart = new Start(splash);
