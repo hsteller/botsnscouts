@@ -77,7 +77,7 @@ public class BotsNScouts {
 		try {
 			/*
 			 * Initializes the LookAndFeel, this has to be done
-			 * before ANY UI element are created 
+			 * before ANY UI element is created 
 			 */
 			MetalLookAndFeel.setCurrentTheme(new GreenTheme());
 			

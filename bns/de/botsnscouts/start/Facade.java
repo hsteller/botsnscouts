@@ -35,11 +35,12 @@ import de.botsnscouts.server.Server;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Location;
 
-// Diese Klasse dient der Entkopplung der GUI-Schicht (StartSpieler)
-// von der Fachkonzeptschicht(...) und der Datenhaltungsschicht (...)
-/**
+/** Diese Klasse dient der Entkopplung der GUI-Schicht (StartSpieler)
+ * von der Fachkonzeptschicht(...) und der Datenhaltungsschicht (...)
+ * 
  * @version $Id$
  */
+//TODO(Comments)
 public class Facade {
 
     private static Category CAT = Category.getInstance(Facade.class);
