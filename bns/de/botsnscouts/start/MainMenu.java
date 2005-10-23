@@ -49,9 +49,13 @@ import de.botsnscouts.widgets.TJButton;
 
 
 public class MainMenu extends JPanel implements ActionListener {
-    private static Category CAT = Category.getInstance(MainMenu.class.getName());
+    /**
+     * The logger which is actually not used 
+     */
+	private static Category CAT = Category.getInstance(MainMenu.class.getName());
 
     private Paint paint;
+    // all my components
     private JButton gameBut;
     private JButton partBut;
     private JButton watchBut;
@@ -59,10 +63,18 @@ public class MainMenu extends JPanel implements ActionListener {
     private JButton endBut;
     private JLabel logo;
 
+    // TODO(Remove me)
     private Start parent;
 
     public MainMenu(Start par) {
-        parent = par;
+        // TODO(Remove me)
+    	parent = par;
+
+    	/* this access is inacceptable
+         * because Start is implemented as a singleton
+         * The common way would be:
+         * Start.getLauncherAppSingleton().setTitle(Message.say("Start", "mStartTitel")); 
+         */
         parent.setTitle(Message.say("Start", "mStartTitel"));
         paint = parent.paint;
 
