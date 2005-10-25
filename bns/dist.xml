@@ -4,17 +4,31 @@
 
 <project name="BotsNScuots-dist" default="fail">
 
-  <target name="fail">
-    <echo message="Please don't call this file directly, use" />
-    <echo message="ant dist" />
-    <echo message="which will proceed to call this file." />
-  </target>
+ 
 
 <!-- Define our own tasks -->
 
   <taskdef name="gentilesindex" 
            classname="de.botsnscouts.build.GenerateTilesIndexTask"
 	   classpath="${tools-build}" />
+
+  <taskdef name="gplifytask" 
+          classname="de.botsnscouts.build.GplifyAntTask"
+	   	  classpath="${tools-build}" />
+
+
+ <target name="fail">
+    <echo message="Please don't call this file directly, use" />
+    <echo message="ant dist" />
+    <echo message="which will proceed to call this file." />
+  </target>
+	
+ <target name="gplify">
+    	<gplifytask replacewithyear="\$\$DATE\$\$" 
+					ignorewithtext="GNU General Public License"
+					gplfile="${basedir}/tools/gpl_template.txt" />
+    </target>
+	
 
   <target name="genIdx">
     <gentilesindex dir="${build}/${maindir}/tiles" />
