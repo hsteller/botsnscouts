@@ -961,6 +961,19 @@ class ClientInfo {
  * Whats the difference to the GameStateListener?
  * void gameIsOver(Game game);
  */
+// hendrik says: 
+// * this GameOverListener monitors the state of the Registry's  internal Game-Objects as in 
+//   "no clients are interested anymore, we can clean up all garbage and remove this Game from the registry", 
+//
+//*   the server.GameStateListener tracks the "Roborally game" as in 
+//     "Has the game started yet? Has the last bot died or reached the final flag?"
+//   
+//   
+// example: if the "Roborally game" is over,  we show the final ranking to the user, so
+//                 there are still clients watching, but the "Roborally Game" is over
+//             => a) the server may quit
+//                   b) for the _Registry_ the game isn't over yet, as there are still BnSThreads alive in relation
+//                      with that game
 
 interface GameOverListener{
 
