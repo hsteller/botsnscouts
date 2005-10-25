@@ -77,9 +77,18 @@ public class Start extends JFrame implements WindowListener {
 	 */
 	private CardLayout layout = new CardLayout();
 
-	// these two seem never to be used seriously
+	// these two seem never to be used seriously;
+	// ServerObserver has a call to showLastShown() that uses them; used to keep track which Card
+	// was shown the before the current one.
+	// Reason: press a button in one of the menus
+	//             -> button kicks off some background action (like starting the server),
+	//                  showing the "doing stuff"-card in the meantime 
+	//             -> background action fails for some reason
+	//             -> we want to go back to the Card/Menu where the button was pressed 
+	//             
+ 
 	private String lastShown = MAIN_MENU;
-	private String currentyShowing = MAIN_MENU;
+	private String currentlyShowing = MAIN_MENU;
 
 	/*
 	 * All the funny menus
@@ -150,7 +159,7 @@ public class Start extends JFrame implements WindowListener {
 	 * sensefull(lol, germandishing) to put the facade in the 
 	 * registry singleton, so we can call 
 	 * Registry.getInstance().getFacade().useMe(1MioKisses)
-	 * instead of all these parent.facade.XXX() calls
+	 * instead of all these parent.facade.xyz() calls
 	 * It breaks the information hiding concept!
 	 */
 	Facade facade;
@@ -209,29 +218,36 @@ public class Start extends JFrame implements WindowListener {
 	 */
 	private void switchCard(String to) {
 		layout.show(getContentPane(), to);
-		lastShown = currentyShowing;
-		currentyShowing = to; // whats this for?
+		// updating the last shown card with the one shown before the switch above
+		lastShown = currentlyShowing;
+		// updating the card that is shown now
+		currentlyShowing = to; 
 	}
 
 	/**
-	 * TODO(Delete me!) There isnt a single reference in the whole project Makes
-	 * the implementation of switchcard a bit easier an probably two variables
-	 * usesless
+	 * Will switch back to the card that was shown before the one that is currently displayed;
+	 * think of javascript's "history(-1)" call and a "history" with the maximum length of 1. 
+	 * 
 	 */
+//	 Don't delete me (yet). 
+//	 * While there isn't a single _active_ reference in the whole project, there still is one in 
+//	 * comments in ServerObserver. 
+//	 * Also, I like the unused functionality more than 
+
 	protected void showLastShown() {
 		switchCard(lastShown);
 	}
 
 	
-	/*
-	 * Kill this and use the System.exit(0) command in dispose
+	/**
+	 * Kill this; uses the System.exit(0) command after dispose
 	 */
 	public void myclose() {
 		dispose();
 		System.exit(0);
 	}
 
-	// no need to override in this way. Nothing happens at all.
+	/** Does (atm) nothing else than calling super.dispose()*/
 	public void dispose() {
 		super.dispose();
 	}
@@ -244,6 +260,7 @@ public class Start extends JFrame implements WindowListener {
 		switchCard(MAIN_MENU);
 		mainMenu.unrollOverButs();
 		setTitle(Message.say("Start", "mStartTitel"));
+		this.toFront();
 		// setVisible(true);
 	}
 	
@@ -458,19 +475,20 @@ public class Start extends JFrame implements WindowListener {
 	 * To obtain the global "Start" object; will exist after
 	 * Start.main(String[]) was called.
 	 * 
+	 * @param splash a Splash that must be hidden before the main menu is displayed
 	 * @return The global "Start" object
 	 */
-	public static Start getLauncherAppSingleton() {
-		/*
-		 * this needs some serious refactoring cause if we have a singleton
-		 * pattern then we should use it the way its meant to be:
-		 * 
-		 * if {globalStart==null}{ globalStart=new Start(); <--then we have a
-		 * prob with the constructor } return globalStart;
-		 */
-		return globalStart;
+	private  static Start getLauncherAppSingleton(Splash splash) {		
+		  if (globalStart==null) { 		     
+		      globalStart=new Start(splash); 
+		  }
+		  return globalStart;	    
 	}
 
+	public  static Start getLauncherAppSingleton() {		
+	    return getLauncherAppSingleton(null);
+	}
+	
 	/**
 	 * Initializes the game registry, the sounds and language via the
 	 * <code>argv<\code> parameter array OR by interrogating
@@ -486,7 +504,7 @@ public class Start extends JFrame implements WindowListener {
 		initBasics();
 
 		if (argv.length != 3) { // "normal" case
-			globalStart = new Start(splash); // this is ugly! See above
+			globalStart = getLauncherAppSingleton(splash);
 		} else { // developer quickstart
 			try {
 				String spielfeld = argv[0];
@@ -584,7 +602,10 @@ public class Start extends JFrame implements WindowListener {
 	 */
 	public void windowOpened(WindowEvent e) {
 		/* Finally hiding the splash */
-		splash.noSplash();
+	    if (splash != null ) {
+	        splash.noSplash();
+	    }
+		
 		CAT.debug("window opened");
 		CAT.debug("triggering tilefactory");
 
