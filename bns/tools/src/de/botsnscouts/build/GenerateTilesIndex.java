@@ -5,7 +5,7 @@ import java.util.*;
 
 public class GenerateTilesIndex{
 
-    public static de.botsnscouts.util.Bot albert;
+  
 
     public static void main(String[] args){
 	if (args.length==0){
