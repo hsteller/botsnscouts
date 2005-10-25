@@ -150,6 +150,13 @@
       <property name="where" value="${build}/${maindir}/tiles" />
     </ant>
   </target>
+	
+	<!-- adds the gpl to every .java file that doesn't contain it already-->
+	<target name="gplify" depends="compile-tools"  
+		description="adds the gpl to every .java file that doesn't contain it already">
+	    <ant antfile="dist.xml" target="gplify">	     
+	    </ant>
+	  </target>
   
 <!-- Stuff needed for packaging distributions up -->
 
