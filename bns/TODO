@@ -1,6 +1,16 @@
+- if your robot reaches the flag and the game is over for you, you 
+  lose your "interactivity", meaning: hotkeys won't work anymore
+  => a) usability sucks
+     b) there is no way to chat anymore if you want to mock the losers ;-)
+
+- explain strength of laser <=> colors somewhere or display them better;
+  maybe it's possible to do "parallel animations" so we can use the 
+  display that is used on the Roborally boards: one ray painted for
+  each additional point of strength
+  
+
 -  include the manual in the "help" menu and maybe some tipps&tricks
   and FAQs (right click for scrolling etc);
-  explain strength of laser <=> colors somewhere or display them better
 
 - using a view to watch a game without participating doesn't work if
   the server runs on windows; for some unknown reason the newly started 
