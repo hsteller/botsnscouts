@@ -783,20 +783,6 @@ public class HumanPlayer extends BNSClientThread {
      }
 
 
- 
-
-    static class RoboTrackListener implements ActionListener {
-        Bot r;
-
-        RoboTrackListener(Bot r) {
-            this.r = r;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-//	    ausgabe.setTracking( r.getName() );
-//	    ausgabe.trackRob( r.getName() );
-        }
-    }
 
 
     class EmergencyDirectionSubmitter extends TimerTask{
