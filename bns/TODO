@@ -3,11 +3,11 @@
   => a) usability sucks
      b) there is no way to chat anymore if you want to mock the losers ;-)
 
-- explain strength of laser <=> colors somewhere or display them better;
-  maybe it's possible to do "parallel animations" so we can use the 
-  display that is used on the Roborally boards: one ray painted for
-  each additional point of strength
-  
+- BUG: repeatable OutOfMemoryError if I try to zoom into a 3x3 board 
+  (for zoom levels > 110%)
+  ? Should be possible to use the zooming support of Swing (again);
+    maybe this could help ? 
+  ? adding this to the SF-Bugtracker ?   
 
 -  include the manual in the "help" menu and maybe some tipps&tricks
   and FAQs (right click for scrolling etc);
@@ -20,6 +20,12 @@
 - explicit notifying of views if someone has lost all lives so we can remove
   his register view from the PhaseEval panel (atm only done if the server
   really removes the player)
+
+
+DONE - explain strength of laser <=> colors somewhere or display them better;
+  maybe it's possible to do "parallel animations" so we can use the
+  display that is used on the Roborally boards: one ray painted for
+  each additional point of strength
 
 
 DONE - JDK1.5: Combobox, Dialogs, some borders of Components,..  
