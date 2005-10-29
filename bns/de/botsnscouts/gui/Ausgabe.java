@@ -960,7 +960,9 @@ public class Ausgabe extends BNSClientThread {
             CAT.error("Ausgabe: BoardLaser: NumberFormatException:", nfe);
         }
 
-        for (int i = 0; i < strength; i++) {
+        for (int i = 0; i < strength; i++) { 
+            // TODO this loop does not work; 
+            // only one of the clips is to hear; better we use different sounds for the different strengths.. 
             SoundMan.playSound(SoundMan.BOARDLASER);
         }
         // if enough information,  show laser animation
