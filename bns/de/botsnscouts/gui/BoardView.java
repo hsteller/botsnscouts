@@ -143,11 +143,9 @@ public class BoardView extends JComponent{
     private static final double FULL_LENGTH_DOUBLE = 30.0;
 
 
-    /** contains colors of the boardlasers, strength 1 to 3*/
-    static final Color[] laserColor = {Color.red.brighter(), //strength 1
-                                       Color.orange, //strength 2
-                                       Color.yellow};//strength 3
-
+    /** Color for boardlasers */
+    private static final Color fstLaserColor = Color.red.brighter();
+    
     /** The color used for the background of active lasers. */
     private final static Color sndLaserColor = new Color(255, 255, 155);
 
@@ -1340,14 +1338,15 @@ public class BoardView extends JComponent{
         return laenge;
     }
 
-    private void paintActiveBordLaser(Graphics g, Location source, int facing, Color c, int actualLength) {
+    private void paintActiveBordLaser(Graphics g, Location source, int facing, int strength, int actualLength) {
 
         Graphics2D g2d = (Graphics2D) g;
         AlphaComposite ac = AC_SRC_OVER;//, 0.5f
         g2d.setComposite(ac);
-        g2d.setColor(c);
+        
 
         int breite = (int)(dScale*4) ; // Die Breite des Lasers, sollte gerade sein
+        int eleven = (int )(dScale*11);
         int lSourceX = 0;
         int lSourceY = 0; // Anfangspunkt des Lasers in Pixeln,
         Location tmp = mapC2PixelCenter(source.x, source.y);
@@ -1355,44 +1354,93 @@ public class BoardView extends JComponent{
         switch (facing) {
             case NORTH:
                 {
-                    lSourceX = tmp.x - (breite / 2 - 1);
-                    lSourceY = tmp.y - actualLength + (scaledFeldSize/breite);
-                    g2d.fillRect(lSourceX, lSourceY, breite, actualLength);
-                    g2d.setColor(sndLaserColor);
-                    g2d.drawRect(lSourceX, lSourceY, breite, actualLength);
-                    break;
-                }
-            case EAST:
-                {
-                    lSourceX = tmp.x - (scaledFeldSize/breite)+breite;
-                    lSourceY = tmp.y - (breite / 2 - 1);                   
-                    g2d.fillRect(lSourceX, lSourceY, actualLength, breite);
-                    g2d.setColor(sndLaserColor);
-                    g2d.drawRect(lSourceX, lSourceY, actualLength, breite);
+	                lSourceX = tmp.x - (breite / 2 - 1);
+	        	    lSourceY = tmp.y - actualLength + (scaledFeldSize/breite);
+                	if (strength != 2) {                	    
+                	    g2d.setColor(fstLaserColor);
+                	    g2d.fillRect(lSourceX, lSourceY, breite, actualLength);
+                	    g2d.setColor(sndLaserColor);
+                	    g2d.drawRect(lSourceX, lSourceY, breite, actualLength);
+                	}
+                	if (strength>1) {
+                	    int offset = (strength-1)*eleven;
+                	    g2d.setColor(fstLaserColor);
+                	    g2d.fillRect(lSourceX-offset, lSourceY, breite, actualLength);
+                	    g2d.fillRect(lSourceX+offset, lSourceY, breite, actualLength);
+                	    g2d.setColor(sndLaserColor);
+                	    g2d.drawRect(lSourceX-offset, lSourceY, breite, actualLength);
+                	    g2d.drawRect(lSourceX+offset, lSourceY, breite, actualLength);                	    
+                	}                	                                      
                     break;
                 }
             case SOUTH:
+            {
+            lSourceX = tmp.x - (breite / 2 - 1);
+    	    lSourceY = tmp.y - (scaledFeldSize/4)+1;
+        	if (strength != 2) {                	    
+        	    g2d.setColor(fstLaserColor);
+        	    g2d.fillRect(lSourceX, lSourceY, breite, actualLength);
+        	    g2d.setColor(sndLaserColor);
+        	    g2d.drawRect(lSourceX, lSourceY, breite, actualLength);
+        	}
+        	if (strength>1) {
+        	    int offset = (strength-1)*eleven;
+        	    g2d.setColor(fstLaserColor);
+        	    g2d.fillRect(lSourceX-offset, lSourceY, breite, actualLength);
+        	    g2d.fillRect(lSourceX+offset, lSourceY, breite, actualLength);
+        	    g2d.setColor(sndLaserColor);
+        	    g2d.drawRect(lSourceX-offset, lSourceY, breite, actualLength);
+        	    g2d.drawRect(lSourceX+offset, lSourceY, breite, actualLength);                	    
+        	}                	                           
+                break;
+            }
+            case EAST:
                 {
-                    lSourceX = tmp.x - (breite / 2 - 1);
-                    lSourceY = tmp.y - (scaledFeldSize/4)+1;
-                    g2d.fillRect(lSourceX, lSourceY, breite, actualLength);
-                    g2d.setColor(sndLaserColor);
-                    g2d.drawRect(lSourceX, lSourceY, breite, actualLength);
+                    lSourceX = tmp.x - (scaledFeldSize/breite)+breite;
+                    lSourceY = tmp.y - (breite / 2 - 1);                
+                    
+                    if (strength != 2) {                	    
+                	    g2d.setColor(fstLaserColor);
+                	    g2d.fillRect(lSourceX, lSourceY, actualLength, breite);
+                	    g2d.setColor(sndLaserColor);
+                	    g2d.drawRect(lSourceX, lSourceY, actualLength, breite);
+                	}
+                	if (strength>1) {
+                	    int offset = (strength-1)*eleven;
+                	    g2d.setColor(fstLaserColor);
+                	    g2d.fillRect(lSourceX, lSourceY-offset, actualLength, breite);
+                	    g2d.fillRect(lSourceX, lSourceY+offset, actualLength, breite);
+                	    g2d.setColor(sndLaserColor);
+                	    g2d.drawRect(lSourceX, lSourceY-offset, actualLength, breite);
+                	    g2d.drawRect(lSourceX, lSourceY+offset, actualLength, breite);
+                	}                	                                                                                  
                     break;
                 }
             case WEST:
                 {
                     lSourceX = tmp.x - actualLength + (scaledFeldSize/4)+((int)(3*dScale));
                     lSourceY = tmp.y - (breite / 2 - 1);
-                    g2d.fillRect(lSourceX, lSourceY, actualLength - 2, breite);
-                    g2d.setColor(sndLaserColor);
-                    g2d.drawRect(lSourceX, lSourceY, actualLength - 2, breite);
+                    if (strength != 2) {                	    
+                	    g2d.setColor(fstLaserColor);
+                	    g2d.fillRect(lSourceX, lSourceY, actualLength - 2, breite);
+                	    g2d.setColor(sndLaserColor);
+                	    g2d.drawRect(lSourceX, lSourceY, actualLength - 2, breite);
+                	}
+                	if (strength>1) {
+                	    int offset = (strength-1)*eleven;
+                	    g2d.setColor(fstLaserColor);
+                	    g2d.fillRect(lSourceX, lSourceY-offset, actualLength - 2, breite);
+                	    g2d.fillRect(lSourceX, lSourceY+offset, actualLength - 2, breite);
+                	    g2d.setColor(sndLaserColor);
+                	    g2d.drawRect(lSourceX, lSourceY-offset, actualLength - 2, breite);
+                	    g2d.drawRect(lSourceX, lSourceY+offset, actualLength - 2, breite);
+                	}                	                  
                     break;
                 }
             default :
                 {
                     CAT.error("BoardView.paintActiveRobLaser: ");
-                    CAT.error("Ungueltige Laserrichtung: " + facing);
+                    CAT.error("illegal value for laser facing: " + facing);
                 }
         }// end switch facing
         //   allDone = true;
@@ -1413,8 +1461,8 @@ public class BoardView extends JComponent{
 
         int laenge = calculateLaserLength(laserPos, targetRob, laserDir);
         laenge = laenge * scaledFeldSize + (scaledFeldSize/4)+((int)(dScale*3));
-        Color c = laserColor[strength - 1];
-
+       // Color c = laserColor[strength - 1];
+      
         // get viewable area
         //	Point upperLeftCorner = surrounding.getViewPosition();
         //  Dimension size = surrounding.getExtentSize();
@@ -1431,7 +1479,7 @@ public class BoardView extends JComponent{
         for (int i = 1; i <= FULL_LENGTH_INT; i++) {
             int tmp_laenge = (int) ((((double) i) / FULL_LENGTH_DOUBLE) * laenge);
             
-            paintActiveBordLaser(g2, laserPos, laserDir, c, tmp_laenge);
+            paintActiveBordLaser(g2, laserPos, laserDir, strength, tmp_laenge);
 
         }
         // activeBordLasers=false; // now paint the non-animated
@@ -1785,41 +1833,61 @@ public class BoardView extends JComponent{
         ac = AC_SRC_OVER_05;
         dbg.setComposite(ac);
         
+        int eleven = (int)(11*dScale);
+        int vier = (int)(4*dScale);
+        int dreissig = (int)(30*dScale);
+        
         LaserDef actuallaser;
+        dbg.setColor(fstLaserColor);
         for (Enumeration e = sf.getLasers().elements(); e.hasMoreElements();) {
             actuallaser = ((LaserDef) e.nextElement());
             int lx = actuallaser.x - 1;
             int ly = sf.getSizeY() - actuallaser.y;
-            int lf = actuallaser.facing;
+          
             int ll = actuallaser.length;
-            int ls = actuallaser.strength;
-
-            switch (ls) {
-                case 1:
-                    dbg.setColor(Color.red.brighter());
+            int strength = actuallaser.strength;
+    
+            switch (actuallaser.facing) {
+                case NORTH:                 
+                    if (strength!=2) {
+                        dbg.fillRect(lx * scaledFeldSize +dreissig, (ly - ll + 1) * scaledFeldSize, vier, ll * scaledFeldSize);
+                    }
+                    if (strength>1){                       
+                        int offset = eleven* (strength-1);  // two lasers: paint them close(r) together, three lasers: move them to the outer edge
+                        dbg.fillRect(lx * scaledFeldSize +dreissig-offset, (ly - ll + 1) * scaledFeldSize, vier, ll * scaledFeldSize);
+                        dbg.fillRect(lx * scaledFeldSize +dreissig+offset, (ly - ll + 1) * scaledFeldSize, vier, ll * scaledFeldSize);
+                    }
                     break;
-                case 2:
-                    dbg.setColor(Color.orange);
+                case SOUTH:
+                    if (strength != 2) {
+                        dbg.fillRect(lx * scaledFeldSize + dreissig, ly * scaledFeldSize,vier, ll * scaledFeldSize);
+                    }
+                    if (strength>1) {
+                        int offset = eleven* (strength-1);  // two lasers: paint them close(r) together, three lasers: move them to the outer edge
+                        dbg.fillRect(lx * scaledFeldSize + dreissig-offset, ly * scaledFeldSize,vier, ll * scaledFeldSize);
+                        dbg.fillRect(lx * scaledFeldSize + dreissig+offset, ly * scaledFeldSize,vier, ll * scaledFeldSize);
+                    }
                     break;
-                case 3:
-                    dbg.setColor(Color.yellow);
+                case EAST:
+                    if (strength != 2) {
+                        dbg.fillRect(lx * scaledFeldSize, ly * scaledFeldSize +dreissig, ll * scaledFeldSize,vier);
+                    }
+                    if (strength > 1){
+                        int offset = eleven* (strength-1);  // two lasers: paint them close(r) together, three lasers: move them to the outer edge
+                        dbg.fillRect(lx * scaledFeldSize, ly * scaledFeldSize +dreissig-offset, ll * scaledFeldSize,vier);
+                        dbg.fillRect(lx * scaledFeldSize, ly * scaledFeldSize +dreissig+offset, ll * scaledFeldSize,vier);
+                    }
                     break;
-            }
-
-            int vier = (int)(4*dScale);
-            int dreissig = (int)(30*dScale);
-            switch (lf) {
-                case 0:
-                    dbg.fillRect(lx * scaledFeldSize +dreissig, (ly - ll + 1) * scaledFeldSize, vier, ll * scaledFeldSize);
-                    break;
-                case 1:
-                    dbg.fillRect(lx * scaledFeldSize, ly * scaledFeldSize +dreissig, ll * scaledFeldSize,vier);
-                    break;
-                case 2:
-                    dbg.fillRect(lx * scaledFeldSize + dreissig, ly * scaledFeldSize,vier, ll * scaledFeldSize);
-                    break;
-                case 3:
-                    dbg.fillRect((lx - ll + 1) * scaledFeldSize, ly * scaledFeldSize +dreissig, ll * scaledFeldSize, vier);
+                
+                case WEST:
+                    if (strength!=2) {
+                        dbg.fillRect((lx - ll + 1) * scaledFeldSize, ly * scaledFeldSize +dreissig, ll * scaledFeldSize, vier);
+                    }
+                    if (strength>1) {
+                        int offset = eleven* (strength-1);  // two lasers: paint them close(r) together, three lasers: move them to the outer edge
+                        dbg.fillRect((lx - ll + 1) * scaledFeldSize, ly * scaledFeldSize +dreissig-offset, ll * scaledFeldSize, vier);
+                        dbg.fillRect((lx - ll + 1) * scaledFeldSize, ly * scaledFeldSize +dreissig+offset, ll * scaledFeldSize, vier);
+                    }
                     break;
             }
         }
@@ -1835,23 +1903,33 @@ public class BoardView extends JComponent{
         int fuenf = (int)(dScale*5);
         int sieben = (int)(dScale*7);
         int sechs = (int) (dScale*6);
-        int neun20 = (int)(dScale*29);
+        int neun20 = (int)(dScale*29);       
         int zwei40 = (int)(dScale*42);
-        int vier20 = (int) (dScale*24);
+        int vier20 = (int) (dScale*24);       
         int sieben30 = (int)(dScale*37);
         int zehn = (int)(dScale*10);
-        // paint wall in the north, if any      
-        if (sf.nw(xpos, ypos).isExisting()) {
+        int elf = (int) (dScale*11);
+        // paint wall in the north, if any    
+        Wall northWall = sf.nw(xpos, ypos);
+        if (northWall.isExisting()) {
             // is there a boardlaser to paint at this wall?
-            if (sf.nw(xpos, ypos).getSouthDeviceType() == Wall.TYPE_LASER) {
-                g.drawImage(diverseCrop[15], actx, acty + fuenf, scaledFeldSize, scaledFeldSize, this);
+            if (northWall.getSouthDeviceType() == Wall.TYPE_LASER) {
+                int strength = northWall.getSouthDeviceInfo();
+               if ( strength != 2) { // paint one in the middle
+                   g.drawImage(diverseCrop[15], actx, acty + fuenf, scaledFeldSize, scaledFeldSize, this);
+               }
+                if (strength > 1) {
+                    int offset = elf * (strength-1);  // two lasers: paint them close(r) together, three lasers: move them to the outer edge
+                    g.drawImage(diverseCrop[15], actx-offset, acty + fuenf, scaledFeldSize, scaledFeldSize, this);                
+                    g.drawImage(diverseCrop[15], actx+offset, acty + fuenf, scaledFeldSize, scaledFeldSize, this);
+                }
             }
             // is there a pusher?
-            if (sf.nw(xpos, ypos).getSouthDeviceType() == Wall.TYPE_PUSHER) {
+            if (northWall.getSouthDeviceType() == Wall.TYPE_PUSHER) {
                 g.drawImage(diverseCrop[7], actx - 1, acty + fuenf, scaledFeldSize, scaledFeldSize, this);
                 // ------------draw text (phases when active) on pusher --------------------
                 for (int phasecount = 1; phasecount <= 5; phasecount++) {
-                    if (sf.nw(xpos, ypos).isSouthPusherActive(phasecount)) {
+                    if (northWall.isSouthPusherActive(phasecount)) {
                         int strx = actx + zehn * phasecount;
                         g.setColor((phasecount % 2) == 0 ?
                                 Color.black : Color.yellow);
@@ -1864,15 +1942,24 @@ public class BoardView extends JComponent{
         }
 
         // paint wall in the south, if any
-        if (sf.sw(xpos, ypos).isExisting()) {
-            if (sf.sw(xpos, ypos).getNorthDeviceType() == Wall.TYPE_LASER) {
-                g.drawImage(diverseCrop[17], actx, acty - fuenf, scaledFeldSize, scaledFeldSize, this);
+        Wall southWall = sf.sw(xpos, ypos); 
+        if (southWall.isExisting()) {           
+            if (southWall.getNorthDeviceType() == Wall.TYPE_LASER) {
+                int strength = southWall.getNorthDeviceInfo();
+                if ( strength != 2) { // paint one in the middle
+                    g.drawImage(diverseCrop[17], actx, acty - fuenf, scaledFeldSize, scaledFeldSize, this);
+                }
+                 if (strength > 1) {
+                     int offset = elf * (strength-1);  // two lasers: paint them close(r) together, three lasers: move them to the outer edge
+                     g.drawImage(diverseCrop[17], actx-offset, acty - fuenf, scaledFeldSize, scaledFeldSize, this);                
+                     g.drawImage(diverseCrop[17], actx+offset, acty - fuenf, scaledFeldSize, scaledFeldSize, this);
+                 }
             }
-            if (sf.sw(xpos, ypos).getNorthDeviceType() == Wall.TYPE_PUSHER) {
+            if (southWall.getNorthDeviceType() == Wall.TYPE_PUSHER) {
                 g.drawImage(diverseCrop[8], actx, acty - fuenf, scaledFeldSize, scaledFeldSize, this);
                 // -----------text on pusher--------------------
                 for (int phasecount = 1; phasecount <= 5; phasecount++) {
-                    if (sf.sw(xpos, ypos).isNorthPusherActive(phasecount)) {
+                    if (southWall.isNorthPusherActive(phasecount)) {
                         int strx = actx + zehn * phasecount;
                         g.setColor((phasecount % 2) == 0 ?
                                 Color.black : Color.yellow);
@@ -1884,16 +1971,24 @@ public class BoardView extends JComponent{
         }
 
         // paint wall in the east, if any
-
-        if (sf.ew(xpos, ypos).isExisting()) {
-            if (sf.ew(xpos, ypos).getWestDeviceType() == Wall.TYPE_LASER) {
-                g.drawImage(diverseCrop[14], actx - sechs+1, acty, scaledFeldSize, scaledFeldSize, this);
+        Wall eastWall = sf.ew(xpos, ypos); 
+        if (eastWall.isExisting()) {
+            if (eastWall.getWestDeviceType() == Wall.TYPE_LASER) {                
+                int strength = eastWall.getWestDeviceInfo();
+                if ( strength != 2) { // paint one in the middle
+                    g.drawImage(diverseCrop[14], actx - sechs+1, acty, scaledFeldSize, scaledFeldSize, this);
+                }
+                 if (strength > 1) {
+                     int offset = elf * (strength-1);  // two lasers: paint them close(r) together, three lasers: move them to the outer edge
+                     g.drawImage(diverseCrop[14], actx - sechs+1, acty-offset, scaledFeldSize, scaledFeldSize, this);                
+                     g.drawImage(diverseCrop[14], actx - sechs+1, acty+offset, scaledFeldSize, scaledFeldSize, this);
+                 }
             }
-            if (sf.ew(xpos, ypos).getWestDeviceType() == Wall.TYPE_PUSHER) {
+            if (eastWall.getWestDeviceType() == Wall.TYPE_PUSHER) {
                 g.drawImage(diverseCrop[6], actx - sechs, acty, scaledFeldSize, scaledFeldSize, this);
                 // ------------text on pusher --------------------
                 for (int phasecount = 1; phasecount <= 5; phasecount++) {
-                    if (sf.ew(xpos, ypos).isWestPusherActive(phasecount)) {
+                    if (eastWall.isWestPusherActive(phasecount)) {
                         int stry = acty + zehn * phasecount;
                         g.setColor((phasecount % 2) == 0 ?
                                 Color.black : Color.yellow);
@@ -1906,15 +2001,24 @@ public class BoardView extends JComponent{
         }
 
         // paint wall in the west, if any
-        if (sf.ww(xpos, ypos).isExisting()) {
-            if (sf.ww(xpos, ypos).getEastDeviceType() == Wall.TYPE_LASER) {
-                g.drawImage(diverseCrop[16], actx + fuenf, acty, scaledFeldSize, scaledFeldSize, this);
+        Wall westWall = sf.ww(xpos, ypos); 
+        if (westWall.isExisting()) {
+            if (westWall.getEastDeviceType() == Wall.TYPE_LASER) {               
+                int strength = westWall.getEastDeviceInfo();
+                if ( strength != 2) { // paint one in the middle
+                    g.drawImage(diverseCrop[16], actx + fuenf, acty, scaledFeldSize, scaledFeldSize, this);
+                }
+                 if (strength > 1) {
+                     int offset = elf * (strength-1);  // two lasers: paint them close(r) together, three lasers: move them to the outer edge
+                     g.drawImage(diverseCrop[16], actx + fuenf, acty-offset, scaledFeldSize, scaledFeldSize, this);                
+                     g.drawImage(diverseCrop[16], actx + fuenf, acty+offset, scaledFeldSize, scaledFeldSize, this);
+                 }
             }
-            if (sf.ww(xpos, ypos).getEastDeviceType() == Wall.TYPE_PUSHER) {
+            if (westWall.getEastDeviceType() == Wall.TYPE_PUSHER) {
                 g.drawImage(diverseCrop[9], actx + vier, acty, scaledFeldSize, scaledFeldSize, this);
                 // ------------Beschriftung --------------------
                 for (int phasecount = 1; phasecount <= 5; phasecount++) {
-                    if (sf.ww(xpos, ypos).isEastPusherActive(phasecount)) {
+                    if (westWall.isEastPusherActive(phasecount)) {
                         int stry = acty + zehn * phasecount;
                         g.setColor((phasecount % 2) == 0 ?
                                 Color.black : Color.yellow);
