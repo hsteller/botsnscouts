@@ -29,6 +29,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -82,16 +84,20 @@ import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.PaintPanel;
 import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJPanel;
+import de.botsnscouts.widgets.ViewportWithMessage;
 
 public class AusgabeView extends PaintPanel  {
     static Category CAT = Category.getInstance(AusgabeView.class);
 
     private final static long SHOW_MESSAGE_DELAY=300;
+ 
+    
+ 
 
     // --- objects
     private PhaseEvaluationPanel phaseInfo=new PhaseEvaluationPanel(); 
     private JScrollPane gameBoardScrollPane;
-    private JViewport gameBoardView;
+    private ViewportWithMessage gameBoardView;
     private BoardView  gameBoardCanvas;
     private Ausgabe   ausgabe;
     private Hashtable robotStatus = new Hashtable(8);
@@ -197,7 +203,10 @@ public class AusgabeView extends PaintPanel  {
 		this.northPanel.setLayout(new BorderLayout());
 		northPanel.setOpaque(false);
 		northPanel.add(robotsStatusContainer, BorderLayout.WEST);		
-		gameBoardScrollPane = new JScrollPane();
+		
+		initGameBoardViewport();
+		gameBoardScrollPane = new JScrollPane();	
+		gameBoardScrollPane.setViewport(gameBoardView);
 		gameBoardScrollPane.getHorizontalScrollBar().setUnitIncrement(64);
 		gameBoardScrollPane.getVerticalScrollBar().setUnitIncrement(64);
 		gameBoardScrollPane.setViewportView(gameBoardCanvas);
@@ -205,7 +214,8 @@ public class AusgabeView extends PaintPanel  {
 		gameBoardScrollPane.getViewport().setOpaque(false);
 		gameBoardScrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));		
 		this.add(gameBoardScrollPane, BorderLayout.CENTER);
-		gameBoardView = gameBoardScrollPane.getViewport();
+		
+		
 		this.initSpeedSettings();
 		this.initMenus();
 		
@@ -214,8 +224,27 @@ public class AusgabeView extends PaintPanel  {
     
     
     
-    public static final String PROPERTY_DEFAULT_SPEED="defaultAnimationSetting";
     
+    
+//  colors & font to display the phase number in the JViewport on start of a new phase
+    
+    
+    private void initGameBoardViewport(){
+        if (gameBoardView == null) {
+            gameBoardView = new ViewportWithMessage();            
+        }
+        gameBoardView.setTextFont(new Font("times", Font.BOLD, 90));
+        gameBoardView.setTextColor(Color.RED);
+        gameBoardView.setBoxColor(new Color(64,181,64));        
+        gameBoardView.setBorderColor(Color.BLACK);                
+        gameBoardView.setTextComposite(BoardView.AC_SRC);
+        gameBoardView.setBoxComposite(BoardView.AC_SRC_OVER_07);
+        gameBoardView.setDimensionOfTextBox(new Rectangle(0,0,490,110));
+        gameBoardView.setTextInsetLeft(25);
+        
+    }
+    
+    public static final String PROPERTY_DEFAULT_SPEED="defaultAnimationSetting";
     private void initSpeedSettings() {
         
         speedSettingSlow = new AnimationConfig(AnimationConfig.ANIMATION_SLOW, true);
@@ -650,6 +679,9 @@ public class AusgabeView extends PaintPanel  {
 	    SwingUtilities.invokeLater( new Runnable() {
 		    public void run() {
 		         gameBoardCanvas.setScale( sc );
+		         
+		         gameBoardScrollPane.revalidate();
+		         
 		         CAT.info("GARBAGE COLLECTION");
 		         System.gc();
 		         actualScale = tmpScale;
@@ -1152,19 +1184,19 @@ public class AusgabeView extends PaintPanel  {
         }
         TimerTask displayStopper = new TimerTask(){
             public void run(){
-                if (gameBoardCanvas != null) {
-                    gameBoardCanvas.setIsPhaseNumToBePainted(false);
-                    gameBoardCanvas.repaint();
+                if (gameBoardView != null) {
+                    gameBoardView.setTextToBeWritten(false);
+                    gameBoardView.repaint();
                 }
                 
             }
         };
         
         phaseTimer = new Timer();
-        phaseTimer.schedule(displayStopper,showThatManyMS);        
-        gameBoardCanvas.setPhaseNumber(phase);
-        gameBoardCanvas.setIsPhaseNumToBePainted(true);
-        gameBoardCanvas.repaint();
+        phaseTimer.schedule(displayStopper,showThatManyMS);                     
+        gameBoardView.setTheText("PHASE #"+phase);
+        gameBoardView.setTextToBeWritten(true);
+        gameBoardView.repaint();
             
     }
     
@@ -1324,6 +1356,8 @@ public class AusgabeView extends PaintPanel  {
            }
        }
    }
+   
+   
 }
 
 

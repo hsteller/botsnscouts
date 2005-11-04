@@ -190,6 +190,13 @@ public class BoardView extends JComponent{
     /** Colors of the robots. */
     public static final Color[] ROBOCOLOR = {GREEN, YELLOW, RED, BLUE, ROSA, ORANGE, GRAY, VIOLET};
 
+    // some often used composite values 
+    public static final AlphaComposite AC_SRC = AlphaComposite.getInstance(AlphaComposite.SRC);
+    public static final AlphaComposite AC_SRC_OVER = AlphaComposite.getInstance(AlphaComposite.SRC_OVER);
+    public static final AlphaComposite AC_SRC_OVER_05 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
+    public static final AlphaComposite AC_SRC_OVER_07 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
+
+    
     /** gameboard object;
      *  stores the information about the board we are playing on;
      *  (where are the pits, where are lasers, and so on..)
@@ -197,10 +204,12 @@ public class BoardView extends JComponent{
     SimBoard sf;
 
     /** scale factor for zooming*/
-   private double dScale = 1.0;
-    
+    private double dScale = 1.0;
+    private static final double DUMMY_DSCALE = 1;
 
-    private int scaledFeldSize; // FELDSIZE * scale
+    
+    
+    private final int scaledFeldSize=FELDSIZE; // FELDSIZE * scale
 
     /** position to highlight*/
     Location highlightPos = new Location(0, 0);
@@ -218,11 +227,7 @@ public class BoardView extends JComponent{
     private AnimationConfig currentAnimationConfig;
     
     
-    private static final AlphaComposite AC_SRC = AlphaComposite.getInstance(AlphaComposite.SRC);
-    private static final AlphaComposite AC_SRC_OVER = AlphaComposite.getInstance(AlphaComposite.SRC_OVER);
-    private static final AlphaComposite AC_SRC_OVER_05 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
-    private static final AlphaComposite AC_SRC_OVER_07 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
-
+  
     // This stuff can be used to display the distance calculation on the board: 
     public static final boolean DEBUG_DISTANCE_CALC = false;
     Font myDebugFont=new Font("SansSerif", Font.PLAIN, 10);
@@ -257,12 +262,18 @@ public class BoardView extends JComponent{
     /*must not be called before images are loaded*/
     public void setScale(double scale) {
         // adapt this Component to the scaling factor
-        //dScale = scale;
-      //  Bot preCopy = previewRob;
+        
+           dScale = scale;
+           widthInPixel = (int) (sf.getSizeX() * scaledFeldSize*dScale);
+	        heightInPixel = (int) (sf.getSizeY() * scaledFeldSize*dScale);
+	        CAT.debug("SCALE: "+widthInPixel+"x"+heightInPixel);
+	        super.setSize(widthInPixel+1,heightInPixel+1);
+	        
+           //  Bot preCopy = previewRob;
       //  previewRob = null;
         synchronized (rescaleLock) {           
 	        deleteScout();
-	        scaledFeldSize = (int) (scale * FELDSIZE);
+	       /*   scaledFeldSize = (int) (scale * FELDSIZE);
 	        dScale = scaledFeldSize/((double)FELDSIZE);
 	        
 	        widthInPixel = (int) (sf.getSizeX() * scaledFeldSize);
@@ -272,13 +283,17 @@ public class BoardView extends JComponent{
 	        setSize(widthInPixel, heightInPixel);
 	
 	        // the preComputed-BoardImage is no longer valid      
-       
-            offScreenImage = createBoardImage();
+       */
+	        // hs_scale: added the "if" before calling createBoardImage
+	         if (offScreenImage == null) {
+		        offScreenImage = createBoardImage();
+	         }
             if (useStaticBg) {
                 staticBackground = createBoardImage(); // TODO possible to use java-scaling instead? 
             }
         }
-      
+       
+      repaint();
        
       //  previewRob = preCopy;
        // paintScout(this.getGraphics());
@@ -534,14 +549,14 @@ public class BoardView extends JComponent{
     
     private void paintBotsOnPositionButNotMe(Location position, Bot me, Graphics2D g2d, int xoffset, int yoffset){       
      
-       int acht = (int)(8*dScale);
+       int acht = (int)(8*DUMMY_DSCALE);
        Composite old = g2d.getComposite();
        synchronized ( internalBotHash) {
            Iterator it = internalBotHash.values().iterator();
            int roboCounter=0;
            while (it.hasNext()) {
                Bot bot = (Bot) it.next();
-               if (!bot.getName().equals(me.getName()) && bot.getPos().equals(position) ){
+               if (!bot.getName().equals(me.getName()) && bot.getPos().equals(position) ){                   
                    if (bot.isVirtual())
                        g2d.setComposite(AC_SRC_OVER_05);
                    else
@@ -552,6 +567,7 @@ public class BoardView extends JComponent{
                    g2d.drawImage(BotVis.getBotImageByBotVis(botVis, bot.getFacing()), xoffset, yoffset,scaledFeldSize, scaledFeldSize,this );                
                    
                }
+               
                roboCounter++;
            }
        }                  
@@ -573,10 +589,9 @@ public class BoardView extends JComponent{
             int yposScaled = (sf.getSizeY() - internal.getY()-1)*feldSize;                         
             int clipLength = 2*feldSize;    
             
-            
-            
-            BufferedImage offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength);
+           BufferedImage offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength);
             Graphics2D myg = (Graphics2D) offScreenClipImage.getGraphics();
+            
            // Raster blankBg;
             BufferedImage blankBgImage;
             if (useStaticBg){
@@ -584,8 +599,8 @@ public class BoardView extends JComponent{
             }
             else {            
              //   blankBg = offscreeClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
-                blankBgImage = new BufferedImage(feldSize, clipLength, offScreenClipImage.getType());
-                blankBgImage.getGraphics().drawImage(offScreenClipImage,0,0,feldSize,clipLength,this);
+                blankBgImage = new ScaledBufferedImage(feldSize, clipLength, offScreenClipImage.getType());                                        
+                blankBgImage.getGraphics().drawImage(offScreenClipImage,0,0,feldSize,clipLength,this);              
             }
                                     
             paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, feldSize);
@@ -600,22 +615,28 @@ public class BoardView extends JComponent{
             g2.setClip(xposScaled,yposScaled,feldSize, clipLength);
             Composite oldComp  = g2.getComposite();
             g2.setComposite(ac);
+            
+            // hs_scale
+          //  g2.scale(dScale, dScale);                        
+      
             for (int yoffset = 0; yoffset >= -feldSize; yoffset -= animationOffsetMoveRob) {
                 if (useStaticBg) {
                 	    myg.drawImage(blankBgImage, 0,0, feldSize, clipLength, this); // paint the image
                	}
                	else {
                	    myg.drawImage(blankBgImage, 0,0, feldSize, clipLength, this);
+               	    g2.drawImage(blankBgImage, 0,0, feldSize, clipLength, this);               	  
                	    //offScreenClipImage.setData(blankBg);
                 }
                 paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, feldSize);
                 paintBotsOnPositionButNotMe(botEndPos, internal,myg,0,0);                     
-                myg.drawImage(imgRob, 0,feldSize+yoffset, feldSize, feldSize, this); // paint the image                                                                                                           
-                g2.drawImage(offScreenClipImage, xposScaled, yposScaled, feldSize, clipLength,this);
+                myg.drawImage(imgRob, 0,feldSize+yoffset, feldSize, feldSize, this); // paint the image    
                 
+                g2.drawImage(offScreenClipImage, xposScaled, yposScaled, feldSize, clipLength,this);
+                repaint( xposScaled, yposScaled, feldSize, clipLength);
                 waitSomeTime(animationDelayMoveRob,this);                 
                    
-                }
+            }
            
             
             if (useStaticBg){
@@ -657,14 +678,15 @@ public class BoardView extends JComponent{
          
             BufferedImage offScreenClipImage  = offScreenImage.getSubimage(xpos64, ypos64, feldSize,clipLength);                                  
             Graphics2D myg = (Graphics2D) offScreenClipImage.getGraphics();
+         //   myg.scale(dScale, dScale);
             BufferedImage blankBgImage;
-            Raster blankBg;
+            //Raster blankBg;
             if (useStaticBg){
                 blankBgImage  = staticBackground.getSubimage(xpos64, ypos64, feldSize,clipLength);
             }
             else  {
               //  blankBg = offScreenClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
-                blankBgImage = new BufferedImage(feldSize, clipLength, offScreenClipImage.getType());
+                blankBgImage = new ScaledBufferedImage(feldSize, clipLength, offScreenClipImage.getType());
                 blankBgImage.getGraphics().drawImage(offScreenClipImage,0,0,feldSize,clipLength,this);
             }
            paintBotsOnPositionButNotMe(botStartPos, internal, myg,0, 0);
@@ -677,6 +699,9 @@ public class BoardView extends JComponent{
             g2.setClip(xpos64,ypos64,feldSize, clipLength);    
             Composite oldComp = g2.getComposite();
             g2.setComposite(oldComp);
+            
+//          hs_scale
+    //        g2.scale(dScale, dScale);          
             for (int yoffset = 0; yoffset <=feldSize; yoffset += animationOffsetMoveRob) {
                 if (useStaticBg) {
                     myg.drawImage(blankBgImage,0,0,feldSize,clipLength,this);
@@ -690,7 +715,7 @@ public class BoardView extends JComponent{
                 myg.drawImage(imgRob, 0,yoffset, feldSize,feldSize, this); // paint the image                                                                                        
                 g2.drawImage(offScreenClipImage, xpos64, ypos64, feldSize, clipLength,this);
                 waitSomeTime(animationDelayMoveRob, this);
-                   
+                repaint(xpos64, ypos64, feldSize, clipLength);
              }
             if (useStaticBg){
                 myg.drawImage(blankBgImage,0,0,feldSize,clipLength,this);
@@ -732,14 +757,15 @@ public class BoardView extends JComponent{
            
             BufferedImage offScreenClipImage = offScreenImage.getSubimage(xpos64, ypos64,clipLength,feldSize); 
             Graphics2D myg = (Graphics2D) offScreenClipImage.getGraphics();    
-            Raster blankBg;
+            //myg.scale(dScale, dScale);
+            // Raster blankBg;
             BufferedImage blankBgImage;
             if (useStaticBg){
                  blankBgImage = staticBackground.getSubimage(xpos64, ypos64,clipLength,feldSize);
             }
             else {
                 // blankBg = offScreenClipImage.getData(new Rectangle(0,0,clipLength, feldSize));
-                blankBgImage = new BufferedImage( clipLength, feldSize, offScreenClipImage.getType());
+                blankBgImage = new ScaledBufferedImage( clipLength, feldSize, offScreenClipImage.getType());
                 blankBgImage.setData(offScreenClipImage.getData(new Rectangle(0,0,clipLength, feldSize)));
                 blankBgImage.getGraphics().drawImage(offScreenClipImage,0,0,clipLength,feldSize,this);
             }
@@ -752,6 +778,9 @@ public class BoardView extends JComponent{
              Rectangle oldClipBounds = g2.getClipBounds();
              g2.setClip(xpos64,ypos64,clipLength,feldSize);
              Composite oldComp = g2.getComposite();
+//           hs_scale
+         //    g2.scale(dScale, dScale);          
+             
             for (int xoffset = 0; xoffset <= feldSize; xoffset += animationOffsetMoveRob) {
                 if (useStaticBg) {
                     myg.drawImage(blankBgImage, 0,0, clipLength, feldSize, this); // paint the image
@@ -765,6 +794,7 @@ public class BoardView extends JComponent{
                                                    
                  myg.drawImage(imgRob, xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
                  g2.drawImage(offScreenClipImage, xpos64, ypos64, clipLength, feldSize,this);
+                 repaint(xpos64, ypos64, clipLength, feldSize);
                  waitSomeTime(animationDelayMoveRob, this);
                
             }
@@ -805,15 +835,15 @@ public class BoardView extends JComponent{
             
             BufferedImage offScreenClipImage   = offScreenImage.getSubimage(xpos64, ypos64,clipLength, feldSize);                        
             Graphics2D offScreenClipGraphics = (Graphics2D) offScreenClipImage.getGraphics();    
-            
+     //       offScreenClipGraphics.scale(dScale, dScale);
             BufferedImage blankBgImage;
-            Raster blankBg;
+           // Raster blankBg;
             if (useStaticBg){
                 blankBgImage = staticBackground.getSubimage(xpos64, ypos64,clipLength, feldSize);
             }
             else {
                 //blankBg = offScreenClipImage.getData(new Rectangle(0,0,clipLength,feldSize));
-                blankBgImage = new BufferedImage( clipLength, feldSize, offScreenClipImage.getType());
+                blankBgImage = new ScaledBufferedImage( clipLength, feldSize, offScreenClipImage.getType());
                 blankBgImage.getGraphics().drawImage(offScreenClipImage,0,0,clipLength,feldSize,this);
             }
            
@@ -829,6 +859,8 @@ public class BoardView extends JComponent{
             g2.setClip(xpos64,ypos64,clipLength,feldSize);
             Composite oldComp = g2.getComposite();
             g2.setComposite(ac);
+//          hs_scale
+       //    g2.scale(dScale, dScale);          
             for (int xoffset = 0; xoffset >= -feldSize; xoffset -= animationOffsetMoveRob) {                                                
                 if (useStaticBg) {    
                     offScreenClipGraphics.drawImage(blankBgImage,0,0,clipLength,feldSize,this); 
@@ -842,7 +874,7 @@ public class BoardView extends JComponent{
                     offScreenClipGraphics.drawImage(imgRob, feldSize+xoffset,0, feldSize, feldSize, this); // paint the image                                                                                        
                     g2.drawImage(offScreenClipImage, xpos64, ypos64, clipLength, feldSize,this);
                     waitSomeTime(animationDelayMoveRob, this);
-                   
+                    repaint(xpos64, ypos64, clipLength, feldSize);
                 }
             
             	
@@ -891,8 +923,7 @@ public class BoardView extends JComponent{
         }
         try {
 	        Bot internal = (Bot) internalBotHash.get(rob.getName());// getBotByName(rob.getName());
-	       
-	        int oldFacing = internal.getFacing();
+	       	currentlyAnimated = internal;
 	        int animationStepsTurnRob =currentAnimationConfig.getAnimationStepsTurnRob();	     
 	        
 	        if (direction == OtherConstants.BOT_TURN_CLOCKWISE){
@@ -907,6 +938,9 @@ public class BoardView extends JComponent{
         // better safe than sorry:
         catch ( RasterFormatException fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore){
             CAT.error(fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore);
+        }
+        finally {
+            currentlyAnimated = null;
         }
         waitSomeTime(currentAnimationConfig.getDelayBetweenActions(),this);
          
@@ -926,7 +960,7 @@ public class BoardView extends JComponent{
 	            rotateTheta = Math.toRadians(360-angle/animationSteps);  
 	        //CAT.debug("turning bot; theta="+rotateTheta);
 	        synchronized (rescaleLock) {       
-	            Graphics2D mainGraphics = (Graphics2D)getGraphics();  
+	            Graphics2D mainGraphics = getScaledGraphics();  
 	            Composite oldComposite = mainGraphics.getComposite();
 	            int feldSize = scaledFeldSize;           
 	            int xposScaled=  (internal.getX()-1) *feldSize;
@@ -936,13 +970,14 @@ public class BoardView extends JComponent{
 	           // TODO rasterFormatException 
 	            BufferedImage offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
 	            Graphics2D offScreenClip = (Graphics2D) offScreenClipImage.getGraphics();     
+	      //      offScreenClip.scale(dScale, dScale);
 	            offScreenClip.setComposite(ac);       
 	            mainGraphics.setComposite(ac);
 	            BufferedImage blankImage;
 	            
-	            Raster blank;
+	           // Raster blank;
 	            if (useStaticBg){
-	                blank = staticBackground.getData(new Rectangle(xposScaled,yposScaled,feldSize,clipLength));
+	            //    blank = staticBackground.getData(new Rectangle(xposScaled,yposScaled,feldSize,clipLength));
 	                blankImage = staticBackground.getSubimage(xposScaled,yposScaled,feldSize,clipLength);
 	                //offScreenClipImage.setData(blank);
 	                offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);
@@ -951,15 +986,15 @@ public class BoardView extends JComponent{
 	            else {
 	                // there shouldn't be any active content on the offScreen image if useStaticBg==false
 	               // blank = offScreenClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
-	                blankImage = new BufferedImage(feldSize, clipLength, BufferedImage.TYPE_INT_ARGB);
+	                blankImage = new ScaledBufferedImage(feldSize, clipLength, BufferedImage.TYPE_INT_ARGB);
 	                blankImage.getGraphics().drawImage(offScreenClipImage,0,0,feldSize,clipLength,this);
 	               
 	            }    
 	                
 	                                                  
 	           // paintBotsOnPositionButNotMe(internal.getPos(), internal,offScreenClip,0,0);
-	           Raster blankWithBots = offScreenClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
-	            //offScreenClipImage.setData(blank);
+	          Raster blankWithBots = offScreenClipImage.getData(new Rectangle(0,0,feldSize,clipLength));
+	           //offScreenClipImage.setData(blank);
 	            
 	            // painting the animated bot           
 	            //offScreenClip.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);            
@@ -968,10 +1003,10 @@ public class BoardView extends JComponent{
 	            int animationDelayTurnRob = currentAnimationConfig.getAnimationDelayTurnRob();
 	             for (int step = 0; step<animationStepsTurnRob;step++) {
 	                 	 
-	               
-	               //  offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);	 
-	               //  paintBotsOnPositionButNotMe(internal.getPos(), internal,offScreenClip,0,0);
-	                 	offScreenClipImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
+	                 
+	                 //offScreenClip.drawImage(blankImage,0,0,feldSize,clipLength,this);	 
+	                 //paintBotsOnPositionButNotMe(internal.getPos(), internal,offScreenClip,0,0);
+	                 	 offScreenClipImage.setData(blankWithBots); // erasing the offscreen image with the boardbackground
 	                     offScreenClip.rotate(rotateTheta,halfSize, halfSize); // rotating the robot pic further   
 	                     offScreenClip.drawImage(cropRobImage, 0, 0, feldSize, feldSize, this);                  
 	                     // paint the offscreen image on the screen:
@@ -1005,26 +1040,27 @@ public class BoardView extends JComponent{
         shrinkRobot(b);
     }
     
-    protected void animatePitFall(Bot b){       
+    protected void animatePitFall(Bot b){               
         SoundMan.playSound(SoundMan.PIT);
         Location pos = b.getPos();
+        
         if (pos.x<1 || pos.y<1||pos.x>sf.getSizeX()|| pos.y>sf.getSizeY()){
-            CAT.debug("ignoring pitfall animation for "+pos );
-            //	don't shrink if bot fell from the board
+            //	don't shrink if bot fell from the board          
+            CAT.debug("ignoring pitfall animation for "+pos );            
         }
         else {
             if (sf.getFloor(pos.x, pos.y).isPit()){ // don't shrink if bot fell from the board
                 shrinkRobot(b);
             }
         }
-
+        
         synchronized (this){
             waitSomeTime(currentAnimationConfig.getLaserDelayAfterEndOfAnimation(), this);  
-        }
+        }        
     }
     
     private void shrinkRobot(Bot internal) {
-       
+        currentlyAnimated = internal;
        double scalePerStep = 0.9;
        int numberOfShrinks = 15;
         AlphaComposite ac = AC_SRC_OVER;         
@@ -1034,13 +1070,12 @@ public class BoardView extends JComponent{
        
        
         synchronized (this) {       
-            Graphics2D mainGraphics = (Graphics2D)getGraphics();  
+            Graphics2D mainGraphics = getScaledGraphics();  
             Composite oldComposite = mainGraphics.getComposite();
             int feldSize = scaledFeldSize;           
             int xposScaled=  (internal.getX()-1) *feldSize;
             int yposScaled = (sf.getSizeY() - internal.getY())*feldSize;                         
             int clipLength = feldSize;    
-            int halfSize = feldSize/2;
            
             
             BufferedImage backgroundImage=  offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
@@ -1069,6 +1104,7 @@ public class BoardView extends JComponent{
                 internal.setPos(PIT); 
                 mainGraphics.setComposite(oldComposite);
         }
+        currentlyAnimated = null;
     }
     
     
@@ -1098,13 +1134,13 @@ public class BoardView extends JComponent{
         
         int oldX = internal.getX();
         int oldY = internal.getY();
-     
+        currentlyAnimated = internal;
         // paint the move animation  and update the position in my internal robot array
         switch (direction) {
             case NORTH:
                 {
                     if (oldY < sf.getSizeY()) {
-                        moveRobNorth(internal,(Graphics2D)getGraphics());
+                        moveRobNorth(internal,getScaledGraphics());
                         internal.setPos(oldX, oldY + 1);
                     }
                     return;
@@ -1112,7 +1148,7 @@ public class BoardView extends JComponent{
             case EAST:
                 {
                     if (oldX < sf.getSizeX()) {
-                        moveRobEast(internal, (Graphics2D)getGraphics());
+                        moveRobEast(internal, getScaledGraphics());
                         internal.setPos(oldX + 1, oldY);
                     }
                     return;
@@ -1120,7 +1156,7 @@ public class BoardView extends JComponent{
             case WEST:
                 {
                     if (oldX > 1) {
-                        moveRobWest(internal,(Graphics2D)getGraphics());
+                        moveRobWest(internal,getScaledGraphics());
                         internal.setPos(oldX - 1, oldY);
                     }
                     return;
@@ -1128,7 +1164,7 @@ public class BoardView extends JComponent{
             case SOUTH:
                 {
                     if (oldY > 1) {
-                        moveRobSouth(internal,(Graphics2D)getGraphics());
+                        moveRobSouth(internal,getScaledGraphics());
                         internal.setPos(oldX, oldY - 1);
                     }
                     return;
@@ -1145,6 +1181,7 @@ public class BoardView extends JComponent{
         catch ( RasterFormatException fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore){
             CAT.error(fixmeCanForExampleHappenIfWeWantToAnimateABotThatHasBeenKilledRightBefore);
         }
+        currentlyAnimated = null;
         waitSomeTime(currentAnimationConfig.getDelayBetweenActions(),this);
     }
 
@@ -1176,7 +1213,7 @@ public class BoardView extends JComponent{
            
             		
             
-            Graphics2D g2 = (Graphics2D) getGraphics();
+            Graphics2D g2 =  getScaledGraphics();
             //g2.scale(dScale, dScale);
             int step = Math.max(1, (int) (((double)laenge)/FULL_LENGTH_DOUBLE)); // step must not be 0 
                     																					// otherwise the while loop below won't exit
@@ -1239,7 +1276,7 @@ public class BoardView extends JComponent{
     private void paintActiveRobLaser(Graphics g, Location source, int laserFacing, int actualLength, Color c) {
         // Laser sollen immer von Source nach Target gezeichnet werden
 
-        int breite = (int)(4*dScale); // Die Breite des Lasers, sollte gerade sein
+        int breite = (int)(4*DUMMY_DSCALE); // Die Breite des Lasers, sollte gerade sein
         int lSourceX = 0;
         int lSourceY = 0; // Anfangspunkt des Lasers in Pixeln,
         Location tmp = mapC2PixelCenter(source.x, source.y); /* Mitte (Punkt (31,31) auf Feld
@@ -1345,8 +1382,8 @@ public class BoardView extends JComponent{
         g2d.setComposite(ac);
         
 
-        int breite = (int)(dScale*4) ; // Die Breite des Lasers, sollte gerade sein
-        int eleven = (int )(dScale*11);
+        int breite = (int)(DUMMY_DSCALE*4) ; // Die Breite des Lasers, sollte gerade sein
+        int eleven = (int )(DUMMY_DSCALE*11);
         int lSourceX = 0;
         int lSourceY = 0; // Anfangspunkt des Lasers in Pixeln,
         Location tmp = mapC2PixelCenter(source.x, source.y);
@@ -1418,7 +1455,7 @@ public class BoardView extends JComponent{
                 }
             case WEST:
                 {
-                    lSourceX = tmp.x - actualLength + (scaledFeldSize/4)+((int)(3*dScale));
+                    lSourceX = tmp.x - actualLength + (scaledFeldSize/4)+((int)(3*DUMMY_DSCALE));
                     lSourceY = tmp.y - (breite / 2 - 1);
                     if (strength != 2) {                	    
                 	    g2d.setColor(fstLaserColor);
@@ -1460,7 +1497,7 @@ public class BoardView extends JComponent{
       
 
         int laenge = calculateLaserLength(laserPos, targetRob, laserDir);
-        laenge = laenge * scaledFeldSize + (scaledFeldSize/4)+((int)(dScale*3));
+        laenge = laenge * scaledFeldSize + (scaledFeldSize/4)+((int)(DUMMY_DSCALE*3));
        // Color c = laserColor[strength - 1];
       
         // get viewable area
@@ -1474,7 +1511,7 @@ public class BoardView extends JComponent{
 
         // paint lasers step by step
         
-        Graphics2D g2 = (Graphics2D) getGraphics();
+        Graphics2D g2 = getScaledGraphics();
       //  g2.scale(dScale, dScale);
         for (int i = 1; i <= FULL_LENGTH_INT; i++) {
             int tmp_laenge = (int) ((((double) i) / FULL_LENGTH_DOUBLE) * laenge);
@@ -1704,7 +1741,7 @@ public class BoardView extends JComponent{
     }
 
 
-    protected void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty,
+    private void paintFeldBoden(Graphics g, int xpos, int ypos, int actx, int acty,
                                   int width, int height) {
 
         //  CAT.debug("xpos="+xpos+" ypos="+ypos+"actx="+actx+"acty="+acty);
@@ -1833,9 +1870,9 @@ public class BoardView extends JComponent{
         ac = AC_SRC_OVER_05;
         dbg.setComposite(ac);
         
-        int eleven = (int)(11*dScale);
-        int vier = (int)(4*dScale);
-        int dreissig = (int)(30*dScale);
+        int eleven = (int)(11*DUMMY_DSCALE);
+        int vier = (int)(4*DUMMY_DSCALE);
+        int dreissig = (int)(30*DUMMY_DSCALE);
         
         LaserDef actuallaser;
         dbg.setColor(fstLaserColor);
@@ -1899,16 +1936,16 @@ public class BoardView extends JComponent{
      */
     private void paintWall(Graphics g, int xpos, int ypos, int actx, int acty) {
        
-        int vier = (int)(dScale*4);
-        int fuenf = (int)(dScale*5);
-        int sieben = (int)(dScale*7);
-        int sechs = (int) (dScale*6);
-        int neun20 = (int)(dScale*29);       
-        int zwei40 = (int)(dScale*42);
-        int vier20 = (int) (dScale*24);       
-        int sieben30 = (int)(dScale*37);
-        int zehn = (int)(dScale*10);
-        int elf = (int) (dScale*11);
+        int vier = (int)(DUMMY_DSCALE*4);
+        int fuenf = (int)(DUMMY_DSCALE*5);
+        int sieben = (int)(DUMMY_DSCALE*7);
+        int sechs = (int) (DUMMY_DSCALE*6);
+        int neun20 = (int)(DUMMY_DSCALE*29);       
+        int zwei40 = (int)(DUMMY_DSCALE*42);
+        int vier20 = (int) (DUMMY_DSCALE*24);       
+        int sieben30 = (int)(DUMMY_DSCALE*37);
+        int zehn = (int)(DUMMY_DSCALE*10);
+        int elf = (int) (DUMMY_DSCALE*11);
         // paint wall in the north, if any    
         Wall northWall = sf.nw(xpos, ypos);
         if (northWall.isExisting()) {
@@ -2077,15 +2114,17 @@ public class BoardView extends JComponent{
     }
 
     /** Berechnet zu einem Location das Rechteck, das die Kachel umschliesst */
-    void ort2Rect(Location ort, Rectangle dest) {
-        ort2Rect(ort.x, ort.y, dest);
+    private Rectangle ort2Rect(Location ort) {
+        return ort2Rect(ort.x, ort.y);
     }
 
-    void ort2Rect(int x, int y, Rectangle dest) {
+    private Rectangle  ort2Rect(int x, int y) {
+         Rectangle dest = new Rectangle();
         dest.x = (int) ((x - 1) * scaledFeldSize);
         dest.y = (int) ((sf.getSizeY() - y) * scaledFeldSize);
         dest.width = (int) scaledFeldSize;
         dest.height = (int) scaledFeldSize;
+        return dest;
     }
 
     public Point ort2Point(Location ort, Point p) {
@@ -2114,7 +2153,7 @@ public class BoardView extends JComponent{
     }
 
 
-    private Rectangle rcForOrt2Rect = new Rectangle();
+    //private 
     // for internal use. see repaintOrt()
 
     /** Triggert ein Neuzeichnen des Feldes mit den \uFFFDbergebenen
@@ -2122,12 +2161,12 @@ public class BoardView extends JComponent{
      */
 
     void repaintOrt(Location ort) {
-        ort2Rect(ort, rcForOrt2Rect);        
+        Rectangle rcForOrt2Rect =  ort2Rect(ort);        
         repaint(1, rcForOrt2Rect.x, rcForOrt2Rect.y, rcForOrt2Rect.width, rcForOrt2Rect.height);
     }
 
     void repaintOrt(int x, int y) {
-        ort2Rect(x, y, rcForOrt2Rect);
+        Rectangle rcForOrt2Rect = ort2Rect(x, y);
         repaint(1, rcForOrt2Rect.x, rcForOrt2Rect.y, rcForOrt2Rect.width, rcForOrt2Rect.height);
     }
 
@@ -2186,7 +2225,7 @@ public class BoardView extends JComponent{
 
     protected void paintScout(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-
+        
         if (previewRob == null)
             return;
 
@@ -2196,8 +2235,10 @@ public class BoardView extends JComponent{
         int ypos64 = ypos * scaledFeldSize;
         // Scout
         AlphaComposite ac = AC_SRC_OVER_07;
-        g2d.setComposite(ac);
-        g.drawImage(scoutCrop[previewRob.getFacing()], xpos64, ypos64, scaledFeldSize, scaledFeldSize, this);
+        g2d.setComposite(ac);      
+       
+        g2d.drawImage(scoutCrop[previewRob.getFacing()], xpos64, ypos64, scaledFeldSize, scaledFeldSize, this);
+        repaint(xpos64,ypos64,scaledFeldSize, scaledFeldSize);
         g2d.setComposite(AC_SRC);
     }
 
@@ -2231,7 +2272,7 @@ public class BoardView extends JComponent{
         if ( theseBotsShouldNotBePainted.contains(robot.getName())){
             return;
         }
-        int acht = (int)(dScale*8);
+        int acht = (int)(DUMMY_DSCALE*8);
         
         int botVis = robot.getBotVis();
         Image imgRob = robosCrop[robot.getFacing() + botVis * 4];
@@ -2249,12 +2290,14 @@ public class BoardView extends JComponent{
           //      g2d.setComposite(AC_SRC);
           // XXXHS }
             String beschriftung = "" + robot.getName();
-            g2d.setColor(ROBOCOLOR[botVis]);
+            g2d.setColor(ROBOCOLOR[botVis]);           
+            // TODO pick AND SET a font for the names, otherwise we use whatever the last component has set..
             g2d.drawString(beschriftung, xpos64, ypos64 + acht + robocount * acht);
             g2d.setComposite(oldComp);
         }
     }
 
+   
     private void paintRobos(Graphics g) {
         paintRobos(g, null);
     }
@@ -2287,8 +2330,7 @@ public class BoardView extends JComponent{
     public final Color highCol2 = new Color(255, 255, 0, 128);
 
     private void paintHighlight(Graphics2D g) {
-        Rectangle rect = new Rectangle();
-        ort2Rect(highlightPos, rect);
+        Rectangle rect = ort2Rect(highlightPos);
         rect.grow(-3, -3);
         for (int i = 0; i < hi.length; i++) {
             g.setColor(hiColOut[i]);
@@ -2319,12 +2361,14 @@ public class BoardView extends JComponent{
     private BufferedImage createBoardImage() {
         CAT.debug("createBoardImage called!");
         //preBoard = new BufferedImage(x,y, BufferedImage.TYPE_BYTE_INDEXED);
-        BufferedImage bi = new BufferedImage(widthInPixel, heightInPixel, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new ScaledBufferedImage(widthInPixel, heightInPixel, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g_off = (Graphics2D) bi.getGraphics();
         g_off.setClip(0, 0, widthInPixel, heightInPixel);
+        
+        
        // g_off.scale(dScale, dScale);
         paintUnbuffered(g_off);
-       // g_off.dispose();
+        g_off.dispose();
         return bi;
     }
 
@@ -2357,13 +2401,16 @@ public class BoardView extends JComponent{
         dumpPngImage(file, 0);
     }
 
-
+    private Bot currentlyAnimated  = null;
     public void paintComponent(Graphics g) {
-        Rectangle oldClip = g.getClipBounds();
-        
+       
+        Graphics2D dbg = (Graphics2D) g;    
+//      hs_scale
+        dbg.scale(dScale, dScale);
      //   System.out.println("OLD="+oldClip+"\tNEW="+rect);
         //g.setClip(rect);
         if (useStaticBg) { // 100% doublebuffered
+            Rectangle oldClip = g.getClipBounds();
             Graphics2D offG = (Graphics2D) offScreenImage.getGraphics();
             offG.setClip(oldClip);
             offG.drawImage(staticBackground,0,0,widthInPixel,heightInPixel,this);
@@ -2371,15 +2418,16 @@ public class BoardView extends JComponent{
             paintHighlight(offG);
             paintScout(offG);
           
-            paintRobos(offG);
+            paintRobos(offG, null);
           
         }
   
         
        //  synchronized (rescaleLock) {
         
+    
        // BufferedImage clip = offScreenImage.getSubimage(oldClip.x, oldClip.y,oldClip.width, oldClip.height);
-        g.drawImage(offScreenImage, 0, 0, this);
+        dbg.drawImage(offScreenImage, 0, 0, this);
         
         //}
         // draw the active elements (robos)
@@ -2387,62 +2435,19 @@ public class BoardView extends JComponent{
                                  // reason: we need it as a source for "clean" background during animations
             			         // (animations will still be doublebuffered, but we will clean the offscreenimage
                                 //   when the animation is finished)
-            Graphics2D dbg = (Graphics2D) g;
+          
             paintHighlight(dbg);
             paintScout(dbg);
-            paintRobos(dbg);
+            paintRobos(dbg,currentlyAnimated);
             dbg.setComposite(AC_SRC);
         }
-        
-        if (isPhaseNumberToBePainted){
-            paintPhaseNumber(g, phaseNumber);
-        }
-        
+     
         //g.setClip(oldClip);
     }
 
     
-    private static final Color COLOR_PHASE_BG =  new Color(64,181,64);
-    private static final Color COLOR_PHASE_FG =  Color.RED;
-    private static final Font  FONT_PHASE = new Font("times", Font.BOLD, 90);
- 
-    private void paintPhaseNumber(Graphics g, int phase){
-        Graphics2D dbg = (Graphics2D) g;
-        Rectangle rect = this.getVisibleRect();
-        int x1 = (int)rect.getCenterX();
-        int y1 = (int)rect.getCenterY();
-        int stringX = x1 - 240;	
-        int stringY= y1;
-        int rectTopLeftX = stringX-25;
-        int rectTopLeftY = y1 - 90;
-        int rectWidth = 490;
-        int rectHeight = 110;
-        
-        dbg.setComposite(AC_SRC_OVER_07);
-        dbg.setColor(COLOR_PHASE_BG);
-        dbg.fillRect(rectTopLeftX, rectTopLeftY, rectWidth, rectHeight); 
-       
-        dbg.setComposite(AC_SRC);
-        dbg.setColor(Color.black);
-        dbg.drawRect(rectTopLeftX, rectTopLeftY, rectWidth, rectHeight); 
-        dbg.setColor(COLOR_PHASE_FG);
-        dbg.setFont(FONT_PHASE);
-        dbg.drawString("PHASE #"+phase,stringX,stringY);
-    }
-    
-    private boolean isPhaseNumberToBePainted=false; 
-    private int phaseNumber = 1;
-    protected void setIsPhaseNumToBePainted (boolean paintIt){
-      //  synchronized (phaseDisplayLock){
-            isPhaseNumberToBePainted = paintIt;
-       //     phaseDisplayLock.notifyAll();
-       // }
-    }
-    
-    protected void setPhaseNumber(int phase){
-        phaseNumber = phase;
-    }
-    
+   
+   
     
     
     protected void paintUnbuffered(Graphics dbg) {
@@ -2467,10 +2472,10 @@ public class BoardView extends JComponent{
         }
     }
 
-    public void update(Graphics g) {
+  /*  public void update(Graphics g) {
         paint(g);
     }
-
+*/
     protected Location[] getFlags() {
         return sf.getFlags();
     }
@@ -2559,7 +2564,25 @@ public class BoardView extends JComponent{
         */            
     }
     
+    private Graphics2D getScaledGraphics(){
+        Graphics2D g2 = (Graphics2D) super.getGraphics();
+        g2.scale(dScale, dScale);
+        return g2;
+    }
     
-    
+    class ScaledBufferedImage extends BufferedImage{
+        
+        public ScaledBufferedImage(int width, int height, int img_type){
+            super(width, height, img_type);
+        }
+        
+        public Graphics getGraphics(){
+            Graphics2D g2 = (Graphics2D) super.getGraphics();
+         //   g2.scale(dScale, dScale);
+            return g2;
+        }
+        
+        
+    }
 }
 
