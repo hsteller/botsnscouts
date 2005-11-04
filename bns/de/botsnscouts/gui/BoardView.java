@@ -223,7 +223,7 @@ public class BoardView extends JComponent{
      * it might result in  <code>OutOfMemoryError</code>s if the user zooms in (like more than 110%).
      * The OutOfMemoryError seems not to crash the game, only the zooming in will fail. 
      */
-    private static  final boolean USE_PRESCALED_BGIMAGE = false;
+    private  boolean usePrescaledBoardImage = true;
     /** This will only be set if {@link: USE_PRESCALED_BGIMAGE} is set to <code>true</code>;
      *    in this case it will have the same value as {@link: dScale}.<br>
      * If  {@link: USE_PRESCALED_BGIMAGE} is set to <code>false</code> it must always be 1.
@@ -280,38 +280,69 @@ public class BoardView extends JComponent{
         return dScale;
     }
 
+    
+    private double biggestWorkingScaleFactor=1;
+    private boolean encounteredOutOfMemory=false;
     /** Adapt this Component to the scaling factor;
      *   must not be called before images are loaded
      * */
     public void setScale(double scale) {
-        
-        double newFeldSize =  scale*FELDSIZE;
-        dScale = scale;       
-        widthInPixel = (int) (sf.getSizeX() * newFeldSize);
-        heightInPixel =(int) (sf.getSizeY() * newFeldSize);
-        CAT.debug("dim : " + widthInPixel + " " + heightInPixel);
-        super.setSize(widthInPixel+1, heightInPixel+1);
-  
-        synchronized (rescaleLock) {           
-	        deleteScout();
+        synchronized (rescaleLock) {        
+	        if (encounteredOutOfMemory && scale <= biggestWorkingScaleFactor) {
+	            // zooming back into "safe" region, we can use the faster scaling again..
+	            usePrescaledBoardImage = true;
+	            encounteredOutOfMemory = false;
+	            CAT.debug("switching back to faster scale method");
+	            offScreenImage = null;
+	            System.gc();
+	        }
 	        
-	        if (USE_PRESCALED_BGIMAGE) {
+	        boolean tmpMemError = false;
+	        
+	        double newFeldSize =  scale*FELDSIZE;
+	        dScale = scale;       
+	        widthInPixel = (int) (sf.getSizeX() * newFeldSize);
+	        heightInPixel =(int) (sf.getSizeY() * newFeldSize);
+	        CAT.debug("dim : " + widthInPixel + " " + heightInPixel);
+	        if (usePrescaledBoardImage) {
 	            dScale2ForBackground =scale;
 	            scaledFeldSize = (int) newFeldSize;
-	        }	           
-	        
-		             
-	         if (USE_PRESCALED_BGIMAGE || offScreenImage == null) {
-	             // the preComputed-BoardImage is no longer valid
-	             offScreenImage = createBoardImage();
-	         }
-            if (useStaticBg) {
-                staticBackground = createBoardImage(); 
-            }
-        }
-        
-      repaint();
-             
+	        }	         
+	        super.setSize(widthInPixel+1, heightInPixel+1);
+	        try {
+		          
+			        deleteScout();		            
+			         if (usePrescaledBoardImage || offScreenImage == null) {
+			             // the preComputed-BoardImage is no longer valid
+			             offScreenImage = null;
+			             System.gc();
+			             offScreenImage = createBoardImage();
+			         }
+		            if (useStaticBg) {
+		                staticBackground = createBoardImage(); 
+		            }
+		        
+		        
+		      repaint();
+		      
+	        }
+	        catch (OutOfMemoryError err) {
+	          
+	            CAT.warn("encountered out of memory error because of zooming; switching the scaling method..");                        
+	            offScreenImage = null;          
+	            System.gc();
+	            tmpMemError = true;
+	            encounteredOutOfMemory  = true;
+	            usePrescaledBoardImage = false;
+	            scaledFeldSize = FELDSIZE;
+	            dScale2ForBackground = 1;
+	            offScreenImage = createBoardImage();            
+	        }
+	        if (usePrescaledBoardImage && !tmpMemError && dScale > biggestWorkingScaleFactor) {
+	            CAT.debug("no memory error, setting lastWorkingScale to: "+dScale);
+	            biggestWorkingScaleFactor = dScale;
+	        }
+        }       
     }
 
     private void init(SimBoard sf_neu, Color[] robColors) {
@@ -2384,7 +2415,7 @@ public class BoardView extends JComponent{
         //    g_off.scale(dScale, dScale);
         
         paintUnbuffered(g_off);
-        g_off.dispose();
+        g_off.dispose();        
         return bi;
     }
 
@@ -2427,7 +2458,7 @@ public class BoardView extends JComponent{
        
         Graphics2D dbg = (Graphics2D) g;    
 //      hs_scale
-        if (!USE_PRESCALED_BGIMAGE) {
+        if (!usePrescaledBoardImage) {
             dbg.scale(dScale, dScale);
         }
      //   System.out.println("OLD="+oldClip+"\tNEW="+rect);
@@ -2589,7 +2620,7 @@ public class BoardView extends JComponent{
     
     private Graphics2D getScaledGraphics(){
         Graphics2D g2 = (Graphics2D) super.getGraphics();
-        if (!USE_PRESCALED_BGIMAGE) {            
+        if (!usePrescaledBoardImage) {            
             g2.scale(dScale, dScale);
             
         }
