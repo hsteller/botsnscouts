@@ -133,7 +133,7 @@ public class BoardView extends JComponent{
     protected static final int WEST = Directions.WEST;
 
 
-    /** size (length and width) of one little field in pixels*/
+    /** The size (length and width) of one little floor  field in pixels*/
     protected static final int FELDSIZE = 64;
     
     /**Number of single steps a laser animation is drawn.*/
@@ -159,24 +159,30 @@ public class BoardView extends JComponent{
     /** maps Location(x,y) to the Image that should be painted as floor*/
    private HashMap floorElementHash = new HashMap();
    
-   /** Main contain names(!) of robots that should not be painted by request of the user
-    *   (to support new "hide robot(s)" menu option) 
+   /** May contain names(!) of robots that should not be painted by request of the user
+    *   (to support the new "hide robot(s)" menu option).
+    *  	 Does not affect animated bots; those bots (and their laser shots) will be painted anyway.  
     */
    private HashSet theseBotsShouldNotBePainted = new HashSet();
-
+   
+   /** The current width of the whole board in pixels.*/ 
     private int widthInPixel;
+    /** The current height of the whole board in pixels.*/
     private int heightInPixel;
 
     /** Stores data of the robots.*/
     //private Bot[] robos;
     
-    /** This robot is used for calculations,
+    /** The Scout.
+     *  This robot is used for calculations,
      *  like making a suggestion for the next move.
+     *  
      */
     private Bot previewRob;
 
-    /** last position of our famous scout ;-) */
+    /** Last position of our famous scout ;-) */
     private Location lastScoutPos = new Location();
+
     // Let's define some colors, so that everybody uses the same..
     public static final Color YELLOW = BotVis.YELLOW;
     public static final Color RED = BotVis.RED;
@@ -201,25 +207,40 @@ public class BoardView extends JComponent{
      *  stores the information about the board we are playing on;
      *  (where are the pits, where are lasers, and so on..)
      */
-    SimBoard sf;
+    private SimBoard sf;
 
     /** scale factor for zooming*/
     private double dScale = 1.0;
-    private static final double DUMMY_DSCALE = 1;
 
+    /** To switch the method in which scaling is done.<br><br>
+     * If set to <code>false</code>, we will create the background image of the board only once
+     * and use Java's <code>Graphics.scale()</code> method to scale the board if the user changes
+     * the zoom level. This can be somewhat CPU heavy as the scaling has to be done everytime
+     * <code>{@link: paintComponent(Graphics)}</code> is called.<br><br>
+     * If set to <code>true</code>, we will create a new,  properly scaled background image everytime
+     * the user changes the zoom level. This is the faster method as the background isn't scaled everytime
+     *  <code>{@link: paintComponent(Graphics)}</code> is called, but on big boards (size 3x3 tiles)
+     * it might result in  <code>OutOfMemoryError</code>s if the user zooms in (like more than 110%).
+     * The OutOfMemoryError seems not to crash the game, only the zooming in will fail. 
+     */
+    private static  final boolean USE_PRESCALED_BGIMAGE = false;
+    /** This will only be set if {@link: USE_PRESCALED_BGIMAGE} is set to <code>true</code>;
+     *    in this case it will have the same value as {@link: dScale}.<br>
+     * If  {@link: USE_PRESCALED_BGIMAGE} is set to <code>false</code> it must always be 1.
+     */
+    private double dScale2ForBackground = 1.0;
     
-    
-    private final int scaledFeldSize=FELDSIZE; // FELDSIZE * scale
+    private int scaledFeldSize=FELDSIZE; // FELDSIZE * scale
 
     /** position to highlight*/
-    Location highlightPos = new Location(0, 0);
+    private Location highlightPos = new Location(0, 0);
 
     /** This is where we keep our internal robots for animations */
     private HashMap internalBotHash = new java.util.HashMap();
     
     private static final Location PIT = new Location(0, 0);
     
-    ClickListener myClickListener;
+    private ClickListener myClickListener;
 
 
    
@@ -259,44 +280,38 @@ public class BoardView extends JComponent{
         return dScale;
     }
 
-    /*must not be called before images are loaded*/
+    /** Adapt this Component to the scaling factor;
+     *   must not be called before images are loaded
+     * */
     public void setScale(double scale) {
-        // adapt this Component to the scaling factor
         
-           dScale = scale;
-           widthInPixel = (int) (sf.getSizeX() * scaledFeldSize*dScale);
-	        heightInPixel = (int) (sf.getSizeY() * scaledFeldSize*dScale);
-	        CAT.debug("SCALE: "+widthInPixel+"x"+heightInPixel);
-	        super.setSize(widthInPixel+1,heightInPixel+1);
-	        
-           //  Bot preCopy = previewRob;
-      //  previewRob = null;
+        double newFeldSize =  scale*FELDSIZE;
+        dScale = scale;       
+        widthInPixel = (int) (sf.getSizeX() * newFeldSize);
+        heightInPixel =(int) (sf.getSizeY() * newFeldSize);
+        CAT.debug("dim : " + widthInPixel + " " + heightInPixel);
+        super.setSize(widthInPixel+1, heightInPixel+1);
+  
         synchronized (rescaleLock) {           
 	        deleteScout();
-	       /*   scaledFeldSize = (int) (scale * FELDSIZE);
-	        dScale = scaledFeldSize/((double)FELDSIZE);
 	        
-	        widthInPixel = (int) (sf.getSizeX() * scaledFeldSize);
-	        heightInPixel = (int) (sf.getSizeY() * scaledFeldSize);
-	       
-	        CAT.debug("dim : " + widthInPixel + " " + heightInPixel);
-	        setSize(widthInPixel, heightInPixel);
-	
-	        // the preComputed-BoardImage is no longer valid      
-       */
-	        // hs_scale: added the "if" before calling createBoardImage
-	         if (offScreenImage == null) {
-		        offScreenImage = createBoardImage();
+	        if (USE_PRESCALED_BGIMAGE) {
+	            dScale2ForBackground =scale;
+	            scaledFeldSize = (int) newFeldSize;
+	        }	           
+	        
+		             
+	         if (USE_PRESCALED_BGIMAGE || offScreenImage == null) {
+	             // the preComputed-BoardImage is no longer valid
+	             offScreenImage = createBoardImage();
 	         }
             if (useStaticBg) {
-                staticBackground = createBoardImage(); // TODO possible to use java-scaling instead? 
+                staticBackground = createBoardImage(); 
             }
         }
-       
+        
       repaint();
-       
-      //  previewRob = preCopy;
-       // paintScout(this.getGraphics());
+             
     }
 
     private void init(SimBoard sf_neu, Color[] robColors) {
@@ -348,7 +363,7 @@ public class BoardView extends JComponent{
     }
 
 
-    void mouseInit() {
+    private void mouseInit() {
         addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent me) {
                 Point feld = calcKachelPos(me.getX(), me.getY());
@@ -524,7 +539,7 @@ public class BoardView extends JComponent{
      * we have to use an internal version of the bots and ignore the server values for position and
      * facing because we have the bots moved before we get the notification that something has changed
      * (and might get other notifications in between that still contain the old values=>bots would be animated and
-     * then placed back to their position before the animation).
+     * then placed back to their position before the animation)).
      * 
      * DON'T USE THIS METHOD TO TURN ROBOTS, use animateRobTurn etc. instead
      * 
@@ -549,7 +564,7 @@ public class BoardView extends JComponent{
     
     private void paintBotsOnPositionButNotMe(Location position, Bot me, Graphics2D g2d, int xoffset, int yoffset){       
      
-       int acht = (int)(8*DUMMY_DSCALE);
+       int acht = (int)(8*dScale2ForBackground);
        Composite old = g2d.getComposite();
        synchronized ( internalBotHash) {
            Iterator it = internalBotHash.values().iterator();
@@ -1276,7 +1291,7 @@ public class BoardView extends JComponent{
     private void paintActiveRobLaser(Graphics g, Location source, int laserFacing, int actualLength, Color c) {
         // Laser sollen immer von Source nach Target gezeichnet werden
 
-        int breite = (int)(4*DUMMY_DSCALE); // Die Breite des Lasers, sollte gerade sein
+        int breite = (int)(4*dScale2ForBackground); // Die Breite des Lasers, sollte gerade sein
         int lSourceX = 0;
         int lSourceY = 0; // Anfangspunkt des Lasers in Pixeln,
         Location tmp = mapC2PixelCenter(source.x, source.y); /* Mitte (Punkt (31,31) auf Feld
@@ -1382,8 +1397,8 @@ public class BoardView extends JComponent{
         g2d.setComposite(ac);
         
 
-        int breite = (int)(DUMMY_DSCALE*4) ; // Die Breite des Lasers, sollte gerade sein
-        int eleven = (int )(DUMMY_DSCALE*11);
+        int breite = (int)(dScale2ForBackground*4) ; // Die Breite des Lasers, sollte gerade sein
+        int eleven = (int )(dScale2ForBackground*11);
         int lSourceX = 0;
         int lSourceY = 0; // Anfangspunkt des Lasers in Pixeln,
         Location tmp = mapC2PixelCenter(source.x, source.y);
@@ -1455,7 +1470,7 @@ public class BoardView extends JComponent{
                 }
             case WEST:
                 {
-                    lSourceX = tmp.x - actualLength + (scaledFeldSize/4)+((int)(3*DUMMY_DSCALE));
+                    lSourceX = tmp.x - actualLength + (scaledFeldSize/4)+((int)(3*dScale2ForBackground));
                     lSourceY = tmp.y - (breite / 2 - 1);
                     if (strength != 2) {                	    
                 	    g2d.setColor(fstLaserColor);
@@ -1497,7 +1512,7 @@ public class BoardView extends JComponent{
       
 
         int laenge = calculateLaserLength(laserPos, targetRob, laserDir);
-        laenge = laenge * scaledFeldSize + (scaledFeldSize/4)+((int)(DUMMY_DSCALE*3));
+        laenge = laenge * scaledFeldSize + (scaledFeldSize/4)+((int)(dScale2ForBackground*3));
        // Color c = laserColor[strength - 1];
       
         // get viewable area
@@ -1870,9 +1885,9 @@ public class BoardView extends JComponent{
         ac = AC_SRC_OVER_05;
         dbg.setComposite(ac);
         
-        int eleven = (int)(11*DUMMY_DSCALE);
-        int vier = (int)(4*DUMMY_DSCALE);
-        int dreissig = (int)(30*DUMMY_DSCALE);
+        int eleven = (int)(11*dScale2ForBackground);
+        int vier = (int)(4*dScale2ForBackground);
+        int dreissig = (int)(30*dScale2ForBackground);
         
         LaserDef actuallaser;
         dbg.setColor(fstLaserColor);
@@ -1936,16 +1951,16 @@ public class BoardView extends JComponent{
      */
     private void paintWall(Graphics g, int xpos, int ypos, int actx, int acty) {
        
-        int vier = (int)(DUMMY_DSCALE*4);
-        int fuenf = (int)(DUMMY_DSCALE*5);
-        int sieben = (int)(DUMMY_DSCALE*7);
-        int sechs = (int) (DUMMY_DSCALE*6);
-        int neun20 = (int)(DUMMY_DSCALE*29);       
-        int zwei40 = (int)(DUMMY_DSCALE*42);
-        int vier20 = (int) (DUMMY_DSCALE*24);       
-        int sieben30 = (int)(DUMMY_DSCALE*37);
-        int zehn = (int)(DUMMY_DSCALE*10);
-        int elf = (int) (DUMMY_DSCALE*11);
+        int vier = (int)(dScale2ForBackground*4);
+        int fuenf = (int)(dScale2ForBackground*5);
+        int sieben = (int)(dScale2ForBackground*7);
+        int sechs = (int) (dScale2ForBackground*6);
+        int neun20 = (int)(dScale2ForBackground*29);       
+        int zwei40 = (int)(dScale2ForBackground*42);
+        int vier20 = (int) (dScale2ForBackground*24);       
+        int sieben30 = (int)(dScale2ForBackground*37);
+        int zehn = (int)(dScale2ForBackground*10);
+        int elf = (int) (dScale2ForBackground*11);
         // paint wall in the north, if any    
         Wall northWall = sf.nw(xpos, ypos);
         if (northWall.isExisting()) {
@@ -2272,7 +2287,7 @@ public class BoardView extends JComponent{
         if ( theseBotsShouldNotBePainted.contains(robot.getName())){
             return;
         }
-        int acht = (int)(DUMMY_DSCALE*8);
+        int acht = (int)(dScale2ForBackground*8);
         
         int botVis = robot.getBotVis();
         Image imgRob = robosCrop[robot.getFacing() + botVis * 4];
@@ -2366,7 +2381,8 @@ public class BoardView extends JComponent{
         g_off.setClip(0, 0, widthInPixel, heightInPixel);
         
         
-       // g_off.scale(dScale, dScale);
+        //    g_off.scale(dScale, dScale);
+        
         paintUnbuffered(g_off);
         g_off.dispose();
         return bi;
@@ -2401,12 +2417,19 @@ public class BoardView extends JComponent{
         dumpPngImage(file, 0);
     }
 
+    /** During animation the of a bot move or turn we save a reference of the bot that is animated.
+     * 	This reference is used to avoid the robot being painted twice: 
+     * once by the animation, once during paintRobos() int the paintComponent method.
+     * During an animation, paintComponent has to ignore this bot. 
+     */ 
     private Bot currentlyAnimated  = null;
     public void paintComponent(Graphics g) {
        
         Graphics2D dbg = (Graphics2D) g;    
 //      hs_scale
-        dbg.scale(dScale, dScale);
+        if (!USE_PRESCALED_BGIMAGE) {
+            dbg.scale(dScale, dScale);
+        }
      //   System.out.println("OLD="+oldClip+"\tNEW="+rect);
         //g.setClip(rect);
         if (useStaticBg) { // 100% doublebuffered
@@ -2566,7 +2589,10 @@ public class BoardView extends JComponent{
     
     private Graphics2D getScaledGraphics(){
         Graphics2D g2 = (Graphics2D) super.getGraphics();
-        g2.scale(dScale, dScale);
+        if (!USE_PRESCALED_BGIMAGE) {            
+            g2.scale(dScale, dScale);
+            
+        }
         return g2;
     }
     
