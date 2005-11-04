@@ -1013,7 +1013,7 @@ public class BoardView extends JComponent{
 	            int yposScaled = (sf.getSizeY() - internal.getY())*feldSize;                         
 	            int clipLength = feldSize;    
 	            int halfSize = feldSize/2;
-	           // TODO rasterFormatException 
+	           // TODO rasterFormatException 	            
 	            BufferedImage offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
 	            Graphics2D offScreenClip = (Graphics2D) offScreenClipImage.getGraphics();     
 	      //      offScreenClip.scale(dScale, dScale);
@@ -1115,7 +1115,7 @@ public class BoardView extends JComponent{
         Image cropRobImage = robosCrop[internal.getFacing() + internal.getBotVis() * 4];
        
        
-        synchronized (this) {       
+        synchronized (rescaleLock) {       
             Graphics2D mainGraphics = getScaledGraphics();  
             Composite oldComposite = mainGraphics.getComposite();
             int feldSize = scaledFeldSize;           
@@ -1124,7 +1124,7 @@ public class BoardView extends JComponent{
             int clipLength = feldSize;    
            
             
-            BufferedImage backgroundImage=  offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
+            BufferedImage backgroundImage =  offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
             Graphics2D background = (Graphics2D) backgroundImage.getGraphics();     
             background.setComposite(ac);       
             // saving a copy of the background:
@@ -1834,6 +1834,8 @@ public class BoardView extends JComponent{
             debugbot = Bot.getNewInstance("debugDummy");
         }
         debugbot.setNextFlag(flag);
+        offScreenImage = null;
+        System.gc();
         offScreenImage = createBoardImage();
         repaint();
     }
@@ -2465,7 +2467,10 @@ public class BoardView extends JComponent{
         //g.setClip(rect);
         if (useStaticBg) { // 100% doublebuffered
             Rectangle oldClip = g.getClipBounds();
-            Graphics2D offG = (Graphics2D) offScreenImage.getGraphics();
+            Graphics2D offG;
+            synchronized (rescaleLock) { 	
+                 offG = (Graphics2D) offScreenImage.getGraphics();
+            }
             offG.setClip(oldClip);
             offG.drawImage(staticBackground,0,0,widthInPixel,heightInPixel,this);
            // draw the active elements (robos)
@@ -2477,13 +2482,10 @@ public class BoardView extends JComponent{
         }
   
         
-       //  synchronized (rescaleLock) {
-        
-    
-       // BufferedImage clip = offScreenImage.getSubimage(oldClip.x, oldClip.y,oldClip.width, oldClip.height);
-        dbg.drawImage(offScreenImage, 0, 0, this);
-        
-        //}
+        synchronized (rescaleLock) {            
+            // BufferedImage clip = offScreenImage.getSubimage(oldClip.x, oldClip.y,oldClip.width, oldClip.height);
+            dbg.drawImage(offScreenImage, 0, 0, this);        
+       }
         // draw the active elements (robos)
         if(!useStaticBg) { // the active elements must not be painted on the offscreen image in this case;
                                  // reason: we need it as a source for "clean" background during animations
