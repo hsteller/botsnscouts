@@ -92,7 +92,7 @@ public class HotKeyMan {
   
   /** Adds a binding for the given HotKey.
    *  NOTE: the binding for the added key will not be saved to the configuration(automatically); 
-   * to save the binding one has to call @see save() or @see updateHotkey(String, KeyStroke)
+   * to save the binding one has to call {@link: save() }or {@link: updateHotkey(String, KeyStroke)}
    * @param key the key that should to be added/bound
    */
   public synchronized void addHotKey(HotKey key) {
