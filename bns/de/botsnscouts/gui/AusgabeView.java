@@ -160,7 +160,7 @@ public class AusgabeView extends PaintPanel  {
 		JPanel robotsStatusContainer = new TJPanel(new FlowLayout(FlowLayout.LEFT));
 		robotsStatusContainer.setOpaque(false);
 		JPanel robotsCardContainer = new TJPanel(new GridLayout(8, 1));
-		flags = sa.sf.getFlags();
+		flags = sa.getFlags();
 		int flagCount = flags.length;
 
 		setLayout(new BorderLayout());
