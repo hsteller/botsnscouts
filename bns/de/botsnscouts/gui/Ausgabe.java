@@ -369,7 +369,7 @@ public class Ausgabe extends BNSClientThread {
                 flags);
 
 
-        BoardView board = new BoardView(sim, robotsNewColor);
+        BoardView board = new BoardView(sim);
         board.setAutoscrolls(true);
         ausgabeView = new AusgabeView(board, getRoboterArray(), this);
         fireAusgabeViewInit();

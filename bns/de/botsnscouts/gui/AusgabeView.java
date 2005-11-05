@@ -432,7 +432,7 @@ public class AusgabeView extends PaintPanel  {
      */
     protected void animateBoardLaser(Location laserPos, int facing, int stregth, Location r1Pos){
         checkAndDoTracking(laserPos);
-       gameBoardCanvas.doBordLaser(laserPos, facing, stregth, r1Pos,gameBoardView);
+       gameBoardCanvas.doBordLaser(laserPos, facing, stregth, r1Pos);
     }
 
     /** bord view is to animate robot movement*/
