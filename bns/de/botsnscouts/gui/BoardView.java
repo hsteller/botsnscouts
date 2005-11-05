@@ -41,8 +41,6 @@ import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.awt.image.RasterFormatException;
@@ -55,7 +53,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.swing.JComponent;
-import javax.swing.JViewport;
 
 import org.apache.log4j.Category;
 
@@ -66,6 +63,7 @@ import de.botsnscouts.autobot.DistanceCalculator;
 import de.botsnscouts.board.Board;
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.board.Floor;
+import de.botsnscouts.board.FloorConstants;
 import de.botsnscouts.board.LaserDef;
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.board.Wall;
@@ -103,6 +101,7 @@ public class BoardView extends JComponent{
     static Category CAT = Category.getInstance(BoardView.class);
 
     private final Object rescaleLock = new Object(); 
+    private final Object offScreenImgNotNullLock = new Object();
     
     /**
      *  Switch for the method that animations use to clear the area where they animate the bots:
@@ -222,6 +221,10 @@ public class BoardView extends JComponent{
      *  <code>{@link: paintComponent(Graphics)}</code> is called, but on big boards (size 3x3 tiles)
      * it might result in  <code>OutOfMemoryError</code>s if the user zooms in (like more than 110%).
      * The OutOfMemoryError seems not to crash the game, only the zooming in will fail. 
+     *
+     * CAUTION: setting this to false wil break the board location <-> pixel calculations and so
+     * the locating of flags etc (will only work for dScale=1)
+     *
      */
     private  boolean usePrescaledBoardImage = true;
     /** This will only be set if {@link: USE_PRESCALED_BGIMAGE} is set to <code>true</code>;
@@ -239,32 +242,23 @@ public class BoardView extends JComponent{
     private HashMap internalBotHash = new java.util.HashMap();
     
     private static final Location PIT = new Location(0, 0);
-    
-    private ClickListener myClickListener;
-
-
-   
-    
+      
     private AnimationConfig currentAnimationConfig;
     
     
   
     // This stuff can be used to display the distance calculation on the board: 
     public static final boolean DEBUG_DISTANCE_CALC = false;
-    Font myDebugFont=new Font("SansSerif", Font.PLAIN, 10);
-    Bot debugbot;
-    DistanceCalculator calc;
+    private Font myDebugFont=new Font("SansSerif", Font.PLAIN, 10);
+    private Bot debugbot;
+    private DistanceCalculator calc;
     
     
     public BoardView(SimBoard sf_neu) {
-        init(sf_neu, ROBOCOLOR);
+        init(sf_neu);
         
     }
 
-    public BoardView(SimBoard sf_neu, Color[] robColors) {
-        init(sf_neu, robColors);
-        mouseInit();
-    }
 
     /** Get a simple board view loaded from one tile file.
      *  This is not the way to do this in general since boards may
@@ -288,64 +282,66 @@ public class BoardView extends JComponent{
      * */
     public void setScale(double scale) {
         synchronized (rescaleLock) {        
-	        if (encounteredOutOfMemory && scale <= biggestWorkingScaleFactor) {
-	            // zooming back into "safe" region, we can use the faster scaling again..
-	            usePrescaledBoardImage = true;
-	            encounteredOutOfMemory = false;
-	            CAT.debug("switching back to faster scale method");
-	            offScreenImage = null;
-	            System.gc();
-	        }
-	        
-	        boolean tmpMemError = false;
-	        
-	        double newFeldSize =  scale*FELDSIZE;
-	        dScale = scale;       
-	        widthInPixel = (int) (sf.getSizeX() * newFeldSize);
-	        heightInPixel =(int) (sf.getSizeY() * newFeldSize);
-	        CAT.debug("dim : " + widthInPixel + " " + heightInPixel);
-	        if (usePrescaledBoardImage) {
-	            dScale2ForBackground =scale;
-	            scaledFeldSize = (int) newFeldSize;
-	        }	         
-	        super.setSize(widthInPixel+1, heightInPixel+1);
-	        try {
+            synchronized (offScreenImgNotNullLock) {
+		        if (encounteredOutOfMemory && scale <= biggestWorkingScaleFactor) {
+		            // zooming back into "safe" region, we can use the faster scaling again..
+		            usePrescaledBoardImage = true;
+		            encounteredOutOfMemory = false;
+		            CAT.debug("switching back to faster scale method");
+		            offScreenImage = null;
+		            System.gc();
+		        }
+		        
+		        boolean tmpMemError = false;
+		        
+		        double newFeldSize =  scale*FELDSIZE;
+		        dScale = scale;       
+		        widthInPixel = (int) (sf.getSizeX() * newFeldSize);
+		        heightInPixel =(int) (sf.getSizeY() * newFeldSize);
+		        CAT.debug("dim : " + widthInPixel + " " + heightInPixel);
+		        if (usePrescaledBoardImage) {
+		            dScale2ForBackground =scale;
+		            scaledFeldSize = (int) newFeldSize;
+		        }	         
+		        super.setSize(widthInPixel+1, heightInPixel+1);
+		        try {
+			          
+				        deleteScout();		            
+				         if (usePrescaledBoardImage || offScreenImage == null) {
+				             // the preComputed-BoardImage is no longer valid
+				             offScreenImage = null;
+				             System.gc();
+				             offScreenImage = createBoardImage();
+				         }
+			            if (useStaticBg) {
+			                staticBackground = createBoardImage(); 
+			            }
+			        
+			        
+			      repaint();
+			      
+		        }
+		        catch (OutOfMemoryError err) {
 		          
-			        deleteScout();		            
-			         if (usePrescaledBoardImage || offScreenImage == null) {
-			             // the preComputed-BoardImage is no longer valid
-			             offScreenImage = null;
-			             System.gc();
-			             offScreenImage = createBoardImage();
-			         }
-		            if (useStaticBg) {
-		                staticBackground = createBoardImage(); 
-		            }
-		        
-		        
-		      repaint();
-		      
-	        }
-	        catch (OutOfMemoryError err) {
-	          
-	            CAT.warn("encountered out of memory error because of zooming; switching the scaling method..");                        
-	            offScreenImage = null;          
-	            System.gc();
-	            tmpMemError = true;
-	            encounteredOutOfMemory  = true;
-	            usePrescaledBoardImage = false;
-	            scaledFeldSize = FELDSIZE;
-	            dScale2ForBackground = 1;
-	            offScreenImage = createBoardImage();            
-	        }
-	        if (usePrescaledBoardImage && !tmpMemError && dScale > biggestWorkingScaleFactor) {
-	            CAT.debug("no memory error, setting lastWorkingScale to: "+dScale);
-	            biggestWorkingScaleFactor = dScale;
-	        }
-        }       
+		            CAT.warn("encountered out of memory error because of zooming; switching the scaling method..");                        
+		            offScreenImage = null;          
+		            System.gc();
+		            tmpMemError = true;
+		            encounteredOutOfMemory  = true;
+		            usePrescaledBoardImage = false;
+		            scaledFeldSize = FELDSIZE;
+		            dScale2ForBackground = 1;
+		            offScreenImage = createBoardImage();            
+		        }
+		        if (usePrescaledBoardImage && !tmpMemError && dScale > biggestWorkingScaleFactor) {
+		            CAT.debug("no memory error, setting lastWorkingScale to: "+dScale);
+		            biggestWorkingScaleFactor = dScale;
+		        }
+	        }       
+        }
     }
 
-    private void init(SimBoard sf_neu, Color[] robColors) {
+    private void init(SimBoard sf_neu) {
 
         gotColors = false;
         sf = sf_neu;
@@ -368,64 +364,7 @@ public class BoardView extends JComponent{
     }
 
 
-    //void setScrollPane(JScrollPane j) {
-    //    myScrollPane = j;
-    //}
-
-    Point calcKachelPos(int mx, int my) {
-        int sfh = sf.getSizeY();
-        int sfw = sf.getSizeX();
-
-        Point p = new Point();
-        p.x = 1 + (int) (mx / scaledFeldSize);
-        p.y = sfh - (int) (my / scaledFeldSize);
-
-        // assure that 1 <= p.x <= sfw
-        // and 1 <= p.y <= sfy
-
-        p.x = Math.min(Math.max(1, p.x), sfw);
-        p.y = Math.min(Math.max(1, p.y), sfh);
-        return p;
-    }
-
-
-    public void addClickListener(ClickListener listener) {
-        myClickListener = listener;
-    }
-
-
-    private void mouseInit() {
-        addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent me) {
-                Point feld = calcKachelPos(me.getX(), me.getY());
-                if (myClickListener != null) {
-                    myClickListener.feldClicked(feld.x, feld.y, me.getModifiers());
-                }
-
-                /*
-                int mods = me.getModifiers();
-                 if( (mods & MouseEvent.BUTTON3_MASK) == 0 )
-                     return;
-
-                Dimension sz = myScrollPane.getViewport().getExtentSize();
-                int w2 = sz.width/2;
-                int h2 = sz.height/2;
-
-                //make sure we dont want to scoll 'out' to
-                // the left and top
-                int x1 = Math.max( me.getX() - w2 , 0);
-                int y1 = Math.max( me.getY() - h2 , 0);
-
-                // ... and right and bottom
-                x1 = Math.min( x1, x - sz.width );
-                y1 = Math.min( y1, y - sz.height );
-
-                myScrollPane.getViewport().setViewPosition(new Point(x1, y1));
-                */
-
-            }
-        });
-    }
+    
 
     public Dimension getMinimumSize() {
         return new Dimension(widthInPixel, heightInPixel);
@@ -635,7 +574,10 @@ public class BoardView extends JComponent{
             int yposScaled = (sf.getSizeY() - internal.getY()-1)*feldSize;                         
             int clipLength = 2*feldSize;    
             
-           BufferedImage offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength);
+           BufferedImage offScreenClipImage;
+           synchronized (offScreenImgNotNullLock) {
+               offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength);
+           }
             Graphics2D myg = (Graphics2D) offScreenClipImage.getGraphics();
             
            // Raster blankBg;
@@ -722,7 +664,12 @@ public class BoardView extends JComponent{
             int clipLength=2*feldSize;
             
          
-            BufferedImage offScreenClipImage  = offScreenImage.getSubimage(xpos64, ypos64, feldSize,clipLength);                                  
+            BufferedImage offScreenClipImage;
+            synchronized (offScreenImgNotNullLock) {
+                offScreenClipImage  = offScreenImage.getSubimage(xpos64, ypos64, feldSize,clipLength); 
+            }
+                
+                                                  
             Graphics2D myg = (Graphics2D) offScreenClipImage.getGraphics();
          //   myg.scale(dScale, dScale);
             BufferedImage blankBgImage;
@@ -801,7 +748,10 @@ public class BoardView extends JComponent{
            
             
            
-            BufferedImage offScreenClipImage = offScreenImage.getSubimage(xpos64, ypos64,clipLength,feldSize); 
+            BufferedImage offScreenClipImage;
+            synchronized (offScreenImgNotNullLock) { 
+                offScreenClipImage= offScreenImage.getSubimage(xpos64, ypos64,clipLength,feldSize);
+            }
             Graphics2D myg = (Graphics2D) offScreenClipImage.getGraphics();    
             //myg.scale(dScale, dScale);
             // Raster blankBg;
@@ -879,7 +829,10 @@ public class BoardView extends JComponent{
             
             
             
-            BufferedImage offScreenClipImage   = offScreenImage.getSubimage(xpos64, ypos64,clipLength, feldSize);                        
+            BufferedImage offScreenClipImage;
+            synchronized (offScreenImgNotNullLock) {
+                offScreenClipImage   = offScreenImage.getSubimage(xpos64, ypos64,clipLength, feldSize);
+            }                                    
             Graphics2D offScreenClipGraphics = (Graphics2D) offScreenClipImage.getGraphics();    
      //       offScreenClipGraphics.scale(dScale, dScale);
             BufferedImage blankBgImage;
@@ -1014,9 +967,12 @@ public class BoardView extends JComponent{
 	            int clipLength = feldSize;    
 	            int halfSize = feldSize/2;
 	           // TODO rasterFormatException 	            
-	            BufferedImage offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
-	            Graphics2D offScreenClip = (Graphics2D) offScreenClipImage.getGraphics();     
-	      //      offScreenClip.scale(dScale, dScale);
+	            BufferedImage offScreenClipImage; 
+	            synchronized (offScreenImgNotNullLock) {
+	                offScreenClipImage = offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); 
+		            //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);		            
+                }
+	            Graphics2D offScreenClip = (Graphics2D) offScreenClipImage.getGraphics();     	     
 	            offScreenClip.setComposite(ac);       
 	            mainGraphics.setComposite(ac);
 	            BufferedImage blankImage;
@@ -1124,7 +1080,11 @@ public class BoardView extends JComponent{
             int clipLength = feldSize;    
            
             
-            BufferedImage backgroundImage =  offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength); //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);            
+            BufferedImage backgroundImage;
+            synchronized (offScreenImgNotNullLock) {
+                backgroundImage =  offScreenImage.getSubimage(xposScaled, yposScaled, feldSize,clipLength);
+                //new BufferedImage(feldSize, feldSize, BufferedImage.TYPE_INT_RGB);
+            }                        
             Graphics2D background = (Graphics2D) backgroundImage.getGraphics();     
             background.setComposite(ac);       
             // saving a copy of the background:
@@ -1261,7 +1221,7 @@ public class BoardView extends JComponent{
             
             Graphics2D g2 =  getScaledGraphics();
             //g2.scale(dScale, dScale);
-            int step = Math.max(1, (int) (((double)laenge)/FULL_LENGTH_DOUBLE)); // step must not be 0 
+            int step = Math.max(1, (int) (laenge/FULL_LENGTH_DOUBLE)); // step must not be 0 
                     																					// otherwise the while loop below won't exit
             int tmp_laenge = step;
             
@@ -1538,36 +1498,21 @@ public class BoardView extends JComponent{
      @param targetRob Die Koordinaten des getroffenen Bots
      @param surrounding Das ScrollPane in dem der Canvas dargestellt wird
      */
-    protected void doBordLaser(Location laserPos, int laserDir, int strength, Location targetRob, JViewport surrounding) {
-        // init laser values
-      
-
+    protected void doBordLaser(Location laserPos, int laserDir, int strength, Location targetRob) {
+        // init laser values      
         int laenge = calculateLaserLength(laserPos, targetRob, laserDir);
         laenge = laenge * scaledFeldSize + (scaledFeldSize/4)+((int)(dScale2ForBackground*3));
-       // Color c = laserColor[strength - 1];
-      
-        // get viewable area
-        //	Point upperLeftCorner = surrounding.getViewPosition();
-        //  Dimension size = surrounding.getExtentSize();
-
-        // Graphics g = getGraphics();
-        //g.setClip(upperLeftCorner.x,upperLeftCorner.y,size.width,size.height);
-        //activeBordLasers=true; // non-animated lasers will
-        //paint(g);              // be deleted now
-
-        // paint lasers step by step
-        
+ 
+        // paint lasers step by step        
         Graphics2D g2 = getScaledGraphics();
-      //  g2.scale(dScale, dScale);
         for (int i = 1; i <= FULL_LENGTH_INT; i++) {
-            int tmp_laenge = (int) ((((double) i) / FULL_LENGTH_DOUBLE) * laenge);
+            int tmp_laenge = (int) (( i / FULL_LENGTH_DOUBLE) * laenge);
             
             paintActiveBordLaser(g2, laserPos, laserDir, strength, tmp_laenge);
 
         }
-        // activeBordLasers=false; // now paint the non-animated
-        repaint();              // lasers again
-       
+
+        repaint();              // lasers again       
             synchronized (this){
                 waitSomeTime(currentAnimationConfig.getLaserDelayAfterEndOfAnimation(), this);  
             }
@@ -1642,141 +1587,141 @@ public class BoardView extends JComponent{
         Floor floor = sf.floor(xpos, ypos);
         switch (floor.getType()) {
 
-            case (Board.FL_PIT):
+            case (FloorConstants.FL_PIT):
                 return diverseCrop[3];
-            case (Board.FL_NORMAL):
+            case (FloorConstants.FL_NORMAL):
                 return diverseCrop[24 + ((xpos * ypos * 19) % 17) % 4];
-            case (Board.FL_ROTGEAR):
+            case (FloorConstants.FL_ROTGEAR):
                 if (floor.getInfo() == 0)
                     return diverseCrop[2];
                 else
                     return diverseCrop[1];
-            case (Board.FL_REPAIR):
+            case (FloorConstants.FL_REPAIR):
                 if (floor.getInfo() == 1)
                     return diverseCrop[4];
                 else
                     return diverseCrop[5];
                 // ------------------- normale Fliessbaender -------------------------
 
-            case (Board.FN1):
+            case (FloorConstants.FN1):
                 return cbeltCrop[14];
-            case (Board.FE1):
+            case (FloorConstants.FE1):
                 return cbeltCrop[19];
-            case (Board.FW1):
+            case (FloorConstants.FW1):
                 return cbeltCrop[9];
-            case (Board.FS1):
+            case (FloorConstants.FS1):
                 return cbeltCrop[4];
 
-            case (Board.NFW1):
-                if (turner(xpos, ypos - 1, Board.NORTH))
+            case (FloorConstants.NFW1):
+                if (turner(xpos, ypos - 1, NORTH))
                     return cbeltCrop[15];
                 else
                     return cbeltCrop[6];
-            case (Board.NFE1):
-                if (turner(xpos, ypos - 1, Board.NORTH))
+            case (FloorConstants.NFE1):
+                if (turner(xpos, ypos - 1, NORTH))
                     return cbeltCrop[18];
                 else
                     return cbeltCrop[7];
-            case (Board.SFW1):
-                if (turner(xpos, ypos + 1, Board.SOUTH))
+            case (FloorConstants.SFW1):
+                if (turner(xpos, ypos + 1,SOUTH))
                     return cbeltCrop[13];
                 else
                     return cbeltCrop[3];
-            case (Board.SFE1):
-                if (turner(xpos, ypos + 1, Board.SOUTH))
+            case (FloorConstants.SFE1):
+                if (turner(xpos, ypos + 1,SOUTH))
                     return cbeltCrop[10];
                 else
                     return cbeltCrop[0];
-            case (Board.EFN1):
-                if (turner(xpos - 1, ypos, Board.EAST))
+            case (FloorConstants.EFN1):
+                if (turner(xpos - 1, ypos, EAST))
                     return cbeltCrop[16];
                 else
                     return cbeltCrop[5];
-            case (Board.EFS1):
-                if (turner(xpos - 1, ypos, Board.EAST))
+            case (FloorConstants.EFS1):
+                if (turner(xpos - 1, ypos, EAST))
                     return cbeltCrop[12];
                 else
                     return cbeltCrop[2];
-            case (Board.WFN1):
-                if (turner(xpos + 1, ypos, Board.WEST))
+            case (FloorConstants.WFN1):
+                if (turner(xpos + 1, ypos,WEST))
                     return cbeltCrop[17];
                 else
                     return cbeltCrop[8];
-            case (Board.WFS1):
-                if (turner(xpos + 1, ypos, Board.WEST))
+            case (FloorConstants.WFS1):
+                if (turner(xpos + 1, ypos, WEST))
                     return cbeltCrop[11];
                 else
                     return cbeltCrop[1];
 
-            case (Board.NFEW1):
+            case (FloorConstants.NFEW1):
                 return cbeltCrop[22];
-            case (Board.SFWE1):
+            case (FloorConstants.SFWE1):
                 return cbeltCrop[20];
-            case (Board.EFNS1):
+            case (FloorConstants.EFNS1):
                 return cbeltCrop[23];
-            case (Board.WFNS1):
+            case (FloorConstants.WFNS1):
                 return cbeltCrop[21];
 
                 // ------------------------ Expressfliessbaender ---------------------
 
-            case (Board.FN2):
+            case (FloorConstants.FN2):
                 return ebeltCrop[14];
-            case (Board.FE2):
+            case (FloorConstants.FE2):
                 return ebeltCrop[19];
-            case (Board.FW2):
+            case (FloorConstants.FW2):
                 return ebeltCrop[9];
-            case (Board.FS2):
+            case (FloorConstants.FS2):
                 return ebeltCrop[4];
 
-            case (Board.NFW2):
-                if (turner(xpos, ypos - 1, Board.NORTH))
+            case (FloorConstants.NFW2):
+                if (turner(xpos, ypos - 1, NORTH))
                     return ebeltCrop[16];
                 else
                     return ebeltCrop[6];
-            case (Board.NFE2):
-                if (turner(xpos, ypos - 1, Board.NORTH))
+            case (FloorConstants.NFE2):
+                if (turner(xpos, ypos - 1, NORTH))
                     return ebeltCrop[17];
                 else
                     return ebeltCrop[7];
-            case (Board.SFW2):
-                if (turner(xpos, ypos + 1, Board.SOUTH))
+            case (FloorConstants.SFW2):
+                if (turner(xpos, ypos + 1, SOUTH))
                     return ebeltCrop[13];
                 else
                     return ebeltCrop[3];
-            case (Board.SFE2):
-                if (turner(xpos, ypos + 1, Board.SOUTH))
+            case (FloorConstants.SFE2):
+                if (turner(xpos, ypos + 1, SOUTH))
                     return ebeltCrop[10];
                 else
                     return ebeltCrop[0];
-            case (Board.EFN2):
-                if (turner(xpos - 1, ypos, Board.EAST))
+            case (FloorConstants.EFN2):
+                if (turner(xpos - 1, ypos, EAST))
                     return ebeltCrop[15];
                 else
                     return ebeltCrop[5];
-            case (Board.EFS2):
-                if (turner(xpos - 1, ypos, Board.EAST))
+            case (FloorConstants.EFS2):
+                if (turner(xpos - 1, ypos, EAST))
                     return ebeltCrop[12];
                 else
                     return ebeltCrop[2];
-            case (Board.WFN2):
-                if (turner(xpos + 1, ypos, Board.WEST))
+            case (FloorConstants.WFN2):
+                if (turner(xpos + 1, ypos, WEST))
                     return ebeltCrop[18];
                 else
                     return ebeltCrop[8];
-            case (Board.WFS2):
-                if (turner(xpos + 1, ypos, Board.WEST))
+            case (FloorConstants.WFS2):
+                if (turner(xpos + 1, ypos, WEST))
                     return ebeltCrop[11];
                 else
                     return ebeltCrop[1];
 
 
-            case (Board.NFWE2):
+            case (FloorConstants.NFWE2):
                 return ebeltCrop[22];
-            case (Board.SFWO2):
+            case (FloorConstants.SFWO2):
                 return ebeltCrop[20];
-            case (Board.EFNS2):
+            case (FloorConstants.EFNS2):
                 return ebeltCrop[23];
-            case (Board.WFNS2):
+            case (FloorConstants.WFNS2):
                 return ebeltCrop[21];
 
 
@@ -1834,9 +1779,11 @@ public class BoardView extends JComponent{
             debugbot = Bot.getNewInstance("debugDummy");
         }
         debugbot.setNextFlag(flag);
-        offScreenImage = null;
-        System.gc();
-        offScreenImage = createBoardImage();
+        synchronized (offScreenImgNotNullLock) {
+            offScreenImage = null;
+            System.gc();
+            offScreenImage = createBoardImage();           
+        }
         repaint();
     }
 
@@ -2168,10 +2115,14 @@ public class BoardView extends JComponent{
 
     private Rectangle  ort2Rect(int x, int y) {
          Rectangle dest = new Rectangle();
-        dest.x = (int) ((x - 1) * scaledFeldSize);
-        dest.y = (int) ((sf.getSizeY() - y) * scaledFeldSize);
-        dest.width = (int) scaledFeldSize;
-        dest.height = (int) scaledFeldSize;
+         int tmpFieldSize = scaledFeldSize;
+         if (!usePrescaledBoardImage) {
+             tmpFieldSize = (int) (dScale*FELDSIZE);
+         }
+        dest.x = (x - 1) * tmpFieldSize;
+        dest.y = (sf.getSizeY() - y) * tmpFieldSize;
+        dest.width = tmpFieldSize;
+        dest.height = tmpFieldSize;
         return dest;
     }
 
@@ -2180,8 +2131,12 @@ public class BoardView extends JComponent{
     }
 
     public Location point2Ort(Point p, Location ort) {
-        ort.x = (int) (p.x / scaledFeldSize) + 1;
-        ort.y = (int) ((getHeight() - p.y) / scaledFeldSize) + 1;
+        int tmpFieldSize = scaledFeldSize;
+        if (!usePrescaledBoardImage) {
+            tmpFieldSize = (int) (dScale*FELDSIZE);
+        }
+        ort.x = p.x / tmpFieldSize + 1;
+        ort.y = (getHeight() - p.y) /tmpFieldSize + 1;
         return ort;
     }
 
@@ -2189,9 +2144,14 @@ public class BoardView extends JComponent{
     public Point ort2Point(int ortx, int orty, Point p) {
         if (p==null){
             p=new Point();
-        }            
-        p.x = (int) ((ortx - 1) * scaledFeldSize);
-        p.y = (int) ((sf.getSizeY() - orty) * scaledFeldSize);
+        }           
+        int tmpFieldSize = scaledFeldSize;
+        if (!usePrescaledBoardImage) {
+            
+            tmpFieldSize = (int) (dScale*FELDSIZE);
+        }
+        p.x = (ortx - 1) * tmpFieldSize;
+        p.y = (sf.getSizeY() - orty) * tmpFieldSize;
         return p;
     }
     
@@ -2208,17 +2168,17 @@ public class BoardView extends JComponent{
      *  Koordinaten. N\uFFFDtzlich um einzelne Felder neuzeichnen zu lassen
      */
 
-    void repaintOrt(Location ort) {
+   private  void repaintOrt(Location ort) {
         Rectangle rcForOrt2Rect =  ort2Rect(ort);        
         repaint(1, rcForOrt2Rect.x, rcForOrt2Rect.y, rcForOrt2Rect.width, rcForOrt2Rect.height);
     }
 
-    void repaintOrt(int x, int y) {
+    private void repaintOrt(int x, int y) {
         Rectangle rcForOrt2Rect = ort2Rect(x, y);
         repaint(1, rcForOrt2Rect.x, rcForOrt2Rect.y, rcForOrt2Rect.width, rcForOrt2Rect.height);
     }
 
-    void unhighlight() {
+    private void unhighlight() {
         highlightPos.x = 0;
         highlightPos.y = 0;
         repaint();
@@ -2290,7 +2250,7 @@ public class BoardView extends JComponent{
         g2d.setComposite(AC_SRC);
     }
 
-
+/*
     private void paintFeldWithElements(Graphics2D g2d, int xpos, int ypos, int actx, int acty) {
         Floor floor = sf.floor(xpos, ypos);
         paintFeldBoden(g2d, xpos, ypos, actx, acty);
@@ -2301,7 +2261,7 @@ public class BoardView extends JComponent{
         paintWall(g2d, xpos, ypos, actx, acty);
         paintFlaggen(g2d);
     }
-
+*/
 
 
     
@@ -2345,11 +2305,7 @@ public class BoardView extends JComponent{
         }
     }
 
-   
-    private void paintRobos(Graphics g) {
-        paintRobos(g, null);
-    }
-
+    
     private void paintRobos(Graphics g, Bot dontPaintMe) {   
         Graphics2D g2d = (Graphics2D) g;          
         Iterator it = internalBotHash.values().iterator();
@@ -2468,9 +2424,9 @@ public class BoardView extends JComponent{
         if (useStaticBg) { // 100% doublebuffered
             Rectangle oldClip = g.getClipBounds();
             Graphics2D offG;
-            synchronized (rescaleLock) { 	
+          synchronized (offScreenImgNotNullLock) { 	
                  offG = (Graphics2D) offScreenImage.getGraphics();
-            }
+          }
             offG.setClip(oldClip);
             offG.drawImage(staticBackground,0,0,widthInPixel,heightInPixel,this);
            // draw the active elements (robos)
@@ -2482,7 +2438,7 @@ public class BoardView extends JComponent{
         }
   
         
-        synchronized (rescaleLock) {            
+        synchronized (offScreenImgNotNullLock) {            
             // BufferedImage clip = offScreenImage.getSubimage(oldClip.x, oldClip.y,oldClip.width, oldClip.height);
             dbg.drawImage(offScreenImage, 0, 0, this);        
        }
@@ -2516,7 +2472,7 @@ public class BoardView extends JComponent{
 
     protected void finalize() throws Throwable {
         super.finalize();
-        synchronized (this) {
+        synchronized (offScreenImgNotNullLock) { 
 	        if (offScreenImage != null) {
 	            Graphics g = offScreenImage.getGraphics();
 	            g.dispose();
@@ -2550,8 +2506,8 @@ public class BoardView extends JComponent{
 
     private synchronized void ersetzeSpielfeld(SimBoard sfs) {
         sf = sfs;
-        widthInPixel = (int) (sf.getSizeX() * scaledFeldSize);
-        heightInPixel = (int) (sf.getSizeY() * scaledFeldSize);
+        widthInPixel = sf.getSizeX() * scaledFeldSize;
+        heightInPixel = sf.getSizeY() * scaledFeldSize;
         setSize(widthInPixel, heightInPixel);
         initFloorHashMap();
     }
