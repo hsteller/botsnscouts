@@ -64,7 +64,7 @@ public class HotKeyMan {
  */
   public synchronized boolean updateHotkey (String keyName, KeyStroke newStroke) throws KeyReserved {
       HotKey k = (HotKey) keynameToHotKey.get(keyName);
-      
+      //TODO (this needs some refactoring, maybe functionally ok, but looks like spaghetti) 
       if (k!=null) {                 
           KeyStroke oldStroke = k.getKeyStroke();
           synchronized (inputMap){
@@ -138,7 +138,7 @@ public class HotKeyMan {
       if (keyname != null) {
           Action action;
           synchronized(actionMap){
-              action = (Action) actionMap.get(keyname);
+              action = actionMap.get(keyname);
           }
           if (action != null){
               ActionEvent dummyEvent = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, stroke.toString());
