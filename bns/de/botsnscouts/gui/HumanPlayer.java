@@ -163,7 +163,7 @@ public class HumanPlayer extends BNSClientThread {
      *  Don't call directly (it assumes the player is already registered at the server),
      *  but if you thought about calling it (or "start()"):
      *  --waves hand -- "These aren't the methods you are looking for."
-     *   But you might want to call/look at @see BnsClientThread.bnsStart()
+     *   But you might want to call/look at {@link: BnsClientThread.bnsStart()}
      */ 
     public void run() {
       try {
