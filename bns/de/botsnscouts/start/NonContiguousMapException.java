@@ -26,4 +26,5 @@
 package de.botsnscouts.start;
 
 class NonContiguousMapException extends Exception{
+//TODO (comment me)
 }

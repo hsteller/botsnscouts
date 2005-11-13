@@ -179,27 +179,34 @@ public class Start extends JFrame implements WindowListener {
 		getContentPane().setLayout(layout);
 
 		wth = new WaiterThread(this);
+		//store the Screensize 
 		Dimension ssize = BotsNScouts.getScreenSize();
 		if (ssize.height < 600) {
 			facade = new Facade(150);
 		} else {
 			facade = new Facade();
 		}
+		//set the size of this Window to Screensize
+		//but we should do a real fullscreen here
+		//TODO(realize a "fullscreen" or "maximized" application window)
 		setSize(ssize);
-		setLocation(0, 0);
+		setLocation(0, 0); //topleft
 
 		paint = OptionPane.getBackgroundPaint(this);
-
+		
+		//setup the main menu
 		mainMenu = new MainMenu(this);
 		getContentPane().add(mainMenu, MAIN_MENU);
-
 		showMainMenu();
-
+		
+		// setting up the busypanel and add it to the contentPane
 		busyPanel = new DoingStuffPanel(paint);
 		getContentPane().add(busyPanel, BUSY);
 
 		addWindowListener(this);
-		show();
+		// this is somehow funny, cause the Java Developers use show() which is deprecated 8-)
+		setVisible(true);
+		//show();
 		this.toFront();
 	}
 
@@ -361,6 +368,7 @@ public class Start extends JFrame implements WindowListener {
 					}
 					ServerObserver foo = new ServerObserver(startPanel
 							.getPlayersPanel());
+					//TODO(variable never used)
 					Server server = facade.startGame(foo);// starting game
 					addServer();
 					postServerStartTask.doIt();
@@ -455,7 +463,7 @@ public class Start extends JFrame implements WindowListener {
 		// getWaiterThread().stopAllWaitingThreads();
 		resetWaiter();
 	}
-    
+    //  TODO (use or delete me)
 	private void beenden() {
 		CAT.debug("beenden() wurde aufgerufen");
 		try {

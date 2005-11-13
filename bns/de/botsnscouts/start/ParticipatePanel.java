@@ -38,8 +38,8 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Category;
@@ -94,8 +94,8 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
 
 
         hostName = new TJTextField(Message.say("Start", "mServerInh"),
-                               JTextField.CENTER, true);
-        robName = new TJTextField(Conf.getDefaultRobName(), JTextField.CENTER, true);
+        		SwingConstants.CENTER, true);
+        robName = new TJTextField(Conf.getDefaultRobName(), SwingConstants.CENTER, true);
         colors = new RoboBox(true);
         //colors.setOpaque(false);
         Font bigFont = new Font("Sans", Font.BOLD, 20);
@@ -143,7 +143,8 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
 	        }   
             Global.debug(this, "SpielerMensch gestartet");
             parent.addKS(smth);
-            parent.hide();         
+            //parent.hide();  //TODO (parent again)
+            parent.setVisible(false);
         } else if (e.getActionCommand().equals("back")) {
             parent.showMainMenu();
         }

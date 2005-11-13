@@ -27,10 +27,12 @@ package de.botsnscouts.start;
 
 import java.io.File;
 import java.io.FilenameFilter;
-
+//TODO (comment me please)
 class RRAFilter implements FilenameFilter{
 
-    public RRAFilter(){}
+  //  public RRAFilter(){
+    	//  TODO (comment me please or delete me)
+   // }
 
     public boolean accept(File dir, String name){
 	try{
