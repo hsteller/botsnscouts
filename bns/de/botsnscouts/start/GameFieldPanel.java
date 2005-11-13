@@ -57,6 +57,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -150,7 +151,7 @@ public class GameFieldPanel extends JPanel {
         leftPane.setOpaque(false);
         leftPane.getViewport().setOpaque(false);
         leftPane.getViewport().setView(pnl);
-        leftPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        leftPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         add(BorderLayout.SOUTH, okPanel);
         add(BorderLayout.CENTER, leftPane);
@@ -159,8 +160,8 @@ public class GameFieldPanel extends JPanel {
         rightPane.setOpaque(false);         
         rightPane.getViewport().setOpaque(false);
        
-        rightPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        rightPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        rightPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        rightPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
        
         add(BorderLayout.EAST, rightPane/*editPanel*/);
         boardGrid.rasterChanged();
