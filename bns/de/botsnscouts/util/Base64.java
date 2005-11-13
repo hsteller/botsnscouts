@@ -79,6 +79,9 @@ import java.io.Writer;
 * @modified 14 February 2000
 * @modified 22 September 2000
 */
+
+//where is it used? 
+//TODO (Delete me if unused) 
 public class Base64 {
 
 /**
