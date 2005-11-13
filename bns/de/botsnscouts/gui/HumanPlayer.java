@@ -25,8 +25,6 @@
 
 package de.botsnscouts.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -397,7 +395,7 @@ public class HumanPlayer extends BNSClientThread {
 	
 	        for (int i = 0; i < registerCards.size(); i++) {
 	            for (int j = 0; j < cards.size(); j++) {
-	                if (((HumanCard) registerCards.get(i)).equals((HumanCard) cards.get(j))) {
+	                if (((HumanCard) registerCards.get(i)).equals(cards.get(j))) {
 	                    sendProg[index] = (j + 1);
 	                    index++;
 	                    continue;
@@ -630,7 +628,9 @@ public class HumanPlayer extends BNSClientThread {
             Card c = somebot.getLockedRegister(i);
             //HumanCard card = (HumanCard) registersWithLockedHumanCards.get(i);
             // somebot.getLockedRegister(i);      
-            if (c == null) {
+            //TODO (this is wicked! Dont cast null to HumanCard, wrap the null in a new card)
+            //This lets stand my hairs to the mountain... lol need to learn more english
+            if (c == null) { //NO WAY! 
                 myRegs.add((HumanCard)null);
             }
             else {
