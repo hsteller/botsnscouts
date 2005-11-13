@@ -61,7 +61,13 @@ public class DoingStuffPanel extends JPanel {
     Paint paint;
     Font font = new Font("Sans", Font.PLAIN, 35);
     Image twonky;
-
+    
+    /* we should use a lazy instanciation here, because we
+     * just dont want to waste time at startup. Maybe we 
+     * can initialize all the components in the show method 
+     * if needed? But i think this is future.
+     */ 
+    
     public DoingStuffPanel(Paint p) {
         paint = p;
 
