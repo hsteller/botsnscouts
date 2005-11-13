@@ -41,7 +41,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -52,7 +51,6 @@ import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.ImageMan;
-import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJPanel;
 
 /**

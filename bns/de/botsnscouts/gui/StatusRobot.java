@@ -31,7 +31,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -49,24 +48,17 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToolTip;
-import javax.swing.JWindow;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
-import javax.swing.ToolTipManager;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Message;
-import de.botsnscouts.widgets.ColoredPanel;
-import de.botsnscouts.widgets.GreenTheme;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.PaintPanel;
 import de.botsnscouts.widgets.TJLabel;
-import de.botsnscouts.widgets.TJPanel;
 
 
 public class StatusRobot extends JButton {

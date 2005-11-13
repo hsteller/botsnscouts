@@ -35,20 +35,14 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import de.botsnscouts.util.BotVis;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.util.Stats;
 import de.botsnscouts.util.StatsList;
 import de.botsnscouts.widgets.ColoredPanel;
-import de.botsnscouts.widgets.GreenTheme;
-import de.botsnscouts.widgets.OptionPane;
-import de.botsnscouts.widgets.PaintPanel;
 import de.botsnscouts.widgets.TJLabel;
-import de.botsnscouts.widgets.TJPanel;
 
 
 
