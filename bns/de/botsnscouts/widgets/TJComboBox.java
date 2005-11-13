@@ -30,12 +30,7 @@
  */
 package de.botsnscouts.widgets;
 
-import java.awt.Color;
-
 import javax.swing.JComboBox;
-import javax.swing.UIManager;
-import javax.swing.plaf.ListUI;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 
 /**
  * @author Hendrik Steller
