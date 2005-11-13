@@ -32,6 +32,7 @@
 
 package de.botsnscouts.editor;
 
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -52,9 +53,9 @@ class EditMouseListener extends MouseAdapter{
 	editor.spfY=e.getY()/64;
 
 	int mods = e.getModifiers();
-        if ((mods & MouseEvent.BUTTON3_MASK) != 0)
+        if ((mods & InputEvent.BUTTON3_MASK) != 0)
             handleRightClick(e);
- 	else if ((mods & MouseEvent.BUTTON1_MASK) != 0)
+ 	else if ((mods & InputEvent.BUTTON1_MASK) != 0)
  	    handleLeftClick(e);
     }
 

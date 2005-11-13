@@ -32,11 +32,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
+import javax.swing.SwingConstants;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import de.botsnscouts.util.Bot;
@@ -60,14 +60,14 @@ public class CardArray extends TJPanel {
         
 
     public CardArray(ActionListener cards, ActionListener send) {
-		JPanel chooser = new TJPanel( new GridLayout(2,1, 3, 3) );
+    	JPanel chooser = new TJPanel( new GridLayout(2,1, 3, 3) );
 		setLayout(new GridLayout(5,2));
 		sendButton.setEnabled(false);
 		powerDownBox.setEnabled(true);
 	    powerDownBox.setOpaque(false);
 		sendButton.addActionListener(send);
-		powerDownBox.setVerticalTextPosition(AbstractButton.BOTTOM);
-		powerDownBox.setHorizontalTextPosition(AbstractButton.CENTER);
+		powerDownBox.setVerticalTextPosition(SwingConstants.BOTTOM);
+		powerDownBox.setHorizontalTextPosition(SwingConstants.CENTER);
 		powerDownBox.setFont(new Font("Dialog",Font.BOLD,8));
 		for (int i=0; i<Bot.NUM_CARDS; i++) {
 		    CardView c = new CardView(cards);

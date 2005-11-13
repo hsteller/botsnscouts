@@ -47,12 +47,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import org.apache.log4j.Category;
 
 import de.botsnscouts.util.Message;
-import de.botsnscouts.widgets.ColoredPanel;
-import de.botsnscouts.widgets.GreenTheme;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.PaintPanel;
 import de.botsnscouts.widgets.TJButton;
@@ -71,9 +70,9 @@ public class AnimationsSettingEditor extends JFrame {
     
     private static final String msgSec = "AnimationSettings";
     
-    protected final static TJLabel labelSpeedSlow = new TJLabel(Message.say("AusgabeFrame", "mSlow"), JLabel.CENTER);
-    protected final static TJLabel labelSpeedMedium= new TJLabel(Message.say("AusgabeFrame", "mMiddle"), JLabel.CENTER);
-    protected final static  TJLabel labelSpeedFast= new TJLabel(Message.say("AusgabeFrame", "mFast"), JLabel.CENTER);        
+    protected final static TJLabel labelSpeedSlow = new TJLabel(Message.say("AusgabeFrame", "mSlow"), SwingConstants.CENTER);
+    protected final static TJLabel labelSpeedMedium= new TJLabel(Message.say("AusgabeFrame", "mMiddle"), SwingConstants.CENTER);
+    protected final static  TJLabel labelSpeedFast= new TJLabel(Message.say("AusgabeFrame", "mFast"), SwingConstants.CENTER);        
     
     
     private static JLabel labelMoveOffset = new TJLabel(Message.say(msgSec,"moveOffset"));
@@ -87,7 +86,7 @@ public class AnimationsSettingEditor extends JFrame {
     private static JLabel labelDelayRevealingCards = new TJLabel(Message.say(msgSec,"cardRevealDelay"));
     private static JLabel labelDelayCardHighlight = new TJLabel(Message.say(msgSec,"cardHighlightDelay"));
     
-    private JLabel labelHeading  = new TJLabel(Message.say(msgSec, "heading"), JLabel.CENTER);
+    private JLabel labelHeading  = new TJLabel(Message.say(msgSec, "heading"), SwingConstants.CENTER);
     private JButton applyButton   = new TJButton(Message.say(msgSec,"apply"), 16);
     private JButton saveButton    = new TJButton(Message.say(msgSec,"save"),16);
     private JButton cancelButton = new TJButton(Message.say(msgSec, "cancel"),16);
@@ -373,7 +372,7 @@ public class AnimationsSettingEditor extends JFrame {
                             				config.getDelayBetweenActions());
             config.setDelayBetweenActions(actionDelay);
             
-            config.setMovementAnimationsEnabled(toggleMovementAnimation.isSelected());
+            AnimationConfig.setMovementAnimationsEnabled(toggleMovementAnimation.isSelected());
             
         }
         

@@ -40,13 +40,11 @@ import java.awt.Image;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
+import javax.swing.SwingConstants;
 
 import org.apache.log4j.Category;
 
@@ -73,7 +71,7 @@ public class PhaseEvaluationPanel extends TJPanel {
     private ScalableRegisterRow [] registerRows;
     
     public PhaseEvaluationPanel(){
-        
+        //TODO (Comment me)
     }
     
     public PhaseEvaluationPanel(Bot [] robots, ScalableRegisterRow [] viewRows ){
@@ -117,7 +115,7 @@ public class PhaseEvaluationPanel extends TJPanel {
       
           
             //BotLabel picLabel = new BotLabel(currentBot);
-            JLabel picLabel = new JLabel(botIcon,JLabel.CENTER);
+            JLabel picLabel = new JLabel(botIcon,SwingConstants.CENTER);
             
             // I don't get any error, but I'm not sure that a JLabel is required
             // to _not_  choke on negative values here..
@@ -129,9 +127,9 @@ public class PhaseEvaluationPanel extends TJPanel {
                 CAT.warn(e.getMessage(), e);
                 picLabel.setIconTextGap(0);
             }
-            picLabel.setVerticalAlignment(JLabel.TOP);
-            picLabel.setVerticalTextPosition(JLabel.BOTTOM);
-            picLabel.setHorizontalTextPosition(JLabel.CENTER);
+            picLabel.setVerticalAlignment(SwingConstants.TOP);
+            picLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
+            picLabel.setHorizontalTextPosition(SwingConstants.CENTER);
             picLabel.setForeground(botColor);
             picLabel.setFont(font);
             picLabel.setText(currentBot.getName());
@@ -196,7 +194,8 @@ public class PhaseEvaluationPanel extends TJPanel {
         PhaseEvaluationPanel pan = new PhaseEvaluationPanel(bs,rows);
         fr.getContentPane().add(pan);
         fr.pack();
-        fr.show();                
+        fr.setVisible(true);
+        //fr.show();                
     }
 }
 
