@@ -27,9 +27,6 @@ package de.botsnscouts.start;
 
 import javax.swing.DefaultComboBoxModel;
 
-import org.apache.log4j.Category;
-
-
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.TJComboBox;
 
