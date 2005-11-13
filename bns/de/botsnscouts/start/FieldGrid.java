@@ -27,8 +27,6 @@ package de.botsnscouts.start;
 
 import java.awt.GridLayout;
 
-import javax.swing.JPanel;
-
 import de.botsnscouts.util.Location;
 import de.botsnscouts.widgets.TJPanel;
 
