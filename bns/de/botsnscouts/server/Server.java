@@ -28,7 +28,6 @@ package de.botsnscouts.server;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Vector;
 
 import org.apache.log4j.Category;
@@ -963,7 +962,14 @@ ThreadMaintainer, Shutdownable {
                  *  Ask just entering bots whether they want to be powered up again.
                  */
                 for (Iterator e = curBotsThreads.iterator(); e.hasNext();) {
-                    ServerRoboterThread robThread = ((ServerRoboterThread) e.next());
+                   /*
+                    * 
+                    * java.util.ConcurrentModificationException
+                    * at java.util.AbstractList$Itr.checkForComodification(AbstractList.java:449)
+                    * at java.util.AbstractList$Itr.next(AbstractList.java:420)
+                    * at de.botsnscouts.server.Server.run(Server.java:965)
+                    */
+                	ServerRoboterThread robThread = ((ServerRoboterThread) e.next());
                     if (!robThread.rob.isActivated()) {
                         if (robThread.rob.isPoweredDownNextTurn()) {
                             //This bot just chose PowerDown.
