@@ -26,7 +26,6 @@
 package de.botsnscouts.start;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -47,6 +46,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -243,7 +243,7 @@ public class StartPanel extends JPanel {
         Insets insets = new Insets(0, 0, 20, 0);
 
         // headline for the whole box
-        JLabel label = new TJLabel(Message.say("Start", "mStartKS"), JLabel.CENTER);
+        JLabel label = new TJLabel(Message.say("Start", "mStartKS"), SwingConstants.CENTER);
         gc.weightx = 1.0;
         gc.gridx = 0;
         gc.gridwidth = 4;
@@ -257,7 +257,7 @@ public class StartPanel extends JPanel {
         panel.add(label, gc);
 
 
-        JLabel nameLabel = new TJLabel(Message.say("Start", "mKSName"), JLabel.LEFT);
+        JLabel nameLabel = new TJLabel(Message.say("Start", "mKSName"), SwingConstants.LEFT);
         gc.weightx = 0.0;
         gc.gridy++; // 3
         gc.gridx = 0;
@@ -276,7 +276,7 @@ public class StartPanel extends JPanel {
         panel.add(botNameField, gc);
 
         // headline above the intelligence slider
-        JLabel ks = new TJLabel(Message.say("Start", "mIntel"), JLabel.CENTER);
+        JLabel ks = new TJLabel(Message.say("Start", "mIntel"), SwingConstants.CENTER);
         gc.gridy++;
         gc.gridx = 1;
         gc.gridwidth = 2;
@@ -287,7 +287,7 @@ public class StartPanel extends JPanel {
         panel.add(ks, gc);
 
         // left label on the slider (intelligent)
-        JLabel lb = new TJLabel(Message.say("Start", "mSchlau"), JLabel.LEFT);
+        JLabel lb = new TJLabel(Message.say("Start", "mSchlau"), SwingConstants.LEFT);
         gc.gridy++;
         gc.gridx = 0;
         gc.weightx = 0.0;
@@ -316,7 +316,7 @@ public class StartPanel extends JPanel {
         gc.gridx = 3;
         gc.anchor = GridBagConstraints.EAST;
         gc.fill = GridBagConstraints.NONE;
-        lb = new TJLabel(Message.say("Start", "mDumm"), JLabel.RIGHT);
+        lb = new TJLabel(Message.say("Start", "mDumm"), SwingConstants.RIGHT);
         panel.add(lb, gc);
 
         // labeled "likes belts"-checkbox
@@ -376,7 +376,8 @@ public class StartPanel extends JPanel {
                 if (playersComponent.names.size() != 8) {
                     CAT.debug("Going to kick the server to get really going...");
                     parent.facade.gameStarts();
-                    parent.hide();
+                    parent.setVisible(false);
+                    //parent.hide();
                     //parent.beenden(); // will be done in playerspanel
                 }
             }

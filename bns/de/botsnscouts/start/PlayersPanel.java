@@ -37,6 +37,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
+import javax.swing.ScrollPaneConstants;
 
 import de.botsnscouts.gui.BoardView;
 import de.botsnscouts.util.Global;
@@ -65,7 +66,7 @@ class PlayersPanel extends ColoredPanel {
         JComponent p = new JPanel(new BorderLayout());
         p.setOpaque(false);
 
-        JScrollPane sp = new JScrollPane(roblist, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane sp = new JScrollPane(roblist, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         sp.setOpaque(false);
         sp.getViewport().setOpaque(false);
         sp.setBorder(OptionPane.niceBorder);
