@@ -51,7 +51,11 @@ public class Facade {
     private TileFactory tileFactory;
 
     private GameOptions gameOptions;
-
+    
+    /**
+     * Constructs a new Facade with a standard thumbnailsize
+     *
+     */
     public Facade() {
         this(180);
     }
@@ -198,6 +202,8 @@ public class Facade {
                     try {
                         setTile(i, j, rot, name);
                     } catch (FlagPresentException e) {
+                    //TODO (comment)
+                    	//dont we need a debug or something here?
                     }
                 }
             }
@@ -215,6 +221,8 @@ public class Facade {
                     addFlag(flx, fly);
                 }
             } catch (Exception e) {
+             //TODO (comment)
+            // i love these, there can be an exception, but i dont know which ;)
             }
         }
     }
