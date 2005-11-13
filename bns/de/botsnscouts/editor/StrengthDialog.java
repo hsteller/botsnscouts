@@ -63,7 +63,8 @@ class StrengthDialog extends JDialog implements ActionListener{
 	ok.addActionListener(this);
 	ok.setActionCommand("OK");
 	getContentPane().add(ok);
-	show();
+	//show();
+	setVisible(true);
     }
 
  public void actionPerformed(ActionEvent e)  {

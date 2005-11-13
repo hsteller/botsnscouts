@@ -57,7 +57,8 @@ class PhaseDialog extends JDialog implements ActionListener{
 	ok.addActionListener(this);
 	ok.setActionCommand("OK");
 	getContentPane().add(ok);
-	show();
+	setVisible(true);
+	//show();
     }
 
  public void actionPerformed(ActionEvent e)  {
