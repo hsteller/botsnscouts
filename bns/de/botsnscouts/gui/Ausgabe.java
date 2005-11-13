@@ -27,6 +27,8 @@ package de.botsnscouts.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -41,8 +43,6 @@ import javax.swing.JFrame;
 
 import org.apache.log4j.Category;
 
-
-import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.comm.ClientAntwort;
@@ -51,7 +51,6 @@ import de.botsnscouts.comm.KommException;
 import de.botsnscouts.comm.KommFutschException;
 import de.botsnscouts.comm.MessageID;
 import de.botsnscouts.server.RegistrationException;
-import de.botsnscouts.start.JoiningGameFailedException;
 import de.botsnscouts.util.BNSClientThread;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.BotVis;
@@ -375,7 +374,7 @@ public class Ausgabe extends BNSClientThread {
         fireAusgabeViewInit();
         board.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent me) {
-                if ((me.getModifiers() & MouseEvent.BUTTON3_MASK) > 0) {
+                if ((me.getModifiers() & InputEvent.BUTTON3_MASK) > 0) {
                     CAT.debug("mouse clicked in canvas " + me.getPoint());
                     Location ort = new Location();
                     BoardView brd = (BoardView) me.getSource();
@@ -567,13 +566,13 @@ public class Ausgabe extends BNSClientThread {
 
             statsWindow.pack();
         }
-        if (statsWindow.getState() == JFrame.ICONIFIED) {
+        if (statsWindow.getState() == Frame.ICONIFIED) {
             CAT.debug("iconified");
-            statsWindow.setState(JFrame.NORMAL);
+            statsWindow.setState(Frame.NORMAL);
         }
         statsWindow.toFront();
         statsWindow.setVisible(true);
-        statsWindow.show();
+        statsWindow.show(); //TODO(This one isnt necessary)
     }
 
     private void comHandleWeWereRemoved(ClientAntwort kommAntwort) throws KommException  {

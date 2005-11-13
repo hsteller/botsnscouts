@@ -77,7 +77,8 @@ public class HotKey {
   }
 
   protected void setAction(HotKeyAction action){
-    String [] values = action.getOptionalValues();
+   //TODO (remove me)
+  	String [] values = action.getOptionalValues();
     this.action = action;
    // HotKeyConf.setOptionalValues(keyName, action.getOptionalValues());
     HotKeyConf.setHotKey(this);

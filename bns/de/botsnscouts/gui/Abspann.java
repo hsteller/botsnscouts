@@ -40,7 +40,8 @@ import de.botsnscouts.util.Message;
  **/
 public class Abspann extends JPanel {
     // Konstanten
-    private static final Color foreColor = new Color(110,240,110);
+	//	TODO (use or delete me)
+	private static final Color foreColor = new Color(110,240,110);
     private final Font font1 = new Font("SansSerif",Font.BOLD,24);
     // Variablen
     public Abspann(String[] gewinnerListe) {

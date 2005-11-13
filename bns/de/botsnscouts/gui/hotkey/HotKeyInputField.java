@@ -33,7 +33,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import org.apache.log4j.Category;
@@ -52,6 +51,7 @@ public class HotKeyInputField extends TJTextField {
     public HotKeyInputField (HotKey hotkey, int size, HotKeyMan keyman){
         super(size);
         this.keyman = keyman;
+        //TODO (remove me)
         KeyStroke stroke = hotkey.getKeyStroke();     
         keyname = hotkey.getName();        
         createHotKeyEditField(hotkey);

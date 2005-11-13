@@ -30,7 +30,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics2D;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -51,7 +51,6 @@ import javax.swing.ButtonModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -61,7 +60,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
-import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Category;
@@ -79,7 +77,6 @@ import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.util.Registry;
 import de.botsnscouts.util.SoundMan;
-import de.botsnscouts.widgets.BnsOptionPane;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.PaintPanel;
 import de.botsnscouts.widgets.TJLabel;
@@ -298,12 +295,14 @@ public class AusgabeView extends PaintPanel  {
     }
 
     public void showGameStatusMessage(String s){
+//    	TODO (use or delete me)
     }
 
     /**
      * Schreibt in die Statuszeile einen Text
      */
     public void showRobStatus(Bot r){
+   //TODO (use or delete me)
     }
 
     boolean allLedReset  = true;
@@ -1016,8 +1015,8 @@ public class AusgabeView extends PaintPanel  {
 		    String message = null;	      
 		 
 	      	if (e.getSource()==customizeButton){    
-	      	  if (speedSettingEditor.getState() == JFrame.ICONIFIED) {
-	              speedSettingEditor.setState(JFrame.NORMAL);
+	      	  if (speedSettingEditor.getState() == Frame.ICONIFIED) {
+	              speedSettingEditor.setState(Frame.NORMAL);
 	          }
 	      	    speedSettingEditor.setVisible(true);
 	      	    speedSettingEditor.toFront();
@@ -1127,7 +1126,8 @@ public class AusgabeView extends PaintPanel  {
        
        void init() {
            if (robotStatus!=null){
-               int l = robotStatus.size();
+               //TODO (variable never used)
+           		int l = robotStatus.size();
                Enumeration e = robotStatus.elements();
                while (e.hasMoreElements()){
                    RobotStatus rs = (RobotStatus) e.nextElement();
@@ -1280,8 +1280,8 @@ public class AusgabeView extends PaintPanel  {
       }
  
 
-      if (hotKeyFrame.getState()==JFrame.ICONIFIED)
-        hotKeyFrame.setState(JFrame.NORMAL);
+      if (hotKeyFrame.getState()==Frame.ICONIFIED)
+        hotKeyFrame.setState(Frame.NORMAL);
 
       hotKeyFrame.toFront();
       hotKeyFrame.setVisible(true);      

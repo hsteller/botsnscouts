@@ -34,7 +34,6 @@ import java.awt.Insets;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Category;
@@ -173,7 +172,7 @@ public class HotKeyEditorPanel extends TJPanel {
     return startRow;
   }
 
-
+  //TODO (use or delete me)
   private void addLine(int startRow, int startColumn, JComponent x1, JComponent x2, JComponent x3, JComponent x4) {
     addLine (startRow,startColumn, x1,  x2,  x3,  x4, 0);
   }
