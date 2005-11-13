@@ -16,13 +16,12 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -33,7 +32,6 @@ import de.botsnscouts.gui.OkComponent;
 import de.botsnscouts.gui.Splash;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Conf;
-import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.ColoredComponent;
 import de.botsnscouts.widgets.OptionPane;
@@ -63,7 +61,7 @@ import de.botsnscouts.widgets.TJTextField;
  *
  * This will replace ParticipatePanel !!!
  *
- * TODO: i18n
+ * TODO: i18n <- ??? Dont speak leet 
  *
  * @author Miriam
  */
@@ -72,7 +70,7 @@ public class JoinGamePanel extends ColoredComponent {
     private static Category CAT = Category.getInstance(JoinGamePanel.class);
 
     private JTextField hostName = new TJTextField(Message.say("Start", "mServerInh"),
-                                        JTextField.CENTER, true);
+                                        SwingConstants.CENTER, true);
     private JTextField robName;
     private TJComboBox colors;
     private int port = GameOptions.DPORT;
@@ -240,7 +238,7 @@ public class JoinGamePanel extends ColoredComponent {
 
     private JComponent newParticipateAsPanel() {
 
-        robName = new TJTextField(Conf.getDefaultRobName(), JTextField.CENTER, true);
+        robName = new TJTextField(Conf.getDefaultRobName(), SwingConstants.CENTER, true);
         colors = new RoboBox(true);
         //colors.setOpaque(false);
         Font bigFont = new Font("Sans", Font.BOLD, 20);
