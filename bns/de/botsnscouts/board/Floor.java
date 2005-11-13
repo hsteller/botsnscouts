@@ -99,7 +99,7 @@ public class Floor implements FloorConstants {
     ///////////////////////////////////////////////////
     private Floor() {
         this.spec = 0;
-        this.type = Board.FL_NORMAL;
+        this.type = FloorConstants.FL_NORMAL;
     }
 
     public Floor getWithCrusher(int phases) {
