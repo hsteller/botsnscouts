@@ -54,7 +54,8 @@ import de.botsnscouts.widgets.TJTextField;
 public class ChatMessageEditor  {
 
   static Category CAT = Category.getInstance(ChatMessageEditor.class);
-
+  
+  //TODO (use or delete me)
   private static final String commitBoxTooltip = Message.say(HotKeyConf.MESSAGE_BUNDLE_SECTION, "autoCommitBoxTooltip");
 
   private HotKeyMan keyman;
@@ -74,7 +75,7 @@ public class ChatMessageEditor  {
     messageField.setText(message);
     autoCommitBox.setSelected(autoCommit);
   }
-
+  //TODO(is there a need for this parameters?)
   private ChatMessageEditor(HotKeyMan keyman, String hotkeyID) {
     messageField = new TJTextField("");
     autoCommitBox = new TJCheckBox("", true);
@@ -102,7 +103,7 @@ public class ChatMessageEditor  {
       key.getAction().setOptionalValues(new String [] {messageField.getText(), autoCommitBox.isSelected()+""});
 
   }
-
+  //TODO (use or delete me)
   private void initListeners(){
     autoCommitBox.addActionListener(new ActionListener(){
         public void actionPerformed(ActionEvent e) {
