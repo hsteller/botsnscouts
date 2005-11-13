@@ -108,8 +108,7 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
             
         }
         
-        public static Registry getSingletonInstance(){
-            /**todo: if (globalGameRegistry==null) globalGameRegistry=new Registry();*/
+        public static Registry getSingletonInstance(){          
         	return globalGameRegistry;
         	
         }
@@ -133,16 +132,14 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
         /**
          * Implementation of the GameStateListener Interface
          */
-        public void gameStarted(Server theServer) {
-          /**TODO: remove or use this Parameter*/
+        public void gameStarted(Server theServer) {       
         	aGameHasStarted = true;            
         }
         /**
          * Implementation of the GameStateListener Interface
          */        
         public void gameFinished(Server theServer){
-            // I don't care (yet?) as a server will also call its shutdown method in that case..
-        	/**TODO: delete or implement*/
+            // I don't care (yet?) as a server will also call its shutdown method in that case..        	
         }
         /**
          * Add a game to the registry
@@ -167,8 +164,7 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
             Game game = new Game(server, serverIp, serverPort);         
             if (server!=null){
                 server.addGameStateListener(this);
-            }
-            /** IMHO it is possible to use a Synchronized Collection, instead of "handsyncing" */
+            }           
             synchronized (games) {
                 games.add(game);
             }
@@ -533,19 +529,19 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
               
             
         }
-        //TODO (use or delete me)
-        /**
+      
+        /*//*
          *This method is never used
          * @param s
          * @return
          */
+        /*
         private static String maskWhiteSpace(String s){
         	if (s == null){
         		return null;
         	}
         	int length = s.length();
         	StringBuffer sb = new StringBuffer(length+10);
-        	//TODO (this variable is never used)
         	char space = ' ';
         	for (int i=0;i<length;i++){
         		char c = s.charAt(i);
@@ -561,6 +557,7 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
         		return s;
         	}
         }
+        */
        /**
         * This one is a heavy hack
         * Kills the VM an starts a new one
@@ -593,8 +590,7 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
 	           
 	           String cmd = binString+s3+" "+s4+" "+s1+" "+s2;
 	           CAT.debug("dir="+f.getCanonicalPath());
-	           CAT.info("EXEC: "+cmd);	       	
-	           //TODO (remove proc variable)
+	           CAT.info("EXEC: "+cmd);	       		           
 	           Process proc = run.exec(cmd);	           	          
            }
            catch (Exception e){
