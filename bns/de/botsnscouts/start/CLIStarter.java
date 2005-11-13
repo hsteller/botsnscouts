@@ -39,8 +39,8 @@ public class CLIStarter {
   /** Define the number of columns (only used for centered headlines)*/
   public static final int DISPLAY_COLS = 60;
 
-  /** The path to the spf-file that contains the gameboard*/
-  //TODO (use or delete me)
+  /** The path to the spf-file that contains the gameboard
+   * (step4StartServer will have to use it)*/
   private static String spfFilePath;
   /** The number of players in this game*/
   private static int    numberOfPlayers=8;
@@ -129,9 +129,8 @@ public class CLIStarter {
         filePath = filePath.trim();
         if (filePath.length()>0) {
           File spfFile = new File(filePath);
-          if (spfFile.exists()) {
-          	//TODO (use or delete me)
-          	spfFilePath = filePath; //and now to trash
+          if (spfFile.exists()) {          
+          	spfFilePath = filePath; 
             if (spfFile.canRead()) {
               ok = true;
             }
@@ -222,7 +221,7 @@ public class CLIStarter {
   }
 
   private static void step4StartServer() {
-     //TODO: Implement me.
+     //TODO: Implement me. Will have to use spfFilePath
 
   }
 
