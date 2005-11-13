@@ -125,6 +125,7 @@ public class H {
     }
 
     /** Diese Methode testet, ob die Datei mit dem Namen filename existiert*/
+    //TODO (remove me) does exist in the java api
     public static boolean fileExists (String filename)  {
 	try {
 	    BufferedReader in = new BufferedReader(new FileReader(filename));

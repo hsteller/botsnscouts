@@ -43,14 +43,7 @@ import java.util.LinkedList;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
-import sun.reflect.Reflection;
-
-import de.botsnscouts.util.Global;
-import de.botsnscouts.util.Message;
 
 /**
  * @author Hendrik Steller
@@ -61,7 +54,7 @@ public class BnsOptionPane extends JOptionPane{
     
    
     private BnsOptionPane(){
-        
+   //TODO (Comment me please)     
     }
     
     

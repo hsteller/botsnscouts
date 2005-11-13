@@ -49,11 +49,17 @@ public class Encoder {
     private static final Category CAT = Category.getInstance(Encoder.class);
     
     public static String encode(String toEncode) {
-        return URLEncoder.encode(toEncode);
+    	//TODO (replace me plz)
+    	/*from the source of URLEncoder:
+    	 * @deprecated The resulting string may vary depending on the platform's
+	     *             default encoding. Instead, use the encode(String,String)
+	     *             method to specify the encoding.*/
+    	return URLEncoder.encode(toEncode);
     }
     
     public static String decode (String toDecode){
-        return URLDecoder.decode(toDecode);        
+    	//TODO (replace me plz)
+    	return URLDecoder.decode(toDecode);        
     }
 
     public static String commDecode(String toDecode) {

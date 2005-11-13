@@ -25,7 +25,6 @@
  
 package de.botsnscouts.util;
 
-import java.io.BufferedReader;
 import java.util.Enumeration;
 import java.util.Hashtable;
 /**
@@ -45,7 +44,7 @@ import java.util.Hashtable;
 	 * Konfiguration aus config-File laden.
 	 */
 	public static void loadConfig() throws ConfigLoadException{
-	    BufferedReader input;
+	   // BufferedReader input;
 	    /**
 	    try {
 		InputStream istr=UserConfig.class.getResourceAsStream("conf"+File.separator+"messages."+lang);//Ludmila
@@ -167,12 +166,14 @@ import java.util.Hashtable;
 	/**
 	   Einen Wert in die Setup-Datenbank schreiben und abspeichern.
 	 */
+        //TODO (remove me, never used)
 	public static void write(String Section, String id, String value) throws ConfigLoadException{
 	    // in DB schreiben
 	    saveConfigTable();
 	    return;
 	}
 
+    //TODO (remove me, never used)
 	/**
 	   Die Einstellungen aus der Datenbank auf den Datentr�ger schreiben
 	 */

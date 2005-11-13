@@ -533,9 +533,9 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
               
             
         }
-        
+        //TODO (use or delete me)
         /**
-         * This method is never used
+         *This method is never used
          * @param s
          * @return
          */
@@ -545,7 +545,7 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
         	}
         	int length = s.length();
         	StringBuffer sb = new StringBuffer(length+10);
-        	// this variable is never used
+        	//TODO (this variable is never used)
         	char space = ' ';
         	for (int i=0;i<length;i++){
         		char c = s.charAt(i);
@@ -577,7 +577,7 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
 	           }
 	           
 	           //String jhome = p.getProperty("java.home", null);
-	           String separator = File.separator;
+	           //String separator = File.separator;
 	           String binString = "java";
 	           //if (jhome != null) {	           	 
 	          // 		binString = jhome+separator+"bin"+separator+"java";
@@ -594,7 +594,7 @@ public class Registry implements ShutdownListener, GameOverListener, GameStateLi
 	           String cmd = binString+s3+" "+s4+" "+s1+" "+s2;
 	           CAT.debug("dir="+f.getCanonicalPath());
 	           CAT.info("EXEC: "+cmd);	       	
-	           
+	           //TODO (remove proc variable)
 	           Process proc = run.exec(cmd);	           	          
            }
            catch (Exception e){

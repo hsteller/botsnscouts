@@ -26,19 +26,11 @@
 
 package de.botsnscouts.widgets;
 
-import java.awt.AWTEvent;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Paint;
-import java.awt.Stroke;
 import java.awt.TexturePaint;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
@@ -46,18 +38,18 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
 import de.botsnscouts.util.ImageMan;
 
-
+//TODO (comment me)
 public class OptionPane extends JPanel {
 
-    static Paint backgroundPaint;
+    static Paint backgroundPaint=null;
     public static Paint getBackgroundPaint(Component c) {
         if( backgroundPaint == null ) {
             ImageIcon icon = ImageMan.getIcon( "garage2.jpg");
@@ -114,7 +106,7 @@ public class OptionPane extends JPanel {
     }
 
     static JSlider getSlider(String title) {
-        JSlider button = new JSlider(JSlider.HORIZONTAL, 30, 150, 100);
+        JSlider button = new JSlider(SwingConstants.HORIZONTAL, 30, 150, 100);
         button.setMajorTickSpacing(50);
         button.setMinorTickSpacing(10);
         button.setSnapToTicks(true);
@@ -126,8 +118,8 @@ public class OptionPane extends JPanel {
         button.setBorder( BorderFactory.createTitledBorder("Zoom"));
         return button;
     }
-
-    public OptionPane(JComponent owner) {
+//TODO (use or delete me)
+    /*public OptionPane(JComponent owner) {
         super(new GridLayout(6,1));
         enableEvents( AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
         setSize(300, 400);
@@ -160,7 +152,6 @@ public class OptionPane extends JPanel {
 //        p.setBorder( BorderFactory.createEmptyBorder(50,50,50,50) );
 //        add( p, BorderLayout.CENTER );
     }
-
     public void paint(Graphics g) {
         g.setColor(getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());
@@ -174,14 +165,18 @@ public class OptionPane extends JPanel {
         g.setStroke(stroke);
         g.setColor( green );
     }
+
+   
     protected void processMouseEvent(MouseEvent e) {
-        /**todo: Override this java.awt.Component method*/
-//        super.processMouseEvent( e);
-    }
-    protected void processMouseMotionEvent(MouseEvent e) {
-        /**todo: Override this java.awt.Component method*/
-//        super.processMouseMotionEvent( e);
+        // todo: Override this java.awt.Component method
+        // super.processMouseEvent( e);
     }
 
+    protected void processMouseMotionEvent(MouseEvent e) {
+  
+  		// todo: Override this java.awt.Component method
+  		// super.processMouseMotionEvent( e);
+    }
+*/
 }
 

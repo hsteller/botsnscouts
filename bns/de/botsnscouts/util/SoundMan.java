@@ -93,7 +93,8 @@ public class SoundMan {
     //                                            LASER5,LASER6,LASER7,LASER8,LASER9,
     //                                           LASER10};
     private static final AudioClip[] sounds = new AudioClip[filenames.length];
-
+    
+    //  TODO (use or delete me)
     private static int actualLaserSound = 0;
 
     private static boolean soundsLoaded;
