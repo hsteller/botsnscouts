@@ -61,7 +61,7 @@ import de.botsnscouts.widgets.TJTextField;
  *
  * This will replace ParticipatePanel !!!
  *
- * TODO: i18n <- ??? Dont speak leet 
+ * TODO: i18n (internationalization)
  *
  * @author Miriam
  */
