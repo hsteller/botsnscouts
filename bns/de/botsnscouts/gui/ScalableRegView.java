@@ -30,7 +30,6 @@
  */
 package de.botsnscouts.gui;
 
-import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -288,7 +287,8 @@ public class ScalableRegView extends JComponent {
         System.out.println(rv.getWidth()+","+rv.getHeight());
         fr.setSize(250,600);
         System.out.println(rv.getWidth()+","+rv.getHeight());
-        fr.show();
+        fr.setVisible(true);
+        //fr.show();
         System.out.println(rv.getWidth()+","+rv.getHeight());               
     }
 }

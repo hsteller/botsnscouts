@@ -200,7 +200,8 @@ public class WinnerListPanel extends JPanel {
        fr.getContentPane().add(new JLabel("foo"), BorderLayout.EAST);
        fr.getContentPane().add(new JLabel("foo"), BorderLayout.WEST);
        fr.pack();
-       fr.show();
+       fr.setVisible(true);
+       //fr.show();
        fr.addWindowListener(new WindowAdapter(){
            public void windowClosing (WindowEvent we) {
                System.exit(0);
