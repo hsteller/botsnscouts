@@ -146,7 +146,9 @@ public class TileComponent extends JComponent implements  MouseListener, MouseMo
 		//flagge-1 -> awt:
 		//x->x*W/12 (+2)
 		//y->H-y*H/12 (-2)
-		g2d.drawString(""+flagNum[i],(int)((double)flagPos[i].x*(double)W/(double)12+2),H-(int)((double)(flagPos[i].y)*(double)H/(double)12)-2);
+		//g2d.drawString(""+flagNum[i],(int)((double)flagPos[i].x*(double)W/(double)12+2),H-(int)((double)(flagPos[i].y)*(double)H/(double)12)-2);
+		//unnecessary casts above, better and faster:
+	    g2d.drawString(""+flagNum[i],(int)((double)flagPos[i].x*(double)W/12.+2),H-(int)((double)(flagPos[i].y)*(double)H/12.)-2);
 	    }
 	}
     }
@@ -165,9 +167,13 @@ public class TileComponent extends JComponent implements  MouseListener, MouseMo
 	if (tileClickListener!=null){
 	    //awt->flagge
 	    //x->x*12/W +1
-	    int xx=(e.getX()==W?12:(int)((double)e.getX()*12.0/(double)W)+1);
+	    // int xx=(e.getX()==W?12:(int)((double)e.getX()*12.0/(double)W)+1);
+		// unnecessary casts above, better and faster:
+	    int xx=(e.getX()==W?12:(int)(e.getX()*12.0/(double)W)+1);
 	    //y->(H-y)*12/H +1
-	    int yy = (e.getY()==0?12:(int)((double)(H-e.getY())*12.0/(double)H)+1);
+	    //int yy = (e.getY()==0?12:(int)((double)(H-e.getY())*12.0/(double)H)+1);
+	    // unnecessary casts above, better and faster:
+	    int yy = (e.getY()==0?12:(int)((H-e.getY())*12.0/(double)H)+1);
 	    tileClickListener.tileClick(myX,myY,xx,yy);
 	}
     }
@@ -184,17 +190,24 @@ public class TileComponent extends JComponent implements  MouseListener, MouseMo
 	}
     }
 
-    //MouseMotionListener Methoden
+    //MouseMotionListener Methods
     public void mouseMoved(MouseEvent e){
 	if (tileClickListener!=null){
 	    //awt->flagge
 	    //x->x*12/W +1
-	    int xx=(e.getX()==W?12:(int)((double)e.getX()*12.0/(double)W)+1);
+		// int xx=(e.getX()==W?12:(int)((double)e.getX()*12.0/(double)W)+1);
+		// unnecessary casts above, better and faster:
+		int xx=(e.getX()==W?12:(int)(e.getX()*12.0/(double)W)+1);
 	    //y->(H-y)*12/H +1
-	    int yy = (e.getY()==0?12:(int)((double)(H-e.getY())*12.0/(double)H)+1);
+		//int yy = (e.getY()==0?12:(int)((double)(H-e.getY())*12.0/(double)H)+1);
+		// unnecessary casts above, better and faster:
+	    int yy = (e.getY()==0?12:(int)((H-e.getY())*12.0/(double)H)+1);
 	    tileClickListener.tileMouseMove(myX,myY,xx,yy);
 	}
     }
-    public void mouseDragged(MouseEvent e){    }
+    //TODO (remove me an use MouseAdapter)
+    public void mouseDragged(MouseEvent e){ //
+    	
+    }
 
 }

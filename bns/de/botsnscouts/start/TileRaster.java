@@ -272,7 +272,7 @@ public class TileRaster{
 	StringBuffer oben = new StringBuffer();
 	StringBuffer unten =new StringBuffer();
 	for (int i=0;i<KX;i++)
-	    for (int j=0;j<KY;tileind[i][j++]=0);
+	    for (int j=0;j<KY;tileind[i][j++]=0); //TODO (This is nasty!) We have to fix this
 	for(int j=bounds[1].y;j>=bounds[0].y;j--){
 	    for (int k=0;k<25;k++){
 		for (int i=bounds[0].x;i<=bounds[1].x;i++){
@@ -448,7 +448,7 @@ public class TileRaster{
 	Location ftile=findFirstTile();
 	boolean[][] mark=new boolean[KX][KY];
 	for (int i=0;i<KX;i++)
-	    for (int j=0;j<KY;mark[i][j]=false,j++);
+	    for (int j=0;j<KY;mark[i][j]=false,j++); //TODO (This is nasty!) We have to fix this, because it is not faster, but less readable
 	mark[ftile.x][ftile.y]=true;
 	markNachbarn(ftile,mark);
 	for (int i=0;i<KX;i++){
