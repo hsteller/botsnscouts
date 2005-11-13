@@ -34,7 +34,7 @@ import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Location;
-
+//TODO (comment me)
 public class ServerRoboterThread extends BNSThread implements Waitable {
     static final Category CAT = Category.getInstance(ServerRoboterThread.class);
 
@@ -61,7 +61,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
         okListener = ok;
         info = inf;
         robMaint = maint;
-        mode = Server.NIX;
+        mode = ModusConstants.NIX;
         komm = k;
     }
 
@@ -74,7 +74,8 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
     }
 
     private boolean isMoveValid(int[] regs) {
-        if (regs == null) {
+     //TODO (clean up the spaghetti(code) here)
+    	if (regs == null) {
             CAT.error("move for robot "+rob.getName()+" was null");
             return false;
         }       
@@ -115,7 +116,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                         int m = mode;
                         switch (ans.typ) {
                             case ServerAntwort.PROGRAMMIERUNG:
-                                if (m != Server.PROGRAMMIERUNG) {
+                                if (m != ModusConstants.PROGRAMMIERUNG) {
                                     d("RULE VIOLATION by "+rob.getName());
                                     d("\treceived programming in mode " + m + "; byebye!");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
@@ -142,19 +143,19 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 break;
 
                             case ServerAntwort.AUSRICHTUNG:
-                                if ((m != Server.INITAUSR) && (m != Server.ZERSTOERT_SYNC)
-                                                && (m != Server.ZERSTOERT_ASYNC)) {
+                                if ((m != ModusConstants.INITAUSR) && (m != ModusConstants.ZERSTOERT_SYNC)
+                                                && (m != ModusConstants.ZERSTOERT_ASYNC)) {
                                     d("RV: received direction choice in mode " + m + "; byebye!");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
                                     break;
                                 }
                                 rob.setFacing(ans.wohin);
-                                if (m == Server.ZERSTOERT_SYNC || m == Server.ZERSTOERT_ASYNC) {
+                                if (m == ModusConstants.ZERSTOERT_SYNC || m == ModusConstants.ZERSTOERT_ASYNC) {
                                     // Implizit synchronized
                                     robMaint.reEntry(this);
 
-                                    if (m == Server.ZERSTOERT_SYNC)
+                                    if (m == ModusConstants.ZERSTOERT_SYNC)
                                         notifyServer();
 
                                 }
@@ -164,7 +165,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 break;
 
                             case ServerAntwort.REAKTIVIERUNG:
-                                if (m != Server.POWERUP) {
+                                if (m != ModusConstants.POWERUP) {
                                     d("RV: received reactivation in mode " + m + "; byebye!");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
@@ -177,7 +178,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 break;
 
                             case ServerAntwort.REPARATUR:
-                                if (m != Server.ENTSPERREN) {
+                                if (m != ModusConstants.ENTSPERREN) {
                                     d("RV: received register repait in mode " + m + "; byebye!");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
@@ -203,7 +204,7 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 break;
 
                             case ServerAntwort.AENDERUNGFERTIG:
-                                if ((m != Server.SPIELSTART) && (m != Server.SPIELENDE)) {
+                                if ((m != ModusConstants.SPIELSTART) && (m != ModusConstants.SPIELENDE)) {
                                     d("RV:received  OK in mode " + m + " ;byebye!");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
@@ -230,13 +231,13 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 break;
 
                             case ServerAntwort.GIBROBOTERPOS:
-                                if ((m == Server.SPIELSTART) || (m == Server.SPIELENDE) || (m == Server.NIX)) {
+                                if ((m == ModusConstants.SPIELSTART) || (m == ModusConstants.SPIELENDE) || (m == ModusConstants.NIX)) {
                                     d("RV: habe GibRoboterPos im Modus " + m + " erhalten; und tschuess");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
                                     return;
                                 }
-                                if (((m == Server.ZERSTOERT_SYNC) || (m == Server.ZERSTOERT_ASYNC))
+                                if (((m == ModusConstants.ZERSTOERT_SYNC) || (m == ModusConstants.ZERSTOERT_ASYNC))
                                                 && (!ans.name.equals(rob.getName()))) {
                                     d("RV: habe GibRoboterPos fuer nicht-mich im Modus " + m
                                                     + " erhalten; und tschuess");
@@ -260,13 +261,13 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 break;
 
                             case ServerAntwort.GIBROBSTATUS:
-                                if ((m == Server.SPIELSTART) || (m == Server.SPIELENDE) || (m == Server.NIX)) {
+                                if ((m == ModusConstants.SPIELSTART) || (m == ModusConstants.SPIELENDE) || (m == ModusConstants.NIX)) {
                                     d("RV: habe GibRobStatus im Modus " + m + " erhalten; und tschuess");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
                                     return;
                                 }
-                                if (((m == Server.ZERSTOERT_SYNC) || (m == Server.ZERSTOERT_ASYNC))
+                                if (((m == ModusConstants.ZERSTOERT_SYNC) || (m == ModusConstants.ZERSTOERT_ASYNC))
                                                 && (!ans.name.equals(rob.getName()))) {
                                     d("RV: habe GibRobStatus fuer nicht-mich im Modus " + m + " erhalten; und tschuess");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);

@@ -71,6 +71,7 @@ public class StatusLog  extends JPanel implements ActionListener{
     static Category CAT = Category.getInstance(StatusLog.class);
 
     // Objects
+    //TODO (remove me)
     private JTextArea textArea = new JTextArea();
     private JLabel singleMessage = new TJLabel();
 
@@ -83,7 +84,7 @@ public class StatusLog  extends JPanel implements ActionListener{
         ta.insert(s+"\n", 0);
     }
 
-
+//  TODO (use or delete me)
     private void d(String s){
 	Global.debug(this, s);
     }
@@ -142,8 +143,8 @@ public class StatusLog  extends JPanel implements ActionListener{
                 }
 		first = false;
 	    }
-            this.setVisible(true);
-	    this.show();
+        this.setVisible(true);
+	    this.show(); //TODO (remove show)
 	}
 	public void finalize() throws Throwable{
 	    super.finalize();

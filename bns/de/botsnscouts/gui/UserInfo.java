@@ -57,6 +57,7 @@ public class UserInfo extends TJPanel {
 
     public UserInfo(JButton addToTheBottomIfNotNull ) {
 		BoxLayout b = new BoxLayout(this,BoxLayout.Y_AXIS);
+		//TODO(This button is never adedd)
 		JButton weiter=new TJButton(Message.say("SpielerMensch","weiterspielen"));
 		for (int i =0; i < 10; i++) {
 		    JLabel l = new TJLabel("");
@@ -87,7 +88,7 @@ public class UserInfo extends TJPanel {
 		StringTokenizer st = new StringTokenizer(s);
 		StringBuffer subString = new StringBuffer(textWidth);
 		String token ="";
-		int length = 0;
+		//int length = 0;
 		int index = 0;
 		while (st.hasMoreTokens()) {
 		    token = st.nextToken();

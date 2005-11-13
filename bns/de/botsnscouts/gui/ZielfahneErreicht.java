@@ -35,7 +35,7 @@ import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.TJLabel;
@@ -54,10 +54,12 @@ import de.botsnscouts.widgets.TJPanel;
  */
 public class ZielfahneErreicht extends TJPanel{
 
+	//	TODO (use or delete me)
     private static final Color backColor = new Color(4,64,4);
+    //  TODO (use or delete me)
     private static final Color foreColor2 = new Color(140,255,140);
 
-  
+    //  TODO (comment me)
     public ZielfahneErreicht() {
         //this("",false);
     }
@@ -82,7 +84,7 @@ public class ZielfahneErreicht extends TJPanel{
         gcs.insets.bottom = 5;        
         gcs.insets.top = 0;
         gcs.fill = GridBagConstraints.NONE;    
-        int align = JLabel.CENTER;
+        int align = SwingConstants.CENTER;
         for (int i=0;i<numOfChars;i++){            
             TJLabel l = new TJLabel(""+bigVerticalMessage.charAt(i),align,col);        
             l.setFont(big);
@@ -95,7 +97,7 @@ public class ZielfahneErreicht extends TJPanel{
             gcs.gridx=0;
             gcs.insets.top = 20;
             Font small = new Font("Sans",Font.PLAIN, 10);
-            TJLabel l = new TJLabel(removalReason,JLabel.CENTER);
+            TJLabel l = new TJLabel(removalReason,SwingConstants.CENTER);
             l.setFont(small);   
             add(l, gcs);
         }
@@ -108,7 +110,7 @@ public class ZielfahneErreicht extends TJPanel{
     public Dimension getPreferredSize() {
 	return new Dimension(180,550);
     }
-
+    //TODO (Why do we have a main here? Testing purposes?)
     public static void main (String args[]) {
 		Message.setLanguage("deutsch");
 		Frame f = new Frame("Test");

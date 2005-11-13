@@ -40,6 +40,7 @@ public class CLIStarter {
   public static final int DISPLAY_COLS = 60;
 
   /** The path to the spf-file that contains the gameboard*/
+  //TODO (use or delete me)
   private static String spfFilePath;
   /** The number of players in this game*/
   private static int    numberOfPlayers=8;
@@ -129,7 +130,8 @@ public class CLIStarter {
         if (filePath.length()>0) {
           File spfFile = new File(filePath);
           if (spfFile.exists()) {
-            spfFilePath = filePath;
+          	//TODO (use or delete me)
+          	spfFilePath = filePath; //and now to trash
             if (spfFile.canRead()) {
               ok = true;
             }
