@@ -129,7 +129,7 @@ public class AdvDistanceCalculator extends DistanceCalculator {
         relax(dist, x, y, rotateright(facing), x, y, facing, TURN_COST);
 
         // m1
-        Floor target;
+        //Floor target;
         // We have to look into the 'next square' to apply belt modifiers
         // properly.
         if (!hasNorthWall(x, y))
