@@ -43,7 +43,7 @@ public class GameOptions {
 
     static {
         String stmp;
-        int tmp;
+        //int tmp;
         stmp = Conf.getProperty("server.IP");
         try {
             stmp = (stmp == null ? InetAddress.getLocalHost().getHostAddress() : stmp);
@@ -304,7 +304,7 @@ public class GameOptions {
     public String toString() {
         return "numberPlayers=" + maxPlayers + ", registrationPort" + registrationPort + "...";
     }
-
+    //TODO (Check if we can remove this exception, cos it isnt actually thrown here)
     public XMLElement toXML() throws UnknownHostException {
         XMLElement xml = new XMLElement();
         xml.setName("game");

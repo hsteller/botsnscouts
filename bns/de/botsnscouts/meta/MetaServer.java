@@ -60,7 +60,8 @@ public class MetaServer {
     static MetaServer getInstance() {
        return theInstance;
     }
-
+    
+    //TODO (Check if we can remove this exception, cos it isnt actually thrown here)
     /** Request to announce a game.
      *  Will only be fullfilled after checking that the named server is really a BNS server and
      *  that it is accessible.
@@ -137,7 +138,7 @@ public class MetaServer {
         answer.setContent(s);
         return answer;
     }
-
+    //TODO (Check if we can remove this exception, cos it isnt actually thrown here)
     /** Handle a request that queries running games. */
     XMLElement query( XMLElement request ) throws IOException {
         debug("query received.");
@@ -152,6 +153,7 @@ public class MetaServer {
         return list;
     }
 
+    //TODO (Check if we can remove this exception, cos it isnt actually thrown here)
     /** Handle request about server statistics*/
     XMLElement stat( XMLElement request ) throws IOException {
         debug("stat received");

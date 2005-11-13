@@ -48,6 +48,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.CropperField2;
@@ -72,6 +73,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
     private FlagBar flagBar2 = new FlagBar();
     private StatusRobot statusRobot1; // must not be initialized here because it needs the bot images that might not be loaded yet
     private JButton diskButton1 = new JButton();
+    //  TODO (use or delete me)   
     private int viz;
     private int ranking = 0;
     private Bot robot;
@@ -304,7 +306,7 @@ public class RobotInfo extends JComponent  implements RobotStatus, ActionListene
         JFrame frame = new JFrame("damage");
         frame.setSize(500, 100);
         frame.getContentPane().setLayout( new BorderLayout() );
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Box b = Box.createHorizontalBox();
         for(int i=0; i<6; i++) {
             Bot robot = Bot.getNewInstance("TestRob " + i);

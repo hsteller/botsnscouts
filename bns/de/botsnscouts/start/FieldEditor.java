@@ -253,7 +253,8 @@ public class FieldEditor extends TJPanel implements ActionListener, TileClickLis
             spf.rasterChanged();
 
             parent.gameFieldPanel.unrollOverButs();
-            parent.show();
+            parent.show(); //TODO (setVisi(true) and we need to get rid of the parent thing cos this cant be handled properly)
+            
         } else if (e.getActionCommand().equals("flSetzen")) {
             currentMode = MODE_FLAGGE_SETZEN;
         } else if (e.getActionCommand().equals("flEntfernen")) {

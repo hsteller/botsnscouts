@@ -57,6 +57,7 @@ public class RepairRegisters extends TJPanel implements ActionListener{
     private JLabel title;
     
     private int toAssign=0;
+    //  TODO (use or delete me)
     private int repairPoints=0;
     
     private ArrayList registers;

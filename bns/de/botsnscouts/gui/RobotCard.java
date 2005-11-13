@@ -38,8 +38,9 @@ import de.botsnscouts.util.ImageMan;
 
 
 public class RobotCard extends JPanel {
-
+	//	TODO (use or delete me)
     private JLabel name;
+    //  TODO (use or delete me)
     private JPanel cards;
 
     public RobotCard(Bot r) {

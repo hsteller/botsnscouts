@@ -49,7 +49,8 @@ class ServerAusgabeThread extends BNSThread implements Waitable
     private boolean ende;
     private int mode;
     private boolean clientHasDeregistered = false;
-   private float version;
+    //  TODO (use or delete me)
+    private float version;
     
     synchronized void setMode(int i){
         mode=i;
