@@ -84,7 +84,7 @@ public class Facade {
     }
 
     /**
-     * Rotates the tile 90� left
+     * Rotates the tile 90 deg left
      */
     public void rotTile(int x, int y) {
         tileRaster.rotTile(x, y);
