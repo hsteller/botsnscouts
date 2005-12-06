@@ -53,11 +53,6 @@ public class Launcher implements RegistrationStartListener{
      *  ParticipateInAGame will use this method to synchronize on so that the  player
      *  won't be launched until the server has signaled that the registration has started. 
      */
-    /* THIS is really insecure! I wasted years in searching for NullPExcp, because if this
-     * construct. The order of instanciation isnt that transparent, so lets use the standard 
-     * way for singleton.
-     * TODO (make me singleton)
-     */
     private static  Launcher meTheLauncher = new Launcher();
     
     // launches output

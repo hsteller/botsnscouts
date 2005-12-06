@@ -40,8 +40,8 @@ import org.apache.log4j.Category;
 /**
  * @author hendrik
  *
- * To reduce the deprecation warnings for using URLEncoder.encode(String)/URLDecoder.decode(String);
- * tp handle all encoding/decoding in one place.. 
+ * To reduce the deprecation warnings for using URLEncoder.encode(String)/URLDecoder.decode(String);<br>
+ * to  handle all encoding/decoding in one place.. 
  *
  */
 public class Encoder {
