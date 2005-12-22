@@ -136,9 +136,9 @@ public abstract class DistanceCalculator {
         if (facing==0) {
             return 3;
         }    
-        else {
-            return --facing;
-        }
+      //  else {
+        return --facing;
+      //  }
         
     }
 

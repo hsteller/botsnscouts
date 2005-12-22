@@ -56,58 +56,56 @@ public class SimpleDistanceCalculator extends DistanceCalculator {
 
         if (distances[m][x][y] == 0) {
             return 0;
-        } else {
-            switch (facing) {
-                case Directions.NORTH:
-                    if ((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y))) {
-                        return distances[m][x][y];
-                    } else {
-                        if (((distances[m][x - 1][y] < distances[m][x][y]) && (!hasWestWall(x, y))) ||
-                                ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y)))) {
-                            return distances[m][x][y] + 1;
-                        } else {
-                            return distances[m][x][y] + 2;
-                        }
-                    }
-
-                case Directions.EAST:
-                    if ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) {
-                        return distances[m][x][y];
-                    } else {
-                        if (((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y))) ||
-                                ((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y)))) {
-                            return distances[m][x][y] + 1;
-                        } else {
-                            return distances[m][x][y] + 2;
-                        }
-                    }
-
-                case Directions.SOUTH:
-                    if ((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y))) {
-                        return distances[m][x][y];
-                    } else {
-                        if (((distances[m][x - 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) ||
-                                ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y)))) {
-                            return distances[m][x][y] + 1;
-                        } else {
-                            return distances[m][x][y] + 2;
-                        }
-                    }
-
-                case Directions.WEST:
-                    if ((distances[m][x - 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) {
-                        return distances[m][x][y];
-                    } else {
-                        if (((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y))) ||
-                                ((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y)))) {
-                            return distances[m][x][y] + 1;
-                        } else {
-                            return distances[m][x][y] + 2;
-                        }
-                    }
-
-            }
         }
+		switch (facing) {
+		    case Directions.NORTH:
+		        if ((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y))) {
+		            return distances[m][x][y];
+		        } 
+		            if (((distances[m][x - 1][y] < distances[m][x][y]) && (!hasWestWall(x, y))) ||
+		                    ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y)))) {
+		                return distances[m][x][y] + 1;
+		            } 
+		                return distances[m][x][y] + 2;
+		            
+		        
+
+		    case Directions.EAST:
+		        if ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) {
+		            return distances[m][x][y];
+		        } 
+		            if (((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y))) ||
+		                    ((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y)))) {
+		                return distances[m][x][y] + 1;
+		            } 
+		                return distances[m][x][y] + 2;
+		            
+		        
+
+		    case Directions.SOUTH:
+		        if ((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y))) {
+		            return distances[m][x][y];
+		        } 
+		            if (((distances[m][x - 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) ||
+		                    ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y)))) {
+		                return distances[m][x][y] + 1;
+		            } 
+		                return distances[m][x][y] + 2;
+		            
+		        
+
+		    case Directions.WEST:
+		        if ((distances[m][x - 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) {
+		            return distances[m][x][y];
+		        } 
+		            if (((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y))) ||
+		                    ((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y)))) {
+		                return distances[m][x][y] + 1;
+		            }
+					return distances[m][x][y] + 2;
+		        
+
+		}
         CAT.error("reached unreachable!");
         return 10000;
         // never reached

@@ -355,7 +355,7 @@ public class KommClient implements Shutdownable{
                 throw new KommFutschException("warte() received null");
             return wait2(rein);
         }
-        else {// we have an old NTC waiting for being processed
+    //    else {// we have an old NTC waiting for being processed
             
             gotNTC=false;
             if ((debug!=null)&&(log)) {
@@ -364,7 +364,7 @@ public class KommClient implements Shutdownable{
             }
             return wait2(strNTC);
         }
-    }
+    //}
     
     /** This method does all the String parsing.
      */
@@ -425,11 +425,11 @@ public class KommClient implements Shutdownable{
                             }
                             
                         }
-                        else  {
+                      //  else  {
                             error =true;
                             errormesg="probably a wrong String ";
                             break;
-                        }
+                      //  }
                     }
                     case 'M': {
                         if ((nd=='S')&&(rd=='G')) { // some generic info message                            
@@ -553,22 +553,22 @@ public class KommClient implements Shutdownable{
                                 back.typ=ClientAntwort.ZERSTOERUNG;
                                 break;
                             }
-                            else {
+                       //     else {
                                 error=true;
                                 errormesg="MN-> danach kein R";
                                 break;
-                            }
+                         //   }
                         }
                         else if (nd=='B') {
                             if (rd=='D') { // power up  again?
                                 back.typ=ClientAntwort.REAKTIVIERUNG;
                                 break;
                             }
-                            else {
+                         //   else {
                                 error=true;
                                 errormesg="MB-> danach kein D";
                                 break;
-                            }
+                          //  }
                         }
                         else {
                             error =true;
@@ -759,13 +759,13 @@ public class KommClient implements Shutdownable{
         }
         if (!error)
             return back;
-        else {
+       // else {
             throw new KommException ("Fehler bei kommClient-warte:\n"+errormesg);
-        }
+       // }
         
     }
     /** This method is used to tell the server that the client wants to quit
-     @param name The name of the client UPDATE: WILL BE IGNORED
+     @param name The name of the client UPDATE: WILL BE IGNORED lol
      
      */
     public void abmelden (String name) {        
@@ -828,7 +828,7 @@ public class KommClient implements Shutdownable{
               CAT.error("Answer is null");
               return false;
             }
-            else {
+          //  else {
                 String answerLC = antwort.toLowerCase();
                 if (answerLC.equals("ok")){
                     return true;
@@ -839,7 +839,7 @@ public class KommClient implements Shutdownable{
                 else {
                 	throw new KommException("Wrong return value for server registration request: "+antwort);
                 }
-            }
+            //}
         }
         catch (IOException ie) {
             throw new KommException ("Error registering at the server: IOException during read: "
@@ -1195,7 +1195,7 @@ public class KommClient implements Shutdownable{
         if (xyz.typ==ClientAntwort.SPIELSTATUS){
             if (xyz.ok==false) 
                 return null;
-            else
+         //   else
                 return xyz.stati;
         }
         else if (xyz.typ!=0)
@@ -1256,7 +1256,7 @@ public class KommClient implements Shutdownable{
         xyz=wait2(com);
         if (xyz.typ==ClientAntwort.TIMEOUT)
             return xyz.zahl;
-        else
+        //else
             throw new KommException ("getTimeOut: falsche Antwort(Typ: "+xyz.typ+")");
     }
     /** Antwort auf spielstart*/
@@ -1382,7 +1382,7 @@ public class KommClient implements Shutdownable{
         //Fall ((,)):
         if (str.length()<=5)
             return back;
-        else {
+        //else {
             String active = str.substring(2);
             active+="**";
             while (active.length()>4){
@@ -1422,7 +1422,7 @@ public class KommClient implements Shutdownable{
             }
             
             return back;
-        }
+        //}
     }
     /** Gibt die Position (in com) hinter der  ')' des ersten Vorkommens von ")("zurueck;
      gibt es keinen substring ")(", so wird -1 zurueckgegeben.
