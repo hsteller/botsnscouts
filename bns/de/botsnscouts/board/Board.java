@@ -49,7 +49,7 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
     static org.apache.log4j.Category sCAT = org.apache.log4j.Category.getInstance(Board.class);
 
     /** Preview-Image is possibly saved along with the tile */
-    protected java.awt.Image img;
+    private java.awt.Image img;
 
     /** Die Spielfeldgroesse */
     protected int sizeX,sizeY;
@@ -61,13 +61,13 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
     private Floor[][] floor;
 
     private Wall[][] vWall;    // vertikal walls
-    protected Wall[][] hWall;    // horizontal walls
+    private Wall[][] hWall;    // horizontal walls
 
     protected Location[] flags;
-    protected String flagErrors;
+    private String flagErrors;
 
     /** Sicherungskopie des Spielfeldstrings */
-    protected String boardAsString;
+    private String boardAsString;
 
     public int getSizeX() {
         return sizeX;
@@ -169,7 +169,10 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
 //
 //	SpielfeldString = getComputedString();
 //    }
-
+    
+    /**
+     * Initializes a new Board
+     */
     public Board(int x, int y, String map, Location[] flags) throws FormatException, FlagException {
         CAT.debug("new Board called");
         sizeX = x;
@@ -219,6 +222,11 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
         }
     }
 
+    /**
+     * checks if flag are placed according to the rules or throws
+     * exception otherwise and checks flags are placed to near to a wall
+     * or are affected by belts 
+    */
     protected void checkFlaggen(Location[] f) throws FlagException {
         // prueft ob Flaggen regelkonform plaziert sind (sonst Exception)
         // und ob sie "gut" sind - sonst kann man die Probleme mit
@@ -333,7 +341,10 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
     public Location[] getFlags() {
         return flags;
     }
-
+    /**
+     * This return the MAP as String
+     * @return The game map in the network-specified string
+     */
     public String getBoardAsString() {
         return boardAsString;
     }
@@ -347,19 +358,19 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
     protected final static void pn(String s) {
         sCAT.debug(s);
     }
-
+    //used by Distance Calculator
     public boolean hasNorthWall(int x, int y) {
         return nw(x, y).isExisting();
     }
-
+    //used by Distance Calculator
     public boolean hasSouthWall(int x, int y) {
         return sw(x, y).isExisting();
     }
-
+    //used by Distance Calculator
     public boolean hasWestWall(int x, int y) {
         return ww(x, y).isExisting();
     }
-
+    //used by Distance Calculator
     public boolean hasEastWall(int x, int y) {
         return ew(x, y).isExisting();
     }
@@ -488,7 +499,13 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
             p("");
         }
     }
-
+    
+    /**
+     * Reads a board from a file
+     * @param file contains a board
+     * @return the board 
+     * @throws IOException if loading fails
+     */
     public static String readMagicString(File file) throws IOException {
         BufferedReader kachReader = new BufferedReader(new InputStreamReader(
                                                        new FileInputStream(file)));
