@@ -37,8 +37,13 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.JViewport;
+
+import org.apache.log4j.Category;
 
 /**
  * @author Hendrik Steller
@@ -50,68 +55,71 @@ import javax.swing.JViewport;
  * of this textbox can be customized by using the appropriate setter methods.
  * 
  */
+@SuppressWarnings("serial")
 public class ViewportWithMessage extends JViewport {
 
-    
-    
-// default values might not make sense, only given to ensure that there is no NullPointerEx.
-// it would be cool to calculate the size of the textbox by using textlength and font size but
-// I'm not sure if that results in valid and good looking values on all operating systems.. 
+          
    private boolean isTextToBeWritten = false;
    private String theText = "";
+   private Font textFont = new Font("times", Font.BOLD, 12); // yeah, that's small and will be overwritten
    
    private Color boxColor =  Color.GREEN;
    private Color textColor = Color.RED;
    private Color borderColor = Color.BLACK;
    private AlphaComposite boxComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
    private AlphaComposite textComposite = AlphaComposite.getInstance(AlphaComposite.SRC);
-   // the following values were pulled out of my <insert body part>..:
-   private Font textFont = new Font("times", Font.BOLD, 12);
-   private Rectangle dimensionOfTextBox = new Rectangle(0,0,300,100);
-   private int textInsetLeft = 25;
-   
+
+
+  
     public void paint (Graphics g){
          super.paint(g);
          if (!isTextToBeWritten) {
              return;
          }
-         
+     
          Graphics2D dbg = (Graphics2D) g;
          Font oldFont = dbg.getFont();
          Composite oldComp = dbg.getComposite();
-         
+                           
+         FontRenderContext frc = dbg.getFontRenderContext();
+         TextLayout layout = new TextLayout(theText, textFont, frc);
+         Rectangle2D textBounds = layout.getBounds();
          Rectangle rect = this.getVisibleRect();         
-          int x1 = (int)rect.getCenterX();
-          int y1 = (int)rect.getCenterY();
-          int boxWidth = dimensionOfTextBox.width;
-          int boxHeight = dimensionOfTextBox.height;
-          
-          // coordinates for the upper left corner of  the surrounding box:
-          int boxX = x1 - boxWidth/2; 
-          int boxY = y1 - textFont.getSize();
-          // (x,y) coordinates for "drawString"
-          int textX = boxX+textInsetLeft;	
-          int textY  = y1;
-          
-          
+         int x1 = (int)rect.getCenterX();
+         int y1 = (int)rect.getCenterY();
+  
+         int inset = 30;
+         int textW =  (int) textBounds.getWidth();
+         int textH =   (int) textBounds.getHeight();
+         int textX =  x1 - (textW+inset)/2;
+         int textY = y1 - (textH+inset)/2; 
+         int boxX = textX - inset/2; 
+         int boxY =  textY - inset/2 - textH; // "- textH": I guess the TextLayout y coordinate is the baseline of the text, not the y coordinate of its surrounding box..          
+         int boxH = textH+inset;
+         int boxW =textW+inset+10; // the width returned by bounds is a bit off (the text doesn't even fit in); 
+                                                       // while the inset will make the text fit into the box, adding those 10 pixels will make it look a bit more centered
+                  
           // painting the box, starting with the background:
           dbg.setComposite(boxComposite);
-          dbg.setColor(boxColor);
-          dbg.fillRect(boxX, boxY, boxWidth, boxHeight); 
+          dbg.setColor(boxColor);         
+          dbg.fillRect(boxX,boxY,boxW,boxH);
           // painting the border of the box: 
           dbg.setComposite(textComposite);
           dbg.setColor(borderColor);
-          dbg.drawRect(boxX, boxY, boxWidth, boxHeight); 
+          dbg.drawRect(boxX, boxY, boxW, boxH); 
           // painting the text:
-          dbg.setColor(textColor);          
-          dbg.setFont(textFont);
-          dbg.drawString(theText,textX,textY);
-          
+          dbg.setComposite(textComposite);
+          dbg.setColor(textColor);       
+          textBounds.setRect(textX, textY,textW,textH);
+          layout.draw(dbg, textX, textY);
+      
           // cleanUp, as BoardView (sometimes) assumes "sane" values atm (at least for the font)..
           dbg.setFont(oldFont);
           dbg.setComposite(oldComp);
-        
+       
     }
+    
+ 
     
     public Color getBoxColor() {
         return boxColor;
@@ -154,25 +162,13 @@ public class ViewportWithMessage extends JViewport {
     }
     public void setTheText(String textToBeWritten) {
         this.theText = textToBeWritten;
+    }    
+    public Color getBorderColor() {
+        return borderColor;
     }
-    
-public Color getBorderColor() {
-    return borderColor;
-}
-public void setBorderColor(Color borderColor) {
-    this.borderColor = borderColor;
-}
-public Rectangle getDimensionOfTextBox() {
-    return dimensionOfTextBox;
-}
-public void setDimensionOfTextBox(Rectangle dimensionOfTextBox) {
-    this.dimensionOfTextBox = dimensionOfTextBox;
-}
-public int getTextInsetLeft() {
-    return textInsetLeft;
-}
-public void setTextInsetLeft(int textInsetLeft) {
-    this.textInsetLeft = textInsetLeft;
-}
+    public void setBorderColor(Color borderColor) {
+        this.borderColor = borderColor;
+    }
+
 }
 

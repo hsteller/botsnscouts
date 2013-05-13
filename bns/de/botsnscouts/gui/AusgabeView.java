@@ -83,6 +83,7 @@ import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJPanel;
 import de.botsnscouts.widgets.ViewportWithMessage;
 
+@SuppressWarnings("serial")
 public class AusgabeView extends PaintPanel  {
     static Category CAT = Category.getInstance(AusgabeView.class);
 
@@ -97,8 +98,8 @@ public class AusgabeView extends PaintPanel  {
     private ViewportWithMessage gameBoardView;
     private BoardView  gameBoardCanvas;
     private Ausgabe   ausgabe;
-    private Hashtable robotStatus = new Hashtable(8);
-    private Hashtable robotCardStatus = new Hashtable(8);
+    private Hashtable<String,RobotInfo> robotStatus = new Hashtable<String,RobotInfo>(8);
+    private Hashtable <String,RobotCard>robotCardStatus = new Hashtable<String,RobotCard>(8);
    
 
     
@@ -168,8 +169,8 @@ public class AusgabeView extends PaintPanel  {
 		    final String robotName = robots[i].getName();
 		    // not for the status panel, but while I am already looping over the bots..
 		    phaseEvalRows[i] = ausgabe.getInfoRegistersForBot(robotName);		    
-			RobotInfo r = new RobotInfo(robots[i], flagCount, ausgabe.getTooltipRegistersForBot(robotName));
-			r.addRobotInfoListener(new RobotInfoListener() {
+			RobotInfo rinfo = new RobotInfo(robots[i], flagCount, ausgabe.getTooltipRegistersForBot(robotName));
+			rinfo.addRobotInfoListener(new RobotInfoListener() {
 				public void robotClicked(RobotInfoEvent rie) {
 				    Bot robot = ((RobotInfo) rie.getSource()).getRobot();
 					showPos(robot.getX(), robot.getY(),true, false);
@@ -187,8 +188,8 @@ public class AusgabeView extends PaintPanel  {
 							true, false);
 				}
 			});
-			robotsStatusContainer.add(r);
-			robotStatus.put(robots[i].getName(), r);			
+			robotsStatusContainer.add(rinfo);
+			robotStatus.put(robots[i].getName(), rinfo);			
 			RobotCard rc = new RobotCard(robots[i]);
 			robotsCardContainer.add(rc);
 			robotsCardContainer.setOpaque(false);
@@ -235,10 +236,7 @@ public class AusgabeView extends PaintPanel  {
         gameBoardView.setBoxColor(new Color(64,181,64));        
         gameBoardView.setBorderColor(Color.BLACK);                
         gameBoardView.setTextComposite(BoardView.AC_SRC);
-        gameBoardView.setBoxComposite(BoardView.AC_SRC_OVER_07);
-        gameBoardView.setDimensionOfTextBox(new Rectangle(0,0,490,110));
-        gameBoardView.setTextInsetLeft(25);
-        
+        gameBoardView.setBoxComposite(BoardView.AC_SRC_OVER_07);                
     }
     
     public static final String PROPERTY_DEFAULT_SPEED="defaultAnimationSetting";
@@ -294,20 +292,11 @@ public class AusgabeView extends PaintPanel  {
         }
     }
 
-    public void showGameStatusMessage(String s){
-//    	TODO (use or delete me)
-    }
 
-    /**
-     * Schreibt in die Statuszeile einen Text
-     */
-    public void showRobStatus(Bot r){
-   //TODO (use or delete me)
-    }
 
     boolean allLedReset  = true;
     public void notifyBotProgrammingDone(Bot bot) {
-        RobotInfo ri = (RobotInfo)robotStatus.get( bot.getName() );
+        RobotInfo ri = robotStatus.get( bot.getName() );
         ri.setLedOn(true);
         SoundMan.playSound(SoundMan.PROGRAMMING_DONE);
         ri.repaint();
@@ -320,9 +309,9 @@ public class AusgabeView extends PaintPanel  {
             return;
         }
 
-        Collection c = robotStatus.values();
-        for (Iterator iterator = c.iterator(); iterator.hasNext();) {
-            RobotInfo info = (RobotInfo) iterator.next();
+        Collection<RobotInfo> c = robotStatus.values();
+        for (Iterator<RobotInfo> iterator = c.iterator(); iterator.hasNext();) {
+            RobotInfo info = iterator.next();
             info.setLedOn(false);
         }
         northPanel.repaint();
@@ -343,8 +332,8 @@ public class AusgabeView extends PaintPanel  {
 	    for (int i = 0; i < count; i++) {
 	        Bot b = r[i];
 	        String name = b.getName();
-		    ((RobotStatus) robotStatus.get(name)).updateRobot(b);
-		    ((RobotCard) robotCardStatus.get(name)).updateRobot(b);		
+		    robotStatus.get(name).updateRobot(b);
+		    robotCardStatus.get(name).updateRobot(b);		
 		}  
 	}
 
@@ -708,6 +697,7 @@ public class AusgabeView extends PaintPanel  {
         }
     }
     
+
     private class ViewMenu extends JMenu  {
         
        
@@ -763,10 +753,10 @@ public class AusgabeView extends PaintPanel  {
             addSeparator();
             
             botBoxes = new BotCheckBoxMenuItem[robotStatus.size()];
-            Enumeration e = robotStatus.elements();                        
+            Enumeration<RobotInfo> e = robotStatus.elements();                        
             int i=0;
             while (e.hasMoreElements()){
-                RobotStatus rs = (RobotStatus) e.nextElement();
+                RobotStatus rs = e.nextElement();
                 Bot robot = rs.getRobot();
                 BotCheckBoxMenuItem box =createCheckBoxItemForBot(robot); 
                 botBoxes[i++] = box;
@@ -886,6 +876,7 @@ public class AusgabeView extends PaintPanel  {
 
     }
 
+
     private class TrackMenu extends JMenu{
     
         JRadioButtonMenuItem trackNothingButton = new JRadioButtonMenuItem(Message.say("AusgabeView","trackNothing"));
@@ -925,10 +916,10 @@ public class AusgabeView extends PaintPanel  {
         
         private void createAndAddBotRadioButtons() {
             if (robotStatus!=null){              
-                      Enumeration e = robotStatus.elements();
+                      Enumeration<RobotInfo> e = robotStatus.elements();
                       // int i=0;
                       while (e.hasMoreElements()){
-                        RobotStatus rs = (RobotStatus) e.nextElement();
+                        RobotStatus rs =  e.nextElement();
                         Bot robot = rs.getRobot();        
                         
                         ImageIcon image = new ImageIcon(BotVis.getRobotImages()[robot.getBotVis()]);
@@ -940,9 +931,9 @@ public class AusgabeView extends PaintPanel  {
                      //   buttons[i++]= botItem;
                       //  trackItemModels[i] = itemModel;                                                    
                         botItem.addActionListener(new ActionListener(){
-                            public void actionPerformed(ActionEvent e){
+                            public void actionPerformed(ActionEvent eve){
                                AusgabeView myView = AusgabeView.this;
-                               RobotStatus stat  = (RobotStatus)  myView.robotStatus.get(name);
+                               RobotStatus stat  =  myView.robotStatus.get(name);
                                myView.botToTrack = stat.getRobot();
                                myView.currentTrackMode = TRACKMODE_BOT;
                                botItem.setSelected(true);
@@ -958,7 +949,8 @@ public class AusgabeView extends PaintPanel  {
     }
     
     
-  private class SoundMenu extends JMenu {
+
+private class SoundMenu extends JMenu {
      SoundMenu () {
         super ((Message.say("AusgabeView","mSound")));
         soundOn = SoundMan.isSoundEnabled();
@@ -984,9 +976,7 @@ public class AusgabeView extends PaintPanel  {
   }
 
   
-  
-  
-  private class SpeedMenu extends JMenu implements ActionListener {
+private class SpeedMenu extends JMenu implements ActionListener {
       	JRadioButtonMenuItem lSpeed;
       	JRadioButtonMenuItem mSpeed;
     	JRadioButtonMenuItem hSpeed;
@@ -1059,7 +1049,8 @@ public class AusgabeView extends PaintPanel  {
 
 
    }
-   private class HelpMenu extends JMenu {
+
+private class HelpMenu extends JMenu {
       HelpMenu () {
         super (Message.say("AusgabeFrame","mHelpMenuName"));
        // TODO include Jude's manual, add title of MenuItem to message bundles
@@ -1085,7 +1076,7 @@ public class AusgabeView extends PaintPanel  {
 
 
 
-   private class JumpToFlagMenu extends JMenu {
+private class JumpToFlagMenu extends JMenu {
       JumpToFlagMenu(Location [] flagPos) {
         super(Message.say("AusgabeView", "flag"));
         init (flagPos);
@@ -1118,19 +1109,17 @@ public class AusgabeView extends PaintPanel  {
 
 
 
-   private class JumpToRobMenu extends JMenu {
+private class JumpToRobMenu extends JMenu {
        JumpToRobMenu() {
            super(Message.say("AusgabeView", "rob"));
            init ();
        }
        
        void init() {
-           if (robotStatus!=null){
-               //TODO (variable never used)
-           		int l = robotStatus.size();
-               Enumeration e = robotStatus.elements();
+           if (robotStatus!=null){            
+               Enumeration<RobotInfo> e = robotStatus.elements();
                while (e.hasMoreElements()){
-                   RobotStatus rs = (RobotStatus) e.nextElement();
+                   RobotStatus rs = e.nextElement();
                    Bot robot = rs.getRobot();
                    CAT.debug( "Bot is: " + robot );
                    CAT.debug( "imgs is: " + BotVis.getRobotImages() );
@@ -1205,7 +1194,7 @@ public class AusgabeView extends PaintPanel  {
         
         HotKeyAction toggleBotVisibility = new HotKeyAction() {           
             public void actionPerformed(ActionEvent e) {                      
-                if (showHideMenu.botsVisible) {                                     
+                if (showHideMenu.botsVisible) {                                      
                     showHideMenu.hideAllRobots();
                 }
                 else {
