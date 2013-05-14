@@ -25,7 +25,6 @@
 
 package de.botsnscouts.board;
 
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -48,23 +47,18 @@ import de.botsnscouts.util.StatsList;
 
 /**
  * This board is also able to do phases.
- *
-
- *     
- *     
  * 
- *
  * @author Dirk Materlik
  *         Id: $Id$
  */
 public class SimBoard extends Board implements Directions {
 
     private static final Category CAT = Category.getInstance(SimBoard.class);
-    
+
     private Priority origLevel = null;
 
     private boolean pushersCanPushMoreThanOneBot = false;
-    
+
     public void setDebug(boolean b) {
         if (origLevel == null) {
             origLevel = CAT.getPriority();
@@ -72,12 +66,13 @@ public class SimBoard extends Board implements Directions {
 
         if (b) {
             CAT.setPriority(origLevel);
-        } else {
+        }
+        else {
             CAT.setPriority(Priority.FATAL);
         }
     }
 
-    protected Vector /* of LaserDef */ lasers;
+    protected Vector<LaserDef> lasers;
 
     /**
      * TODO: the server to be notified of every change... This design sucks royally
@@ -91,20 +86,22 @@ public class SimBoard extends Board implements Directions {
      * Contains the laser stats
      */
     private StatsList stats = null;
+
     private Stats curStats = null;
 
-    private Vector msgIdsQ = new Vector();
-    private Vector msgArgsQ = new Vector();
+    private Vector<String> msgIdsQ = new Vector<String>();
 
+    private Vector<String[]> msgArgsQ = new Vector<String[]>();
 
     private int seqNumber = 0;
+
     private static final String MSG_NUM_STRING = OtherConstants.MESSAGE_NUMBER + "=";
 
     private String getSeqNumberMessageString() {
         return MSG_NUM_STRING + (++seqNumber);
     }
 
-    public Vector getLasers() {
+    public Vector<LaserDef> getLasers() {
         return lasers;
     }
 
@@ -112,14 +109,14 @@ public class SimBoard extends Board implements Directions {
         for (int i = 0; i < moved.length; i++) {
             moved[i] = false;
         }
-    } 
-    
+    }
+
     private void fireBotsChanged(BoardBot[] robbis) {
         if (server == null) {
             return;
         }
         sendCollectedMsgs();
-        
+
         int botNum = moved.length;
         int num = 0;
         for (int i = 0; i < botNum; i++) {
@@ -127,20 +124,19 @@ public class SimBoard extends Board implements Directions {
                 num++;
             }
         }
-      
-        if (num != 0) {  
-	        String[] names = new String[num];       
-	        for (int i = 0, j=0; i<botNum; i++) {
-	            if (moved[i]) {
-	               names[j++] = robbis[i].getName();
-	            }
-	        }
-	        server.notifyViews(++seqNumber, names);
+
+        if (num != 0) {
+            String[] names = new String[num];
+            for (int i = 0, j = 0; i < botNum; i++) {
+                if (moved[i]) {
+                    names[j++] = robbis[i].getName();
+                }
+            }
+            server.notifyViews(++seqNumber, names);
         }
-       
+
         moved2false();
     }
-
 
     /**
      * Collects the messages which are sent later after NTC.
@@ -163,7 +159,8 @@ public class SimBoard extends Board implements Directions {
             msgIdsQ.add(id);
             if (argsHasSequenceNumber) {
                 msgArgsQ.add(args);
-            } else {
+            }
+            else {
                 int l = args.length;
                 String[] newArgs = new String[l + 1];
                 for (int i = 0; i < l; i++) {
@@ -195,25 +192,24 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void sendCollectedMsgs() {
-        if (server != null) {  
+        if (server != null) {
             try {
-	            while (msgIdsQ.size() > 0) {
-	                server.sendMsg((String) msgIdsQ.remove(0), (String[]) msgArgsQ.remove(0));
-	            }
+                while (msgIdsQ.size() > 0) {
+                    server.sendMsg(msgIdsQ.remove(0), msgArgsQ.remove(0));
+                }
             }
-            catch (NullPointerException ne){
+            catch (NullPointerException ne) {
                 // now that is ugly, but safer than "while (server !=null && msgIdsQ..)"
                 // (if someone shuts down the server, our server will become null while
-                //   we are in the loop.. and I don't want to do synchronization here/because of that) 
-                CAT.warn("NullPointerException while sending messages;"+
-                                " I guess someone shut down the server..", ne);                                  
+                // we are in the loop.. and I don't want to do synchronization here/because of that)
+                CAT.warn("NullPointerException while sending messages;" + " I guess someone shut down the server..", ne);
             }
         }
     }
 
     /**
      * Creates the internal StatsList.
-     *
+     * 
      * @param sl The robots that should be managed in the StatsList
      */
     public void initStats(StatsList sl) {
@@ -223,7 +219,7 @@ public class SimBoard extends Board implements Directions {
     /**
      * Initializes including notification support
      * 
-     * @param map   The game map in the network-specified string
+     * @param map The game map in the network-specified string
      * @param flags The flags
      */
     // used by the Server
@@ -237,34 +233,34 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void initLaserList() {
-        lasers = new Vector();
+        lasers = new Vector<LaserDef>();
         for (int x = 1; x <= sizeX; x++) {
             for (int y = 1; y <= sizeY; y++) {
                 Wall w = nw(x, y);
-                //d("x="+x+"; y="+y+";w: "+w.wandEl[0]+"|"+w.getElemSpecialNW()+(w.isExisting()?"#":"_")+w.wandEl[1]+"|"+w.getElemSpecialSE());
-                if (w.isExisting() && (w.getSouthDeviceType() == Wall.TYPE_LASER)) {  // Laser nach S
-                    //d("LaserSued");
+                // d("x="+x+"; y="+y+";w: "+w.wandEl[0]+"|"+w.getElemSpecialNW()+(w.isExisting()?"#":"_")+w.wandEl[1]+"|"+w.getElemSpecialSE());
+                if (w.isExisting() && (w.getSouthDeviceType() == Wall.TYPE_LASER)) { // Laser nach S
+                    // d("LaserSued");
                     int length = findLLength(x, y, SOUTH);
                     LaserDef neu = new LaserDef(x, y, SOUTH, w.getSouthDeviceInfo(), length);
                     lasers.addElement(neu);
                 }
                 w = ew(x, y);
-                if (w.isExisting() && (w.getWestDeviceType() == Wall.TYPE_LASER)) {  // Laser nach W
-                    //d("LaserWest");
+                if (w.isExisting() && (w.getWestDeviceType() == Wall.TYPE_LASER)) { // Laser nach W
+                    // d("LaserWest");
                     int length = findLLength(x, y, WEST);
                     LaserDef neu = new LaserDef(x, y, WEST, w.getWestDeviceInfo(), length);
                     lasers.addElement(neu);
                 }
                 w = sw(x, y);
                 if (w.isExisting() && (w.getNorthDeviceType() == Wall.TYPE_LASER)) { // Laser nach N
-                    //d("LaserNord");
+                    // d("LaserNord");
                     int length = findLLength(x, y, NORTH);
                     LaserDef neu = new LaserDef(x, y, NORTH, w.getNorthDeviceInfo(), length);
                     lasers.addElement(neu);
                 }
                 w = ww(x, y);
                 if (w.isExisting() && (w.getEastDeviceType() == Wall.TYPE_LASER)) { // Laser nach O
-                    //d("LaserOst");
+                    // d("LaserOst");
                     int length = findLLength(x, y, EAST);
                     LaserDef neu = new LaserDef(x, y, EAST, w.getEastDeviceInfo(), length);
                     lasers.addElement(neu);
@@ -304,16 +300,16 @@ public class SimBoard extends Board implements Directions {
     /**
      * Initialize without notification support
      */
-    // used by getInstance() and everybody else.. 
+    // used by getInstance() and everybody else..
     public SimBoard(int x, int y, String map, Location[] flags) throws FormatException, FlagException {
         this(x, y, map, flags, null);
     }
 
     /**
      * Board without notification support and without inital flags.
-     *
+     * 
      * @throws FlagException will not be thrown here.
-     */    
+     */
     // used by BoardView for board thumbnails&stuff
     public SimBoard(int x, int y, String map) throws FormatException, FlagException {
         this(x, y, map, new Location[0]);
@@ -326,8 +322,7 @@ public class SimBoard extends Board implements Directions {
         super.print();
         p("LaserDefs:");
         p("");
-        for (Enumeration e = lasers.elements(); e.hasMoreElements();) {
-            LaserDef l = (LaserDef) e.nextElement();
+        for (LaserDef l : lasers) {
             p("str=" + l.strength + "; facing=" + l.facing + "; x=" + l.x + "; y=" + l.y + "; length=" + l.length);
         }
     }
@@ -336,15 +331,15 @@ public class SimBoard extends Board implements Directions {
      * Simulates a phase with a single Bot
      */
     public void doPhase(int phase, BoardBot r) {
-        doPhaseReal(phase, new BoardBot[]{r});
+        doPhaseReal(phase, new BoardBot[] { r });
     }
 
     /**
      * Simulates a phase. If initialized with notifiaciton support,
      * notifies server of every change.
-     *
+     * 
      * @param phase The number of the phase to be simulated (1..5)
-     * @param bots  The bots to be considered
+     * @param bots The bots to be considered
      */
     public void doPhase(int phase, Bot[] bots) {
         BoardBot[] b = new BoardBot[bots.length];
@@ -355,57 +350,57 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void doPhaseReal(int phase, BoardBot[] bots) {
-        String [] botsNCards = new String [bots.length*3+1];
-        botsNCards[0] = (phase-1)+"";
-        for (int i = 0; i < bots.length; i++) {  // potential direction to -1
-            bots[i].setTempFacing(DUMMY_DIRECTION,DUMMY_DIRECTION) ;
+        String[] botsNCards = new String[bots.length * 3 + 1];
+        botsNCards[0] = (phase - 1) + "";
+        for (int i = 0; i < bots.length; i++) { // potential direction to -1
+            bots[i].setTempFacing(DUMMY_DIRECTION, DUMMY_DIRECTION);
             if (server != null) {
-	            int x = 3*i+1;
-	            botsNCards[x]=bots[i].getName();
-	            Card c = bots[i].getMove(phase-1);
-	            botsNCards[x+1] = ""+c.getprio();
-	            botsNCards[x+2]=c.getAction();
+                int x = 3 * i + 1;
+                botsNCards[x] = bots[i].getName();
+                Card c = bots[i].getMove(phase - 1);
+                botsNCards[x + 1] = "" + c.getprio();
+                botsNCards[x + 2] = c.getAction();
             }
-        } 
+        }
 
         moved = new boolean[bots.length];
         moved2false();
 
-        ausgabenMsg(MessageID.PHASE_STARTED,botsNCards);
-        
-   //    ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        ausgabenMsg(MessageID.PHASE_STARTED, botsNCards);
+
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswRobBew");
         doRobMoveCards(phase, bots);
-     //   ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
-    //    ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswExprFl");
         doExpressBelts(bots);
         fireBotsChanged(bots);
-//       ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
- //       ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswFl");
-        doBelts(bots);  // also 2nd move of express belts
+        doBelts(bots); // also 2nd move of express belts
         fireBotsChanged(bots);
-  //      ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
-  //      ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswPusher");
         doPushers(phase, bots);
         fireBotsChanged(bots);
-     //   ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
-     //   ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswRot", null);
         doRotatingGears(bots);
         fireBotsChanged(bots);
-   //     ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
-    //    ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
         ausgabenMsgString("mAuswCrushers");
         doCrushers(phase, bots);
         fireBotsChanged(bots);
-    //    ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
-     //   ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
-        doLasers(bots);        // Board and bot lasers
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_START);
+        doLasers(bots); // Board and bot lasers
         fireBotsChanged(bots);
-   //     ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
+        // ausgabenMsgString(MessageID.SIGNAL_ACTION_STOP);
 
         doArchiveUpdate(bots);
         fireBotsChanged(bots);
@@ -417,7 +412,7 @@ public class SimBoard extends Board implements Directions {
             devirtualize(bots);
             fireBotsChanged(bots);
         }
-        ausgabenMsg(MessageID.PHASE_ENDED,new String[]{""+phase});
+        ausgabenMsg(MessageID.PHASE_ENDED, new String[] { "" + phase });
     }
 
     private void doRobMoveCards(int phase, BoardBot[] robbis) {
@@ -447,65 +442,79 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void moveRob(BoardBot[] robbis, int rob, String aktion) {
-        
+
         BoardBot bot = robbis[rob];
         int facing = bot.getFacing();
         String name = bot.getName();
         ausgabenMsgString2(MessageID.PLAYING_CARD, name, aktion);
         if (aktion.equals(Card.ACTION_MOVE1)) {
-            if (moveRobOne(robbis, rob, facing, true)){
-                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
+            if (moveRobOne(robbis, rob, facing, true)) {
+                ausgabenMsgString2(MessageID.BOT_MOVE, name, facing + "");
             }
             checkForPitVictims(robbis, false);
-        } else if (aktion.equals(Card.ACTION_MOVE2)) {
-            if (moveRobOne(robbis, rob, facing, true)){
-                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
-            }
-            checkForPitVictims(robbis, false);
-            if (moveRobOne(robbis, rob, facing, true)){
-                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
-            }
-            checkForPitVictims(robbis, false);
-        } else if (aktion.equals(Card.ACTION_MOVE3)) {
-            if (moveRobOne(robbis, rob, facing, true)){
-                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
-            }
-            checkForPitVictims(robbis, false);
-            if (moveRobOne(robbis, rob, facing, true)){
-                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
-            }
-            checkForPitVictims(robbis, false);
-            if (moveRobOne(robbis, rob, facing, true)){
-                ausgabenMsgString2(MessageID.BOT_MOVE, name,  facing + "");
-            }
-            checkForPitVictims(robbis, false);
-        } else if (aktion.equals(Card.ACTION_BACK)) {  // Back Up
-            int trueDirection = (facing+ 2) % 4;
-            if (moveRobOne(robbis, rob, trueDirection, true)){           
-                    ausgabenMsgString2(MessageID.BOT_MOVE, name,   trueDirection + "");           
-            }
-            checkForPitVictims(robbis, false);
-        } else if (aktion.equals(Card.ACTION_ROTATE_L)) {  // Rotate Left
-            turnBot(robbis[rob], GEAR_COUNTERCLOCKWISE);
-            moved[rob] = true;
-        } else if (aktion.equals(Card.ACTION_ROTATE_R)) {  // Rotate Right
-            turnBot(robbis[rob], GEAR_CLOCKWISE);
-            moved[rob] = true;
-        } else if (aktion.equals(Card.ACTION_UTURN)) {  // U-Turn
-            robbis[rob].setFacing((robbis[rob].getFacing() + 2) % 4);
-            ausgabenMsgString(MessageID.BOT_UTURN, robbis[rob].getName());
-            moved[rob] = true;
-        } else {
-            throw new DoPhaseException("Unknown card '" + aktion + "' for Bot " + robbis[rob].getName());
         }
+        else
+            if (aktion.equals(Card.ACTION_MOVE2)) {
+                if (moveRobOne(robbis, rob, facing, true)) {
+                    ausgabenMsgString2(MessageID.BOT_MOVE, name, facing + "");
+                }
+                checkForPitVictims(robbis, false);
+                if (moveRobOne(robbis, rob, facing, true)) {
+                    ausgabenMsgString2(MessageID.BOT_MOVE, name, facing + "");
+                }
+                checkForPitVictims(robbis, false);
+            }
+            else
+                if (aktion.equals(Card.ACTION_MOVE3)) {
+                    if (moveRobOne(robbis, rob, facing, true)) {
+                        ausgabenMsgString2(MessageID.BOT_MOVE, name, facing + "");
+                    }
+                    checkForPitVictims(robbis, false);
+                    if (moveRobOne(robbis, rob, facing, true)) {
+                        ausgabenMsgString2(MessageID.BOT_MOVE, name, facing + "");
+                    }
+                    checkForPitVictims(robbis, false);
+                    if (moveRobOne(robbis, rob, facing, true)) {
+                        ausgabenMsgString2(MessageID.BOT_MOVE, name, facing + "");
+                    }
+                    checkForPitVictims(robbis, false);
+                }
+                else
+                    if (aktion.equals(Card.ACTION_BACK)) { // Back Up
+                        int trueDirection = (facing + 2) % 4;
+                        if (moveRobOne(robbis, rob, trueDirection, true)) {
+                            ausgabenMsgString2(MessageID.BOT_MOVE, name, trueDirection + "");
+                        }
+                        checkForPitVictims(robbis, false);
+                    }
+                    else
+                        if (aktion.equals(Card.ACTION_ROTATE_L)) { // Rotate Left
+                            turnBot(robbis[rob], GEAR_COUNTERCLOCKWISE);
+                            moved[rob] = true;
+                        }
+                        else
+                            if (aktion.equals(Card.ACTION_ROTATE_R)) { // Rotate Right
+                                turnBot(robbis[rob], GEAR_CLOCKWISE);
+                                moved[rob] = true;
+                            }
+                            else
+                                if (aktion.equals(Card.ACTION_UTURN)) { // U-Turn
+                                    robbis[rob].setFacing((robbis[rob].getFacing() + 2) % 4);
+                                    ausgabenMsgString(MessageID.BOT_UTURN, robbis[rob].getName());
+                                    moved[rob] = true;
+                                }
+                                else {
+                                    throw new DoPhaseException("Unknown card '" + aktion + "' for Bot "
+                                                    + robbis[rob].getName());
+                                }
     }
 
-    
     private boolean moveRobOne(BoardBot[] robbis, int rob, int direction, boolean pushOthers) {
-        return  moveRobOne(robbis, rob, direction, pushOthers, false);
+        return moveRobOne(robbis, rob, direction, pushOthers, false);
     }
-    
-    private boolean moveRobOne(BoardBot[] robbis, int rob, int direction, boolean pushOthers, boolean hack_isCollisionMove) {
+
+    private boolean moveRobOne(BoardBot[] robbis, int rob, int direction, boolean pushOthers,
+                    boolean hack_isCollisionMove) {
         BoardBot currentBot = robbis[rob];
         if (currentBot.getDamage() >= 10) {
             return false;
@@ -554,30 +563,31 @@ public class SimBoard extends Board implements Directions {
                     break;
             }
 
-            //third, check for collision with other robbis
+            // third, check for collision with other robbis
             for (int i = 0; i < robbis.length; i++) {
-                if ((i != rob) && (robbis[i].getX() == xx) && (robbis[i].getY() == yy) && (!robbis[i].isVirtual()) && (!currentBot.isVirtual())) {
+                if ((i != rob) && (robbis[i].getX() == xx) && (robbis[i].getY() == yy) && (!robbis[i].isVirtual())
+                                && (!currentBot.isVirtual())) {
                     if (!moveRobOne(robbis, i, direction, true, true)) {
                         return (false);
                     }
                 }
             }
-          
-            //fourth, commit the change if we reach this point            
+
+            // fourth, commit the change if we reach this point
             currentBot.setPos(xx, yy);
-            // the setting of currentBot.xx and currentBot.yy is necessary here if pushersCanPushMultiple is 
-            // true and this method here was called by doPushers(): 
-            // without updating currentBot.xx and currentBot.yy a subsequent "doIntended()" call in doPushers() 
-            // will move the robot back to  (xx,yy), sending a movement message with the wrong direction to the clients
+            // the setting of currentBot.xx and currentBot.yy is necessary here if pushersCanPushMultiple is
+            // true and this method here was called by doPushers():
+            // without updating currentBot.xx and currentBot.yy a subsequent "doIntended()" call in doPushers()
+            // will move the robot back to (xx,yy), sending a movement message with the wrong direction to the clients
             currentBot.xx = xx;
             currentBot.yy = yy;
-            //in that case, the robot has actually moved a square
+            // in that case, the robot has actually moved a square
             moved[rob] = true;
-            if (hack_isCollisionMove ) {                
+            if (hack_isCollisionMove) {
                 ausgabenMsgString2(MessageID.BOT_MOVE, "" + currentBot.getName(), direction + "");
             }
-         
-        } //if pushOthers
+
+        } // if pushOthers
         else {
             switch (direction) {
                 case NORTH:
@@ -597,7 +607,7 @@ public class SimBoard extends Board implements Directions {
                     currentBot.xx = currentBot.getX() - 1;
                     break;
             }
-        }    
+        }
         return (true);
     }
 
@@ -611,12 +621,14 @@ public class SimBoard extends Board implements Directions {
                     }
                     destroyBot(currentBot);
                 }
-            } else if (floor(currentBot.xx, currentBot.yy).isPit()) {
-                if (!currentBot.isInPit()) {
-                    ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_IN_PIT, currentBot.getName());
-                }
-                destroyBot(currentBot);
             }
+            else
+                if (floor(currentBot.xx, currentBot.yy).isPit()) {
+                    if (!currentBot.isInPit()) {
+                        ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_IN_PIT, currentBot.getName());
+                    }
+                    destroyBot(currentBot);
+                }
         }
     }
 
@@ -641,18 +653,19 @@ public class SimBoard extends Board implements Directions {
         ausgabenMsgString2(MessageID.BOT_TURN, robbi.getName(), direction + "");
     }
 
-    private void turnBotIntended(BoardBot robbi, int drehR) {        
-       if (drehR== GEAR_CLOCKWISE) {
-           robbi.setTempFacing((robbi.getFacing() + 1) % 4, BOT_TURN_CLOCKWISE);                      
-       }
-       else if (drehR ==  GEAR_COUNTERCLOCKWISE){
-           		int oldFacing = robbi.getFacing();
-           		int newFacing = WEST;
-           		if (oldFacing != NORTH) {
-           		    newFacing = oldFacing -1 ;
-           		}
+    private void turnBotIntended(BoardBot robbi, int drehR) {
+        if (drehR == GEAR_CLOCKWISE) {
+            robbi.setTempFacing((robbi.getFacing() + 1) % 4, BOT_TURN_CLOCKWISE);
+        }
+        else
+            if (drehR == GEAR_COUNTERCLOCKWISE) {
+                int oldFacing = robbi.getFacing();
+                int newFacing = WEST;
+                if (oldFacing != NORTH) {
+                    newFacing = oldFacing - 1;
+                }
                 robbi.setTempFacing(newFacing, BOT_TURN_COUNTER_CLOCKWISE);
-        }        
+            }
     }
 
     private void doExpressBelts(BoardBot[] bots) {
@@ -663,12 +676,12 @@ public class SimBoard extends Board implements Directions {
                 doBelts(bots, i, floor.getBeltInfo());
             }
         }
-      //  checkForPitVictims(bots, true);
+        // checkForPitVictims(bots, true);
         if (CAT.isDebugEnabled()) {
             CAT.debug("ROBOTS BEFORE:");
             CAT.debug(Global.arrayToString(bots));
         }
-        doBeltsCollisionCheck(bots);       
+        doBeltsCollisionCheck(bots);
         if (CAT.isDebugEnabled()) {
             CAT.debug("++++++++++++++++++++++++++++++++");
             CAT.debug(Global.arrayToString(bots));
@@ -685,7 +698,7 @@ public class SimBoard extends Board implements Directions {
                 doBelts(bots, i, floor.getBeltInfo());
             }
         }
-        //checkForPitVictims(bots, true);
+        // checkForPitVictims(bots, true);
         doBeltsCollisionCheck(bots);
         doIntended(bots);
         checkForPitVictims(bots, false);
@@ -730,94 +743,94 @@ public class SimBoard extends Board implements Directions {
                     turnBotIntended(robbis[rob], GEAR_COUNTERCLOCKWISE);
                 }
             }
-            if (((bInfo / 10) == 3) || ((bInfo / 10) == 5)){ // clockwise
+            if (((bInfo / 10) == 3) || ((bInfo / 10) == 5)) { // clockwise
                 if (((typ % 10 + 1) % 4) == bInfo % 10) {
                     turnBotIntended(robbis[rob], GEAR_CLOCKWISE);
                 }
             }
         }
     }
-    
+
     /**
-     * PROBLEM: "doBelts" and "doIntended" can create illegal moves because there is no check for pushing 
-     *  in "doBelts"; "doBelts" only checks for walls and the collision checks in "doIntended" fail in certain 
-     *  "belt-related" circumstances:
-     *   Suppose we have an east movind belt that ends at a wall:      ->>>>>>| 
-     *  Let there be three bots (A,B,N) on the belt                              ->>>ABN|
-     *   What will happen:
-     *   1. in doBelts() there won't be an "intended move" of bot N as the wall blocks it -> ok
-     *   2. in "doIntended()" the bot B won't move because its neighbour N 
-     *       has no intended move (==is blocked) and so the target field of B's move is blocked
-     *       -> ok
-     *   3.  BUT:  "doIntended" will move A onto the same field as B, not recognizing that B's 
-     *                 intended move got blocked
-     *        -> A and B and up on the same position -> NOT OK
-     *    
+     * PROBLEM: "doBelts" and "doIntended" can create illegal moves because there is no check for pushing
+     * in "doBelts"; "doBelts" only checks for walls and the collision checks in "doIntended" fail in certain
+     * "belt-related" circumstances:
+     * Suppose we have an east movind belt that ends at a wall: ->>>>>>|
+     * Let there be three bots (A,B,N) on the belt ->>>ABN|
+     * What will happen:
+     * 1. in doBelts() there won't be an "intended move" of bot N as the wall blocks it -> ok
+     * 2. in "doIntended()" the bot B won't move because its neighbour N
+     * has no intended move (==is blocked) and so the target field of B's move is blocked
+     * -> ok
+     * 3. BUT: "doIntended" will move A onto the same field as B, not recognizing that B's
+     * intended move got blocked
+     * -> A and B and up on the same position -> NOT OK
+     * 
      * SOLUTION: I don't want to add a check for this to "doIntended()" as it might be wrong
-     *                  if there are not belts involved and/or it might create the wrong results if we
-     *                  iterate in different orders through the robots; I'm too lazy to think about/check
-     *                  all possible problems, so the simplest solution will be to call this method before
-     *                  "doIntended" in the do[Express]Belts methods.
-     *                   
-     *   It is supposed fix the above problem by resetting B's intended move..               
+     * if there are not belts involved and/or it might create the wrong results if we
+     * iterate in different orders through the robots; I'm too lazy to think about/check
+     * all possible problems, so the simplest solution will be to call this method before
+     * "doIntended" in the do[Express]Belts methods.
+     * 
+     * It is supposed fix the above problem by resetting B's intended move..
      * 
      * @param robbis
      */
-    private void doBeltsCollisionCheck(BoardBot [] robbis) {
+    private void doBeltsCollisionCheck(BoardBot[] robbis) {
         int roboCount = robbis.length;
-        int [] intendedMoveDirections = new int [roboCount];
-        boolean [] botMoved = new boolean [roboCount];
-        HashSet blockedPositions = new HashSet();
+        int[] intendedMoveDirections = new int[roboCount];
+        boolean[] botMoved = new boolean[roboCount];
+        HashSet<Location> blockedPositions = new HashSet<Location>();
         boolean moveBlocked = false;
-        for (int i=0;i<roboCount;i++){
-            intendedMoveDirections[i] = robbis[i].getIntendedMoveDirection();    
-            botMoved[i] = intendedMoveDirections[i]!=DUMMY_DIRECTION;
-            if (!botMoved[i]){
+        for (int i = 0; i < roboCount; i++) {
+            intendedMoveDirections[i] = robbis[i].getIntendedMoveDirection();
+            botMoved[i] = intendedMoveDirections[i] != DUMMY_DIRECTION;
+            if (!botMoved[i]) {
                 // robot will keep its old position
                 blockedPositions.add(robbis[i].getPos());
                 moveBlocked = true;
             }
         }
         if (CAT.isDebugEnabled()) {
-            CAT.debug("intendedDirs: "+Global.arrayToString(intendedMoveDirections));
-       
-            CAT.debug("botMoved: "+Global.arrayToString(botMoved));       
-            CAT.debug("blockedPositions:"+Global.collectionToString(blockedPositions));
+            CAT.debug("intendedDirs: " + Global.arrayToString(intendedMoveDirections));
+
+            CAT.debug("botMoved: " + Global.arrayToString(botMoved));
+            CAT.debug("blockedPositions:" + Global.collectionToString(blockedPositions));
         }
 
         while (moveBlocked) {
             boolean foundAnotherBlockedPosition = false;
-	        for (int i = 0; i < roboCount; i++){
-	            if (botMoved[i]) { // no need to check the non-moving bots
-		            BoardBot bot = robbis[i];
-		            Location intendedNewPos = new Location (bot.xx, bot.yy);
-		            if (blockedPositions.contains(intendedNewPos)){
-		                // the target of the current bot's move is blocked
-		                // => reset the intended move
-		                bot.xx = bot.getX();
-		                bot.yy = bot.getY();
-		                // if the belt has a curve it would have turned the bot in it's intended move
-		                // => also reset a possible change of the bot's facing:
-		                if (bot.getTempFacing()!= DUMMY_DIRECTION) {
-		                    bot.setTempFacing(DUMMY_DIRECTION, DUMMY_DIRECTION);
-		                }	                		                
-		                botMoved[i]=false; // don't check this bot again, it's intended move is gone
-		                // adding the bot's position to the list of blocked Positions:		                
-		                blockedPositions.add(bot.getPos());
-		                // we found another blocked position so we have to check the other intended moves 
-		                // for a possible problem with this new blocked position as it didn't yet exist in the
-		                // previous loop iterations
-		                foundAnotherBlockedPosition = true;
-		                // as we have to do the for-loop again with the updated block list, we might as well 
-		                // jump out of the loop now to avoid a few unnecessary loop iterations
-		                break; 
-		            }
-	            }
-	        }
-	        // re-check the intended moves if we found a blocked position that didn't exist before 
-	        moveBlocked = foundAnotherBlockedPosition;
+            for (int i = 0; i < roboCount; i++) {
+                if (botMoved[i]) { // no need to check the non-moving bots
+                    BoardBot bot = robbis[i];
+                    Location intendedNewPos = new Location(bot.xx, bot.yy);
+                    if (blockedPositions.contains(intendedNewPos)) {
+                        // the target of the current bot's move is blocked
+                        // => reset the intended move
+                        bot.xx = bot.getX();
+                        bot.yy = bot.getY();
+                        // if the belt has a curve it would have turned the bot in it's intended move
+                        // => also reset a possible change of the bot's facing:
+                        if (bot.getTempFacing() != DUMMY_DIRECTION) {
+                            bot.setTempFacing(DUMMY_DIRECTION, DUMMY_DIRECTION);
+                        }
+                        botMoved[i] = false; // don't check this bot again, it's intended move is gone
+                        // adding the bot's position to the list of blocked Positions:
+                        blockedPositions.add(bot.getPos());
+                        // we found another blocked position so we have to check the other intended moves
+                        // for a possible problem with this new blocked position as it didn't yet exist in the
+                        // previous loop iterations
+                        foundAnotherBlockedPosition = true;
+                        // as we have to do the for-loop again with the updated block list, we might as well
+                        // jump out of the loop now to avoid a few unnecessary loop iterations
+                        break;
+                    }
+                }
+            }
+            // re-check the intended moves if we found a blocked position that didn't exist before
+            moveBlocked = foundAnotherBlockedPosition;
 
-        }  
+        }
     }
 
     private void initIntendedValues(BoardBot[] robbis) {
@@ -826,21 +839,23 @@ public class SimBoard extends Board implements Directions {
             BoardBot bot = robbis[i];
             bot.xx = bot.getX();
             bot.yy = bot.getY();
-            bot.setTempFacing( bot.getFacing(), DUMMY_DIRECTION);
+            bot.setTempFacing(bot.getFacing(), DUMMY_DIRECTION);
         }
     }
-    /*TODO there are some open questions regarding rules, I think:
-        * 1. multiple pushers (active in the same phase) on one field;
-        *     for example: one at the north wall, one at the east wall
-        *     => will a robot be pushed to the south or to the west?
-        * 2. pushers (active in the same phase) with the same "push-to field":
-        *     example: one pusher pushes to the south, another to the west;
-        *                   both will push a robot onto the same field.
-        *                   Now, if bot pushers have to push a bot: what to do?
-        *                   - Select one pusher that pushes first?
-        *                   - No pushing at all?
-        *                   ..our code _might_ merge them on the same field.. 
-        */     
+
+    /*
+     * TODO there are some open questions regarding rules, I think:
+     * 1. multiple pushers (active in the same phase) on one field;
+     * for example: one at the north wall, one at the east wall
+     * => will a robot be pushed to the south or to the west?
+     * 2. pushers (active in the same phase) with the same "push-to field":
+     * example: one pusher pushes to the south, another to the west;
+     * both will push a robot onto the same field.
+     * Now, if bot pushers have to push a bot: what to do?
+     * - Select one pusher that pushes first?
+     * - No pushing at all?
+     * ..our code _might_ merge them on the same field..
+     */
     private void doPushers(int phase, BoardBot[] robbis) {
         initIntendedValues(robbis);
         for (int i = 0; i < robbis.length; i++) {
@@ -862,11 +877,12 @@ public class SimBoard extends Board implements Directions {
             if (ww(x, y).isEastPusherActive(phase)) {
                 moveRobOne(robbis, i, EAST, pushersCanPushMoreThanOneBot, pushersCanPushMoreThanOneBot);
             }
-        } //for
-        
+        } // for
+
         doIntended(robbis);
         checkForPitVictims(robbis, false);
     }
+
     private void doIntended(BoardBot[] robbis) {
         int roboCount = robbis.length;
         boolean[] robmove = new boolean[roboCount];
@@ -875,7 +891,7 @@ public class SimBoard extends Board implements Directions {
         }
         for (int rob1 = 0; rob1 < roboCount; rob1++) {
             for (int rob2 = rob1 + 1; rob2 < roboCount; rob2++) {
-                if ((!robbis[rob1].isVirtual()) && (!robbis[rob2].isVirtual())) { 
+                if ((!robbis[rob1].isVirtual()) && (!robbis[rob2].isVirtual())) {
                     // both are non-virtual
                     if ((robbis[rob1].xx == robbis[rob2].xx) && (robbis[rob1].yy == robbis[rob2].yy)) {
                         // both non-virtuals would have the same position after intended move->not good
@@ -883,10 +899,11 @@ public class SimBoard extends Board implements Directions {
                         robmove[rob2] = false;
                     }
                     if ((robbis[rob1].getX() == robbis[rob2].xx) && (robbis[rob1].getY() == robbis[rob2].yy)
-                           && (robbis[rob2].getX() == robbis[rob1].xx) && (robbis[rob2].getY() == robbis[rob1].yy)) {
+                                    && (robbis[rob2].getX() == robbis[rob1].xx)
+                                    && (robbis[rob2].getY() == robbis[rob1].yy)) {
                         // um, not sure what happens here...
-                        // looks like a check to avoid robots switching their positions 
-                        // (I guess to avoid a non-virtual bot moving through another non-virtual?!?) 
+                        // looks like a check to avoid robots switching their positions
+                        // (I guess to avoid a non-virtual bot moving through another non-virtual?!?)
                         robmove[rob1] = false;
                         robmove[rob2] = false;
                     }
@@ -894,22 +911,21 @@ public class SimBoard extends Board implements Directions {
             }
         }
         for (int i = 0; i < roboCount; i++) {
-            if (robmove[i]) { 
-                // if there are no objections we can execute the intended move 
+            if (robmove[i]) {
+                // if there are no objections we can execute the intended move
                 BoardBot currentBot = robbis[i];
-    
+
                 int direction = currentBot.getIntendedMoveDirection();
                 currentBot.setPos(currentBot.xx, currentBot.yy);
                 if (direction != DUMMY_DIRECTION) {
                     ausgabenMsgString2(MessageID.BOT_MOVE, "" + currentBot.getName(), direction + "");
                 }
-                
-                
+
                 if (currentBot.getTempFacing() != DUMMY_DIRECTION) {
                     currentBot.setFacing(currentBot.getTempFacing());
-                    int turnDirection = currentBot.getLastTempRotateDirection();       
+                    int turnDirection = currentBot.getLastTempRotateDirection();
                     if (turnDirection != DUMMY_DIRECTION) {
-                        ausgabenMsgString2(MessageID.BOT_TURN,currentBot.getName(), ""+turnDirection);
+                        ausgabenMsgString2(MessageID.BOT_TURN, currentBot.getName(), "" + turnDirection);
                     }
                     currentBot.setTempFacing(DUMMY_DIRECTION, DUMMY_DIRECTION);
                 }
@@ -917,68 +933,68 @@ public class SimBoard extends Board implements Directions {
             }
         }
     }
-    
-  /*  private void doIntended(BoardBot[] robbis) {
-        int roboCount = robbis.length;
-        boolean[] robmove = new boolean[roboCount];
-        
-        for (int i = 0; i < roboCount; i++) {
-            robmove[i] = true;
-           
-        }
-        
-        for (int rob1 = 0; rob1 < roboCount; rob1++) {
-            for (int rob2 = rob1 + 1; rob2 < roboCount; rob2++) {
-                if ((!robbis[rob1].isVirtual()) && (!robbis[rob2].isVirtual())) { 
-                    // both are non-virtual
-                    if ((robbis[rob1].xx == robbis[rob2].xx) && (robbis[rob1].yy == robbis[rob2].yy)) {
-                        // both non-virtuals would have the same position after intended move->not good
-                        robmove[rob1] = false;
-                        robmove[rob2] = false;
-                    }
-                    if ((robbis[rob1].getX() == robbis[rob2].xx) && (robbis[rob1].getY() == robbis[rob2].yy)
-                                    // above: rob1 occupies the position that rob2 wants to move to
-                                    // below: rob2 occupies the position that rob1 wants to move to
-                           && (robbis[rob2].getX() == robbis[rob1].xx) && (robbis[rob2].getY() == robbis[rob1].yy)) {
-                        // um, not sure what happens here...
-                        // looks like a check to avoid robots switching their positions 
-                        // (I guess to avoid a non-virtual bot moving through another non-virtual?!?) 
-                        robmove[rob1] = false;
-                        robmove[rob2] = false;
-                    }
-                }
-            }
-        }
-       
-        
-        for (int i = 0; i < roboCount; i++) {
-            if (robmove[i]) {  // if there are no objections we can execute the intended move
-                BoardBot currentBot = robbis[i];
-                currentBot.setPos(currentBot.xx, currentBot.yy);
-                int direction = currentBot.getIntendedMoveDirection(); 
-                if ( direction != DUMMY_DIRECTION) {
-                        // bot has moved->notify clients
-                        ausgabenMsgString2(MessageID.BOT_MOVE, "" + currentBot.getName(),
-                                        				direction + "");
-                }
-                
-              
-                if (currentBot.getTempFacing() != DUMMY_DIRECTION) {
-                    // bot has turned
-                    currentBot.setFacing(currentBot.getTempFacing());
-                    int turnDirection = currentBot.getLastTempRotateDirection();       
-                    if (turnDirection != DUMMY_DIRECTION) {
-                        ausgabenMsgString2(MessageID.BOT_TURN,currentBot.getName(), ""+turnDirection);
-                    }
-                    currentBot.setTempFacing(DUMMY_DIRECTION, DUMMY_DIRECTION);
-                }
-                moved[i] = true;
-            }
-        }
-    }
-*/
-   
-    
+
+    /*
+     * private void doIntended(BoardBot[] robbis) {
+     * int roboCount = robbis.length;
+     * boolean[] robmove = new boolean[roboCount];
+     * 
+     * for (int i = 0; i < roboCount; i++) {
+     * robmove[i] = true;
+     * 
+     * }
+     * 
+     * for (int rob1 = 0; rob1 < roboCount; rob1++) {
+     * for (int rob2 = rob1 + 1; rob2 < roboCount; rob2++) {
+     * if ((!robbis[rob1].isVirtual()) && (!robbis[rob2].isVirtual())) {
+     * // both are non-virtual
+     * if ((robbis[rob1].xx == robbis[rob2].xx) && (robbis[rob1].yy == robbis[rob2].yy)) {
+     * // both non-virtuals would have the same position after intended move->not good
+     * robmove[rob1] = false;
+     * robmove[rob2] = false;
+     * }
+     * if ((robbis[rob1].getX() == robbis[rob2].xx) && (robbis[rob1].getY() == robbis[rob2].yy)
+     * // above: rob1 occupies the position that rob2 wants to move to
+     * // below: rob2 occupies the position that rob1 wants to move to
+     * && (robbis[rob2].getX() == robbis[rob1].xx) && (robbis[rob2].getY() == robbis[rob1].yy)) {
+     * // um, not sure what happens here...
+     * // looks like a check to avoid robots switching their positions
+     * // (I guess to avoid a non-virtual bot moving through another non-virtual?!?)
+     * robmove[rob1] = false;
+     * robmove[rob2] = false;
+     * }
+     * }
+     * }
+     * }
+     * 
+     * 
+     * for (int i = 0; i < roboCount; i++) {
+     * if (robmove[i]) { // if there are no objections we can execute the intended move
+     * BoardBot currentBot = robbis[i];
+     * currentBot.setPos(currentBot.xx, currentBot.yy);
+     * int direction = currentBot.getIntendedMoveDirection();
+     * if ( direction != DUMMY_DIRECTION) {
+     * // bot has moved->notify clients
+     * ausgabenMsgString2(MessageID.BOT_MOVE, "" + currentBot.getName(),
+     * direction + "");
+     * }
+     * 
+     * 
+     * if (currentBot.getTempFacing() != DUMMY_DIRECTION) {
+     * // bot has turned
+     * currentBot.setFacing(currentBot.getTempFacing());
+     * int turnDirection = currentBot.getLastTempRotateDirection();
+     * if (turnDirection != DUMMY_DIRECTION) {
+     * ausgabenMsgString2(MessageID.BOT_TURN,currentBot.getName(), ""+turnDirection);
+     * }
+     * currentBot.setTempFacing(DUMMY_DIRECTION, DUMMY_DIRECTION);
+     * }
+     * moved[i] = true;
+     * }
+     * }
+     * }
+     */
+
     private void doRotatingGears(BoardBot[] robbis) {
         for (int i = 0; i < robbis.length; i++) {
             Floor floor = floor(robbis[i].getX(), robbis[i].getY());
@@ -991,28 +1007,28 @@ public class SimBoard extends Board implements Directions {
 
     private void doCrushers(int phase, BoardBot[] robbis) {
         BoardBot b;
-        int botcount =  robbis.length;
+        int botcount = robbis.length;
         for (int i = 0; i < botcount; i++) {
-            b= robbis[i];
+            b = robbis[i];
             Floor floor = floor(b.getX(), b.getY());
             if (floor.isCrusherActive(phase)) {
                 ausgabenMsgString(de.botsnscouts.comm.MessageID.BOT_CRUSHED, b.getName());
-                destroyBot(b);                
+                destroyBot(b);
             }
         }
     }
+
     /**
      * Does the evaluation of the board lasers.
      * 
      * @param robbis all our robots
-     * @return boolean array of the same length as "robbis"; if it contains true at index i, 
-     *               "robbis[i]" received so much damage that it has to be destroyed 
+     * @return boolean array of the same length as "robbis"; if it contains true at index i,
+     *         "robbis[i]" received so much damage that it has to be destroyed
      */
-    private boolean[] doBoardLasers(BoardBot [] robbis) {
-        int robCount = robbis!=null?robbis.length:0;
-        boolean[] haveToDestoryBotLater = new boolean [robCount];
-        for (Enumeration e = lasers.elements(); e.hasMoreElements();) {
-            LaserDef l = (LaserDef) e.nextElement();
+    private boolean[] doBoardLasers(BoardBot[] robbis) {
+        int robCount = robbis != null ? robbis.length : 0;
+        boolean[] haveToDestoryBotLater = new boolean[robCount];
+        for (LaserDef l : lasers) {
             int x = l.x;
             int y = l.y;
             boolean hit = false;
@@ -1038,24 +1054,25 @@ public class SimBoard extends Board implements Directions {
                             for (int s = l.strength; s > 0; s--) {
                                 robbis[j].incDamage();
                                 lockRegisters(robbis[j]);
-                                if (robbis[j].getDamage()>=10) {
-                                    haveToDestoryBotLater[j]=true;
+                                if (robbis[j].getDamage() >= 10) {
+                                    haveToDestoryBotLater[j] = true;
                                 }
                             }
                             moved[j] = true;
                         }
-                        else if (!hit) {
-                            for (int s = l.strength; s > 0; s--) {
-                                robbis[j].incDamage();
-                                lockRegisters(robbis[j]);
-                            }
-                            if (robbis[j].getDamage()>=10) {
-                                haveToDestoryBotLater[j]=true;
-                            }
+                        else
+                            if (!hit) {
+                                for (int s = l.strength; s > 0; s--) {
+                                    robbis[j].incDamage();
+                                    lockRegisters(robbis[j]);
+                                }
+                                if (robbis[j].getDamage() >= 10) {
+                                    haveToDestoryBotLater[j] = true;
+                                }
 
-                            moved[j] = true;
-                            hit = true;
-                        }
+                                moved[j] = true;
+                                hit = true;
+                            }
                     } // Hit
                 }
 
@@ -1076,24 +1093,24 @@ public class SimBoard extends Board implements Directions {
                     case WEST:
                         x--;
                         break;
-                } //switch
+                } // switch
             } // for length
-        } //for Enumeration
+        } // for Enumeration
 
         return haveToDestoryBotLater;
     }
-    
+
     /**
      * Does the evaluation of the robot lasers.
      * 
      * @param robbis all our robots
-     * @return boolean array of the same length as "robbis"; if it contains true at index i, 
-     *               "robbis[i]" received so much damage that it has to be destroyed 
+     * @return boolean array of the same length as "robbis"; if it contains true at index i,
+     *         "robbis[i]" received so much damage that it has to be destroyed
      */
-    private boolean[] doRobLasers(BoardBot[] robbis){
-        int robCount = robbis!=null?robbis.length:0;
-        boolean[] haveToDestoryBotLater = new boolean [robCount];
-//      Bot-Laser
+    private boolean[] doRobLasers(BoardBot[] robbis) {
+        int robCount = robbis != null ? robbis.length : 0;
+        boolean[] haveToDestoryBotLater = new boolean[robCount];
+        // Bot-Laser
         aussen2: for (int rob = 0; rob < robCount; rob++) {
             if ((robbis[rob].isVirtual()) || (!robbis[rob].isActivated())) {
                 continue aussen2;
@@ -1105,13 +1122,13 @@ public class SimBoard extends Board implements Directions {
                     if (ew(x, y).isExisting()) {
                         continue aussen2;
                     }
-                    x++;  // Start on next field
+                    x++; // Start on next field
                     while ((x <= sizeX) && (!ww(x, y).isExisting())) {
                         for (int j = 0; j < robCount; j++) {
                             BoardBot target = robbis[j];
                             if ((target.getX() == x) && (target.getY() == y) && (!target.isVirtual())) { // Hit
-                                haveToDestoryBotLater[j]=doSingleRobLaserShot(robbis[rob], target);                                
-                                moved[j] = true;                                     
+                                haveToDestoryBotLater[j] = doSingleRobLaserShot(robbis[rob], target);
+                                moved[j] = true;
                                 continue aussen2;
                             }
                         }
@@ -1126,9 +1143,9 @@ public class SimBoard extends Board implements Directions {
                     while ((x > 0) && (!ew(x, y).isExisting())) {
                         for (int j = 0; j < robCount; j++) {
                             BoardBot target = robbis[j];
-                            if ((target.getX() == x) && (target.getY() == y) && (!target.isVirtual())) { //Hit
-                                haveToDestoryBotLater[j]=doSingleRobLaserShot(robbis[rob], target);                                
-                                moved[j] = true;      
+                            if ((target.getX() == x) && (target.getY() == y) && (!target.isVirtual())) { // Hit
+                                haveToDestoryBotLater[j] = doSingleRobLaserShot(robbis[rob], target);
+                                moved[j] = true;
                                 continue aussen2;
                             }
                         }
@@ -1143,9 +1160,9 @@ public class SimBoard extends Board implements Directions {
                     while ((y <= sizeY) && (!sw(x, y).isExisting())) {
                         for (int j = 0; j < robCount; j++) {
                             BoardBot target = robbis[j];
-                            if ((target.getX() == x) && (target.getY() == y) && (!target.isVirtual())) { //Hit
-                                haveToDestoryBotLater[j]=doSingleRobLaserShot(robbis[rob], target);                                
-                                moved[j] = true;      
+                            if ((target.getX() == x) && (target.getY() == y) && (!target.isVirtual())) { // Hit
+                                haveToDestoryBotLater[j] = doSingleRobLaserShot(robbis[rob], target);
+                                moved[j] = true;
                                 continue aussen2;
                             }
                         }
@@ -1160,53 +1177,54 @@ public class SimBoard extends Board implements Directions {
                     while ((y > 0) && (!nw(x, y).isExisting())) {
                         for (int j = 0; j < robCount; j++) {
                             BoardBot target = robbis[j];
-                            if ((target.getX() == x) && (target.getY() == y) && (!target.isVirtual())) { // Hit                             
-                                haveToDestoryBotLater[j]=doSingleRobLaserShot(robbis[rob], target);                                
-                                moved[j] = true;                          
+                            if ((target.getX() == x) && (target.getY() == y) && (!target.isVirtual())) { // Hit
+                                haveToDestoryBotLater[j] = doSingleRobLaserShot(robbis[rob], target);
+                                moved[j] = true;
                                 continue aussen2;
                             }
                         }
                         y--;
                     }
                     break;
-            } //switch
-        } //for rob
+            } // switch
+        } // for rob
         return haveToDestoryBotLater;
-        
+
     }
-/**
- * 
- * @param robbis out robbots
- * @param hasToBeDestroyed if "hasToBeDestroyed[i]" is true, "robbis[i]" will be destroyed
- */
-    private void doDestroyIfNecessary(BoardBot[] robbis, boolean [] hasToBeDestroyed){
-        int robCount = robbis!=null?robbis.length:0;
-        for (int rob=0;rob<robCount;rob++){
-            if (hasToBeDestroyed[rob]){
-                destroyBot(robbis[rob]);                
+
+    /**
+     * 
+     * @param robbis out robbots
+     * @param hasToBeDestroyed if "hasToBeDestroyed[i]" is true, "robbis[i]" will be destroyed
+     */
+    private void doDestroyIfNecessary(BoardBot[] robbis, boolean[] hasToBeDestroyed) {
+        int robCount = robbis != null ? robbis.length : 0;
+        for (int rob = 0; rob < robCount; rob++) {
+            if (hasToBeDestroyed[rob]) {
+                destroyBot(robbis[rob]);
             }
         }
     }
-    
-    private void doLasers(BoardBot[] robbis) {        
-        boolean[] haveToDestoryBotLater = doBoardLasers(robbis); 
+
+    private void doLasers(BoardBot[] robbis) {
+        boolean[] haveToDestoryBotLater = doBoardLasers(robbis);
         doDestroyIfNecessary(robbis, haveToDestoryBotLater);
         haveToDestoryBotLater = doRobLasers(robbis);
-        doDestroyIfNecessary(robbis, haveToDestoryBotLater);        
+        doDestroyIfNecessary(robbis, haveToDestoryBotLater);
     } // doLasers
-    
+
     /**
-     *  @return if the target robot was killed/is dead
+     * @return if the target robot was killed/is dead
      */
-    private boolean doSingleRobLaserShot (BoardBot source, BoardBot target){
+    private boolean doSingleRobLaserShot(BoardBot source, BoardBot target) {
         boolean wasKilled = false;
         target.incDamage();
         lockRegisters(target);
-        if (target.getDamage()>=10) {
-            wasKilled=true;
-        }      
+        if (target.getDamage() >= 10) {
+            wasKilled = true;
+        }
 
-        ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER, source.getName(),target.getName());
+        ausgabenMsgString2(de.botsnscouts.comm.MessageID.BOT_LASER, source.getName(), target.getName());
         curStats = stats.getStats(source.getName());
         curStats.incHits();
         if (wasKilled) {
@@ -1218,7 +1236,7 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void doArchiveUpdate(BoardBot[] robbis) {
-        //d("doArchivUpdate called.");
+        // d("doArchivUpdate called.");
 
         for (int i = 0; i < robbis.length; i++) {
             Floor floor = floor(robbis[i].getX(), robbis[i].getY());
@@ -1226,30 +1244,32 @@ public class SimBoard extends Board implements Directions {
             if (floor.isRepairing()) {
                 robbis[i].setArchive(robbis[i].getPos());
                 moved[i] = true;
-                //d(robbis[i].getName()+" ist auf einem Reperaturfeld. Archivpos updated");
+                // d(robbis[i].getName()+" ist auf einem Reperaturfeld. Archivpos updated");
             }
             for (int j = 0; j < flags.length; j++) {
                 if ((robbis[i].getX() == flags[j].getX()) && (robbis[i].getY() == flags[j].getY())) {
                     robbis[i].touchArchive();
                     moved[i] = true;
-                    //d(robbis[i].getName()+" ist auf einer Flagge (R1). Archivpos updated");
+                    // d(robbis[i].getName()+" ist auf einer Flagge (R1). Archivpos updated");
                 }
             }
         }
     } // doArchivUpdate
 
     private void doFlaggenUpdate(BoardBot[] robbis) {
-        //d("doFlaggenUpdate called.");
+        // d("doFlaggenUpdate called.");
 
         for (int i = 0; i < robbis.length; i++) {
             if (robbis[i].getNextFlag() == flags.length + 1) {
                 continue;
             }
-            if ((robbis[i].getX() == flags[robbis[i].getNextFlag() - 1].getX()) && (robbis[i].getY() == flags[robbis[i].getNextFlag() - 1].getY())) {
+            if ((robbis[i].getX() == flags[robbis[i].getNextFlag() - 1].getX())
+                            && (robbis[i].getY() == flags[robbis[i].getNextFlag() - 1].getY())) {
                 robbis[i].incNextFlag();
                 moved[i] = true;
-                //d(robbis[i].getName()+" hat naechste Flagge erreicht.");
-                ausgabenMsgString2(de.botsnscouts.comm.MessageID.FLAG_REACHED, robbis[i].getName(), "" + (robbis[i].getNextFlag() - 1));
+                // d(robbis[i].getName()+" hat naechste Flagge erreicht.");
+                ausgabenMsgString2(de.botsnscouts.comm.MessageID.FLAG_REACHED, robbis[i].getName(),
+                                "" + (robbis[i].getNextFlag() - 1));
             }
 
         }
@@ -1259,7 +1279,7 @@ public class SimBoard extends Board implements Directions {
      * Repair bots at end of 5th phase
      */
     private void doRepairs(BoardBot[] robbis) {
-        //d("doRepairs called.");
+        // d("doRepairs called.");
 
         for (int i = 0; i < robbis.length; i++) {
             Floor floor = floor(robbis[i].getX(), robbis[i].getY());
@@ -1267,7 +1287,7 @@ public class SimBoard extends Board implements Directions {
                 boolean msg = robbis[i].getDamage() > 0;
                 robbis[i].decrDamage(floor.getInfo());
                 moved[i] = true;
-                //d(robbis[i].getName()+" repariert wegen Repa-Feld.");
+                // d(robbis[i].getName()+" repariert wegen Repa-Feld.");
                 if (msg) {
                     ausgabenMsgString2("mRepFeld", robbis[i].getName(), "" + floor.getInfo());
                 }
@@ -1278,81 +1298,77 @@ public class SimBoard extends Board implements Directions {
                     boolean msg = robbis[i].getDamage() > 0;
                     robbis[i].decrDamage(1);
                     moved[i] = true;
-                    //d(robbis[i].getName()+" repariert wegen Flagge.");
+                    // d(robbis[i].getName()+" repariert wegen Flagge.");
                     if (msg) {
                         ausgabenMsgString("mRepFlag", robbis[i].getName());
                     }
                 }
-            }   
+            }
         }
     } // doRepairs
-
 
     /**
      * Devirtualize a bot if he is not destroyed and alone on a field
      */
     private void devirtualize(BoardBot[] bots) {
         boolean cont;
-        for (int a = 0; a < bots.length; a++) {      // Schleife 1
+        for (int a = 0; a < bots.length; a++) { // Schleife 1
             cont = false;
             if (bots[a].isVirtual()) {
-                for (int b = 0; b < bots.length; b++)   // Schleife 2
+                for (int b = 0; b < bots.length; b++) // Schleife 2
                 {
                     if (bots[a] != bots[b]) {
-                        if ((bots[a].getX() == bots[b].getX()) && (bots[a].getY() == bots[b].getY()))  // wenn zwei verschiedene Bot auf gleicher Position
+                        if ((bots[a].getX() == bots[b].getX()) && (bots[a].getY() == bots[b].getY())) // wenn zwei verschiedene Bot auf gleicher
+                                                                                                      // Position
                         {
-                            cont = true;   // continue aktivieren
-                            break;       // dann entvirtualisieren fuer robbis[a] abbrechen
+                            cont = true; // continue aktivieren
+                            break; // dann entvirtualisieren fuer robbis[a] abbrechen
                         }
                     }
                 }
                 if (cont) {
-                    continue;  // naechsten Bot bearbeiten
+                    continue; // naechsten Bot bearbeiten
                 }
                 if (bots[a].getDamage() < 10) {
-                    bots[a].setVirtual(false);     // wenn er nicht zerstoert ist: entvirtualisieren durchf�hren
-                    //d("Entvirtualisiere Bot "+robbis[a].getName());
+                    bots[a].setVirtual(false); // wenn er nicht zerstoert ist: entvirtualisieren durchf�hren
+                    // d("Entvirtualisiere Bot "+robbis[a].getName());
                     moved[a] = true;
                 }
             } // if
         } // for Schleife 1
-        if (bots.length == 1)          // Sonderfall einzelner Bot
+        if (bots.length == 1) // Sonderfall einzelner Bot
         {
             if (bots[0].getDamage() < 10) {
                 bots[0].setVirtual(false);
-                //d("Entvirtualisiere einzelnen Bot "+robbis[0].getName());
+                // d("Entvirtualisiere einzelnen Bot "+robbis[0].getName());
                 moved[0] = true;
             }
         }
     } // entvirtualisiere ende
-
 
     /**
      * Lock registers if damage sufficiently high
      */
     private void lockRegisters(BoardBot robbi) {
         // TODO could be done in BoardBot.incDamage()
-        
-        //d("registerSperren called mit "+robbi.getName());
+
+        // d("registerSperren called mit "+robbi.getName());
 
         if (robbi.getDamage() >= 10) {
             // HS: don't do that here; it messes up laser evaluation if this bot is destroyed before he had a chance
-            //       to fire
-            //  destroyBot(robbi);
+            // to fire
+            // destroyBot(robbi);
             return;
         }
         if (robbi.getDamage() >= 5) {
             for (int i = 4; i >= 0; i--) {
                 if (robbi.getLockedRegisters()[i] == null) {
-                    Card c = robbi.getMove()[i]; 
+                    Card c = robbi.getMove()[i];
                     if (c != null) {
                         robbi.lockRegister(i);
-                        String [] msg = new String [] {
-                                        robbi.getName(),""+i,
-                                        c.getprio()+"", c.getAction()                                        
-                        };
-                        ausgabenMsg(MessageID.REGISTER_LOCKED,msg);
-                        //d("Sperre Register "+i);
+                        String[] msg = new String[] { robbi.getName(), "" + i, c.getprio() + "", c.getAction() };
+                        ausgabenMsg(MessageID.REGISTER_LOCKED, msg);
+                        // d("Sperre Register "+i);
                     }
                     return;
                 }
@@ -1360,40 +1376,38 @@ public class SimBoard extends Board implements Directions {
         } // if
     } // registerSperren ende
 
-    private static Map instances = new HashMap();
+    private static Map<String, SimBoard> instances = new HashMap<String, SimBoard>();
 
-    public static SimBoard getInstance(int x, int y, String field, Location[] flags) throws FormatException, FlagException {
-        String hashString = field+"XXX("+x+","+y+")XXX"+Global.arrayToString(flags,';');
+    public static SimBoard getInstance(int x, int y, String field, Location[] flags) throws FormatException,
+                    FlagException {
+        String hashString = field + "XXX(" + x + "," + y + ")XXX" + Global.arrayToString(flags, ';');
         synchronized (instances) {
-	        SimBoard old = (SimBoard)instances.get(hashString);
-	        if (old == null) {
-	            old = new SimBoard(x, y, field, flags);
-	            instances.put(hashString,old );
-	        }
-	        return old;
+            SimBoard old = instances.get(hashString);
+            if (old == null) {
+                old = new SimBoard(x, y, field, flags);
+                instances.put(hashString, old);
+            }
+            return old;
         }
-        
-	   
-	        
+
     }
-    
-    public static void clearBoardCache(){
-        synchronized (instances){
+
+    public static void clearBoardCache() {
+        synchronized (instances) {
             instances.clear();
         }
     }
-    
-    public void setServer(Server serv){
-        	this.server = serv;
+
+    public void setServer(Server serv) {
+        this.server = serv;
     }
-    
-    public void setPusherCanPushMoreThanOneBot(boolean wellCanThey){
+
+    public void setPusherCanPushMoreThanOneBot(boolean wellCanThey) {
         pushersCanPushMoreThanOneBot = wellCanThey;
     }
-    
-    public boolean arePushersPushingMoreThanOneBot(){
+
+    public boolean arePushersPushingMoreThanOneBot() {
         return pushersCanPushMoreThanOneBot;
     }
-    
-    
+
 } // spielfeldsim ende

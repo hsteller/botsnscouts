@@ -48,21 +48,29 @@ import org.apache.log4j.Category;
 
 import de.botsnscouts.util.Message;
 
-
+@SuppressWarnings("serial")
 class ButtonBar extends JPanel implements ActionListener {
+
     static final Category CAT = Category.getInstance(ButtonBar.class);
 
     private final static String DEFAULT_SAVE_DIR = "tiles";
-    
+
     private JButton feldSpeich = null;
+
     private JButton feldLaden = null;
+
     private JButton feldClear = null;
+
     private JButton exit = null;
+
     private JButton export = null;
+
     private JCheckBoxMenuItem advanced = null;
 
     protected BoardEditor editor = null;
+
     JFileChooser chooser;
+
     FileFilter rraFilter = new FileFilter() {
         public boolean accept(File file) {
             String name = file.getName();
@@ -85,18 +93,16 @@ class ButtonBar extends JPanel implements ActionListener {
         }
     };
 
-
     void makeChooser() {
         chooser = new JFileChooser(DEFAULT_SAVE_DIR);
         chooser.setFileFilter(rraFilter);
     }
 
-
     public ButtonBar(BoardEditor p) {
         editor = p;
         setLayout(new BorderLayout());
         JToolBar tb = new JToolBar();
-        //	setLayout(new GridLayout(1,3));
+        // setLayout(new GridLayout(1,3));
 
         feldLaden = new JButton(Message.say("BoardEditor", "bLaden"));
         feldLaden.addActionListener(this);
@@ -174,30 +180,30 @@ class ButtonBar extends JPanel implements ActionListener {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
             String filename = file.getName();
-            if (file.getName().equals("")) return;
+            if (file.getName().equals(""))
+                return;
             if (!filename.endsWith(".png")) {
                 file = new File(file.getParent(), filename + ".png");
                 CAT.debug("File " + file);
             }
             if (file.exists()) {
-                Object[] options = {Message.say("Start", "mOK"),
-                                    Message.say("Start", "mAbbr")};
+                Object[] options = { Message.say("Start", "mOK"), Message.say("Start", "mAbbr") };
 
                 String msg = Message.say("BoardEditor", "mDatEx", filename);
                 String warn = Message.say("BoardEditor", "mWarnung");
-                int r = JOptionPane.showOptionDialog(null, msg, warn,
-                        JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-                        null, options, options[0]);
+                int r = JOptionPane.showOptionDialog(null, msg, warn, JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.WARNING_MESSAGE, null, options, options[0]);
                 if (r != 0) {
                     return;
                 }
             }
-            
-            CAT.debug("Speichere " + file + " " + file.getName() + " (" + file.getName() + ")");         
+
+            CAT.debug("Speichere " + file + " " + file.getName() + " (" + file.getName() + ")");
             CAT.debug("File opened");
             try {
                 editor.dumpPngImage(file);
-            } catch (IOException i) {
+            }
+            catch (IOException i) {
                 System.err.println(Message.say("BoardEditor", "mDateiErr") + file + i);
             }
         }
@@ -211,33 +217,34 @@ class ButtonBar extends JPanel implements ActionListener {
             editor.setMagicBoardString(tmp);
             CAT.debug("Starte FileDialog");
 
-            //	    new NameDialog(editor,Message.say("BoardEditor","mKachelSave"),true);
+            // new
+            // NameDialog(editor,Message.say("BoardEditor","mKachelSave"),true);
             chooser.setFileFilter(rraFilter);
             chooser.rescanCurrentDirectory();
             int returnVal = chooser.showSaveDialog(editor);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
                 String filename = file.getName();
-                if (file.getName().equals("")) return;
+                if (file.getName().equals(""))
+                    return;
                 if (!filename.endsWith(".rra")) {
                     file = new File(file.getParent(), filename + ".rra");
                     CAT.debug("File " + file);
                 }
                 if (file.exists()) {
-                    Object[] options = {Message.say("Start", "mOK"),
-                                        Message.say("Start", "mAbbr")};
+                    Object[] options = { Message.say("Start", "mOK"), Message.say("Start", "mAbbr") };
 
                     String msg = Message.say("BoardEditor", "mDatEx", filename);
                     String warn = Message.say("BoardEditor", "mWarnung");
-                    int r = JOptionPane.showOptionDialog(null, msg, warn,
-                            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
-                            null, options, options[0]);
+                    int r = JOptionPane.showOptionDialog(null, msg, warn, JOptionPane.DEFAULT_OPTION,
+                                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
                     if (r != 0) {
                         return;
                     }
                 }
 
-                CAT.debug("Speichere " + file + " " + file.getName() + " (" + DEFAULT_SAVE_DIR+"/" + file.getName() + ")");             
+                CAT.debug("Speichere " + file + " " + file.getName() + " (" + DEFAULT_SAVE_DIR + "/" + file.getName()
+                                + ")");
                 CAT.debug("File opened");
                 try {
                     FileOutputStream fop = new FileOutputStream(file);
@@ -248,41 +255,52 @@ class ButtonBar extends JPanel implements ActionListener {
                     CAT.debug("String in File written");
                     pw.close();
                     CAT.debug("File closed");
-                } catch (IOException i) {
+                }
+                catch (IOException i) {
                     System.err.println(Message.say("BoardEditor", "mDateiErr") + file + i);
                 }
             }
-        } else if (e.getActionCommand().compareTo("Beenden") == 0) {
-            editor.dispose();
-            
-            //System.exit(0);
-        } else if (e.getActionCommand().compareTo("Clear") == 0) {
-            CAT.debug("Clearing field");
-            editor.initSpF();
-            editor.sp.getViewport().setView(editor.boardView);
-        } else if (e.getActionCommand().compareTo("Laden") == 0) {
-            chooser.rescanCurrentDirectory();
-            int returnVal = chooser.showOpenDialog(editor);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = chooser.getSelectedFile();
-                String name = file.getName();
-
-                if (name.equals("") || !file.exists() || !file.canRead() || file.isDirectory()) {
-                    String fehler = Message.say("Start", "mError");
-                    String msg = Message.say("BoardEditor", "eDateiErr");
-
-                    JOptionPane.showMessageDialog(null, msg, fehler, JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                editor.loadTileFile(file);
-            }
-            //new LadenDialog(editor,Message.say("BoardEditor","mKachelSave"),true);
-        } else if (e.getActionCommand().compareTo("Flag") == 0) {
-
-        } else {
-            CAT.error("unhandled ActionCommand " + e.getActionCommand());
         }
+        else
+            if (e.getActionCommand().compareTo("Beenden") == 0) {
+                editor.dispose();
+
+                // System.exit(0);
+            }
+            else
+                if (e.getActionCommand().compareTo("Clear") == 0) {
+                    CAT.debug("Clearing field");
+                    editor.initSpF();
+                    editor.sp.getViewport().setView(editor.boardView);
+                }
+                else
+                    if (e.getActionCommand().compareTo("Laden") == 0) {
+                        chooser.rescanCurrentDirectory();
+                        int returnVal = chooser.showOpenDialog(editor);
+                        if (returnVal == JFileChooser.APPROVE_OPTION) {
+                            File file = chooser.getSelectedFile();
+                            String name = file.getName();
+
+                            if (name.equals("") || !file.exists() || !file.canRead() || file.isDirectory()) {
+                                String fehler = Message.say("Start", "mError");
+                                String msg = Message.say("BoardEditor", "eDateiErr");
+
+                                JOptionPane.showMessageDialog(null, msg, fehler, JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+
+                            editor.loadTileFile(file);
+                        }
+                        // new
+                        // LadenDialog(editor,Message.say("BoardEditor","mKachelSave"),true);
+                    }
+                    else
+                        if (e.getActionCommand().compareTo("Flag") == 0) {
+
+                        }
+                        else {
+                            CAT.error("unhandled ActionCommand " + e.getActionCommand());
+                        }
     }
 
 }

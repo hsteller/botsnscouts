@@ -36,7 +36,8 @@ class SpfFilter implements FilenameFilter {
         try {
             // endsWith(".spf") ???
             return name.toLowerCase().endsWith(".spf");
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             return false;
         }
     }

@@ -22,10 +22,10 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.start;
 
-class OneFlagException extends Exception{
-//	TODO (comment me)
-}
+@SuppressWarnings("serial")
+class OneFlagException extends Exception {
 
+}

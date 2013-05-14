@@ -42,118 +42,144 @@ import java.awt.event.WindowListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
 import org.apache.log4j.Category;
 
-import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJLabel;
+
 /**
  * shows the status messages and action messages on the scrren
+ * 
  * @author Lukasz Pekacki
  */
+@SuppressWarnings("serial")
+public class StatusLog extends JPanel implements ActionListener {
 
-public class StatusLog  extends JPanel implements ActionListener{
     public StatusLog(View out) {
         parent = out;
 
         lF = new LogFrame();
-        JButton logButton = OptionPane.getTransparentButton(Message.say("StatusLog","afLog"), 14);
+        JButton logButton = OptionPane.getTransparentButton(Message.say("StatusLog", "afLog"), 14);
         logButton.addActionListener(this);
         add(logButton);
 
-	setLayout(new FlowLayout(FlowLayout.LEFT));
-	add(singleMessage);
+        setLayout(new FlowLayout(FlowLayout.LEFT));
+        add(singleMessage);
     }
 
     static Category CAT = Category.getInstance(StatusLog.class);
 
-    // Objects
-    //TODO (remove me)
-    private JTextArea textArea = new JTextArea();
     private JLabel singleMessage = new TJLabel();
 
     private View parent;
+
     private LogFrame lF;
-    protected TextArea ta = new TextArea(Message.say("StatusLog","afLog"),5,40);
+
+    protected TextArea ta = new TextArea(Message.say("StatusLog", "afLog"), 5, 40);
 
     public void addMessage(String s) {
-	singleMessage.setText(s);
-        ta.insert(s+"\n", 0);
+        singleMessage.setText(s);
+        ta.insert(s + "\n", 0);
     }
 
-//  TODO (use or delete me)
-    private void d(String s){
-	Global.debug(this, s);
+    public void actionPerformed(ActionEvent e) {
+        lF.makeVisible();
     }
 
-
-
-    public void actionPerformed(ActionEvent e){
-      lF.makeVisible();
+    protected Point ausgabeFrameLoc() {
+        return getLocationOnScreen();
     }
 
+    protected class LogFrame extends Frame implements WindowListener, MouseListener {
 
- protected Point ausgabeFrameLoc() {
-	return getLocationOnScreen();
- }
- protected class LogFrame extends Frame implements WindowListener,MouseListener {
-	boolean first = true;
-	public LogFrame() {
-	    this.setTitle(Message.say("AusgabeFrame","ereigLog"));
-	    this.add(ta);
-	    this.addWindowListener(this);
-	    this.addMouseListener(this);
-	    ta.addMouseListener(new MouseAdapter() {
-		    public void mouseClicked(MouseEvent e){ LogFrame.this.setVisible(false);}
-		    public void mousePressed(MouseEvent e){ LogFrame.this.setVisible(false);}
-		});
-	    this.setSize(500,150);
-	    this.setBackground(Color.lightGray);
-	    this.setResizable(false);
-	}
-	public void windowDeactivated(WindowEvent e) {this.setVisible(false);}
-	public void windowOpened(WindowEvent e)      {}
-	public void windowClosing(WindowEvent e) {this.setVisible(false);}
-	public void windowIconified(WindowEvent e)   { this.setVisible(false);}
-	public void windowDeiconified(WindowEvent e) {}
-	public void windowActivated(WindowEvent e)   {}
-	public void windowClosed(WindowEvent e)   { this.setVisible(false);}
+        boolean first = true;
 
-	public void mouseClicked(MouseEvent e){this.setVisible(false);}
-	public void mouseEntered(MouseEvent e){}
-	public void mouseExited(MouseEvent e){this.setVisible(false);}
-	public void mouseReleased(MouseEvent e){}
-	public void mousePressed(MouseEvent e){this.setVisible(false);}
+        public LogFrame() {
+            this.setTitle(Message.say("AusgabeFrame", "ereigLog"));
+            this.add(ta);
+            this.addWindowListener(this);
+            this.addMouseListener(this);
+            ta.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    LogFrame.this.setVisible(false);
+                }
 
-	public void makeVisible(){
-	    if (first){
-		int startx = ausgabeFrameLoc().x;
-		int starty = ausgabeFrameLoc().y;
-		Dimension dim = parent.getSize();
-                if (dim==null){
-                  CAT.warn("Oh-Oh! Dim is null=>showing log window in upper left corner!");
-                  this.setLocation(0,0);
+                public void mousePressed(MouseEvent e) {
+                    LogFrame.this.setVisible(false);
+                }
+            });
+            this.setSize(500, 150);
+            this.setBackground(Color.lightGray);
+            this.setResizable(false);
+        }
+
+        public void windowDeactivated(WindowEvent e) {
+            this.setVisible(false);
+        }
+
+        public void windowOpened(WindowEvent e) {
+        }
+
+        public void windowClosing(WindowEvent e) {
+            this.setVisible(false);
+        }
+
+        public void windowIconified(WindowEvent e) {
+            this.setVisible(false);
+        }
+
+        public void windowDeiconified(WindowEvent e) {
+        }
+
+        public void windowActivated(WindowEvent e) {
+        }
+
+        public void windowClosed(WindowEvent e) {
+            this.setVisible(false);
+        }
+
+        public void mouseClicked(MouseEvent e) {
+            this.setVisible(false);
+        }
+
+        public void mouseEntered(MouseEvent e) {
+        }
+
+        public void mouseExited(MouseEvent e) {
+            this.setVisible(false);
+        }
+
+        public void mouseReleased(MouseEvent e) {
+        }
+
+        public void mousePressed(MouseEvent e) {
+            this.setVisible(false);
+        }
+
+        public void makeVisible() {
+            if (first) {
+                int startx = ausgabeFrameLoc().x;
+                int starty = ausgabeFrameLoc().y;
+                Dimension dim = parent.getSize();
+                if (dim == null) {
+                    CAT.warn("Oh-Oh! Dim is null=>showing log window in upper left corner!");
+                    this.setLocation(0, 0);
                 }
                 else {
-                  this.setLocation((startx+ dim.width-500),
-                             (starty+dim.height-150));
+                    this.setLocation((startx + dim.width - 500), (starty + dim.height - 150));
                 }
-		first = false;
-	    }
-        this.setVisible(true);
-	    this.show(); //TODO (remove show)
-	}
-	public void finalize() throws Throwable{
-	    super.finalize();
-	    this.dispose();
-	}
+                first = false;
+            }
+            this.setVisible(true);
+        }
+
+        public void finalize() throws Throwable {
+            super.finalize();
+            this.dispose();
+        }
 
     }
 
 }
-
-
-

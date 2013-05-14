@@ -23,13 +23,11 @@
  
  *******************************************************************/
 
-
 /*
  * Created on 11.09.2005
  *
  */
 package de.botsnscouts.util;
-
 
 import de.botsnscouts.comm.KommException;
 import de.botsnscouts.server.RegistrationException;
@@ -39,129 +37,124 @@ import de.botsnscouts.start.JoiningGameFailedException;
  * @author Hendrik Steller
  * @version $Id$
  */
-public abstract  class BNSClientThread extends BNSThread {
-    
+public abstract class BNSClientThread extends BNSThread {
+
     private static final int REGISTRATION_RETRY_INTERVAL = 3000;
+
     private static final int MAX_RETRIES = 3;
-  
-    
+
     private String host;
+
     private int port;
+
     private int type;
 
     /**
      * 
-     * @param clientName The name of the client
-     * @param clientType one of the constants defined in @see de.botsnsouts.util.Registry
+     * @param clientName
+     *            The name of the client
+     * @param clientType
+     *            one of the constants defined in @see de.botsnsouts.util.Registry
      * @param serverHost
      * @param serverPort
      */
-    public BNSClientThread(String clientName, int clientType,  String serverHost, int serverPort){
+    public BNSClientThread(String clientName, int clientType, String serverHost, int serverPort) {
         super(clientName);
         this.host = serverHost;
         this.port = serverPort;
         this.type = clientType;
     }
-    
-    public void start(){       
-       throw new RuntimeException ("You are supposed to call bnsStart() instead of start()!");
+
+    public void start() {
+        throw new RuntimeException("You are supposed to call bnsStart() instead of start()!");
     }
-    
-  
-    public void bnsStart() throws JoiningGameFailedException{
-       
-    	Exception tmp; 
-    	JoiningGameFailedException isNullInCaseOfSuccess=null;
-       	try {
-       	    tmp = registerAtServer();
-       	}
-       	catch (Exception e){
-       	    tmp = e;
-       	}
-       	if (tmp != null) {
-           	if (tmp instanceof JoiningGameFailedException){
-           	    isNullInCaseOfSuccess = (JoiningGameFailedException) tmp;
-           	}
-           	else {
-           	    isNullInCaseOfSuccess = new JoiningGameFailedException(tmp);
-           	}
-       	}
-        if (isNullInCaseOfSuccess == null) {          
+
+    public void bnsStart() throws JoiningGameFailedException {
+
+        Exception tmp;
+        JoiningGameFailedException isNullInCaseOfSuccess = null;
+        try {
+            tmp = registerAtServer();
+        }
+        catch (Exception e) {
+            tmp = e;
+        }
+        if (tmp != null) {
+            if (tmp instanceof JoiningGameFailedException) {
+                isNullInCaseOfSuccess = (JoiningGameFailedException) tmp;
+            }
+            else {
+                isNullInCaseOfSuccess = new JoiningGameFailedException(tmp);
+            }
+        }
+        if (isNullInCaseOfSuccess == null) {
             Registry.getSingletonInstance().addClient(host, port, this, type);
             super.start();
         }
-        else {            
-            String error ="Could not connect with the server at: "+host+":"+port;
-            CAT.error(error);                        
+        else {
+            String error = "Could not connect with the server at: " + host + ":" + port;
+            CAT.error(error);
             throw isNullInCaseOfSuccess;
         }
-     
+
     }
-    
-    public String getServer(){
+
+    public String getServer() {
         return host;
     }
-    
-    public int getPortOnServer(){
+
+    public int getPortOnServer() {
         return port;
     }
-    
-    
-    
-    
-    public abstract boolean sendRegistrationRequestOnce( String hostname, int portNr) 
-    throws KommException, RegistrationException;
-        
-   
+
+    public abstract boolean sendRegistrationRequestOnce(String hostname, int portNr) throws KommException,
+                    RegistrationException;
+
     private Exception registerAtServer() {
         boolean registrationSuccess = false;
         int retries = 0;
         Exception lastEx = null;
         while ((!registrationSuccess) && (retries < MAX_RETRIES)) {
             try {
-                registrationSuccess = sendRegistrationRequestOnce(host, port);                                  
+                registrationSuccess = sendRegistrationRequestOnce(host, port);
             }
-            catch (RegistrationException re){
-               // no retries in that case, we have encountered some "logical error":
-               // the name is already in use, the game has already started or the 
+            catch (RegistrationException re) {
+                // no retries in that case, we have encountered some "logical error":
+                // the name is already in use, the game has already started or the
                 // maximum number of players is already registered
-                return new JoiningGameFailedException(re);                   
+                return new JoiningGameFailedException(re);
             }
             catch (Exception kE) {
                 lastEx = kE;
-                CAT.debug(kE.getMessage());                                                   
-            }            
+                CAT.debug(kE.getMessage());
+            }
             if (!registrationSuccess) {
                 waitToRetry();
                 retries++;
             }
         }
-  
+
         if (registrationSuccess) {
             CAT.debug("registered for game with name: " + getName());
             return null;
-        } 
-        else {                  
-            String error = "could not register at the server: " + host+":"+port; 
+        }
+        else {
+            String error = "could not register at the server: " + host + ":" + port;
             CAT.warn(error);
-            lastEx =  new JoiningGameFailedException(lastEx);
+            lastEx = new JoiningGameFailedException(lastEx);
             return lastEx;
-        }          
-    }
-    
-    private void waitToRetry(){
-        try {
-            synchronized(this) {
-                this.wait(REGISTRATION_RETRY_INTERVAL);
-            }
-        } 
-        catch (InterruptedException e) {
-            CAT.warn(e.getMessage(),e );
         }
     }
-   
-    
-    
+
+    private void waitToRetry() {
+        try {
+            synchronized (this) {
+                this.wait(REGISTRATION_RETRY_INTERVAL);
+            }
+        }
+        catch (InterruptedException e) {
+            CAT.warn(e.getMessage(), e);
+        }
+    }
 
 }
-

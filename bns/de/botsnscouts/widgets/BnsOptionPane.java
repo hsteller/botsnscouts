@@ -23,7 +23,6 @@
  
  *******************************************************************/
 
-
 /*
  * Created on 04.09.2005
  *
@@ -49,99 +48,91 @@ import javax.swing.JOptionPane;
  * @author Hendrik Steller
  * @version $Id$
  */
-public class BnsOptionPane extends JOptionPane{
+@SuppressWarnings("serial")
+public class BnsOptionPane extends JOptionPane {
 
-    
-   
-    private BnsOptionPane(){
-   //TODO (Comment me please)     
-    }
-    
-    
-    
-    
-    public static int getIntForReturnValue(JOptionPane pane){
+    public static int getIntForReturnValue(JOptionPane pane) {
         Object val = pane.getValue();
         int intval;
-        if (val != null){
-           intval =  ((Integer)val).intValue();
+        if (val != null) {
+            intval = ((Integer) val).intValue();
         }
         else {
             intval = JOptionPane.CLOSED_OPTION;
         }
         return intval;
-        
+
     }
-    
-    public int bnsShowConfirmDialog( Component parent, 
-                    String title, Object messageToShow) {
-        	return bnsShowConfirmDialog(this, parent, title, messageToShow);
+
+    public int bnsShowConfirmDialog(Component parent, String title, Object messageToShow) {
+        return bnsShowConfirmDialog(this, parent, title, messageToShow);
     }
-    
-    public static int bnsShowConfirmDialog(JOptionPane opt, Component parent, 
-                                                              String title, Object message) {        
-		opt.setOpaque(false);		
-		opt.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-		opt.setMessageType(JOptionPane.QUESTION_MESSAGE);
-		opt.setMessage(message);
-		
-		JDialog dialog = opt.createDialog(parent, title);
-		
-		Collection comps = getAllChildComponents(opt, JComponent.class);
-		for (Iterator it = comps.iterator(); it.hasNext();){
-		    JComponent comp = (JComponent)it.next();
-		    comp.setOpaque(false);
-		}	
-		dialog.pack();
-		dialog.setVisible(true);
-		return getIntForReturnValue(opt);    
+
+    public static int bnsShowConfirmDialog(JOptionPane opt, Component parent, String title, Object message) {
+        opt.setOpaque(false);
+        opt.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+        opt.setMessageType(JOptionPane.QUESTION_MESSAGE);
+        opt.setMessage(message);
+
+        JDialog dialog = opt.createDialog(parent, title);
+
+        Collection<Component> comps = getAllChildComponents(opt, JComponent.class);
+        for (Iterator<Component> it = comps.iterator(); it.hasNext();) {
+            Component comp = it.next();
+            if (comp instanceof JComponent) {
+                ((JComponent) comp).setOpaque(false);
+            }
+        }
+        dialog.pack();
+        dialog.setVisible(true);
+        return getIntForReturnValue(opt);
     }
-    
+
     /**
      * Creates a list of all of a Container's components by traversing the
-     *  (child) component tree.   
+     * (child) component tree.
      * 
      * @param traversalRoot the GUI element to start the traversion
      * @return A list of all child components of <code>traversatRoot</code>
      */
-    public static Collection getAllChildComponents(Container traversalRoot){
+    public static Collection<Component> getAllChildComponents(Container traversalRoot) {
         return getAllChildComponents(traversalRoot, null);
     }
+
     /**
-     * Creates a list of some or all  of a Container's components by traversing the
-     *  (child) component tree.   
+     * Creates a list of some or all of a Container's components by traversing the
+     * (child) component tree.
      * 
      * @param classfilter only include components that are instances of <code>classfilter</code>;
-     *               set NULL if you want an unfiltered list of all components.  
+     *            set NULL if you want an unfiltered list of all components.
      * @param traversalRoot the GUI element to start the traversion
      * @return A list of all child components of <code>traversatRoot</code> that are an instance of <code>filter</code>
      */
-    public static Collection getAllChildComponents(Container traversalRoot, Class classfilter){
-        LinkedList comps = new LinkedList();
+    public static <E> Collection<Component> getAllChildComponents(Container traversalRoot, Class<E> classfilter) {
+        LinkedList<Component> comps = new LinkedList<Component>();
         addComponentsOf(traversalRoot, comps, classfilter);
         return comps;
     }
-    
-    private static void addComponentsOf(Container comp, Collection toAddTo, Class filter){
-        
-        Component [] comps = comp.getComponents();
-        int count = comps!=null?comps.length:0;
-        for (int i=0;i<count;i++){
+
+    private static <E> void addComponentsOf(Container comp, Collection<Component> toAddTo, Class<E> filter) {
+
+        Component[] comps = comp.getComponents();
+        int count = comps != null ? comps.length : 0;
+        for (int i = 0; i < count; i++) {
             Component cur = comps[i];
-            if (filter == null || filter.isInstance(cur))  {
-                toAddTo.add(cur);        
-            }            
+            if (filter == null || filter.isInstance(cur)) {
+                toAddTo.add(cur);
+            }
             if (cur instanceof Container) {
-                addComponentsOf((Container)cur, toAddTo, filter);
+                addComponentsOf((Container) cur, toAddTo, filter);
             }
         }
-        
+
     }
-    
-   
+
     public static BnsOptionPane createColoredOptionPane(Color color) {
         final Color finalColor = color;
-        BnsOptionPane pane = new BnsOptionPane(){
+        BnsOptionPane pane = new BnsOptionPane() {
             public void paint(Graphics g) {
                 g.setColor(finalColor);
                 g.fillRect(0, 0, getWidth(), getHeight());
@@ -149,49 +140,44 @@ public class BnsOptionPane extends JOptionPane{
             }
         };
         return pane;
-        
+
     }
-    
-    
-    public  static JOptionPane createPaintedOptionPane () {
+
+    public static JOptionPane createPaintedOptionPane() {
         return createPaintedOptionPane(false);
     }
-    public  static JOptionPane createShadedPaintedOptionPane () {
+
+    public static JOptionPane createShadedPaintedOptionPane() {
         return createPaintedOptionPane(true);
     }
-    public static BnsOptionPane createPaintedOptionPane ( boolean shade) {
-       
-        final boolean finalShade = shade;        
-        BnsOptionPane pane = new BnsOptionPane(){
-            Paint myPaint = OptionPane.getBackgroundPaint(this);            
+
+    public static BnsOptionPane createPaintedOptionPane(boolean shade) {
+
+        final boolean finalShade = shade;
+        BnsOptionPane pane = new BnsOptionPane() {
+            Paint myPaint = OptionPane.getBackgroundPaint(this);
+
             public void paintComponent(Graphics g) {
-	    		Graphics2D g2d = (Graphics2D) g;
-	    		Dimension d = getSize();	
-	    		g2d.setPaint(myPaint);
-	    		g2d.fillRect(0,0, d.width, d.height);
-	            if( finalShade ) {
-	                g2d.setPaint(PaintPanel.color);
-	                g2d.fillRect(0,0, d.width, d.height);
-	            }
-            }                    
+                Graphics2D g2d = (Graphics2D) g;
+                Dimension d = getSize();
+                g2d.setPaint(myPaint);
+                g2d.fillRect(0, 0, d.width, d.height);
+                if (finalShade) {
+                    g2d.setPaint(PaintPanel.color);
+                    g2d.fillRect(0, 0, d.width, d.height);
+                }
+            }
         };
         return pane;
     }
-    
-   
-    
-   public static void main (String [] args){
-       TJLabel msg = new TJLabel("bla fasel foo bar yaddayadda");
-       JOptionPane colorPane = createColoredOptionPane(GreenTheme.getBnsBackgroundColor());
-       JOptionPane imagePane = createPaintedOptionPane(true);
-       BnsOptionPane.bnsShowConfirmDialog(colorPane, null,"window title color", msg);
-       BnsOptionPane.bnsShowConfirmDialog(imagePane, null,"window title image", msg);
-       
-   }
-    
-    
-    
-    
-    
-}
 
+    public static void main(String[] args) {
+        TJLabel msg = new TJLabel("bla fasel foo bar yaddayadda");
+        JOptionPane colorPane = createColoredOptionPane(GreenTheme.getBnsBackgroundColor());
+        JOptionPane imagePane = createPaintedOptionPane(true);
+        BnsOptionPane.bnsShowConfirmDialog(colorPane, null, "window title color", msg);
+        BnsOptionPane.bnsShowConfirmDialog(imagePane, null, "window title image", msg);
+
+    }
+
+}

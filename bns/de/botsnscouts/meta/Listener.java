@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /*
-  *******************************************************************
+ *******************************************************************
  *        Bots 'n' Scouts - Multi-Player networked Java game       *
  *                                                                 *
  * Copyright (C) 2001-2004 scouties.                               *
@@ -20,13 +20,14 @@ import java.net.Socket;
 
 /**
  * Listen for requests.
+ * 
  * @author miriam
  */
 public class Listener extends Thread {
 
     private ServerSocket serverSocket;
 
-    Listener( int port ) throws IOException {
+    Listener(int port) throws IOException {
 
         serverSocket = new ServerSocket(port);
 
@@ -37,8 +38,9 @@ public class Listener extends Thread {
             try {
                 Socket sock = serverSocket.accept();
                 (new Handler(sock)).start();
-            } catch (IOException ex) {
-                //TODO:
+            }
+            catch (IOException ex) {
+                // TODO:
                 ex.printStackTrace();
             }
         }

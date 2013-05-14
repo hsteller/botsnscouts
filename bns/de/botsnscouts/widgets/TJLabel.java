@@ -34,10 +34,13 @@ import javax.swing.JLabel;
 /**
  * Transparent JLabel
  */
+@SuppressWarnings("serial")
 public class TJLabel extends JLabel {
 
     private static Font fontSmall = new Font("Sans", Font.BOLD, 12);
+
     private static Font fontBig = new Font("Sans", Font.BOLD, 24);
+
     private static Color textColor = GreenTheme.getTextColor();
 
     public TJLabel() {
@@ -65,9 +68,9 @@ public class TJLabel extends JLabel {
         init();
         setForeground(color);
     }
-    
+
     public TJLabel(String text, int align, Color color) {
-        this(text,align);
+        this(text, align);
         init();
         setForeground(color);
     }
@@ -78,16 +81,18 @@ public class TJLabel extends JLabel {
         setForeground(color);
         if (big) {
             setFont(fontBig);
-        } else {
+        }
+        else {
             setFont(fontSmall);
         }
     }
+
     public TJLabel(String text, Color color, Font font) {
         super(text);
         init();
         setForeground(color);
         setFont(font);
-        
+
     }
 
     public TJLabel(Icon icon) {

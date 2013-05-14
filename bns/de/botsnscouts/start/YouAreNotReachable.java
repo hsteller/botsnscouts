@@ -23,13 +23,12 @@
  
  *******************************************************************/
 
-
 package de.botsnscouts.start;
 
 /**
  * @author Miriam Busch - <miriam.busch@codimi.de>
  */
-
+@SuppressWarnings("serial")
 public class YouAreNotReachable extends Exception {
-}
 
+}

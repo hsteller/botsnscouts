@@ -73,12 +73,11 @@ public class ServerAnmeldeThread extends Thread {
     }
 
     /**
-     * Wartet server.anmeldeto auf eine Aktion, kreiert ggf. neue
-     * ServerRoboterThread- bzw ServerAusgabeThread-Objekte und haengt diese in
-     * die richtigen Vektoren ein.
+     * Wartet server.anmeldeto auf eine Aktion, kreiert ggf. neue ServerRoboterThread- bzw ServerAusgabeThread-Objekte und haengt diese in die
+     * richtigen Vektoren ein.
      */
     public void run() {
-        CAT.debug ("SERVER ANMELDTHREAD STARTED");
+        CAT.debug("SERVER ANMELDTHREAD STARTED");
         try {
             PrintWriter out = null;
             BufferedReader in = null;
@@ -185,7 +184,7 @@ public class ServerAnmeldeThread extends Thread {
             // OK, nun geeignete Objekte kreieren und einsortieren
 
             if ((clienttype == AUSGABE) || (clienttype == AUSGABEV2)) {
-                KommServerAusgabe ksa = new KommServerAusgabe(in, out, "ServerComm_"+clientname);
+                KommServerAusgabe ksa = new KommServerAusgabe(in, out, "ServerComm_" + clientname);
                 // sende 'ok' zur anmeldebestaetigung
                 try {
                     ksa.anmeldeBestaetigung(true);
@@ -237,7 +236,7 @@ public class ServerAnmeldeThread extends Thread {
                         }
                         out.close();
                         return;
-                    } //oberThread.roboterAnmeldung false
+                    } // oberThread.roboterAnmeldung false
                     d("Er darf jedenfalls, vom Server aus.");
 
                     synchronized (oberThread.namen) {
@@ -251,7 +250,7 @@ public class ServerAnmeldeThread extends Thread {
                             }
                             out.close();
                             return;
-                        } //Name illegal
+                        } // Name illegal
                         d("Der Name ist jedenfalls noch nicht vergeben.");
 
                         synchronized (oberThread.anzSpieler) {
@@ -273,7 +272,7 @@ public class ServerAnmeldeThread extends Thread {
 
                             Bot h = Bot.getNewInstance(clientname);
                             h.setBotVis(farbe);
-                            KommServerRoboter komm = new KommServerRoboter(in, out, "ServerComm_"+clientname);
+                            KommServerRoboter komm = new KommServerRoboter(in, out, "ServerComm_" + clientname);
                             try {
                                 komm.anmeldeBestaetigung(true);
                             }
@@ -286,15 +285,15 @@ public class ServerAnmeldeThread extends Thread {
                             oberThread.anzSpieler = new Integer(oberThread.anzSpieler.intValue() + 1);
                             d("" + oberThread.anzSpieler + ". Bot mit Name " + clientname + " erzeugt.");
 
-                            ServerRoboterThread neu = new ServerRoboterThread(h, server.getOKListener(), server
-                                            .getInfoRequestAnswerer(), server.getRobThreadMaintainer(), komm);
+                            ServerRoboterThread neu = new ServerRoboterThread(h, server.getOKListener(),
+                                            server.getInfoRequestAnswerer(), server.getRobThreadMaintainer(), komm);
                             server.addRobotThread(neu);
                             d("ServerRoboterThread erzeugt und einsortiert.");
                             oberThread.addName(" " + clientname + " ");
                             server.updateNewBot(clientname, farbe);
 
                             if (oberThread.anzSpieler.intValue() >= server.getMaxPlayers()) { // alle
-                                                                                                                                               // da
+                                                                                              // da
                                 try {
                                     sleep(5000);
                                 }
@@ -309,13 +308,13 @@ public class ServerAnmeldeThread extends Thread {
                         } // synchronized oberThread.anzSpieler
                     } // synchronized oberThread.namen
                 } // synchronized oberThread.roboterAnmeldung
-            } //clienttype==spieler
+            } // clienttype==spieler
         }
         catch (Throwable t) {
             CAT.fatal("Exception:", t);
-        }        
-        CAT.debug ("SERVER ANMELDETHREAD REACHED END OF RUN");
-    } //run
+        }
+        CAT.debug("SERVER ANMELDETHREAD REACHED END OF RUN");
+    } // run
 
     private boolean nurLatein(String s) {
         if (s == null)

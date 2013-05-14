@@ -45,19 +45,23 @@ import de.botsnscouts.widgets.ColoredPanel;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJLabel;
 
-
+@SuppressWarnings("serial")
 class PlayersPanel extends ColoredPanel {
-    private JList roblist;
+
+    private JList<String> roblist;
+
     Start parent;
-    Vector names = new Vector();
-    private Hashtable map = new Hashtable();
+
+    Vector<String> names = new Vector<String>();
+
+    private Hashtable<String, Integer> map = new Hashtable<String, Integer>(8);
 
     public PlayersPanel(Start par) {
         setLayout(new BorderLayout());
         parent = par;
-        roblist = new JList();
+        roblist = new JList<String>();
         roblist.setOpaque(false);
-        roblist.setFixedCellWidth(250);      
+        roblist.setFixedCellWidth(250);
         roblist.setFont(new Font("Sans", Font.BOLD, 20));
         roblist.setCellRenderer(new CellRenderer());
         roblist.setFixedCellHeight(64);
@@ -66,7 +70,8 @@ class PlayersPanel extends ColoredPanel {
         JComponent p = new JPanel(new BorderLayout());
         p.setOpaque(false);
 
-        JScrollPane sp = new JScrollPane(roblist, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane sp = new JScrollPane(roblist, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         sp.setOpaque(false);
         sp.getViewport().setOpaque(false);
         sp.setBorder(OptionPane.niceBorder);
@@ -78,7 +83,7 @@ class PlayersPanel extends ColoredPanel {
         map.put(name, new Integer(farbe));
         Global.debug(this, "neuer roboter:" + name + BoardView.ROBOCOLOR[farbe]);
         names.addElement(name);
-        Global.debug(this, name+" added to name list");
+        Global.debug(this, name + " added to name list");
         roblist.setListData(names);
         Global.debug(this, "name list replaced");
         parent.setVisible(true);
@@ -86,23 +91,22 @@ class PlayersPanel extends ColoredPanel {
 
     public void gameStarted() {
         Global.debug(this, "Spiel geht los");
-//      XXX HS 28.05.2005 parent.beenden();
+        // XXX HS 28.05.2005 parent.beenden();
         map.clear();
         names.clear();
         roblist.removeAll();
-        
+
         parent.setVisible(false);
     }
 
-    
-    
+    class CellRenderer extends TJLabel implements ListCellRenderer<String> {
 
-    class CellRenderer extends TJLabel implements ListCellRenderer {
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            String name = (String) value;
+        @Override
+        public Component getListCellRendererComponent(JList<? extends String> list, String name, int index,
+                        boolean isSelected, boolean cellHasFocus) {
 
             setText(name);
-            int farbe = ((Integer) map.get(name)).intValue();
+            int farbe = map.get(name).intValue();
             setIcon(RoboCellRenderer.robIcons[farbe]);
             this.setFont(list.getFont());
             this.setOpaque(false);

@@ -41,40 +41,29 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import org.apache.log4j.Category;
-
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJButton;
 
-
+@SuppressWarnings("serial")
 public class MainMenu extends JPanel implements ActionListener {
-    /**
-     * The logger which is actually not used 
-     */
-	private static Category CAT = Category.getInstance(MainMenu.class.getName());
 
     private Paint paint;
+
     // all my components
     private JButton gameBut;
+
     private JButton partBut;
+
     private JButton watchBut;
+
     private JButton editBut;
+
     private JButton endBut;
+
     private JLabel logo;
 
-    // TODO(Remove me)
-    private Start parent;
-
-    public MainMenu(Start par) {
-        // TODO(Remove me)
-    	parent = par;
-
-    	/* this access is inacceptable
-         * because Start is implemented as a singleton
-         * The common way would be:
-         * Start.getLauncherAppSingleton().setTitle(Message.say("Start", "mStartTitel")); 
-         */
+    public MainMenu(Start parent) {        
         parent.setTitle(Message.say("Start", "mStartTitel"));
         paint = parent.paint;
 
@@ -130,17 +119,26 @@ public class MainMenu extends JPanel implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+        Start parent = Start.getLauncherAppSingleton();
         if (e.getActionCommand().equals("endBut")) {
             parent.myclose();
-        } else if (e.getActionCommand().equals("gameBut")) {
-            parent.showGameFieldPanel();
-        } else if (e.getActionCommand().equals("partBut")) {
-            parent.showParticipatePanel();
-        } else if (e.getActionCommand().equals("watchBut")) {
-            parent.showWatchPanel();
-        } else if (e.getActionCommand().equals("editBut")) {
-            new de.botsnscouts.editor.BoardEditor();
         }
+        else
+            if (e.getActionCommand().equals("gameBut")) {
+                parent.showGameFieldPanel();
+            }
+            else
+                if (e.getActionCommand().equals("partBut")) {
+                    parent.showParticipatePanel();
+                }
+                else
+                    if (e.getActionCommand().equals("watchBut")) {
+                        parent.showWatchPanel();
+                    }
+                    else
+                        if (e.getActionCommand().equals("editBut")) {
+                            new de.botsnscouts.editor.BoardEditor();
+                        }
     }
 
     public void unrollOverButs() {

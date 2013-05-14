@@ -33,8 +33,10 @@ import java.awt.Paint;
 
 import javax.swing.JPanel;
 
+@SuppressWarnings("serial")
 public class PaintPanel extends JPanel {
     Paint paint;
+
     boolean shade;
 
     static Color color;
@@ -43,27 +45,24 @@ public class PaintPanel extends JPanel {
         color = new Color(c.getRed(), c.getGreen(), c.getBlue(), ColoredComponent.alpha);
     }
 
-
-
-    public PaintPanel( Paint paint ) {
-        this( paint, false );
+    public PaintPanel(Paint paint) {
+        this(paint, false);
     }
 
-    public PaintPanel( Paint paint, boolean shade ) {
+    public PaintPanel(Paint paint, boolean shade) {
         this.paint = paint;
         this.shade = shade;
     }
 
     public void paintComponent(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-		Dimension d = getSize();	
-		g2d.setPaint(paint);
-		g2d.fillRect(0,0, d.width, d.height);
-        if( shade ) {
-            g2d.setPaint( color );
-            g2d.fillRect(0,0, d.width, d.height);
+        Graphics2D g2d = (Graphics2D) g;
+        Dimension d = getSize();
+        g2d.setPaint(paint);
+        g2d.fillRect(0, 0, d.width, d.height);
+        if (shade) {
+            g2d.setPaint(color);
+            g2d.fillRect(0, 0, d.width, d.height);
         }
     }
-
 
 }

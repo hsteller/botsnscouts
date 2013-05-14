@@ -22,7 +22,7 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.editor;
 
 import java.awt.Button;
@@ -35,44 +35,47 @@ import javax.swing.JDialog;
 
 import de.botsnscouts.util.Message;
 
-class PhaseDialog extends JDialog implements ActionListener{
+@SuppressWarnings("serial")
+class PhaseDialog extends JDialog implements ActionListener {
 
-    private Button ok=null;
-    private Checkbox[] chkb=new Checkbox[5];
+    private Button ok = null;
 
-    private BoardEditor par=null;
-    private int x=200,y=300;
+    private Checkbox[] chkb = new Checkbox[5];
 
-    public PhaseDialog(BoardEditor pa,String tit,boolean mod){
-	super(pa,tit,mod);
-	par=pa;
-	setSize(x,y);
-	getContentPane().setLayout(new GridLayout(6,1,2,2));
+    private BoardEditor par = null;
 
-	for(int i=0;i<5;i++){
-	    chkb[i]=new Checkbox(Message.say("BoardEditor","mPhase")+" "+(i+1));
-	    getContentPane().add(chkb[i]);
-	}
-	ok=new Button(Message.say("BoardEditor","bOk"));
-	ok.addActionListener(this);
-	ok.setActionCommand("OK");
-	getContentPane().add(ok);
-	setVisible(true);
-	//show();
+    private int x = 200, y = 300;
+
+    public PhaseDialog(BoardEditor pa, String tit, boolean mod) {
+        super(pa, tit, mod);
+        par = pa;
+        setSize(x, y);
+        getContentPane().setLayout(new GridLayout(6, 1, 2, 2));
+
+        for (int i = 0; i < 5; i++) {
+            chkb[i] = new Checkbox(Message.say("BoardEditor", "mPhase") + " " + (i + 1));
+            getContentPane().add(chkb[i]);
+        }
+        ok = new Button(Message.say("BoardEditor", "bOk"));
+        ok.addActionListener(this);
+        ok.setActionCommand("OK");
+        getContentPane().add(ok);
+        setVisible(true);
+        // show();
     }
 
- public void actionPerformed(ActionEvent e)  {
-     if(e.getActionCommand().equals("OK")){
-	 int mult=1;
-	 par.phasen=0;
-	 for(int i=0;i<5;i++){
-	     if(chkb[i].getState())
-		 par.phasen+=mult;
-	     mult*=2;
-	 }
-	 if(par.phasen>0)
-	     this.dispose();
-     }
- }
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("OK")) {
+            int mult = 1;
+            par.phasen = 0;
+            for (int i = 0; i < 5; i++) {
+                if (chkb[i].getState())
+                    par.phasen += mult;
+                mult *= 2;
+            }
+            if (par.phasen > 0)
+                this.dispose();
+        }
+    }
 
 }

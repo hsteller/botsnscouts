@@ -23,7 +23,6 @@
  
  *******************************************************************/
 
-
 package de.botsnscouts.start;
 
 import java.awt.BorderLayout;
@@ -47,27 +46,30 @@ import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJLabel;
 
 /**
- * Shown when something is happening, yet we don't know
- * how long it'll take to complete
- *
+ * Shown when something is happening, yet we don't know how long it'll take to complete
+ * 
  * @author Dirk
  */
-
+@SuppressWarnings("serial")
 public class DoingStuffPanel extends JPanel {
 
     TJLabel txt;
+
     FourRobs progressIndicator;
+
     double angle;
+
     Paint paint;
+
     Font font = new Font("Sans", Font.PLAIN, 35);
+
     Image twonky;
-    
-    /* we should use a lazy instanciation here, because we
-     * just dont want to waste time at startup. Maybe we 
-     * can initialize all the components in the show method 
-     * if needed? But i think this is future.
-     */ 
-    
+
+    /*
+     * we should use a lazy instanciation here, because we just dont want to waste time at startup. Maybe we can initialize all the components in the
+     * show method if needed? But i think this is future.
+     */
+
     public DoingStuffPanel(Paint p) {
         paint = p;
 
@@ -120,6 +122,7 @@ public class DoingStuffPanel extends JPanel {
     }
 
     private class FourRobs extends de.botsnscouts.widgets.ColoredComponent {
+
         private Rob[] robs;
 
         public FourRobs() {
@@ -167,7 +170,9 @@ public class DoingStuffPanel extends JPanel {
 
     private class Rob {
         private Image im;
+
         private int x, y;
+
         private Dimension d;
 
         public Rob(Image i, int xx, int yy) {
@@ -183,7 +188,7 @@ public class DoingStuffPanel extends JPanel {
         public void paint(Graphics2D g2) {
             g2.drawImage(im, x, y, d.width, d.height, DoingStuffPanel.this);
         }
-        //d=new Dimension(im.getHeight(this)*2,im.getWidth(this)*2);
+        // d=new Dimension(im.getHeight(this)*2,im.getWidth(this)*2);
     }
 
     public static void main(String[] argv) {
@@ -193,11 +198,12 @@ public class DoingStuffPanel extends JPanel {
         final DoingStuffPanel p = new DoingStuffPanel(Color.gray);
         new Thread(new Runnable() {
             public void run() {
-                for (; ;) {
+                for (;;) {
                     p.inc();
                     try {
                         Thread.sleep(50);
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e) {
                     }
                 }
             }
@@ -208,4 +214,3 @@ public class DoingStuffPanel extends JPanel {
     }
 
 }
-

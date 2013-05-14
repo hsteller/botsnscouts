@@ -23,13 +23,11 @@
  
  *******************************************************************/
 
-
 package de.botsnscouts.gui.hotkey;
-
+@SuppressWarnings("serial")
 public class KeyReserved extends Exception {
 
-  public KeyReserved() {
-    super();
-  }
+    public KeyReserved() {
+        super();
+    }
 }
-

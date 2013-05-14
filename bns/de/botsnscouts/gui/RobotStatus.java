@@ -27,11 +27,13 @@ package de.botsnscouts.gui;
 
 import de.botsnscouts.util.Bot;
 
-    /**
-     * Status of a robot
-     */
+/**
+ * Status of a robot
+ */
 public interface RobotStatus {
     public void updateRobot(Bot r);
-    public void setWinnerNumber (int ranking);
+
+    public void setWinnerNumber(int ranking);
+
     public Bot getRobot();
 }

@@ -22,26 +22,39 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.server;
 
 /** Can answer the various InfoRequests a client might have */
-interface InfoRequestAnswerer{
+interface InfoRequestAnswerer {
     int getFieldSizeX();
+
     int getFieldSizeY();
+
     String getFieldString();
+
     de.botsnscouts.util.Location[] getFlags();
+
     String[] getNames();
+
     de.botsnscouts.util.Location getRobPos(String name);
+
     de.botsnscouts.util.Bot getRobStatus(String name);
+
     boolean gameRunning();
+
     String[] getStanding();
+
     de.botsnscouts.util.Status[] getEvalStatus();
+
     String[] getNamesByColor();
+
     de.botsnscouts.util.StatsList getStats();
-    
+
     boolean isScoutAllowed();
+
     boolean isWisenheimerAllowed();
-    boolean  arePushersPushingMultipleBots();
-    
+
+    boolean arePushersPushingMultipleBots();
+
 }

@@ -23,9 +23,9 @@
 
  *******************************************************************/
 
-
 package de.botsnscouts.board;
 
+@SuppressWarnings("serial")
 public class DoPhaseException extends RuntimeException {
     DoPhaseException() {
         super();

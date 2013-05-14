@@ -23,12 +23,12 @@
  
  *******************************************************************/
 
-
 package de.botsnscouts.start;
 
 /**
  * @author Miriam Busch - <miriam.busch@codimi.de>
  */
+@SuppressWarnings("serial")
 public class UnableToAnnounceGameException extends Exception {
 
     public UnableToAnnounceGameException() {
@@ -40,4 +40,3 @@ public class UnableToAnnounceGameException extends Exception {
     }
 
 }
-

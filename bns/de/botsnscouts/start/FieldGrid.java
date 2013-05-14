@@ -30,13 +30,17 @@ import java.awt.GridLayout;
 import de.botsnscouts.util.Location;
 import de.botsnscouts.widgets.TJPanel;
 
+@SuppressWarnings("serial")
 class FieldGrid extends TJPanel {
+
     private Start parent;
+
     private TileComponent[][] tileP;
 
     FieldGrid(Start par) {
         parent = par;
-        Location spfDim = parent.facade.getBoardDim();
+        Facade facade = parent.getFacade();
+        Location spfDim = facade.getBoardDim();
         GridLayout lay = new GridLayout(spfDim.y, spfDim.x);
         lay.setHgap(0);
         lay.setVgap(0);
@@ -46,7 +50,7 @@ class FieldGrid extends TJPanel {
         tileP = new TileComponent[spfDim.x][spfDim.y];
         for (int j = spfDim.y - 1; j >= 0; j--) {
             for (int i = 0; i < spfDim.x; i++) {
-                tileP[i][j] = new TileComponent(par.facade, i, j);
+                tileP[i][j] = new TileComponent(facade, i, j);
                 add(tileP[i][j]);
             }
         }

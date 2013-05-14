@@ -23,7 +23,6 @@
  
  *******************************************************************/
 
-
 /*
  * Created on 13.06.2005
  *
@@ -57,72 +56,70 @@ import de.botsnscouts.util.KrimsKrams;
 import de.botsnscouts.widgets.TJPanel;
 
 /**
- * To be shown during  the five evaluation phases of a round.
- * Intended to display who played which cards, maybe highlight currently evaluated card. 
+ * To be shown during the five evaluation phases of a round. Intended to display
+ * who played which cards, maybe highlight currently evaluated card.
  * 
  * @author Hendrik Steller
- * @version $Id$
+ * @version $Id: PhaseEvaluationPanel.java,v 1.7 2005/11/13 18:38:18 igzorn Exp
+ *          $
  */
+@SuppressWarnings("serial")
 public class PhaseEvaluationPanel extends TJPanel {
-    
+
     private static Category CAT = Category.getInstance(PhaseEvaluationPanel.class);
-    
-    private Bot [] bots;
-    private ScalableRegisterRow [] registerRows;
-    
-    public PhaseEvaluationPanel(){
-        //TODO (Comment me)
+
+    private Bot[] bots;
+
+    private ScalableRegisterRow[] registerRows;
+
+    public PhaseEvaluationPanel() {
     }
-    
-    public PhaseEvaluationPanel(Bot [] robots, ScalableRegisterRow [] viewRows ){
+
+    public PhaseEvaluationPanel(Bot[] robots, ScalableRegisterRow[] viewRows) {
         setContents(robots, viewRows);
     }
 
-    public void setContents(Bot [] robots, ScalableRegisterRow [] viewRows ){
+    public void setContents(Bot[] robots, ScalableRegisterRow[] viewRows) {
         this.bots = robots;
         this.registerRows = viewRows;
         reinitLayout();
     }
-    
-   
-    
-    protected void reinitLayout()  {
-        this.removeAll(); 
+
+    protected void reinitLayout() {
+        this.removeAll();
         GridBagLayout gr = new GridBagLayout();
         GridBagConstraints outer = new GridBagConstraints();
-        outer.insets.bottom=5;
-        outer.fill= GridBagConstraints.BOTH;
+        outer.insets.bottom = 5;
+        outer.fill = GridBagConstraints.BOTH;
         outer.anchor = GridBagConstraints.NORTH;
         this.setLayout(gr);
         setOpaque(false);
-        
+
         GridBagConstraints gc = new GridBagConstraints();
         gc.insets.bottom = 0;
-       Font font = new Font("Sans", Font.BOLD, 10);
-        
-        int count = bots!=null?bots.length:0;
-        for (int row=0;row<count;row++){                       
-            TJPanel rowPanel = new TJPanel();                        
+        Font font = new Font("Sans", Font.BOLD, 10);
+
+        int count = bots != null ? bots.length : 0;
+        for (int row = 0; row < count; row++) {
+            TJPanel rowPanel = new TJPanel();
             Bot currentBot = bots[row];
-            
-          
+
             int visID = currentBot.getBotVis();
             Color botColor = BotVis.getBotColorByBotVis(visID);
-            
+
             Image img = BotVis.get48x48BotImageByBotVis(visID, Directions.NORTH);
-            	
+
             ImageIcon botIcon = new ImageIcon(img);
-      
-          
-            //BotLabel picLabel = new BotLabel(currentBot);
-            JLabel picLabel = new JLabel(botIcon,SwingConstants.CENTER);
-            
+
+            // BotLabel picLabel = new BotLabel(currentBot);
+            JLabel picLabel = new JLabel(botIcon, SwingConstants.CENTER);
+
             // I don't get any error, but I'm not sure that a JLabel is required
-            // to _not_  choke on negative values here..
+            // to _not_ choke on negative values here..
             try {
                 picLabel.setIconTextGap(-5);
             }
-            catch (Exception e){
+            catch (Exception e) {
                 CAT.warn("your JDK didn't like a negative pixel value..");
                 CAT.warn(e.getMessage(), e);
                 picLabel.setIconTextGap(0);
@@ -133,98 +130,97 @@ public class PhaseEvaluationPanel extends TJPanel {
             picLabel.setForeground(botColor);
             picLabel.setFont(font);
             picLabel.setText(currentBot.getName());
-            
-            
+
             gc.gridy = row;
             gc.gridx = 0;
             gc.fill = GridBagConstraints.NONE;
             gc.anchor = GridBagConstraints.WEST;
-           
+
             rowPanel.add(picLabel, gc);
-           
-            
+
             gc.gridx = 1;
-          
-            gc.anchor=GridBagConstraints.EAST;
+
+            gc.anchor = GridBagConstraints.EAST;
             gc.fill = GridBagConstraints.BOTH;
-            
-         //   Border border = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED, botColor.brighter(),botColor.darker());            
-         //   TitledBorder titleBorder =  BorderFactory.createTitledBorder(border,currentBot.getName(),
-         //                   					TitledBorder.LEFT, TitledBorder.TOP,nameFont, botColor);
-            
-           
-          //  rowPanel.setBorder(border);
-            rowPanel.add(registerRows[row], gc);           
-          
+
+            // Border border =
+            // BorderFactory.createEtchedBorder(EtchedBorder.LOWERED,
+            // botColor.brighter(),botColor.darker());
+            // TitledBorder titleBorder =
+            // BorderFactory.createTitledBorder(border,currentBot.getName(),
+            // TitledBorder.LEFT, TitledBorder.TOP,nameFont, botColor);
+
+            // rowPanel.setBorder(border);
+            rowPanel.add(registerRows[row], gc);
+
             outer.gridy = row;
             this.add(rowPanel, outer);
         }
-      //  this.setPreferredSize(new Dimension(260,550));
+        // this.setPreferredSize(new Dimension(260,550));
         this.revalidate();
-        this.repaint();        
+        this.repaint();
     }
-    
-    public void hideAll(boolean showCardBacksideInsteadOfEmpty){
-        int size = registerRows!=null?registerRows.length:0;
-        for (int i=0;i<size;i++){       
-            registerRows[i].alwayshowCardBackInsteadOfEmpty(showCardBacksideInsteadOfEmpty); 
+
+    public void hideAll(boolean showCardBacksideInsteadOfEmpty) {
+        int size = registerRows != null ? registerRows.length : 0;
+        for (int i = 0; i < size; i++) {
+            registerRows[i].alwayshowCardBackInsteadOfEmpty(showCardBacksideInsteadOfEmpty);
             registerRows[i].hideAll();
         }
     }
-    
-    
+
     public static void main(String[] args) {
         ImageMan.finishLoading();
         CursorMan.finishLoading();
-        Bot [] bs = new Bot[8];
-        ScalableRegisterRow [] rows = new ScalableRegisterRow[bs.length];
-        for (int i=0;i<bs.length;i++){
-            bs[i]=Bot.getNewInstance(KrimsKrams.randomName());
+        Bot[] bs = new Bot[8];
+        ScalableRegisterRow[] rows = new ScalableRegisterRow[bs.length];
+        for (int i = 0; i < bs.length; i++) {
+            bs[i] = Bot.getNewInstance(KrimsKrams.randomName());
             bs[i].setBotVis(i);
             rows[i] = new ScalableRegisterRow(0.5, false, 5);
         }
-        
-        
+
         JFrame fr = new JFrame("EvalPhasePanel Test");
         fr.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent we){
+            public void windowClosing(WindowEvent we) {
                 System.exit(0);
             }
         });
-        PhaseEvaluationPanel pan = new PhaseEvaluationPanel(bs,rows);
+        PhaseEvaluationPanel pan = new PhaseEvaluationPanel(bs, rows);
         fr.getContentPane().add(pan);
         fr.pack();
         fr.setVisible(true);
-        //fr.show();                
+        // fr.show();
     }
 }
 
-class BotLabel extends JComponent{
+@SuppressWarnings("serial")
+class BotLabel extends JComponent {
     Image botImage;
+
     Color color;
+
     String name;
-   
-    
-    public BotLabel(Bot bot){
+
+    public BotLabel(Bot bot) {
         int visID = bot.getBotVis();
         color = BotVis.getBotColorByBotVis(visID);
-        
+
         botImage = BotVis.get48x48BotImageByBotVis(visID, Directions.NORTH);
         name = bot.getName();
         setOpaque(false);
     }
-    
-    public void paintComponent(Graphics g){
-        //g.clearRect(0,0,48,48);
-        g.drawImage(botImage,0,-7,48,48,this);
-        g.setColor(color);
-           
-        g.drawString(name, 0,45);
-    }
-    
-    public Dimension getPreferredSize() {
-      return  new Dimension (48,48);
-    }
-    
-}
 
+    public void paintComponent(Graphics g) {
+        // g.clearRect(0,0,48,48);
+        g.drawImage(botImage, 0, -7, 48, 48, this);
+        g.setColor(color);
+
+        g.drawString(name, 0, 45);
+    }
+
+    public Dimension getPreferredSize() {
+        return new Dimension(48, 48);
+    }
+
+}

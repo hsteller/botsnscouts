@@ -37,17 +37,19 @@ import javax.swing.ListCellRenderer;
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.Message;
 
-/** 
+/**
  * 
  * @version $Id$
  */
-public class RoboCellRenderer extends JLabel implements ListCellRenderer {
-   
-    
+@SuppressWarnings("serial")
+public class RoboCellRenderer<E> extends JLabel implements ListCellRenderer<E> {
+
     public static ImageIcon[] robIcons = new ImageIcon[8];
 
     private String zufall = Message.say("Start", "mFarbeEgal");
+
     private Dimension size;
+
     private boolean withEgal = true;
 
     static {
@@ -61,7 +63,7 @@ public class RoboCellRenderer extends JLabel implements ListCellRenderer {
         this(true);
     }
 
-    RoboCellRenderer(boolean wEgal) {       
+    RoboCellRenderer(boolean wEgal) {
         withEgal = wEgal;
         size = new Dimension(96, 48);
         setOpaque(false);
@@ -69,13 +71,18 @@ public class RoboCellRenderer extends JLabel implements ListCellRenderer {
 
     /**
      * @param list
-     * @param value        value to display
-     * @param index        cell index
-     * @param isSelected   is the cell selected
-     * @param cellHasFocus the list and the cell have the focus
+     * @param value
+     *            value to display
+     * @param index
+     *            cell index
+     * @param isSelected
+     *            is the cell selected
+     * @param cellHasFocus
+     *            the list and the cell have the focus
      */
-    public Component getListCellRendererComponent(JList list, Object value, int index,
-                                                  boolean isSelected, boolean cellHasFocus) {
+    @Override
+    public Component getListCellRendererComponent(JList<? extends E> list, E value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
         if (index == -1) {
             index = list.getSelectedIndex();
             if (index == -1) {
@@ -92,18 +99,20 @@ public class RoboCellRenderer extends JLabel implements ListCellRenderer {
         setText("");
         if (withEgal) {
             setIcon(robIcons[index - 1]);
-        } else {
+        }
+        else {
             setIcon(robIcons[index]);
         }
 
-       if (isSelected) {       
+        if (isSelected) {
             setBackground(list.getSelectionBackground());
             setForeground(list.getSelectionForeground());
-        } else {
-           setBackground(list.getBackground());
-           setForeground(list.getForeground());
         }
-   
+        else {
+            setBackground(list.getBackground());
+            setForeground(list.getForeground());
+        }
+
         setEnabled(list.isEnabled());
         setFont(list.getFont());
         return this;

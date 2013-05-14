@@ -32,195 +32,205 @@ import java.util.Vector;
 
 import org.apache.log4j.Category;
 
-public class Stats implements Comparable{
-    static Category CAT = Category.getInstance(Stats.class);
+public class Stats implements Comparable <Stats>{
+    private static final Category CAT = Category.getInstance(Stats.class);
 
     private String name;
+
     private int hits;
+
     private int kills;
+
     private int damageByBoard;
+
     private int damageByRobots;
+
     private int askedWisenheimer;
+
     private int sentCardsLast;
 
-    private Vector listeners = new Vector();
+    private Vector<ActionListener> listeners = new Vector<ActionListener>();
 
-
-    public Stats (String n) {
-	this.name  = n;
-	this.hits  = 0;
-	this.kills = 0;
-	this.damageByBoard=0;
-	this.damageByRobots=0;
-        this.askedWisenheimer=0;
-        this.sentCardsLast=0;
+    public Stats(String n) {
+        this.name = n;
+        this.hits = 0;
+        this.kills = 0;
+        this.damageByBoard = 0;
+        this.damageByRobots = 0;
+        this.askedWisenheimer = 0;
+        this.sentCardsLast = 0;
     }
 
-
-
-    public String getName (){
-	return name;
+    public String getName() {
+        return name;
     }
 
-    public int getHits(){
-	return hits;
-    }
-    public int getDamageByBoard(){
-	return damageByBoard;
-    }
-    public int getDamageByRobots(){
-	return damageByRobots;
-    }
-    public int getKills(){
-	return kills;
+    public int getHits() {
+        return hits;
     }
 
-    public int getWasSlowest(){
+    public int getDamageByBoard() {
+        return damageByBoard;
+    }
+
+    public int getDamageByRobots() {
+        return damageByRobots;
+    }
+
+    public int getKills() {
+        return kills;
+    }
+
+    public int getWasSlowest() {
         return sentCardsLast;
     }
 
     public int getAskedWisenheimer() {
-      return this.askedWisenheimer;
+        return this.askedWisenheimer;
     }
 
     public void setName(String n) {
-	this.name=n;
+        this.name = n;
         fireActionEvent();
     }
+
     public void setHits(int i) {
-	this.hits=i;
+        this.hits = i;
         fireActionEvent();
     }
+
     public void setKills(int i) {
-	this.kills=i;
+        this.kills = i;
         fireActionEvent();
     }
+
     public void setDamageByBoard(int i) {
-	this.damageByBoard=i;
+        this.damageByBoard = i;
         fireActionEvent();
     }
+
     public void setDamageByRobots(int i) {
-	this.damageByRobots=i;
+        this.damageByRobots = i;
         fireActionEvent();
     }
 
     public void setAskedWisenheimer(int i) {
-      this.askedWisenheimer=i;
-      fireActionEvent();
+        this.askedWisenheimer = i;
+        fireActionEvent();
     }
 
-    public void setWasSlowest(int i){
-      this.sentCardsLast = i;
-      fireActionEvent();
+    public void setWasSlowest(int i) {
+        this.sentCardsLast = i;
+        fireActionEvent();
     }
-
 
     public void incAskWisenheimer() {
-      ++askedWisenheimer;
-      fireActionEvent();
+        ++askedWisenheimer;
+        fireActionEvent();
     }
 
-    /** Increases this Stats number of hits by(?) one*/
+    /** Increases this Stats number of hits by(?) one */
     public void incHits() {
-	++hits;
+        ++hits;
         fireActionEvent();
     }
-    /** Increases this Stats number of kills by(?) one*/
+
+    /** Increases this Stats number of kills by(?) one */
     public void incKills() {
-	++kills;
+        ++kills;
         fireActionEvent();
     }
-   /** Increases this Stats number of damage got by Boardlasers by(?) one*/
+
+    /** Increases this Stats number of damage got by Boardlasers by(?) one */
     public void incDamageByBoard() {
-	++damageByBoard;
+        ++damageByBoard;
         fireActionEvent();
     }
-    /** Increases this Stats number of damage got by(?) robotlasers by(?) one*/
+
+    /** Increases this Stats number of damage got by(?) robotlasers by(?) one */
     public void incDamageByRobots() {
-	++damageByRobots;
+        ++damageByRobots;
         fireActionEvent();
     }
 
     public void incWasSlowest() {
-      ++sentCardsLast;
-      fireActionEvent();
+        ++sentCardsLast;
+        fireActionEvent();
     }
 
-
-    public String toSendString () {
-	return (Encoder.commEncode(this.name)+","+this.hits+","+this.kills+","+this.damageByBoard+","
-               +this.damageByRobots+","+this.askedWisenheimer+","+sentCardsLast);
+    public String toSendString() {
+        return (Encoder.commEncode(this.name) + "," + this.hits + "," + this.kills + "," + this.damageByBoard + ","
+                        + this.damageByRobots + "," + this.askedWisenheimer + "," + sentCardsLast);
     }
 
-    public String toString () {
-	return ("Bot: "+name+"\tHits: "+hits+"\tKills: "+kills+"\tdamByBoard:"
-                +damageByBoard+"\tdamByRobot:"+damageByRobots+
-                "\taskedWise"+askedWisenheimer+"\tsentLast:"+sentCardsLast);
+    public String toString() {
+        return ("Bot: " + name + "\tHits: " + hits + "\tKills: " + kills + "\tdamByBoard:" + damageByBoard
+                        + "\tdamByRobot:" + damageByRobots + "\taskedWise" + askedWisenheimer + "\tsentLast:" + sentCardsLast);
     }
 
-    /** Helper method for implementing the <code>Comparable</code> interface.*/
-    private boolean less (Stats s) {
-	if (this.hits<s.getHits())
-	    return true;
-	else if (this.hits==s.getHits()) {
-	    if (this.kills<s.getKills())
-		return true;
-	    else if (this.kills==s.kills){
-		if (this.name.toUpperCase().compareTo(s.name.toUpperCase())<0)
-		    return true;
-		else
-		    return false;
-	    }
-	    else
-		return false;
-	}
-	else
-	    return false;
+    /** Helper method for implementing the <code>Comparable</code> interface. */
+    private boolean less(Stats s) {
+        if (this.hits < s.getHits())
+            return true;
+        else
+            if (this.hits == s.getHits()) {
+                if (this.kills < s.getKills())
+                    return true;
+                else
+                    if (this.kills == s.kills) {
+                        if (this.name.toUpperCase().compareTo(s.name.toUpperCase()) < 0)
+                            return true;
+                        else
+                            return false;
+                    }
+                    else
+                        return false;
+            }
+            else
+                return false;
     }
 
-    /** Implementation of the Comparable-interface;
-	two stats-Objects can not be equal.
-	@return -1 if this is less than o
-	         1  otherwise
-    */
-    public int compareTo(Object o) {
-	Stats s = (Stats) o;
-
-	if (this.less(s)){
-	    return 1;
-	}
-	else {
-	    return -1;
-	}
+    /**
+     * Implementation of the Comparable-interface; two stats-Objects can not be equal.
+     * 
+     * @return -1 if this is less than o 1 otherwise
+     */
+    @Override
+    public int compareTo(Stats s) {
+        if (this.less(s)) {
+            return 1;
+        }
+        else {
+            return -1;
+        }
 
     }
 
-    public void addActionListener (ActionListener al){
-      if (al!=null && !listeners.contains(al)) {
-        listeners.add(al);
-        CAT.debug("registered a listener that wants to be informed about my robot's stats");
-      }
+    public void addActionListener(ActionListener al) {
+        if (al != null && !listeners.contains(al)) {
+            listeners.add(al);
+            CAT.debug("registered a listener that wants to be informed about my robot's stats");
+        }
     }
 
-    public void removeActionListener(ActionListener al){
-      CAT.debug("removeActionListener was called");
-      if (listeners.removeElement(al)){
-        CAT.debug("removed Listener");
-      }
-      else {
-        CAT.debug("this listener was not registered");
-      }
+    public void removeActionListener(ActionListener al) {
+        CAT.debug("removeActionListener was called");
+        if (listeners.removeElement(al)) {
+            CAT.debug("removed Listener");
+        }
+        else {
+            CAT.debug("this listener was not registered");
+        }
     }
 
     private void fireActionEvent() {
-      CAT.debug("my robot has changed; firing actionEvent..");
-      ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,"");
-      Iterator it = listeners.iterator();
-      while (it.hasNext()){
-        ActionListener l = (ActionListener) it.next();
-        l.actionPerformed(e);
-      }
+        CAT.debug("my robot has changed; firing actionEvent..");
+        ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "");
+        Iterator<ActionListener> it = listeners.iterator();
+        while (it.hasNext()) {
+            ActionListener l =  it.next();
+            l.actionPerformed(e);
+        }
     }
-
 
 }

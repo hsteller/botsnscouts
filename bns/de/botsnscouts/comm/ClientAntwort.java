@@ -30,25 +30,34 @@ import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Status;
 
-public class ClientAntwort implements Comparable {
+public class ClientAntwort implements Comparable<ClientAntwort> {
     /**
-     * Ermoeglicht die Abfrage der Kommunikationsart mittels der Konstanten dieser Klasse
+     * Ermoeglicht die Abfrage der Kommunikationsart mittels der Konstanten
+     * dieser Klasse
      */
     public int typ;
+
     /**
-     * Container; enthaelt den Location, der bei ROBOTERPOS oder SPIELFELDDIM zurueckgegeben wird.
+     * Container; enthaelt den Location, der bei ROBOTERPOS oder SPIELFELDDIM
+     * zurueckgegeben wird.
      */
     public Location ort;
+
     /**
      * Container; enthaelt die Positionen der Flaggen bei FAHNENPOS
      */
     public Location[] positionen;
+
     /**
-     * Container; falls ein einzelner String geschickt wurde, ist er in str abgelegt, so zum Beispiel bei 'entfernung': dann steht der Entfernungsgrund in str
+     * Container; falls ein einzelner String geschickt wurde, ist er in str
+     * abgelegt, so zum Beispiel bei 'entfernung': dann steht der
+     * Entfernungsgrund in str
      */
     public String str;
+
     /**
-     * Container; Falls mehrere Strings (Namen) geschickt wurden, sind diese in �namen� abgelegt (bei SPIELERNAMEN, SPIELSTAND)
+     * Container; Falls mehrere Strings (Namen) geschickt wurden, sind diese in
+     * �namen� abgelegt (bei SPIELERNAMEN, SPIELSTAND)
      */
     public String[] namen;
 
@@ -56,28 +65,31 @@ public class ClientAntwort implements Comparable {
      * Container; enthaelt die ausgeteilten Karten bei MACHEZUG
      */
     public Card[] karten;
+
     /**
      * Container; wird gesetzt, falls ein bool geschickt wird
      */
     public boolean ok;
+
     /**
      * Container; enthaelt bei SPIELSTATUS f�r jeden Bot ein Statusobjekt
      */
     public Status[] stati;
+
     /**
-     * Container ; enthaelt bei TIMEOUT das Timeout, bei REPARATUR die Registerzahl
+     * Container ; enthaelt bei TIMEOUT das Timeout, bei REPARATUR die
+     * Registerzahl
      */
     public int zahl;
 
     /**
-     * added later to fix some timing bugs in (laser-)animations;
-     * might be used for synchronizing "notify change"s and
-     * information messages (i.e. to avoid that a bot is removed from the
-     * board (triggered by a "notify change") before a possible laser animation
-     * is shown (triggered by an information message)
+     * added later to fix some timing bugs in (laser-)animations; might be used
+     * for synchronizing "notify change"s and information messages (i.e. to
+     * avoid that a bot is removed from the board (triggered by a
+     * "notify change") before a possible laser animation is shown (triggered by
+     * an information message)
      */
     public int messageSequenceNumber = -1;
-
 
     /**
      * Used by the MessageSequencer
@@ -89,37 +101,55 @@ public class ClientAntwort implements Comparable {
     /**
      * Used by the Sequencer to sort received messages by their number
      */
-    public int compareTo(Object o) {
-        ClientAntwort ca = (ClientAntwort) o;
+    public int compareTo(ClientAntwort ca) {
         int num = ca.messageSequenceNumber;
-        return messageSequenceNumber-num;
+        return messageSequenceNumber - num;
     }
 
-    
     public final static int REMOVAL_REASON_TIMEOUT = 1;
+
     public final static int REMOVAL_REASON_RULEVIOLATION = 2;
+
     public final static int REMOVAL_REASON_GAMEOVER = 3;
+
     public final static int REMOVAL_REASON_LOSTLIVES = 4;
+
     public final static int REMOVAL_REASON_TOOLATE = 5;
+
     public final static int REMOVAL_REASON_OTHER = 6;
 
-    
     public final static int SPIELFELDDIM = 1;
+
     public final static int FAHNENPOS = 2;
+
     public final static int SPIELERNAMEN = 3;
+
     public final static int ROBOTERPOS = 4;
+
     public final static int SPIELSTAND = 5;
+
     public final static int SPIELSTATUS = 6;
+
     public final static int MACHEZUG = 7;
+
     public final static int ANGEMELDET = 8;
+
     public final static int ZERSTOERUNG = 9;
+
     public final static int REAKTIVIERUNG = 10;
+
     public final static int REPARATUR = 11;
+
     public final static int ENTFERNUNG = 12;
+
     public final static int AENDERUNG = 13;
+
     public final static int TIMEOUT = 14;
+
     public final static int SPIELSTART = 15;
+
     public final static int MESSAGE = 16;
+
     public final static int BOOLEAN = 17;
 
     /**
@@ -167,11 +197,3 @@ public class ClientAntwort implements Comparable {
     }
 
 }
-
-
-
-
-
-
-
-

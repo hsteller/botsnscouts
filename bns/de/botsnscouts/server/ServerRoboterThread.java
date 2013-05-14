@@ -34,6 +34,7 @@ import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Global;
 import de.botsnscouts.util.Location;
+
 //TODO (comment me)
 public class ServerRoboterThread extends BNSThread implements Waitable {
     static final Category CAT = Category.getInstance(ServerRoboterThread.class);
@@ -74,40 +75,40 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
     }
 
     private boolean isMoveValid(int[] regs) {
-     //TODO (clean up the spaghetti(code) here)
-    	if (regs == null) {
-            CAT.error("move for robot "+rob.getName()+" was null");
+        // TODO (clean up the spaghetti(code) here)
+        if (regs == null) {
+            CAT.error("move for robot " + rob.getName() + " was null");
             return false;
-        }       
+        }
         else {
             int size = regs.length;
-            boolean [] cardsReceivedSoFar = new boolean [Bot.NUM_CARDS];
-            for (int i=0;i<size;i++){
+            boolean[] cardsReceivedSoFar = new boolean[Bot.NUM_CARDS];
+            for (int i = 0; i < size; i++) {
                 int cardNum = regs[i];
-                if(cardNum<1 || cardNum>rob.cardsToGive()){
-                    CAT.error(rob.getName()+" returned invalid card index:"+cardNum);
-                    CAT.error("\tshould have gotten  "+rob.cardsToGive()+" cards");
+                if (cardNum < 1 || cardNum > rob.cardsToGive()) {
+                    CAT.error(rob.getName() + " returned invalid card index:" + cardNum);
+                    CAT.error("\tshould have gotten  " + rob.cardsToGive() + " cards");
                     return false;
                 }
                 else {
                     // case above should have taken care of size>=cardsReceivedSoFar.length
-                    if (cardsReceivedSoFar[cardNum-1]) {
-                        CAT.error(rob.getName()+" used a card more than once");
+                    if (cardsReceivedSoFar[cardNum - 1]) {
+                        CAT.error(rob.getName() + " used a card more than once");
                         return false;
                     }
                     else {
-                        cardsReceivedSoFar[cardNum-1] = true;
+                        cardsReceivedSoFar[cardNum - 1] = true;
                     }
-                }               
+                }
             }
             return true;
         }
     }
-    
+
     public void run() {
         try {
             ende = false;
-            CAT.debug ("SERVERROBOTER THREAD STARTED");
+            CAT.debug("SERVERROBOTER THREAD STARTED");
             while ((!ende) && (!isInterrupted())) {
                 try {
                     ans = komm.warte();
@@ -117,19 +118,20 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                         switch (ans.typ) {
                             case ServerAntwort.PROGRAMMIERUNG:
                                 if (m != ModusConstants.PROGRAMMIERUNG) {
-                                    d("RULE VIOLATION by "+rob.getName());
+                                    d("RULE VIOLATION by " + rob.getName());
                                     d("\treceived programming in mode " + m + "; byebye!");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
                                     return;
                                 }
-                                else if (!isMoveValid(ans.register)){
-                                    d("RULE VIOLATION by "+rob.getName());
-                                    d("\treceived an illegal programming; byebye!");
-                                    robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
-                                    ende = true;
-                                    return;
-                                }
+                                else
+                                    if (!isMoveValid(ans.register)) {
+                                        d("RULE VIOLATION by " + rob.getName());
+                                        d("\treceived an illegal programming; byebye!");
+                                        robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
+                                        ende = true;
+                                        return;
+                                    }
 
                                 rob.setNextTurnPoweredDown(ans.ok); // PowerDown?
 
@@ -188,8 +190,8 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 for (int i = 0; i < ans.register.length; i++) {
                                     int regIndex = ans.register[i] - 1;
                                     rob.unlockRegister(regIndex);
-                                    robMaint.sendMsg(MessageID.REGISTER_UNLOCKED, new String[]
-                                                                                             {rob.getName(),""+regIndex});
+                                    robMaint.sendMsg(MessageID.REGISTER_UNLOCKED, new String[] { rob.getName(),
+                                            "" + regIndex });
                                 }
                                 notifyServer();
 
@@ -231,7 +233,8 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 break;
 
                             case ServerAntwort.GIBROBOTERPOS:
-                                if ((m == ModusConstants.SPIELSTART) || (m == ModusConstants.SPIELENDE) || (m == ModusConstants.NIX)) {
+                                if ((m == ModusConstants.SPIELSTART) || (m == ModusConstants.SPIELENDE)
+                                                || (m == ModusConstants.NIX)) {
                                     d("RV: habe GibRoboterPos im Modus " + m + " erhalten; und tschuess");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
@@ -261,7 +264,8 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                 break;
 
                             case ServerAntwort.GIBROBSTATUS:
-                                if ((m == ModusConstants.SPIELSTART) || (m == ModusConstants.SPIELENDE) || (m == ModusConstants.NIX)) {
+                                if ((m == ModusConstants.SPIELSTART) || (m == ModusConstants.SPIELENDE)
+                                                || (m == ModusConstants.NIX)) {
                                     d("RV: habe GibRobStatus im Modus " + m + " erhalten; und tschuess");
                                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                                     ende = true;
@@ -321,9 +325,9 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                                     tmp[k - 1] = ans.msg[k];
                                 robMaint.sendMsg(ans.msg[0], tmp);
                                 break;
-                        } //switch
-                    } //synchronized this
-                } //try
+                        } // switch
+                    } // synchronized this
+                } // try
                 catch (KommFutschException e) {
                     d("KommFutschException aufgetreten. Beende mich.");
                     ende = true;
@@ -333,12 +337,12 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
                     robMaint.deleteRob(this, OtherConstants.REASON_RULE_VIOLATION);
                     ende = true;
                 }
-            } //Endlosschleife
+            } // Endlosschleife
         }
         catch (Throwable t) {
             CAT.fatal("Exception:", t);
-        }        
-        CAT.debug ("SERVERROBOTERTHREAD REACHED END OF RUN");
+        }
+        CAT.debug("SERVERROBOTERTHREAD REACHED END OF RUN");
     } // run()
 
     private void d(String s) {
@@ -376,19 +380,18 @@ public class ServerRoboterThread extends BNSThread implements Waitable {
     synchronized void registerRepair(int nr) throws KommException {
         komm.regReparatur(nr);
     }
-    
-    
+
     public void doShutdown() {
         try {
             komm.entfernen(OtherConstants.REASON_SERVER_SHUTDOWN);
             komm.out.close();
             komm.in.close();
         }
-        catch (Exception e){
+        catch (Exception e) {
             CAT.warn("while sending shutdown notice to Roboter", e);
         }
         ende = true;
-        this.interrupt();        
+        this.interrupt();
     }
 } // class
 

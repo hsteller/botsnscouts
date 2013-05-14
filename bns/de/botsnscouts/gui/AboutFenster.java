@@ -22,7 +22,7 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.gui;
 
 import java.awt.Dimension;
@@ -41,58 +41,54 @@ import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.TJButton;
 
+@SuppressWarnings("serial")
+public class AboutFenster extends JFrame {
 
-public class AboutFenster extends JFrame{
-  
     public AboutFenster() {
-	
-	Dimension d = BotsNScouts.getScreenSize();
-	setLocation((d.width/2)-200,((d.height/2)-200));
-	setSize(400,500);
-	setTitle(Message.say("AboutFenster","mtitel"));
 
-	String s = Message.say("AboutFenster","mtext");
-	JPanel inhalt = new JPanel();
-	inhalt.setBorder(new EmptyBorder(10,10,10,10));
+        Dimension d = BotsNScouts.getScreenSize();
+        setLocation((d.width / 2) - 200, ((d.height / 2) - 200));
+        setSize(400, 500);
+        setTitle(Message.say("AboutFenster", "mtitel"));
 
-	JTextArea text = new JTextArea(s){
-		public Dimension getPreferredSize() {
-		    return new Dimension(370,400);
-		}
-	    };
-	text.setLineWrap(true);
-	text.setWrapStyleWord(true);
-	text.setEditable(false);
-	inhalt.add(text);
+        String s = Message.say("AboutFenster", "mtext");
+        JPanel inhalt = new JPanel();
+        inhalt.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-	JButton ok = new TJButton(Message.say("AboutFenster","mok"));
-	ok.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    dispose();
-		}
-	    }
-			     );
+        JTextArea text = new JTextArea(s) {
+            public Dimension getPreferredSize() {
+                return new Dimension(370, 400);
+            }
+        };
+        text.setLineWrap(true);
+        text.setWrapStyleWord(true);
+        text.setEditable(false);
+        inhalt.add(text);
 
+        JButton ok = new TJButton(Message.say("AboutFenster", "mok"));
+        ok.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
 
-	inhalt.add(ok);
+        inhalt.add(ok);
 
-	getContentPane().add(inhalt);
+        getContentPane().add(inhalt);
 
-	addWindowListener(new WindowAdapter() {
-		public void windowClosing(WindowEvent e){
-		    dispose();
-		}});
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                dispose();
+            }
+        });
 
+        setVisible(true);
+    }
 
-	
-
-	setVisible(true);
-	}
-    
-    public static void main (String args[]) {
-	Message.setLanguage("deutsch");
-	AboutFenster f = new AboutFenster();
-	// f.setSize(200,640);
-	f.setVisible(true);
-   }
-}	
+    public static void main(String args[]) {
+        Message.setLanguage("deutsch");
+        AboutFenster f = new AboutFenster();
+        // f.setSize(200,640);
+        f.setVisible(true);
+    }
+}

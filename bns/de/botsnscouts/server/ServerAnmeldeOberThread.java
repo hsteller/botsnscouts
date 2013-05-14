@@ -34,17 +34,22 @@ import org.apache.log4j.Category;
 
 import de.botsnscouts.util.Global;
 
-/** Erlaubt die nebenlaeufige Anmeldung von Robotern und Ausgaben
- *  Startet fuer jeden Anmeldeversuch einen ServerAnmeldeThread.
+/**
+ * Supports the concurrent registration of outputs and robots.
+ * Starts a new ServerAnmeldeThread for each registration attempt.
  */
 
 class ServerAnmeldeOberThread extends Thread {
     static final Category CAT = Category.getInstance(ServerAnmeldeOberThread.class);
 
     Server server;
+
     ServerSocket seso;
+
     Boolean roboterAnmeldung;
+
     String namen = "";
+
     Integer anzSpieler;
 
     public ServerAnmeldeOberThread(Server s) {
@@ -60,21 +65,24 @@ class ServerAnmeldeOberThread extends Thread {
 
     public void run() {
         try {
-            CAT.debug ("SERVER ANMELDEOBERTHREAD STARTED");
+            CAT.debug("SERVER ANMELDEOBERTHREAD STARTED");
             try {
                 seso = new ServerSocket(server.getRegistrationPort());
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 System.err.println("ServerAnmeldeOberThread: Konnte Socket nicht binden. Beende mich.");
                 return;
             }
 
             try {
                 seso.setSoTimeout(0); // wir warten bis zum notify()
-            } catch (SocketException e) {
+            }
+            catch (SocketException e) {
                 System.err.println("ServerAnmeldeOberThread: SocketExc beim Setzen des TO. Beende mich.");
                 try {
                     seso.close();
-                } catch (IOException f) {
+                }
+                catch (IOException f) {
                 }
                 return;
             }
@@ -84,10 +92,12 @@ class ServerAnmeldeOberThread extends Thread {
             while (!isInterrupted()) {
                 try {
                     client = seso.accept();
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     try {
                         seso.close();
-                    } catch (IOException f) {
+                    }
+                    catch (IOException f) {
                     }
                     System.err.println("ServerAnmeldeOberThread: Fehler bei ServerSocket.accept(). Beende mich.");
                     return;
@@ -96,10 +106,11 @@ class ServerAnmeldeOberThread extends Thread {
                 d("Neuer Client! Starte ServerAnmeldeThread...");
                 handhaber.start();
             }
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             CAT.fatal("Exception:", t);
         }
-        CAT.debug ("SERVER ANMELDEOBERTHREAD REACHED END OF RUN");
+        CAT.debug("SERVER ANMELDEOBERTHREAD REACHED END OF RUN");
     }
 
     /** Registriert Namen als benutzt - soll mit isLegalName() benutzt werden */
@@ -116,4 +127,3 @@ class ServerAnmeldeOberThread extends Thread {
         return (namen.indexOf(" " + s + " ") == -1);
     }
 }
-

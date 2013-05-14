@@ -40,7 +40,6 @@ import org.apache.log4j.Category;
 
 import de.botsnscouts.BotsNScouts;
 import de.botsnscouts.gui.Splash;
-import de.botsnscouts.server.Server;
 import de.botsnscouts.util.BNSThread;
 import de.botsnscouts.util.Conf;
 import de.botsnscouts.util.KrimsKrams;
@@ -55,607 +54,594 @@ import de.botsnscouts.widgets.OptionPane;
  * 
  * @version $Id$
  */
+@SuppressWarnings("serial")
 public class Start extends JFrame implements WindowListener {
-	/**
-	 * Duh, logging
-	 */
-	private static final Category CAT = Category.getInstance(Start.class);
 
-	/**
-	 * This seems to be the Container for the texture the background image for
-	 * nearly all Windows It is located at \de\botsnscouts\images\garage2.jpg A
-	 * more customizable solution should be found
-	 */
-	// argh! Now I realize why this is PROTECTED! Nobody ever extends it!
-	// This is an synthetic extension of the visibility for package members
-	// protected is removed now. We should make this private and add get/set
-	Paint paint;
+    private static final Category CAT = Category.getInstance(Start.class);
 
-	/**
-	 * this Cardlayout shold be outsourced in an extra layout class, where we
-	 * can store all the layout methods
-	 */
-	private CardLayout layout = new CardLayout();
+    /**
+     * This seems to be the Container for the texture the background image for nearly all Windows It is located at \de\botsnscouts\images\garage2.jpg
+     * A more customizable solution should be found
+     */
+    // argh! Now I realize why this is PROTECTED! Nobody ever extends it!
+    // This is an synthetic extension of the visibility for package members
+    // protected is removed now. We should make this private and add get/set
+    Paint paint;
 
-	// these two seem never to be used seriously;
-	// ServerObserver has a call to showLastShown() that uses them; used to keep track which Card
-	// was shown the before the current one.
-	// Reason: press a button in one of the menus
-	//             -> button kicks off some background action (like starting the server),
-	//                  showing the "doing stuff"-card in the meantime 
-	//             -> background action fails for some reason
-	//             -> we want to go back to the Card/Menu where the button was pressed 
-	//             
- 
-	private String lastShown = MAIN_MENU;
-	private String currentlyShowing = MAIN_MENU;
+    /**
+     * this Cardlayout shold be outsourced in an extra layout class, where we can store all the layout methods
+     */
+    private CardLayout layout = new CardLayout();
 
-	/*
-	 * All the funny menus
-	 */
-	/** Start screen, the first Menu to be seen*/
-	private MainMenu mainMenu;
-	private static String MAIN_MENU = "main";
+    // these two seem never to be used seriously;
+    // ServerObserver has a call to showLastShown() that uses them; used to keep track which Card
+    // was shown the before the current one.
+    // Reason: press a button in one of the menus
+    // -> button kicks off some background action (like starting the server),
+    // showing the "doing stuff"-card in the meantime
+    // -> background action fails for some reason
+    // -> we want to go back to the Card/Menu where the button was pressed
+    //
 
-	/** build your board */
-	private FieldEditor fieldEditor;
-	private static String FIELD_EDITOR = "fieldedit";
+    private String lastShown = MAIN_MENU;
 
-	/** participating panel */
-	private JoinGamePanel partPanel;
-	private static String PARTICIPATE = "participate";
+    private String currentlyShowing = MAIN_MENU;
 
-	/** watching panel */
-	private WatchPanel watchPanel;
-	private static String WATCH = "watch";
+    /*
+     * All the funny menus
+     */
+    /** Start screen, the first Menu to be seen */
+    private MainMenu mainMenu;
 
-	// Second level in depth
-	/** Will be displayed after pressing "Spiel starten/Host Game"*/
-	private DoingStuffPanel busyPanel;
-	private static String BUSY = "busy";
+    private static String MAIN_MENU = "main";
 
-	/**
-	 * Choose your robot and board
-	 */ 
-	protected GameFieldPanel gameFieldPanel;
-	private static String GAME_FIELD = "gamefield";
+    /** build your board */
+    private FieldEditor fieldEditor;
 
-	// Third level in depth
-	/** 
-	 * Screen with all information, Autorobot chooser and start button to
-	 * finally launch the game
-	 * */
-	private StartPanel startPanel;
-	private static String START = "start";
-	// Menus End
-	
-	/**
-	 * This is set in the main method and then ass raped for the window listener
-	 * This can be static at least and using the java.awt.event.WindowAdapter
-	 * 
-	 */
-	private Splash splash;
+    private static String FIELD_EDITOR = "fieldedit";
 
-	/**
-	 * the singleton Instance
-	 */
-	private static Start globalStart;
+    /** participating panel */
+    private JoinGamePanel partPanel;
 
-	/**
-	 * Gets activated every time a panel is changed
-	 * 
-	 */
-	private Thread animatorThread;
-	
-	/**
-	 * This is used for some wicked synchronization
-	 * Comments here? 
-	 * TODO(Comment all the wth stuff)
-	 */
-	private WaiterThread wth;
-	
-	/**
-	 * The facade for this game instance, it seems to be more
-	 * sensefull(lol, germandishing) to put the facade in the 
-	 * registry singleton, so we can call 
-	 * Registry.getInstance().getFacade().useMe(1MioKisses)
-	 * instead of all these parent.facade.xyz() calls
-	 * It breaks the information hiding concept!
-	 */
-	Facade facade;
-	
-	/**
-	 * This is the private Constructor, you can get an instance by
-	 * calling the @see getLauncherAppSingleton
-	 * @param splash The Splash which will be hidden
-	 */
-	private Start(Splash splash) {
-		// setting the title with the localized string
-		super(Message.say("Start", "mStartTitel"));
+    private static String PARTICIPATE = "participate";
 
-		// again the splash, see above
-		this.splash = splash;
-		
-		getContentPane().setLayout(layout);
+    /** watching panel */
+    private WatchPanel watchPanel;
 
-		wth = new WaiterThread(this);
-		//store the Screensize 
-		Dimension ssize = BotsNScouts.getScreenSize();
-		if (ssize.height < 600) {
-			facade = new Facade(150);
-		} else {
-			facade = new Facade();
-		}
-		//set the size of this Window to Screensize
-		//but we should do a real fullscreen here
-		//TODO(realize a "fullscreen" or "maximized" application window)
-		setSize(ssize);
-		setLocation(0, 0); //topleft
+    private static String WATCH = "watch";
 
-		paint = OptionPane.getBackgroundPaint(this);
-		
-		//setup the main menu
-		mainMenu = new MainMenu(this);
-		getContentPane().add(mainMenu, MAIN_MENU);
-		showMainMenu();
-		
-		// setting up the busypanel and add it to the contentPane
-		busyPanel = new DoingStuffPanel(paint);
-		getContentPane().add(busyPanel, BUSY);
+    // Second level in depth
+    /** Will be displayed after pressing "Spiel starten/Host Game" */
+    private DoingStuffPanel busyPanel;
 
-		addWindowListener(this);
-		// this is somehow funny, cause the Java Developers use show() which is deprecated 8-)
-		setVisible(true);
-		//show();
-		this.toFront();
-	}
+    private static String BUSY = "busy";
 
-	/**
-	 * Switches through the card layout by the given paramter <code>to</code>.
-	 * <br>
-	 * For example:<br>
-	 * the CardLayout is initialized with the cards name Hendrik, Miriam and
-	 * Igzorn <br>
-	 * a call switchCard("Hendrik") would show the items which were added to the
-	 * card "Hendrik" <br>
-	 * If no such card exists nothing happens
-	 * 
-	 * @param to
-	 *            The card u are looking for
-	 */
-	private void switchCard(String to) {
-		layout.show(getContentPane(), to);
-		// updating the last shown card with the one shown before the switch above
-		lastShown = currentlyShowing;
-		// updating the card that is shown now
-		currentlyShowing = to; 
-	}
+    /**
+     * Choose your robot and board
+     */
+    protected GameFieldPanel gameFieldPanel;
 
-	/**
-	 * Will switch back to the card that was shown before the one that is currently displayed;
-	 * think of javascript's "history(-1)" call and a "history" with the maximum length of 1. 
-	 * 
-	 */
-//	 Don't delete me (yet). 
-//	 * While there isn't a single _active_ reference in the whole project, there still is one in 
-//	 * comments in ServerObserver. 
-//	 * Also, I like the unused functionality more than 
+    private static String GAME_FIELD = "gamefield";
 
-	protected void showLastShown() {
-		switchCard(lastShown);
-	}
+    // Third level in depth
+    /**
+     * Screen with all information, Autorobot chooser and start button to finally launch the game
+     * */
+    private StartPanel startPanel;
 
-	
-	/**
-	 * Kill this; uses the System.exit(0) command after dispose
-	 */
-	public void myclose() {
-		dispose();
-		System.exit(0);
-	}
+    private static String START = "start";
 
-	/** Does (atm) nothing else than calling super.dispose()*/
-	public void dispose() {
-		super.dispose();
-	}
+    // Menus End
 
-	
-	/**
-	 * Displays the Main menu by switching to the layoutcard for the very first screen
-	 */
-	public void showMainMenu() {
-		switchCard(MAIN_MENU);
-		mainMenu.unrollOverButs();
-		setTitle(Message.say("Start", "mStartTitel"));
-		this.toFront();
-		// setVisible(true);
-	}
-	
-	/**
-	 * Displays the layoutcard where u can choose your robot and start the game
-	 *
-	 */
-	protected void showGameFieldPanel() {
-	// All of the following Methods showXXXPanel follow the same schema:
-		// Show the Busy Panel
-		// make a thread
-		// in which we DO show the panel 
-		showBusy(Message.say("Start", "mLoadGameFieldPanel"));
-		new Thread(new Runnable() {
-			public void run() {
-				if (gameFieldPanel == null) {
-					gameFieldPanel = new GameFieldPanel(Start.this);
-					getContentPane().add(gameFieldPanel, GAME_FIELD);
-				}
+    /**
+     * This is set in the main method and then ass raped for the window listener. This can be static at least and using the
+     * java.awt.event.WindowAdapter
+     */
+    private Splash splash;
 
-				CAT.debug("setting gameFieldPanel");
-				switchCard(GAME_FIELD);
-				stopBusy();
-			}
-		}).start();
-	}
+    /**
+     * the singleton Instance
+     */
+    private static Start globalStart;
 
-	/**
-	 * Displays the layoutcard where u can participate in a online game 
-	 */
-	protected void showParticipatePanel() {
-		showBusy(Message.say("Start", "mLoadParticipatePanel"));
-		new Thread(new Runnable() {
-			public void run() {
-				if (partPanel == null) {
-					partPanel = new JoinGamePanel(Start.this);
-					getContentPane().add(partPanel, PARTICIPATE);
-				}
-				switchCard(PARTICIPATE);
-				stopBusy();
-			}
-		}).start();
-	}
+    /**
+     * Gets activated every time a panel is changed
+     * 
+     */
+    private Thread animatorThread;
 
-	/**
-	 * Displays the layoutcard where u can watch a online game 
-	 */
-	protected void showWatchPanel() {
-		showBusy(Message.say("Start", "mLoadWatchPanel"));
-		new Thread(new Runnable() {
-			public void run() {
-				if (watchPanel == null) {
-					watchPanel = new WatchPanel(Start.this);
-					getContentPane().add(watchPanel, WATCH);
-				}
-				switchCard(WATCH);
-				stopBusy();
-			}
-		}).start();
-	}
+    /**
+     * This is used for some wicked synchronization Comments here?
+     */
+    private WaiterThread wth;
 
-	/**
-   * Displays the layoutcard where u can build your board 
-   * @param spf why do we need this?
-   */
-	protected void showFieldEditor(final FieldGrid spf) {
-		showBusy(Message.say("Start", "mLoadFieldEditor"));
-		new Thread(new Runnable() {
-			public void run() {
-				if (fieldEditor == null) {
-					fieldEditor = new FieldEditor(Start.this, spf);
-					getContentPane().add(fieldEditor, FIELD_EDITOR);
-				} else {
-					fieldEditor.spf.addTileClickListener(fieldEditor);
-					fieldEditor.fuerSpf.add(fieldEditor.spf);
-				}
-				facade.saveTileRaster();
-				switchCard(FIELD_EDITOR);
-				stopBusy();
-			}
-		}).start();
-	}
+    /**
+     * The facade for this game instance, it seems to make more sense to put the facade in the registry singleton, so we can call
+     * Registry.getInstance().getFacade().useMe(1MioKisses) instead of all these parent.facade.xyz() calls It breaks the
+     * information hiding concept!
+     */
+    private Facade facade;
 
-	/**
-	 * Shows the panel where u can add the autorobots, see the other players
-	 * and start the game
-	 * @param postServerStartTask we will call doIt! :-)
-	 */
-	protected void showNewStartPanel(final Task postServerStartTask) {
-		showBusy(Message.say("Start", "mStartingServer"));
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					// TODO(HS_TODO)
-					if (startPanel == null) {
-						startPanel = new StartPanel(Start.this);
-						getContentPane().add(startPanel, START);
-					}
-					ServerObserver foo = new ServerObserver(startPanel
-							.getPlayersPanel());
-					//TODO(variable never used)
-					Server server = facade.startGame(foo);// starting game
-					addServer();
-					postServerStartTask.doIt();
+    /**
+     * This is the private Constructor, you can get an instance by calling the @see getLauncherAppSingleton
+     * 
+     * @param splash
+     *            The Splash which will be hidden
+     */
+    private Start(Splash splash) {
+        // setting the title with the localized string
+        super(Message.say("Start", "mStartTitel"));
 
-					switchCard(START);
-					stopBusy();
-				} catch (OneFlagException ex) {
-					JOptionPane.showMessageDialog(Start.this, Message.say(
-							"Start", "mZweiFlaggen"), Message.say("Start",
-							"mError"), JOptionPane.ERROR_MESSAGE);
+        // again the splash, see above
+        this.splash = splash;
 
-				} catch (NonContiguousMapException exc) {
-					JOptionPane.showMessageDialog(Start.this, Message.say(
-							"Start", "mNichtZus"), Message.say("Start",
-							"mError"), JOptionPane.ERROR_MESSAGE);
+        getContentPane().setLayout(layout);
 
-				}
-			}
-		}).start();
+        wth = new WaiterThread(this);
+        // store the Screensize
+        Dimension ssize = BotsNScouts.getScreenSize();
+        if (ssize.height < 600) {
+            facade = new Facade(150);
+        }
+        else {
+            facade = new Facade();
+        }
+        // set the size of this Window to Screensize
+        // but we should do a real fullscreen here
+        // TODO(realize a "fullscreen" or "maximized" application window)
+        setSize(ssize);
+        setLocation(0, 0); // topleft
 
-	}
+        paint = OptionPane.getBackgroundPaint(this);
 
-	/**
-	 * Shows the busy panel, ya the busy panel, is more a doingStuff panel
-	 * @see de.botsnscouts.start.DoingStuffPanel
-	 * @param txt the String we'll display
-	 */
-	protected void showBusy(String txt) {
-	/*
-	 * This was an external declaration but is ONLY
-	 * used in this method. We will put things together
-	 * which belong to each other
-	 */
-		/**
-		 * uses busyPanel.inc()
-		 */
-		Runnable busyAnimator = new Runnable() {
-			public void run() {
-				while (!Thread.currentThread().isInterrupted()) {
-					busyPanel.inc();
-					try {
-						Thread.sleep(50);
-					} catch (InterruptedException ex) {
-						break;
-					}
-				}
-				CAT.debug("Animatorthread exiting.");
-			}
-		};
+        // setup the main menu
+        mainMenu = new MainMenu(this);
+        getContentPane().add(mainMenu, MAIN_MENU);
+        showMainMenu();
 
-		CAT.debug("setting busypanel. txt: " + txt);
-		busyPanel.setText(txt);
-		/** we are busy now*/
-		switchCard(BUSY);
-		/** using the declared Runnable from above*/
-		animatorThread = new Thread(busyAnimator);
-		animatorThread.start();
-	}
-	
-	/**
-	 * Stops the bysypanellayoutcard displaying
-	 */
-	protected void stopBusy() {
-		animatorThread.interrupt();
-	}
+        // setting up the busypanel and add it to the contentPane
+        busyPanel = new DoingStuffPanel(paint);
+        getContentPane().add(busyPanel, BUSY);
 
-	
-	
-	protected WaiterThread getWaiterThread() {
-		return wth;
-	}
+        addWindowListener(this);       
+        setVisible(true);       
+        this.toFront();
+    }
 
-	public synchronized void addKS(BNSThread k) {
-		wth.addThread(k);
-	}
-	public synchronized void addServer() {
-		wth.setServer();
-	}
+    /**
+     * Switches through the card layout by the given paramter <code>to</code>. <br>
+     * For example:<br>
+     * the CardLayout is initialized with the cards name Hendrik, Miriam and Igzorn <br>
+     * a call switchCard("Hendrik") would show the items which were added to the card "Hendrik" <br>
+     * If no such card exists nothing happens
+     * 
+     * @param to
+     *            The card u are looking for
+     */
+    private void switchCard(String to) {
+        layout.show(getContentPane(), to);
+        // updating the last shown card with the one shown before the switch above
+        lastShown = currentlyShowing;
+        // updating the card that is shown now
+        currentlyShowing = to;
+    }
 
+    /**
+     * Will switch back to the card that was shown before the one that is currently displayed; think of javascript's "history(-1)" call and a
+     * "history" with the maximum length of 1.
+     * 
+     */
+    // Don't delete me (yet).
+    // * While there isn't a single _active_ reference in the whole project, there still is one in
+    // * comments in ServerObserver.
+    // * Also, I like the unused functionality more than
 
-	private synchronized void resetWaiter() {
-		wth.quitYourself();
-		wth.reset();
-		wth = new WaiterThread(this);
-	}
-	
+    protected void showLastShown() {
+        switchCard(lastShown);
+    }
+
+    /**
+     * Kill this; uses the System.exit(0) command after dispose
+     */
+    public void myclose() {
+        dispose();
+        System.exit(0);
+    }
+
+    /** Does (atm) nothing else than calling super.dispose() */
+    public void dispose() {
+        super.dispose();
+    }
+
+    /**
+     * Displays the Main menu by switching to the layoutcard for the very first screen
+     */
+    public void showMainMenu() {
+        switchCard(MAIN_MENU);
+        mainMenu.unrollOverButs();
+        setTitle(Message.say("Start", "mStartTitel"));
+        this.toFront();
+        // setVisible(true);
+    }
+
+    /**
+     * Displays the layoutcard where u can choose your robot and start the game
+     * 
+     */
+    protected void showGameFieldPanel() {
+        // All of the following Methods showXXXPanel follow the same schema:
+        // Show the Busy Panel
+        // make a thread
+        // in which we DO show the panel
+        showBusy(Message.say("Start", "mLoadGameFieldPanel"));
+        new Thread(new Runnable() {
+            public void run() {
+                if (gameFieldPanel == null) {
+                    gameFieldPanel = new GameFieldPanel(Start.this);
+                    getContentPane().add(gameFieldPanel, GAME_FIELD);
+                }
+
+                CAT.debug("setting gameFieldPanel");
+                switchCard(GAME_FIELD);
+                stopBusy();
+            }
+        }).start();
+    }
+
+    /**
+     * Displays the layoutcard where u can participate in a online game
+     */
+    protected void showParticipatePanel() {
+        showBusy(Message.say("Start", "mLoadParticipatePanel"));
+        new Thread(new Runnable() {
+            public void run() {
+                if (partPanel == null) {
+                    partPanel = new JoinGamePanel(Start.this);
+                    getContentPane().add(partPanel, PARTICIPATE);
+                }
+                switchCard(PARTICIPATE);
+                stopBusy();
+            }
+        }).start();
+    }
+
+    /**
+     * Displays the layoutcard where u can watch a online game
+     */
+    protected void showWatchPanel() {
+        showBusy(Message.say("Start", "mLoadWatchPanel"));
+        new Thread(new Runnable() {
+            public void run() {
+                if (watchPanel == null) {
+                    watchPanel = new WatchPanel(Start.this);
+                    getContentPane().add(watchPanel, WATCH);
+                }
+                switchCard(WATCH);
+                stopBusy();
+            }
+        }).start();
+    }
+
+    /**
+     * Displays the layoutcard where u can build your board
+     * 
+     * @param spf
+     *            why do we need this?
+     */
+    protected void showFieldEditor(final FieldGrid spf) {
+        showBusy(Message.say("Start", "mLoadFieldEditor"));
+        new Thread(new Runnable() {
+            public void run() {
+                if (fieldEditor == null) {
+                    fieldEditor = new FieldEditor(Start.this, spf);
+                    getContentPane().add(fieldEditor, FIELD_EDITOR);
+                }
+                else {
+                    fieldEditor.spf.addTileClickListener(fieldEditor);
+                    fieldEditor.fuerSpf.add(fieldEditor.spf);
+                }
+                facade.saveTileRaster();
+                switchCard(FIELD_EDITOR);
+                stopBusy();
+            }
+        }).start();
+    }
+
+    /**
+     * Shows the panel where u can add the autorobots, see the other players and start the game
+     * 
+     * @param postServerStartTask
+     *            we will call doIt! :-)
+     */
+    protected void showNewStartPanel(final Task postServerStartTask) {
+        showBusy(Message.say("Start", "mStartingServer"));
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    if (startPanel == null) {
+                        startPanel = new StartPanel(Start.this);
+                        getContentPane().add(startPanel, START);
+                    }
+                    ServerObserver foo = new ServerObserver(startPanel.getPlayersPanel());
+                    facade.startGame(foo);// starting game
+                    addServer();
+                    postServerStartTask.doIt();
+
+                    switchCard(START);
+                    stopBusy();
+                }
+                catch (OneFlagException ex) {
+                    JOptionPane.showMessageDialog(Start.this, Message.say("Start", "mZweiFlaggen"),
+                                    Message.say("Start", "mError"), JOptionPane.ERROR_MESSAGE);
+
+                }
+                catch (NonContiguousMapException exc) {
+                    JOptionPane.showMessageDialog(Start.this, Message.say("Start", "mNichtZus"),
+                                    Message.say("Start", "mError"), JOptionPane.ERROR_MESSAGE);
+
+                }
+            }
+        }).start();
+
+    }
+
+    /**
+     * Shows the busy panel, ya the busy panel, is more a doingStuff panel
+     * 
+     * @see de.botsnscouts.start.DoingStuffPanel
+     * @param txt
+     *            the String we'll display
+     */
+    protected void showBusy(String txt) {
+        /*
+         * This was an external declaration but is ONLY used in this method. We will put things together which belong to each other
+         */
+        /**
+         * uses busyPanel.inc()
+         */
+        Runnable busyAnimator = new Runnable() {
+            public void run() {
+                while (!Thread.currentThread().isInterrupted()) {
+                    busyPanel.inc();
+                    try {
+                        Thread.sleep(50);
+                    }
+                    catch (InterruptedException ex) {
+                        break;
+                    }
+                }
+                CAT.debug("Animatorthread exiting.");
+            }
+        };
+
+        CAT.debug("setting busypanel. txt: " + txt);
+        busyPanel.setText(txt);
+        /** we are busy now */
+        switchCard(BUSY);
+        /** using the declared Runnable from above */
+        animatorThread = new Thread(busyAnimator);
+        animatorThread.start();
+    }
+
+    /**
+     * Stops the bysypanellayoutcard displaying
+     */
+    protected void stopBusy() {
+        animatorThread.interrupt();
+    }
+
+    protected WaiterThread getWaiterThread() {
+        return wth;
+    }
+
+    public synchronized void addKS(BNSThread k) {
+        wth.addThread(k);
+    }
+
+    public synchronized void addServer() {
+        wth.setServer();
+    }
+
+    private synchronized void resetWaiter() {
+        wth.quitYourself();
+        wth.reset();
+        wth = new WaiterThread(this);
+    }
+
+    public Facade getFacade() {
+        return facade;
+    }
+
     public void reset() {
-		facade.killServer();
-		getContentPane().remove(startPanel);
-		startPanel = null;
-		// startPanel.recreateServerObeserver();
-		// getWaiterThread().stopAllWaitingThreads();
-		resetWaiter();
-	}
-    //  TODO (use or delete me)
-	private void beenden() {
-		CAT.debug("beenden() wurde aufgerufen");
-		try {
-			if (!wth.isAlive()) {
-				wth.start();
-			}
-		} catch (IllegalThreadStateException e) {
-			CAT.error(Message.say("Start", "eSpielEnde"));
-		}
-		CAT.debug("disposing start frame");
-		dispose();
-		CAT.debug(this);
-	}
+        facade.killServer();
+        getContentPane().remove(startPanel);
+        startPanel = null;
+        // startPanel.recreateServerObeserver();
+        // getWaiterThread().stopAllWaitingThreads();
+        resetWaiter();
+    }
 
-	
-	/**
-	 * To obtain the global "Start" object; will exist after
-	 * Start.main(String[]) was called.
-	 * 
-	 * @param splash a Splash that must be hidden before the main menu is displayed
-	 * @return The global "Start" object
-	 */
-	private  static Start getLauncherAppSingleton(Splash splash) {		
-		  if (globalStart==null) { 		     
-		      globalStart=new Start(splash); 
-		  }
-		  return globalStart;	    
-	}
+    /**
+     * To obtain the global "Start" object; will exist after Start.main(String[]) was called.
+     * 
+     * @param splash
+     *            a Splash that must be hidden before the main menu is displayed
+     * @return The global "Start" object
+     */
+    private static Start getLauncherAppSingleton(Splash splash) {
+        if (globalStart == null) {
+            globalStart = new Start(splash);
+        }
+        return globalStart;
+    }
 
-	public  static Start getLauncherAppSingleton() {		
-	    return getLauncherAppSingleton(null);
-	}
-	
-	/**
-	 * Initializes the game registry, the sounds and language via the
-	 * <code>argv<\code> parameter array OR by interrogating
-	 * the user
-	 * Hides the Splash screen
-	 * @param argv the parameters for the developer quickstart
-	 * @param splash the Splash wich is displayed at the loading screen
-	 */
-	public static void main(String[] argv, Splash splash) {
-		/**
-		 * Initializing the Gameregistry, the Sounds and Language
-		 */
-		initBasics();
+    public  static Start getLauncherAppSingleton() {
+        return getLauncherAppSingleton(null);
+    }
 
-		if (argv.length != 3) { // "normal" case
-			globalStart = getLauncherAppSingleton(splash);
-		} else { // developer quickstart
-			try {
-				String spielfeld = argv[0];
-				if (spielfeld.toLowerCase().endsWith(".spf")) {
-					spielfeld = spielfeld.substring(0, spielfeld.length() - 4);
-				}
-				CAT.debug("Board " + spielfeld);
-				GameFieldLoader loader = new GameFieldLoader();
-				Facade fassade = new Facade();
-				Properties prop = loader.getProperties(spielfeld);
-				CAT.debug("Properties " + prop);
-				fassade.loadBoardFromProperties(prop);
-				CAT.debug("Spielfed loaded");
-				fassade.startGame();
-				CAT.debug("Server gestartet");
-				if (argv[1].equals("yes")) {
-					Facade.participateInAGame(KrimsKrams.randomName(), 0);
-					CAT.debug("Human player started");
-				} else {
-					Facade.watchAGame();
-					CAT.debug("View started");
-				}
-				int anzKS = 0;
-				try {
-					anzKS = Integer.parseInt(argv[2]);
-					for (int i = 0; i < anzKS; i++) {
-						Facade.startAutoBot(40, true);
-						CAT.debug("A.I. Bot started");
-					}
-				} catch (NumberFormatException e) {
-				}
-				try {
-					Thread.sleep((anzKS + 1) * 3000);
-				} catch (InterruptedException e) {
-					CAT.warn(e.getMessage());
-				}
-				fassade.gameStarts();
-				CAT.debug("Spiel geht los");
-				return;
-			} catch (Exception e) {
-				CAT.error(e.getMessage(), e);
-				System.exit(1);
-			}
-		}
+    /**
+     * Initializes the game registry, the sounds and language via the <code>argv<\code> parameter array OR by interrogating
+     * the user
+     * Hides the Splash screen
+     * 
+     * @param argv
+     *            the parameters for the developer quickstart
+     * @param splash
+     *            the Splash wich is displayed at the loading screen
+     */
+    public static void main(String[] argv, Splash splash) {
+        /**
+         * Initializing the Gameregistry, the Sounds and Language
+         */
+        initBasics();
 
-	}
+        if (argv.length != 3) { // "normal" case
+            globalStart = getLauncherAppSingleton(splash);
+        }
+        else { // developer quickstart
+            try {
+                String spielfeld = argv[0];
+                if (spielfeld.toLowerCase().endsWith(".spf")) {
+                    spielfeld = spielfeld.substring(0, spielfeld.length() - 4);
+                }
+                CAT.debug("Board " + spielfeld);
+                GameFieldLoader loader = new GameFieldLoader();
+                Facade fassade = new Facade();
+                Properties prop = loader.getProperties(spielfeld);
+                CAT.debug("Properties " + prop);
+                fassade.loadBoardFromProperties(prop);
+                CAT.debug("Spielfed loaded");
+                fassade.startGame();
+                CAT.debug("Server gestartet");
+                if (argv[1].equals("yes")) {
+                    Facade.participateInAGame(KrimsKrams.randomName(), 0);
+                    CAT.debug("Human player started");
+                }
+                else {
+                    Facade.watchAGame();
+                    CAT.debug("View started");
+                }
+                int anzKS = 0;
+                try {
+                    anzKS = Integer.parseInt(argv[2]);
+                    for (int i = 0; i < anzKS; i++) {
+                        Facade.startAutoBot(40, true);
+                        CAT.debug("A.I. Bot started");
+                    }
+                }
+                catch (NumberFormatException e) {
+                }
+                try {
+                    Thread.sleep((anzKS + 1) * 3000);
+                }
+                catch (InterruptedException e) {
+                    CAT.warn(e.getMessage());
+                }
+                fassade.gameStarts();
+                CAT.debug("Spiel geht los");
+                return;
+            }
+            catch (Exception e) {
+                CAT.error(e.getMessage(), e);
+                System.exit(1);
+            }
+        }
 
-	/**
-	 * Initializing the Gameregistry, the Sounds and Language
-	 */
-	protected static void initBasics() {
-		// enabling registry
-		Registry.getSingletonInstance().setEnabled(true);
+    }
 
-		// load Sounds
-		CAT.debug("starting soundman..");
-		SoundMan.loadSounds();
-		CAT.debug("..done");
+    /**
+     * Initializing the Gameregistry, the Sounds and Language
+     */
+    protected static void initBasics() {
+        // enabling registry
+        Registry.getSingletonInstance().setEnabled(true);
 
-		// language conf
-		Locale myLocale = null;
-		String loc = Conf.getProperty("language.isSet");
-		if (loc != null) {
-			myLocale = new Locale(Conf.getProperty("language.lang"), Conf
-					.getProperty("language.country"));
-		} else {
-			Locale[] list = Message.getLocales();
-			String[] locals = new String[list.length];
-			for (int i = 0; i < locals.length; i++) {
-				locals[i] = list[i].getDisplayLanguage();
-			}
-			int sel = JOptionPane.showOptionDialog(null,
-					"Please select your Language", "Language selection",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-					null, locals, locals[0]);
-			if (sel == JOptionPane.CLOSED_OPTION) {
-				myLocale = new Locale("en", "US");
-			} else {
-				myLocale = list[sel];
-				Conf.setProperty("language.isSet", "yes");
-				Conf.setProperty("language.lang", myLocale.getLanguage());
-				Conf.setProperty("language.country", myLocale.getCountry());
-				Conf.saveProperties();
-			}
-		}
+        // load Sounds
+        CAT.debug("starting soundman..");
+        SoundMan.loadSounds();
+        CAT.debug("..done");
 
-		Message.setLanguage(myLocale);
-		// ende language conf
-	}
+        // language conf
+        Locale myLocale = null;
+        String loc = Conf.getProperty("language.isSet");
+        if (loc != null) {
+            myLocale = new Locale(Conf.getProperty("language.lang"), Conf.getProperty("language.country"));
+        }
+        else {
+            Locale[] list = Message.getLocales();
+            String[] locals = new String[list.length];
+            for (int i = 0; i < locals.length; i++) {
+                locals[i] = list[i].getDisplayLanguage();
+            }
+            int sel = JOptionPane.showOptionDialog(null, "Please select your Language", "Language selection",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, locals, locals[0]);
+            if (sel == JOptionPane.CLOSED_OPTION) {
+                myLocale = new Locale("en", "US");
+            }
+            else {
+                myLocale = list[sel];
+                Conf.setProperty("language.isSet", "yes");
+                Conf.setProperty("language.lang", myLocale.getLanguage());
+                Conf.setProperty("language.country", myLocale.getCountry());
+                Conf.saveProperties();
+            }
+        }
 
-	/*
-	 * Begin of Methods for:
-	 * 
-	 * @see java.awt.event.WindowListener
-	 */
-	public void windowOpened(WindowEvent e) {
-		/* Finally hiding the splash */
-	    if (splash != null ) {
-	        splash.noSplash();
-	    }
-		
-		CAT.debug("window opened");
-		CAT.debug("triggering tilefactory");
+        Message.setLanguage(myLocale);
+        // ende language conf
+    }
 
-		// DO WE REALLY NEED THIS?
-		// I tested it and it seems to be useless,
-		// if it is neccesary a triggered solution should be preferred
-		// Needed so our window is actually drawn before triggering
-		// tile-loading
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException ie) {
-				}
-				facade.prepareTiles();
-			}
-		}).start();
-	}
+    /*
+     * Begin of Methods for:
+     * 
+     * @see java.awt.event.WindowListener
+     */
+    public void windowOpened(WindowEvent e) {
+        /* Finally hiding the splash */
+        if (splash != null) {
+            splash.noSplash();
+        }
 
-	/**
-	 * Disposes the Window and terminates the currently running VM
-	 */
-	public void windowClosing(WindowEvent e) {
-		myclose();
-	}
+        CAT.debug("window opened");
+        CAT.debug("triggering tilefactory");
 
-	public void windowDeactivated(WindowEvent e) {
-	}
+        // DO WE REALLY NEED THIS?
+        // I tested it and it seems to be useless,
+        // if it is necessary a triggered solution should be preferred
+        // Needed so our window is actually drawn before triggering
+        // tile-loading
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                }
+                catch (InterruptedException ie) {
+                }
+                facade.prepareTiles();
+            }
+        }).start();
+    }
 
-	public void windowClosed(WindowEvent e) {
-	}
+    /**
+     * Disposes the Window and terminates the currently running VM
+     */
+    public void windowClosing(WindowEvent e) {
+        myclose();
+    }
 
-	public void windowIconified(WindowEvent e) {
-	}
+    public void windowDeactivated(WindowEvent e) {
+    }
 
-	public void windowDeiconified(WindowEvent e) {
-	}
+    public void windowClosed(WindowEvent e) {
+    }
 
-	public void windowActivated(WindowEvent e) {
-	}
-	/*
-	 * end java.awt.event.WindowListener
-	 */
+    public void windowIconified(WindowEvent e) {
+    }
 
-}// class Start end
+    public void windowDeiconified(WindowEvent e) {
+    }
+
+    public void windowActivated(WindowEvent e) {
+    }
+
+}

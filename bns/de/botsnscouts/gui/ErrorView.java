@@ -31,18 +31,15 @@ import javax.swing.JOptionPane;
 import de.botsnscouts.util.Message;
 
 /** Tell that something went wrong. */
-public class ErrorView{
+public class ErrorView {
 
-  public static void show(Object errmsg){
-    show(null, errmsg);
-  }
+    public static void show(Object errmsg) {
+        show(null, errmsg);
+    }
 
+    public static void show(Component parentComponent, Object errmsg) {
+        JOptionPane.showMessageDialog(parentComponent, errmsg, Message.say("ErrorView", "terror"),
+                        JOptionPane.ERROR_MESSAGE);
 
-  public static void show(Component parentComponent, Object errmsg){
-    JOptionPane.showMessageDialog(parentComponent, errmsg, 
-				  Message.say("ErrorView", "terror"), 
-				  JOptionPane.ERROR_MESSAGE
-				  );
-
-  }
+    }
 }

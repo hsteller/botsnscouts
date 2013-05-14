@@ -40,17 +40,23 @@ import javax.swing.plaf.metal.DefaultMetalTheme;
  */
 public class GreenTheme extends DefaultMetalTheme {
     private static final ColorUIResource black = new ColorUIResource(Color.lightGray);
+
     private static final ColorUIResource white = new ColorUIResource(Color.black);
 
     private static final ColorUIResource prim1 = new ColorUIResource(new Color(64, 255, 64));
+
     private static final ColorUIResource prim2 = new ColorUIResource(new Color(64, 192, 64));
+
     private static final ColorUIResource prim3 = new ColorUIResource(new Color(64, 128, 64));
-              
+
     private static final ColorUIResource sec1 = new ColorUIResource(new Color(0, 128, 0));
+
     private static final ColorUIResource sec2 = new ColorUIResource(new Color(0, 96, 0));
+
     private static final ColorUIResource sec3 = new ColorUIResource(new Color(0, 64, 0));
 
     private final static Font font = new Font("Sans", Font.BOLD, 12);
+
     private final static Font bigFont = new Font("Sans", Font.BOLD, 24);
 
     public String getName() {
@@ -65,7 +71,7 @@ public class GreenTheme extends DefaultMetalTheme {
         return bigFont;
     }
 
-    protected ColorUIResource getPrimary1() {    
+    protected ColorUIResource getPrimary1() {
         return prim1;
     }
 
@@ -95,55 +101,54 @@ public class GreenTheme extends DefaultMetalTheme {
 
     protected ColorUIResource getWhite() {
         return white;
-        
+
     }
-    
-    public static Color getBnsCaretColor(){      
+
+    public static Color getBnsCaretColor() {
         return prim1;
     }
-    
-    public static Color getBnsBackgroundColor(){
+
+    public static Color getBnsBackgroundColor() {
         return sec2;
     }
-    public static Color getBnsForegroundColor(){
+
+    public static Color getBnsForegroundColor() {
         return prim2;
     }
-    
-    public static Color getBnsDisabledTextColor(){
+
+    public static Color getBnsDisabledTextColor() {
         return white;
     }
-    
+
     public static Color getTextColor() {
         return black;
     }
-    
-    public static void main (String [] args){
+
+    public static void main(String[] args) {
         JFrame frame = new JFrame("color test");
         frame.addWindowListener(new WindowAdapter() {
-            public void windowClosing (WindowEvent e){
+            public void windowClosing(WindowEvent e) {
                 System.exit(0);
             }
         });
-        
+
         TJPanel content = new TJPanel();
-        GridLayout lay = new GridLayout(2,3);
+        GridLayout lay = new GridLayout(2, 3);
         lay.setHgap(10);
         lay.setVgap(10);
         content.setLayout(lay);
-        Color [] colors = new Color[] {
-                        prim1, prim2, prim3, sec1, sec2, sec3
-        };
-              
-        for (int i=0;i<colors.length;i++){
+        Color[] colors = new Color[] { prim1, prim2, prim3, sec1, sec2, sec3 };
+
+        for (int i = 0; i < colors.length; i++) {
             TJLabel l = new TJLabel();
             l.setBackground(colors[i]);
             l.setOpaque(true);
             l.setText(colors[i].toString());
-            content.add(l); 
+            content.add(l);
         }
         frame.getContentPane().add(content);
         frame.pack();
         frame.setVisible(true);
-        
+
     }
 }

@@ -23,7 +23,6 @@
  
  *******************************************************************/
 
-
 package de.botsnscouts.gui;
 
 import java.util.HashMap;
@@ -34,24 +33,26 @@ import org.apache.log4j.Category;
 
 import de.botsnscouts.comm.ClientAntwort;
 
-
 public class MessageSequencer {
     private static Category CAT = Category.getInstance(MessageSequencer.class);
 
     private int nextMsg;
-    private TreeSet messages = new TreeSet();
-    private HashMap eventToActionMap = new HashMap();
+
+    private TreeSet<ClientAntwort> messages = new TreeSet<ClientAntwort>();
+
+    private HashMap<String, AbstractMessageAction> eventToActionMap = new HashMap<String, AbstractMessageAction>();
+
     private static final int LATESTART = -1;
 
     public MessageSequencer(boolean lateStart) {
         nextMsg = lateStart ? LATESTART : 1;
     }
 
-    public synchronized void clear(){
+    public synchronized void clear() {
         messages.clear();
         eventToActionMap.clear();
     }
-    
+
     public synchronized void addActionMapping(String messageEventID, AbstractMessageAction action) {
         eventToActionMap.put(messageEventID, action);
     }
@@ -65,10 +66,11 @@ public class MessageSequencer {
                 actionType = messageData.namen[0];
             else
                 actionType = useThisIDString;
-            AbstractMessageAction action = (AbstractMessageAction) eventToActionMap.get(actionType);
+            AbstractMessageAction action = eventToActionMap.get(actionType);
             action.invoke(messageData);
             // invokeAsLongAsPossible();
-        } else {
+        }
+        else {
             // store the special String for later use in our special container
             if (useThisIDString != null)
                 messageData.specialMessageId = useThisIDString;
@@ -85,7 +87,8 @@ public class MessageSequencer {
                 invokeAsLongAsPossible();
                 CAT.debug("after invokeAsLongAsPossible():");
                 dump();
-            } else {
+            }
+            else {
                 invokeAsLongAsPossible();
             }
         }
@@ -97,14 +100,14 @@ public class MessageSequencer {
 
     /**
      * Invokes actions (ordered by their sequence number) until there is no
-     * uninvoked action/message left or we detect that the next message in
-     * the sequence is missing
+     * uninvoked action/message left or we detect that the next message in the
+     * sequence is missing
      */
     private void invokeAsLongAsPossible() {
         if (messages.isEmpty())
             return;
 
-        ClientAntwort smallest = (ClientAntwort) messages.first();
+        ClientAntwort smallest = messages.first();
         int currentId = smallest.messageSequenceNumber;
         if (nextMsg == LATESTART) {
             nextMsg = currentId;
@@ -116,13 +119,13 @@ public class MessageSequencer {
             if (actionType == null)
                 actionType = smallest.namen[0];
 
-            AbstractMessageAction action = (AbstractMessageAction) eventToActionMap.get(actionType);
+            AbstractMessageAction action = eventToActionMap.get(actionType);
             if (action != null)
                 action.invoke(smallest);
             ++nextMsg;
             messages.remove(smallest);
             if (!messages.isEmpty()) {
-                smallest = (ClientAntwort) messages.first();
+                smallest = messages.first();
                 currentId = smallest.messageSequenceNumber;
             }
             CAT.debug("actual=" + currentId + "\tnext=" + nextMsg);
@@ -134,10 +137,10 @@ public class MessageSequencer {
         CAT.debug("nextMesg=" + nextMsg);
         CAT.debug("ids: ");
         StringBuffer sb = new StringBuffer();
-        Iterator it = messages.iterator();
-        while (it.hasNext())
-            sb.append(((ClientAntwort) it.next()).messageSequenceNumber).append(", ");
+        Iterator<ClientAntwort> it = messages.iterator();
+        while (it.hasNext()) {
+            sb.append(it.next().messageSequenceNumber).append(", ");
+        }
         CAT.debug(sb.toString());
     }
 }
-

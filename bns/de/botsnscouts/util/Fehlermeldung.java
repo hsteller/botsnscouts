@@ -22,23 +22,22 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.util;
 
 /** Ausgabe von Fehlermeldungen
-    zun�chst nur auf die Konsole, erweiterbar auf Fenster
-    @author Miriam
-*/
-
+ zun�chst nur auf die Konsole, erweiterbar auf Fenster
+ @author Miriam
+ */
 
 import java.io.PrintStream;
 
-public class Fehlermeldung{
+public class Fehlermeldung {
 
-    protected PrintStream out=System.err;
-    
+    protected PrintStream out = System.err;
+
     public Fehlermeldung(String s) {
-	out.println(Message.say("Fehlermeldung","eError", s));
+        out.println(Message.say("Fehlermeldung", "eError", s));
     }
 
 }

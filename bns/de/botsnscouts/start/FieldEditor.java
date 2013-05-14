@@ -51,6 +51,8 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.log4j.Category;
+
 import de.botsnscouts.board.FlagException;
 import de.botsnscouts.util.CursorMan;
 import de.botsnscouts.util.ImageMan;
@@ -59,62 +61,80 @@ import de.botsnscouts.widgets.ColoredPanel;
 import de.botsnscouts.widgets.TJButton;
 import de.botsnscouts.widgets.TJPanel;
 
-/**
- */
+@SuppressWarnings("serial")
 public class FieldEditor extends TJPanel implements ActionListener, TileClickListener, ListSelectionListener {
 
+    private static final Category CAT = Category.getInstance(FieldEditor.class);
+
     public static final int MODE_FLAGGE_SETZEN = 0;
+
     public static final int MODE_FLAGGE_ENTFERNEN = 1;
+
     public static final int MODE_FLAGGE_VERSCHIEBEN = 2;
 
     public static final int MODE_TILE_SETZEN = 3;
+
     public static final int MODE_TILE_ENTFERNEN = 4;
+
     public static final int MODE_TILE_DREHEN = 5;
 
-    public static final int CURSOR_DEFAULT = 0,
-    CURSOR_FLAGGE_SETZBAR = 1,
-    CURSOR_FLAGGE_NICHT_SETZBAR = 2,
-    CURSOR_FLAGGE_VERSCHIEBEN = 3,
-    CURSOR_FLAGGE_NICHT_OK = 4,
-    CURSOR_FLAGGE_LOESCHEN = 5;
-
+    public static final int CURSOR_DEFAULT = 0, CURSOR_FLAGGE_SETZBAR = 1, CURSOR_FLAGGE_NICHT_SETZBAR = 2,
+                    CURSOR_FLAGGE_VERSCHIEBEN = 3, CURSOR_FLAGGE_NICHT_OK = 4, CURSOR_FLAGGE_LOESCHEN = 5;
 
     FieldGrid spf;
+
     Start parent;
+
     Paint paint;
 
     JToggleButton modeFlaggeSetzen;
+
     JToggleButton modeFlaggeEntfernen;
+
     JToggleButton modeFlaggeVerschieben;
 
     JToggleButton modeTileSetzen;
+
     JToggleButton modeTileEntfernen;
+
     JToggleButton modeTileDrehen;
 
     ButtonGroup tilesGroup;
 
     JButton ok;
+
     JButton zurueck;
 
     JPanel flaggenButtons;
+
     JPanel fuerSpf;
+
     JScrollPane fuerfuerSpf;
 
     JScrollPane fuerTileListe;
-    JList tileListe;
+
+    JList<TileInfo> tileListe;
+
     JPanel okZur;
 
     int currentMode;
+
     int currentTile;
 
     boolean kannFlaggeSetzen;
+
     boolean flaggeGewaehlt;
+
     boolean istFlagge;
+
     String istFlaggeGut;
-    int flaggeX,flaggeY;
+
+    int flaggeX, flaggeY;
 
     Image[] images;
+
     TileInfo[] tileInfos;
+
     Cursor[] cursors;
 
     public FieldEditor(Start par, FieldGrid spf) {
@@ -127,7 +147,7 @@ public class FieldEditor extends TJPanel implements ActionListener, TileClickLis
 
         images = ImageMan.getImages(ImageMan.STARTKNOEPFE);
 
-        tileInfos = parent.facade.getTileInfos();
+        tileInfos = parent.getFacade().getTileInfos();
 
         BorderLayout lay = new BorderLayout();
 
@@ -187,7 +207,7 @@ public class FieldEditor extends TJPanel implements ActionListener, TileClickLis
         flaggenButtons.add(modeTileDrehen);
         add(BorderLayout.NORTH, flaggenButtons);
 
-        tileListe = new JList(tileInfos);
+        tileListe = new JList<TileInfo>(tileInfos);
 
         tileListe.setCellRenderer(new ThumbsCellRenderer());
         tileListe.setOpaque(false);
@@ -230,45 +250,63 @@ public class FieldEditor extends TJPanel implements ActionListener, TileClickLis
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("ok")) {
             try {
-                parent.facade.isBoardValid();
+                parent.getFacade().isBoardValid();
                 parent.showGameFieldPanel();
                 spf.removeTileClickListener();
                 parent.gameFieldPanel.pnl.add(spf);
-            } catch (OneFlagException ex) {
-                JOptionPane.showMessageDialog(this, Message.say("Start", "mZweiFlaggen"), Message.say("Start", "mError"), JOptionPane.ERROR_MESSAGE);
+            }
+            catch (OneFlagException ex) {
+                JOptionPane.showMessageDialog(this, Message.say("Start", "mZweiFlaggen"),
+                                Message.say("Start", "mError"), JOptionPane.ERROR_MESSAGE);
 
-            } catch (NonContiguousMapException ex) {
-                JOptionPane.showMessageDialog(this, Message.say("Start", "mNichtZus"), Message.say("Start", "mError"), JOptionPane.ERROR_MESSAGE);
+            }
+            catch (NonContiguousMapException ex) {
+                JOptionPane.showMessageDialog(this, Message.say("Start", "mNichtZus"), Message.say("Start", "mError"),
+                                JOptionPane.ERROR_MESSAGE);
 
             }
 
-        } else if (e.getActionCommand().equals("abbrechen")) {
-            if (parent.gameFieldPanel == null) {
-                parent.gameFieldPanel = new GameFieldPanel(parent);
-            }
-            parent.facade.restoreTileRaster();
-            spf.removeTileClickListener();
-            parent.gameFieldPanel.pnl.add(spf);
-            parent.showGameFieldPanel();
-            spf.rasterChanged();
-
-            parent.gameFieldPanel.unrollOverButs();
-            parent.show(); //TODO (setVisi(true) and we need to get rid of the parent thing cos this cant be handled properly)
-            
-        } else if (e.getActionCommand().equals("flSetzen")) {
-            currentMode = MODE_FLAGGE_SETZEN;
-        } else if (e.getActionCommand().equals("flEntfernen")) {
-            currentMode = MODE_FLAGGE_ENTFERNEN;
-        } else if (e.getActionCommand().equals("flVerschieben")) {
-            currentMode = MODE_FLAGGE_VERSCHIEBEN;
-            flaggeGewaehlt = false;
-        } else if (e.getActionCommand().equals("kachSetzen")) {
-            currentMode = MODE_TILE_SETZEN;
-        } else if (e.getActionCommand().equals("kachEntfernen")) {
-            currentMode = MODE_TILE_ENTFERNEN;
-        } else if (e.getActionCommand().equals("kahcDrehen")) {
-            currentMode = MODE_TILE_DREHEN;
         }
+        else
+            if (e.getActionCommand().equals("abbrechen")) {
+                if (parent.gameFieldPanel == null) {
+                    parent.gameFieldPanel = new GameFieldPanel(parent);
+                }
+                parent.getFacade().restoreTileRaster();
+                spf.removeTileClickListener();
+                parent.gameFieldPanel.pnl.add(spf);
+                parent.showGameFieldPanel();
+                spf.rasterChanged();
+
+                parent.gameFieldPanel.unrollOverButs();
+                parent.setVisible(true); // TODO ( we need to get rid of the parent thing cos this cant be handled properly)
+
+            }
+            else
+                if (e.getActionCommand().equals("flSetzen")) {
+                    currentMode = MODE_FLAGGE_SETZEN;
+                }
+                else
+                    if (e.getActionCommand().equals("flEntfernen")) {
+                        currentMode = MODE_FLAGGE_ENTFERNEN;
+                    }
+                    else
+                        if (e.getActionCommand().equals("flVerschieben")) {
+                            currentMode = MODE_FLAGGE_VERSCHIEBEN;
+                            flaggeGewaehlt = false;
+                        }
+                        else
+                            if (e.getActionCommand().equals("kachSetzen")) {
+                                currentMode = MODE_TILE_SETZEN;
+                            }
+                            else
+                                if (e.getActionCommand().equals("kachEntfernen")) {
+                                    currentMode = MODE_TILE_ENTFERNEN;
+                                }
+                                else
+                                    if (e.getActionCommand().equals("kahcDrehen")) {
+                                        currentMode = MODE_TILE_DREHEN;
+                                    }
     }
 
     public void paint(Graphics g) {
@@ -281,176 +319,189 @@ public class FieldEditor extends TJPanel implements ActionListener, TileClickLis
 
     public void tileClick(int rx, int ry, int fx, int fy) {
         switch (currentMode) {
-            case MODE_FLAGGE_SETZEN:
-                {
-                    try {
-                        if (kannFlaggeSetzen) {
-                            if (!istFlaggeGut.equals("")) {
-                                int ret = JOptionPane.showConfirmDialog(this, istFlaggeGut + Message.say("Start", "mWirklich"), Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, new ImageIcon(images[0]));
-                                if (ret != JOptionPane.YES_OPTION) {
-                                    return;
-                                }
-                            }
-                            parent.facade.addFlag(rx * 12 + fx, ry * 12 + fy);
-                            spf.rasterChanged();
-                        } else {
-                            //System.err.println("You cannot place a flag here!");
-                        }
-                    } catch (FlagException ex) {
-                        System.err.println("You cannot place a flag here!");
-                    }
-
-                    break;
-                }
-            case MODE_FLAGGE_ENTFERNEN:
-                {
-                    parent.facade.delFlag(rx * 12 + fx, ry * 12 + fy);
-                    spf.rasterChanged();
-                    break;
-                }
-            case MODE_FLAGGE_VERSCHIEBEN:
-                {
-                    if ((!flaggeGewaehlt) && istFlagge) {
-                        flaggeX = rx * 12 + fx;
-                        flaggeY = ry * 12 + fy;
-                        flaggeGewaehlt = true;
-                    } else if (flaggeGewaehlt && kannFlaggeSetzen) {
+            case MODE_FLAGGE_SETZEN: {
+                try {
+                    if (kannFlaggeSetzen) {
                         if (!istFlaggeGut.equals("")) {
-                            int ret = JOptionPane.showConfirmDialog(this, istFlaggeGut + Message.say("Start", "mWirklich"), Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, new ImageIcon(images[0]));
+                            int ret = JOptionPane.showConfirmDialog(this,
+                                            istFlaggeGut + Message.say("Start", "mWirklich"),
+                                            Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION,
+                                            JOptionPane.QUESTION_MESSAGE, new ImageIcon(images[0]));
+                            if (ret != JOptionPane.YES_OPTION) {
+                                return;
+                            }
+                        }
+                        parent.getFacade().addFlag(rx * 12 + fx, ry * 12 + fy);
+                        spf.rasterChanged();
+                    }
+                    else {
+                        // System.err.println("You cannot place a flag here!");
+                    }
+                }
+                catch (FlagException ex) {
+                    System.err.println("You cannot place a flag here!");
+                }
+
+                break;
+            }
+            case MODE_FLAGGE_ENTFERNEN: {
+                parent.getFacade().delFlag(rx * 12 + fx, ry * 12 + fy);
+                spf.rasterChanged();
+                break;
+            }
+            case MODE_FLAGGE_VERSCHIEBEN: {
+                if ((!flaggeGewaehlt) && istFlagge) {
+                    flaggeX = rx * 12 + fx;
+                    flaggeY = ry * 12 + fy;
+                    flaggeGewaehlt = true;
+                }
+                else
+                    if (flaggeGewaehlt && kannFlaggeSetzen) {
+                        if (!istFlaggeGut.equals("")) {
+                            int ret = JOptionPane.showConfirmDialog(this,
+                                            istFlaggeGut + Message.say("Start", "mWirklich"),
+                                            Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION,
+                                            JOptionPane.QUESTION_MESSAGE, new ImageIcon(images[0]));
                             if (ret != JOptionPane.YES_OPTION) {
                                 return;
                             }
                         }
                         try {
-                            parent.facade.moveFlag(flaggeX, flaggeY, rx * 12 + fx, ry * 12 + fy);
-                        } catch (FlagException ex) {
+                            parent.getFacade().moveFlag(flaggeX, flaggeY, rx * 12 + fx, ry * 12 + fy);
+                        }
+                        catch (FlagException ex) {
                             System.err.println("You cannot place a flag here!");
                         }
                         flaggeGewaehlt = false;
                         spf.rasterChanged();
                     }
-                    break;
-                }
-            case MODE_TILE_SETZEN:
-                {
-                    if (parent.facade.flagsOnTile(rx, ry)) {
-                        int ret = JOptionPane.showConfirmDialog(this, Message.say("Start", "mKachelSetzen"), Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION, JOptionPane.DEFAULT_OPTION, new ImageIcon(images[4]));
-                        //fragen,ob kachel mit den flaggen gel�scht werden soll
-                        if (ret != JOptionPane.YES_OPTION) {
-                            return;
-                        }
+                break;
+            }
+            case MODE_TILE_SETZEN: {
+                Facade facade = parent.getFacade();
+                if (facade.flagsOnTile(rx, ry)) {
+                    int ret = JOptionPane.showConfirmDialog(this, Message.say("Start", "mKachelSetzen"),
+                                    Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.DEFAULT_OPTION, new ImageIcon(images[4]));
+                    // ask if the tile with the flags should be deleted
+                    if (ret != JOptionPane.YES_OPTION) {
+                        return;
                     }
-                    try {
-                        parent.facade.delTile(rx, ry);
-                        parent.facade.setTile(rx, ry, 0, tileInfos[currentTile].toString());
-                    } catch (FlagPresentException ex) {
-                        System.err.println("You cannot place here a field!");
-                    }
-                    spf.rasterChanged();
-                    break;
                 }
-            case MODE_TILE_ENTFERNEN:
-                {
-                    if (parent.facade.flagsOnTile(rx, ry)) {
-                        //fragen,ob kachel mit den flaggen gel�scht werden soll
-                        int ret = JOptionPane.showConfirmDialog(this, Message.say("Start", "mKachelLoeschen"), Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION, JOptionPane.DEFAULT_OPTION, new ImageIcon(images[4]));
-                        if (ret == JOptionPane.YES_OPTION) {
-                            parent.facade.delTile(rx, ry);
-                            spf.rasterChanged();
-                        }
-                    } else {
-                        parent.facade.delTile(rx, ry);
+                try {
+                    facade.delTile(rx, ry);
+                    facade.setTile(rx, ry, 0, tileInfos[currentTile].toString());
+                }
+                catch (FlagPresentException ex) {
+                    CAT.error("You cannot place a field here!");
+                }
+                spf.rasterChanged();
+                break;
+            }
+            case MODE_TILE_ENTFERNEN: {
+                Facade facade = parent.getFacade();
+                if (facade.flagsOnTile(rx, ry)) {
+                    // fragen,ob kachel mit den flaggen gel�scht werden soll
+                    int ret = JOptionPane.showConfirmDialog(this, Message.say("Start", "mKachelLoeschen"),
+                                    Message.say("Start", "mKachelSetzenTitel"), JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.DEFAULT_OPTION, new ImageIcon(images[4]));
+                    if (ret == JOptionPane.YES_OPTION) {
+                        facade.delTile(rx, ry);
                         spf.rasterChanged();
                     }
-
-                    break;
                 }
-            case MODE_TILE_DREHEN:
-                {
-                    parent.facade.rotTile(rx, ry);
+                else {
+                    facade.delTile(rx, ry);
                     spf.rasterChanged();
-
-                    break;
                 }
+
+                break;
+            }
+            case MODE_TILE_DREHEN: {
+                parent.getFacade().rotTile(rx, ry);
+                spf.rasterChanged();
+
+                break;
+            }
         }
     }
 
     public void tileMouseMove(int rx, int ry, int fx, int fy) {
         switch (currentMode) {
-            case MODE_FLAGGE_SETZEN:
-                {
-                    kannFlaggeSetzen = parent.facade.legalFlagPosition(rx * 12 + fx, ry * 12 + fy);
+            case MODE_FLAGGE_SETZEN: {
+                kannFlaggeSetzen = parent.getFacade().legalFlagPosition(rx * 12 + fx, ry * 12 + fy);
+                if (kannFlaggeSetzen) {
+                    istFlaggeGut = parent.getFacade().reasonFlagIllegal(rx * 12 + fx, ry * 12 + fy);
+                    if (istFlaggeGut.equals("")) {
+                        setCursor(cursors[CURSOR_FLAGGE_SETZBAR]);
+                    }
+                    else {
+                        setCursor(cursors[CURSOR_FLAGGE_NICHT_OK]);
+                    }
+                }
+                else {
+                    setCursor(cursors[CURSOR_FLAGGE_NICHT_SETZBAR]);
+                }
+                break;
+            }
+            case MODE_FLAGGE_ENTFERNEN: {
+                setCursor(cursors[CURSOR_FLAGGE_LOESCHEN]);
+                break;
+            }
+            case MODE_FLAGGE_VERSCHIEBEN: {
+                if (!flaggeGewaehlt) {
+                    istFlagge = parent.getFacade().flagExists(rx * 12 + fx, ry * 12 + fy);
+                    if (istFlagge) {
+                        setCursor(cursors[CURSOR_FLAGGE_VERSCHIEBEN]);
+                    }
+                    else {
+                        setCursor(cursors[CURSOR_DEFAULT]);
+                    }
+                }
+                else {
+                    kannFlaggeSetzen = parent.getFacade().legalFlagPosAfterMove(rx * 12 + fx, ry * 12 + fy);
                     if (kannFlaggeSetzen) {
-                        istFlaggeGut = parent.facade.reasonFlagIllegal(rx * 12 + fx, ry * 12 + fy);
+                        istFlaggeGut = parent.getFacade().reasonFlagIllegal(rx * 12 + fx, ry * 12 + fy);
                         if (istFlaggeGut.equals("")) {
                             setCursor(cursors[CURSOR_FLAGGE_SETZBAR]);
-                        } else {
+                        }
+                        else {
                             setCursor(cursors[CURSOR_FLAGGE_NICHT_OK]);
                         }
-                    } else {
+                    }
+                    else {
                         setCursor(cursors[CURSOR_FLAGGE_NICHT_SETZBAR]);
                     }
-                    break;
                 }
-            case MODE_FLAGGE_ENTFERNEN:
-                {
-                    setCursor(cursors[CURSOR_FLAGGE_LOESCHEN]);
-                    break;
-                }
-            case MODE_FLAGGE_VERSCHIEBEN:
-                {
-                    if (!flaggeGewaehlt) {
-                        istFlagge = parent.facade.flagExists(rx * 12 + fx, ry * 12 + fy);
-                        if (istFlagge) {
-                            setCursor(cursors[CURSOR_FLAGGE_VERSCHIEBEN]);
-                        } else {
-                            setCursor(cursors[CURSOR_DEFAULT]);
-                        }
-                    } else {
-                        kannFlaggeSetzen = parent.facade.legalFlagPosAfterMove(rx * 12 + fx, ry * 12 + fy);
-                        if (kannFlaggeSetzen) {
-                            istFlaggeGut = parent.facade.reasonFlagIllegal(rx * 12 + fx, ry * 12 + fy);
-                            if (istFlaggeGut.equals("")) {
-                                setCursor(cursors[CURSOR_FLAGGE_SETZBAR]);
-                            } else {
-                                setCursor(cursors[CURSOR_FLAGGE_NICHT_OK]);
-                            }
-                        } else {
-                            setCursor(cursors[CURSOR_FLAGGE_NICHT_SETZBAR]);
-                        }
-                    }
-                    break;
-                }
-            case MODE_TILE_SETZEN:
-                {
-                    break;
-                }
-            case MODE_TILE_ENTFERNEN:
-                {
+                break;
+            }
+            case MODE_TILE_SETZEN: {
+                break;
+            }
+            case MODE_TILE_ENTFERNEN: {
 
-                    break;
-                }
-            case MODE_TILE_DREHEN:
-                {
+                break;
+            }
+            case MODE_TILE_DREHEN: {
 
-                    break;
-                }
+                break;
+            }
         }
     }
 
     public void tileMouseLeave() {
-        //Global.debug(this,"Mouse left");
+        // Global.debug(this,"Mouse left");
         setCursor(cursors[CURSOR_DEFAULT]);
     }
 
     public void valueChanged(ListSelectionEvent e) {
-        //Global.debug(this,"selected tile "+tileListe.getSelectedIndex());
+        // Global.debug(this,"selected tile "+tileListe.getSelectedIndex());
         currentTile = tileListe.getSelectedIndex();
         tilesGroup.setSelected(modeTileSetzen.getModel(), true);
         currentMode = MODE_TILE_SETZEN;
         setCursor(cursors[CURSOR_DEFAULT]);
         flaggenButtons.repaint();
-        //repaint();
+        // repaint();
     }
 
     private void initCursors() {
@@ -466,6 +517,3 @@ public class FieldEditor extends TJPanel implements ActionListener, TileClickLis
     }
 
 }
-
-
-

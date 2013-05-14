@@ -23,7 +23,6 @@
  
  *******************************************************************/
 
-
 /*
  * Created on 07.06.2005
  *
@@ -37,6 +36,5 @@ package de.botsnscouts.start;
 public interface RegistrationStartListener {
 
     public void registrationStarted();
-    
-}
 
+}

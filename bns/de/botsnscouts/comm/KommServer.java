@@ -41,21 +41,21 @@ import de.botsnscouts.util.Status;
  *  
  */
 public class KommServer {
-    static Category CAT = Category.getInstance(KommServer.class);
+    private static final Category CAT = Category.getInstance(KommServer.class);
 
     static final boolean LOG_RECEIVE = false;
 
     static final boolean LOG_SEND = false;
 
     private String name = "someKommServer";
-    
+
     public KommServer(BufferedReader i, PrintWriter o, String name) {
         in = i;
         out = o;
         this.name = name;
     }
-    
-    public String getName(){
+
+    public String getName() {
         return this.name;
     }
 
@@ -66,16 +66,14 @@ public class KommServer {
     public PrintWriter out;
 
     /**
-     * Warte dient zum 'Horchen' am Kommunikationskanal und Warten auf beliebige
-     * Kommunikation von Client-Seite. Warte parst den �ber den BufferedReader
-     * hereinkommenden String und liefert ein Objekt der Klasse ServerAntwort
-     * zur�ck, �ber das abgefragt werden kann, was f�r eine Art Kommunikation
-     * vorliegt und welche Informationen mitgesandt wurden.
+     * Warte ist there to listen to the communication channel and to wait for
+     * arbitrary communication by the client. It parses the communicated String
+     * and provides an object of the class ServerAntwort which can be used to
+     * determine what kind of communication this was and what data was sent.
      * 
-     * @return Das Antwortobjekt mit den Daten
+     * @return the answer object with the data
      * @exception KommException
-     *                           Tritt beim Parsen ein Fehler auf (z.B. wegen falsch
-     *                           aufgebauten Strings), wird eine KommException geworfen.
+     *                if there's an error parsing the String sent by the Client
      */
     public ServerAntwort warte() throws KommException {
         try {
@@ -84,19 +82,17 @@ public class KommServer {
             if (s == null) {
                 try {
                     s = in.readLine();
-                    if (s == null)
-                        throw new KommException("KS.warte: Zweimal null gelesen; vielleicht haengt der Client?!");
+                    if (s == null) {
+                        throw new KommException("KS.warte: read NULL twice; maybe the client is dead?!");
+                    }
                 }
                 catch (Exception ex) {
                     throw new KommException("Exception (Message:" + ex.getMessage()
-                                    + ")bei KommServer.warte(vorher 'null' gelesen)");
+                                    + ") in KommServer.warte(read 'null' earlier)");
                 }
             }
-            if (s != null)
-                return wait2(s);
-            else
-                throw new KommException("Ks.warte hat null gelesen");
-
+            // block above assures that s isn't null
+            return wait2(s);
         }
         catch (IOException ie) {
             throw new KommException("Es trat eine IOException beim Aufruf von wait2 auf");
@@ -108,17 +104,17 @@ public class KommServer {
      * also vergesst, dass Ihr sie gesehen habt. ;-)
      * 
      * @exception KommException
-     *                           Tritt beim Parsen ein Fehler auf (z.B. wegen falsch
-     *                           aufgebauten Strings), wird eine KommException geworfen.
+     *                Tritt beim Parsen ein Fehler auf (z.B. wegen falsch
+     *                aufgebauten Strings), wird eine KommException geworfen.
      */
     ServerAntwort wait2(String input) throws KommException {
         ServerAntwort back = new ServerAntwort();
         boolean error = false;
         String errormsg = "";
         char st, nd, rd; /*
-                                  * Die drei ersten Zeichen des Strings: firST,
-                                  * secoND, thiRD
-                                  */
+                          * Die drei ersten Zeichen des Strings: firST, secoND,
+                          * thiRD
+                          */
         try {
             /*
              * try wegen IndexOutOfBoundsExceptions, die entstehen, wenn in
@@ -171,533 +167,542 @@ public class KommServer {
 
                 switch (st) {
 
-                case 'S': {
-                    if ((nd == 'R') && (rd == 'O')) {
-                        //input: "SRO(Robbi Nummer 1)"
-                        int klammeraufpos = input.indexOf('(');
-                        int klammerzupos = input.lastIndexOf(')');
-                        if (klammeraufpos == -1) {
-                            errormsg = "SRO->keine '(' gefunden";
-                            error = true;
-                            break;
-                        }
-                        if (klammerzupos == -1) {
-                            errormsg = "SRO->keine ')' gefunden";
-                            error = true;
-                            break;
-                        }
-                        back.typ = ServerAntwort.GIBROBOTERPOS;
-                        back.name = Encoder.commDecode(input.substring(klammeraufpos + 1, klammerzupos));
-                        // System.out.println ("SRO-test");
-
-                    }
-                    else
-                        if ((nd == 'F') && (rd == 'I')) {
-                            // input: "SFI(37,123)" !!FALSCH!! -> SFI((37,123))
-                            int x = -1;
-                            int y = -1;
-                            int klammeraufpos = input.indexOf('(');
-                            if (klammeraufpos == -1) {
-                                error = true;
-                                errormsg = "SFI->keine '(' gefunden";
-                                break;
-                            }
-                            int klammerzupos = input.lastIndexOf(')');
-                            if (klammerzupos == -1) {
-                                error = true;
-                                errormsg = "SFI->keine ')' gefunden";
-                                break;
-                            }
-                            int kommapos = input.indexOf(',');
-                            if (kommapos == -1) {
-                                errormsg = "SFI->kein Komma gefunden";
-                                error = true;
-                                break;
-                            }
-                            String xs = input.substring(klammeraufpos + 2, kommapos);
-                            // +2, um die innere Klammer zu erwischen
-                            String ys = input.substring(kommapos + 1, klammerzupos - 1);
-                            // -1, um die innere Klammer zu erwischen
-                            try {
-                                x = Integer.parseInt(xs);
-                                y = Integer.parseInt(ys);
-                                back.typ = ServerAntwort.GIBFELDINHALT;
-                                back.ort = new Location(x, y);
-                                //  System.out.println("SFI-Ende");
-                            }
-                            catch (NumberFormatException xy) {
-                                errormsg = "SFI(x,y) ->  x oder y keine Zahl oder ein Zeichen keine Ziffer, z.B. Space";
-                                error = true;
-                                return null;
-                            }
-                        }
-                        else {
-                            errormsg = "String beginnt mit S, danach ungueltig";
-                            error = true;
-                        }
-                    //System.out.println("DEBUG");
-                    break;
-                }
-
-                case 'G': {
-                    if (nd == 'R') {
-                        if (rd == 'S') {
-                            //input "GRS(Robbis name)"
+                    case 'S': {
+                        if ((nd == 'R') && (rd == 'O')) {
+                            // input: "SRO(Robbi Nummer 1)"
                             int klammeraufpos = input.indexOf('(');
                             int klammerzupos = input.lastIndexOf(')');
                             if (klammeraufpos == -1) {
-                                errormsg = "GRS->keine '(' gefunden";
+                                errormsg = "SRO->keine '(' gefunden";
                                 error = true;
                                 break;
                             }
                             if (klammerzupos == -1) {
+                                errormsg = "SRO->keine ')' gefunden";
                                 error = true;
-                                errormsg = "GRS->keine ')' gefunden";
                                 break;
                             }
-                            back.typ = ServerAntwort.GIBROBSTATUS;
-                            back.name = Encoder.decode(input.substring(klammeraufpos + 1, klammerzupos));
+                            back.typ = ServerAntwort.GIBROBOTERPOS;
+                            back.name = Encoder.commDecode(input.substring(klammeraufpos + 1, klammerzupos));
+                            // System.out.println ("SRO-test");
+
                         }
-                        else {
-                            error = true;
-                            errormsg = "String begint mit \"GR\", danach ungueltig";
-                            break;
-                        }
-                    }
-                    else
-                        if (nd == 'S') {
-                            if (rd == 'A') {
-                                back.typ = ServerAntwort.GIBAUSWERTUNGSSTATUS;
-                            }
-                            else
-                                if (rd == 'N') {
-                                    back.typ = ServerAntwort.GIBNAMEN;
-                                }
-                                else
-                                    if (rd == 'D') {
-                                        back.typ = ServerAntwort.GIBSPIELFELDDIM;
-                                    }
-                                    else
-                                        if (rd == 'S') {
-                                            back.typ = ServerAntwort.GIBSPIELSTAND;
-                                        }
-                                        else
-                                            if (rd == 'F') {
-                                                back.typ = ServerAntwort.GIBFARBEN;
-                                            }
-                                            else
-                                                if (rd == 'T') {
-                                                    back.typ = ServerAntwort.STATS;
-                                                }
-                                                else {
-                                                    errormsg = "GS->danach nichts aus ['A','N','D','S','F','T'] gefunden";
-                                                    error = true;
-                                                    break;
-                                                }
-                        } // nd==s
                         else
-                            if (nd == 'F') {
-                                if (rd == 'L')
-                                    back.typ = ServerAntwort.GIBFAHNENPOS;
-                                else {
-                                    errormsg = "GF-> danach kein 'L' gefunden";
+                            if ((nd == 'F') && (rd == 'I')) {
+                                // input: "SFI(37,123)" !!FALSCH!! ->
+                                // SFI((37,123))
+                                int x = -1;
+                                int y = -1;
+                                int klammeraufpos = input.indexOf('(');
+                                if (klammeraufpos == -1) {
+                                    error = true;
+                                    errormsg = "SFI->keine '(' gefunden";
+                                    break;
+                                }
+                                int klammerzupos = input.lastIndexOf(')');
+                                if (klammerzupos == -1) {
+                                    error = true;
+                                    errormsg = "SFI->keine ')' gefunden";
+                                    break;
+                                }
+                                int kommapos = input.indexOf(',');
+                                if (kommapos == -1) {
+                                    errormsg = "SFI->kein Komma gefunden";
                                     error = true;
                                     break;
                                 }
+                                String xs = input.substring(klammeraufpos + 2, kommapos);
+                                // +2, um die innere Klammer zu erwischen
+                                String ys = input.substring(kommapos + 1, klammerzupos - 1);
+                                // -1, um die innere Klammer zu erwischen
+                                try {
+                                    x = Integer.parseInt(xs);
+                                    y = Integer.parseInt(ys);
+                                    back.typ = ServerAntwort.GIBFELDINHALT;
+                                    back.ort = new Location(x, y);
+                                    // System.out.println("SFI-Ende");
+                                }
+                                catch (NumberFormatException xy) {
+                                    errormsg = "SFI(x,y) ->  x oder y keine Zahl oder ein Zeichen keine Ziffer, z.B. Space";
+                                    error = true;
+                                    return null;
+                                }
                             }
+                            else {
+                                errormsg = "String beginnt mit S, danach ungueltig";
+                                error = true;
+                            }
+                        // System.out.println("DEBUG");
+                        break;
+                    }
+
+                    case 'G': {
+                        if (nd == 'R') {
+                            if (rd == 'S') {
+                                // input "GRS(Robbis name)"
+                                int klammeraufpos = input.indexOf('(');
+                                int klammerzupos = input.lastIndexOf(')');
+                                if (klammeraufpos == -1) {
+                                    errormsg = "GRS->keine '(' gefunden";
+                                    error = true;
+                                    break;
+                                }
+                                if (klammerzupos == -1) {
+                                    error = true;
+                                    errormsg = "GRS->keine ')' gefunden";
+                                    break;
+                                }
+                                back.typ = ServerAntwort.GIBROBSTATUS;
+                                back.name = Encoder.commDecode(input.substring(klammeraufpos + 1, klammerzupos));
+                            }
+                            else {
+                                error = true;
+                                errormsg = "String begint mit \"GR\", danach ungueltig";
+                                break;
+                            }
+                        }
+                        else
+                            if (nd == 'S') {
+                                if (rd == 'A') {
+                                    back.typ = ServerAntwort.GIBAUSWERTUNGSSTATUS;
+                                }
+                                else
+                                    if (rd == 'N') {
+                                        back.typ = ServerAntwort.GIBNAMEN;
+                                    }
+                                    else
+                                        if (rd == 'D') {
+                                            back.typ = ServerAntwort.GIBSPIELFELDDIM;
+                                        }
+                                        else
+                                            if (rd == 'S') {
+                                                back.typ = ServerAntwort.GIBSPIELSTAND;
+                                            }
+                                            else
+                                                if (rd == 'F') {
+                                                    back.typ = ServerAntwort.GIBFARBEN;
+                                                }
+                                                else
+                                                    if (rd == 'T') {
+                                                        back.typ = ServerAntwort.STATS;
+                                                    }
+                                                    else {
+                                                        errormsg = "GS->danach nichts aus ['A','N','D','S','F','T'] gefunden";
+                                                        error = true;
+                                                        break;
+                                                    }
+                            } // nd==s
                             else
-                                if (nd == 'T') {
-                                    if (rd == 'O')
-                                        back.typ = ServerAntwort.GIBTIMEOUT;
+                                if (nd == 'F') {
+                                    if (rd == 'L')
+                                        back.typ = ServerAntwort.GIBFAHNENPOS;
                                     else {
+                                        errormsg = "GF-> danach kein 'L' gefunden";
                                         error = true;
-                                        errormsg = "GT-> danach kein 'O' gefunden";
                                         break;
                                     }
                                 }
                                 else
-                                    if (nd == 'P') {
-                                        if (rd == 'L')
-                                            back.typ = ServerAntwort.GIBSPIELFELD;
+                                    if (nd == 'T') {
+                                        if (rd == 'O')
+                                            back.typ = ServerAntwort.GIBTIMEOUT;
                                         else {
                                             error = true;
-                                            errormsg = "GP-> danach kein 'L' gefunden";
-                                            break;
-                                        }
-                                    }
-
-                    break;
-                }
-                case 'T': {
-                    if (nd == 'R') {
-                        if (rd == 'P') {
-                            //input: "TRP(robbis name,(4,8,3,),f)"
-                            int klammerauf1 = input.indexOf('(');
-                            int klammerauf2 = input.lastIndexOf('(');
-                            int klammerzu2 = input.lastIndexOf(')');
-                            int klammerzu1 = input.lastIndexOf(')', klammerzu2 - 1);
-                            int kommaletzt = input.lastIndexOf(',');
-                            int komma1 = input.lastIndexOf(',', klammerauf2 - 1);
-
-                            if ((klammerauf1 != -1) && (klammerauf2 != -1) && (klammerzu1 != -1) && (klammerzu2 != -1)
-                                            && (klammerzu2 != -1) && (komma1 != -1) && (kommaletzt != -1)) {
-                                // Auslesen der Karten
-                                String karten = new String(input.substring(klammerauf2 + 1, klammerzu1));
-                                int[] kart = new int[5];
-                                int zaehler = 0;
-                                boolean istLetztesZeichenZiffer = false; // Test
-                                                                                                      // auf
-                                                                                                      // 2-stellige
-                                                                                                      // Karten-Nummern,
-                                                                                                      // die
-                                                                                                      // ansonsten
-                                                                                                      // als
-                                                                                                      // zwei
-                                                                                                      // Karten
-                                                                                                      // verstanden
-                                                                                                      // w�rden
-                                for (int i = 0; i < karten.length(); i++) {
-                                    if (Character.isDigit(karten.charAt(i))) {
-                                        try {
-                                            if (istLetztesZeichenZiffer) {
-                                                error = true;
-                                                errormsg = "Karten-Nummer >9 abgegeben";
-                                            }
-                                            else {
-                                                kart[zaehler] = Integer.parseInt(karten.substring(i, i + 1));
-                                                istLetztesZeichenZiffer = true;
-                                                zaehler++;
-                                            }
-                                        }
-                                        catch (NumberFormatException should_not_happen) {
-                                            error = true;
-                                            errormsg = "Kartenrueckgabe: NumberFormatException; sollte eigentlich selbst bei falschem String nicht moeglich sein";
-                                            break;
-                                        }
-                                        catch (ArrayIndexOutOfBoundsException falsche_Rueckgabe) {
-                                            error = true;
-                                            errormsg = "Falsche Kartenrueckgabe, wahrscheinlich zu viele Karten";
+                                            errormsg = "GT-> danach kein 'O' gefunden";
                                             break;
                                         }
                                     }
                                     else
-                                        istLetztesZeichenZiffer = false;
-                                }
-                                if (!error) {
-                                    // Programmierung zuweisen
-                                    back.register = new int[zaehler];
-                                    for (int i = 0; i < zaehler; i++)
-                                        back.register[i] = kart[i];
-
-                                    /*
-                                     * Auslesen des Namens; aufgrund der
-                                     * persoenlichen Komm-Objekte unseres
-                                     * Servers eigentlich ueberfluessig
-                                     */
-                                    back.name = Encoder.decode(new String(input.substring(klammerauf1 + 1, komma1)));
-                                    // Auslesen des Power-Down-Booleans
-                                    String deaktiviert = new String(input.substring(kommaletzt + 1, klammerzu2));
-                                    try {
-                                        char powerdown = deaktiviert.trim().toUpperCase().charAt(0);
-                                        if (powerdown == 'F')
-                                            back.ok = false;
-                                        else
-                                            if (powerdown == 'T')
-                                                back.ok = true;
+                                        if (nd == 'P') {
+                                            if (rd == 'L')
+                                                back.typ = ServerAntwort.GIBSPIELFELD;
                                             else {
                                                 error = true;
-                                                errormsg = "Kartenrueckgabe: falscher Bool (nicht f/t) fuer powerdown zurueckgegeben";
+                                                errormsg = "GP-> danach kein 'L' gefunden";
+                                                break;
                                             }
-                                    }
-                                    catch (java.lang.Exception kein_bool) {
-                                        error = true;
-                                        errormsg = "Kartenrueckgabe: vermutlich kein Bool fuer powerdown zurueckgegeben (d.h. letztes Zeichen in der Klammer nicht t oder f) ";
-                                    }
-                                    // setzen des Typs
-                                    back.typ = ServerAntwort.PROGRAMMIERUNG;
-                                    /*
-                                     * System.err.print ("SERVER: gebe
-                                     * Kartenzahlen zurueck: "); for (int i=0;i
-                                     * <back.register.length;i++)
-                                     * System.err.print (back.register[i]+", ");
-                                     * System.err.println();
-                                     */
-                                }
-                            }
-                            else {
-                                error = true;
-                                errormsg = "Kartenrueckgabe: falsch aufgebauter Rueckgabestring; vermutlich falsche Klammerung oder falsche Kommasetzung";
-                            }
-                        }
-                        else
-                            if (rd == 'R') {
-                                int klammerauf = input.indexOf('(');
-                                int klammerzu = input.lastIndexOf(')');
-                                int komma1 = input.indexOf(',');
-
-                                if ((klammerauf != -1) && (klammerzu != -1) && (komma1 != -1)) {
-                                    try {
-                                        String regStr = input.substring(komma1 + 1, klammerzu); /*
-                                                                                                                                             * Der
-                                                                                                                                             * Teilstring
-                                                                                                                                             * der
-                                                                                                                                             * die
-                                                                                                                                             * Registernummern
-                                                                                                                                             * enthaelt
-                                                                                                                                             */
-                                        int[] regs = new int[9]; // Die
-                                                                              // Registernummern
-                                        int zaehler = 0;
-                                        boolean istLetztesZeichenZiffer = false; // Zum
-                                                                                                              // Test
-                                                                                                              // auf
-                                                                                                              // 2-stellige
-                                                                                                              // Karten-Nummern,
-                                                                                                              // die
-                                                                                                              // ansonsten
-                                                                                                              // als
-                                                                                                              // zwei
-                                                                                                              // Karten
-                                                                                                              // verstanden
-                                                                                                              // w�rden
-                                        for (int i = 0; i < regStr.length(); i++) {
-                                            if (Character.isDigit(regStr.charAt(i))) {
-                                                try {
-                                                    if (istLetztesZeichenZiffer) {
-                                                        error = true;
-                                                        errormsg = "Register-Reparatur: zweistellige Registernummer angegeben";
-                                                    }
-                                                    else {
-                                                        regs[zaehler] = Integer.parseInt(regStr.substring(i, i + 1));
-                                                        istLetztesZeichenZiffer = true;
-                                                        zaehler++;
-                                                    }
-                                                }
-                                                catch (NumberFormatException should_not_happen) {
-                                                    error = true;
-                                                    errormsg = "Register-Reparatur: NumberFormatException; sollte eigentlich selbst bei falschem String nicht moeglich sein";
-                                                    break;
-                                                }
-                                                catch (ArrayIndexOutOfBoundsException falsche_Rueckgabe) {
-                                                    error = true;
-                                                    errormsg = "Falsche Registeranzahl, wahrscheinlich zu viele Register-Nummern";
-                                                    break;
-                                                }
-                                            }
-                                            else
-                                                istLetztesZeichenZiffer = false;
                                         }
-                                        // Registernummern zuweisen
+
+                        break;
+                    }
+                    case 'T': {
+                        if (nd == 'R') {
+                            if (rd == 'P') {
+                                // input: "TRP(robbis name,(4,8,3,),f)"
+                                int klammerauf1 = input.indexOf('(');
+                                int klammerauf2 = input.lastIndexOf('(');
+                                int klammerzu2 = input.lastIndexOf(')');
+                                int klammerzu1 = input.lastIndexOf(')', klammerzu2 - 1);
+                                int kommaletzt = input.lastIndexOf(',');
+                                int komma1 = input.lastIndexOf(',', klammerauf2 - 1);
+
+                                if ((klammerauf1 != -1) && (klammerauf2 != -1) && (klammerzu1 != -1)
+                                                && (klammerzu2 != -1) && (klammerzu2 != -1) && (komma1 != -1)
+                                                && (kommaletzt != -1)) {
+                                    // Auslesen der Karten
+                                    String karten = new String(input.substring(klammerauf2 + 1, klammerzu1));
+                                    int[] kart = new int[5];
+                                    int zaehler = 0;
+                                    boolean istLetztesZeichenZiffer = false; // Test
+                                                                             // auf
+                                                                             // 2-stellige
+                                                                             // Karten-Nummern,
+                                                                             // die
+                                                                             // ansonsten
+                                                                             // als
+                                                                             // zwei
+                                                                             // Karten
+                                                                             // verstanden
+                                                                             // w�rden
+                                    for (int i = 0; i < karten.length(); i++) {
+                                        if (Character.isDigit(karten.charAt(i))) {
+                                            try {
+                                                if (istLetztesZeichenZiffer) {
+                                                    error = true;
+                                                    errormsg = "Karten-Nummer >9 abgegeben";
+                                                }
+                                                else {
+                                                    kart[zaehler] = Integer.parseInt(karten.substring(i, i + 1));
+                                                    istLetztesZeichenZiffer = true;
+                                                    zaehler++;
+                                                }
+                                            }
+                                            catch (NumberFormatException should_not_happen) {
+                                                error = true;
+                                                errormsg = "Kartenrueckgabe: NumberFormatException; sollte eigentlich selbst bei falschem String nicht moeglich sein";
+                                                break;
+                                            }
+                                            catch (ArrayIndexOutOfBoundsException falsche_Rueckgabe) {
+                                                error = true;
+                                                errormsg = "Falsche Kartenrueckgabe, wahrscheinlich zu viele Karten";
+                                                break;
+                                            }
+                                        }
+                                        else
+                                            istLetztesZeichenZiffer = false;
+                                    }
+                                    if (!error) {
+                                        // Programmierung zuweisen
                                         back.register = new int[zaehler];
                                         for (int i = 0; i < zaehler; i++)
-                                            back.register[i] = regs[i];
+                                            back.register[i] = kart[i];
 
                                         /*
                                          * Auslesen des Namens; aufgrund der
                                          * persoenlichen Komm-Objekte unseres
                                          * Servers eigentlich ueberfluessig
                                          */
-                                        back.name = Encoder.decode(new String(input
-                                                        .substring(klammerauf + 1, komma1)));
-                                        back.typ = ServerAntwort.REPARATUR;
-                                    }
-                                    catch (StringIndexOutOfBoundsException xe) {
-                                        error = true;
-                                        errormsg = "Reparatur: ungueltiger String";
-                                    }
-                                }
-                                else {
-                                    error = true;
-                                    errormsg = "TRR - Falscher String";
-                                    break;
-                                }
-
-                            }
-                            else {
-                                error = true;
-                                errormsg = "GR-> danach weder P noch R";
-                                break;
-                            }
-                    }
-                    else
-                        if (nd == 'N') {
-                            if (rd == 'R') {
-                                // TNR(<Name>,<Richtung>)
-                                int klammerauf = input.indexOf('(');
-                                int klammerzu = input.indexOf(')');
-                                int komma1 = input.indexOf(',');
-                                if ((komma1 != -1) && (klammerauf != -1) && (klammerzu != -1)) {
-                                    try {
-                                        String richtstr = input.substring(komma1 + 1, klammerzu);
-                                        back.name = Encoder.decode(input.substring(klammerauf + 1, komma1));
-                                        back.typ = ServerAntwort.AUSRICHTUNG;
-                                        /*
-                                         * Es koennte eine Exception kommen,
-                                         * falls nach 'trim' keine Zeichen mehr
-                                         * in 'richtstr' sind TESTERGEBNIS: SIE
-                                         * KOMMT AUCH!
-                                         */
-                                        char richtung = Character.toUpperCase(richtstr.trim().charAt(0));
-
-                                        if (richtung == 'N')
-                                            back.wohin = 0;
-                                        else
-                                            if (richtung == 'S')
-                                                back.wohin = 2;
+                                        back.name = Encoder.commDecode(new String(input.substring(klammerauf1 + 1,
+                                                        komma1)));
+                                        // Auslesen des Power-Down-Booleans
+                                        String deaktiviert = new String(input.substring(kommaletzt + 1, klammerzu2));
+                                        try {
+                                            char powerdown = deaktiviert.trim().toUpperCase().charAt(0);
+                                            if (powerdown == 'F')
+                                                back.ok = false;
                                             else
-                                                if ((richtung == 'E') || (richtung == 'O'))
-                                                    back.wohin = 1;
-                                                else
-                                                    if (richtung == 'W')
-                                                        back.wohin = 3;
-                                                    else {
-                                                        error = true;
-                                                        errormsg = "TNR -> keine gueltige Richtung angegeben";
-                                                    }
-                                    }
-                                    catch (Exception e) {
-                                        error = true;
-                                        errormsg = "TNR -> keinen RichtungsCharacter gefunden (!?)";
+                                                if (powerdown == 'T')
+                                                    back.ok = true;
+                                                else {
+                                                    error = true;
+                                                    errormsg = "Kartenrueckgabe: falscher Bool (nicht f/t) fuer powerdown zurueckgegeben";
+                                                }
+                                        }
+                                        catch (java.lang.Exception kein_bool) {
+                                            error = true;
+                                            errormsg = "Kartenrueckgabe: vermutlich kein Bool fuer powerdown zurueckgegeben (d.h. letztes Zeichen in der Klammer nicht t oder f) ";
+                                        }
+                                        // setzen des Typs
+                                        back.typ = ServerAntwort.PROGRAMMIERUNG;
+                                        /*
+                                         * System.err.print ("SERVER: gebe
+                                         * Kartenzahlen zurueck: "); for (int
+                                         * i=0;i <back.register.length;i++)
+                                         * System.err.print
+                                         * (back.register[i]+", ");
+                                         * System.err.println();
+                                         */
                                     }
                                 }
                                 else {
                                     error = true;
-                                    errormsg = "TNR -> kein gueltiger String";
+                                    errormsg = "Kartenrueckgabe: falsch aufgebauter Rueckgabestring; vermutlich falsche Klammerung oder falsche Kommasetzung";
                                 }
                             }
-                            else {
-                                error = true;
-                                errormsg = "TN -> danach kein R";
-                            }
-                        }
-                        else
-                            if (nd == 'B') { //FEHLT FEHLT FEHLT gleich
-                                                    // nicht mehr
-                                if (rd == 'D') {
-                                    //TBD(<Name>,<Bool>)
+                            else
+                                if (rd == 'R') {
                                     int klammerauf = input.indexOf('(');
                                     int klammerzu = input.lastIndexOf(')');
                                     int komma1 = input.indexOf(',');
-                                    if ((komma1 != -1) && (klammerauf != -1) && (klammerzu != -1)) {
-                                        back.name = Encoder.decode(input.substring(klammerauf + 1, komma1));
-                                        back.typ = ServerAntwort.REAKTIVIERUNG;
+
+                                    if ((klammerauf != -1) && (klammerzu != -1) && (komma1 != -1)) {
                                         try {
-                                            char stayPDown = Character.toUpperCase(input.substring(komma1 + 1,
-                                                            klammerzu).trim().charAt(0));
-                                            /*
-                                             * Die Rueckgabewerte sind
-                                             * invertiert, d.h., wenn der
-                                             * Spieler f zurueckgibt, wird ok
-                                             * auf true gesetzt und nicht auf
-                                             * false. Gibt der Spieler t
-                                             * zurueck, wird ok auf false
-                                             * gesetzt. Dieses geschieht
-                                             * aufgrund der Definition der
-                                             * Rueckgabewerte von
-                                             * KommServerRoboter.reaktivierung():
-                                             * Dort wird nicht zurueckgegeben,
-                                             * ob der Spieler deaktiviert
-                                             * bleiben moechte, sondern ob er
-                                             * wieder aktiviert werden moechte.
-                                             */
-                                            if (stayPDown == 'F')
-                                                back.ok = true;
-                                            else
-                                                if (stayPDown == 'T')
-                                                    back.ok = false;
-                                                else {
-                                                    error = true;
-                                                    errormsg = "TBD -> kein Boolean gefunden :-(";
+                                            String regStr = input.substring(komma1 + 1, klammerzu); /*
+                                                                                                     * Der
+                                                                                                     * Teilstring
+                                                                                                     * der
+                                                                                                     * die
+                                                                                                     * Registernummern
+                                                                                                     * enthaelt
+                                                                                                     */
+                                            int[] regs = new int[9]; // Die
+                                                                     // Registernummern
+                                            int zaehler = 0;
+                                            boolean istLetztesZeichenZiffer = false; // Zum
+                                                                                     // Test
+                                                                                     // auf
+                                                                                     // 2-stellige
+                                                                                     // Karten-Nummern,
+                                                                                     // die
+                                                                                     // ansonsten
+                                                                                     // als
+                                                                                     // zwei
+                                                                                     // Karten
+                                                                                     // verstanden
+                                                                                     // w�rden
+                                            for (int i = 0; i < regStr.length(); i++) {
+                                                if (Character.isDigit(regStr.charAt(i))) {
+                                                    try {
+                                                        if (istLetztesZeichenZiffer) {
+                                                            error = true;
+                                                            errormsg = "Register-Reparatur: zweistellige Registernummer angegeben";
+                                                        }
+                                                        else {
+                                                            regs[zaehler] = Integer
+                                                                            .parseInt(regStr.substring(i, i + 1));
+                                                            istLetztesZeichenZiffer = true;
+                                                            zaehler++;
+                                                        }
+                                                    }
+                                                    catch (NumberFormatException should_not_happen) {
+                                                        error = true;
+                                                        errormsg = "Register-Reparatur: NumberFormatException; sollte eigentlich selbst bei falschem String nicht moeglich sein";
+                                                        break;
+                                                    }
+                                                    catch (ArrayIndexOutOfBoundsException falsche_Rueckgabe) {
+                                                        error = true;
+                                                        errormsg = "Falsche Registeranzahl, wahrscheinlich zu viele Register-Nummern";
+                                                        break;
+                                                    }
                                                 }
+                                                else
+                                                    istLetztesZeichenZiffer = false;
+                                            }
+                                            // Registernummern zuweisen
+                                            back.register = new int[zaehler];
+                                            for (int i = 0; i < zaehler; i++)
+                                                back.register[i] = regs[i];
+
+                                            /*
+                                             * Auslesen des Namens; aufgrund der
+                                             * persoenlichen Komm-Objekte
+                                             * unseres Servers eigentlich
+                                             * ueberfluessig
+                                             */
+                                            back.name = Encoder.commDecode(new String(input.substring(klammerauf + 1,
+                                                            komma1)));
+                                            back.typ = ServerAntwort.REPARATUR;
                                         }
-                                        catch (Exception abc) {
+                                        catch (StringIndexOutOfBoundsException xe) {
                                             error = true;
-                                            errormsg = "TBD -> Vermutlich kein Bool an der richtigen Stelle";
+                                            errormsg = "Reparatur: ungueltiger String";
                                         }
                                     }
                                     else {
                                         error = true;
-                                        errormsg = "TBD -> kein gueltiger String";
+                                        errormsg = "TRR - Falscher String";
+                                        break;
+                                    }
+
+                                }
+                                else {
+                                    error = true;
+                                    errormsg = "GR-> danach weder P noch R";
+                                    break;
+                                }
+                        }
+                        else
+                            if (nd == 'N') {
+                                if (rd == 'R') {
+                                    // TNR(<Name>,<Richtung>)
+                                    int klammerauf = input.indexOf('(');
+                                    int klammerzu = input.indexOf(')');
+                                    int komma1 = input.indexOf(',');
+                                    if ((komma1 != -1) && (klammerauf != -1) && (klammerzu != -1)) {
+                                        try {
+                                            String richtstr = input.substring(komma1 + 1, klammerzu);
+                                            back.name = Encoder.commDecode(input.substring(klammerauf + 1, komma1));
+                                            back.typ = ServerAntwort.AUSRICHTUNG;
+                                            /*
+                                             * Es koennte eine Exception kommen,
+                                             * falls nach 'trim' keine Zeichen
+                                             * mehr in 'richtstr' sind
+                                             * TESTERGEBNIS: SIE KOMMT AUCH!
+                                             */
+                                            char richtung = Character.toUpperCase(richtstr.trim().charAt(0));
+
+                                            if (richtung == 'N')
+                                                back.wohin = 0;
+                                            else
+                                                if (richtung == 'S')
+                                                    back.wohin = 2;
+                                                else
+                                                    if ((richtung == 'E') || (richtung == 'O'))
+                                                        back.wohin = 1;
+                                                    else
+                                                        if (richtung == 'W')
+                                                            back.wohin = 3;
+                                                        else {
+                                                            error = true;
+                                                            errormsg = "TNR -> keine gueltige Richtung angegeben";
+                                                        }
+                                        }
+                                        catch (Exception e) {
+                                            error = true;
+                                            errormsg = "TNR -> keinen RichtungsCharacter gefunden (!?)";
+                                        }
+                                    }
+                                    else {
+                                        error = true;
+                                        errormsg = "TNR -> kein gueltiger String";
                                     }
                                 }
                                 else {
                                     error = true;
-                                    errormsg = "TB-> danach kein gueltiges Zeichen gefunden";
+                                    errormsg = "TN -> danach kein R";
                                 }
                             }
-                            else {
-                                errormsg = "T-> danach kein R.N oder B";
+                            else
+                                if (nd == 'B') { // FEHLT FEHLT FEHLT gleich
+                                                 // nicht mehr
+                                    if (rd == 'D') {
+                                        // TBD(<Name>,<Bool>)
+                                        int klammerauf = input.indexOf('(');
+                                        int klammerzu = input.lastIndexOf(')');
+                                        int komma1 = input.indexOf(',');
+                                        if ((komma1 != -1) && (klammerauf != -1) && (klammerzu != -1)) {
+                                            back.name = Encoder.commDecode(input.substring(klammerauf + 1, komma1));
+                                            back.typ = ServerAntwort.REAKTIVIERUNG;
+                                            try {
+                                                char stayPDown = Character.toUpperCase(input
+                                                                .substring(komma1 + 1, klammerzu).trim().charAt(0));
+                                                /*
+                                                 * Die Rueckgabewerte sind
+                                                 * invertiert, d.h., wenn der
+                                                 * Spieler f zurueckgibt, wird
+                                                 * ok auf true gesetzt und nicht
+                                                 * auf false. Gibt der Spieler t
+                                                 * zurueck, wird ok auf false
+                                                 * gesetzt. Dieses geschieht
+                                                 * aufgrund der Definition der
+                                                 * Rueckgabewerte von
+                                                 * KommServerRoboter
+                                                 * .reaktivierung(): Dort wird
+                                                 * nicht zurueckgegeben, ob der
+                                                 * Spieler deaktiviert bleiben
+                                                 * moechte, sondern ob er wieder
+                                                 * aktiviert werden moechte.
+                                                 */
+                                                if (stayPDown == 'F')
+                                                    back.ok = true;
+                                                else
+                                                    if (stayPDown == 'T')
+                                                        back.ok = false;
+                                                    else {
+                                                        error = true;
+                                                        errormsg = "TBD -> kein Boolean gefunden :-(";
+                                                    }
+                                            }
+                                            catch (Exception abc) {
+                                                error = true;
+                                                errormsg = "TBD -> Vermutlich kein Bool an der richtigen Stelle";
+                                            }
+                                        }
+                                        else {
+                                            error = true;
+                                            errormsg = "TBD -> kein gueltiger String";
+                                        }
+                                    }
+                                    else {
+                                        error = true;
+                                        errormsg = "TB-> danach kein gueltiges Zeichen gefunden";
+                                    }
+                                }
+                                else {
+                                    errormsg = "T-> danach kein R.N oder B";
+                                    error = true;
+                                }
+                        break;
+                    }
+                    case 'R': {
+                        if ((nd == 'L') && (rd == 'E')) {
+                            // input: "RLE(Client_sein_Name)"
+                            int klammeraufpos = input.indexOf('(');
+                            int klammerzupos = input.lastIndexOf(')');
+                            if (klammeraufpos == -1) {
                                 error = true;
+                                errormsg = "RLE -> keine '('";
+                                break;
                             }
-                    break;
-                }
-                case 'R': {
-                    if ((nd == 'L') && (rd == 'E')) {
-                        // input: "RLE(Client_sein_Name)"
-                        int klammeraufpos = input.indexOf('(');
-                        int klammerzupos = input.lastIndexOf(')');
-                        if (klammeraufpos == -1) {
-                            error = true;
-                            errormsg = "RLE -> keine '('";
-                            break;
+                            if (klammerzupos == -1) {
+                                error = true;
+                                errormsg = "RLE -> keine ')'";
+                                break;
+                            }
+                            back.typ = ServerAntwort.ABMELDUNG;
+                            back.name = input.substring(klammeraufpos + 1, klammerzupos);
                         }
-                        if (klammerzupos == -1) {
+                        else {
+                            errormsg = "R -> danach kein LE";
                             error = true;
-                            errormsg = "RLE -> keine ')'";
-                            break;
-                        }
-                        back.typ =ServerAntwort.ABMELDUNG;
-                        back.name = input.substring(klammeraufpos + 1, klammerzupos);
-                    }
-                    else {
-                        errormsg = "R -> danach kein LE";
-                        error = true;
-                    }
-                    break;
-                } //
-                case 'M': {
-                    if ((nd == 'S') && (rd == 'G')) {
-                        back.typ = ServerAntwort.MESSAGE;
-                        int k1 = input.indexOf('(');
-                        String input1 = input.substring(k1 + 1, input.length() - 1);
-                        java.util.StringTokenizer sto = new java.util.StringTokenizer(input1, ",)");
-                        back.msg = new String[sto.countTokens()];
-                        int i = 0;
-                        while (sto.hasMoreTokens()) {
-                            back.msg[i] = Encoder.decode(sto.nextToken());
-                            i++;
                         }
                         break;
+                    } //
+                    case 'M': {
+                        if ((nd == 'S') && (rd == 'G')) {
+                            back.typ = ServerAntwort.MESSAGE;
+                            int k1 = input.indexOf('(');
+                            String input1 = input.substring(k1 + 1, input.length() - 1);
+                            java.util.StringTokenizer sto = new java.util.StringTokenizer(input1, ",)");
+                            back.msg = new String[sto.countTokens()];
+                            int i = 0;
+                            while (sto.hasMoreTokens()) {
+                                back.msg[i] = Encoder.commDecode(sto.nextToken());
+                                i++;
+                            }
+                            break;
+                        }
+                        if ((nd == 'O') && (rd == 'K')) {
+                            back.typ = ServerAntwort.MSG_ACK;
+                            break;
+                        }
                     }
-                    if ((nd == 'O') && (rd == 'K')) {
-                        back.typ =ServerAntwort.MSG_ACK;
-                        break;
-                    }
-                }
-                case 'I':{
-                    if (nd == 'S') {
-                        if (rd == 'S')
-                            back.typ = ServerAntwort.IS_SCOUT_ALLOWED;
-                        else if (rd == 'W')
-                            back.typ = ServerAntwort.IS_WISENHEIMER_ALLOWED;                        
-                        else if (input.equals(OtherConstants.REQUEST_PUSHERS_PUSH_MULTIPLE)){
-                            back.typ = ServerAntwort.CAN_PUSHERS_PUSH_MORE_THAN_ONE_BOT;
+                    case 'I': {
+                        if (nd == 'S') {
+                            if (rd == 'S')
+                                back.typ = ServerAntwort.IS_SCOUT_ALLOWED;
+                            else
+                                if (rd == 'W')
+                                    back.typ = ServerAntwort.IS_WISENHEIMER_ALLOWED;
+                                else
+                                    if (input.equals(OtherConstants.REQUEST_PUSHERS_PUSH_MULTIPLE)) {
+                                        back.typ = ServerAntwort.CAN_PUSHERS_PUSH_MORE_THAN_ONE_BOT;
+                                    }
+                                    else {
+                                        error = true;
+                                        errormsg = "received IS but no S or W as third character";
+                                    }
                         }
                         else {
                             error = true;
-                            errormsg = "received IS but no S or W as third character";
+                            errormsg = "received I, but was not followed by S";
                         }
+                        break;
                     }
-                    else {
+                    default: {
                         error = true;
-                        errormsg = "received I, but was not followed by S";
-                    }                                                          
-                    break;
-                }
-                default: {
-                    error = true;
-                    errormsg = "Default: kein gueltiger String(-anfang)";
-                }
+                        errormsg = "Default: kein gueltiger String(-anfang)";
+                    }
                 } // switch
             }
         } /*
@@ -721,11 +726,11 @@ public class KommServer {
      * laut Protokoll vorgesehenen Syntax.
      * 
      * @param grund
-     *                     Der String mit der Begr�ndung des Aussschlusses (in
-     *                     'richtiger' syntax)
+     *            Der String mit der Begr�ndung des Aussschlusses (in
+     *            'richtiger' syntax)
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void entfernen(String grund) throws KommException {
         try {
@@ -740,15 +745,15 @@ public class KommServer {
      * Zur Best�tigung der Anmeldung.
      * 
      * @param ok
-     *                     'true', falls die Anmeldung erfolgreich war, ansonsten 'false'
+     *            'true', falls die Anmeldung erfolgreich war, ansonsten 'false'
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void anmeldeBestaetigung(boolean ok) throws KommException {
         try {
             String raus = ""; // ueberfluessig, aber zum Testen
-                                        // hilfreich
+                              // hilfreich
             if (ok == true)
                 raus = "ok";
             else
@@ -764,11 +769,11 @@ public class KommServer {
      * Zur Antwort auf Info-Request 'gibSpielfeldDim'.
      * 
      * @param nordostecke
-     *                     Die Koordinaten der Nordostecke des Spielfeldes in Form eines
-     *                     Ortes
+     *            Die Koordinaten der Nordostecke des Spielfeldes in Form eines
+     *            Ortes
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void sendSpielfeldDim(Location nordostecke) throws KommException {
         sendSpielfeldDim(nordostecke.x, nordostecke.y);
@@ -778,12 +783,12 @@ public class KommServer {
      * Alternative Antwort auf Info-Request 'gibSpielfeldDim'.
      * 
      * @param x
-     *                     Die x-Koordinate der Nordostecke des Spielfeldes
+     *            Die x-Koordinate der Nordostecke des Spielfeldes
      * @param y
-     *                     Die y-Koordinate der Nordostecke des Spielfeldes
+     *            Die y-Koordinate der Nordostecke des Spielfeldes
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void sendSpielfeldDim(int x, int y) throws KommException {
         try {
@@ -800,10 +805,10 @@ public class KommServer {
      * Zur Antwort auf Info-Request 'gibSpielfeld'.
      * 
      * @param spielfeld
-     *                     Das Board in Form eines Strings, der dem Protokoll entspricht
+     *            Das Board in Form eines Strings, der dem Protokoll entspricht
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void sendSpielfeld(String spielfeld) throws KommException {
         try {
@@ -825,8 +830,8 @@ public class KommServer {
      * an erster Stelle, die Position der zweiten Fahne an zweiter Stelle usw..
      * 
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void sendFahnenpos(Location[] fahnen) throws KommException {
         try {
@@ -846,8 +851,8 @@ public class KommServer {
      * Namen der Mitspieler
      * 
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void sendNamen(String[] namen) throws KommException {
         // 2.7.99
@@ -893,8 +898,8 @@ public class KommServer {
      * Roboters, der gesucht wurde.
      * 
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void sendRobpos(Location ort) throws KommException {
         // 2.7.99
@@ -906,29 +911,30 @@ public class KommServer {
         }
     }
 
-    /** Generic method to send either "true" or "false" to the client, 
+    /**
+     * Generic method to send either "true" or "false" to the client,
      * 
-     * @param someValue The boolean to send
+     * @param someValue
+     *            The boolean to send
      * @throws KommException
      */
-    public void sendBoolean (boolean someValue) throws KommException{
+    public void sendBoolean(boolean someValue) throws KommException {
         try {
-            out.println(someValue?"true":"false");
+            out.println(someValue ? "true" : "false");
         }
-        catch (Exception foo){
+        catch (Exception foo) {
             CAT.error("Exception sending boolean", foo);
-            throw new KommException("Exception sending boolean"); 
+            throw new KommException("Exception sending boolean");
         }
     }
-    
-    
+
     /**
      * Alternative zur Antwort auf Info-Request 'gibRoboterPos'. Erh�lt die
      * koordinaten als Integers
      * 
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void sendRobpos(int x, int y) throws KommException {
         // 2.7.99
@@ -947,32 +953,32 @@ public class KommServer {
      * den 'Daten' des gew�nschten Roboters.
      * 
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void sendRobStatus(Bot r) throws KommException {
 
         try {
             String raus = "RS(";
             switch (r.getFacing()) {
-            case 0: {
-                raus = raus + "N,";
-                break;
-            }
-            case 1: {
-                raus = raus + "E,";
-                break;
-            }
-            case 2: {
-                raus = raus + "S,";
-                break;
-            }
-            case 3: {
-                raus = raus + "W,";
-                break;
-            }
-            default:
-                throw new KommException("SendRobStatus: Falsche Richtung");
+                case 0: {
+                    raus = raus + "N,";
+                    break;
+                }
+                case 1: {
+                    raus = raus + "E,";
+                    break;
+                }
+                case 2: {
+                    raus = raus + "S,";
+                    break;
+                }
+                case 3: {
+                    raus = raus + "W,";
+                    break;
+                }
+                default:
+                    throw new KommException("SendRobStatus: Falsche Richtung");
             }
             raus = raus + "(" + r.getX() + "," + r.getY() + "),";
             raus = raus + (r.getNextFlag() - 1) + ",";
@@ -999,7 +1005,7 @@ public class KommServer {
                 raus += "f,";
 
             raus += ")"; // Komma wegen RSreserviert (Optionskarten)
-                                // schon gesetzt
+                         // schon gesetzt
             out.println(raus);
         }
         catch (Exception e) {
@@ -1012,8 +1018,8 @@ public class KommServer {
      * abgefragt, wird vom Server sendRobStatus() aufgerufen.
      * 
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void sendRobStatus() throws KommException {
         try {
@@ -1027,14 +1033,13 @@ public class KommServer {
     /**
      * Zur Antwort auf Info-Request 'gibSpielstand'. Boolean 'laeuft' gibt an,
      * ob das Spiel noch l�uft oder schon beendet ist (true = Spiel l�uft,
-     * false=Spiel beendet). 
-     * Falls das Spiel beendet ist, enth�lt das Array die Namen der Spieler,
-     * wobei der des Gewinners an erster Stelle steht Falls nicht, wird 'null'
-     * anstelle des Arrays �bergeben.
+     * false=Spiel beendet). Falls das Spiel beendet ist, enth�lt das Array die
+     * Namen der Spieler, wobei der des Gewinners an erster Stelle steht Falls
+     * nicht, wird 'null' anstelle des Arrays �bergeben.
      * 
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
 
     public void spielstand(boolean laeuft, String[] endplazierung) throws KommException {
@@ -1067,8 +1072,8 @@ public class KommServer {
      * des TimeOut in Sekunden.
      * 
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void sendTimeOut(int sekunden) throws KommException {
         try {
@@ -1088,8 +1093,8 @@ public class KommServer {
      * enth�lt.
      * 
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void spielStatus(Status[] robbis) throws KommException {
         // 2.7.99
@@ -1106,16 +1111,16 @@ public class KommServer {
                 return;
             }
             String raus = "SA(" + robbis[0].aktPhase + ",";
-            //  System.err.println ("raus"+raus);
+            // System.err.println ("raus"+raus);
 
             for (int i = 0; i < robbis.length; i++) {
-                raus += "(" + Encoder.commEncode(robbis[i].robName) + ","; 
-                //  System.err.println ("raus aeussere For: "+raus);
+                raus += "(" + Encoder.commEncode(robbis[i].robName) + ",";
+                // System.err.println ("raus aeussere For: "+raus);
                 if (robbis[i].register != null) {
                     for (int j = 0; j < (robbis[i].register.length); j++) {
                         raus = raus + "PK(" + robbis[i].register[j].getAction() + "," + robbis[i].register[j].getprio()
                                         + ")";
-                        //     System.err.println ("raus innere For: "+raus);
+                        // System.err.println ("raus innere For: "+raus);
                     }
                 }
                 raus += ")";
@@ -1138,8 +1143,7 @@ public class KommServer {
      * ((a.equals("error"))||(a.equals("ERROR"))) return false; else throw new
      * KommException ("Fehler bei der Antwort auf spielstart: "+a); } catch
      * (IOException ioe) { throw new KommException ("IOException bei
-     * spielstart"); }
-     *  }
+     * spielstart"); } }
      */
 
     /**
@@ -1148,8 +1152,8 @@ public class KommServer {
      * ServerAntwort.typ = AENDERUNGFERTIG).
      * 
      * @exception KommException
-     *                           wird geworfen, falls beim Senden ein Fehler (z.B.
-     *                           IOException) auftrat
+     *                wird geworfen, falls beim Senden ein Fehler (z.B.
+     *                IOException) auftrat
      */
     public void spielstart() throws KommException {
         try {
@@ -1160,7 +1164,6 @@ public class KommServer {
         }
 
     }
-
 
     protected void finalize() throws Throwable {
         super.finalize();
@@ -1173,248 +1176,246 @@ public class KommServer {
     /**
      * DEPRECATED - has never been used
      */
-    //  public void sendFeldinhalt (de.botsnscouts.old.Feld f) throws
+    // public void sendFeldinhalt (de.botsnscouts.old.Feld f) throws
     // KommException{}
-    //     /**Zur Antwort auf Info-Request 'gibFeldinhalt'.
-    //    * erh�lt ein Objekt des Typs Feld, das dem Feld an der gew�nschten Stelle
+    // /**Zur Antwort auf Info-Request 'gibFeldinhalt'.
+    // * erh�lt ein Objekt des Typs Feld, das dem Feld an der gew�nschten Stelle
     // entspricht
-    //    * Feld enth�lt den Bodeninhalt und die Wandger�te.
-    //  @exception KommException wird geworfen, falls beim Senden ein Fehler
+    // * Feld enth�lt den Bodeninhalt und die Wandger�te.
+    // @exception KommException wird geworfen, falls beim Senden ein Fehler
     // (z.B. IOException) auftrat
-    //    */
-    //   public void sendFeldinhalt (Feld f) throws KommException{
-    //     // IST NOCH NICHT FERTIG
+    // */
+    // public void sendFeldinhalt (Feld f) throws KommException{
+    // // IST NOCH NICHT FERTIG
     // try {
-    //       String raus="(";
-    //       String boden = "";
-    //       String wandLinks="";
-    //       String wandRechts="";
-    //       String wandUnten="";
-    //       String wandOben="";
+    // String raus="(";
+    // String boden = "";
+    // String wandLinks="";
+    // String wandRechts="";
+    // String wandUnten="";
+    // String wandOben="";
 
-    //       // DIE WAENDE:
-    //       // obere Wand:
-    //       if (f.o_exist) { // gibt es eine Wamd ?
-    // 	String oben = wandgeraet (f.o_WandEl2,f.o_WandEl2Spez);
-    // 	String unten = wandgeraet (f.o_WandEl1, f.o_WandEl1Spez);
-    // 	if (oben.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-    // 	  oben = "["+oben;
-    // 	if (unten.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-    // 	  unten = unten + "]";
-    // 	wandOben=oben+"#"+unten; // zusammensetzen der oberen Wand
-    //       }
-    //       else {
-    // 	wandOben="_"; // keine Wand
-    //       }
-    //       // rechte Wand:
-    //       if (f.r_exist) {
-    // 	String links = wandgeraet (f.r_WandEl1, f.r_WandEl1Spez);
-    // 	String rechts = wandgeraet (f.r_WandEl2, f.r_WandEl2Spez);
-    // 	if (links.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-    // 	  links = "["+links;
-    // 	if (rechts.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-    // 	  rechts = rechts + "]";
-    // 	wandRechts = links+"#"+rechts;
-    //       }
-    //       else {
-    // 	wandRechts="_";
-    //       }
-    //       // untere Wand:
-    //       if (f.u_exist) {
-    // 	String oben = wandgeraet (f.u_WandEl1, f.u_WandEl1Spez);
-    // 	String unten = wandgeraet (f.u_WandEl2, f.u_WandEl2Spez);
-    // 	if (oben.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-    // 	  oben = "["+oben;
-    // 	if (unten.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-    // 	  unten = unten + "]";
-    // 	wandUnten = oben+"#"+unten;
-    //       }
-    //       else {
-    // 	wandUnten="_";
-    //       }
-    //       // linke Wand
-    //       if (f.l_exist) {
-    // 	String links = wandgeraet (f.l_WandEl2, f.l_WandEl2Spez);
-    // 	String rechts = wandgeraet (f.l_WandEl1 ,f.l_WandEl1Spez );
-    // 	if (links.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-    // 	  links = "["+links;
-    // 	if (rechts.length()>1) // gibt es ueberhaupt ein Wandgeraet?
-    // 	   rechts = rechts + "]";
-    // 	wandLinks = links+"#"+rechts;
-    //       }
-    //       else {
-    // 	wandLinks="_";
-    //       }
-    //       // Die vier Waende wurden erstellt
-    //       // jetzt folgt DER BODEN:
-    //       boden = bodeninhalt(f.bodenTyp, f.bodenSpez);
-    //       // raus zuEnde basteln
-    //       raus+=boden+","+wandOben+wandRechts+wandUnten+wandLinks;
-    //       raus+=")";
-    //       out.println (raus);
-    //     }
-    //     catch (Exception e) {
-    //       throw new KommException ("sendFeldinhalt fuehrte zu einer
+    // // DIE WAENDE:
+    // // obere Wand:
+    // if (f.o_exist) { // gibt es eine Wamd ?
+    // String oben = wandgeraet (f.o_WandEl2,f.o_WandEl2Spez);
+    // String unten = wandgeraet (f.o_WandEl1, f.o_WandEl1Spez);
+    // if (oben.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+    // oben = "["+oben;
+    // if (unten.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+    // unten = unten + "]";
+    // wandOben=oben+"#"+unten; // zusammensetzen der oberen Wand
+    // }
+    // else {
+    // wandOben="_"; // keine Wand
+    // }
+    // // rechte Wand:
+    // if (f.r_exist) {
+    // String links = wandgeraet (f.r_WandEl1, f.r_WandEl1Spez);
+    // String rechts = wandgeraet (f.r_WandEl2, f.r_WandEl2Spez);
+    // if (links.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+    // links = "["+links;
+    // if (rechts.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+    // rechts = rechts + "]";
+    // wandRechts = links+"#"+rechts;
+    // }
+    // else {
+    // wandRechts="_";
+    // }
+    // // untere Wand:
+    // if (f.u_exist) {
+    // String oben = wandgeraet (f.u_WandEl1, f.u_WandEl1Spez);
+    // String unten = wandgeraet (f.u_WandEl2, f.u_WandEl2Spez);
+    // if (oben.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+    // oben = "["+oben;
+    // if (unten.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+    // unten = unten + "]";
+    // wandUnten = oben+"#"+unten;
+    // }
+    // else {
+    // wandUnten="_";
+    // }
+    // // linke Wand
+    // if (f.l_exist) {
+    // String links = wandgeraet (f.l_WandEl2, f.l_WandEl2Spez);
+    // String rechts = wandgeraet (f.l_WandEl1 ,f.l_WandEl1Spez );
+    // if (links.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+    // links = "["+links;
+    // if (rechts.length()>1) // gibt es ueberhaupt ein Wandgeraet?
+    // rechts = rechts + "]";
+    // wandLinks = links+"#"+rechts;
+    // }
+    // else {
+    // wandLinks="_";
+    // }
+    // // Die vier Waende wurden erstellt
+    // // jetzt folgt DER BODEN:
+    // boden = bodeninhalt(f.bodenTyp, f.bodenSpez);
+    // // raus zuEnde basteln
+    // raus+=boden+","+wandOben+wandRechts+wandUnten+wandLinks;
+    // raus+=")";
+    // out.println (raus);
+    // }
+    // catch (Exception e) {
+    // throw new KommException ("sendFeldinhalt fuehrte zu einer
     // Exception:"+e.getMessage());
-    //     }
-    //   }
-    //   /** liefert die Richtung (N,E,S,W) zurueck, die vom Wert x beschrieben
+    // }
+    // }
+    // /** liefert die Richtung (N,E,S,W) zurueck, die vom Wert x beschrieben
     // wird(zwischen 0 und 3); die Methode haette sich vor zwei Wochen schon
     // eher gelohnt :-)
-    //    */
-    //   private static String getRichtung (int x) {
-    //     x%=4; // nur zur Sicherheit
-    //    if (x==0)
-    //      return "N";
-    //    else if (x==1)
-    //      return "E";
-    //    else if (x==2)
-    //      return "S";
-    //    else
-    //      return "W";
-    //   }
-    //   /** Hilfsmethode, die f�r ein abbiegendes Fliessband das �woher�
+    // */
+    // private static String getRichtung (int x) {
+    // x%=4; // nur zur Sicherheit
+    // if (x==0)
+    // return "N";
+    // else if (x==1)
+    // return "E";
+    // else if (x==2)
+    // return "S";
+    // else
+    // return "W";
+    // }
+    // /** Hilfsmethode, die f�r ein abbiegendes Fliessband das �woher�
     // ermittelt.
-    //     Dieses m�sste irgendwie mithilfe der Richtung und der Drehrichtung
+    // Dieses m�sste irgendwie mithilfe der Richtung und der Drehrichtung
     // m�glich sein
-    //     */
-    //   private static String fromDirection (int richtung, int art) {
-    //     // art=2 => Linksdrehung; art=3 => rechtsdrehung
-    //     int from = richtung;
-    //     if ((art==2)&&(richtung>0))
-    //       from--;
-    //     else if ((art==2)&&(richtung==0))
-    //       from=3;
-    //     if (art==3) {
-    //       from++;
-    //       from%=4;
-    //     }
-    //     return getRichtung(from);
-    //   }
-    //   /** Hilfsmethode, die einen <Bodeninhalt>-String laut "Protokolle und
+    // */
+    // private static String fromDirection (int richtung, int art) {
+    // // art=2 => Linksdrehung; art=3 => rechtsdrehung
+    // int from = richtung;
+    // if ((art==2)&&(richtung>0))
+    // from--;
+    // else if ((art==2)&&(richtung==0))
+    // from=3;
+    // if (art==3) {
+    // from++;
+    // from%=4;
+    // }
+    // return getRichtung(from);
+    // }
+    // /** Hilfsmethode, die einen <Bodeninhalt>-String laut "Protokolle und
     // Datenformate" zur�ckgibt.
-    //     typ und spez sind der Typ und die Spezifikationszahl (siehe Klasse Feld)
+    // typ und spez sind der Typ und die Spezifikationszahl (siehe Klasse Feld)
     // des Boden(feldes)
-    //    */
-    //     private static String bodeninhalt (int typ, int spez)throws KommException
+    // */
+    // private static String bodeninhalt (int typ, int spez)throws KommException
     // {
-    //     Feld f = new Feld();
-    //     String boden = ""; // soll zurueckgegeben werden
-    //     boolean set=false;
-    //     if (typ>=100) {// dann Fliessband
-    //       boolean crusher=false;
-    //       if (spez>0)
-    // 	crusher=true;
-    //       int tempo=typ/100; // hunderter-Stelle
-    //       int richtung=typ%10; // einer-Stelle
-    //       int art =(typ/10)%10; // zehner-Stelle
-    //       	boden = "F(";
-    // 	boden+=getRichtung(richtung)+","+tempo+",";
-    //       if (art==0) { // band geradeaus
-    // 	boden+="()"; // kein Dreher
-    //       }
-    //       /* // GIBTS NICHT MEHR! Feld-Spezifikation falsch!
-    // 	      else if (art==1) { // band mit crusher
-    // 	System.out.println("CRUSHER !!!");
-    // 	boden+="()"+"("; // kein Dreher
-    // 	for (int i=1;i<6;i++) {
-    // 	  if (f.isCrusherActive(spez, i))
-    // 	    boden+=i+","; // aktive Phasen anhaengen
-    // 	}
-    // 	boden += "))"; // Crusher zu, Fliessband zu
-    //       }
-    //       */
-    //       else if (art==2) { // linkskurve
-    // 	boden+="(("+fromDirection(richtung, art)+","+"D(L)))"; // dreher nach
+    // Feld f = new Feld();
+    // String boden = ""; // soll zurueckgegeben werden
+    // boolean set=false;
+    // if (typ>=100) {// dann Fliessband
+    // boolean crusher=false;
+    // if (spez>0)
+    // crusher=true;
+    // int tempo=typ/100; // hunderter-Stelle
+    // int richtung=typ%10; // einer-Stelle
+    // int art =(typ/10)%10; // zehner-Stelle
+    // boden = "F(";
+    // boden+=getRichtung(richtung)+","+tempo+",";
+    // if (art==0) { // band geradeaus
+    // boden+="()"; // kein Dreher
+    // }
+    // /* // GIBTS NICHT MEHR! Feld-Spezifikation falsch!
+    // else if (art==1) { // band mit crusher
+    // System.out.println("CRUSHER !!!");
+    // boden+="()"+"("; // kein Dreher
+    // for (int i=1;i<6;i++) {
+    // if (f.isCrusherActive(spez, i))
+    // boden+=i+","; // aktive Phasen anhaengen
+    // }
+    // boden += "))"; // Crusher zu, Fliessband zu
+    // }
+    // */
+    // else if (art==2) { // linkskurve
+    // boden+="(("+fromDirection(richtung, art)+","+"D(L)))"; // dreher nach
     // links
-    //       }
-    //       else if (art==3) { // rechtskurve
-    // 	boden+="(("+fromDirection(richtung, art)+","+"D(R)))"; // dreher nach
+    // }
+    // else if (art==3) { // rechtskurve
+    // boden+="(("+fromDirection(richtung, art)+","+"D(R)))"; // dreher nach
     // rechts
-    //       }
-    //       else if (art==5) { // einbiegen aus zwei Richtungen => zwei Dreher, aus
+    // }
+    // else if (art==5) { // einbiegen aus zwei Richtungen => zwei Dreher, aus
     // jeder Richtung einer
-    // 	boden+="(("+fromDirection(richtung, 2)+","+"D(L))"; // erster Dreher
-    // 	boden+="("+fromDirection(richtung, 3)+","+"D(R)))"; // zweiter Dreher
-    //       }
-    //       else {
-    // 	throw new KommException ("sendeFeldInhalt: kein gueltiger Bodeninhalt");
-    //       }
-    //       if (crusher) {
-    // 	boden+="(";
-    // 	for (int i=1;i<6;i++) {
-    // 	  if (f.isCrusherActive(spez, i))
-    // 	    boden+=i+","; // aktive Phasen anhaengen
-    // 	}
-    // 	boden += "))"; // Crusher zu, Fliessband zu
-    //       }
-    //       else //kein Crusher
-    // 	boden+="())"; // kein Crusher, Fliessband zu
-    //       return boden;
-    //     } // Ende Fall Fliessband
-    //     else {
-    //       switch (typ) {
-    //       case Feld.BDGRUBE: {
-    // 	boden="G";
-    // 	break;
-    //       }
-    //       case Feld.BDNORMAL: {
-    // 	boden="B";
-    // 	break;
-    //       }
-    //       case Feld.BDREPA: {
-    // 	boden="R("+spez+")";
-    // 	break;
-    //     }
-    //       case Feld.BDDREHEL: {
-    // 	boden ="D(";
-    // 	if (spez==Feld.DUHRZ)
-    // 	  boden+="R";
-    // 	else
-    // 	  boden+="L";
-    // 	boden+=")";
-    // 	break;
-    //       }
-    //       default: {throw new KommException ("sendeFeldInhlt: bodentyp <100 und
+    // boden+="(("+fromDirection(richtung, 2)+","+"D(L))"; // erster Dreher
+    // boden+="("+fromDirection(richtung, 3)+","+"D(R)))"; // zweiter Dreher
+    // }
+    // else {
+    // throw new KommException ("sendeFeldInhalt: kein gueltiger Bodeninhalt");
+    // }
+    // if (crusher) {
+    // boden+="(";
+    // for (int i=1;i<6;i++) {
+    // if (f.isCrusherActive(spez, i))
+    // boden+=i+","; // aktive Phasen anhaengen
+    // }
+    // boden += "))"; // Crusher zu, Fliessband zu
+    // }
+    // else //kein Crusher
+    // boden+="())"; // kein Crusher, Fliessband zu
+    // return boden;
+    // } // Ende Fall Fliessband
+    // else {
+    // switch (typ) {
+    // case Feld.BDGRUBE: {
+    // boden="G";
+    // break;
+    // }
+    // case Feld.BDNORMAL: {
+    // boden="B";
+    // break;
+    // }
+    // case Feld.BDREPA: {
+    // boden="R("+spez+")";
+    // break;
+    // }
+    // case Feld.BDDREHEL: {
+    // boden ="D(";
+    // if (spez==Feld.DUHRZ)
+    // boden+="R";
+    // else
+    // boden+="L";
+    // boden+=")";
+    // break;
+    // }
+    // default: {throw new KommException ("sendeFeldInhlt: bodentyp <100 und
     // nicht definiert");
-    //       }
-    //       }
-    //     }
-    //     return boden;
-    //   }
+    // }
+    // }
+    // }
+    // return boden;
+    // }
 
-    //   /** Hilfsmethode f�r sendFeldInhalt, die das durch elem und spez
+    // /** Hilfsmethode f�r sendFeldInhalt, die das durch elem und spez
     // definierte Wandger�t (siehe Klasse Feld) in Form eines Strings laut
     // "Protokolle und Datenformate" zur�ckgibt.
-    //    */
-    //   private static String wandgeraet (int elem, int spez) throws
+    // */
+    // private static String wandgeraet (int elem, int spez) throws
     // KommException{
-    //     Feld f=new Feld();
-    //     String back="";
-    //     switch (elem) {
-    //     case Feld.WKEINS: {
-    //       back="";
-    //       break;
-    //     }
-    //     case Feld.WLASER:{
-    //       back="L("+spez+")";
-    //       break;
-    //     }
-    //     case Feld.WPUSHER: {
-    //       back="S(";
-    //       for (int i=1;i<6;i++) {
-    // 	if (f.isPusherActive(spez,i))
-    // 	    back+=i+",";
-    //       }
-    //       back+=")";
-    //       break;
-    //     }
-    //     default: throw new KommException ("SFI-Antwort: Weder 'Laser', 'Pusher'
+    // Feld f=new Feld();
+    // String back="";
+    // switch (elem) {
+    // case Feld.WKEINS: {
+    // back="";
+    // break;
+    // }
+    // case Feld.WLASER:{
+    // back="L("+spez+")";
+    // break;
+    // }
+    // case Feld.WPUSHER: {
+    // back="S(";
+    // for (int i=1;i<6;i++) {
+    // if (f.isPusherActive(spez,i))
+    // back+=i+",";
+    // }
+    // back+=")";
+    // break;
+    // }
+    // default: throw new KommException ("SFI-Antwort: Weder 'Laser', 'Pusher'
     // noch 'kein' Wandelement");
-    //     }
-    //    return back;
-    //   }
+    // }
+    // return back;
+    // }
 
-   
 }
-

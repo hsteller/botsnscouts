@@ -3,7 +3,7 @@ package de.botsnscouts.meta;
 import java.io.IOException;
 
 /*
-  *******************************************************************
+ *******************************************************************
  *        Bots 'n' Scouts - Multi-Player networked Java game       *
  *                                                                 *
  * Copyright (C) 2001-2004 scouties.                                    *
@@ -21,7 +21,7 @@ import java.io.IOException;
  */
 public class Server {
 
-    public static int PORT=8725;
+    public static int PORT = 8725;
 
     private static void usage() {
         System.err.println("Usage: java de.botsnscouts.meta.Server [-p PORT]");
@@ -32,14 +32,15 @@ public class Server {
         int port = PORT;
 
         try {
-            for (int i=0; i<argv.length; i++) {
+            for (int i = 0; i < argv.length; i++) {
                 if (argv[i].equals("-p")) {
-                    port = Integer.parseInt(argv[i+1]);
+                    port = Integer.parseInt(argv[i + 1]);
                     i++;
                 }
             }
-        } catch (Exception ex) {
-            //Problem in parsing parameters.
+        }
+        catch (Exception ex) {
+            // Problem in parsing parameters.
             usage();
             System.exit(-1);
         }
@@ -47,8 +48,8 @@ public class Server {
         try {
             Listener listener = new Listener(port);
             listener.start();
-        } catch (IOException ex) {
-            //TODO
+        }
+        catch (IOException ex) {
             ex.printStackTrace();
             System.exit(-1);
         }

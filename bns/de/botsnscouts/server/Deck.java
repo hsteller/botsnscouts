@@ -32,32 +32,35 @@ import java.util.Vector;
 import de.botsnscouts.util.Card;
 import de.botsnscouts.util.Global;
 
-/** he deck containg all the cards.
- *  handOutCard() returns a random card from the deck
- *  @author Miriam
+/**
+ * The deck containg all the cards. handOutCard() returns a random card from the deck
+ * 
+ * @author Miriam
  */
 
 public class Deck {
 
     /** Different kinds of cards */
-    public static final String[] types = {"UT", "RR", "RL", "BU", "M1", "M2", "M3"};
-    /** Number of each type of cards */
-    private static final int[] noPerCard = {6, 18, 18, 6, 17, 13, 6};
+    public static final String[] types = { "UT", "RR", "RL", "BU", "M1", "M2", "M3" };
 
-    /** Array of all valid cards
-     *  Invariant: The cards are kept sorted by priority.
+    /** Number of each type of cards */
+    private static final int[] noPerCard = { 6, 18, 18, 6, 17, 13, 6 };
+
+    /**
+     * Array of all valid cards Invariant: The cards are kept sorted by priority.
      */
     private static CardImpl[] allCards = null;
 
     /** The real card deck */
-    private Vector deck = new Vector();
+    private Vector<CardImpl> deck = new Vector<CardImpl>();
 
     private java.util.Random random = new Random();
 
-    /** creates a new card deck respecting which card are stuck in
-     *  locked registers.
-     *  @param locked - the cards that are not present in the
-     *  new desk.
+    /**
+     * creates a new card deck respecting which card are stuck in locked registers.
+     * 
+     * @param locked
+     *            - the cards that are not present in the new desk.
      */
 
     protected Deck(Card[] locked) {
@@ -77,7 +80,6 @@ public class Deck {
         }
     }
 
-
     /** creates new card deck */
     protected Deck() {
         this(new Card[0]);
@@ -95,7 +97,7 @@ public class Deck {
             Global.debug("Es gibt " + size + " Karten im Spiel.");
             allCards = new CardImpl[size];
             int max = 0;
-            int i=0;
+            int i = 0;
             for (int n = 0; n < noPerCard.length; n++) {
                 max += noPerCard[n];
                 for (; i < max; i++) {
@@ -107,19 +109,17 @@ public class Deck {
         }
     }
 
-    /** Returns a random card from the card deck.
-     * The card is removed from the deck.
-     * Pre: card deck is not empty.
+    /**
+     * Returns a random card from the card deck. The card is removed from the deck. Pre: card deck is not empty.
      */
     protected Card handOutCard() {
         int index = random.nextInt(deck.size());
-        return (Card) deck.remove(index);
+        return deck.remove(index);
     }
 
-    /** returns an array of n cards from the deck.
-     * These cards are removed from the deck.
-     * PRE: Es werden nicht zu viele Karten vom Server verteilt.
-     *
+    /**
+     * returns an array of n cards from the deck. These cards are removed from the deck. PRE: Es werden nicht zu viele Karten vom Server verteilt.
+     * 
      */
     public Card[] handOutCards(int n) {
         Card[] k = new Card[n];
@@ -129,16 +129,16 @@ public class Deck {
         return k;
     }
 
-    /* returns the Card with a given priority.
+    /*
+     * returns the Card with a given priority.
      */
     public static Card get(int prio) {
         createAllCardsIfNeeded();
         return allCards[prio - 1];
     }
 
-
-    /** returns one card as a reference for a kind of cards
-     *  null if String is invalid.
+    /**
+     * returns one card as a reference for a kind of cards null if String is invalid.
      */
     public static Card getRefCard(String kind) {
         createAllCardsIfNeeded();
@@ -154,7 +154,7 @@ public class Deck {
 
     public String toString() {
         StringBuffer s = new StringBuffer("(");
-        for (Iterator i = deck.iterator(); i.hasNext();) {
+        for (Iterator<CardImpl> i = deck.iterator(); i.hasNext();) {
             s.append(i.next().toString() + " ");
         }
         s.append(")");
@@ -162,4 +162,3 @@ public class Deck {
     }
 
 }
-

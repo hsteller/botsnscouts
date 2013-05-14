@@ -35,9 +35,9 @@ import de.botsnscouts.util.Directions;
 import de.botsnscouts.util.Location;
 
 /**
- *  This class can calculate the distance a robot is from
- *  the next flag. Does not take conveyor belts into account.
- *  Id: $Id$
+ * This class can calculate the distance a robot is from
+ * the next flag. Does not take conveyor belts into account.
+ * Id: $Id$
  */
 public class SimpleDistanceCalculator extends DistanceCalculator {
     static final Category CAT = Category.getInstance(SimpleDistanceCalculator.class);
@@ -49,7 +49,7 @@ public class SimpleDistanceCalculator extends DistanceCalculator {
     }
 
     /**
-     *  Gives the distance to the next flag, tahes into account neccesary turns.
+     * Gives the distance to the next flag, tahes into account neccesary turns.
      */
     public int getDistance(int x, int y, int flag, int facing) {
         int m = flag - 1;
@@ -57,55 +57,48 @@ public class SimpleDistanceCalculator extends DistanceCalculator {
         if (distances[m][x][y] == 0) {
             return 0;
         }
-		switch (facing) {
-		    case Directions.NORTH:
-		        if ((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y))) {
-		            return distances[m][x][y];
-		        } 
-		            if (((distances[m][x - 1][y] < distances[m][x][y]) && (!hasWestWall(x, y))) ||
-		                    ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y)))) {
-		                return distances[m][x][y] + 1;
-		            } 
-		                return distances[m][x][y] + 2;
-		            
-		        
+        switch (facing) {
+            case Directions.NORTH:
+                if ((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y))) {
+                    return distances[m][x][y];
+                }
+                if (((distances[m][x - 1][y] < distances[m][x][y]) && (!hasWestWall(x, y)))
+                                || ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y)))) {
+                    return distances[m][x][y] + 1;
+                }
+                return distances[m][x][y] + 2;
 
-		    case Directions.EAST:
-		        if ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) {
-		            return distances[m][x][y];
-		        } 
-		            if (((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y))) ||
-		                    ((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y)))) {
-		                return distances[m][x][y] + 1;
-		            } 
-		                return distances[m][x][y] + 2;
-		            
-		        
+            case Directions.EAST:
+                if ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) {
+                    return distances[m][x][y];
+                }
+                if (((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y)))
+                                || ((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y)))) {
+                    return distances[m][x][y] + 1;
+                }
+                return distances[m][x][y] + 2;
 
-		    case Directions.SOUTH:
-		        if ((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y))) {
-		            return distances[m][x][y];
-		        } 
-		            if (((distances[m][x - 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) ||
-		                    ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y)))) {
-		                return distances[m][x][y] + 1;
-		            } 
-		                return distances[m][x][y] + 2;
-		            
-		        
+            case Directions.SOUTH:
+                if ((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y))) {
+                    return distances[m][x][y];
+                }
+                if (((distances[m][x - 1][y] < distances[m][x][y]) && (!hasEastWall(x, y)))
+                                || ((distances[m][x + 1][y] < distances[m][x][y]) && (!hasEastWall(x, y)))) {
+                    return distances[m][x][y] + 1;
+                }
+                return distances[m][x][y] + 2;
 
-		    case Directions.WEST:
-		        if ((distances[m][x - 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) {
-		            return distances[m][x][y];
-		        } 
-		            if (((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y))) ||
-		                    ((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y)))) {
-		                return distances[m][x][y] + 1;
-		            }
-					return distances[m][x][y] + 2;
-		        
+            case Directions.WEST:
+                if ((distances[m][x - 1][y] < distances[m][x][y]) && (!hasEastWall(x, y))) {
+                    return distances[m][x][y];
+                }
+                if (((distances[m][x][y + 1] < distances[m][x][y]) && (!hasNorthWall(x, y)))
+                                || ((distances[m][x][y - 1] < distances[m][x][y]) && (!hasSouthWall(x, y)))) {
+                    return distances[m][x][y] + 1;
+                }
+                return distances[m][x][y] + 2;
 
-		}
+        }
         CAT.error("reached unreachable!");
         return 10000;
         // never reached
@@ -154,53 +147,45 @@ public class SimpleDistanceCalculator extends DistanceCalculator {
         }
 
         if ((u == x) && (v != y)) {
-            if (!hasNorthWall(x, y) && !floor(x, y + 1).isPit() &&
-                    (enftab[x][y + 1] > enftab[x][y] + 1)) {
+            if (!hasNorthWall(x, y) && !floor(x, y + 1).isPit() && (enftab[x][y + 1] > enftab[x][y] + 1)) {
                 enftab[x][y + 1] = enftab[x][y] + 1;
                 calculateDistancesForField(enftab, x, y, x, y + 1);
             }
-            if (!hasWestWall(x, y) && !floor(x - 1, y).isPit() &&
-                    (enftab[x - 1][y] > enftab[x][y] + 2)) {
+            if (!hasWestWall(x, y) && !floor(x - 1, y).isPit() && (enftab[x - 1][y] > enftab[x][y] + 2)) {
                 enftab[x - 1][y] = enftab[x][y] + 2;
                 calculateDistancesForField(enftab, x, y, x - 1, y);
             }
-            if (!hasEastWall(x, y) && !floor(x + 1, y).isPit() &&
-                    (enftab[x + 1][y] > enftab[x][y] + 2)) {
+            if (!hasEastWall(x, y) && !floor(x + 1, y).isPit() && (enftab[x + 1][y] > enftab[x][y] + 2)) {
                 enftab[x + 1][y] = enftab[x][y] + 2;
                 calculateDistancesForField(enftab, x, y, x + 1, y);
             }
-            if (!hasSouthWall(x, y) && !floor(x, y - 1).isPit() &&
-                    (enftab[x][y - 1] > enftab[x][y] + 1)) {
+            if (!hasSouthWall(x, y) && !floor(x, y - 1).isPit() && (enftab[x][y - 1] > enftab[x][y] + 1)) {
                 enftab[x][y - 1] = enftab[x][y] + 1;
                 calculateDistancesForField(enftab, x, y, x, y - 1);
             }
         }
 
         if ((u != x) && (v == y)) {
-            if (!hasNorthWall(x, y) && !floor(x, y + 1).isPit() &&
-                    (enftab[x][y + 1] > enftab[x][y] + 2)) {
+            if (!hasNorthWall(x, y) && !floor(x, y + 1).isPit() && (enftab[x][y + 1] > enftab[x][y] + 2)) {
                 enftab[x][y + 1] = enftab[x][y] + 2;
                 calculateDistancesForField(enftab, x, y, x, y + 1);
             }
-            if (!hasWestWall(x, y) && !floor(x - 1, y).isPit() &&
-                    (enftab[x - 1][y] > enftab[x][y] + 1)) {
+            if (!hasWestWall(x, y) && !floor(x - 1, y).isPit() && (enftab[x - 1][y] > enftab[x][y] + 1)) {
                 enftab[x - 1][y] = enftab[x][y] + 1;
                 calculateDistancesForField(enftab, x, y, x - 1, y);
             }
-            if (!hasEastWall(x, y) && !floor(x + 1, y).isPit() &&
-                    (enftab[x + 1][y] > enftab[x][y] + 1)) {
+            if (!hasEastWall(x, y) && !floor(x + 1, y).isPit() && (enftab[x + 1][y] > enftab[x][y] + 1)) {
                 enftab[x + 1][y] = enftab[x][y] + 1;
                 calculateDistancesForField(enftab, x, y, x + 1, y);
             }
-            if (!hasSouthWall(x, y) && !floor(x, y - 1).isPit() &&
-                    (enftab[x][y - 1] > enftab[x][y] + 2)) {
+            if (!hasSouthWall(x, y) && !floor(x, y - 1).isPit() && (enftab[x][y - 1] > enftab[x][y] + 2)) {
                 enftab[x][y - 1] = enftab[x][y] + 2;
                 calculateDistancesForField(enftab, x, y, x, y - 1);
             }
         }
     }
 
-    private static Map uniqueInstances = new HashMap();
+    private static Map<Board, SimpleDistanceCalculator> uniqueInstances = new HashMap<Board, SimpleDistanceCalculator>();
 
     /**
      * Returns a reference to a SimpleDistanceCalculator. To be used instead
@@ -210,7 +195,7 @@ public class SimpleDistanceCalculator extends DistanceCalculator {
     public static synchronized SimpleDistanceCalculator getInstance(Board board) {
         if (uniqueInstances.get(board) == null)
             uniqueInstances.put(board, new SimpleDistanceCalculator(board));
-        return (SimpleDistanceCalculator) uniqueInstances.get(board);
+        return uniqueInstances.get(board);
     }
 
 }

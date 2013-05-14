@@ -42,15 +42,17 @@ public class Conf {
     public static final Category CAT = Category.getInstance(de.botsnscouts.BotsNScouts.class);
 
     private static final String CONFNAME = "bns.config";
+
     private static final String bnsHome;
+
     private static Properties properties;
+
     private static final char MULTIPLE_PROP_SEPARATOR = ',';
 
-//    private static final String PROPNAME_METASERVER_ENABLED = "enableMetaserver";
-    public static final boolean IS_METASERVER_ENABLED = false;//Conf.getBooleanProperty(
-    										//Conf.PROPNAME_METASERVER_ENABLED, false);
-    
-    
+    // private static final String PROPNAME_METASERVER_ENABLED = "enableMetaserver";
+    public static final boolean IS_METASERVER_ENABLED = false;// Conf.getBooleanProperty(
+    // Conf.PROPNAME_METASERVER_ENABLED, false);
+
     static {
         // Set bnsHome: if it's explicitly set, we take that
         String s = System.getProperty("bns.home");
@@ -69,7 +71,8 @@ public class Conf {
             }
             properties.load(in);
             CAT.debug("defautl bns.config loaded.");
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             CAT.fatal("default bns.config not found.");
             throw new RuntimeException("default bns.config not found");
         }
@@ -79,7 +82,8 @@ public class Conf {
             p.load(new FileInputStream(bnsHome + System.getProperty("file.separator") + CONFNAME));
             properties = p;
             CAT.info("user-defined bns.config loaded.");
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             CAT.info("no user-defined bns.config found.");
         }
         // c) System-wide properties override that -- see getProperty
@@ -87,6 +91,7 @@ public class Conf {
 
     /**
      * Used to access the bns installation directory.
+     * 
      * @return a <code>String</code> value representing the absolute path there.
      */
     public static String getBnsHome() {
@@ -94,11 +99,11 @@ public class Conf {
     }
 
     public static String getDefaultRobName() {
-        String n = Conf.getProperty("robot.name");   // Set in bns.config?
+        String n = Conf.getProperty("robot.name"); // Set in bns.config?
         if (n == null || n.equals(""))
-            n = Conf.getProperty("user.name");	      // System property
+            n = Conf.getProperty("user.name"); // System property
         if (n == null || n.equals(""))
-            n = KrimsKrams.randomName();	      // KrimsKrams-Random
+            n = KrimsKrams.randomName(); // KrimsKrams-Random
         return n.substring(0, 1).toUpperCase() + n.substring(1, n.length());
     }
 
@@ -123,18 +128,19 @@ public class Conf {
                 for (int i = 0; i < back.length; i++) {
                     back[i] = Encoder.propertyDecode(st.nextToken());
                 }
-            } else {
-                back = new String[]{Encoder.propertyDecode(data)};
+            }
+            else {
+                back = new String[] { Encoder.propertyDecode(data) };
             }
         }
         return back;
     }
 
-    public static Vector getMultiplePropertyVector(String key) {
+    public static Vector<String> getMultiplePropertyVector(String key) {
         String data = System.getProperty(key);
         if (data == null)
             data = properties.getProperty(key);
-        Vector back = new Vector();
+        Vector<String> back = new Vector<String>();
         if (data != null) {
             if (data.indexOf(MULTIPLE_PROP_SEPARATOR) > -1) {
                 StringTokenizer st = new StringTokenizer(data, "" + MULTIPLE_PROP_SEPARATOR);
@@ -142,37 +148,39 @@ public class Conf {
                 for (int i = 0; i < length; i++) {
                     back.addElement(Encoder.propertyDecode(st.nextToken()));
                 }
-            } else {
+            }
+            else {
                 back.add(Encoder.propertyDecode(data));
             }
         }
         return back;
     }
 
-
     public static boolean getBooleanProperty(String key, boolean defaultValue) {
         String data = getProperty(key);
         boolean ret = defaultValue;
-       
-        if (data !=null) {
+
+        if (data != null) {
             String d = data.trim();
             if (d.equalsIgnoreCase("true")) {
                 ret = true;
             }
-        else if (d.equalsIgnoreCase("false")) {
-                ret = true;
-            }
-        }                
-           
+            else
+                if (d.equalsIgnoreCase("false")) {
+                    ret = true;
+                }
+        }
+
         return ret;
     }
-    
+
     public static int getIntProperty(String key, int defaultValue) {
         String data = getProperty(key);
         int ret = defaultValue;
         try {
             ret = Integer.parseInt(data);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             CAT.warn(e.getMessage());
         }
         return ret;
@@ -182,7 +190,7 @@ public class Conf {
         properties.setProperty(key, Encoder.propertyEncode(data));
     }
 
-   public static void setMultipleProperty(String key, String[] values) {
+    public static void setMultipleProperty(String key, String[] values) {
         if (values == null || values.length < 1) {
             properties.setProperty(key, "");
             return;
@@ -195,7 +203,7 @@ public class Conf {
         properties.setProperty(key, sb.toString());
     }
 
-    public static void setMultipleProperty(String key, Vector values) {
+    public static void setMultipleProperty(String key, Vector<String> values) {
         if (values == null || values.size() < 1) {
             properties.setProperty(key, "");
             return;
@@ -208,13 +216,13 @@ public class Conf {
         properties.setProperty(key, sb.toString());
     }
 
-
     public static void saveProperties() {
         try {
             File file = new File(bnsHome + System.getProperty("file.separator") + CONFNAME);
             OutputStream ostream = new FileOutputStream(file);
             properties.store(ostream, null);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             CAT.info("Save of user-defined bns.config failed.");
         }
     }
@@ -228,7 +236,7 @@ public class Conf {
 
     public static int getDefaultMetaServerPort() {
         String portString = Conf.getProperty("meta.port");
-        if (portString!=null && !portString.equals(""))
+        if (portString != null && !portString.equals(""))
             return Integer.parseInt(portString);
         else
             return 8725;

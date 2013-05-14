@@ -11,7 +11,7 @@ import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.TJButton;
 
 /*
-  *******************************************************************
+ *******************************************************************
  *        Bots 'n' Scouts - Multi-Player networked Java game       *
  *                                                                 *
  * Copyright (C) 2001-2004 scouties.                               *
@@ -25,14 +25,16 @@ import de.botsnscouts.widgets.TJButton;
  */
 
 /**
- * Provides ok and cancel button in a colored component.
- * Call addOKListener and addBackListener to privide functionality.
- *
+ * Provides ok and cancel button in a colored component. Call addOKListener and
+ * addBackListener to privide functionality.
+ * 
  * @author miriam
  */
-public class OkComponent  extends JPanel {
+@SuppressWarnings("serial")
+public class OkComponent extends JPanel {
 
     private JButton okBut;
+
     private JButton backBut;
 
     /** ok/cancel-buttons with specified texts */
@@ -54,13 +56,13 @@ public class OkComponent  extends JPanel {
 
     }
 
-    /** Ok/cancel buttons with specified ok-text*/
+    /** Ok/cancel buttons with specified ok-text */
     public OkComponent(String ok) {
         this(ok, Message.say("Start", "mZurueckButton"));
     }
 
     public OkComponent() {
-        this(Message.say("Start", "mOK")) ;
+        this(Message.say("Start", "mOK"));
     }
 
     public void addOkListener(ActionListener l) {
@@ -70,6 +72,5 @@ public class OkComponent  extends JPanel {
     public void addBackListener(ActionListener l) {
         backBut.addActionListener(l);
     }
-
 
 }

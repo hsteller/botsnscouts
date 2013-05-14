@@ -22,9 +22,10 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.server;
 
 /** Marker interface for classes that a WaitForSet can be used on. */
 
-interface Waitable{}
+interface Waitable {
+}

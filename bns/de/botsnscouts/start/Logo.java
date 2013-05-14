@@ -34,20 +34,19 @@ import javax.swing.border.EtchedBorder;
 import de.botsnscouts.util.ImageMan;
 
 /**
- * Creates a JLabel instance with image and with an empty string for the
- * title. The label is centered vertically in its display area. The label's
- * contents, once set, will be displayed on the leading edge of the label's
- * display area.
+ * Creates a JLabel instance with image and with an empty string for the title. The label is centered vertically in its display area. The label's
+ * contents, once set, will be displayed on the leading edge of the label's display area.
  * 
- * The image used is located under \de\botsnscouts\images\bnslogo.jpg
- * TODO(Make me custom..)
+ * The image used is located under \de\botsnscouts\images\bnslogo.jpg TODO(Make me custom..)
  */
+@SuppressWarnings("serial")
 public class Logo extends JLabel {
-	public Logo() {
-		super();
-		Icon icon = ImageMan.getIcon("bnslogo.jpg");
-		setIcon(icon);
-		setBackground(Color.gray);
-		setBorder(new EtchedBorder(8));
-	}
+
+    public Logo() {
+        super();
+        Icon icon = ImageMan.getIcon("bnslogo.jpg");
+        setIcon(icon);
+        setBackground(Color.gray);
+        setBorder(new EtchedBorder(8));
+    }
 }

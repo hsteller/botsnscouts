@@ -11,7 +11,7 @@ import nanoxml.XMLElement;
 import nanoxml.XMLParseException;
 
 /*
-  *******************************************************************
+ *******************************************************************
  *        Bots 'n' Scouts - Multi-Player networked Java game       *
  *                                                                 *
  * Copyright (C) 2001-2004 scouties.                               *
@@ -26,12 +26,15 @@ import nanoxml.XMLParseException;
 
 /**
  * Handles an incoming request.
+ * 
  * @author miriam
  */
 public class Handler extends Thread {
 
     private Reader reader;
+
     private Writer writer;
+
     private String partner;
 
     Handler(Socket s) throws IOException {
@@ -54,33 +57,39 @@ public class Handler extends Thread {
                     try {
                         XMLElement revoke = new XMLElement();
                         revoke.parseFromReader(reader);
-                        /* Do not care what is actually sent: We will revoke the announced game
-                           in either situation.
-                        */
-                    } catch (IOException ex) {
-                        //TODO
+                        /*
+                         * Do not care what is actually sent: We will revoke the announced game in either situation.
+                         */
+                    }
+                    catch (IOException ex) {
+                        // TODO
                         ex.printStackTrace();
-                    } catch (XMLParseException ex) {
-                        //TODO
+                    }
+                    catch (XMLParseException ex) {
+                        // TODO
                         ex.printStackTrace();
-                    } finally {
+                    }
+                    finally {
                         MetaServer.getInstance().revoke(request);
                     }
                 }
-            } else {
+            }
+            else {
                 if (request.getName().equals("query"))
 
                     answer = MetaServer.getInstance().query(request);
-                else if (request.getName().equals("stat"))
-                    answer = MetaServer.getInstance().stat(request);
-                else {
-                    // Unknown Request
-                    answer = MetaServer.getInstance().createInvalidXML("Unknown Request");
-                }
+                else
+                    if (request.getName().equals("stat"))
+                        answer = MetaServer.getInstance().stat(request);
+                    else {
+                        // Unknown Request
+                        answer = MetaServer.getInstance().createInvalidXML("Unknown Request");
+                    }
                 System.out.println("Sending answer " + answer);
                 answer.write(writer);
             }
-        } catch (XMLParseException ex) {
+        }
+        catch (XMLParseException ex) {
             // Incorrect behaviour.
             answer = new XMLElement();
             answer.setName("invalid");
@@ -88,7 +97,6 @@ public class Handler extends Thread {
             answer.write(writer);
         }
     }
-
 
     public void run() {
         try {
@@ -99,8 +107,9 @@ public class Handler extends Thread {
             writer.flush();
             reader.close();
             writer.close();
-        } catch (IOException ex) {
-            //TODO
+        }
+        catch (IOException ex) {
+            // TODO
             ex.printStackTrace();
         }
     }

@@ -55,17 +55,20 @@ import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJTextField;
 
 /**
- * The panel you get when you want to participate in a game hosted by someone else.
- * You choose the server parameters and you player here and then you
+ * The panel you get when you want to participate in a game hosted by someone else. You choose the server parameters and you player here and then you
  * may press Go to register.
  */
+@SuppressWarnings("serial")
 public class ParticipatePanel extends ColoredComponent implements ActionListener {
 
     private static Category CAT = Category.getInstance(ParticipatePanel.class);
-    
+
     private JTextField hostName;
+
     private JTextField robName;
-    private JComboBox colors;
+
+    private JComboBox<String> colors;
+
     private int port = GameOptions.DPORT;
 
     private Start parent;
@@ -73,31 +76,25 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
     private Paint paint;
 
     public ParticipatePanel(Start par) {
-        
+
         TJButton go;
-        TJButton back;       
+        TJButton back;
         parent = par;
         parent.setTitle(Message.say("Start", "mTeilnehmen"));
-        paint = parent.paint;        
-       
+        paint = parent.paint;
+
         GridLayout lay;
         lay = new GridLayout(4, 2);
         lay.setHgap(170);
         lay.setVgap(80);
 
         setLayout(lay);
-        setBorder(BorderFactory.createCompoundBorder(
-                new EmptyBorder(150, 150, 150, 150),
-                OptionPane.niceBorder
-        ));
+        setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(150, 150, 150, 150), OptionPane.niceBorder));
 
-
-
-        hostName = new TJTextField(Message.say("Start", "mServerInh"),
-        		SwingConstants.CENTER, true);
+        hostName = new TJTextField(Message.say("Start", "mServerInh"), SwingConstants.CENTER, true);
         robName = new TJTextField(Conf.getDefaultRobName(), SwingConstants.CENTER, true);
         colors = new RoboBox(true);
-        //colors.setOpaque(false);
+        // colors.setOpaque(false);
         Font bigFont = new Font("Sans", Font.BOLD, 20);
         colors.setFont(bigFont);
         go = new TJButton(Message.say("Start", "mGoButton"));
@@ -111,43 +108,43 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
 
         add(new TJLabel(Message.say("Start", "mServer"), Color.lightGray, bigFont));
         add(hostName);
-        add(new TJLabel(Message.say("Start", "mName"), Color.lightGray, bigFont ));
+        add(new TJLabel(Message.say("Start", "mName"), Color.lightGray, bigFont));
         add(robName);
 
-        add(new TJLabel(Message.say("Start", "mFarbe"), Color.lightGray, bigFont ));
+        add(new TJLabel(Message.say("Start", "mFarbe"), Color.lightGray, bigFont));
         add(colors);
         add(back);
         add(go);
-        
+
     }
 
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("go")) {
             BNSThread smth;
             try {
-                smth = Facade.participateInAGame(hostName.getText(), port, robName.getText(),         
-                    colors.getSelectedIndex());
-            }        
-            catch (JoiningGameFailedException je){
-	            Exception cause = je.getPossibleReason();                      
-	            String msg1 = Message.say("Start","registerAtServerError");
-	            String msg2 = msg1;
-	            CAT.error(je.getMessage(),je);
-	            if (cause!=null){                         
-	                msg2 = cause.getMessage();                         
-	                CAT.error(msg2, cause);
-	            }                      	  		 
-	            JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);                                                                                        
-	            parent.showMainMenu();
-	            return;
-	        }   
+                smth = Facade.participateInAGame(hostName.getText(), port, robName.getText(), colors.getSelectedIndex());
+            }
+            catch (JoiningGameFailedException je) {
+                Exception cause = je.getPossibleReason();
+                String msg1 = Message.say("Start", "registerAtServerError");
+                String msg2 = msg1;
+                CAT.error(je.getMessage(), je);
+                if (cause != null) {
+                    msg2 = cause.getMessage();
+                    CAT.error(msg2, cause);
+                }
+                JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);
+                parent.showMainMenu();
+                return;
+            }
             Global.debug(this, "SpielerMensch gestartet");
             parent.addKS(smth);
-            //parent.hide();  //TODO (parent again)
             parent.setVisible(false);
-        } else if (e.getActionCommand().equals("back")) {
-            parent.showMainMenu();
         }
+        else
+            if (e.getActionCommand().equals("back")) {
+                parent.showMainMenu();
+            }
 
     }
 
@@ -159,4 +156,4 @@ public class ParticipatePanel extends ColoredComponent implements ActionListener
         paintChildren(g);
     }
 
-}//class StartTeilZusch end
+}// class StartTeilZusch end

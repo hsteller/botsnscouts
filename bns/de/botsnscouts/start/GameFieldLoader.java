@@ -39,102 +39,109 @@ import org.apache.log4j.Category;
 
 import de.botsnscouts.BotsNScouts;
 
-class GameFieldLoader{
+class GameFieldLoader {
 
-    private static final Category CAT = Category.getInstance( GameFieldLoader.class );
-    private static HashSet distSpf = new HashSet(); // The spfs from the distribution
+    private static final Category CAT = Category.getInstance(GameFieldLoader.class);
 
-    public String[] getSpielfelder(){
-	String[] part1;
+    private static HashSet<String> distSpf = new HashSet<String>(); // The spfs from the distribution
 
-        File kd=new File("tiles");
+    public String[] getSpielfelder() {
+        String[] part1;
+
+        File kd = new File("tiles");
         if (kd != null && kd.exists()) {
-          part1 = kd.list(new SpfFilter());
-          for (int i=0;i<part1.length;i++){
-              part1[i]=part1[i].substring(0,part1[i].length()-4);
-          }
+            part1 = kd.list(new SpfFilter());
+            for (int i = 0; i < part1.length; i++) {
+                part1[i] = part1[i].substring(0, part1[i].length() - 4);
+            }
         }
         else {
-          CAT.warn("could not find tiles directory for personal tiles");
-          part1 = new String [0];
+            CAT.warn("could not find tiles directory for personal tiles");
+            part1 = new String[0];
         }
 
-	// Load those from the distribution
-	InputStream stream = BotsNScouts.class.getResourceAsStream("tiles/tile.index");
-	if (stream==null){
-	    CAT.warn("Couldn't find tiles/tile.index");
-	    return part1;
-	}
-	Properties prop=new Properties();
-	try{
-	    prop.load(stream);
-	}catch(IOException e){
-	    CAT.warn("Couldn't load tile.index from distrib.");
-	    return part1;
-	}
-	int numSpf=0;
-	try{
-	    numSpf=Integer.parseInt(prop.getProperty("numSpf"));
-	}catch(NumberFormatException e){
-	    CAT.warn("Error parsing numSpf in tile.index!");
-	}
-	if (numSpf==0) // none in distribution
-	    return part1;
+        // Load those from the distribution
+        InputStream stream = BotsNScouts.class.getResourceAsStream("tiles/tile.index");
+        if (stream == null) {
+            CAT.warn("Couldn't find tiles/tile.index");
+            return part1;
+        }
+        Properties prop = new Properties();
+        try {
+            prop.load(stream);
+        }
+        catch (IOException e) {
+            CAT.warn("Couldn't load tile.index from distrib.");
+            return part1;
+        }
+        int numSpf = 0;
+        try {
+            numSpf = Integer.parseInt(prop.getProperty("numSpf"));
+        }
+        catch (NumberFormatException e) {
+            CAT.warn("Error parsing numSpf in tile.index!");
+        }
+        if (numSpf == 0) // none in distribution
+            return part1;
 
-	String[] all=new String[part1.length+numSpf];
+        String[] all = new String[part1.length + numSpf];
 
-	for (int i=0;i<numSpf;i++){
-	    String name=prop.getProperty("spf"+i);
-	    all[i]=name;
-	    distSpf.add(name);
-	}
-	for (int i=numSpf;i<all.length;i++)
-	    all[i]=part1[i-numSpf];
+        for (int i = 0; i < numSpf; i++) {
+            String name = prop.getProperty("spf" + i);
+            all[i] = name;
+            distSpf.add(name);
+        }
+        for (int i = numSpf; i < all.length; i++)
+            all[i] = part1[i - numSpf];
 
-	Arrays.sort(all);
-	return all;
+        Arrays.sort(all);
+        return all;
     }
 
-    public Properties getProperties(String name){
-	InputStream istream=null;
+    public Properties getProperties(String name) {
+        InputStream istream = null;
 
-	// Is it from the distribution?
-	if (distSpf.contains(name)){
-	    istream=BotsNScouts.class.getResourceAsStream("tiles/"+name+".spf");
-	    if (istream==null){
-		CAT.error("Error loading spf "+name+" from distribution.");
-		return null;
-	    }
-	}else{
-	    try{
-		istream=new FileInputStream("tiles"+System.getProperty("file.separator")+name+".spf");
-	    }catch(IOException e){
-	        
-		CAT.error("Error loading spf "+name+" from user-def");
-		CAT.error(e.getMessage(), e);
-		return null;
-	    }
-	}
+        // Is it from the distribution?
+        if (distSpf.contains(name)) {
+            istream = BotsNScouts.class.getResourceAsStream("tiles/" + name + ".spf");
+            if (istream == null) {
+                CAT.error("Error loading spf " + name + " from distribution.");
+                return null;
+            }
+        }
+        else {
+            try {
+                istream = new FileInputStream("tiles" + System.getProperty("file.separator") + name + ".spf");
+            }
+            catch (IOException e) {
 
-	Properties spfProp=new Properties();
-	try{
-	    spfProp.load(istream);
-	}catch(IOException e){
-	    CAT.error("Error loading spf "+name);
-	    CAT.error(e.getMessage(), e);
-	    return null;
-	}
-	return spfProp;
+                CAT.error("Error loading spf " + name + " from user-def");
+                CAT.error(e.getMessage(), e);
+                return null;
+            }
+        }
+
+        Properties spfProp = new Properties();
+        try {
+            spfProp.load(istream);
+        }
+        catch (IOException e) {
+            CAT.error("Error loading spf " + name);
+            CAT.error(e.getMessage(), e);
+            return null;
+        }
+        return spfProp;
     }
 
-    public void saveSpielfeld(Properties spfProp, File file){
-	try{
-	 OutputStream ostream=new FileOutputStream(file);
-	 spfProp.store(ostream,null);
-	}catch(IOException e){
-	    CAT.error(e.getMessage(), e);
-	    
-	}
+    public void saveSpielfeld(Properties spfProp, File file) {
+        try {
+            OutputStream ostream = new FileOutputStream(file);
+            spfProp.store(ostream, null);
+        }
+        catch (IOException e) {
+            CAT.error(e.getMessage(), e);
+
+        }
 
     }
 

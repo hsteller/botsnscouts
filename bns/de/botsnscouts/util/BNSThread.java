@@ -22,7 +22,7 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.util;
 
 /**
@@ -30,90 +30,79 @@ package de.botsnscouts.util;
  * @version $Id$
  */
 public abstract class BNSThread extends Thread implements Shutdownable {
-    static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance( BNSThread.class );
+    static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(BNSThread.class);
 
-    /** boolean is set to true once this BNSThread's shutdown() method has been called*/ 
+    /** boolean is set to true once this BNSThread's shutdown() method has been called */
     private boolean hasBeenShutDown = false;
-    
-    private static int count =  0;    
-    
+
     private static ThreadGroup threadGroup = new ThreadGroup("BNS Threads") {
-        public void uncaughtException( Thread t, Throwable e ) {
-            if( e instanceof ThreadDeath )
-                CAT.debug("Thread "+t.getName()+" exited gracefully.");
+        public void uncaughtException(Thread t, Throwable e) {
+            if (e instanceof ThreadDeath)
+                CAT.debug("Thread " + t.getName() + " exited gracefully.");
             else
                 CAT.error("Exception in thread: " + t.getName(), e);
         }
     };
 
     public static ThreadGroup getBNSThreadGroup() {
-        // if s.o. ever needs to build ones own threadgroup, this one should be its parent
-        // so that logging exceptions will automatically work
         return threadGroup;
     }
 
     public BNSThread(String name) {
-        super( threadGroup, name );
-        count++;
-    }
-
-    private BNSThread() {
-        this( "BNSThread-"+count );
+        super(threadGroup, name);
     }
 
     public BNSThread(Runnable r) {
-        super( threadGroup, r );
+        super(threadGroup, r);
     }
 
     public BNSThread(Runnable r, String name) {
-        super( threadGroup, r, name );
+        super(threadGroup, r, name);
     }
-    
-    public String toString(){
-        String s = super.toString();     
+
+    public String toString() {
+        String s = super.toString();
         return s;
     }
 
-    
-    
     private ShutdownableSupport shutdownSupport = new ShutdownableSupport(this);
-    
+
     /** Override this method instead of "shutdown()" */
     public abstract void doShutdown();
- 
-    public final void shutdown(){
+
+    public final void shutdown() {
         shutdown(true);
     }
-    
-    public  void shutdown(boolean notifyListeners){
-        if (isShutDown()){
-            CAT.debug("XXXXXXXXXXXXXXXXX is already shut down:"+getName());
+
+    public void shutdown(boolean notifyListeners) {
+        if (isShutDown()) {
+            CAT.debug("XXXXXXXXXXXXXXXXX is already shut down:" + getName());
             return;
         }
-        
+
         try {
-         //   doShutdown(notifyListeners);
+            // doShutdown(notifyListeners);
             doShutdown();
         }
-        finally {            
-           
+        finally {
+
             if (notifyListeners) {
                 shutdownSupport.shutdown();
             }
             hasBeenShutDown = true;
-            
+
         }
     }
-    
-    public  boolean isShutDown(){
+
+    public boolean isShutDown() {
         return hasBeenShutDown;
     }
-    
-    public void addShutdownListener(ShutdownListener l){
+
+    public void addShutdownListener(ShutdownListener l) {
         shutdownSupport.addShutdownListener(l);
     }
-    
-    public boolean removeShutdownListener(ShutdownListener l){
+
+    public boolean removeShutdownListener(ShutdownListener l) {
         return shutdownSupport.removeShutdownListener(l);
     }
 }

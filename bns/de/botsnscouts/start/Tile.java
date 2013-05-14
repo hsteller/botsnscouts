@@ -30,8 +30,8 @@ import de.botsnscouts.board.SimBoard;
 import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.Location;
 
-/** Saves image and name of tiles and
- *  gives rotated image.
+/**
+ * Saves image and name of tiles and gives rotated image.
  * 
  * @version $Id$
  */
@@ -42,9 +42,10 @@ public class Tile extends SimBoard {
     private int thumbnailsize;
 
     String kName;
+
     int rotat;
 
-    //create new tile
+    // create new tile
     public Tile(String name, String field, int thumbnailsize) throws FormatException, FlagException {
         super(12, 12, field, null);
         this.thumbnailsize = thumbnailsize;
@@ -52,19 +53,15 @@ public class Tile extends SimBoard {
         rotat = 0;
     }
 
-    //create rotated tile
+    // create rotated tile
     public Tile(String name, String field, int rot, int thumbnailsize) throws FormatException, FlagException {
         this(name, field, thumbnailsize);
         rotat = rot;
     }
 
-/*public Image getImage(){
-	if (img==null){
-	    CAT.debug("creating image on-demand.");
-	    img=BoardView.createThumb(this,thumbnailsize);
-	}
-	return img;
-	}*/
+    /*
+     * public Image getImage(){ if (img==null){ CAT.debug("creating image on-demand."); img=BoardView.createThumb(this,thumbnailsize); } return img; }
+     */
 
     public String getName() {
         return kName;
@@ -82,24 +79,29 @@ public class Tile extends SimBoard {
         Tile drTile = null;
         try {
             drTile = new Tile(kName, gedrTile, (rotat + 1) % 4, thumbnailsize);
-        } catch (FlagException e) {
+        }
+        catch (FlagException e) {
             System.err.println(e);
-        } catch (FormatException e) {
+        }
+        catch (FormatException e) {
             System.err.println(e);
         }
         return drTile;
     }
 
     /**
-     *  Check whether flag locations are valid.
-     * @param fl flag locations to be checked
+     * Check whether flag locations are valid.
+     * 
+     * @param fl
+     *            flag locations to be checked
      * @return
      */
     public boolean areFlagPositionsValid(Location[] fl) {
         try {
             // enno: habe checkflaggen protected gemacht
             checkFlaggen(fl);
-        } catch (FlagException e) {
+        }
+        catch (FlagException e) {
             return false;
         }
         return true;

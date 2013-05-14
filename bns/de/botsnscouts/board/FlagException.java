@@ -26,10 +26,12 @@
 package de.botsnscouts.board;
 
 /**
- * FlagException wird bei Abweichungen vom Spielfelddatenformat geworfen.
+ * FlagException is thrown if there are inconsistencies with the gameboard's data format (e.g. someone tries to place a flag on a pit).
+ * 
  * @author: Dirk Materlik
  */
 
+@SuppressWarnings("serial")
 public class FlagException extends Exception {
     public FlagException() {
         super();

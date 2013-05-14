@@ -23,14 +23,12 @@
  
  *******************************************************************/
 
-
 /*
  * Created on 23.05.2005
  */
 package de.botsnscouts.util;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -38,38 +36,33 @@ import java.util.LinkedList;
  * @version $Id$
  * 
  */
-public class ShutdownableSupport  {
+public class ShutdownableSupport {
 
-    private Collection listeners;
+    private Collection<ShutdownListener> listeners;
+
     private Shutdownable ownerInNeedOfSupport;
-    
-    public ShutdownableSupport(Shutdownable supportee){
-        listeners = new LinkedList();
+
+    public ShutdownableSupport(Shutdownable supportee) {
+        listeners = new LinkedList<ShutdownListener>();
         ownerInNeedOfSupport = supportee;
     }
-    
-    public void addShutdownListener(ShutdownListener listener){
+
+    public void addShutdownListener(ShutdownListener listener) {
         listeners.add(listener);
-    }  
-    
-    public boolean removeShutdownListener(ShutdownListener listener){
+    }
+
+    public boolean removeShutdownListener(ShutdownListener listener) {
         return listeners.remove(listener);
     }
-    
-    /** 
-     * The Shutdownable using this helper object should call this method at the
-     * end of its shutdown()-method.
-     * It will notify all listeners.
-     */
-    public void shutdown(){
-        Iterator it = listeners.iterator();
-        while (it.hasNext()){
-            ((ShutdownListener) it.next()).shutdown(ownerInNeedOfSupport);
-        }
-        
-    }
-    
-    
-    
-}
 
+    /**
+     * The Shutdownable using this helper object should call this method at the end of its shutdown()-method.
+     *  It will notify all listeners.
+     */
+    public void shutdown() {
+        for (ShutdownListener sl : listeners) {
+            sl.shutdown(ownerInNeedOfSupport);
+        }
+    }
+
+}

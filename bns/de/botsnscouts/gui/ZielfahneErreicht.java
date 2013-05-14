@@ -43,86 +43,77 @@ import de.botsnscouts.widgets.TJPanel;
 
 /**
  * 
- * Gets shown in the right half of the GUI (instead of the cards, registers etc) if
- * the game is over.
- * Contains a big vertical message, every letter in a TJLabel; also, another TJLabel
- * for additional inforamtion (example: big message="robot destroyed", small="reason:rule violation").
- * But mostly intended to show something like "Goal reached" if the bot has reached the
+ * Gets shown in the right half of the GUI (instead of the cards, registers etc)
+ * if the game is over. Contains a big vertical message, every letter in a
+ * TJLabel; also, another TJLabel for additional inforamtion (example: big
+ * message="robot destroyed", small="reason:rule violation"). But mostly
+ * intended to show something like "Goal reached" if the bot has reached the
  * final flag
  * 
  * @version $Id$
  */
-public class ZielfahneErreicht extends TJPanel{
+@SuppressWarnings("serial")
+public class ZielfahneErreicht extends TJPanel {
 
-	//	TODO (use or delete me)
-    private static final Color backColor = new Color(4,64,4);
-    //  TODO (use or delete me)
-    private static final Color foreColor2 = new Color(140,255,140);
-
-    //  TODO (comment me)
     public ZielfahneErreicht() {
-        //this("",false);
+        super();
     }
 
-    
-    public void setMessage(String bigVerticalMessage, boolean isDead, String removalReason){
-    	boolean haveReason = removalReason != null && removalReason.trim().length()>1;
-        int numOfChars = bigVerticalMessage != null?bigVerticalMessage.length():0;
+    public void setMessage(String bigVerticalMessage, boolean isDead, String removalReason) {
+        boolean haveReason = removalReason != null && removalReason.trim().length() > 1;
+        int numOfChars = bigVerticalMessage != null ? bigVerticalMessage.length() : 0;
         setLayout(new GridBagLayout());
-        
-        GridBagConstraints gcs = new GridBagConstraints();        
+
+        GridBagConstraints gcs = new GridBagConstraints();
         gcs.anchor = GridBagConstraints.CENTER;
         gcs.gridx = 0;
         gcs.gridy = 0;
-        gcs.insets = new Insets(10,10,10,10);
+        gcs.insets = new Insets(10, 10, 10, 10);
         gcs.gridheight = 1;
         gcs.gridwidth = 1;
         gcs.fill = GridBagConstraints.HORIZONTAL;
         add(new TJLabel(""), gcs); // space on the top
         Font big = new Font("Sans", Font.BOLD, 24);
-        Color col = isDead?Color.RED:Color.YELLOW;
-        gcs.insets.bottom = 5;        
+        Color col = isDead ? Color.RED : Color.YELLOW;
+        gcs.insets.bottom = 5;
         gcs.insets.top = 0;
-        gcs.fill = GridBagConstraints.NONE;    
+        gcs.fill = GridBagConstraints.NONE;
         int align = SwingConstants.CENTER;
-        for (int i=0;i<numOfChars;i++){            
-            TJLabel l = new TJLabel(""+bigVerticalMessage.charAt(i),align,col);        
+        for (int i = 0; i < numOfChars; i++) {
+            TJLabel l = new TJLabel("" + bigVerticalMessage.charAt(i), align, col);
             l.setFont(big);
-            gcs.anchor=GridBagConstraints.CENTER;
-            gcs.gridy++;            
-            add(l, gcs);            
+            gcs.anchor = GridBagConstraints.CENTER;
+            gcs.gridy++;
+            add(l, gcs);
         }
         if (haveReason) {
             gcs.gridy++;
-            gcs.gridx=0;
+            gcs.gridx = 0;
             gcs.insets.top = 20;
-            Font small = new Font("Sans",Font.PLAIN, 10);
-            TJLabel l = new TJLabel(removalReason,SwingConstants.CENTER);
-            l.setFont(small);   
+            Font small = new Font("Sans", Font.PLAIN, 10);
+            TJLabel l = new TJLabel(removalReason, SwingConstants.CENTER);
+            l.setFont(small);
             add(l, gcs);
         }
-        
 
-        
     }
-    
-   
+
     public Dimension getPreferredSize() {
-	return new Dimension(180,550);
+        return new Dimension(180, 550);
     }
-    //TODO (Why do we have a main here? Testing purposes?)
-    public static void main (String args[]) {
-		Message.setLanguage("deutsch");
-		Frame f = new Frame("Test");
-		f.setSize(350,640);
-		ZielfahneErreicht zf = new ZielfahneErreicht();
-		zf.setMessage("Robot destroyed", true, "Rule violation - probably a program error");
-		f.add(zf);
-		f.setVisible(true);
-		f.addWindowListener(new WindowAdapter(){
-		    public void windowClosing(WindowEvent e){
-		        System.exit(0);
-		    }
-		});
+
+    public static void main(String args[]) {
+        Message.setLanguage("deutsch");
+        Frame f = new Frame("Test");
+        f.setSize(350, 640);
+        ZielfahneErreicht zf = new ZielfahneErreicht();
+        zf.setMessage("Robot destroyed", true, "Rule violation - probably a program error");
+        f.add(zf);
+        f.setVisible(true);
+        f.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
     }
 }

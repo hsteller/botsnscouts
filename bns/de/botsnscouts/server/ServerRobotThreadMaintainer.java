@@ -22,13 +22,16 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.server;
 
 /** What someone who keeps track of SRTs must provide */
-interface ServerRobotThreadMaintainer{
+interface ServerRobotThreadMaintainer {
     void deleteRob(ServerRoboterThread it, String reason);
+
     void reEntry(ServerRoboterThread it);
+
     int getTurnTimeout();
+
     void sendMsg(String id, String[] args);
 }

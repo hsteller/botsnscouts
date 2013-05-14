@@ -65,25 +65,29 @@ import de.botsnscouts.widgets.TJPanel;
 import de.botsnscouts.widgets.TJTextField;
 
 /**
- * The panel that includes the Really-start-game-button.
- * You get this panel after you chose to host a game and have chosen the
- * game options and thus started a server.
- * Now you see who registers for your game.
+ * The panel that includes the Really-start-game-button. You get this panel after you chose to host a game and have chosen the game options and thus
+ * started a server. Now you see who registers for your game.
  */
+@SuppressWarnings("serial")
 public class StartPanel extends JPanel {
 
     private static final Category CAT = Category.getInstance(StartPanel.class);
+
     private Paint paint;
+
     private Start parent;
 
     private JLabel angem;
+
     private PlayersPanel playersComponent;
 
- //   private ServerObserver listener;
+    // private ServerObserver listener;
 
     private JSlider intel;
+
     private JTextField name;
-    private JComboBox color;
+
+    private JComboBox<String> color; // actually a RoboBox
 
     public StartPanel(Start par) {
         parent = par;
@@ -95,15 +99,15 @@ public class StartPanel extends JPanel {
         setLayout(lay);
         setBorder(new EmptyBorder(50, 50, 50, 50));
         setOpaque(false);
-        
+
         angem = new TJLabel();
         playersComponent = new PlayersPanel(parent);
-     //   recreateServerObeserver();
+        // recreateServerObeserver();
 
         angem.setFont(font);
         JPanel p = new JPanel(new BorderLayout());
         p.setOpaque(false);
-        //p.add( angem, BorderLayout.NORTH );
+        // p.add( angem, BorderLayout.NORTH );
         p.add(playersComponent, BorderLayout.CENTER);
         add(BorderLayout.WEST, p);
         add(BorderLayout.SOUTH, getOkComponent());
@@ -122,19 +126,13 @@ public class StartPanel extends JPanel {
         add(BorderLayout.EAST, panel);
     }
 
-    /*protected void recreateServerObeserver() {
-        if (listener != null) {
-            listener.closeSock();
-        }
-        listener = new ServerObserver(playersComponent);
-        listener.start();
-    }
-    */
     /*
-    ServerObserver getServerObserver() {
-        return listener;
-    }
-*/
+     * protected void recreateServerObeserver() { if (listener != null) { listener.closeSock(); } listener = new ServerObserver(playersComponent);
+     * listener.start(); }
+     */
+    /*
+     * ServerObserver getServerObserver() { return listener; }
+     */
     private JComponent getLocalComponent() {
         JComponent panel = new ColoredComponent();
 
@@ -199,20 +197,20 @@ public class StartPanel extends JPanel {
                         try {
                             player = Facade.participateInAGameNoSplash(name.getText(), color.getSelectedIndex());
                         }
-                        catch (JoiningGameFailedException je){
-                            Exception cause = je.getPossibleReason();                      
-                            String msg1 = Message.say("Start","registerAtServerError");
+                        catch (JoiningGameFailedException je) {
+                            Exception cause = je.getPossibleReason();
+                            String msg1 = Message.say("Start", "registerAtServerError");
                             String msg2 = msg1;
-                            CAT.error(je.getMessage(),je);
-                            if (cause!=null){                         
-                                msg2 = cause.getMessage();                         
+                            CAT.error(je.getMessage(), je);
+                            if (cause != null) {
+                                msg2 = cause.getMessage();
                                 CAT.error(msg2, cause);
-                            }                                        		 
-                            JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);                                                                                        
+                            }
+                            JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);
                             return;
-                        }   
+                        }
                         parent.addKS(player);
-                        //Generate a new name for the (potential) next local player
+                        // Generate a new name for the (potential) next local player
                         name.setText(KrimsKrams.randomName());
                     }
                 }.start();
@@ -226,8 +224,7 @@ public class StartPanel extends JPanel {
         gc.fill = GridBagConstraints.CENTER;
         gc.insets = new Insets(0, 0, 0, 0);
         panel.add(ok, gc);
-        panel.setBorder(new CompoundBorder(new EtchedBorder(8),
-                new EmptyBorder(10, 10, 10, 10)));
+        panel.setBorder(new CompoundBorder(new EtchedBorder(8), new EmptyBorder(10, 10, 10, 10)));
 
         return panel;
     }
@@ -256,7 +253,6 @@ public class StartPanel extends JPanel {
         label.setFont(font);
         panel.add(label, gc);
 
-
         JLabel nameLabel = new TJLabel(Message.say("Start", "mKSName"), SwingConstants.LEFT);
         gc.weightx = 0.0;
         gc.gridy++; // 3
@@ -264,7 +260,7 @@ public class StartPanel extends JPanel {
         gc.gridwidth = 1;
         gc.anchor = GridBagConstraints.WEST;
         gc.fill = GridBagConstraints.NONE;
-        gc.insets = new Insets(0,0,10,5);
+        gc.insets = new Insets(0, 0, 10, 5);
         panel.add(nameLabel, gc);
 
         final JTextField botNameField = new TJTextField(KrimsKrams.randomName());
@@ -335,20 +331,18 @@ public class StartPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 new Thread() {
                     public void run() {
-		                CAT.debug("intelligence is now" + intel.getValue());              
-		                String name = botNameField.getText();
-		                if (name == null || name.length() == 0)
-		                    name = KrimsKrams.randomName();
-		                parent.addKS(Facade.startAutoBot(intel.getValue(),
-		                        beltAware.getModel().isSelected(), name));
-		                CAT.debug("Bot started, setting new name in textfield..");
-		                String tmpname = KrimsKrams.randomName();
-		                CAT.debug("new name will be: "+tmpname);
-			            botNameField.setText(tmpname); // DEADLOCK here without new Thread..wtf?
-			             CAT.debug("new name set");       
+                        CAT.debug("intelligence is now" + intel.getValue());
+                        String localName = botNameField.getText();
+                        if (localName == null || localName.length() == 0) {
+                            localName = KrimsKrams.randomName();
+                        }
+                        parent.addKS(Facade.startAutoBot(intel.getValue(), beltAware.getModel().isSelected(), localName));
+                        CAT.debug("Bot started, setting new name in textfield; new name will be: " + localName);
+                        botNameField.setText(KrimsKrams.randomName()); // DEADLOCK here without new Thread..wtf?
+                        CAT.debug("new name set");
                     }
-               }.start();
-               
+                }.start();
+
             }
         });
 
@@ -360,42 +354,40 @@ public class StartPanel extends JPanel {
         gc.fill = GridBagConstraints.NONE;
         gc.insets = noInsets;
         panel.add(startAB, gc);
-        panel.setBorder(new CompoundBorder(new EtchedBorder(8),
-                			new EmptyBorder(10, 10, 10, 10)));
+        panel.setBorder(new CompoundBorder(new EtchedBorder(8), new EmptyBorder(10, 10, 10, 10)));
         return panel;
     }
 
     private JComponent getOkComponent() {
 
-        OkComponent okComponent = new OkComponent( Message.say("Start", "mLos"),
-                                                   Message.say("Start", "mAbbrechen") );
+        OkComponent okComponent = new OkComponent(Message.say("Start", "mLos"), Message.say("Start", "mAbbrechen"));
 
         okComponent.addOkListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 CAT.debug("Start-button pressed.");
                 if (playersComponent.names.size() != 8) {
                     CAT.debug("Going to kick the server to get really going...");
-                    parent.facade.gameStarts();
+                    parent.getFacade().gameStarts();
                     parent.setVisible(false);
-                    //parent.hide();
-                    //parent.beenden(); // will be done in playerspanel
+                    // parent.hide();
+                    // parent.beenden(); // will be done in playerspanel
                 }
             }
         });
         okComponent.addBackListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 parent.reset();
-                
+
                 parent.showGameFieldPanel();
-                //parent.startPanel = null;
-                
-              //  System.exit(0);
+                // parent.startPanel = null;
+
+                // System.exit(0);
             }
         });
 
         return okComponent;
     }
-    
+
     public PlayersPanel getPlayersPanel() {
         return playersComponent;
     }

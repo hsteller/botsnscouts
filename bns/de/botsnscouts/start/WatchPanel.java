@@ -52,19 +52,22 @@ import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJTextField;
 
 /**
- * You see this panel when you want to register for watching a game without
- * participating.
+ * You see this panel when you want to register for watching a game without participating.
+ * 
  * @version $Id$
  */
+@SuppressWarnings("serial")
 public class WatchPanel extends JPanel implements ActionListener, MouseListener {
-    
+
     private static Category CAT = Category.getInstance(WatchPanel.class);
-    
+
     JLabel server;
-    //JLabel port;
+
+    // JLabel port;
 
     JTextField serv;
-    //JTextField prt;
+
+    // JTextField prt;
 
     Start parent;
 
@@ -88,21 +91,21 @@ public class WatchPanel extends JPanel implements ActionListener, MouseListener 
         setBorder(new EmptyBorder(200, 100, 200, 100));
 
         server = new TJLabel(Message.say("Start", "mServer"));
-        //port=new JLabel(Message.say("Start","mPort"));
+        // port=new JLabel(Message.say("Start","mPort"));
         serv = new TJTextField(Message.say("Start", "mServerInh"));
-        //prt=new JTextField(Message.say("Start","mPortInh"));
+        // prt=new JTextField(Message.say("Start","mPortInh"));
         TJButton go = new TJButton(Message.say("Start", "mGoButton"));
         TJButton back = new TJButton(Message.say("Start", "mZurueckButton"));
 
         server.setFont(font);
-        //port.setFont(font);
+        // port.setFont(font);
         serv.setFont(font);
-        //prt.setFont(font);
+        // prt.setFont(font);
         serv.setOpaque(false);
-        //prt.setOpaque(false);
+        // prt.setOpaque(false);
 
         server.setForeground(Color.lightGray);
-        //port.setForeground(Color.lightGray);
+        // port.setForeground(Color.lightGray);
 
         go.addActionListener(this);
         back.addActionListener(this);
@@ -112,48 +115,50 @@ public class WatchPanel extends JPanel implements ActionListener, MouseListener 
 
         add(server);
         add(serv);
-        //add(port);
-        //add(prt);
+        // add(port);
+        // add(prt);
         add(back);
         add(go);
 
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("go")) {           
+        if (e.getActionCommand().equals("go")) {
             Thread foo = new Thread(new Runnable() {
                 public void run() {
-                    BNSThread ausgabe;  
+                    BNSThread ausgabe;
                     int portnr = 8077;
-		            try {
-		                parent.setVisible(false);
-		                // shows a splash:
-		                ausgabe = Facade.watchAGame(serv.getText(), portnr);
-		            }
-		            catch (JoiningGameFailedException je){
-		                Exception cause = je.getPossibleReason();                      
-		                String msg1 = Message.say("Start","registerAtServerError");
-		                String msg2 = msg1;
-		                CAT.error(je.getMessage(),je);
-		                if (cause!=null){                         
-		                    msg2 = cause.getMessage();                         
-		                    CAT.error(msg2, cause);
-		                }                      
-		      		 
-		                JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);                                                                                        
-		                parent.setVisible(true);
-		                //parent.showMainMenu();
-		                return;
-		            }   
-		            parent.addKS(ausgabe);
-		            
+                    try {
+                        parent.setVisible(false);
+                        // shows a splash:
+                        ausgabe = Facade.watchAGame(serv.getText(), portnr);
+                    }
+                    catch (JoiningGameFailedException je) {
+                        Exception cause = je.getPossibleReason();
+                        String msg1 = Message.say("Start", "registerAtServerError");
+                        String msg2 = msg1;
+                        CAT.error(je.getMessage(), je);
+                        if (cause != null) {
+                            msg2 = cause.getMessage();
+                            CAT.error(msg2, cause);
+                        }
+
+                        JOptionPane.showMessageDialog(parent, msg2, msg1, JOptionPane.ERROR_MESSAGE);
+                        parent.setVisible(true);
+                        // parent.showMainMenu();
+                        return;
+                    }
+                    parent.addKS(ausgabe);
+
                 }
             });
             foo.start();
-            
-        } else if (e.getActionCommand().equals("back")) {
-            parent.showMainMenu();
+
         }
+        else
+            if (e.getActionCommand().equals("back")) {
+                parent.showMainMenu();
+            }
 
     }
 
@@ -164,7 +169,6 @@ public class WatchPanel extends JPanel implements ActionListener, MouseListener 
     public void mouseExited(MouseEvent e) {
 
     }
-
 
     public void mouseClicked(MouseEvent e) {
 

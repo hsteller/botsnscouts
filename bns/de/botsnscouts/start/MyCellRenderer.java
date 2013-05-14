@@ -22,7 +22,7 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.start;
 
 import java.awt.Component;
@@ -37,68 +37,68 @@ import javax.swing.ListCellRenderer;
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.Message;
 
-public class MyCellRenderer extends JLabel implements ListCellRenderer {
-
+@SuppressWarnings("serial")
+public class MyCellRenderer<E> extends JLabel implements ListCellRenderer<E> {
     public static ImageIcon[] robIcons = new ImageIcon[8];
+
     String zufall = Message.say("Start", "mFarbeEgal");
+
     Dimension size;
+
     boolean withEgal = true;
 
-    static{
-	Image[] robbis = ImageMan.getImages(ImageMan.ROBOS);
-	for (int i=0; i<8;i++) {
-	    robIcons[i]=new ImageIcon(robbis[i*4]);
-	}
+    static {
+        Image[] robbis = ImageMan.getImages(ImageMan.ROBOS);
+        for (int i = 0; i < 8; i++) {
+            robIcons[i] = new ImageIcon(robbis[i * 4]);
+        }
     }
 
     MyCellRenderer() {
-	this( true );
+        this(true);
     }
 
     MyCellRenderer(boolean wEgal) {
-	withEgal = wEgal;
-	size=new Dimension(96,48);
+        withEgal = wEgal;
+        size = new Dimension(96, 48);
     }
-    public Component getListCellRendererComponent
-	(
-	 JList list,
-	 Object value,         // value to display
-	 int index,	       // cell index
-	 boolean isSelected,   // is the cell selected
-	 boolean cellHasFocus) // the list and the cell have the focus
+
+    @Override
+    public Component getListCellRendererComponent(JList<? extends E> list, E value, // value to display
+                    int index, // cell index
+                    boolean isSelected, // is the cell selected
+                    boolean cellHasFocus) // the list and the cell have the focus
     {
-	 
-	if (index==-1) {
-	    index = list.getSelectedIndex();
-	    if( index == -1 ) index = 0;
-	}
-	setPreferredSize( size );
-	if(index == 0 && withEgal ) {
-	    setText(zufall);
-	    setIcon(null);
-	    return this;
-	}
-	 
-	setText("");
-	if( withEgal )
-	    setIcon( robIcons[index-1] );
-	else
-	    setIcon( robIcons[index] );
 
-	if (isSelected) {
-	    setBackground(list.getSelectionBackground());
-	    setForeground(list.getSelectionForeground());
-	}
-	else {
-	    setBackground(list.getBackground());
-	    setForeground(list.getForeground());
-	}
-	setEnabled(list.isEnabled());
-	setFont(list.getFont());
-	return this;
+        if (index == -1) {
+            index = list.getSelectedIndex();
+            if (index == -1)
+                index = 0;
+        }
+        setPreferredSize(size);
+        if (index == 0 && withEgal) {
+            setText(zufall);
+            setIcon(null);
+            return this;
+        }
+
+        setText("");
+        if (withEgal)
+            setIcon(robIcons[index - 1]);
+        else
+            setIcon(robIcons[index]);
+
+        if (isSelected) {
+            setBackground(list.getSelectionBackground());
+            setForeground(list.getSelectionForeground());
+        }
+        else {
+            setBackground(list.getBackground());
+            setForeground(list.getForeground());
+        }
+        setEnabled(list.isEnabled());
+        setFont(list.getFont());
+        return this;
     }
-
-
 
 }
-

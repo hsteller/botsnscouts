@@ -44,26 +44,24 @@ import de.botsnscouts.util.ParseUtils;
 
 public class Board implements de.botsnscouts.util.Directions, FloorConstants {
 
-    /* not static on purpose, need to inherit it */
-    org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Board.class);
-    static org.apache.log4j.Category sCAT = org.apache.log4j.Category.getInstance(Board.class);
-
-    /** Preview-Image is possibly saved along with the tile */
-    private java.awt.Image img;
+    private static final org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Board.class);
 
     /** Die Spielfeldgroesse */
-    protected int sizeX,sizeY;
+    protected int sizeX, sizeY;
 
-    /** Die Floortypen
-     *  2-dimensional   1. x-Koordinate
-     *                  2. y-Koordinate
+    /**
+     * Die Floortypen
+     * 2-dimensional 1. x-Koordinate
+     * 2. y-Koordinate
      */
     private Floor[][] floor;
 
-    private Wall[][] vWall;    // vertikal walls
-    private Wall[][] hWall;    // horizontal walls
+    private Wall[][] vWall; // vertikal walls
+
+    private Wall[][] hWall; // horizontal walls
 
     protected Location[] flags;
+
     private String flagErrors;
 
     /** Sicherungskopie des Spielfeldstrings */
@@ -79,97 +77,98 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
 
     /***** Construktors *****/
 
-    /** Initialisiert ein Board aus zweien. Zerst�rt unter Umst�nden Teile der hereingegebenen
-     Spielfelder!
+    /**
+     * Initialisiert ein Board aus zweien. Zerst�rt unter Umst�nden Teile der hereingegebenen
+     * Spielfelder!
      */
-//    // UNGETESTET!!!
-//    public Board(Board s1, Board s2, boolean nebeneinander) throws FormatException{
-//      CAT.debug("new Board called");
-//	if (nebeneinander){
-//	    sizeX=s1.sizeX+s2.sizeX;
-//	    sizeY=s1.sizeY;
-//	    if (sizeY!=s2.sizeY)
-//		throw new FormatException("Die beiden Spielfelder sind nicht gleich hoch!");
-//
-//	    initArys();
-//
-//	    // Erstes reinkopieren
-//	    for (int x=1;x<=s1.sizeX;x++)
-//		for (int y=1;y<=sizeY;y++)
-//		    floor[x][y]=s1.floor[x][y];
-//	    for (int x=0;x<=s1.sizeX;x++)
-//		for (int y=0;y<sizeY;y++)
-//		    vWall[x][y]=s1.vWall[x][y];
-//	    for (int x=0;x<s1.sizeX;x++)
-//		for (int y=0;y<=sizeY;y++)
-//		    hWall[x][y]=s1.hWall[x][y];
-//
-//	    // Zweites reinkopieren
-//	    for (int x=1;x<=s2.sizeX;x++)
-//		for (int y=1;y<=sizeY;y++)
-//		    floor[x+s1.sizeX][y]=s2.floor[x][y];
-//	    for (int x=0;x<=s2.sizeX;x++)
-//		for (int y=0;y<sizeY;y++)
-//		    vWall[x+s1.sizeX][y]=s2.vWall[x][y];
-//	    for (int x=0;x<s2.sizeX;x++)
-//		for (int y=0;y<=sizeY;y++)
-//		    hWall[x+s1.sizeX][y]=s2.hWall[x][y];
-//
-//	    // Konflikte resolven
-//	    for (int y=0;y<sizeY;y++){
-//                Wall w = vWall[s1.sizeX][y];
-// //		w.setExisting( s1.vWall[s1.sizeX][y].isExisting()||s2.vWall[0][y].isExisting() );
-// //              w.copyElementNW( s1.vWall[s1.sizeX][y] );
-//                // wall on border between boards:
-//                if( s1.getVWall(s1.sizeX,y).isExisting() ||s2.getVWall(0,y).isExisting() ) {
-//                    vWall[s1.sizeX][y] = w.getWithElementNW( s1.getVWall(s1.sizeX, y) );
-// //                  w.copyElementNW( s1.vWall[s1.sizeX][y] );
-//                }
-//	    }
-//
-//	}else{ //untereinander
-//	    sizeX=s1.sizeX;
-//	    sizeY=s1.sizeY+s2.sizeY;
-//	    if (sizeX!=s2.sizeX)
-//		throw new FormatException("Die beiden Spielfelder sind nicht gleich breit!");
-//
-//	    initArys();
-//
-//	    // Erstes reinkopieren
-//	    for (int x=1;x<=s1.sizeX;x++)
-//		for (int y=1;y<=sizeY;y++)
-//		    floor[x][s2.sizeY+y]=s1.floor[x][y];
-//	    for (int x=0;x<=s1.sizeX;x++)
-//		for (int y=0;y<sizeY;y++)
-//		    vWall[x][s2.sizeY+y]=s1.vWall[x][y];
-//	    for (int x=0;x<s1.sizeX;x++)
-//		for (int y=0;y<=sizeY;y++)
-//		    hWall[x][s2.sizeY+y]=s1.hWall[x][y];
-//
-//	    // Zweites reinkopieren
-//	    for (int x=1;x<=s2.sizeX;x++)
-//		for (int y=1;y<=sizeY;y++)
-//		    floor[x][y]=s2.floor[x][y];
-//	    for (int x=0;x<=s2.sizeX;x++)
-//		for (int y=0;y<sizeY;y++)
-//		    vWall[x][y]=s2.vWall[x][y];
-//	    for (int x=0;x<s2.sizeX;x++)
-//		for (int y=0;y<=sizeY;y++)
-//		    hWall[x][y]=s2.hWall[x][y];
-//
-//	    // Konflikte resolven
-//	    for (int x=0;x<sizeX;x++){
-//                if ( s1.vWall[x][0].isExisting()||s2.vWall[x][s2.sizeY].isExisting() ) {
-// //                 vWall[x][s2.sizeY] =
-//                }
-// //		hWall[x][s2.sizeY].setExisting( s1.vWall[x][0].isExisting()||s2.vWall[x][s2.sizeY].isExisting() );
-// //		hWall[x][s2.sizeY].copyElementNW( s1.vWall[x][0] );
-//	    }
-//	}
-//
-//	SpielfeldString = getComputedString();
-//    }
-    
+    // // UNGETESTET!!!
+    // public Board(Board s1, Board s2, boolean nebeneinander) throws FormatException{
+    // CAT.debug("new Board called");
+    // if (nebeneinander){
+    // sizeX=s1.sizeX+s2.sizeX;
+    // sizeY=s1.sizeY;
+    // if (sizeY!=s2.sizeY)
+    // throw new FormatException("Die beiden Spielfelder sind nicht gleich hoch!");
+    //
+    // initArys();
+    //
+    // // Erstes reinkopieren
+    // for (int x=1;x<=s1.sizeX;x++)
+    // for (int y=1;y<=sizeY;y++)
+    // floor[x][y]=s1.floor[x][y];
+    // for (int x=0;x<=s1.sizeX;x++)
+    // for (int y=0;y<sizeY;y++)
+    // vWall[x][y]=s1.vWall[x][y];
+    // for (int x=0;x<s1.sizeX;x++)
+    // for (int y=0;y<=sizeY;y++)
+    // hWall[x][y]=s1.hWall[x][y];
+    //
+    // // Zweites reinkopieren
+    // for (int x=1;x<=s2.sizeX;x++)
+    // for (int y=1;y<=sizeY;y++)
+    // floor[x+s1.sizeX][y]=s2.floor[x][y];
+    // for (int x=0;x<=s2.sizeX;x++)
+    // for (int y=0;y<sizeY;y++)
+    // vWall[x+s1.sizeX][y]=s2.vWall[x][y];
+    // for (int x=0;x<s2.sizeX;x++)
+    // for (int y=0;y<=sizeY;y++)
+    // hWall[x+s1.sizeX][y]=s2.hWall[x][y];
+    //
+    // // Konflikte resolven
+    // for (int y=0;y<sizeY;y++){
+    // Wall w = vWall[s1.sizeX][y];
+    // // w.setExisting( s1.vWall[s1.sizeX][y].isExisting()||s2.vWall[0][y].isExisting() );
+    // // w.copyElementNW( s1.vWall[s1.sizeX][y] );
+    // // wall on border between boards:
+    // if( s1.getVWall(s1.sizeX,y).isExisting() ||s2.getVWall(0,y).isExisting() ) {
+    // vWall[s1.sizeX][y] = w.getWithElementNW( s1.getVWall(s1.sizeX, y) );
+    // // w.copyElementNW( s1.vWall[s1.sizeX][y] );
+    // }
+    // }
+    //
+    // }else{ //untereinander
+    // sizeX=s1.sizeX;
+    // sizeY=s1.sizeY+s2.sizeY;
+    // if (sizeX!=s2.sizeX)
+    // throw new FormatException("Die beiden Spielfelder sind nicht gleich breit!");
+    //
+    // initArys();
+    //
+    // // Erstes reinkopieren
+    // for (int x=1;x<=s1.sizeX;x++)
+    // for (int y=1;y<=sizeY;y++)
+    // floor[x][s2.sizeY+y]=s1.floor[x][y];
+    // for (int x=0;x<=s1.sizeX;x++)
+    // for (int y=0;y<sizeY;y++)
+    // vWall[x][s2.sizeY+y]=s1.vWall[x][y];
+    // for (int x=0;x<s1.sizeX;x++)
+    // for (int y=0;y<=sizeY;y++)
+    // hWall[x][s2.sizeY+y]=s1.hWall[x][y];
+    //
+    // // Zweites reinkopieren
+    // for (int x=1;x<=s2.sizeX;x++)
+    // for (int y=1;y<=sizeY;y++)
+    // floor[x][y]=s2.floor[x][y];
+    // for (int x=0;x<=s2.sizeX;x++)
+    // for (int y=0;y<sizeY;y++)
+    // vWall[x][y]=s2.vWall[x][y];
+    // for (int x=0;x<s2.sizeX;x++)
+    // for (int y=0;y<=sizeY;y++)
+    // hWall[x][y]=s2.hWall[x][y];
+    //
+    // // Konflikte resolven
+    // for (int x=0;x<sizeX;x++){
+    // if ( s1.vWall[x][0].isExisting()||s2.vWall[x][s2.sizeY].isExisting() ) {
+    // // vWall[x][s2.sizeY] =
+    // }
+    // // hWall[x][s2.sizeY].setExisting( s1.vWall[x][0].isExisting()||s2.vWall[x][s2.sizeY].isExisting() );
+    // // hWall[x][s2.sizeY].copyElementNW( s1.vWall[x][0] );
+    // }
+    // }
+    //
+    // SpielfeldString = getComputedString();
+    // }
+
     /**
      * Initializes a new Board
      */
@@ -181,10 +180,10 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
 
         initArys();
 
-        int strpos = 0;            // Current pos in the String
+        int strpos = 0; // Current pos in the String
 
         for (int zeile = sizeY; zeile > 0; zeile--) {
-            //parse ZwischenReihe (Nordwaende)
+            // parse ZwischenReihe (Nordwaende)
             for (int spalte = 0; spalte < sizeX; spalte++) {
                 strpos = parseAndCreateWall(strpos, map, hWall, spalte, zeile);
             }
@@ -197,7 +196,7 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
                 strpos = parseAndCreateWall(strpos, map, vWall, spalte, zeile - 1);
             }
             strpos = ParseUtils.assertws(map, strpos);
-        }    // for zeile
+        } // for zeile
         // parse last row of walls
         for (int spalte = 0; spalte < sizeX; spalte++) {
             strpos = parseAndCreateWall(strpos, map, hWall, spalte, 0);
@@ -205,7 +204,7 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
 
         checkFlaggen(flags);
         this.flags = flags;
-    } //Konstruktor
+    } // Konstruktor
 
     private void initArys() {
         // initialize arrays
@@ -225,8 +224,8 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
     /**
      * checks if flag are placed according to the rules or throws
      * exception otherwise and checks flags are placed to near to a wall
-     * or are affected by belts 
-    */
+     * or are affected by belts
+     */
     protected void checkFlaggen(Location[] f) throws FlagException {
         // prueft ob Flaggen regelkonform plaziert sind (sonst Exception)
         // und ob sie "gut" sind - sonst kann man die Probleme mit
@@ -257,14 +256,14 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
                 anzwand++;
 
             if (anzwand > 2) {
-                //Ludmila:String so ge�ndert, da� keine Nummer angezeigt wird
+                // Ludmila:String so ge�ndert, da� keine Nummer angezeigt wird
                 // flaggenProbleme+=Message.say("Board","mFlagProbManyWalls",(i+1),anzwand); //original
-                flagErrors += Message.say("Board", "mFlagProbManyWalls", anzwand);//ge�ndert
+                flagErrors += Message.say("Board", "mFlagProbManyWalls", anzwand);// ge�ndert
             }
 
-            if (floor(f[i].x, f[i].y).isBelt()) { //Fliessband
-                //flaggenProbleme+=Message.say("Board","mFlagProbConvBelt",(i+1));//original
-                flagErrors += Message.say("Board", "mFlagProbConvBelt");//gfe�ndert
+            if (floor(f[i].x, f[i].y).isBelt()) { // Fliessband
+                // flaggenProbleme+=Message.say("Board","mFlagProbConvBelt",(i+1));//original
+                flagErrors += Message.say("Board", "mFlagProbConvBelt");// gfe�ndert
             }
         }
     }
@@ -285,20 +284,20 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
             s.append('\n');
             nw(x, sizeX).write(s);
             for (int y = sizeY; y > 0; y--) {
-                //Floor
+                // Floor
                 floor(x, y).write(s, true);
                 sw(x, y).write(s);
             }
             s.append("\n");
-        } //for x
-        // unterste ZwischenReihe
+        } // for x
+          // unterste ZwischenReihe
         for (int y = sizeY; y > 0; y--)
             ww(1, y).writeReversed(s);
         s.append("\n.\n");
         return new String(s);
     }
 
-/* Well, and I hoped I'd never have to do this one -right- :-) */
+    /* Well, and I hoped I'd never have to do this one -right- :-) */
     public String getComputedString() {
         CAT.debug("getComputedString called");
         StringBuffer s = new StringBuffer();
@@ -310,13 +309,13 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
             s.append("\n");
             ww(1, y).write(s);
             for (int x = 1; x <= sizeX; x++) {
-                //Floor
+                // Floor
                 floor(x, y).write(s, false);
                 ew(x, y).write(s);
             }
             s.append("\n");
-        } //for y
-        // unterste ZwischenReihe
+        } // for y
+          // unterste ZwischenReihe
         for (int x = 1; x <= sizeX; x++) {
             sw(x, 1).write(s);
         }
@@ -324,15 +323,14 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
         return new String(s);
     }
 
-    private int parseAndCreateWall(int strpos, String kacheln, Wall[][] walls, int a, int b)
-            throws FormatException {
+    private int parseAndCreateWall(int strpos, String kacheln, Wall[][] walls, int a, int b) throws FormatException {
         String wallString = Wall.extractWallDef(strpos, kacheln);
         walls[a][b] = Wall.getWall(wallString);
         return strpos + wallString.length();
     }
 
     private int parseAndCreateFloor(int strpos, String kacheln, Floor[][] somefloor, int a, int b)
-            throws FormatException {
+                    throws FormatException {
         String floorString = Floor.extractFloorDef(strpos, kacheln);
         somefloor[a][b] = Floor.getFloor(floorString);
         return strpos + floorString.length();
@@ -341,8 +339,10 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
     public Location[] getFlags() {
         return flags;
     }
+
     /**
      * This return the MAP as String
+     * 
      * @return The game map in the network-specified string
      */
     public String getBoardAsString() {
@@ -352,25 +352,29 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
     /***** protected Methods *****/
 
     protected final static void p(String s) {
-        sCAT.debug(s);
+        CAT.debug(s);
     }
 
     protected final static void pn(String s) {
-        sCAT.debug(s);
+        CAT.debug(s);
     }
-    //used by Distance Calculator
+
+    // used by Distance Calculator
     public boolean hasNorthWall(int x, int y) {
         return nw(x, y).isExisting();
     }
-    //used by Distance Calculator
+
+    // used by Distance Calculator
     public boolean hasSouthWall(int x, int y) {
         return sw(x, y).isExisting();
     }
-    //used by Distance Calculator
+
+    // used by Distance Calculator
     public boolean hasWestWall(int x, int y) {
         return ww(x, y).isExisting();
     }
-    //used by Distance Calculator
+
+    // used by Distance Calculator
     public boolean hasEastWall(int x, int y) {
         return ew(x, y).isExisting();
     }
@@ -390,7 +394,6 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
         return (vWall[x][y - 1]);
     }
 
-
     /* South wall */
     public Wall sw(int x, int y) {
         return (hWall[x - 1][y - 1]);
@@ -400,7 +403,6 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
     public Wall ww(int x, int y) {
         return (vWall[x - 1][y - 1]);
     }
-
 
     public Wall getVWall(int a, int b) {
         return vWall[a][b];
@@ -423,7 +425,7 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
     }
 
     public void setFloor(int a, int b, Floor aFloor) {
-        CAT.debug("Setting new floor elemnt to ("+a+","+b+")");
+        CAT.debug("Setting new floor elemnt to (" + a + "," + b + ")");
         floor[a][b] = aFloor;
     }
 
@@ -461,14 +463,16 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
                 Wall wall = vWall[x][y];
                 if (wall == null)
                     pn("null\t");
-                else if (wall.isExisting()) {
-                    StringBuffer sb = new StringBuffer();
-                    sb.append(wall.getNWDeviceType()).append('|').append(wall.getNWDeviceInfo());
-                    sb.append('#').append(wall.getSEDeviceType()).append('|');
-                    sb.append(wall.getSEDeviceInfo()).append('\t');
-                    pn(sb.toString());
-                } else
-                    pn(".\t");
+                else
+                    if (wall.isExisting()) {
+                        StringBuffer sb = new StringBuffer();
+                        sb.append(wall.getNWDeviceType()).append('|').append(wall.getNWDeviceInfo());
+                        sb.append('#').append(wall.getSEDeviceType()).append('|');
+                        sb.append(wall.getSEDeviceInfo()).append('\t');
+                        pn(sb.toString());
+                    }
+                    else
+                        pn(".\t");
             }
             p("");
         }
@@ -487,43 +491,36 @@ public class Board implements de.botsnscouts.util.Directions, FloorConstants {
                 Wall wall = hWall[x][y];
                 if (wall == null)
                     pn("null\t");
-                else if (wall.isExisting()) {
-                    StringBuffer sb = new StringBuffer();
-                    sb.append(wall.getNWDeviceType()).append('|').append(wall.getNWDeviceInfo());
-                    sb.append('#').append(wall.getSEDeviceType()).append('|');
-                    sb.append(wall.getSEDeviceInfo()).append('\t');
-                    pn(sb.toString());
-                } else
-                    pn(".\t");
+                else
+                    if (wall.isExisting()) {
+                        StringBuffer sb = new StringBuffer();
+                        sb.append(wall.getNWDeviceType()).append('|').append(wall.getNWDeviceInfo());
+                        sb.append('#').append(wall.getSEDeviceType()).append('|');
+                        sb.append(wall.getSEDeviceInfo()).append('\t');
+                        pn(sb.toString());
+                    }
+                    else
+                        pn(".\t");
             }
             p("");
         }
     }
-    
+
     /**
      * Reads a board from a file
+     * 
      * @param file contains a board
-     * @return the board 
+     * @return the board
      * @throws IOException if loading fails
      */
     public static String readMagicString(File file) throws IOException {
-        BufferedReader kachReader = new BufferedReader(new InputStreamReader(
-                                                       new FileInputStream(file)));
+        BufferedReader kachReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
         StringBuffer str = new StringBuffer();
         String tmp = null;
-        //read board:
+        // read board:
         while ((tmp = kachReader.readLine()) != null)
             str.append(tmp + "\n");
         return new String(str);
     }
 
 }
-
-
-
-
-
-
-
-
-

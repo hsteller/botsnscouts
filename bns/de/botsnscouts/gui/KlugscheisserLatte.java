@@ -36,52 +36,55 @@ import javax.swing.JToggleButton;
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.Message;
 
-    /**
-     * KlugscheisserLatte, die im oben rechts in der Infoleiste dargestellt ist
-     */
+/**
+ * Wisenheimer bar; where the Wisenheimer hangs out while he isn't needed.
+ */
+@SuppressWarnings("serial")
 public class KlugscheisserLatte extends JToggleButton {
 
-    int xsize=60, ysize=60;
+    int xsize = 60, ysize = 60;
+
     Image klugSchlaf[];
+
     Image klugWach[];
 
     public KlugscheisserLatte(ActionListener al) {
-	// Referenz holen
-	klugSchlaf=ImageMan.getImages(ImageMan.KSCHLAF);
-	klugWach=ImageMan.getImages(ImageMan.KWACH);
-	setContentAreaFilled(false);
-        setOpaque( false );
-	setBorder(null);
-	setToolTipText(Message.say("KlugscheisserLatte","mtooltip"));
-	setIcon(new ImageIcon(klugSchlaf[0]));
-	setSelectedIcon(new ImageIcon(klugWach[0]));
-	addActionListener(al);
-	setFocusable(false);
+        // Referenz holen
+        klugSchlaf = ImageMan.getImages(ImageMan.KSCHLAF);
+        klugWach = ImageMan.getImages(ImageMan.KWACH);
+        setContentAreaFilled(false);
+        setOpaque(false);
+        setBorder(null);
+        setToolTipText(Message.say("KlugscheisserLatte", "mtooltip"));
+        setIcon(new ImageIcon(klugSchlaf[0]));
+        setSelectedIcon(new ImageIcon(klugWach[0]));
+        addActionListener(al);
+        setFocusable(false);
 
     }
 
     public Dimension getMinimumSize() {
-	return new Dimension(xsize,ysize);
+        return new Dimension(xsize, ysize);
     }
 
     public Dimension getPreferredSize() {
-	return new Dimension(xsize,ysize);
+        return new Dimension(xsize, ysize);
     }
 
     protected void reset() {
-	setSelected(false);
+        setSelected(false);
     }
 
     protected boolean selected() {
-	return isSelected();
+        return isSelected();
     }
 
-    public static void main (String args[]) {
-	Message.setLanguage("deutsch");
+    public static void main(String args[]) {
+        Message.setLanguage("deutsch");
         JFrame f = new JFrame();
-	f.setSize(100,100);
-	f.getContentPane().add(new KlugscheisserLatte(null));
-	f.setVisible(true);
+        f.setSize(100, 100);
+        f.getContentPane().add(new KlugscheisserLatte(null));
+        f.setVisible(true);
     }
 
 }

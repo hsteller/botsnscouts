@@ -40,16 +40,17 @@ import de.botsnscouts.util.FormatException;
 import de.botsnscouts.util.KrimsKrams;
 import de.botsnscouts.util.Location;
 
-/** AutoBot implements the computer-controlled robots.
+/**
+ * AutoBot implements the computer-controlled robots.
  */
 
-public class AutoBot extends BNSThread  {
-  
+public class AutoBot extends BNSThread {
+
     static final Category CAT = Category.getInstance(AutoBot.class);
-       
-    /** If set to true, we will do a System.exit(0) on the end of the run() method*/
+
+    /** If set to true, we will do a System.exit(0) on the end of the run() method */
     private boolean killJVMonceFinished = false;
-    
+
     public AutoBot(String ip, int port) {
         this(ip, port, 0);
     }
@@ -57,6 +58,7 @@ public class AutoBot extends BNSThread  {
     public AutoBot(String ip, int port, int malus) {
         this(ip, port, malus, false, KrimsKrams.randomName());
     }
+
     /**
      * This constructor also gets a playing strength: the higher malus
      * is, the worse the 'bot will be. 0 is best, therefore.
@@ -67,198 +69,213 @@ public class AutoBot extends BNSThread  {
         ip = i;
         port = p;
         this.malus = malus;
-        this.beltAware=beltAware;        
-        
+        this.beltAware = beltAware;
+
     }
 
     String ip;
+
     int port;
+
     int malus;
+
     boolean beltAware;
 
     final String realname;
+
     DistanceCalculator calc;
+
     SearchRecursively wirbel;
+
     String fieldAsString;
+
     Location[] flags;
 
     Bot myBot = Bot.getNewInstance("AutoBotRobbi");
+
     KommClientSpieler myComm = new KommClientSpieler();
+
     ClientAntwort answer = new ClientAntwort();
 
     SimBoard myMap;
+
     private boolean gameRunning;
+
     /**
      * run-Methode erzeugt zufaelligen Namen fuer den kuenstlichen Spieler, meldet ihn an
      * und wartet dann auf Nachrichten vom Server, die entsprechend beantwortet werden
      */
     public void run() {
-      try {
-
         try {
-            CAT.debug("sending registration");
-            boolean ok = myComm.anmelden(ip, port, realname);
-            if (!ok) {
-                CAT.error("AutoBot '"+realname+"' failed to register :-(");
-                shutdown();
+
+            try {
+                CAT.debug("sending registration");
+                boolean ok = myComm.anmelden(ip, port, realname);
+                if (!ok) {
+                    CAT.error("AutoBot '" + realname + "' failed to register :-(");
+                    shutdown();
+                    return;
+                }
+            }
+            catch (RegistrationException re) {
+                CAT.error("The server denied the registration: " + re.getMessage());
                 return;
             }
-        }
-        catch (RegistrationException re){
-            CAT.error("The server denied the registration: "+re.getMessage() );
-            return;
-        }
-        catch (KommException e) {
-            CAT.error("Could not connect", e);
-            return;
-        }
-
-        try {
-            answer = myComm.warte();
-            if (answer.typ == ClientAntwort.SPIELSTART) {
-                myComm.spielstart();
+            catch (KommException e) {
+                CAT.error("Could not connect", e);
+                return;
             }
-            else {
-                CAT.warn("was expecting gamestart message but got: "+answer.getTyp());
-            }
-        } catch (KommException e) {
-            CAT.error("Didn't get game start signal", e);
-            return;
-        }
-        gameRunning = true;
 
-        while (gameRunning) {
-            CAT.debug("Waiting...");
             try {
                 answer = myComm.warte();
-            } catch (KommException kE) {
-                CAT.error("Got an exception while waiting", kE);               
+                if (answer.typ == ClientAntwort.SPIELSTART) {
+                    myComm.spielstart();
+                }
+                else {
+                    CAT.warn("was expecting gamestart message but got: " + answer.getTyp());
+                }
+            }
+            catch (KommException e) {
+                CAT.error("Didn't get game start signal", e);
                 return;
             }
+            gameRunning = true;
 
-            CAT.debug("Got an answer, type: " + answer.getTyp());
+            while (gameRunning) {
+                CAT.debug("Waiting...");
+                try {
+                    answer = myComm.warte();
+                }
+                catch (KommException kE) {
+                    CAT.error("Got an exception while waiting", kE);
+                    return;
+                }
 
-            switch (answer.typ) {
-                case (ClientAntwort.ZERSTOERUNG):
-                    if (myMap == null) {
-                        initField();
-                        if (beltAware){
-                            calc=AdvDistanceCalculator.getInstance(myMap);
-                            CAT.debug("got adv dist calc");
-                        } else {
-                            calc=SimpleDistanceCalculator.getInstance(myMap);
-                            CAT.debug("got simple dist calc");
-                        }
-                        wirbel = new SearchRecursively(myMap, malus, calc);
-                        myMap.setDebug(false);
-                    }
-                    updateBot();
+                CAT.debug("Got an answer, type: " + answer.getTyp());
 
-                    CAT.debug("handling destroyed request...");
-                    handleDestroyedRequest();
-                    break;
-
-                case (ClientAntwort.REPARATUR):
-                    CAT.debug("handling repair request...");
-                    updateBot();
-                    handleRepairRequest(answer.zahl);
-                    break;
-
-                case (ClientAntwort.MACHEZUG):
-                    boolean powerdown = false;
-                    for (int i = 0; i < answer.karten.length; i++)
-                        CAT.debug("Card " + i + " is " + answer.karten[i].getprio() + "|" + answer.karten[i].getAction());
-                    updateBot();
-                    Bot simRob = Bot.getCopy(myBot);  // Kopieren fuer spaetere Powerdown-Simulationen
-
-                    Card[] maxCards = new Card[9];
-
-                    for (int i = 0; i < answer.karten.length; i++)
-                        maxCards[i] = answer.karten[i];
-                    Bot pRob = Bot.getCopy(myBot);
-                    // copy locked registers
-                    for (int i = 0; i < pRob.getLockedRegisters().length; i++)
-                        pRob.setMove(i, pRob.getLockedRegister(i));
-                    pRob.debug();
-
-                    Card[] vonPermut = wirbel.findBestMove(maxCards, pRob);
-
-                    // Absende-Karten vorbereiten
-                    int kartenZahl;
-                    if (answer.karten.length > 5)
-                        kartenZahl = 5;
-                    else
-                        kartenZahl = answer.karten.length;
-
-                    int[] anServer = new int[kartenZahl];
-                    int k = 0;
-                    int l = 0;
-                    for (int i = 0; i < answer.karten.length; i++) {
-                        int j = 0;
-                        while ((j < answer.karten.length) && (k < 5)) {
-                            if (answer.karten[j].getprio() == vonPermut[k].getprio()) {
-                                anServer[l++] = (j + 1);
+                switch (answer.typ) {
+                    case (ClientAntwort.ZERSTOERUNG):
+                        if (myMap == null) {
+                            initField();
+                            if (beltAware) {
+                                calc = AdvDistanceCalculator.getInstance(myMap);
+                                CAT.debug("got adv dist calc");
                             }
-                            j++;
+                            else {
+                                calc = SimpleDistanceCalculator.getInstance(myMap);
+                                CAT.debug("got simple dist calc");
+                            }
+                            wirbel = new SearchRecursively(myMap, malus, calc);
+                            myMap.setDebug(false);
                         }
-                        k++;
-                        if (j == answer.karten.length) {
-                            i--;
+                        updateBot();
+
+                        CAT.debug("handling destroyed request...");
+                        handleDestroyedRequest();
+                        break;
+
+                    case (ClientAntwort.REPARATUR):
+                        CAT.debug("handling repair request...");
+                        updateBot();
+                        handleRepairRequest(answer.zahl);
+                        break;
+
+                    case (ClientAntwort.MACHEZUG):
+                        boolean powerdown = false;
+                        for (int i = 0; i < answer.karten.length; i++)
+                            CAT.debug("Card " + i + " is " + answer.karten[i].getprio() + "|"
+                                            + answer.karten[i].getAction());
+                        updateBot();
+                        Bot simRob = Bot.getCopy(myBot); // Kopieren fuer spaetere Powerdown-Simulationen
+
+                        Card[] maxCards = new Card[9];
+
+                        for (int i = 0; i < answer.karten.length; i++)
+                            maxCards[i] = answer.karten[i];
+                        Bot pRob = Bot.getCopy(myBot);
+                        // copy locked registers
+                        for (int i = 0; i < pRob.getLockedRegisters().length; i++)
+                            pRob.setMove(i, pRob.getLockedRegister(i));
+                        pRob.debug();
+
+                        Card[] vonPermut = wirbel.findBestMove(maxCards, pRob);
+
+                        // Absende-Karten vorbereiten
+                        int kartenZahl;
+                        if (answer.karten.length > 5)
+                            kartenZahl = 5;
+                        else
+                            kartenZahl = answer.karten.length;
+
+                        int[] anServer = new int[kartenZahl];
+                        int k = 0;
+                        int l = 0;
+                        for (int i = 0; i < answer.karten.length; i++) {
+                            int j = 0;
+                            while ((j < answer.karten.length) && (k < 5)) {
+                                if (answer.karten[j].getprio() == vonPermut[k].getprio()) {
+                                    anServer[l++] = (j + 1);
+                                }
+                                j++;
+                            }
+                            k++;
+                            if (j == answer.karten.length) {
+                                i--;
+                            }
                         }
-                    }
 
-                    Bot[] simRobs = new Bot[1];         // Powerdown !?
-                    simRobs[0] = simRob;
-                    int schadenAlt = simRob.getDamage();
-                    for (int i = 1; i < 6; i++) {
-                        simRobs[0].setMove(i - 1, vonPermut[i - 1]);
-                        myMap.doPhase(i, simRobs);       // geplante Belegung simulieren
-                        simRobs[0].setMove(i - 1, null);
-                    }
-                    if ((simRobs[0].getDamage() > 5) || (java.lang.Math.random() < (((double) simRobs[0].getDamage() - 1) * 0.1))) {
-                        simRobs[0].setActivated(false);
-                        simRobs[0].setDamage(0);
-                        for (int i = 1; i < 6; i++) {                    // die Phase mit powerdown simulieren
-                            myMap.doPhase(i, simRobs);
+                        Bot[] simRobs = new Bot[1]; // Powerdown !?
+                        simRobs[0] = simRob;
+                        int schadenAlt = simRob.getDamage();
+                        for (int i = 1; i < 6; i++) {
+                            simRobs[0].setMove(i - 1, vonPermut[i - 1]);
+                            myMap.doPhase(i, simRobs); // geplante Belegung simulieren
+                            simRobs[0].setMove(i - 1, null);
                         }
-                        if (simRobs[0].getDamage() <= schadenAlt)
-                            powerdown = true;
-                    }
+                        if ((simRobs[0].getDamage() > 5)
+                                        || (java.lang.Math.random() < (((double) simRobs[0].getDamage() - 1) * 0.1))) {
+                            simRobs[0].setActivated(false);
+                            simRobs[0].setDamage(0);
+                            for (int i = 1; i < 6; i++) { // die Phase mit powerdown simulieren
+                                myMap.doPhase(i, simRobs);
+                            }
+                            if (simRobs[0].getDamage() <= schadenAlt)
+                                powerdown = true;
+                        }
 
-                    // Send cards
-                    myComm.registerProg(realname, anServer, powerdown);
-                    break;
+                        // Send cards
+                        myComm.registerProg(realname, anServer, powerdown);
+                        break;
 
-                case (ClientAntwort.REAKTIVIERUNG):
-                    myComm.respReaktivierung(realname, false); // Anwort: Bot wiedereinsetzen
-                    break;
+                    case (ClientAntwort.REAKTIVIERUNG):
+                        myComm.respReaktivierung(realname, false); // Anwort: Bot wiedereinsetzen
+                        break;
 
-                case (ClientAntwort.ENTFERNUNG):
-                    CAT.info("Was removed! Reason:" + answer.str + "\nSending ack.");
-                    gameRunning = false;
-                    myComm.bestaetigung();
-                    break;
+                    case (ClientAntwort.ENTFERNUNG):
+                        CAT.info("Was removed! Reason:" + answer.str + "\nSending ack.");
+                        gameRunning = false;
+                        myComm.bestaetigung();
+                        break;
 
-                default:
-                    CAT.warn("Illegal msg from server. Type:" + answer.getTyp());
-                    break;
-            }     //Ende switch
-        }         //Ende while
-      } // Ende of first "try" 
-      finally {
-          // don't call shutdown: it will remove the robot from the game and (ATM) result in the GUI
-          // removing the  "ranking-picture" (so the robot reached the end of "run" by finishing the game)
-          // When the Registry works, it should cleanup everything when it's time to shutdowm the server
-        //CAT.debug("End of run()...calling shutdown in case there is some IO left to clean up..");
-        //shutdown();
-        CAT.info("Autobot "+realname+" finished");
-        if (killJVMonceFinished){
-            CAT.info("As I was started via my main method (and so very likely via CLI), I will kill the JVM now!" );
-            System.exit(0);
+                    default:
+                        CAT.warn("Illegal msg from server. Type:" + answer.getTyp());
+                        break;
+                } // Ende switch
+            } // Ende while
+        } // Ende of first "try"
+        finally {
+            // don't call shutdown: it will remove the robot from the game and (ATM) result in the GUI
+            // removing the "ranking-picture" (so the robot reached the end of "run" by finishing the game)
+            // When the Registry works, it should cleanup everything when it's time to shutdowm the server
+            // CAT.debug("End of run()...calling shutdown in case there is some IO left to clean up..");
+            // shutdown();
+            CAT.info("Autobot " + realname + " finished");
+            if (killJVMonceFinished) {
+                CAT.info("As I was started via my main method (and so very likely via CLI), I will kill the JVM now!");
+                System.exit(0);
+            }
         }
-      }
-     }
-
+    }
 
     /**
      * get current status from server into myBot
@@ -266,7 +283,8 @@ public class AutoBot extends BNSThread  {
     public Bot updateBot() {
         try {
             myBot = myComm.getRobStatus(realname);
-        } catch (KommException e) {
+        }
+        catch (KommException e) {
             CAT.error("Could not update myself", e);
         }
         return myBot;
@@ -291,24 +309,27 @@ public class AutoBot extends BNSThread  {
             flags = myComm.getFahnenPos();
 
             fieldAsString = myComm.getSpielfeld();
-            //d(spielfeldstring);
+            // d(spielfeldstring);
 
             boolean canPushersPushMultipleBots = myComm.getCanPushersPushMultipleBots();
             try {
                 myMap = SimBoard.getInstance(dimx, dimy, fieldAsString, flags);
                 myMap.setPusherCanPushMoreThanOneBot(canPushersPushMultipleBots);
-            } catch (FlagException fe) {
+            }
+            catch (FlagException fe) {
                 CAT.warn("Flag on pit", fe);
-            } catch (FormatException e) {
+            }
+            catch (FormatException e) {
                 CAT.error("Malformed field", e);
             }
-        } catch (KommException e) {
+        }
+        catch (KommException e) {
             CAT.error("Did not get a field", e);
         }
     }
 
     public void handleRepairRequest(int reparatur) {
-        CAT.debug("repairing "+reparatur+" registers.");
+        CAT.debug("repairing " + reparatur + " registers.");
         int[] regsToUnlock = new int[reparatur];
         int regsFound = 0;
         for (int i = 0; i < 5; i++) {
@@ -342,10 +363,11 @@ public class AutoBot extends BNSThread  {
         }
         myComm.respZerstoert(realname, direction);
     }
-/**
- * Attention: if the bot is started by calling the main method, it will kill the JVM once it reached the end of its run() method!
- * 
- */
+
+    /**
+     * Attention: if the bot is started by calling the main method, it will kill the JVM once it reached the end of its run() method!
+     * 
+     */
     public static void main(String[] args) {
         int sPort = 0;
         AutoBot spK;
@@ -357,8 +379,8 @@ public class AutoBot extends BNSThread  {
         boolean killJVM = true;
         try {
             switch (args.length) {
-                case 4: 
-                    killJVM = new Boolean (args[3]).booleanValue();
+                case 4:
+                    killJVM = new Boolean(args[3]).booleanValue();
                 case 3:
                     malus = Integer.parseInt(args[2]);
                 case 2:
@@ -369,7 +391,8 @@ public class AutoBot extends BNSThread  {
                 default:
                     throw new IllegalArgumentException();
             } // switch
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.err.println("Usage: java de.botsnscouts.autobot.AutoBot <host> <port> [kill JVM on exit; default=true]");
         }
 
@@ -382,37 +405,31 @@ public class AutoBot extends BNSThread  {
         spK.killJVMonceFinished = killJVM;
         spK.start();
     }
-    
-   
-    public void doShutdown(){
+
+    public void doShutdown() {
         doShutdown(true);
     }
-    
+
     private void doShutdown(boolean deregister) {
-        	CAT.debug(realname+": shutting down..");
-        	gameRunning = false;
-        	if (deregister) {
-	        	try {
-	        	    CAT.debug("deregistering from server if still possible..");
-	        	    myComm.abmelden(realname);
-	        	}
-	        	catch (Exception e){
-	        	    CAT.debug("during deregister", e);
-	        	}
-        	}
-        	try {
-        	    CAT.debug("killing communication..");
-        	    myComm.shutdown(true);
-        	}
-        	catch (Exception e){
-        	    CAT.debug(e);
-        	}       
-        	
-        	
-        	
+        CAT.debug(realname + ": shutting down..");
+        gameRunning = false;
+        if (deregister) {
+            try {
+                CAT.debug("deregistering from server if still possible..");
+                myComm.abmelden(realname);
+            }
+            catch (Exception e) {
+                CAT.debug("during deregister", e);
+            }
+        }
+        try {
+            CAT.debug("killing communication..");
+            myComm.shutdown(true);
+        }
+        catch (Exception e) {
+            CAT.debug(e);
+        }
+
     }
-     
-   
-    
-    
+
 }

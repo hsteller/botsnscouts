@@ -23,7 +23,6 @@
  
  *******************************************************************/
 
-
 /*
  * Created on 24.02.2005
  *
@@ -39,56 +38,52 @@ import org.apache.log4j.Category;
 
 /**
  * @author hendrik
- *
- * To reduce the deprecation warnings for using URLEncoder.encode(String)/URLDecoder.decode(String);<br>
- * to  handle all encoding/decoding in one place.. 
- *
+ * 
+ *         To reduce the deprecation warnings for using URLEncoder.encode(String)/URLDecoder.decode(String);<br>
+ *         to handle all encoding/decoding in one place..
+ * 
  */
 public class Encoder {
-    
+
     private static final Category CAT = Category.getInstance(Encoder.class);
-    
-    public static String encode(String toEncode) {
-    	//TODO (replace me plz)
-    	/*from the source of URLEncoder:
-    	 * @deprecated The resulting string may vary depending on the platform's
-	     *             default encoding. Instead, use the encode(String,String)
-	     *             method to specify the encoding.*/
-    	return URLEncoder.encode(toEncode);
+
+    @SuppressWarnings("deprecation")
+    private static String encode(String toEncode) {
+        return URLEncoder.encode(toEncode);
     }
-    
-    public static String decode (String toDecode){
-    	//TODO (replace me plz)
-    	return URLDecoder.decode(toDecode);        
+
+    @SuppressWarnings("deprecation")
+    private static String decode(String toDecode) {
+
+        return URLDecoder.decode(toDecode);
     }
 
     public static String commDecode(String toDecode) {
         try {
             return URLDecoder.decode(toDecode, "utf-8");
         }
-        catch (UnsupportedEncodingException ex){
-            CAT.error (ex);
+        catch (UnsupportedEncodingException ex) {
+            CAT.error(ex);
             return decode(toDecode);
         }
     }
-    
-    public static String commEncode (String toEncode){
+
+    public static String commEncode(String toEncode) {
         try {
             return URLEncoder.encode(toEncode, "utf-8");
         }
-        catch (UnsupportedEncodingException ex){
-            CAT.error (ex);
+        catch (UnsupportedEncodingException ex) {
+            CAT.error(ex);
             return encode(toEncode);
-        }      
+        }
     }
-    
+
     public static String propertyEncode(String toEncode) {
         return commEncode(toEncode);
     }
-    
-    public static String propertyDecode (String toDecode){
-        return commDecode(toDecode);        
-    }
-    
-}
 
+    public static String propertyDecode(String toDecode) {
+        return commDecode(toDecode);
+    }
+
+}

@@ -25,7 +25,6 @@
 
 package de.botsnscouts.editor;
 
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -63,36 +62,49 @@ import de.botsnscouts.util.Location;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.GreenTheme;
 
+@SuppressWarnings("serial")
 public class BoardEditor extends JFrame implements WindowListener, ActionListener {
-    // enno:
-    // 1. ImageMan wird verwendet (damit die Bilder nicht einmal von
-    //     BoardEditor und einmal vom LeftPanel/BoardView geladen werden
-    // 2. BoardEditor reagiert nur noch auf die linke Maustaste (die anderen
-    //    sind irgendwann mal f�rs Scrollen zust�ndig - s. BoardView)
-    //    das Scrollen funkt. im Editor und der Vorschau bereits, im Spiel noch nicht ..
-    //    warum, weiss ich noch nicht
 
     public static final Category CAT = Category.getInstance(BoardEditor.class);
 
     protected EditorBoardView boardView = null;
+
     protected ButtonBar dp = null;
+
     protected JScrollPane sp = null;
+
     protected JScrollPane sp2 = null;
-    protected Image[] cbeltCrop,ebeltCrop,diverseCrop;
+
+    protected Image[] cbeltCrop, ebeltCrop, diverseCrop;
+
     protected Image[] images;
+
     protected JPanel but;
+
     protected JToggleButton[] buttons;
+
     protected ButtonGroup felder;
+
     protected EditableBoard board = null;
 
-    protected int elemX = 0,elemY = 0,indx = 0;
-    protected int spfX = 0,spfY = 0;
+    protected int elemX = 0, elemY = 0, indx = 0;
+
+    protected int spfX = 0, spfY = 0;
+
     protected int phasen = 0;
 
     private String magicBoardString = null;
+
     protected int laserSt = 1;
-    protected int[] elemTyp = {122, 123, 131, 132, 102, 121, 120, 130, 133, 103, 122, 123, 131, 132, 100, 120, 121, 133, 130, 101, 152, 153, 150, 151, 222, 223, 231, 232, 202, 221, 220, 230, 233, 203, 222, 223, 231, 232, 200, 221, 220, 230, 233, 201, 252, 253, 250, 251, 0, 10, 10, -1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    protected int[] elemSpez = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 2, 2, 2, 2, 2, 2, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    protected int[] elemTyp = { 122, 123, 131, 132, 102, 121, 120, 130, 133, 103, 122, 123, 131, 132, 100, 120, 121,
+            133, 130, 101, 152, 153, 150, 151, 222, 223, 231, 232, 202, 221, 220, 230, 233, 203, 222, 223, 231, 232,
+            200, 221, 220, 230, 233, 201, 252, 253, 250, 251, 0, 10, 10, -1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0 };
+
+    protected int[] elemSpez = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 2, 2, 2, 2, 2, 2, 1, 0, 1, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0 };
 
     public BoardEditor() {
         loadImg();
@@ -102,7 +114,6 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 
         setTitle(Message.say("BoardEditor", "mTitel"));
 
-       
         Dimension dim = BotsNScouts.getScreenSize();
 
         sp = new JScrollPane();
@@ -116,9 +127,12 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
         buttons = new JToggleButton[66];
 
         if (dim.width >= 768) {
-            but.setLayout(new GridLayout((buttons.length + 2) / 3, 3));//3 spalten
-        } else {
-            but.setLayout(new GridLayout((buttons.length + 1) / 2, 2));//2 spalten
+            but.setLayout(new GridLayout((buttons.length + 2) / 3, 3));// 3
+                                                                       // spalten
+        }
+        else {
+            but.setLayout(new GridLayout((buttons.length + 1) / 2, 2));// 2
+                                                                       // spalten
         }
 
         for (int i = 0; i < buttons.length; i++) {
@@ -137,7 +151,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
         dp = new ButtonBar(this);
         getContentPane().add(BorderLayout.NORTH, dp);
 
-        //addMouseListener(this);
+        // addMouseListener(this);
         addWindowListener(this);
 
         setSize(dim.width, dim.height - 70);
@@ -176,17 +190,21 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
         Global.debug(this, "Bilder geladen");
 
         return true;
-    }//ende loadImg
+    }// ende loadImg
 
     protected boolean initSpF() {
         String gr1 = "____________\n";
         String gr2 = "_B_B_B_B_B_B_B_B_B_B_B_B_\n";
         try {
-            board = new EditableBoard(12, 12, new String(gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1), null);
-        } catch (FormatException e) {
+            board = new EditableBoard(12, 12, new String(gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2
+                            + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1 + gr2 + gr1),
+                            null);
+        }
+        catch (FormatException e) {
             System.err.println("Oups!" + e);
             return false;
-        } catch (FlagException ex) {
+        }
+        catch (FlagException ex) {
             System.err.println("Oups!" + ex);
             return false;
         }
@@ -201,7 +219,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
     public void setFlag(int x, int y) {
         if (dp.advancedFeaturesEnabled()) {
             CAT.debug("setting flag to " + x + ", " + y);
-            board.setFlags(new Location[]{new Location(x, y)});
+            board.setFlags(new Location[] { new Location(x, y) });
             DistanceCalculator calc = AdvDistanceCalculator.getInstance(board);
             calc.preCalculate();
             boardView.setCalc(calc);
@@ -211,13 +229,14 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 
     /**
      * Load a new file into the editor.
+     * 
      * @param file
      */
     void loadTileFile(File file) {
         String save = getMagicBoardString();
         try {
             magicBoardString = Board.readMagicString(file);
-            //Leo's Code
+            // Leo's Code
             board = new EditableBoard(12, 12, magicBoardString, null);
             CAT.debug("Board erzeugt");
 
@@ -228,25 +247,28 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
             sp.getViewport().setView(boardView);
 
             CAT.debug("sac added");
-        } catch (FormatException ex) {
+        }
+        catch (FormatException ex) {
             System.err.println(Message.say("BoardEditor", "eDatNotEx") + ex);
             magicBoardString = save;
-        } catch (FlagException ex) {
+        }
+        catch (FlagException ex) {
             System.err.println(Message.say("BoardEditor", "eDatNotEx") + ex);
             magicBoardString = save;
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             System.err.println(Message.say("BoardEditor", "eDateiErr") + ex);
             magicBoardString = save;
         }
     }
-
 
     public void actionPerformed(ActionEvent e) {
         String a = e.getActionCommand();
         try {
             indx = Integer.parseInt(a);
             CAT.debug("button #" + indx + " clicked");
-        } catch (NumberFormatException d) {
+        }
+        catch (NumberFormatException d) {
             CAT.error("Boo: " + a, d);
         }
     }
@@ -259,7 +281,7 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 
     public void windowClosing(WindowEvent e) {
         this.dispose();
-        //System.exit(0);
+        // System.exit(0);
     }
 
     public void windowClosed(WindowEvent e) {
@@ -282,16 +304,19 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
             String loc = Conf.getProperty("language.isSet");
             if (loc != null) {
                 myLocale = new Locale(Conf.getProperty("language.lang"), Conf.getProperty("language.country"));
-            } else {
+            }
+            else {
                 Locale[] list = Message.getLocales();
                 String[] locals = new String[list.length];
                 for (int i = 0; i < locals.length; i++) {
                     locals[i] = list[i].getDisplayLanguage();
                 }
-                int sel = JOptionPane.showOptionDialog(null, "Please select your Language", "Language selection", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, locals, locals[0]);
+                int sel = JOptionPane.showOptionDialog(null, "Please select your Language", "Language selection",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, locals, locals[0]);
                 if (sel == JOptionPane.CLOSED_OPTION) {
                     myLocale = new Locale("en", "US");
-                } else {
+                }
+                else {
                     myLocale = list[sel];
                     Conf.setProperty("language.isSet", "yes");
                     Conf.setProperty("language.lang", myLocale.getLanguage());
@@ -303,11 +328,11 @@ public class BoardEditor extends JFrame implements WindowListener, ActionListene
 
             MetalLookAndFeel.setCurrentTheme(new GreenTheme());
             new BoardEditor();
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             CAT.fatal("Exception:", t);
             throw t;
         }
     }
 
-
-}//end class BoardEditor
+}// end class BoardEditor

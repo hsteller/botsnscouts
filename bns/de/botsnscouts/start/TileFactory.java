@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Properties;
@@ -53,38 +52,43 @@ public class TileFactory {
 
     public static final Category CAT = Category.getInstance(TileFactory.class);
 
-    private Hashtable tileTab;
-    private Hashtable imgTab;
+    private Hashtable<String, Tile[]> tileTab;
+
+    private Hashtable<String, Image> imgTab;
+
     private int thumbnailsize;
+
     boolean fertig = false;
+
     Object lock = new Object();
 
-
     public TileFactory(int thumbnailsize) {
-        tileTab = new Hashtable();
-        imgTab = new Hashtable();
+        tileTab = new Hashtable<String, Tile[]>();
+        imgTab = new Hashtable<String, Image>();
         this.thumbnailsize = thumbnailsize;
     }
 
     boolean workerStarted = false;
+
     private Thread worker = new BNSThread("TileWorker") {
-        public void doShutdown(){
-            CAT.debug ("TileFactory's workerThread: empty doShutdown() called");
+        public void doShutdown() {
+            CAT.debug("TileFactory's workerThread: empty doShutdown() called");
         }
-        
+
         public void run() {
 
             // Load those from bns.home/tiles
             File kd = null;
             kd = new File(Conf.getBnsHome() + System.getProperty("file.separator") + "tiles");
             File[] all = kd.listFiles(new RRAFilter());
-            //File[] allj = kdj.listFiles(new RRAFilter());
+            // File[] allj = kdj.listFiles(new RRAFilter());
             FileInputStream istream;
             if (all != null) {
                 for (int i = 0; i < all.length; i++) {
                     try {
                         istream = new FileInputStream(all[i]);
-                    } catch (FileNotFoundException e) {
+                    }
+                    catch (FileNotFoundException e) {
                         continue;
                     }
                     putOneTile(istream, all[i].getName());
@@ -100,13 +104,15 @@ public class TileFactory {
             Properties prop = new Properties();
             try {
                 prop.load(stream);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 CAT.warn("Couldn't load tile.index from distrib.");
             }
             int numTiles = 0;
             try {
                 numTiles = Integer.parseInt(prop.getProperty("numTiles"));
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 CAT.warn("Error parsing numTiles in tile.index!");
             }
             for (int i = 0; i < numTiles; i++) {
@@ -121,7 +127,6 @@ public class TileFactory {
         }
     };
 
-
     /** Reads one tile and puts into the hashtable */
     private void putOneTile(InputStream istream, String name) {
         CAT.debug("putting tile " + name);
@@ -133,47 +138,50 @@ public class TileFactory {
         try {
             BufferedReader kachReader = new BufferedReader(new InputStreamReader(istream));
             String tmp = null;
-//und lese Board aus
+            // und lese Board aus
             while ((tmp = kachReader.readLine()) != null)
                 str.append(tmp + "\n");
 
-        } catch (Exception e) {
-            System.err.println(e);
         }
-        //erzeige Tile mit der Tilestring
+        catch (Exception e) {
+            CAT.error(e);
+        }
+        // create tile from tilestring
         Tile kach = null;
         try {
             kach = new Tile(name, str.toString(), thumbnailsize);
-            //kach.getImage();
+            // kach.getImage();
             Tile[] kachAr = new Tile[4];
-            kachAr[0] = kach;//Die Tile mit Drehung 0 wird initialisiert
+            kachAr[0] = kach;// initial tile with rotation(orientation) 0
             tileTab.put(name, kachAr);
-        } catch (FlagException e) {
-            System.err.println(e);
-        } catch (FormatException e) {
-            System.err.println(e);
+        }
+        catch (FlagException e) {
+            CAT.error(e.getMessage(), e);
+        }
+        catch (FormatException e) {
+            CAT.error(e.getMessage(), e);
         }
     }
 
-    //gibt eine Tile mit Drehung zur�ck
-    public Tile getTile(String name, int drehung) {
+    // returns a tile with a rotation
+    public Tile getTile(String name, int rotation) {
         checkLadeStatus();
-        Tile[] kachAr = (Tile[]) tileTab.get(name);
-        //Global.debug(this,tileTab.toString());
-        if (kachAr[drehung] != null) {
-            return kachAr[drehung];
+        Tile[] kachAr = tileTab.get(name);
+        // Global.debug(this,tileTab.toString());
+        if (kachAr[rotation] != null) {
+            return kachAr[rotation];
         }
-        for (int i = 1; i <= drehung; i++) {
+        for (int i = 1; i <= rotation; i++) {
             if (kachAr[i] == null)
                 kachAr[i] = kachAr[i - 1].getRotated();
         }
-        return kachAr[drehung];
+        return kachAr[rotation];
     }
 
     public Image getImage(String name) {
         if (imgTab.get(name) != null)
-            return (Image) imgTab.get(name);
-        Tile[] kachAr = (Tile[]) tileTab.get(name);
+            return imgTab.get(name);
+        Tile[] kachAr = tileTab.get(name);
         CAT.debug("creating image on-demand.");
         Image img = BoardView.createThumb(kachAr[0], thumbnailsize);
         imgTab.put(name, img);
@@ -186,37 +194,39 @@ public class TileFactory {
         TileInfo[] infos = new TileInfo[anz];
         String[] all = new String[anz];
         int i = 0;
-        for (Enumeration namen = tileTab.keys(); namen.hasMoreElements(); i++) {
-            all[i] = (String) namen.nextElement();
+        for (String name : tileTab.keySet()) {
+            all[i++] = name;
         }
         Arrays.sort(all);
         for (i = 0; i < anz; i++) {
             CAT.debug(all[i]);
             infos[i] = new TileInfo(all[i], getImage(all[i]));
-            //((Tile[])tileTab.get(all[i]))[0].getImage());
+            // ((Tile[])tileTab.get(all[i]))[0].getImage());
         }
         return infos;
     }
 
     private void checkLadeStatus() {
-    
-            if (!workerStarted)
-                prepareTiles();
-      
+
+        if (!workerStarted)
+            prepareTiles();
+
         try {
-            synchronized (worker){ // FIXME vielleicht hilft das syncen hier gegen die NPE in prepareTiles?
+            synchronized (worker) { // FIXME vielleicht hilft das syncen hier gegen die NPE in prepareTiles?
                 worker.join();
             }
-        } catch (InterruptedException e) {
-            System.err.println(e);
+        }
+        catch (InterruptedException e) {
+            CAT.error(e.getMessage(), e);
         }
     }
 
     public void prepareTiles() {
         synchronized (worker) {
-            if (workerStarted) return;
+            if (workerStarted)
+                return;
             worker.start();
-          //  worker.setPriority(Thread.MIN_PRIORITY); // FIXME hier gibts NullPoin
+            // worker.setPriority(Thread.MIN_PRIORITY); // FIXME hier gibts NullPoin
             workerStarted = true;
         }
     }
@@ -231,5 +241,3 @@ public class TileFactory {
         (new TileFactory(150)).checkLadeStatus();
     }
 }
-
-

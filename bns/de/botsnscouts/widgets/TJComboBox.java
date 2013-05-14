@@ -23,7 +23,6 @@
  
  *******************************************************************/
 
-
 /*
  * Created on 03.09.2005
  *
@@ -36,24 +35,22 @@ import javax.swing.JComboBox;
  * @author Hendrik Steller
  * @version $Id$
  */
-public class TJComboBox extends JComboBox {
-    
-    public TJComboBox(String [] items) {
+@SuppressWarnings("serial")
+public class TJComboBox extends JComboBox<String> {
+
+    public TJComboBox(String[] items) {
         super(items);
         initTheme();
     }
-    
+
     public TJComboBox() {
-	    super();
-	    initTheme();
+        super();
+        initTheme();
     }
-    
-    
-    
+
     private void initTheme() {
-        setOpaque(false);                        
+        setOpaque(false);
         setForeground(GreenTheme.getTextColor());
-	    setFont(GreenTheme.getFont());
+        setFont(GreenTheme.getFont());
     }
 }
-

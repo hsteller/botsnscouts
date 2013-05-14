@@ -22,25 +22,25 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.comm;
 
-  /**
-   * KommExceptions will be thrown by communication classes in case they are not able
-   * to parse a received String. 
-   * 
-   * @author Hendrik Steller
-   * @version $Id$
-   */
+/**
+ * KommExceptions will be thrown by communication classes in case they are not
+ * able to parse a received String.
+ * 
+ * @author Hendrik Steller
+ * @version $Id$
+ */
+@SuppressWarnings("serial")
 public class KommException extends Exception {
-  
-	public KommException () {
-    		super();
-  	}
 
+    public KommException() {
+        super();
+    }
 
-  public KommException (String s) {
-    		super (s);
-  	}
-  
+    public KommException(String s) {
+        super(s);
+    }
+
 }

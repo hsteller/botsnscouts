@@ -22,7 +22,7 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.editor;
 
 import java.awt.Button;
@@ -36,46 +36,50 @@ import javax.swing.JDialog;
 
 import de.botsnscouts.util.Message;
 
+@SuppressWarnings("serial")
+class StrengthDialog extends JDialog implements ActionListener {
 
-class StrengthDialog extends JDialog implements ActionListener{
+    private Button ok = null;
 
-    private Button ok=null;
-    private Checkbox[] chkb=new Checkbox[3];
-    private CheckboxGroup cgrp=null;
+    private Checkbox[] chkb = new Checkbox[3];
 
-    private BoardEditor par=null;
-    private int x=200,y=200;
+    private CheckboxGroup cgrp = null;
 
-    public StrengthDialog(BoardEditor pa,String tit,boolean mod){
-	super(pa,tit,mod);
-	par=pa;
-	setSize(x,y);
-	getContentPane().setLayout(new GridLayout(4,1,2,2));
+    private BoardEditor par = null;
 
-	cgrp=new CheckboxGroup();
+    private int x = 200, y = 200;
 
-	for(int i=0;i<3;i++){
-	    chkb[i]=new Checkbox(Message.say("BoardEditor","mStaerke")+" "+(i+1),cgrp,false);
-	    getContentPane().add(chkb[i]);
-	}
-	cgrp.setSelectedCheckbox(chkb[0]);
-	ok=new Button(Message.say("BoardEditor","bOk"));
-	ok.addActionListener(this);
-	ok.setActionCommand("OK");
-	getContentPane().add(ok);
-	//show();
-	setVisible(true);
+    public StrengthDialog(BoardEditor pa, String tit, boolean mod) {
+        super(pa, tit, mod);
+        par = pa;
+        setSize(x, y);
+        getContentPane().setLayout(new GridLayout(4, 1, 2, 2));
+
+        cgrp = new CheckboxGroup();
+
+        for (int i = 0; i < 3; i++) {
+            chkb[i] = new Checkbox(Message.say("BoardEditor", "mStaerke") + " " + (i + 1), cgrp, false);
+            getContentPane().add(chkb[i]);
+        }
+        cgrp.setSelectedCheckbox(chkb[0]);
+        ok = new Button(Message.say("BoardEditor", "bOk"));
+        ok.addActionListener(this);
+        ok.setActionCommand("OK");
+        getContentPane().add(ok);
+        // show();
+        setVisible(true);
     }
 
- public void actionPerformed(ActionEvent e)  {
-     if(e.getActionCommand().equals("OK")){
-	 int sel=1;
-	 if(chkb[1]==cgrp.getSelectedCheckbox()) sel=2;
-	 if(chkb[2]==cgrp.getSelectedCheckbox()) sel=3;
-	 par.laserSt=sel;
-	 this.dispose();
-     }
- }
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("OK")) {
+            int sel = 1;
+            if (chkb[1] == cgrp.getSelectedCheckbox())
+                sel = 2;
+            if (chkb[2] == cgrp.getSelectedCheckbox())
+                sel = 3;
+            par.laserSt = sel;
+            this.dispose();
+        }
+    }
 
 }
-

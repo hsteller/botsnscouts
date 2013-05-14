@@ -22,21 +22,22 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.util;
 
 /**
- * ConfigSaveException wird Problemen beim Speichern in config.txt 
- * oder fehlender config.txt geworfen.
- *
+ * ConfigSaveException wird Problemen beim Speichern in config.txt oder fehlender config.txt geworfen.
+ * 
  */
-
+@SuppressWarnings("serial")
 public class ConfigSaveException extends Exception {
-  public ConfigSaveException () {
-    super();
-  }
-  public ConfigSaveException (String s) {
-    super (s);
-  }
-  
+    
+    public ConfigSaveException() {
+        super();
+    }
+
+    public ConfigSaveException(String s) {
+        super(s);
+    }
+
 }

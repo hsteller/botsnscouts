@@ -23,7 +23,6 @@
  
  *******************************************************************/
 
-
 /*
  * Created on 18.05.2005
  *
@@ -31,18 +30,21 @@
 package de.botsnscouts.util;
 
 /**
- *  @author hendrik
- *  @version $Id$
- *
- * This class can check (@link #isInRange(int)) whether an integer is in a certain integer interval.
- * It can be set to an "infinite mode" so that @link #isInRange(int) always returns true. 
+ * @author hendrik
+ * @version $Id$
+ * 
+ *          This class can check (@link #isInRange(int)) whether an integer is in a certain integer interval. It can be set to an "infinite mode" so that @link #isInRange(int) always returns true.
  */
 
-public  class RangeFilter {
+public class RangeFilter {
     private int type;
+
     private int min;
+
     private int max;
+
     public static final int INFINITE = 0;
+
     public static final int BOUND = 1;
 
     public RangeFilter() {
@@ -100,4 +102,3 @@ public  class RangeFilter {
     }
 
 }
-

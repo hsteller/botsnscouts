@@ -31,84 +31,106 @@ import java.util.Vector;
 
 import org.apache.log4j.Category;
 
-/** Wait for some roboters or views for some reason.
- *  Constructing a WaitingForSet blocks the current Thread until all
- *  elements of the set tell they are ready (by calling remove())
+/**
+ * Wait for some roboters or views for some reason. Constructing a WaitingForSet blocks the current Thread until all elements of the set tell they are
+ * ready (by calling remove())
  */
- class WaitingForSet {
-      static Category CAT = Category.getInstance(WaitingForSet.class);
-     private Vector waitingFor;
+class WaitingForSet<T> {
+    static Category CAT = Category.getInstance(WaitingForSet.class);
 
-     /** Constructs the set of elements to wait for.
-      */
-     WaitingForSet(Collection c){
-	 waitingFor = new Vector(c);
-     }
+    private Vector<T> waitingFor;
 
-     /** Blocks until the thing we waited for is done.
-      *  @param timeout Timeout in ms.
-      *  @return Iterator to the ones who did not make it within the timeout.
-      */
-     synchronized Iterator waitFor(int timeout){
-	 if (waitingFor.isEmpty()){
-	     return waitingFor.iterator();
-	 }
-	 try{
-	     wait(timeout);
-	 }catch (InterruptedException e){
-		 d("InterruptedException, shouldn't happen: "+e.getMessage());
-	 }
-	 return waitingFor.iterator();
-     }
+    /**
+     * Constructs the set of elements to wait for.
+     */
+    public WaitingForSet(Collection<T> c) {
+        waitingFor = new Vector<T>();
+        waitingFor.addAll(c);
+    }
 
+    /**
+     * Blocks until the thing we waited for is done.
+     * 
+     * @param timeout
+     *            Timeout in ms.
+     * @return Iterator of the ones who did not make it within the timeout.
+     */
+    synchronized Iterator<T> waitFor(int timeout) {
+        if (waitingFor.isEmpty()) {
+            return waitingFor.iterator();
+        }
+        try {
+            wait(timeout);
+        }
+        catch (InterruptedException e) {
+            CAT.debug("InterruptedException, shouldn't happen: " + e.getMessage());
+        }
+        return waitingFor.iterator();
+    }
 
-     /** Removes one object we waited for from the set.
-      * @throws RuntimeException if we didn't wait for that element.
-      */
-     synchronized void removeAndNotify(Waitable w){
+    /**
+     * Removes one object we waited for from the set.
+     * 
+     * @throws RuntimeException
+     *             if we didn't wait for that element.
+     */
+    synchronized void removeAndNotify(T w) {
         CAT.debug("remove and notify!");
-		 if (waitingFor.remove(w)) {
-		     CAT.debug("fire removal event");
-	         fireRemovalEvent(w);	
-	     }
-		 CAT.debug("before empty check");
-		 if (waitingFor.isEmpty()){
-	            CAT.debug("waitingFor is empty/notify");
-		     notify();
-		 }
-		 CAT.debug("leaving remove and notify");
-     }
+        if (waitingFor.remove(w)) {
+            CAT.debug("fire removal event");
+            fireRemovalEvent(w);
+        }
+        CAT.debug("before empty check");
+        if (waitingFor.isEmpty()) {
+            CAT.debug("waitingFor is empty/notify");
+            notify();
+        }
+        CAT.debug("leaving remove and notify");
+    }
 
-     boolean isEmpty(){ return waitingFor.isEmpty(); }
-     Iterator iterator(){ return waitingFor.iterator(); }
-     synchronized void remove(Waitable w){ waitingFor.remove(w); }
-     int size() { return waitingFor.size(); }
-     synchronized Waitable getElement(){
-	 if (waitingFor.size()!=1)
-	     throw new RuntimeException("Precondition: only one element left violated.");
-	 return (Waitable)waitingFor.get(0);
-     }
+    synchronized boolean isEmpty() {
+        return waitingFor.isEmpty();
+    }
 
-     // Event-throwing
-     Vector listeners=new Vector();
-     public void addRemovalListener(RemovalListener l){
-	 synchronized (listeners){
-	     listeners.add(l);
-	 }
-     }
-     public void removeRemovalListener(RemovalListener l){
-	 synchronized (listeners){
-	     listeners.remove(l);
-	 }
-     }
-     private void fireRemovalEvent(Waitable removed){
-	 synchronized (listeners){
-	     for (Iterator it=listeners.iterator();it.hasNext();)
-		 ((RemovalListener)it.next()).waitableRemoved(removed);
-	 }
-     }
+    synchronized Iterator<T> iterator() {
+        return waitingFor.iterator();
+    }
 
-     private void d(String s){
-	 de.botsnscouts.util.Global.debug(this,s);
-     }
- }
+    synchronized void remove(Waitable w) {
+        waitingFor.remove(w);
+    }
+
+    int size() {
+        return waitingFor.size();
+    }
+
+    synchronized T getElement() {
+        if (waitingFor.size() != 1)
+            throw new RuntimeException("Precondition: only one element left violated.");
+        return waitingFor.get(0);
+    }
+
+    // Event-throwing
+    Vector<RemovalListener<T>> listeners = new Vector<RemovalListener<T>>();
+
+    public void addRemovalListener(RemovalListener<T> l) {
+        synchronized (listeners) {
+            listeners.add(l);
+        }
+    }
+
+    public void removeRemovalListener(RemovalListener<T> l) {
+        synchronized (listeners) {
+            listeners.remove(l);
+        }
+    }
+
+    private void fireRemovalEvent(T removed) {
+        synchronized (listeners) {
+            for (Iterator<RemovalListener<T>> it = listeners.iterator(); it.hasNext();) {
+                it.next().waitableRemoved(removed);
+            }
+        }
+    }
+
+}

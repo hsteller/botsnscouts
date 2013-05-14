@@ -30,14 +30,15 @@ import java.awt.LayoutManager;
 import javax.swing.JPanel;
 
 /** Transparent JPanel */
+@SuppressWarnings("serial")
 public class TJPanel extends JPanel {
     public TJPanel() {
-	setOpaque( false );
+        setOpaque(false);
     }
 
     public TJPanel(LayoutManager layout) {
-	super(layout);
-	setOpaque(false);
+        super(layout);
+        setOpaque(false);
     }
 
 }

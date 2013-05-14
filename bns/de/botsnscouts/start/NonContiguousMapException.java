@@ -22,9 +22,10 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.start;
 
-class NonContiguousMapException extends Exception{
-//TODO (comment me)
+@SuppressWarnings("serial")
+class NonContiguousMapException extends Exception {
+
 }

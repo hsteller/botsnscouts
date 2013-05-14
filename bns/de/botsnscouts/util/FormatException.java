@@ -22,20 +22,23 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.util;
 
 /**
  * FormatException wird bei Abweichungen vom Spielfelddatenformat geworfen.
+ * 
  * @author: Dirk Materlik
  */
+@SuppressWarnings("serial")
+public class FormatException extends Exception {    
+    
+    public FormatException() {
+        super();
+    }
 
-public class FormatException extends Exception {
-  public FormatException () {
-    super();
-  }
-  public FormatException (String s) {
-    super (s);
-  }
-  
+    public FormatException(String s) {
+        super(s);
+    }
+
 }

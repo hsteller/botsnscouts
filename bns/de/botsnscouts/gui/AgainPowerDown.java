@@ -41,61 +41,58 @@ import de.botsnscouts.widgets.GreenTheme;
 import de.botsnscouts.widgets.OptionPane;
 import de.botsnscouts.widgets.TJLabel;
 import de.botsnscouts.widgets.TJPanel;
+
 /**
  * ask the user for the direction
+ * 
  * @author Lukasz Pekacki
  */
+@SuppressWarnings("serial")
 public class AgainPowerDown extends TJPanel {
+
     public AgainPowerDown() {
-	this(new ActionListener() {
-		public void actionPerformed(ActionEvent ae) {
-		    System.err.println("ActionCommand: "+ae.getActionCommand());
-		}
-	    }
-	     );
+        this(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                System.err.println("ActionCommand: " + ae.getActionCommand());
+            }
+        });
     }
+
     public AgainPowerDown(ActionListener al) {
-	BoxLayout b = new BoxLayout(this,BoxLayout.Y_AXIS);
-	JLabel titel = new TJLabel(Message.say("SpielerMensch","roboreaktwtitle"));
-	JLabel unter = new TJLabel(Message.say("SpielerMensch","powerdownwieder"));
-	JButton wieder=OptionPane.getButton(Message.say("SpielerMensch","wiederPowerFrage"));
-	JButton weiter=OptionPane.getButton(Message.say("SpielerMensch","weiterspielen"));
+        BoxLayout b = new BoxLayout(this, BoxLayout.Y_AXIS);
+        JLabel titel = new TJLabel(Message.say("SpielerMensch", "roboreaktwtitle"));
+        JLabel unter = new TJLabel(Message.say("SpielerMensch", "powerdownwieder"));
+        JButton wieder = OptionPane.getButton(Message.say("SpielerMensch", "wiederPowerFrage"));
+        JButton weiter = OptionPane.getButton(Message.say("SpielerMensch", "weiterspielen"));
 
-	setLayout(b);
-	setBorder(new EmptyBorder(0,10,0,0));
+        setLayout(b);
+        setBorder(new EmptyBorder(0, 10, 0, 0));
 
-	wieder.addActionListener(al);
-	wieder.setActionCommand("powerdownagain");
-	weiter.addActionListener(al);
-	weiter.setActionCommand("continueplaying");
+        wieder.addActionListener(al);
+        wieder.setActionCommand("powerdownagain");
+        weiter.addActionListener(al);
+        weiter.setActionCommand("continueplaying");
 
-	add(Box.createVerticalStrut(30));
-	add(titel);
-	add(unter);
-	add(Box.createVerticalStrut(10));
-	add(wieder);
-	add(Box.createVerticalStrut(10));
-	add(weiter);
+        add(Box.createVerticalStrut(30));
+        add(titel);
+        add(unter);
+        add(Box.createVerticalStrut(10));
+        add(wieder);
+        add(Box.createVerticalStrut(10));
+        add(weiter);
     }
 
-
-    public static void main (String args[]) {
-	Message.setLanguage("deutsch");
+    public static void main(String args[]) {
+        Message.setLanguage("deutsch");
         JWindow f = new JWindow();
-	MetalLookAndFeel.setCurrentTheme( new GreenTheme() );
+        MetalLookAndFeel.setCurrentTheme(new GreenTheme());
 
         AgainPowerDown ag = new AgainPowerDown();
 
-	f.getContentPane().add(ag);
-	f.pack();
-	f.setLocation(100,100);
-	f.setVisible(true);
+        f.getContentPane().add(ag);
+        f.pack();
+        f.setLocation(100, 100);
+        f.setVisible(true);
     }
 
 }
-
-
-
-
-
-

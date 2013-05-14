@@ -22,8 +22,6 @@
 
 package de.botsnscouts.start;
 
-
-
 import org.apache.log4j.Category;
 
 import de.botsnscouts.util.BNSThread;
@@ -32,7 +30,7 @@ import de.botsnscouts.util.Message;
 
 public class WaiterThread extends BNSThread {
     static Category CAT = Category.getInstance(WaiterThread.class);
-    
+
     Thread[] ks = new Thread[100];
 
     int ksanz = 0;
@@ -56,7 +54,7 @@ public class WaiterThread extends BNSThread {
 
     public void run() {
         if (ks == null || ksanz == 0) {
-            CAT.debug( "habe keine threads! beende mich");
+            CAT.debug("habe keine threads! beende mich");
             return;
         }
 
@@ -88,17 +86,17 @@ public class WaiterThread extends BNSThread {
             CAT.error("Interrupted while waiting for Threads!");
         }
         if (meldung) {
-            javax.swing.JOptionPane.showMessageDialog(null, Message.say("Start", "mBeendeAlles"), Message.say("Start",
-                            "mMeldung"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(null, Message.say("Start", "mBeendeAlles"),
+                            Message.say("Start", "mMeldung"), javax.swing.JOptionPane.INFORMATION_MESSAGE);
         }
 
         // enno: wozu das alles, wenn wir sowieso system.exit(0) machen?
-        //parent.fassade.killStartServer();
-        //parent.fassade=null;
-        //	parent.dispose();
-        
-        //  hendrik: ..and I don't even want to exist, "parent" will do the cleanup..
-        //System.exit(0);
+        // parent.fassade.killStartServer();
+        // parent.fassade=null;
+        // parent.dispose();
+
+        // hendrik: ..and I don't even want to exist, "parent" will do the cleanup..
+        // System.exit(0);
     }
 
     public synchronized void addThread(BNSThread th) {
@@ -130,20 +128,20 @@ public class WaiterThread extends BNSThread {
     public void quitYourself() {
         beendemich = true;
     }
-    
-    public void doShutdown(){
+
+    public void doShutdown() {
         stopAllWaitingThreads();
-        reset();    
+        reset();
     }
-    
+
     public synchronized void stopAllWaitingThreads() {
-        int count = ks == null?0:ks.length;
-        for (int i=0;i<count;i++) {
+        int count = ks == null ? 0 : ks.length;
+        for (int i = 0; i < count; i++) {
             if (ks[i] != null) {
                 try {
                     ks[i].interrupt();
                 }
-                catch (Exception e){
+                catch (Exception e) {
                     CAT.warn(e);
                 }
             }
@@ -151,4 +149,3 @@ public class WaiterThread extends BNSThread {
     }
 
 }
-

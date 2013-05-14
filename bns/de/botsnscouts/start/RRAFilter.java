@@ -22,29 +22,33 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.start;
 
 import java.io.File;
 import java.io.FilenameFilter;
+
 /**
  * This class is a simple FilenameFilter.<br>
  * It will accept all files that end with ".rra" (case does not matter).<br>
- * ".rra" files for Bots'n'Scouts are files that contain the internal String description of a tile.<br> 
+ * ".rra" files for Bots'n'Scouts are files that contain the internal String description of a tile.<br>
  * 
  * @version $Id$
  */
-class RRAFilter implements FilenameFilter{
+class RRAFilter implements FilenameFilter {
 
- 
-    /* This filter will accept all files that end with ".rra" (case does not matter).<br>
-    * ".rra" files for Bots'n'Scouts are files that contain the internal String description of a tile.<br> 
-    */
-    public boolean accept(File dir, String name){
-	try{	   
-	    boolean isRRA=name.toLowerCase().endsWith(".rra");
-	    return isRRA;
-	} catch(Throwable t){return false;}
+    /*
+     * This filter will accept all files that end with ".rra" (case does not matter).<br> ".rra" files for Bots'n'Scouts are files that contain the
+     * internal String description of a tile.<br>
+     */
+    public boolean accept(File dir, String name) {
+        try {
+            boolean isRRA = name.toLowerCase().endsWith(".rra");
+            return isRRA;
+        }
+        catch (Throwable t) {
+            return false;
+        }
     }
 
 }

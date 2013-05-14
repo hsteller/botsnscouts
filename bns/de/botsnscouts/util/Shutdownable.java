@@ -23,29 +23,27 @@
  
  *******************************************************************/
 
-
 /*
  * Created on 08.12.2004
-*/
+ */
 package de.botsnscouts.util;
 
 /**
- *  @author Hendrik Steller
- *  @version $Id$
+ * @author Hendrik Steller
+ * @version $Id$
  * 
  */
 public interface Shutdownable {
-    
-   //public void shutdown(); 
-   
-   public void shutdown(boolean notifyRegistry);
-   
-   /** Should be set to true once shutdown() got called */
-   public boolean isShutDown();
 
-   public void addShutdownListener(ShutdownListener listener);
-   
-   public boolean removeShutdownListener(ShutdownListener listener);
-   
+    // public void shutdown();
+
+    public void shutdown(boolean notifyRegistry);
+
+    /** Should be set to true once shutdown() got called */
+    public boolean isShutDown();
+
+    public void addShutdownListener(ShutdownListener listener);
+
+    public boolean removeShutdownListener(ShutdownListener listener);
+
 }
-

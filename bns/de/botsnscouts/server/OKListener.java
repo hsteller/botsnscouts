@@ -22,12 +22,15 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.server;
 
-/** Used by a Waitable to notify an interested party
-    that something has been received (e.g., a register
-    programming). */
-interface OKListener{
-    void notifyDone(Waitable w);
+/**
+ * Used by a ServerAusgabeThread or a ServerRoboterThread to notify an interested party (i.e. the server) that something has been received (e.g., a
+ * register programming).
+ */
+interface OKListener {
+    void notifyDone(ServerAusgabeThread w);
+
+    void notifyDone(ServerRoboterThread w);
 }

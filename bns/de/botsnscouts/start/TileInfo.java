@@ -22,26 +22,27 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.start;
 
 import java.awt.Image;
 
-class TileInfo{
+class TileInfo {
     private Image image;
+
     private String name;
 
-    public TileInfo(String nam, Image img){
-	name=nam;
-	image=img;
+    public TileInfo(String nam, Image img) {
+        name = nam;
+        image = img;
     }
 
-    public Image getImage(){
-	return image;
+    public Image getImage() {
+        return image;
     }
 
-    public String toString(){
-	return name;
+    public String toString() {
+        return name;
     }
 
 }

@@ -45,20 +45,23 @@ public class SearchRecursively {
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(SearchRecursively.class);
 
     private SimBoard sf;
+
     private DistanceCalculator calc;
+
     private Card[] bestCards;
+
     private int bestScore;
+
     private int malus;
 
-    private static final Card[] malusCards = {Deck.getRefCard("RL"),
-                                               Deck.getRefCard("M1"),
-                                               Deck.getRefCard("M2"),
-                                               Deck.getRefCard("M3"),
-                                               Deck.getRefCard("BU")};
-    private static final int[] mali = {25, 15, 15, 15, 10};
+    private static final Card[] malusCards = { Deck.getRefCard("RL"), Deck.getRefCard("M1"), Deck.getRefCard("M2"),
+            Deck.getRefCard("M3"), Deck.getRefCard("BU") };
+
+    private static final int[] mali = { 25, 15, 15, 15, 10 };
+
     private static final int maliSum = 80;
 
-    public SearchRecursively(SimBoard s, int malus){
+    public SearchRecursively(SimBoard s, int malus) {
         this(s, malus, SimpleDistanceCalculator.getInstance(s));
     }
 
@@ -74,7 +77,8 @@ public class SearchRecursively {
         for (int i = 0; i < 5; i++) {
             if (r.getMove(i) == null) {
                 bestCards[i] = ka[j++];
-            } else {
+            }
+            else {
                 bestCards[i] = r.getMove(i);
             }
         }
@@ -99,18 +103,21 @@ public class SearchRecursively {
         return bestCards;
     }
 
-    /** We need one temp per level of recursion, however we don't want to
-     create a new one on each call. */
-    private BoardBot[] tmp = {new BoardBot(), new BoardBot(),
-                                  new BoardBot(), new BoardBot(),
-                                  new BoardBot(), new BoardBot()};
+    /**
+     * We need one temp per level of recursion, however we don't want to
+     * create a new one on each call.
+     */
+    private BoardBot[] tmp = { new BoardBot(), new BoardBot(), new BoardBot(), new BoardBot(), new BoardBot(),
+            new BoardBot() };
 
     private void recurse(final BoardBot r, Card[] ka, int recursionLevel) {
-        if (r.getDamage() == 10) return;
+        if (r.getDamage() == 10)
+            return;
         int anzahl = 0;
         for (int i = 0; i < 5; i++)
-            if (r.getMove(i) != null) anzahl++;
-        if (anzahl == 5) {   // end of recursion reached, 5 cards selected
+            if (r.getMove(i) != null)
+                anzahl++;
+        if (anzahl == 5) { // end of recursion reached, 5 cards selected
             int diemalus = 0;
 
             // If we are standing on a conveyor belt, check what cards we need
@@ -144,7 +151,8 @@ public class SearchRecursively {
             tmp[recursionLevel].initFrom(r);
 
             int j = 0;
-            while (tmp[recursionLevel].getMove(j) != null) j++;
+            while (tmp[recursionLevel].getMove(j) != null)
+                j++;
             tmp[recursionLevel].setMove(j, cardTemp);
             while ((j < 5) && (tmp[recursionLevel].getMove(j) != null)) {
                 sf.doPhase(j + 1, tmp[recursionLevel]);

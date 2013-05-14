@@ -60,96 +60,106 @@ public class BoardBot extends Bot {
     }
 
     /**
-     *  X-coordinate of temporary, "intended" position for the bot. Only used internally by
-     *  SimBoard.
+     * X-coordinate of temporary, "intended" position for the bot. Only used internally by
+     * SimBoard.
      */
     protected int xx;
+
     /**
-     *  Y-coordinate of temporary, "intended" position for the bot. Only used internally by
-     *  SimBoard.
+     * Y-coordinate of temporary, "intended" position for the bot. Only used internally by
+     * SimBoard.
      */
     protected int yy;
+
     /** Temporary facing */
-    private  int aa;
+    private int aa;
+
     private int lastRotateDirection;
+
     /**
-     *  
-     * @param newFacing SimBoard uses constants as specified in Directions class (example: Directions.NORTH) 
-     * @param rotateDirection SimBoard uses constants as defined in Directions (example: OtherConstants.BOT_TURN_CLOCKWISE) 
+     * 
+     * @param newFacing SimBoard uses constants as specified in Directions class (example: Directions.NORTH)
+     * @param rotateDirection SimBoard uses constants as defined in Directions (example: OtherConstants.BOT_TURN_CLOCKWISE)
      */
-    protected void setTempFacing(int newFacing, int rotateDirection){
+    protected void setTempFacing(int newFacing, int rotateDirection) {
         lastRotateDirection = rotateDirection;
         aa = newFacing;
     }
+
     /**
      * 
-     * @return SimBoard uses constants as specified in Directions class (example: Directions.NORTH) 
+     * @return SimBoard uses constants as specified in Directions class (example: Directions.NORTH)
      */
-    protected int getTempFacing(){
+    protected int getTempFacing() {
         return aa;
     }
-    
-    
+
     /**
      * 
      * @return SimBoard uses constants as defined in OtherConstants (example: OtherConstants.BOT_TURN_CLOCKWISE)
      */
-    protected int getLastTempRotateDirection(){
+    protected int getLastTempRotateDirection() {
         return lastRotateDirection;
     }
-    
+
     /**
      * Uses the current position of the bot and its intended position (this.xx, this.yy)
      * to determinen in which direction the robot will move.
-     * If there is no movement (if xx=getX() && yy ==getY()) 
+     * If there is no movement (if xx=getX() && yy ==getY())
      * de.botsncouts.util.Directions.DUMMY_DIRECTION will be returned
-     * @return one of the direction constants from de.botsncouts.util.Directions; 
-     * might be Directions.DUMMY_DIRECTION
+     * 
+     * @return one of the direction constants from de.botsncouts.util.Directions;
+     *         might be Directions.DUMMY_DIRECTION
      */
     protected int getIntendedMoveDirection() {
         int direction = Directions.DUMMY_DIRECTION;
-        if (this.yy> this.getY()){
+        if (this.yy > this.getY()) {
             direction = Directions.NORTH;
-        }                
-        else if (this.yy < this.getY()) {
-            direction = Directions.SOUTH;
         }
-        else if (this.xx<this.getX()){
-            direction = Directions.WEST;
-        }
-        else if (this.xx>this.getX()){
-            direction = Directions.EAST;
-        }
+        else
+            if (this.yy < this.getY()) {
+                direction = Directions.SOUTH;
+            }
+            else
+                if (this.xx < this.getX()) {
+                    direction = Directions.WEST;
+                }
+                else
+                    if (this.xx > this.getX()) {
+                        direction = Directions.EAST;
+                    }
         return direction;
     }
-    
-    
-    /** Increment damage by one 
+
+    /**
+     * Increment damage by one
      * WARNING: won't lock any registers
-     * */  
-    public void incDamage() {        
+     * */
+    public void incDamage() {
         this.damage++;
     }
-    
-    /** Reduces the damage (==repairs the bot).
-     *   WARNING: won't unlock any registers
-     *   NOTE: the damage will not become less than zero
-     *      * @param i the amount of damage points to decrease by
+
+    /**
+     * Reduces the damage (==repairs the bot).
+     * WARNING: won't unlock any registers
+     * NOTE: the damage will not become less than zero
+     * * @param i the amount of damage points to decrease by
      */
     public void decrDamage(int i) {
         damage -= i;
-        if (damage < 0){
+        if (damage < 0) {
             damage = 0;
         }
     }
-    
-    /** Sets damage to 10,  the position to somewhere outside of the board
-     *  and the bot to virtual.    
+
+    /**
+     * Sets damage to 10, the position to somewhere outside of the board
+     * and the bot to virtual.
      */
-    public void destroyBot(){      
-	    this.damage = 10;
-	    this.setVirtual();
-	    this.setInvalidPos();       
+    public void destroyBot() {
+        this.damage = 10;
+        this.setVirtual();
+        this.setInvalidPos();
         this.xx = 0;
         this.yy = 0;
     }

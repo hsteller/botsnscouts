@@ -22,21 +22,22 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.util;
 
 /**
- * ConfigLoadException wird bei Problemen beim Lesen von config.txt
- * oder fehlender config.txt geworfen.
- *
+ * ConfigLoadException wird bei Problemen beim Lesen von config.txt oder fehlender config.txt geworfen.
+ * 
  */
-
+@SuppressWarnings("serial")
 public class ConfigLoadException extends Exception {
-  public ConfigLoadException () {
-    super();
-  }
-  public ConfigLoadException (String s) {
-    super (s);
-  }
-  
+
+    public ConfigLoadException() {
+        super();
+    }
+
+    public ConfigLoadException(String s) {
+        super(s);
+    }
+
 }

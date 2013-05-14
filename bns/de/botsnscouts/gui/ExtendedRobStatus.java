@@ -22,9 +22,8 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
-package de.botsnscouts.gui;
 
+package de.botsnscouts.gui;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -36,69 +35,64 @@ import de.botsnscouts.widgets.TJLabel;
 
 /**
  * Fenster, das weitere Statusinfos anzeigt
+ * 
  * @author Lukasz Pekacki
  */
-
+@SuppressWarnings("serial")
 public class ExtendedRobStatus extends JFrame {
-    
+
     JLabel name, gesperrt, gelegt, archivpos, aktiviert, virtuell, pos;
+
     int xsize = 350;
+
     int ysize = 200;
 
-    
-    public ExtendedRobStatus () {
-	this(Bot.getNewInstance("DefaultRob"),100,100);
-    }
-    
-
-    public ExtendedRobStatus (Bot r, int locationX, int locationY) {
-	setTitle(Message.say("Ausgabe","statusVon")+r.getName());
-	setLocation(locationX,locationY);
-	setSize(xsize,ysize);
-	JPanel hauptPanel = new JPanel();
-
-	// ---- gesperrte Regisster toString
-	String gespReg = "[ ";
-	if (r.countLockedRegisters() > 0) {
-	    for (int i = 0; i < r.countLockedRegisters(); i++)
-		if (r.getLockedRegister(i) != null) {
-		    gespReg+= r.getLockedRegisters()[i].getAction() + " | ";
-		}
-	    gespReg += "]";
-	}
-	// ---- gelegte Karten toString
-	String gelegtKarte = "[ ";
-	if (r.getMove() != null) {
-	    for (int i = 0; i < r.getMove().length; i++)
-		if (r.getMove()[i] != null) gelegtKarte+= r.getMove()[i].getAction() + " | ";
-	    gelegtKarte += "]";
-	}
-	// ---- Label erzeugen
-	gesperrt = new TJLabel(Message.say("Ausgabe","gespReg")+gespReg);
-	hauptPanel.add(gesperrt);
-	gelegt = new TJLabel(Message.say("Ausgabe","gelKarte")+gelegtKarte);
-	hauptPanel.add(gelegt);
-	archivpos = new TJLabel(Message.say("Ausgabe","archPos")+" x: "+r.getArchiveX()+" y: "+r.getArchiveY());
-	hauptPanel.add(archivpos);
-	aktiviert = new TJLabel(Message.say("Ausgabe","aktiviert")+r.isActivated());
-	hauptPanel.add(aktiviert);
-	virtuell = new TJLabel(Message.say("Ausgabe","virtuell")+r.isVirtual());
-	hauptPanel.add(virtuell);
-	pos = new TJLabel(Message.say("Ausgabe","pos")+" x: "+r.getX()+" y: "+r.getY());
-	hauptPanel.add(pos);
-	getContentPane().add(hauptPanel);
+    public ExtendedRobStatus() {
+        this(Bot.getNewInstance("DefaultRob"), 100, 100);
     }
 
+    public ExtendedRobStatus(Bot r, int locationX, int locationY) {
+        setTitle(Message.say("Ausgabe", "statusVon") + r.getName());
+        setLocation(locationX, locationY);
+        setSize(xsize, ysize);
+        JPanel hauptPanel = new JPanel();
 
-    public static void main (String args[]) {
-	Message.setLanguage("deutsch");
+        // ---- gesperrte Regisster toString
+        String gespReg = "[ ";
+        if (r.countLockedRegisters() > 0) {
+            for (int i = 0; i < r.countLockedRegisters(); i++)
+                if (r.getLockedRegister(i) != null) {
+                    gespReg += r.getLockedRegisters()[i].getAction() + " | ";
+                }
+            gespReg += "]";
+        }
+        // ---- gelegte Karten toString
+        String gelegtKarte = "[ ";
+        if (r.getMove() != null) {
+            for (int i = 0; i < r.getMove().length; i++)
+                if (r.getMove()[i] != null)
+                    gelegtKarte += r.getMove()[i].getAction() + " | ";
+            gelegtKarte += "]";
+        }
+        // ---- Label erzeugen
+        gesperrt = new TJLabel(Message.say("Ausgabe", "gespReg") + gespReg);
+        hauptPanel.add(gesperrt);
+        gelegt = new TJLabel(Message.say("Ausgabe", "gelKarte") + gelegtKarte);
+        hauptPanel.add(gelegt);
+        archivpos = new TJLabel(Message.say("Ausgabe", "archPos") + " x: " + r.getArchiveX() + " y: " + r.getArchiveY());
+        hauptPanel.add(archivpos);
+        aktiviert = new TJLabel(Message.say("Ausgabe", "aktiviert") + r.isActivated());
+        hauptPanel.add(aktiviert);
+        virtuell = new TJLabel(Message.say("Ausgabe", "virtuell") + r.isVirtual());
+        hauptPanel.add(virtuell);
+        pos = new TJLabel(Message.say("Ausgabe", "pos") + " x: " + r.getX() + " y: " + r.getY());
+        hauptPanel.add(pos);
+        getContentPane().add(hauptPanel);
+    }
+
+    public static void main(String args[]) {
+        Message.setLanguage("deutsch");
         JFrame f = new ExtendedRobStatus();
-	f.setVisible(true);
+        f.setVisible(true);
     }
 }
-    
-
-
-
-
-

@@ -34,7 +34,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -54,97 +53,96 @@ import de.botsnscouts.util.Shutdownable;
 import de.botsnscouts.util.ShutdownableSupport;
 
 /**
- * Erlaubt die nebenlaeufige Anmeldung von Robotern und Ausgaben Startet fuer
- * jeden Anmeldeversuch einen ServerAnmeldeThread.
+ * 
+ * Allows the concurrent registration of robots and outputs. Starts a new ServerAnmeldeThread for each registration attempt
+ * 
  */
-
 class RegistrationManager implements Runnable, Shutdownable {
-    static final Category CAT = Category.getInstance(RegistrationManager.class);
-    
+    private static final Category CAT = Category.getInstance(RegistrationManager.class);
+
     static final String REGISTER_PATTERN = "(RGS|RGA|RS2|RA2)\\((([:alnum:]|\\+|\\%|\\_|\\-|\\.|\\*)+)(,([1-8]))?\\)";
-    
+
     Server server;
-    
-    ServerSocket seso; 
-    
-    private Set names = new HashSet();
-    
+
+    ServerSocket seso;
+
+    private Set<String> names = new HashSet<String>();
+
     int anzSpieler = 0;
-    
+
     private boolean isShutDown = false;
-    
+
     private ShutdownableSupport shutdownSupport = new ShutdownableSupport(this);
-    
-    BNSThread workingThread = new BNSThread(this, "RegMan"){
-        public void doShutdown(){
+
+    BNSThread workingThread = new BNSThread(this, "RegMan") {
+        public void doShutdown() {
             this.shutdown();
         }
     };
-    
+
     public RegistrationManager(Server s) {
-        //super("RegistrationManager");
+        // super("RegistrationManager");
         server = s;
         CAT.debug("creating new registration manaegr");
     }
-    
+
     public void beginRegistration() {
         workingThread.start();
     }
-    
+
     public void endRegistration() {
         CAT.debug("endRegistration() called!");
-        workingThread.interrupt();            
+        workingThread.interrupt();
     }
-    
-    
-    
+
     public void shutdown(boolean notifyListeners) {
         endRegistration();
-        if (seso != null){
+        if (seso != null) {
             try {
                 seso.close();
             }
-            catch (Exception e){
+            catch (Exception e) {
                 CAT.warn(e);
             }
         }
         isShutDown = true;
     }
-    
-    public boolean isShutDown(){
-        return isShutDown;        
+
+    public boolean isShutDown() {
+        return isShutDown;
     }
-    
-    public void addShutdownListener(ShutdownListener l){
+
+    public void addShutdownListener(ShutdownListener l) {
         shutdownSupport.addShutdownListener(l);
     }
-    
-    public boolean removeShutdownListener(ShutdownListener l){
+
+    public boolean removeShutdownListener(ShutdownListener l) {
         return shutdownSupport.removeShutdownListener(l);
     }
-    
+
     public void run() {
         Socket clientSocket = null;
         try {
-           CAT.debug("creating server socket");
+            CAT.debug("creating server socket");
             seso = new ServerSocket(server.getRegistrationPort());
             seso.setSoTimeout(0);
-            
+
             // we need to wait a little, so that "seso.accept()" below
             // is up and working; otherwise a quick (local) client still tries
             // to connect too early (yes, that does happen)
             // => notifying from this "dummy" Thread that will wait a few ms
-            //      before notifying the listeners
-           
-            Runnable notifier = new Runnable(){
+            // before notifying the listeners
+
+            Runnable notifier = new Runnable() {
                 Object foo = new Object();
+
                 public void run() {
                     try {
                         synchronized (foo) {
                             foo.wait(200);
                         }
                     }
-                    catch (InterruptedException ie){
+                    catch (InterruptedException ie) {
                         CAT.warn(ie);
                     }
                     notifyStartListeners();
@@ -152,9 +150,7 @@ class RegistrationManager implements Runnable, Shutdownable {
             };
             Thread dummyNotify = new Thread(notifier);
             dummyNotify.start();
-           
-            
-            
+
             while (!Thread.interrupted()) {
                 clientSocket = seso.accept();
                 if (CAT.isDebugEnabled())
@@ -182,69 +178,70 @@ class RegistrationManager implements Runnable, Shutdownable {
             }
         }
     }
-    
+
     /** Registriert Namen als benutzt - soll mit isLegalName() benutzt werden */
     private void addName(String s) throws RegistrationException {
         synchronized (names) {
-	        if (CAT.isDebugEnabled()) {
-	            CAT.debug("want to add " + s + ", right now we have:");
-	            Iterator i = names.iterator();
-	            while (i.hasNext())
-	                CAT.debug(i.next());
-	        }
-	        if (names.contains(s))
-	            throw new RegistrationException("Name already registered");
-	        else
-	            names.add(s);
+            if (CAT.isDebugEnabled()) {
+                CAT.debug("want to add " + s + ", right now we have:");
+                for (String ns : names) {
+                    CAT.debug(ns);
+                }
+            }
+            if (names.contains(s)) {
+                throw new RegistrationException("Name already registered");
+            }
+            else {
+                names.add(s);
+            }
         }
     }
-    
+
     boolean isNameAvailable(String name) {
         synchronized (names) {
             return !names.contains(name);
         }
     }
-    
+
     /**
-     * Wartet server.anmeldeto auf eine Aktion, kreiert ggf. neue
-     * ServerRoboterThread- bzw ServerAusgabeThread-Objekte und haengt diese in
-     * die richtigen Vektoren ein.
+     * Wartet server.anmeldeto auf eine Aktion, kreiert ggf. neue ServerRoboterThread- bzw ServerAusgabeThread-Objekte und haengt diese in die
+     * richtigen Vektoren ein.
      */
-    
+
     private synchronized void register(Socket socket) {
         PrintWriter out = null;
         BufferedReader in = null;
         String clientName = "";
         int farbe = -1;
-        
+
         try {
             CAT.debug("out = new PrintWriter    ...");
             out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
             CAT.debug("in  = new BufferedReader ...");
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             CAT.debug("... we are connected, now check if client sent s.th.");
-            
+
             socket.setSoTimeout(server.getSignUpTimeout());
             String erhalten = in.readLine();
             if (CAT.isDebugEnabled())
                 CAT.debug("erhalten = " + erhalten);
-            
+
             socket.setSoTimeout(0);
-            
+
             RE registerRE = new RE(REGISTER_PATTERN);
-            
+
             if (!registerRE.match(erhalten))
                 throw new RegistrationException("Register string not in the right format");
-            
+
             String type = registerRE.getParen(1);
             clientName = Encoder.commDecode(registerRE.getParen(2));
-            
+
             if (registerRE.getParenCount() >= 5) {
-                //for (int i=0; i<=5;i++)
-                //  System.out.println(i+"="+registerRE.getParen(i));
+                // for (int i=0; i<=5;i++)
+                // System.out.println(i+"="+registerRE.getParen(i));
                 farbe = Integer.parseInt(registerRE.getParen(5));
             }
-            
+
             if (type.equals("RGS"))
                 registerPlayer(clientName, farbe, in, out, 1.0f);
             else
@@ -272,48 +269,48 @@ class RegistrationManager implements Runnable, Shutdownable {
             out.close();
         }
     }
-    
-    private void registerPlayer(String clientName, int farbe, BufferedReader in, PrintWriter out, float version)
-    throws RegistrationException {
+
+    private void registerPlayer(String clientName, int farbe, BufferedReader in, PrintWriter out,
+                    @SuppressWarnings("unused") float version) throws RegistrationException {
         // darf ein Spieler sich anmelden?
         CAT.debug("A player tries to connect");
         // einfacher?: if(server.gameRunning())
         if (server.isGameStarted()) {
             CAT.debug("No more bot registrations at this point . Killing connection");
             String msg = Message.say("Server", "registrationFailureGameRunning");
-            out.println("Error: "+msg);            
-            //            out.println("error ");
-           // out.println("REN(SO(SpielLaeuftSchon))");
+            out.println("Error: " + msg);
+            // out.println("error ");
+            // out.println("REN(SO(SpielLaeuftSchon))");
             throw new RegistrationException("No robot registrations allowed now.");
         }
         CAT.debug("He may - as far as the server is concerned..");
-        
+
         if (!isNameAvailable(clientName)) {
             String msg = Message.say("Server", "registrationFailureName");
-            out.println("Error: "+msg);                                   
-            //out.println("error");
-         //   out.println("REN(SO(nameAlreadyInUse)");
+            out.println("Error: " + msg);
+            // out.println("error");
+            // out.println("REN(SO(nameAlreadyInUse)");
             throw new RegistrationException("Name already registered: " + clientName);
         }
         CAT.debug("The name isn't in use.");
         addName(clientName);
-        
+
         if (anzSpieler == server.getMaxPlayers()) {
             CAT.debug("Too many players. Killing connection");
             String msg = Message.say("Server", "registrationFailureGameFull");
-            out.println("Error: "+msg);
-            //out.println("error");
-            //out.println("REN(ZS)");
+            out.println("Error: " + msg);
+            // out.println("error");
+            // out.println("REN(ZS)");
             throw new RegistrationException("Game is full!");
         } // Zuviele Spieler
         CAT.debug("Not yet too many players..");
-        
+
         farbe = server.allocateColor(farbe, clientName);
         CAT.debug("Assigned color: " + farbe);
-        
+
         Bot h = Bot.getNewInstance(clientName);
         h.setBotVis(farbe);
-        KommServerRoboter komm = new KommServerRoboter(in, out, "ServerComm_"+clientName);
+        KommServerRoboter komm = new KommServerRoboter(in, out, "ServerComm_" + clientName);
         try {
             komm.anmeldeBestaetigung(true);
         }
@@ -322,17 +319,17 @@ class RegistrationManager implements Runnable, Shutdownable {
             throw new RegistrationException("Couldn't send OK to robot");
         }
         CAT.debug("ok an Spieler geschickt.");
-        
+
         anzSpieler++;
         if (CAT.isDebugEnabled())
             CAT.debug("" + anzSpieler + ". Bot mit Name " + clientName + " erzeugt.");
-        
+
         ServerRoboterThread neu = new ServerRoboterThread(h, server.getOKListener(), server.getInfoRequestAnswerer(),
                         server.getRobThreadMaintainer(), komm);
         server.addRobotThread(neu);
         CAT.debug("ServerRoboterThread erzeugt und einsortiert.");
         server.updateNewBot(clientName, farbe);
-        
+
         if (anzSpieler >= server.getMaxPlayers()) { // alle
             // da
             try {
@@ -345,10 +342,10 @@ class RegistrationManager implements Runnable, Shutdownable {
             server.startGame();
         } // if maxspieler angemeldet
     }
-    
+
     private void registerOutput(String clientName, BufferedReader in, PrintWriter out, float version)
-    throws RegistrationException {
-        KommServerAusgabe ksa = new KommServerAusgabe(in, out, "ServerComm_"+clientName);
+                    throws RegistrationException {
+        KommServerAusgabe ksa = new KommServerAusgabe(in, out, "ServerComm_" + clientName);
         // sende 'ok' zur anmeldebestaetigung
         try {
             ksa.anmeldeBestaetigung(true);
@@ -357,7 +354,7 @@ class RegistrationManager implements Runnable, Shutdownable {
             CAT.debug("ok konnte nicht an Ausgabekanal gesendet werden");
             throw new RegistrationException(ke);
         }
-        
+
         try {
             addName("(" + clientName + ")");
             ServerAusgabeThread neu = new ServerAusgabeThread(ksa, server.getOKListener(), server.getMOKListener(),
@@ -371,22 +368,20 @@ class RegistrationManager implements Runnable, Shutdownable {
             throw re;
         }
     }
-    
-    
-    private Collection startListeners = new LinkedList(); 
-    public  void addRegStartListener(RegistrationStartListener l) {
-        synchronized (startListeners){
+
+    private Collection<RegistrationStartListener> startListeners = new LinkedList<RegistrationStartListener>();
+
+    public void addRegStartListener(RegistrationStartListener l) {
+        synchronized (startListeners) {
             startListeners.add(l);
         }
     }
-    
-    private void notifyStartListeners(){
-        synchronized (startListeners){
-            Iterator it = startListeners.iterator();
-            while (it.hasNext()){
-                ((RegistrationStartListener) it.next()).registrationStarted();
+
+    private void notifyStartListeners() {
+        synchronized (startListeners) {
+            for (RegistrationStartListener listener : startListeners) {
+                listener.registrationStarted();
             }
         }
     }
 }
-

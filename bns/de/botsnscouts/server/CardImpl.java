@@ -22,18 +22,17 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.server;
 
 import de.botsnscouts.util.Card;
 
 /**
-* Implementation of the card interface.
-* Goal: Nobody can produce Cards except the card desk.
-*/
+ * Implementation of the card interface. Goal: Nobody can produce Cards except the card desk.
+ */
 public class CardImpl extends Card {
 
-    protected CardImpl(int priority,String action){
-        super( priority, action );
+    protected CardImpl(int priority, String action) {
+        super(priority, action);
     }
 }

@@ -33,9 +33,7 @@ import org.apache.log4j.Category;
 import de.botsnscouts.BotsNScouts;
 
 /**
- * SoundMan configures, loads and plays the sounds To add a new sound, simply
- * add a constant and add the filename to the array at the appropiate position.
- * If you add a laser sound, add the constant to the laser sound array.
+ * SoundMan configures, loads and plays the sounds To add a new sound, simply add a constant and add the filename to the array at the appropiate position. If you add a laser sound, add the constant to the laser sound array.
  */
 public class SoundMan {
     static Category CAT = Category.getInstance(SoundMan.class);
@@ -75,12 +73,11 @@ public class SoundMan {
     public static final int MESSAGE = 14;
 
     public static final int PROGRAMMING_DONE = 15;
-    
+
     public static final int REVEAL_CARDS = PROGRAMMING_DONE;
 
     /**
-     * How to locate the sounds relative to de.botsnscouts.BotsNScouts Mind the
-     * ordering.
+     * How to locate the sounds relative to de.botsnscouts.BotsNScouts Mind the ordering.
      */
     private static final String[] filenames = { "sounds/pit.wav", "sounds/boo.wav", "sounds/crusher.wav",
             "sounds/flag_reached.wav", "sounds/boardlaser.wav", "sounds/push.wav", "sounds/laser_green.wav",
@@ -89,13 +86,10 @@ public class SoundMan {
             "sounds/ledon.wav" };
 
     /** These sounds are robot laser sounds */
-    //  private static final int[] laserSounds = {LASER1, LASER2, LASER3, LASER4,
-    //                                            LASER5,LASER6,LASER7,LASER8,LASER9,
-    //                                           LASER10};
+    // private static final int[] laserSounds = {LASER1, LASER2, LASER3, LASER4,
+    // LASER5,LASER6,LASER7,LASER8,LASER9,
+    // LASER10};
     private static final AudioClip[] sounds = new AudioClip[filenames.length];
-    
-    //  TODO (use or delete me)
-    private static int actualLaserSound = 0;
 
     private static boolean soundsLoaded;
 
@@ -110,20 +104,18 @@ public class SoundMan {
     }
 
     public SoundMan() {
-        actualLaserSound = 0;
-
     }
 
     public static synchronized void playSound(int sound) {
-        try {
-
-            if (soundsLoaded && soundsEnabled) {
+        if (soundsLoaded && soundsEnabled) {
+            if (sound >= 0 && sound < sounds.length) {
                 sounds[sound].play();
             }
+            else {
+                CAT.error("Invalid sound constant chosen.");
+            }
         }
-        catch (ArrayIndexOutOfBoundsException ex) {
-            CAT.error("Invalid sound constant chosen.");
-        }
+
     }
 
     public static synchronized void playPitFallSound() {
@@ -141,8 +133,7 @@ public class SoundMan {
     }
 
     /**
-     * Returns true if the user has enabled sound AND the sounds are already
-     * loaded
+     * Returns true if the user has enabled sound AND the sounds are already loaded
      */
     public synchronized static boolean isSoundActive() {
         return soundsEnabled && soundsLoaded;
@@ -163,7 +154,7 @@ public class SoundMan {
             public void doShutdown() {
                 SoundMan.CAT.debug("SoundMan's empty doShutdown() called");
             }
-            
+
             public void run() {
                 try {
 

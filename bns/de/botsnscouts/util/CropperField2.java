@@ -30,39 +30,39 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
-
 public class CropperField2 {
     Image cropper[][];
+
     Toolkit comp;
+
     int grid;
+
     Image img;
 
-
     public CropperField2(int cols, int rows, int grid, Image img) {
-	cropper = new Image[cols][rows];
-//	this.comp = comp;
+        cropper = new Image[cols][rows];
+        // this.comp = comp;
         this.img = img;
         this.grid = grid;
     }
 
     public Image cropImage(int col, int row) {
-			if( cropper[col][row] != null )
-	            return cropper[col][row];
-	
-	        BufferedImage bi = new BufferedImage( grid, grid, BufferedImage.TYPE_4BYTE_ABGR );
-	        Graphics g = bi.createGraphics();
-	        g.drawImage( img, 0, 0, grid, grid, col*grid, row*grid, (col+1)*grid, (row+1)*grid, null );
-	        g.dispose();
-	        return bi;
+        if (cropper[col][row] != null) {
+            return cropper[col][row];
+        }
+        BufferedImage bi = new BufferedImage(grid, grid, BufferedImage.TYPE_4BYTE_ABGR);
+        Graphics g = bi.createGraphics();
+        g.drawImage(img, 0, 0, grid, grid, col * grid, row * grid, (col + 1) * grid, (row + 1) * grid, null);
+        g.dispose();
+        return bi;
 
     }
 
-
-    public void multiCrop(Image img, int rowlength, int total, Image[] dest,  int imageID)
-    {
-	for(int i=0; i<total; i++) {
-	    Image image = cropImage( i % rowlength, i / rowlength);
-	    dest[i] = image;
+    @SuppressWarnings("unused")
+    public void multiCrop(Image image, int rowlength, int total, Image[] dest,  int imageID) {
+        for (int i = 0; i < total; i++) {
+            Image myimage = cropImage(i % rowlength, i / rowlength);
+            dest[i] = myimage;
         }
     }
 

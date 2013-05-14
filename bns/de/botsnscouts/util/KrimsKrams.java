@@ -29,6 +29,7 @@ import java.util.Random;
 
 /**
  * Generating nice random names.
+ * 
  * @author Miriam
  */
 public class KrimsKrams {
@@ -36,30 +37,32 @@ public class KrimsKrams {
     /**
      * Array of vowels. Different frequencys to make the names nicer...
      */
-    static char[] vowels = {'a', 'a', 'a', 'e', 'e', 'i', 'i', 'i', 'o', 'u'};
-    static char[] consonants = {'b', 'b', 'b', 'c', 'd', 'd', 'd', 'f', 'f', 'g', 'g', 'h', 'h', 'j', 'k', 'k', 'l', 'l', 'l', 'm', 'm', 'n', 'n', 'p', 'p', 'r', 'r', 'r', 's', 's', 's', 's', 't', 't', 't', 'v', 'w', 'w', 'x', 'y', 'z'};
+    static char[] vowels = { 'a', 'a', 'a', 'e', 'e', 'i', 'i', 'i', 'o', 'u' };
+
+    static char[] consonants = { 'b', 'b', 'b', 'c', 'd', 'd', 'd', 'f', 'f', 'g', 'g', 'h', 'h', 'j', 'k', 'k', 'l',
+            'l', 'l', 'm', 'm', 'n', 'n', 'p', 'p', 'r', 'r', 'r', 's', 's', 's', 's', 't', 't', 't', 'v', 'w', 'w',
+            'x', 'y', 'z' };
 
     private static Random random = new Random();
 
-    /**  Pattern vor the random name: true means vowel, false consonant.
+    /**
+     * Pattern vor the random name: true means vowel, false consonant.
      */
-    private static boolean[][] vowelPattern = {
-        {false, true, false, false, true, false}, //'male' name
-        {false, true, false, false, true, false}, //double likeliness for this one
-        {false, true, false, false, true, true}, //'female' name
-        {false, true, false, false, true}, //e.g. Babba
-        {false, true, false, true}, //e.g. Baba
-        {false, true, false, false}, //e.g.Babb
-        {true, false, false, true, false}, //e.g.Abbab
-        {true, false, false, true, false, true}    //e.g.     Abbaba
+    private static boolean[][] vowelPattern = { { false, true, false, false, true, false }, // 'male' name
+            { false, true, false, false, true, false }, // double likeliness for this one
+            { false, true, false, false, true, true }, // 'female' name
+            { false, true, false, false, true }, // e.g. Babba
+            { false, true, false, true }, // e.g. Baba
+            { false, true, false, false }, // e.g.Babb
+            { true, false, false, true, false }, // e.g.Abbab
+            { true, false, false, true, false, true } // e.g. Abbaba
     };
 
     /**
      * Generates a nice name, usually pronouncable.
-     *
-     * @return a random name, consisting of
-     * 'A'-'Z','a'-'z'.
-     *
+     * 
+     * @return a random name, consisting of 'A'-'Z','a'-'z'.
+     * 
      */
     public static String randomName() {
 
@@ -75,7 +78,7 @@ public class KrimsKrams {
                 c = vowels[z % vowels.length];
             else
                 c = consonants[z % consonants.length];
-            if (name.length() == 0) //Capital first letter
+            if (name.length() == 0) // Capital first letter
                 c = Character.toUpperCase(c);
             name = name.append(c);
         }
@@ -91,9 +94,3 @@ public class KrimsKrams {
     }
 
 }
-
-
-
-
-
-

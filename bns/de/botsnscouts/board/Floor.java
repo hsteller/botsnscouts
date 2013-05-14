@@ -33,12 +33,12 @@ import de.botsnscouts.util.ParseUtils;
 
 public class Floor implements FloorConstants {
     private int type;
-    // generelle Bodenart
+
     private int spec;
 
     static org.apache.log4j.Category CAT = org.apache.log4j.Category.getInstance(Floor.class);
 
-    final static String[] RUECK = {"N", "E", "S", "W"};
+    final static String[] RUECK = { "N", "E", "S", "W" };
 
     final static String wallChars = "#_[";
 
@@ -47,15 +47,15 @@ public class Floor implements FloorConstants {
     // direction of rotating gears
     // strength of repairfield
 
-
-    ///////////////////////////////////////////////////
+    // /////////////////////////////////////////////////
     // Factory methods
-    ///////////////////////////////////////////////////
+    // /////////////////////////////////////////////////
 
     public static Floor getPit() {
         try {
             return Floor.getFloor("G");
-        } catch (FormatException fe) {
+        }
+        catch (FormatException fe) {
             CAT.fatal("'G' as floorstring triggers: ", fe);
             return null;
         }
@@ -64,14 +64,17 @@ public class Floor implements FloorConstants {
     public static Floor getEmptyFloor() {
         try {
             return Floor.getFloor("B");
-        } catch (FormatException fe) {
+        }
+        catch (FormatException fe) {
             CAT.fatal("'B' as floorstring triggers: ", fe);
             return null;
         }
     }
 
+    private static HashMap<String, Floor> cache = new HashMap<String, Floor>();
+
     public static Floor getFloor(String floorString) throws FormatException {
-        Floor w = (Floor) cache.get(floorString);
+        Floor w = cache.get(floorString);
         if (w == null) {
             w = Floor.parseFloor(floorString);
             if (!floorString.equals(w.toString())) {
@@ -86,26 +89,25 @@ public class Floor implements FloorConstants {
         try {
             StringBuffer sb = new StringBuffer(10);
             Floor.write(sb, type, info);
-            CAT.debug("Going to return '"+sb+"'");
+            CAT.debug("Going to return '" + sb + "'");
             return Floor.getFloor(sb.toString());
-        } catch (FormatException ex) {
+        }
+        catch (FormatException ex) {
             CAT.fatal("getFloor triggers after constructing string itself", ex);
             return null;
         }
     }
 
-    private static HashMap cache = new HashMap();
-
-    ///////////////////////////////////////////////////
+    // /////////////////////////////////////////////////
     private Floor() {
         this.spec = 0;
         this.type = FloorConstants.FL_NORMAL;
     }
 
     public Floor getWithCrusher(int phases) {
-        //CAT.assert(isBelt(), "requesting crusher on non-belt-floor");
+        // CAT.assert(isBelt(), "requesting crusher on non-belt-floor");
         if (!isBelt())
-          CAT.warn("ASSERT: requesting crusher on non-belt-floor!");
+            CAT.warn("ASSERT: requesting crusher on non-belt-floor!");
         return Floor.getFloor(type, phases);
     }
 
@@ -118,7 +120,7 @@ public class Floor implements FloorConstants {
     }
 
     public int getBeltSpeed() {
-        return isExpressBelt()?2:1;
+        return isExpressBelt() ? 2 : 1;
     }
 
     public boolean isPit() {
@@ -142,16 +144,16 @@ public class Floor implements FloorConstants {
     }
 
     public int getBeltInfo() {
-       // CAT.assert(isBelt(), "getBeltInfo() called on non-belt-floor");
+        // CAT.assert(isBelt(), "getBeltInfo() called on non-belt-floor");
         if (!isBelt())
-          CAT.warn("ASSERT: getBeltInfo() called on non-belt-floor!");
+            CAT.warn("ASSERT: getBeltInfo() called on non-belt-floor!");
         return type % 100;
     }
 
     public int getBeltDirection() {
-       // CAT.assert(isBelt(), "getBeltDirection() called on non-belt-floor");
-       if (!isBelt())
-          CAT.warn("ASSERT: getBeltDirection() called on non-belt-floor!");
+        // CAT.assert(isBelt(), "getBeltDirection() called on non-belt-floor");
+        if (!isBelt())
+            CAT.warn("ASSERT: getBeltDirection() called on non-belt-floor!");
         return type % 10;
     }
 
@@ -198,7 +200,7 @@ public class Floor implements FloorConstants {
                         s.append("W,");
                         break;
                 }
-                //switch richtung
+                // switch richtung
                 s.append(btyp / 100);
                 s.append(",(");
                 if (((btyp / 10) % 10) == 2) {
@@ -206,31 +208,36 @@ public class Floor implements FloorConstants {
                     s.append('(');
                     s.append(RUECK[((btyp % 10) + 3) % 4]);
                     s.append(",D(L))");
-                } else if (((btyp / 10) % 10) == 3) {
-                    // im Uhrzeigersinn
-                    s.append('(');
-                    s.append(RUECK[((btyp % 10) + 1) % 4]);
-                    s.append(",D(R))");
-                } else if (((btyp / 10) % 10) == 5) {
-                    // beides
-                    if (drehen) {
-                        s.append('(');
-                        s.append(RUECK[((btyp % 10) + 3) % 4]);
-                        s.append(",D(R))");
-                        s.append('(');
-                        s.append(RUECK[((btyp % 10) + 1) % 4]);
-                        s.append(",D(L))");
-                    } else {
-                        s.append("(");
-                        s.append(RUECK[((btyp % 10) + 1) % 4]);
-                        s.append(",D(R))");
-                        s.append('(');
-                        s.append(RUECK[((btyp % 10) + 3) % 4]);
-                        s.append(",D(L))");
-                    }
                 }
+                else
+                    if (((btyp / 10) % 10) == 3) {
+                        // im Uhrzeigersinn
+                        s.append('(');
+                        s.append(RUECK[((btyp % 10) + 1) % 4]);
+                        s.append(",D(R))");
+                    }
+                    else
+                        if (((btyp / 10) % 10) == 5) {
+                            // beides
+                            if (drehen) {
+                                s.append('(');
+                                s.append(RUECK[((btyp % 10) + 3) % 4]);
+                                s.append(",D(R))");
+                                s.append('(');
+                                s.append(RUECK[((btyp % 10) + 1) % 4]);
+                                s.append(",D(L))");
+                            }
+                            else {
+                                s.append("(");
+                                s.append(RUECK[((btyp % 10) + 1) % 4]);
+                                s.append(",D(R))");
+                                s.append('(');
+                                s.append(RUECK[((btyp % 10) + 3) % 4]);
+                                s.append(",D(L))");
+                            }
+                        }
                 s.append(")(");
-                //crushers
+                // crushers
                 if (info > 0) {
                     for (int i = 1; i < 6; i++) {
                         if (isCrusherActive(i, type, info)) {
@@ -242,9 +249,8 @@ public class Floor implements FloorConstants {
                 s.append("))");
                 break;
         }
-        //switch type
+        // switch type
     }
-
 
     public static void write(StringBuffer s, int type, int info) {
         Floor.write(s, type, info, false);
@@ -254,7 +260,7 @@ public class Floor implements FloorConstants {
         Floor.write(s, type, spec, drehen);
     }
 
-    public static String extractFloorDef(int pos, String s) throws FormatException {
+    public static String extractFloorDef(int pos, String s) {
         int i = skipFloorDef(pos, s);
         return s.substring(pos, i);
     }
@@ -283,99 +289,121 @@ public class Floor implements FloorConstants {
         if (ParseUtils.is(s, pos, 'B')) {
             neu.type = FL_NORMAL;
             pos++;
-        } else if (ParseUtils.is(s, pos, 'G')) {
-            neu.type = FL_PIT;
-            pos++;
-        } else if (ParseUtils.is(s, pos, 'D')) {
-            neu.type = FL_ROTGEAR;
-            pos++;
-            ParseUtils.assertTrue(s, pos++, '(');
-            if (ParseUtils.is(s, pos, 'L')) {
-                neu.spec = GEAR_COUNTERCLOCKWISE;
-            } else if (ParseUtils.is(s, pos, 'R')) {
-                neu.spec = GEAR_CLOCKWISE;
-            } else {
-                // Keines der erlaubten Zeichen 'LR' in Position "pos"
-                throw new FormatException(Message.say("Board", "xCharNotAllowed", pos, "LR"));
-            }
-            pos++;
-            ParseUtils.assertTrue(s, pos++, ')');
-        } else if (ParseUtils.is(s, pos, 'R')) {
-            neu.type = FL_REPAIR;
-            pos++;
-            ParseUtils.assertTrue(s, pos++, '(');
-            neu.spec = java.lang.Character.digit(s.charAt(pos++), 10);
-            ParseUtils.assertTrue(s, pos++, ')');
-        } else if (ParseUtils.is(s, pos, 'F')) {
-            pos++;
-            ParseUtils.assertTrue(s, pos++, '(');
-            int typus;
-            if (ParseUtils.is(s, pos, 'N')) {
-                typus = BELT_NORTH;
-            } else if (ParseUtils.is(s, pos, 'E')) {
-                typus = BELT_EAST;
-            } else if (ParseUtils.is(s, pos, 'S')) {
-                typus = BELT_SOUTH;
-            } else if (ParseUtils.is(s, pos, 'W')) {
-                typus = BELT_WEST;
-            } else {
-                //Keines der erlaubten Zeichen 'NEWS' in Position "pos"
-                throw new FormatException(Message.say("Board", "xCharNotAllowed", pos, "NEWS"));
-            }
-            pos++;
-            ParseUtils.assertTrue(s, pos++, ',');
-            typus += 100 * (java.lang.Character.digit(s.charAt(pos++), 10));
-            ParseUtils.assertTrue(s, pos++, ',');
-            ParseUtils.assertTrue(s, pos++, '(');
-            if (ParseUtils.is(s, pos, '(')) {
-                pos++;
-                char fromR = s.charAt(pos++);
-                ParseUtils.assertTrue(s, pos++, ',');
-                ParseUtils.assertTrue(s, pos++, 'D');
-                ParseUtils.assertTrue(s, pos++, '(');
-                char drehR = s.charAt(pos++);
-                typus = drehungLegal(typus, fromR, drehR, pos);
-                ParseUtils.assertTrue(s, pos++, ')');
-                ParseUtils.assertTrue(s, pos++, ')');
-            }
-            if (ParseUtils.is(s, pos, '(')) {
-                pos++;
-                char fromR = s.charAt(pos++);
-                ParseUtils.assertTrue(s, pos++, ',');
-                ParseUtils.assertTrue(s, pos++, 'D');
-                ParseUtils.assertTrue(s, pos++, '(');
-                char drehR = s.charAt(pos++);
-                typus = drehungLegal(typus, fromR, drehR, pos);
-                ParseUtils.assertTrue(s, pos++, ')');
-                ParseUtils.assertTrue(s, pos++, ')');
-            }
-            ParseUtils.assertTrue(s, pos++, ')');
-            ParseUtils.assertTrue(s, pos++, '(');
-            int crusher = 0;
-            while (java.lang.Character.isDigit(s.charAt(pos))) {
-                crusher += (int) java.lang.Math.pow(2, java.lang.Character.digit(s.charAt(pos++), 10) - 1);
-                //d("parseFlie�bandCrusher: read "+s.charAt(pos-1)+"; crusher="+crusher);
-                ParseUtils.assertTrue(s, pos++, ',');
-                //if(((typus%100)/10)>1)
-                //  throw new FormatException("Keine Crusher auf Drehfliessbaendern! Problem nahe Zeichen "+pos);
-                //else if (((typus%100)/10)==0) //sonst ist's schon erh�ht
-                //  typus+=10;
-            }
-            ParseUtils.assertTrue(s, pos++, ')');
-            ParseUtils.assertTrue(s, pos++, ')');
-            neu.type = typus;
-            if (crusher != 0) {
-                neu.spec = crusher;
-            }
-        } else {
-            // Keines der erlaubten Zeichen 'BGDRF' in Position "pos"
-            throw new FormatException(Message.say("Board", "xCharNotAllowed", pos, "BGDRF"));
         }
+        else
+            if (ParseUtils.is(s, pos, 'G')) {
+                neu.type = FL_PIT;
+                pos++;
+            }
+            else
+                if (ParseUtils.is(s, pos, 'D')) {
+                    neu.type = FL_ROTGEAR;
+                    pos++;
+                    ParseUtils.assertTrue(s, pos++, '(');
+                    if (ParseUtils.is(s, pos, 'L')) {
+                        neu.spec = GEAR_COUNTERCLOCKWISE;
+                    }
+                    else
+                        if (ParseUtils.is(s, pos, 'R')) {
+                            neu.spec = GEAR_CLOCKWISE;
+                        }
+                        else {
+                            // Keines der erlaubten Zeichen 'LR' in Position "pos"
+                            throw new FormatException(Message.say("Board", "xCharNotAllowed", pos, "LR"));
+                        }
+                    pos++;
+                    ParseUtils.assertTrue(s, pos++, ')');
+                }
+                else
+                    if (ParseUtils.is(s, pos, 'R')) {
+                        neu.type = FL_REPAIR;
+                        pos++;
+                        ParseUtils.assertTrue(s, pos++, '(');
+                        neu.spec = java.lang.Character.digit(s.charAt(pos++), 10);
+                        ParseUtils.assertTrue(s, pos++, ')');
+                    }
+                    else
+                        if (ParseUtils.is(s, pos, 'F')) {
+                            pos++;
+                            ParseUtils.assertTrue(s, pos++, '(');
+                            int typus;
+                            if (ParseUtils.is(s, pos, 'N')) {
+                                typus = BELT_NORTH;
+                            }
+                            else
+                                if (ParseUtils.is(s, pos, 'E')) {
+                                    typus = BELT_EAST;
+                                }
+                                else
+                                    if (ParseUtils.is(s, pos, 'S')) {
+                                        typus = BELT_SOUTH;
+                                    }
+                                    else
+                                        if (ParseUtils.is(s, pos, 'W')) {
+                                            typus = BELT_WEST;
+                                        }
+                                        else {
+                                            // Keines der erlaubten Zeichen 'NEWS' in Position "pos"
+                                            throw new FormatException(Message.say("Board", "xCharNotAllowed", pos,
+                                                            "NEWS"));
+                                        }
+                            pos++;
+                            ParseUtils.assertTrue(s, pos++, ',');
+                            typus += 100 * (java.lang.Character.digit(s.charAt(pos++), 10));
+                            ParseUtils.assertTrue(s, pos++, ',');
+                            ParseUtils.assertTrue(s, pos++, '(');
+                            if (ParseUtils.is(s, pos, '(')) {
+                                pos++;
+                                char fromR = s.charAt(pos++);
+                                ParseUtils.assertTrue(s, pos++, ',');
+                                ParseUtils.assertTrue(s, pos++, 'D');
+                                ParseUtils.assertTrue(s, pos++, '(');
+                                // char drehR = s.charAt(pos++);
+                                pos++; // skip unused drehR
+                                typus = drehungLegal(typus, fromR, pos);
+                                ParseUtils.assertTrue(s, pos++, ')');
+                                ParseUtils.assertTrue(s, pos++, ')');
+                            }
+                            if (ParseUtils.is(s, pos, '(')) {
+                                pos++;
+                                char fromR = s.charAt(pos++);
+                                ParseUtils.assertTrue(s, pos++, ',');
+                                ParseUtils.assertTrue(s, pos++, 'D');
+                                ParseUtils.assertTrue(s, pos++, '(');
+                                // char drehR = s.charAt(pos++);
+                                pos++; // skip unused drehR
+                                typus = drehungLegal(typus, fromR, pos);
+                                ParseUtils.assertTrue(s, pos++, ')');
+                                ParseUtils.assertTrue(s, pos++, ')');
+                            }
+                            ParseUtils.assertTrue(s, pos++, ')');
+                            ParseUtils.assertTrue(s, pos++, '(');
+                            int crusher = 0;
+                            while (java.lang.Character.isDigit(s.charAt(pos))) {
+                                crusher += (int) java.lang.Math.pow(2,
+                                                java.lang.Character.digit(s.charAt(pos++), 10) - 1);
+                                // d("parseFlie�bandCrusher: read "+s.charAt(pos-1)+"; crusher="+crusher);
+                                ParseUtils.assertTrue(s, pos++, ',');
+                                // if(((typus%100)/10)>1)
+                                // throw new FormatException("Keine Crusher auf Drehfliessbaendern! Problem nahe Zeichen "+pos);
+                                // else if (((typus%100)/10)==0) //sonst ist's schon erh�ht
+                                // typus+=10;
+                            }
+                            ParseUtils.assertTrue(s, pos++, ')');
+                            ParseUtils.assertTrue(s, pos++, ')');
+                            neu.type = typus;
+                            if (crusher != 0) {
+                                neu.spec = crusher;
+                            }
+                        }
+                        else {
+                            // Keines der erlaubten Zeichen 'BGDRF' in Position "pos"
+                            throw new FormatException(Message.say("Board", "xCharNotAllowed", pos, "BGDRF"));
+                        }
         return neu;
     }
 
-
-    private static int drehungLegal(int typus, char from, char dreh, int pos) throws FormatException {
+    private static int drehungLegal(int typus, char from, int pos) throws FormatException {
         int t = typus;
         switch (typus % 10) {
             case BELT_NORTH:

@@ -22,10 +22,11 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.server;
 
-interface ServerOutputThreadMaintainer{
+interface ServerOutputThreadMaintainer {
     void deleteOutput(ServerAusgabeThread it, String reason);
+
     int getOutputTimeout();
 }

@@ -23,7 +23,6 @@
  
  *******************************************************************/
 
-
 package de.botsnscouts.widgets;
 
 import java.awt.Color;
@@ -31,9 +30,11 @@ import java.awt.Graphics;
 
 import javax.swing.JComponent;
 
+@SuppressWarnings("serial")
 public class ColoredComponent extends JComponent {
 
     public static final Color defaultColor = ColoredPanel.defaultColor;
+
     public static final int alpha = ColoredPanel.alpha;
 
     Color color;
@@ -53,4 +54,3 @@ public class ColoredComponent extends JComponent {
     }
 
 }
-

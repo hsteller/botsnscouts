@@ -26,12 +26,12 @@ package de.botsnscouts.util;
  */
 
 /**
- * Exception indicating that User input was invalid.
- * Shall be handled in UI.
+ * Exception indicating that User input was invalid. Shall be handled in UI.
+ * 
  * @author Miriam Busch
  */
- public class InvalidInputException extends Exception {
-
+@SuppressWarnings("serial")
+public class InvalidInputException extends Exception {
     public InvalidInputException() {
         super();
     }

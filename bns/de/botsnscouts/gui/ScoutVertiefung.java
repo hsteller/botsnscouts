@@ -36,49 +36,50 @@ import javax.swing.JToggleButton;
 import de.botsnscouts.util.ImageMan;
 import de.botsnscouts.util.Message;
 
-    /**
-     * Scoutvertiefung, die im oben rechts in der Infoleiste dargestellt ist
-     */
+/**
+ * Scoutvertiefung, die im oben rechts in der Infoleiste dargestellt ist
+ */
+@SuppressWarnings("serial")
 public class ScoutVertiefung extends JToggleButton {
+    int xsize = 60, ysize = 60;
 
-    int xsize=60, ysize=60;
     Image[] imageActive;
+
     Image[] imageDream;
 
     public Dimension getMinimumSize() {
-	return new Dimension(xsize,ysize);
+        return new Dimension(xsize, ysize);
     }
 
     public Dimension getPreferredSize() {
-	return new Dimension(xsize,ysize);
+        return new Dimension(xsize, ysize);
     }
 
     public ScoutVertiefung(ActionListener al) {
-	imageActive=ImageMan.getImages(ImageMan.SCHLAFPLATZ);
-	imageDream=ImageMan.getImages(ImageMan.SCHLAFSCOUT);
-	//	scoutImages=ImageMan.getImages(ImageMan.SCOUT);
-	setContentAreaFilled(false);
-        setOpaque( false );
-	setBorder(null);
-	setToolTipText(Message.say("ScoutVertiefung","mtooltip"));
-	setIcon(new ImageIcon(imageActive[0]));
-	//	setPressedIcon(new ImageIcon(scoutImages[2]));
-	setSelectedIcon(new ImageIcon(imageDream[0]));
-	addActionListener(al);
-	setFocusable(false);
+        imageActive = ImageMan.getImages(ImageMan.SCHLAFPLATZ);
+        imageDream = ImageMan.getImages(ImageMan.SCHLAFSCOUT);
+        // scoutImages=ImageMan.getImages(ImageMan.SCOUT);
+        setContentAreaFilled(false);
+        setOpaque(false);
+        setBorder(null);
+        setToolTipText(Message.say("ScoutVertiefung", "mtooltip"));
+        setIcon(new ImageIcon(imageActive[0]));
+        // setPressedIcon(new ImageIcon(scoutImages[2]));
+        setSelectedIcon(new ImageIcon(imageDream[0]));
+        addActionListener(al);
+        setFocusable(false);
 
     }
 
-    public static void main (String[] args) {
-	Message.setLanguage("deutsch");
-    JFrame f = new JFrame();
-	f.setSize(100,100);
-	f.getContentPane().add(new ScoutVertiefung(null));
-	f.setVisible(true);
+    public static void main(String[] args) {
+        Message.setLanguage("deutsch");
+        JFrame f = new JFrame();
+        f.setSize(100, 100);
+        f.getContentPane().add(new ScoutVertiefung(null));
+        f.setVisible(true);
     }
-
 
     protected boolean selected() {
-	return isSelected();
+        return isSelected();
     }
 }

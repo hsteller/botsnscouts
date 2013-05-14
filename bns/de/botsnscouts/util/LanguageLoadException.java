@@ -22,21 +22,22 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.util;
 
 /**
- * LanguageLoadException wird bei Abweichungen vom messages-FileFormat
- * oder fehlendem messages.<sprache> geworfen.
- *
+ * LanguageLoadException wird bei Abweichungen vom messages-FileFormat oder fehlendem messages.<sprache> geworfen.
+ * 
  */
-
+@SuppressWarnings("serial")
 public class LanguageLoadException extends Exception {
-  public LanguageLoadException () {
-    super();
-  }
-  public LanguageLoadException (String s) {
-    super (s);
-  }
-  
+
+    public LanguageLoadException() {
+        super();
+    }
+
+    public LanguageLoadException(String s) {
+        super(s);
+    }
+
 }

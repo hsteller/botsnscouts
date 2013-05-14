@@ -43,11 +43,14 @@ import de.botsnscouts.widgets.TJPanel;
 
 /**
  * where the registers are displayed in a column
+ * 
  * @author Lukasz Pekacki
  */
+@SuppressWarnings("serial")
 public class RegisterArray extends TJPanel {
 
-    private ArrayList registerView = new ArrayList(Bot.NUM_REG);
+    private ArrayList<RegisterView> registerView = new ArrayList<RegisterView>(Bot.NUM_REG);
+
     private int xsize = 70, ysize = 550;
 
     public RegisterArray() {
@@ -61,7 +64,7 @@ public class RegisterArray extends TJPanel {
 
     public RegisterArray(ActionListener register) {
         setLayout(new GridLayout(Bot.NUM_REG, 1));
-        int size=Bot.NUM_REG;
+        int size = Bot.NUM_REG;
         for (int i = 0; i < size; i++) {
             RegisterView r = new RegisterView(register);
             registerView.add((i), r);
@@ -72,19 +75,19 @@ public class RegisterArray extends TJPanel {
 
     protected void resetAll() {
         for (int i = 0; i < registerView.size(); i++) {
-            ((RegisterView) registerView.get(i)).reset();
+            registerView.get(i).reset();
         }
     }
 
-    /** 
+    /**
      * 
      * @return a list containing all cards that already were chosen for the move (doesn't contain content of lockes registers).
      */
-    protected ArrayList getCards() {
-        ArrayList regs = new ArrayList(programmed());
+    protected ArrayList<HumanCard> getCards() {
+        ArrayList<HumanCard> regs = new ArrayList<HumanCard>(programmed());
         int size = registerView.size();
         for (int i = 0; i < size; i++) {
-            RegisterView view = (RegisterView) registerView.get(i); 
+            RegisterView view = registerView.get(i);
             if (!view.locked()) {
                 regs.add(view.getCard());
             }
@@ -94,23 +97,23 @@ public class RegisterArray extends TJPanel {
 
     /**
      * 
-     * @return the cards in the registers atm, including content of locked registers 
+     * @return the cards in the registers atm, including content of locked registers
      */
-    protected ArrayList getWisenheimerCards() {
-        ArrayList regs = new ArrayList(programmed());
+    protected ArrayList<HumanCard> getWisenheimerCards() {
+        ArrayList<HumanCard> regs = new ArrayList<HumanCard>(programmed());
         int size = registerView.size();
         for (int i = 0; i < size; i++) {
-            regs.add(((RegisterView) registerView.get(i)).getCard());
+            regs.add(registerView.get(i).getCard());
         }
         return regs;
     }
 
-    protected ArrayList getAlreadyChosen() {
+    protected ArrayList<HumanCard> getAlreadyChosen() {
         int ap = alreadyProgrammed();
         d("already Programmed Registers: " + ap);
-        ArrayList regs = new ArrayList(ap);
+        ArrayList<HumanCard> regs = new ArrayList<HumanCard>(ap);
         for (int i = 0; i < ap; i++) {
-            regs.add(((RegisterView) registerView.get(i)).getCard());
+            regs.add(registerView.get(i).getCard());
         }
         return regs;
 
@@ -119,7 +122,7 @@ public class RegisterArray extends TJPanel {
     void addCard(HumanCard hc) {
         int size = registerView.size();
         for (int i = 0; i < size; i++) {
-            RegisterView view = (RegisterView) registerView.get(i); 
+            RegisterView view = registerView.get(i);
             if (view.getCard() == null) {
                 view.setCard(hc);
                 break;
@@ -127,11 +130,10 @@ public class RegisterArray extends TJPanel {
         }
     }
 
-
     boolean allOcupied() {
         int size = registerView.size();
         for (int i = 0; i < size; i++) {
-            if (((RegisterView) registerView.get(i)).getCard() == null) {
+            if (registerView.get(i).getCard() == null) {
                 return false;
             }
         }
@@ -166,27 +168,28 @@ public class RegisterArray extends TJPanel {
         int size = Bot.NUM_REG;
         for (int i = 0; i < size; i++) {
             if (roboCards[i] != null) {
-                ((RegisterView) registerView.get(i)).setLocked(true);
-            } else {
-                ((RegisterView) registerView.get(i)).setLocked(false);
+                registerView.get(i).setLocked(true);
+            }
+            else {
+                registerView.get(i).setLocked(false);
             }
 
         }
     }
 
     protected void unlockRegister(int index) {
-        ((RegisterView) registerView.get(index)).setLocked(false);
+        registerView.get(index).setLocked(false);
     }
 
-    protected ArrayList getRegisterViewArray() {
+    protected ArrayList<RegisterView> getRegisterViewArray() {
         return registerView;
     }
 
     protected boolean allLocked() {
         int size = registerView.size();
-        for (int i = 0; i < size;  i++) {
-            RegisterView view =  (RegisterView) registerView.get(i);
-            if ( view == null || !view.locked() ) {                
+        for (int i = 0; i < size; i++) {
+            RegisterView view = registerView.get(i);
+            if (view == null || !view.locked()) {
                 return false;
             }
         }
@@ -200,7 +203,7 @@ public class RegisterArray extends TJPanel {
     private int programmed() {
         int oc = 0;
         for (int i = 0; i < registerView.size(); i++) {
-            if (((RegisterView) registerView.get(i)).locked()) {
+            if (registerView.get(i).locked()) {
                 oc++;
             }
         }
@@ -210,9 +213,10 @@ public class RegisterArray extends TJPanel {
     private int alreadyProgrammed() {
         int oc = 0;
         for (int i = 0; i < registerView.size(); i++) {
-            if (((RegisterView) registerView.get(i)).free()) {
+            if (registerView.get(i).free()) {
                 break;
-            } else {
+            }
+            else {
                 oc++;
             }
         }
@@ -226,15 +230,9 @@ public class RegisterArray extends TJPanel {
     public String toString() {
         String s = "";
         for (int i = 0; i < registerView.size(); i++) {
-            s += "Reg: " + (i + 1) + " hat Card: " + ((RegisterView) registerView.get(i)).getCard() + "\n";
+            s += "Reg: " + (i + 1) + " hat Card: " + registerView.get(i).getCard() + "\n";
         }
         return s;
     }
 
 }
-
-
-
-
-
-

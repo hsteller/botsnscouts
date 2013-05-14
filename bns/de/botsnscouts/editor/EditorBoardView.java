@@ -22,7 +22,7 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.editor;
 
 import java.awt.Color;
@@ -37,15 +37,17 @@ import de.botsnscouts.gui.BoardView;
 import de.botsnscouts.util.Bot;
 import de.botsnscouts.util.Directions;
 
+@SuppressWarnings("serial")
+class EditorBoardView extends BoardView {
 
-class EditorBoardView extends BoardView{
     private DistanceCalculator calc = null;
-    static final Category CAT=Category.getInstance(EditorBoardView.class);
 
-    public EditorBoardView(SimBoard ss,BoardEditor p){
-	super(ss);
-	addMouseListener(new EditMouseListener(p));
-        bot=Bot.getNewInstance("editorDummy");
+    static final Category CAT = Category.getInstance(EditorBoardView.class);
+
+    public EditorBoardView(SimBoard ss, BoardEditor p) {
+        super(ss);
+        addMouseListener(new EditMouseListener(p));
+        bot = Bot.getNewInstance("editorDummy");
         bot.setNextFlag(1);
     }
 
@@ -54,28 +56,30 @@ class EditorBoardView extends BoardView{
     }
 
     public void paintComponent(Graphics g) {
-        paintUnbuffered( g );
+        paintUnbuffered(g);
     }
 
-    Font myFont=new Font("SansSerif", Font.PLAIN, 12);
+    Font myFont = new Font("SansSerif", Font.PLAIN, 12);
+
     Bot bot;
+
     protected void paintFeldBoden(Graphics g, int xpos, int ypos, int pixelx, int pixely) {
         super.paintFeldBoden(g, xpos, ypos, pixelx, pixely);
-        if (calc != null){
-            int x = pixelx+FELDSIZE/2;
-            int y = pixely+FELDSIZE/2;
+        if (calc != null) {
+            int x = pixelx + FELDSIZE / 2;
+            int y = pixely + FELDSIZE / 2;
             g.setFont(myFont);
             g.setColor(Color.red);
             bot.moveTo(xpos, ypos);
             bot.setDamage(0);
             bot.setFacing(Directions.NORTH);
-            g.drawString(""+calc.getDistance(bot), x, y-20);
+            g.drawString("" + calc.getDistance(bot), x, y - 20);
             bot.setFacing(Directions.SOUTH);
-            g.drawString(""+calc.getDistance(bot), x, y+20);
+            g.drawString("" + calc.getDistance(bot), x, y + 20);
             bot.setFacing(Directions.EAST);
-            g.drawString(""+calc.getDistance(bot), x+5, y);
+            g.drawString("" + calc.getDistance(bot), x + 5, y);
             bot.setFacing(Directions.WEST);
-            g.drawString(""+calc.getDistance(bot), x-30, y);
+            g.drawString("" + calc.getDistance(bot), x - 30, y);
         }
     }
 }

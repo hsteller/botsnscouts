@@ -22,9 +22,9 @@
  Boston, MA  02111-1307  USA
  
  *******************************************************************/
- 
+
 package de.botsnscouts.server;
 
-public interface RemovalListener{
-    void waitableRemoved(Waitable w);
+public interface RemovalListener<T> {
+    void waitableRemoved(T w);
 }

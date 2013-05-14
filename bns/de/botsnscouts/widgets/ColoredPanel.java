@@ -23,7 +23,6 @@
  
  *******************************************************************/
 
-
 package de.botsnscouts.widgets;
 
 import java.awt.Color;
@@ -31,27 +30,27 @@ import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
-public class ColoredPanel extends JPanel{
+@SuppressWarnings("serial")
+public class ColoredPanel extends JPanel {
 
-  public static final Color defaultColor = Color.black;
-  public static final int alpha = 133;
+    public static final Color defaultColor = Color.black;
 
-  Color color;
+    public static final int alpha = 133;
 
-  public ColoredPanel(){
-    this(defaultColor);
-  }
+    Color color;
 
-  public ColoredPanel(Color c){
-    color = new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
-  }
+    public ColoredPanel() {
+        this(defaultColor);
+    }
 
+    public ColoredPanel(Color c) {
+        color = new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
+    }
 
-  public void paint(Graphics g){
-    g.setColor(color);
-    g.fillRect(0,0,getWidth(),getHeight());
-    super.paint(g);
-  }
+    public void paint(Graphics g) {
+        g.setColor(color);
+        g.fillRect(0, 0, getWidth(), getHeight());
+        super.paint(g);
+    }
 
 }
-

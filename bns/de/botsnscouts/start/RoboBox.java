@@ -30,28 +30,33 @@ import javax.swing.DefaultComboBoxModel;
 import de.botsnscouts.util.Message;
 import de.botsnscouts.widgets.TJComboBox;
 
+@SuppressWarnings("serial")
 class RoboBox extends TJComboBox {
-    
-
-    
     private boolean withEgal;
 
     public RoboBox(boolean egal) {
         String[] farben;
 
         withEgal = egal;
-       // setOpaque(true);
+        // setOpaque(true);
 
         if (withEgal) {
-            farben = new String[]{Message.say("Start", "mFarbeEgal"), Message.say("Start", "mFarbeGruen"), Message.say("Start", "mFarbeGelb"), Message.say("Start", "mFarbeRot"), Message.say("Start", "mFarbeBlau"), Message.say("Start", "mFarbeMagenta"), Message.say("Start", "mFarbeOrange"), Message.say("Start", "mFarbeGrau"), Message.say("Start", "mFarbeDunkelMagenta")};
-        } else {
-            farben = new String[]{Message.say("Start", "mFarbeGruen"), Message.say("Start", "mFarbeGelb"), Message.say("Start", "mFarbeRot"), Message.say("Start", "mFarbeBlau"), Message.say("Start", "mFarbeMagenta"), Message.say("Start", "mFarbeOrange"), Message.say("Start", "mFarbeGrau"), Message.say("Start", "mFarbeDunkelMagenta")};
+            farben = new String[] { Message.say("Start", "mFarbeEgal"), Message.say("Start", "mFarbeGruen"),
+                    Message.say("Start", "mFarbeGelb"), Message.say("Start", "mFarbeRot"),
+                    Message.say("Start", "mFarbeBlau"), Message.say("Start", "mFarbeMagenta"),
+                    Message.say("Start", "mFarbeOrange"), Message.say("Start", "mFarbeGrau"),
+                    Message.say("Start", "mFarbeDunkelMagenta") };
+        }
+        else {
+            farben = new String[] { Message.say("Start", "mFarbeGruen"), Message.say("Start", "mFarbeGelb"),
+                    Message.say("Start", "mFarbeRot"), Message.say("Start", "mFarbeBlau"),
+                    Message.say("Start", "mFarbeMagenta"), Message.say("Start", "mFarbeOrange"),
+                    Message.say("Start", "mFarbeGrau"), Message.say("Start", "mFarbeDunkelMagenta") };
         }
 
-        setModel(new DefaultComboBoxModel(farben));       
-        setRenderer(new RoboCellRenderer(true));
-        //setLightWeightPopupEnabled(false);
+        setModel(new DefaultComboBoxModel<String>(farben));
+        setRenderer(new RoboCellRenderer<String>(true));
+        // setLightWeightPopupEnabled(false);
         setSelectedIndex(0);
     }
 }
-	

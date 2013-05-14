@@ -23,7 +23,6 @@
  
  *******************************************************************/
 
-
 /*
  * Created by dirk.
  * Date: Mar 10, 2002, 6:58:27 PM
@@ -47,10 +46,10 @@ public abstract class DistanceCalculator {
         }
     }
 
-    public DistanceCalculator(Board board){
+    public DistanceCalculator(Board board) {
         this(board, true);
     }
-    
+
     /*
      * Takes into account actual distance, flag, damage, repair possibility
      * and play strength. The lower the return value is, the better.
@@ -59,7 +58,8 @@ public abstract class DistanceCalculator {
         return getGoodness(robbi, 0);
     }
 
-    /** Also takes a malus into account
+    /**
+     * Also takes a malus into account
      */
     public int getGoodness(Bot robbi, int malus) {
         if (robbi.getDamage() == 10) {
@@ -92,13 +92,12 @@ public abstract class DistanceCalculator {
 
     /** Gives the "raw" distance, without fancier mechanisms */
     public int getDistance(Bot robbi) {
-        return getDistance(robbi.getX(), robbi.getY(),
-                robbi.getNextFlag(), robbi.getFacing());
+        return getDistance(robbi.getX(), robbi.getY(), robbi.getNextFlag(), robbi.getFacing());
     }
 
     /**
-     *  Gives the distance to the next flag, tahes into account whatever
-     *  the subclass thinks necessary.
+     * Gives the distance to the next flag, tahes into account whatever
+     * the subclass thinks necessary.
      */
     protected abstract int getDistance(int x, int y, int flag, int facing);
 
@@ -108,39 +107,45 @@ public abstract class DistanceCalculator {
     public abstract void preCalculate();
 
     // if subclasses have larger "distances"
-    int getScalingFactor(){ return 1; }
+    int getScalingFactor() {
+        return 1;
+    }
 
-    /// Utility functions for subclasses. Delegate to board.
+    // / Utility functions for subclasses. Delegate to board.
 
     boolean hasNorthWall(int x, int y) {
         return board.hasNorthWall(x, y);
     }
+
     boolean hasEastWall(int x, int y) {
         return board.hasEastWall(x, y);
     }
+
     boolean hasSouthWall(int x, int y) {
         return board.hasSouthWall(x, y);
     }
+
     boolean hasWestWall(int x, int y) {
         return board.hasWestWall(x, y);
     }
+
     Floor floor(int x, int y) {
         return board.floor(x, y);
     }
 
     /* final so it may be inlined */
-    final int rotateright(int facing) {    
-        return (facing+1)%4;
+    final int rotateright(int facing) {
+        return (facing + 1) % 4;
     }
+
     final int rotateleft(int facing) {
-        if (facing==0) {
+        if (facing == 0) {
             return 3;
-        }    
-      //  else {
+        }
+        // else {
         return --facing;
-      //  }
-        
+        // }
+
     }
 
 }
-
