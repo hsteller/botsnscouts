@@ -1,6 +1,6 @@
 ## The host to which email will be submitted.  This host must be able
 #  to act as an SMTP relay for the CVS server.
-SMTP_HOST = 'localhost'
+SMTP_HOST = 'mx.sourceforge.net'
 
 ## The domain that will be tacked onto usernames as the reply-to
 #  address for the emails.   Unfortunately, this locks everyone into
