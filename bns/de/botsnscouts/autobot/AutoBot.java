@@ -166,7 +166,7 @@ public class AutoBot extends BNSThread {
                                 CAT.debug("got simple dist calc");
                             }
                             wirbel = new SearchRecursively(myMap, malus, calc);
-                            myMap.setDebug(false);
+                            myMap.setEnableDebugLogging(false);
                         }
                         updateBot();
 

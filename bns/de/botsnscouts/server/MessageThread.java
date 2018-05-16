@@ -102,7 +102,7 @@ class MessageThread extends de.botsnscouts.util.BNSThread implements MOKListener
             }
 
             long a = System.currentTimeMillis();
-            CAT.debug("94 now starting wait: ");
+            CAT.debug("94 now starting wait; timeout: "+timeout);
             Iterator<ServerAusgabeThread> it = wait.waitFor(timeout);
             long b = System.currentTimeMillis();
             CAT.debug("94 end of wait after " + (b - a));

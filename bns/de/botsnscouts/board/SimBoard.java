@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Category;
 import org.apache.log4j.Priority;
@@ -54,24 +55,11 @@ import de.botsnscouts.util.StatsList;
 public class SimBoard extends Board implements Directions {
 
     private static final Category CAT = Category.getInstance(SimBoard.class);
-
-    private Priority origLevel = null;
-
+    private boolean doLogging=false;
+    
     private boolean pushersCanPushMoreThanOneBot = false;
 
-    public void setDebug(boolean b) {
-        if (origLevel == null) {
-            origLevel = CAT.getPriority();
-        }
-
-        if (b) {
-            CAT.setPriority(origLevel);
-        }
-        else {
-            CAT.setPriority(Priority.FATAL);
-        }
-    }
-
+   
     protected Vector<LaserDef> lasers;
 
     /**
@@ -93,12 +81,28 @@ public class SimBoard extends Board implements Directions {
 
     private Vector<String[]> msgArgsQ = new Vector<String[]>();
 
-    private int seqNumber = 0;
-
+    private final AtomicInteger seqNumber=new AtomicInteger(0);
+    
+    
     private static final String MSG_NUM_STRING = OtherConstants.MESSAGE_NUMBER + "=";
 
+    
+    
+    public void setEnableDebugLogging(boolean enableIt) {
+    	doLogging =  enableIt;
+    }
+    
+    private final void logDebug(String msg) {
+    	if (doLogging) {
+    		CAT.debug(msg);
+    	}
+    }
+    
     private String getSeqNumberMessageString() {
-        return MSG_NUM_STRING + (++seqNumber);
+    	final int num = getNextMessageNumber();
+        final String foo =  MSG_NUM_STRING + num;
+    	logDebug("getSeqNumberMessageString() will return "+foo);
+    	return foo;
     }
 
     public Vector<LaserDef> getLasers() {
@@ -112,6 +116,7 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void fireBotsChanged(BoardBot[] robbis) {
+    	logDebug("fireBotsChanged"); 
         if (server == null) {
             return;
         }
@@ -132,10 +137,18 @@ public class SimBoard extends Board implements Directions {
                     names[j++] = robbis[i].getName();
                 }
             }
-            server.notifyViews(++seqNumber, names);
+            final int msgNo = getNextMessageNumber();
+            logDebug("fireBotsChanged msgNo: "+msgNo);
+            server.notifyViews(msgNo, names);
         }
 
         moved2false();
+    }
+    
+    private final int getNextMessageNumber() {    	
+        final int msgNo = seqNumber.incrementAndGet();
+        logDebug("getNextMessageNumber() will return msgNo "+msgNo);
+        return msgNo;
     }
 
     /**
@@ -192,6 +205,7 @@ public class SimBoard extends Board implements Directions {
     }
 
     private void sendCollectedMsgs() {
+    	logDebug("sendCollectedMsgs()");
         if (server != null) {
             try {
                 while (msgIdsQ.size() > 0) {
@@ -418,6 +432,8 @@ public class SimBoard extends Board implements Directions {
     private void doRobMoveCards(int phase, BoardBot[] robbis) {
         boolean[] mymoved = new boolean[robbis.length];
         int todo = robbis.length;
+    	logDebug("doRobMoveCards for "+todo+" bots");
+
         for (int i = 0; i < robbis.length; i++) {
             if (!robbis[i].isActivated() || (robbis[i].getDamage() >= 10)) {
                 todo--;
@@ -678,13 +694,13 @@ public class SimBoard extends Board implements Directions {
         }
         // checkForPitVictims(bots, true);
         if (CAT.isDebugEnabled()) {
-            CAT.debug("ROBOTS BEFORE:");
-            CAT.debug(Global.arrayToString(bots));
+            logDebug("ROBOTS BEFORE:");
+            logDebug(Global.arrayToString(bots));
         }
         doBeltsCollisionCheck(bots);
         if (CAT.isDebugEnabled()) {
-            CAT.debug("++++++++++++++++++++++++++++++++");
-            CAT.debug(Global.arrayToString(bots));
+            logDebug("++++++++++++++++++++++++++++++++");
+            logDebug(Global.arrayToString(bots));
         }
         doIntended(bots);
         checkForPitVictims(bots, false);
@@ -792,10 +808,10 @@ public class SimBoard extends Board implements Directions {
             }
         }
         if (CAT.isDebugEnabled()) {
-            CAT.debug("intendedDirs: " + Global.arrayToString(intendedMoveDirections));
+            logDebug("intendedDirs: " + Global.arrayToString(intendedMoveDirections));
 
-            CAT.debug("botMoved: " + Global.arrayToString(botMoved));
-            CAT.debug("blockedPositions:" + Global.collectionToString(blockedPositions));
+            logDebug("botMoved: " + Global.arrayToString(botMoved));
+            logDebug("blockedPositions:" + Global.collectionToString(blockedPositions));
         }
 
         while (moveBlocked) {

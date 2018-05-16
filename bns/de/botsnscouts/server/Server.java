@@ -132,6 +132,7 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
         this.options = options;
         try {
             board = new SimBoard(options.getX(), options.getY(), options.getBoard(), options.getFlags(), this);
+            board.setEnableDebugLogging(true);
             board.setPusherCanPushMoreThanOneBot(options.arePushersAbleToPushMultipleBots());
         }
         catch (FormatException e) {
@@ -452,14 +453,15 @@ public class Server extends BNSThread implements ModusConstants, ServerOutputThr
      */
 
     public void notifyViews(String[] robotNames) {
+        CAT.debug("in notifyViews without msgNum");
         notifyViews(-1, robotNames);
     }
 
-    public void notifyViews(int msgNum, String[] robotNames) {
+    public void notifyViews(final int msgNum, String[] robotNames) {
 
         // PRE: currentThread is the ServerThread
         // but let's make sure.
-        CAT.debug("in notifyViews");
+        CAT.debug("in notifyViews for msgNum "+msgNum);
         if (Thread.currentThread() != this) {
             CAT.debug("This method must be called by the ServerThread, not" + Thread.currentThread());
             throw new RuntimeException();
