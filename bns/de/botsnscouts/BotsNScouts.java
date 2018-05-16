@@ -116,6 +116,7 @@ public class BotsNScouts {
      */
     public static Dimension getScreenSize() {
         String s = System.getProperty("geometry");
+        Dimension dim = null;
         if (s != null) {
             try {
                 s = s.toLowerCase();
@@ -126,7 +127,7 @@ public class BotsNScouts {
                     String heightS = s.substring(x2).trim();
                     int width = Integer.parseInt(widthS);
                     int height = Integer.parseInt(heightS);
-                    return new Dimension(width, height);
+                    dim = new Dimension(width, height);
                 }
             }
             catch (Exception e) {
@@ -134,8 +135,20 @@ public class BotsNScouts {
             }
         }
 
-        Toolkit tk = Toolkit.getDefaultToolkit();
-        return tk.getScreenSize();
+        if (dim == null) {
+        	Toolkit tk = Toolkit.getDefaultToolkit();
+        	dim =  tk.getScreenSize();
+        }
+        
+        // BNS looks stupid on modern systems if it stretches over multiple screens of a multiple-monitor setup
+        // (like I'm using right now ;-))or if the display has a really high horizontal resolution.
+        // So I'll limit the maximum default wndow size to Full HD or rather the 1920x1200/16:10 of the
+        // screen I'm using right now.
+        final double betterw = Math.min(dim.getWidth(),1920d);
+        final double betterh = Math.min(dim.getHeight(),1200d);        
+        dim.setSize(betterw, betterh);      
+        
+        return dim;
     }
 
 }
