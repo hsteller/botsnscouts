@@ -1,9 +1,6 @@
 # botsnscouts
-
-![screenshot-1](htdocs/images/screenshot.gif)
-![screenshot-2](htdocs/images/screenshot2.gif)
-![screenshot-3](htdocs/images/screenshot3.gif)
-![screenshot-4](htdocs/images/screenshot4.gif)
+<a href="htdocs/images/screenshot.gif"><img src="htdocs/images/screenshot.gif" alt="Screenshot during game"></a>
+<a href="htdocs/images/screenshot2.gif"><img src="htdocs/images/tn_screenshot2.gif" alt="Screenshot board setup"></a> <a href="htdocs/images/screenshot3.gif"><img src="htdocs/images/tn_screenshot3.gif" alt="Screenhost player selection"></a> <a href="htdocs/images/screenshot4.gif"><img src="htdocs/images/tn_screenshot4.gif" alt="Screenhost tile editor"></a>
 
 ## Run
 If you've got Apache Ant installed, it should be possible to start the current development state of the game by changing into the "bns" folder and executing "ant run".
